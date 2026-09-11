@@ -1,0 +1,5 @@
+# Cloudflare Pages — configuration as code.
+# Site statique : aucune commande de build, la racine du dépôt EST le site.
+name = "fiches-ml-llm"
+compatibility_date = "2026-09-11"
+pages_build_output_dir = "."
