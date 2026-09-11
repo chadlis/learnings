@@ -1,15 +1,5 @@
-# Cloudflare Workers — static assets. Aucun code, aucun build : le dépôt EST le site.
-# Pages est passé « legacy » : c'est ce flux-ci que propose Cloudflare pour un
-# nouveau dépôt. Commande de déploiement : npx wrangler deploy
+# Cloudflare Pages — configuration as code.
+# Site statique : aucune commande de build, la racine du dépôt EST le site.
 name = "fiches-ml-llm"
 compatibility_date = "2026-09-11"
-
-[assets]
-directory = "."
-
-# « none » sert /fiches/theme/x.html tel quel, en 200. Les autres modes
-# redirigent .html en 307 vers l'URL sans extension : une redirection par
-# navigation, et un cache de service worker indexé sur des réponses redirigées.
-# La racine est traitée par la réécriture 200 de _redirects.
-html_handling = "none"
-not_found_handling = "none"
+pages_build_output_dir = "."

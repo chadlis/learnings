@@ -1,4 +1,4 @@
-# En-têtes des assets statiques Workers. Ce fichier est consommé, pas servi.
+# En-têtes Cloudflare Pages. Ce fichier est consommé par Pages, pas servi.
 
 # Le service worker ne doit jamais être servi depuis un cache périmé :
 # c'est lui qui décide de la fraîcheur de tout le reste.
@@ -7,9 +7,9 @@
   Service-Worker-Allowed: /
 
 # L'index est régénéré à chaque fiche ajoutée : toujours revalider.
-/
-  Cache-Control: no-cache, must-revalidate
 /index.html
+  Cache-Control: no-cache, must-revalidate
+/
   Cache-Control: no-cache, must-revalidate
 
 /manifest.webmanifest

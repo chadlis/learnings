@@ -77,12 +77,11 @@ site a changé, et purge alors l'ancien cache chez les visiteurs.
 | `make test` | tests headless (playwright, dépendance de développement — saute si absente) |
 | `make hooks` | installe le hook `pre-commit` |
 
-Pour servir le site localement (nécessaire pour tester le service worker, qui
-ne s'enregistre pas en `file://`) :
+Pour servir le site localement (nécessaire pour tester le service worker,
+qui ne s'enregistre pas en `file://`) :
 
 ```sh
-python3 -m http.server 8777     # sans dépendance
-npx wrangler dev                # runtime Cloudflare réel : _headers, _redirects
+python3 -m http.server 8777
 ```
 
 ## Notes de révision
@@ -109,28 +108,6 @@ ajoutées depuis.
 
 ## Hébergement
 
-Cloudflare **Workers static assets**, dépôt public, pas de build : `wrangler.toml`
-déclare la racine du dépôt comme répertoire d'assets. Chaque `push` sur `main`
-déclenche un déploiement (commande `npx wrangler deploy`). Le workflow Pages
-existe encore mais Cloudflare l'a passé en « legacy » pour les nouveaux projets.
-
-Trois fichiers portent la configuration :
-
-- `wrangler.toml` — `html_handling = "none"`, pour que
-  `/fiches/theme/x.html` réponde 200 directement. Les autres modes redirigent
-  les URL en `.html` (307 vers la version sans extension) : une redirection à
-  chaque navigation, et un cache de service worker indexé sur des réponses
-  redirigées.
-- `_redirects` — la racine `/` réécrite (200, pas une redirection) vers
-  `index.html`, puisque `html_handling = "none"` ne devine plus l'index.
-- `_headers` — revalidation forcée sur `sw.js`, l'index et les fiches ; type
-  MIME du manifeste ; `nosniff` et `Referrer-Policy` partout.
-
-`.assetsignore` écarte de la publication ce qui n'est pas le site : `.git`,
-`tools/`, `Makefile`, `README.md`, `wrangler.toml`.
-
-Pour servir le site avec le runtime réel (en-têtes, réécritures, MIME) :
-
-```sh
-npx wrangler dev
-```
+Cloudflare Pages, dépôt public, pas de build : `wrangler.toml` déclare la
+racine du dépôt comme répertoire de sortie. Chaque `push` sur `main` déclenche
+un déploiement.
