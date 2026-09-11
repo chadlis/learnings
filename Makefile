@@ -12,6 +12,10 @@ hooks:
 	@git config core.hooksPath .githooks
 	@echo "core.hooksPath = .githooks"
 
+## test : vérifie la persistance des notes dans un Chromium headless (playwright)
+test:
+	@sh tools/run_tests.sh
+
 ## check : vérifie que l'index committé est bien à jour (utile en CI)
 check:
 	@$(PYTHON) tools/build_index.py
@@ -19,4 +23,4 @@ check:
 		echo "index.html/sw.js ne sont pas à jour : lance 'make index' et committe."; exit 1; }
 	@echo "index à jour."
 
-.PHONY: index hooks check
+.PHONY: index hooks test check

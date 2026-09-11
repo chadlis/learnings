@@ -269,6 +269,7 @@ svg [stroke="rgba(255,255,255,.28)"]{stroke:var(--axis)}
   <div class="tabs" role="tablist"><button role="tab" data-v="v-labo" aria-selected="true">Labo</button><button role="tab" data-v="v-deck" aria-selected="false">Parcours</button><button role="tab" data-v="v-carte" aria-selected="false">Carte</button></div>
   <button class="tb" id="dictBtn" aria-pressed="true">Dictée des « donc » : on</button>
   <button class="tb" id="themeBtn" data-cls="white" data-alt="Tableau blanc" data-base="Tableau noir" data-query="(prefers-color-scheme: light)" aria-pressed="false">Tableau blanc</button>
+  <button class="tb" id="forgetBtn" title="Efface les notes enregistrées pour cette fiche">Oublier mes notes</button>
 </div>
 <section class="view on labo" id="v-labo"><div class="cols">
   <nav class="tree" id="tree" aria-label="Le tronc et les branches"><div class="root">« qu'est-ce qui varierait si je refaisais l'expérience ? »</div><div class="score" id="score"></div>
@@ -303,7 +304,15 @@ const oa=document.getElementById('openAll'),ca=document.getElementById('closeAll
   const cards=[]; secs.forEach((s,bi)=>{const br=s.querySelector('h2').textContent, ac=s.getAttribute('style');
     s.querySelectorAll('details').forEach(d=>{d.id='q'+(cards.length+1);
       cards.push({bi,br,ac,el:d,q:d.querySelector('summary span:nth-child(2)').innerHTML,a:d.querySelector('.body').innerHTML,rating:null});});});
-  const listeners=[]; function setRating(k,r){cards[k].rating=r; listeners.forEach(f=>f());}
+  const listeners=[]; function setRating(k,r){cards[k].rating=r; saveRatings(); listeners.forEach(f=>f());}
+  // ---------- notes persistées d'une session à l'autre ----------
+  const RKEY='fiche:'+(location.pathname.split('/').pop()||'index.html')+':ratings';
+  function saveRatings(){try{const o={};cards.forEach((c,k)=>{if(c.rating)o[k]=c.rating;});localStorage.setItem(RKEY,JSON.stringify(o));}catch(e){}}
+  function loadRatings(){try{const o=JSON.parse(localStorage.getItem(RKEY)||'{}');cards.forEach((c,k)=>{if(RL[o[k]])c.rating=o[k];});}catch(e){}}
+  function forgetRatings(){try{localStorage.removeItem(RKEY);}catch(e){}cards.forEach(c=>c.rating=null);listeners.forEach(f=>f());}
+  loadRatings();
+  (function(){const btn=document.getElementById('forgetBtn');if(!btn)return;
+    btn.onclick=()=>{if(confirm('Oublier toutes tes notes sur cette fiche ?'))forgetRatings();};})();
   // ---------- dictée des « donc » ----------
   function dictee(root){root.querySelectorAll('.board .say').forEach(say=>{
     const parts=say.innerHTML.split(/(\sdonc\s)/); if(parts.length<3)return; let out=parts[0];
@@ -381,7 +390,7 @@ const oa=document.getElementById('openAll'),ca=document.getElementById('closeAll
       wk.querySelectorAll('a').forEach(a=>a.onclick=e=>{e.preventDefault();order=cards.map((_,k)=>k);pos=+a.dataset.k;show();});
       document.getElementById('replay').disabled=!weak.length;
       document.getElementById('replay').onclick=()=>{order=weak.map(o=>o.k);pos=0;show();};
-      document.getElementById('restart').onclick=()=>{cards.forEach(c=>c.rating=null);listeners.forEach(f=>f());order=cards.map((_,k)=>k);pos=0;show();};
+      document.getElementById('restart').onclick=()=>{cards.forEach(c=>c.rating=null);saveRatings();listeners.forEach(f=>f());order=cards.map((_,k)=>k);pos=0;show();};
       drawRail();}
     document.getElementById('flipBtn').onclick=flip;
     back.querySelectorAll('.rate .btn').forEach(b=>b.onclick=()=>rate(b.dataset.r));
