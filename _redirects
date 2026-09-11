@@ -1,0 +1,3 @@
+# Réécriture (200, pas une redirection) : la racine sert l'index.
+# Nécessaire parce que html_handling = "none" ne devine aucun index.html.
+/  /index.html  200

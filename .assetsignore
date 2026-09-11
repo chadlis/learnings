@@ -1,0 +1,11 @@
+# Ce qui ne doit pas être publié (syntaxe .gitignore, propre aux assets Workers).
+.git
+.gitignore
+.githooks
+.assetsignore
+wrangler.toml
+Makefile
+README.md
+tools
+node_modules
+.DS_Store

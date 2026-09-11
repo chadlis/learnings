@@ -1,5 +1,0 @@
-# Ce qui ne doit pas être publié sur Cloudflare Pages.
-Makefile
-README.md
-tools/
-.githooks/
