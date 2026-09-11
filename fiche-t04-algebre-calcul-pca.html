@@ -1,0 +1,413 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="fiche" content="serie=thematique;numero=04;statut=v1"><title>Algèbre linéaire, calcul & PCA — fiche thématique</title><style>
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4;
+  --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --green:#B9E2C4; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --grid:rgba(38,72,124,.11); --red:#B8322A; --pen:#1E4E9E; --pen2:#163A7A; --hl:rgba(255,222,64,.55);
+  --again:#B93A5A; --hard:#B7791F; --good:#1F7A44;
+  --node:#1A2925; --axis:rgba(237,232,218,.4);
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44;
+  --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --green:#1F7A44; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12); --node:#FFFFFF; --axis:rgba(30,42,54,.45)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+.app{max-width:1200px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 48px}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.top .title{font-size:13.5px;color:var(--faint);flex:1 1 100%;margin-bottom:4px}
+.top .title b{font-family:var(--serif);font-size:17px;color:var(--chalk);font-weight:400;text-shadow:0 0 1px var(--dust);margin-right:6px}
+.tabs{display:flex;gap:2px;margin-right:auto;border-bottom:2px solid var(--line2)}
+.tabs button{font:500 14px var(--serif);color:var(--muted);background:transparent;border:0;border-bottom:3px solid transparent;margin-bottom:-2px;padding:8px 16px;cursor:pointer}
+.tabs button[aria-selected="true"]{color:var(--chalk);border-bottom-color:var(--yellow);text-shadow:0 0 1px var(--dust)}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.view{display:none}.view.on{display:block}
+/* ---- rail : a chalk line with stations ---- */
+.rail{margin:22px 0 4px;overflow-x:auto;padding:10px 2px 6px}
+.rail svg{display:block;min-width:760px;width:100%;height:auto;filter:url(#chalkf)}
+.rail .st{cursor:pointer}
+.rail .st circle{fill:var(--board);stroke-width:2.5}
+.rail .st.rated-again circle{fill:var(--pink);stroke:var(--pink)}
+.rail .st.rated-hard circle{fill:var(--yellow);stroke:var(--yellow)}
+.rail .st.rated-good circle{fill:var(--mint);stroke:var(--mint)}
+.rail .st.cur circle{r:8;stroke-width:3.5}
+.rail text{font:600 11px var(--sans);fill:var(--muted)}
+/* ---- stage ---- */
+.stage{margin-top:14px;display:grid;grid-template-columns:44px minmax(0,1fr) 44px;gap:12px;align-items:center}
+.nav{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line2);background:transparent;color:var(--muted);font-size:20px;cursor:pointer}
+.nav:hover{color:var(--yellow);border-color:var(--yellow)}
+.deck{position:relative;min-height:380px}
+.card{position:relative;min-height:380px;transition:height .3s}
+.face{position:absolute;inset:0;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .3s,transform .3s,visibility 0s .3s;display:flex;flex-direction:column;overflow:hidden}
+.card:not(.flipped) .face.front,.card.flipped .face.back{opacity:1;visibility:visible;transform:none;transition:opacity .3s,transform .3s,visibility 0s}
+/* front : the question written in chalk, framed on the board */
+.front{border:2px solid var(--line2);border-radius:4px;padding:22px 28px 22px}
+.front .br{display:flex;align-items:center;gap:10px;font:600 13px var(--sans);color:var(--ac)}
+.front .br i{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--ac);display:grid;place-items:center;font-size:12px}
+.front .br small{margin-left:auto;font-weight:500;color:var(--faint);font-variant-numeric:tabular-nums}
+.front .qtxt{font-family:var(--serif);font-size:clamp(24px,3.6vw,34px);line-height:1.28;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:auto 0;padding:26px 0}
+.front .cta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:auto}
+.front .cta .say{font-size:13.5px;color:var(--faint);max-width:40ch}
+.btn{font:600 14px var(--sans);border-radius:3px;padding:11px 18px;cursor:pointer;border:1.5px solid transparent}
+.btn.flip{margin-left:auto;background:transparent;color:var(--yellow);border-color:var(--yellow)}
+.btn.flip:hover{background:var(--yellow);color:var(--board)}
+kbd{font:11px var(--mono);opacity:.75;margin-left:6px;border:1px solid currentColor;border-radius:3px;padding:0 4px}
+/* back : the index card, board formulation goes back on the board */
+.back{background:var(--card);color:var(--cardink);border-radius:3px;padding:18px 22px 20px 24px;overflow:auto;
+  box-shadow:0 14px 26px -14px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);
+  background-image:repeating-linear-gradient(0deg,transparent 0 27px,var(--cardline) 27px 28px);background-position:0 10px}
+.back::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--ac);border-radius:3px 0 0 3px}
+.back .br{display:flex;align-items:center;gap:10px;font:600 12.5px var(--sans);color:var(--ac);filter:saturate(1.4) brightness(.72);margin-bottom:8px}
+body.white .back .br{filter:none}
+.back .br small{margin-left:auto;font-weight:500;color:var(--cardmuted);filter:none;font-variant-numeric:tabular-nums}
+.ans{font-size:15.5px;line-height:1.55}
+.ans p{margin-bottom:10px}.ans p:last-child{margin-bottom:0}
+.ans .def::before,.ans .intu::before,.ans .ex::before,.ans .step::before{font:600 11px var(--sans);letter-spacing:.06em;color:var(--ac);filter:saturate(1.4) brightness(.72);margin-right:8px}
+body.white .ans .def::before,body.white .ans .intu::before,body.white .ans .ex::before,body.white .ans .step::before{filter:none}
+.ans .def::before{content:"déf."}.ans .intu::before{content:"intuition"}.ans .ex::before{content:"ex."}.ans .step::before{content:"pas à pas"}
+.ans .intu,.ans .ex,.ans .step{color:var(--cardmuted)}
+.ans .m,.ans .up,.ans .hat{color:var(--cardink)}
+.ans table.t{font-family:var(--sans);border-collapse:collapse;width:100%;margin:6px 0 14px;font-size:14px;background:var(--card)}
+.ans table.t th,.ans table.t td{border:1px solid var(--cardline);padding:6px 9px;text-align:left;vertical-align:top}
+.ans table.t th{font-size:11px;letter-spacing:.06em;color:var(--cardmuted);font-weight:600}
+.ans table.t td.num{font-family:var(--mono)}
+.ans .chain{font-family:var(--mono);font-size:13.5px;line-height:1.9;padding:8px 12px;border-left:2px solid var(--ac);margin:8px 0 12px;background:rgba(34,48,43,.05)}
+.ans .chain b{color:var(--ac);filter:saturate(1.4) brightness(.72);font-weight:700}
+.ans .trap{border:1.5px solid var(--red);border-radius:3px;padding:10px 13px;margin-top:14px;font-size:14px;background:rgba(184,50,42,.06);transform:rotate(-.3deg)}
+.ans .trap .lbl{font:700 11px var(--sans);letter-spacing:.08em;color:var(--red);margin-bottom:3px}
+.ans .trap b{color:var(--red)}
+.ans .board{margin:14px 0 0 -24px;margin-right:-22px;padding:14px 22px 14px 24px;background:var(--board2);color:var(--chalk);border-top:1px solid var(--line)}
+.ans .board .lbl{font:600 11.5px var(--sans);letter-spacing:.08em;color:var(--yellow);margin-bottom:8px}
+.ans .board .say{font-family:var(--serif);font-size:19px;line-height:1.55;color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.ans .board .say .m,.ans .board .say .up,.ans .board .say .hat{color:var(--chalk)}
+.ans .board .say .dz{cursor:pointer;transition:filter .25s}
+body.dictee .ans .board .say .dz.hid{filter:blur(6px);color:var(--yellow);user-select:none}
+.ans .board .donc{color:var(--yellow);font-weight:700}
+.ans .board .dict{margin-top:8px;font:12.5px var(--sans);color:var(--faint)}
+body:not(.dictee) .ans .board .dict{display:none}
+.rate{display:flex;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--cardline);flex-wrap:wrap}
+.rate .lbl{width:100%;font-size:12.5px;color:var(--cardmuted)}
+.rate .btn{flex:1;min-width:120px;color:#fff}
+.rate .again{background:var(--again)}.rate .hard{background:var(--hard)}.rate .good{background:var(--good)}
+/* ---- recap : written on the board ---- */
+.recap{border:2px solid var(--line2);border-radius:4px;padding:26px 28px;margin-top:14px}
+.recap h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.recap .p{color:var(--muted);font-size:14.5px;margin-bottom:18px}
+.bars{display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:200px 1fr 60px;gap:12px;align-items:center;font-size:14px}
+.bar .tr{height:9px;border-radius:2px;background:var(--line);overflow:hidden;display:flex}
+.bar .tr i{display:block;height:100%}
+.bar small{color:var(--faint);text-align:right;font-variant-numeric:tabular-nums}
+.weak{margin-top:22px}
+.weak h3{font:600 14px var(--sans);color:var(--muted);margin-bottom:8px}
+.weak a{display:block;color:var(--cardink);text-decoration:none;padding:9px 12px;background:var(--card);margin-bottom:6px;font-size:14.5px;border-left:4px solid var(--ac);border-radius:2px}
+.weak a:hover{background:var(--cardsoft)}
+.recap .btns{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+.recap .btn{background:var(--yellow);color:var(--board)}
+.recap .btn:disabled{opacity:.4;cursor:default}
+.recap .btn.ghostb{background:transparent;color:var(--ink);border-color:var(--line2)}
+/* ---- labo : millimetre-paper sheets pinned on the board (carnet structure) ---- */
+.labo .intro{font-family:var(--serif);font-size:15.5px;line-height:1.6;color:var(--muted);max-width:66ch;margin:24px 0 6px}
+.labo .intro b{color:var(--ink);font-weight:600}
+.panel{margin:30px 0 0}
+.panel h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:10px;letter-spacing:-.005em}
+.panel h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--yellow);vertical-align:middle;margin-right:10px}
+.frame{border:1px solid var(--cardline);border-radius:3px;background:
+  repeating-linear-gradient(0deg,var(--grid) 0 1px,transparent 1px 12px),
+  repeating-linear-gradient(90deg,var(--grid) 0 1px,transparent 1px 12px),var(--card);
+  color:var(--cardink);box-shadow:0 14px 26px -14px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2)}
+.frame .plot{padding:6px 4px 0}
+.frame .plot text{fill:var(--cardmuted)!important}
+.frame .plot line[stroke="rgba(255,255,255,.28)"]{stroke:rgba(34,48,43,.45)!important}
+.frame .plot [fill="#54C8B8"],.frame .plot [stroke="#54C8B8"]{fill:#0F8A7C;stroke:#0F8A7C}
+.frame .plot text[fill="#54C8B8"]{fill:#0F8A7C!important}.frame .plot text[fill="#B49CF6"]{fill:#6B46C1!important}.frame .plot text[fill="#F0796B"]{fill:#C0392B!important}.frame .plot text[fill="#E8B04B"]{fill:#B7791F!important}
+.frame .plot line[stroke="#54C8B8"]{stroke:#0F8A7C!important}.frame .plot line[stroke="#B49CF6"]{stroke:#6B46C1!important}.frame .plot line[stroke="#F0796B"]{stroke:#C0392B!important}.frame .plot line[stroke="#E8B04B"]{stroke:#B7791F!important}
+.plot .hv{fill:#6B46C1;opacity:.7}.plot .hp{fill:#1F7A44;opacity:.8}.plot .hu{fill:#C0392B;opacity:.4}.plot .hc{fill:#C0392B;opacity:.7}.plot .dot{fill:#B7791F}
+.sampctl{display:flex;flex-wrap:wrap;gap:8px;padding:12px 14px;border-bottom:1px solid var(--cardline);background:var(--card)}
+.sampctl button{font:500 13px var(--sans);color:var(--cardink);background:var(--cardsoft);border:1px solid var(--cardline);border-radius:3px;padding:6px 12px;cursor:pointer}
+.sampctl button:hover{border-color:var(--pen);color:var(--pen)}
+.readout{display:flex;flex-wrap:wrap;gap:6px 22px;padding:11px 14px;border-top:1px solid var(--cardline);font:13px var(--sans);color:var(--cardmuted);background:var(--card)}
+.readout b{color:var(--cardink);font-weight:600;font-variant-numeric:tabular-nums}
+.readout .hot b{color:#B7791F}.readout .win b{color:#1F7A44}.readout .bad b{color:#C0392B}
+.wcap{padding:12px 16px 14px;font-family:var(--serif);font-size:15px;line-height:1.55;color:var(--cardmuted);background:var(--card);border-top:1px solid var(--cardline)}
+.wcap b{color:var(--cardink)}
+.wcap .m,.wcap .up,.wcap .hat{color:var(--cardink)}
+/* ---- carte ---- */
+.carte .panel h2::before{display:none}
+.mapscroll svg{filter:url(#chalkf)}
+.mapscroll svg text{text-shadow:0 0 1px var(--dust)}
+.mapscroll svg rect{fill:transparent!important;stroke-width:2}
+.mapscroll svg .lk,.mapscroll svg .lk2{opacity:.85;stroke-width:2}
+.caption{font-size:14px;color:var(--muted);margin-top:8px;max-width:66ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin-top:22px}
+.chip{background:var(--card);color:var(--cardink);border:0;border-left:4px solid var(--ac);border-radius:2px;padding:10px 12px;font-size:13.5px;line-height:1.35;cursor:pointer;text-align:left;font-family:var(--sans)}
+.chip small{display:block;color:var(--cardmuted);font-size:11.5px;margin-top:4px}
+.chip.rated-again small{color:var(--again)}.chip.rated-hard small{color:var(--hard)}.chip.rated-good small{color:var(--good)}
+#src{display:none}
+footer{margin-top:44px;padding-top:14px;border-top:1.5px solid var(--line2);font-size:12.5px;color:var(--faint);line-height:1.7;max-width:70ch}
+:focus-visible{outline:2px solid var(--yellow);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.card,.face,.dz{transition:none!important}}
+@media(max-width:640px){kbd{display:none}.stage{grid-template-columns:1fr}.nav{display:none}.front{padding:18px 16px}.back{padding:16px 16px 18px 18px}.ans .board{margin-left:-18px;margin-right:-16px}.bar{grid-template-columns:120px 1fr 50px}.tabs{margin-left:0;width:100%}}
+
+/* ---- labo : sidebar + full flow ---- */
+.cols{display:grid;grid-template-columns:270px minmax(0,1fr);gap:44px;margin-top:22px}
+.tree{position:sticky;top:14px;align-self:start;font-family:var(--sans);font-size:13.5px;max-height:calc(100vh - 28px);overflow:auto;padding-right:6px}
+.tree .root{font-family:var(--serif);font-size:16px;line-height:1.3;color:var(--chalk);text-shadow:0 0 1px var(--dust);padding:0 0 12px 12px;border-left:2px solid var(--yellow);margin-bottom:14px}
+.tree .score{font-size:12px;color:var(--faint);margin-bottom:16px;padding-left:14px}
+.tree .score b{color:var(--ink)}
+.branch{margin:0 0 12px}
+.branch .bh{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--ink);padding:4px 0}
+.branch .bh i{width:9px;height:9px;border-radius:50%;background:var(--ac);flex:none}
+.branch .bh small{margin-left:auto;font-weight:400;color:var(--faint);font-variant-numeric:tabular-nums}
+.branch ul{list-style:none;margin:2px 0 0 4px;border-left:1px solid var(--line2);padding-left:11px}
+.branch li a{display:block;color:var(--muted);text-decoration:none;padding:3px 0;line-height:1.35}
+.branch li a:hover{color:var(--yellow)}
+.branch li a.good{color:var(--mint);text-decoration:line-through;text-decoration-color:var(--line2)}
+.branch li a.again{color:var(--pink);font-weight:600}
+.branch li a.hard{color:var(--yellow)}
+.branch li a::before{content:"";display:inline-block;width:6px;height:6px;border:1px solid var(--line2);border-radius:1px;margin:0 8px 1px -15px;background:var(--board)}
+.branch li a.good::before{background:var(--mint);border-color:var(--mint)}
+.branch li a.again::before{background:var(--pink);border-color:var(--pink)}
+.branch li a.hard::before{background:var(--yellow);border-color:var(--yellow)}
+.tree .redo{margin-top:8px;width:100%;font:600 13px var(--sans);color:var(--pink);background:transparent;border:1.5px dashed var(--pink);border-radius:3px;padding:8px;cursor:pointer}
+.tree .redo:disabled{opacity:.35;cursor:default}
+.tree .tools{display:flex;gap:6px;margin-top:8px}
+.tree .tools button{flex:1;font:500 12.5px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px;cursor:pointer}
+.content{min-width:0}
+/* sections : chalk questions, index cards */
+.sec{margin-top:48px;scroll-margin-top:14px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-head .n{font-family:var(--serif);font-size:30px;color:var(--ac);text-shadow:0 0 1px var(--dust);line-height:1}
+.sec-head h2{font-family:var(--serif);font-weight:400;font-size:26px;color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.sec-head::after{content:"";flex:1;height:2px;background:var(--ac);opacity:.6;margin-left:6px;align-self:center;border-radius:2px;filter:url(#chalkf)}
+details{margin:14px 0 0;scroll-margin-top:14px}
+summary{list-style:none;cursor:pointer;padding:10px 0;display:flex;gap:14px;align-items:flex-start;font-family:var(--serif);font-size:20px;line-height:1.35;color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+summary::-webkit-details-marker{display:none}
+summary .q{font:600 13px var(--sans);color:var(--ac);flex:none;margin-top:8px;text-shadow:none;border:1.5px solid var(--ac);border-radius:50%;width:24px;height:24px;display:grid;place-items:center}
+summary .chev{margin-left:auto;flex:none;color:var(--faint);transition:transform .2s;margin-top:4px;text-shadow:none;font-family:var(--sans)}
+details[open] summary .chev{transform:rotate(90deg)}
+summary:hover{color:var(--yellow)}
+.body{background:var(--card);color:var(--cardink);border-radius:3px;padding:18px 20px 20px 22px;margin:6px 0 10px 38px;font-size:15.5px;line-height:1.55;position:relative;
+  box-shadow:0 12px 24px -12px rgba(0,0,0,.55),0 1px 0 rgba(0,0,0,.2);
+  background-image:repeating-linear-gradient(0deg,transparent 0 27px,var(--cardline) 27px 28px);background-position:0 8px}
+.body::before{content:"";position:absolute;left:-1px;top:0;bottom:0;width:4px;background:var(--ac);border-radius:3px 0 0 3px}
+.body p{margin-bottom:10px}.body p:last-child{margin-bottom:0}
+.body .def::before,.body .intu::before,.body .ex::before,.body .step::before{font:600 11px var(--sans);letter-spacing:.06em;color:var(--ac);filter:saturate(1.4) brightness(.72);margin-right:8px}
+body.white .body .def::before,body.white .body .intu::before,body.white .body .ex::before,body.white .body .step::before{filter:none}
+.body .def::before{content:"déf."}.body .intu::before{content:"intuition"}.body .ex::before{content:"ex."}.body .step::before{content:"pas à pas"}
+.body .intu,.body .ex,.body .step{color:var(--cardmuted)}
+.body .m,.body .up,.body .hat{color:var(--cardink)}
+.body table.t{font-family:var(--sans);border-collapse:collapse;width:100%;margin:6px 0 14px;font-size:14px;background:var(--card)}
+.body table.t th,.body table.t td{border:1px solid var(--cardline);padding:6px 9px;text-align:left;vertical-align:top}
+.body table.t th{font-size:11px;letter-spacing:.06em;color:var(--cardmuted);font-weight:600}
+.body table.t td.num{font-family:var(--mono)}
+.body .chain{font-family:var(--mono);font-size:13.5px;line-height:1.9;padding:8px 12px;border-left:2px solid var(--ac);margin:8px 0 12px;background:rgba(34,48,43,.05)}
+.body .chain b{color:var(--ac);filter:saturate(1.4) brightness(.72);font-weight:700}
+.body .trap{border:1.5px solid var(--red);border-radius:3px;padding:10px 13px;margin-top:14px;font-size:14px;background:rgba(184,50,42,.06);transform:rotate(-.3deg)}
+.body .trap .lbl{font:700 11px var(--sans);letter-spacing:.08em;color:var(--red);margin-bottom:3px}
+.body .trap b{color:var(--red)}
+.body .board{margin:14px 0 0 -22px;margin-right:-20px;padding:14px 20px 14px 22px;background:var(--board2);color:var(--chalk);border-top:1px solid var(--line)}
+.body .board .lbl{font:600 11.5px var(--sans);letter-spacing:.08em;color:var(--yellow);margin-bottom:8px}
+.body .board .say{font-family:var(--serif);font-size:19px;line-height:1.55;color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.body .board .say .m,.body .board .say .up,.body .board .say .hat{color:var(--chalk)}
+.body .board .say .dz{cursor:pointer;transition:filter .25s}
+body.dictee .body .board .say .dz.hid{filter:blur(6px);color:var(--yellow);user-select:none}
+.body .board .donc{color:var(--yellow);font-weight:700}
+.body .board .dict{margin-top:8px;font:12.5px var(--sans);color:var(--faint)}
+body:not(.dictee) .body .board .dict{display:none}
+.grade{display:flex;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid var(--cardline);font-family:var(--sans);align-items:center;flex-wrap:wrap}
+.grade span{font-size:12.5px;color:var(--cardmuted);margin-right:4px}
+.grade button{font:600 12.5px var(--sans);border-radius:3px;padding:5px 12px;cursor:pointer;border:1px solid var(--cardline);background:var(--card);color:var(--cardmuted)}
+.grade button.on.again{background:var(--again);border-color:var(--again);color:#fff}
+.grade button.on.hard{background:var(--hard);border-color:var(--hard);color:#fff}
+.grade button.on.good{background:var(--good);border-color:var(--good);color:#fff}
+.labo footer{margin-top:44px}
+#v-deck,#v-carte{max-width:960px;margin:0 auto}
+@media(max-width:900px){.cols{grid-template-columns:1fr;gap:20px}.tree{position:static;max-height:300px;border:1.5px solid var(--line2);border-radius:3px;padding:12px}}
+@media(max-width:520px){.body{margin-left:0;padding:14px 14px 16px 16px}.body .board{margin-left:-16px;margin-right:-14px}summary{font-size:18px}}
+
+.m{font-family:var(--math);font-style:italic;white-space:nowrap}
+.up{font-style:normal;font-family:var(--math)}
+sup,sub{font-size:.72em;line-height:0}
+.hat{display:inline-block;position:relative;font-style:normal;font-family:var(--math)}
+.hat::before{content:"ˆ";position:absolute;top:-.58em;left:50%;transform:translateX(-50%);font-size:.85em;color:inherit}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;font-family:var(--math);line-height:1.1;margin:0 3px}
+.frac>span{padding:0 4px}.frac>span:first-child{border-bottom:1px solid currentColor}
+.mapscroll{overflow-x:auto}.mapscroll svg{display:block;min-width:680px;width:100%;height:auto}
+.plot svg{display:block;width:100%;max-width:640px;margin:0 auto;height:auto}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+svg [fill="#101822"]{fill:var(--node)} svg [stroke="#54C8B8"]{stroke:var(--teal)} svg [fill="#54C8B8"]{fill:var(--teal)}
+svg [stroke="#B49CF6"]{stroke:var(--violet)} svg [fill="#B49CF6"]{fill:var(--violet)}
+svg [stroke="#6FA6E8"]{stroke:var(--blue)} svg [fill="#6FA6E8"]{fill:var(--blue)}
+svg [stroke="#7BD88F"]{stroke:var(--green)} svg [fill="#7BD88F"]{fill:var(--green)}
+svg [stroke="#F0796B"]{stroke:var(--coral)} svg [fill="#F0796B"]{fill:var(--coral)}
+svg [stroke="#E8B04B"]{stroke:var(--amber)} svg [fill="#E8B04B"]{fill:var(--amber)}
+svg [fill="#E9EDF3"]{fill:var(--ink)} svg [fill="#5E6C84"]{fill:var(--faint)} svg .leaf{fill:var(--muted)}
+svg [stroke="rgba(255,255,255,.28)"]{stroke:var(--axis)}
+
+.branch .bh{cursor:pointer;user-select:none}.branch.fold ul{display:none}.branch .bh::after{content:"▾";margin-left:6px;color:var(--faint);font-size:11px}.branch.fold .bh::after{content:"▸"}
+</style></head>
+<body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="chalkf" x="-2%" y="-2%" width="104%" height="104%">
+<feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="2" seed="7" result="n"/>
+<feDisplacementMap in="SourceGraphic" in2="n" scale="1.2" xChannelSelector="R" yChannelSelector="G"/></filter></svg><div class="ledge" aria-hidden="true"></div><div class="app">
+<div class="top">
+  <div class="title"><b>Algèbre linéaire, calcul & PCA</b> fiche thématique 04 · 23 questions · v1 du 11/09/2026 · couvre les cartes Anki « swe » algebre::eigen, maths::algebre::svd, diagonalisation, algebre-lineaire, analyse::gradient-jacobienne, chain-rule, ml::pca, deep-learning::backprop, preuve::temoin</div>
+  <div class="tabs" role="tablist"><button role="tab" data-v="v-labo" aria-selected="true">Labo</button><button role="tab" data-v="v-deck" aria-selected="false">Parcours</button><button role="tab" data-v="v-carte" aria-selected="false">Carte</button></div>
+  <button class="tb" id="dictBtn" aria-pressed="true">Dictée des « donc » : on</button>
+  <button class="tb" id="themeBtn" data-cls="white" data-alt="Tableau blanc" data-base="Tableau noir" data-query="(prefers-color-scheme: light)" aria-pressed="false">Tableau blanc</button>
+</div>
+<section class="view on labo" id="v-labo"><div class="cols">
+  <nav class="tree" id="tree" aria-label="Le tronc et les branches"><div class="root">« quelle direction est conservée, et par combien est-elle étirée ? »</div><div class="score" id="score"></div>
+    <button class="redo" id="redo" disabled>Rouvrir seulement les faibles</button><div class="tools"><button id="openAll">Tout déplier</button><button id="closeAll">Tout replier</button></div></nav>
+  <main class="content"><p class="intro">Fil rouge : A = <span class='m'>(2 1 ; 0 3)</span> (λ = 3, 2 ; u₁ = (1,1), u₂ = (1,0)), la matrice symétrique S = <span class='m'>(2 1 ; 1 2)</span> (λ = 3, 1), et un nuage centré de trois points dont la covariance vaut <span class='m'>(1 1 ; 1 4)</span>.</p><section class="sec" style="--ac:var(--teal)"><div class="sec-head"><span class="n">01</span><h2>Applications linéaires — colonnes, noyau, affine</h2></div><details><summary><span class="q">Q</span><span>Vue « par colonnes » de Ax : que vaut-il, et que dit-elle sur l'image de A ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Ax est la combinaison linéaire des colonnes de A pondérée par les coordonnées de x : Ax = Σ x<sub>j</sub> c<sub>j</sub>. L'image de A est donc l'espace engendré par ses colonnes.</p><p class="ex">c₁ = (1,4), c₂ = (2,5), c₃ = (3,6), x = (7, −2, 4) : Ax = 7c₁ − 2c₂ + 4c₃ = (15, 42).</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Chaque coordonnée de x multiplie une colonne, donc Ax est une combinaison des colonnes, donc tout ce que A peut produire vit dans l'espace des colonnes. »</p></div></div></details><details><summary><span class="q">Q</span><span>Pourquoi une matrice qui « écrase » (noyau non réduit à {0}) ne peut-elle pas être inversée ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Écraser détruit de l'information, et aucune fonction ne peut la ressusciter. Si Ak = 0 avec k ≠ 0, alors A(x + k) = Ax : deux entrées distinctes ont la même image, donc pas d'inverse.</p><p class="intu">Conséquence : Ax = b a zéro solution (b hors de l'image) ou une infinité (solution particulière + noyau), jamais exactement une.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Un vecteur non nul est envoyé sur 0, donc deux entrées différentes ont la même sortie, donc l'application n'est pas injective, donc elle n'a pas d'inverse. »</p></div></div></details><details><summary><span class="q">Q</span><span>Pourquoi la couche y = Wx + b d'un réseau n'est-elle pas linéaire au sens algébrique ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Elle est <b>affine</b> : le biais b casse f(0) = 0. Toute application linéaire envoie 0 sur 0.</p><p class="ex">En dimension 1, h(x) = 3x + 1 a pour graphe une droite mais h(0) = 1.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Une application linéaire vérifie f(0) = 0, donc dès que b ≠ 0 la couche ne le vérifie plus, donc elle est affine, pas linéaire. »</p></div></div></details><details><summary><span class="q">Q</span><span>Pour établir une borne sur un minimum : pourquoi le majorer est-il facile et le minorer difficile ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Majorer : exhiber un seul <b>témoin</b> atteignable — le minimum lui est ≤ par définition. Minorer : montrer que <i>tout</i> élément est ≥ la borne, donc un argument sur l'ensemble entier.</p><p class="intu">Que d'autres éléments fassent mieux que le témoin ne peut que renforcer la conclusion. C'est l'argument derrière « R² ne peut que croître » (fiche 05).</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Le minimum est inférieur à n'importe quel élément, donc un seul témoin le majore, donc majorer coûte un exemple et minorer coûte une preuve universelle. »</p></div></div></details></section><section class="sec" style="--ac:var(--violet)"><div class="sec-head"><span class="n">02</span><h2>Valeurs propres et diagonalisation</h2></div><details><summary><span class="q">Q</span><span>Dans Av = λv, pourquoi la clause v ≠ 0 est-elle indispensable, et à quoi une valeur propre est-elle attachée ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Sans v ≠ 0, tout λ serait valeur propre de toute matrice (A0 = λ0). Une valeur propre est attachée à <b>toute la droite</b>, le sous-espace propre : Av = λv entraîne A(cv) = λ(cv). Signe et norme d'un vecteur propre sont arbitraires.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Le vecteur nul vérifie l'équation pour tout λ, donc il faut l'exclure ; et si v marche, cv marche aussi, donc c'est la direction qui est propre, pas le vecteur. »</p></div></div></details><details><summary><span class="q">Q</span><span>D'où vient det(A − λI) = 0 ? Chaîne complète.</span><span class="chev">›</span></summary><div class="body"><p class="def">Av = λv ⟺ (A − λI)v = 0 avec v ≠ 0. L'identité répare l'homogénéité : A − λ n'a pas de sens. Si A − λI était inversible, v = 0, contradiction. Donc A − λI est non inversible, donc son déterminant est nul.</p><p class="ex">A = (3 1 ; 0 2) : (3 − λ)(2 − λ) = 0, λ ∈ {2, 3}. Polynôme caractéristique de degré n → au plus n valeurs propres ; sur ℝ parfois moins (rotation de 90° : λ² + 1).</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Un vecteur propre non nul est envoyé sur 0 par A − λI, donc cette matrice a un noyau, donc elle n'est pas inversible, donc son déterminant vaut 0. »</p></div></div></details><details><summary><span class="q">Q</span><span>Lis A = PDP⁻¹ comme trois actions successives sur un vecteur w.</span><span class="chev">›</span></summary><div class="body"><p class="def">P⁻¹ <b>décompose</b> w dans la base propre (traduction) ; D <b>multiplie</b> chaque coordonnée par sa valeur propre, sans mélange ; P <b>recompose</b> en coordonnées ordinaires. Les colonnes de P sont les vecteurs propres.</p><p class="ex">u₁ = (1,0), λ₁ = 3 ; u₂ = (1,−1), λ₂ = 2 ; w = (5,−2) = 3u₁ + 2u₂. P⁻¹w = (3,2) ; D → (9,4) ; P → 9u₁ + 4u₂ = Aw. D'où Aᵏ = PDᵏP⁻¹.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« P⁻¹ exprime w dans la base propre, donc D agit axe par axe, donc P ramène le résultat dans la base canonique, donc Aᵏ ne coûte que Dᵏ. »</p></div><div class="trap"><div class="lbl">Piège</div>P n'est pas une rotation en général. C'est la <i>symétrie</i> de A, pas sa diagonalisabilité, qui rend P orthogonale.</div></div></details><details><summary><span class="q">Q</span><span>A diagonalisable, |λ₁| &gt; |λ₂| ≥ … : que devient la direction de Aᵏw quand k grandit, et pourquoi ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Aᵏw = λ₁ᵏ [c₁u₁ + Σ<sub>i≥2</sub> c<sub>i</sub>(λ<sub>i</sub>/λ₁)ᵏ u<sub>i</sub>]. Chaque ratio est &lt; 1 en valeur absolue, donc le crochet tend vers c₁u₁, donc la direction tend vers u₁ — sauf si c₁ = 0.</p><p class="intu">Direction ≠ norme : le facteur λ₁ᵏ est hors du crochet et décide seul de la norme (explosion si |λ₁| &gt; 1, stabilité si = 1 : Markov). Même mécanisme : PageRank, distribution stationnaire, première composante d'une PCA.</p><p class="ex">Fil rouge, w = 3u₁ + 2u₂ : A¹⁰w = 3¹⁰[3u₁ + 2(2/3)¹⁰u₂], (2/3)¹⁰ ≈ 0,017 → à 0,3° de u₁, norme × 4,3·10⁴. La direction a convergé, la grandeur non.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« On factorise par λ₁ᵏ, donc les autres composantes sont multipliées par des ratios plus petits que 1 élevés à la puissance k, donc elles s'éteignent, donc seule la direction u₁ survit. »</p></div></div></details><details><summary><span class="q">Q</span><span>Quel signal, dans un énoncé, indique qu'il faut sortir les valeurs propres ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Trois marqueurs conjoints : (1) une application linéaire <b>itérée</b> (Mᵏx₀) ; (2) une question de <b>long terme</b> (équilibre, stationnarité, stabilité) ; (3) une matrice <b>carrée</b> qui agit sur son propre espace.</p><p class="ex">Plateforme à deux états, chaque mois 30 % des actifs deviennent dormants et 10 % des dormants reviennent : la distribution stationnaire est le vecteur propre de λ = 1.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Une itération linéaire se lit dans la base propre, donc le comportement à long terme est dicté par la valeur propre dominante, donc dès qu'on itère et qu'on demande l'équilibre, on diagonalise. »</p></div></div></details></section><section class="sec" style="--ac:var(--blue)"><div class="sec-head"><span class="n">03</span><h2>Théorème spectral et SVD</h2></div><details><summary><span class="q">Q</span><span>Théorème spectral (cas réel) : hypothèse et affirmation exacte ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Hypothèse : S réelle <b>symétrique</b>. Affirmation : (1) valeurs propres réelles ; (2) base orthonormée de vecteurs propres ; donc (3) S = PDPᵀ avec P orthogonale (P⁻¹ = Pᵀ).</p><p class="intu">Où sert la symétrie : (Su)ᵀv = uᵀSv, donc (λ₁ − λ₂)⟨u,v⟩ = 0, donc ⟨u,v⟩ = 0 dès que λ₁ ≠ λ₂. Valeur propre multiple → orthogonalité <i>choisie</i> (Gram-Schmidt). Sans symétrie, trois échecs : vecteurs propres non orthogonaux ; non diagonalisable ; λ complexes (rotation).</p><p class="ex">S = (2 1 ; 1 2) : λ = 3, 1 ; vecteurs (1,1) et (1,−1), orthogonaux ; P = (1/√2)(1 1 ; 1 −1).</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« La symétrie fait passer S d'un côté à l'autre du produit scalaire, donc deux vecteurs propres de valeurs distinctes sont orthogonaux, donc il existe une base orthonormée propre, donc P est orthogonale et S = PDPᵀ. »</p></div></div></details><details><summary><span class="q">Q</span><span>La matrice de covariance est symétrique par construction. Que garantit le théorème spectral gratuitement pour la PCA ?</span><span class="chev">›</span></summary><div class="body"><p class="def">(1) Toujours diagonalisable : les composantes principales existent quel que soit le jeu de données. (2) Axes orthogonaux : les composantes sont décorrélées. (3) Valeurs propres réelles (et ≥ 0 car ce sont des variances) : lisibles comme variances expliquées.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Une covariance est symétrique, donc le théorème spectral s'applique, donc les axes principaux existent, sont orthogonaux et portent des variances réelles positives. »</p></div></div></details><details><summary><span class="q">Q</span><span>Pourquoi une matrice rectangulaire n × p n'a-t-elle pas de valeurs propres — et que fait-on à la place ?</span><span class="chev">›</span></summary><div class="body"><p class="def">L'équation Av = λv est <b>malformée</b> : v ∈ ℝᵖ mais Av ∈ ℝⁿ, deux espaces différents. À la place : la SVD, A = UΣVᵀ, qui existe pour <b>toute</b> matrice. Contraste : diagonaliser exige carrée ET diagonalisable ; la SVD n'exige rien.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Av et v ne vivent pas dans le même espace, donc on ne peut pas les comparer, donc il n'y a pas de valeur propre, donc on remplace l'idée par deux bases orthonormées reliées par Σ. »</p></div></div></details><details><summary><span class="q">Q</span><span>A rectangulaire : les valeurs propres de quelle matrice donnent ses valeurs singulières, et pourquoi la racine est-elle légitime ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Celles de AᵀA, carrée et symétrique : AᵀA = V(ΣᵀΣ)Vᵀ, donc σ<sub>i</sub> = √λ<sub>i</sub>(AᵀA). Légitime car vᵀAᵀAv = ‖Av‖² ≥ 0, donc les λ<sub>i</sub> sont réelles et ≥ 0. Les colonnes de V sont les vecteurs propres de AᵀA, celles de U ceux de AAᵀ.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« AᵀA est symétrique positive, donc ses valeurs propres sont réelles positives, donc leur racine existe, donc ce sont les valeurs singulières de A. »</p></div></div></details><details><summary><span class="q">Q</span><span>Valeurs propres et valeurs singulières d'une même matrice carrée : est-ce le même objet ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Deux questions différentes. Valeur propre : quelle direction est <b>conservée</b> (Av ∥ v) et par combien. Valeur singulière : par combien A <b>étire</b> au maximum, quelle que soit la direction de sortie. Symétrique SDP : σ<sub>i</sub> = λ<sub>i</sub> ; symétrique non SDP : σ<sub>i</sub> = |λ<sub>i</sub>|.</p><p class="ex">Rotation de 90° : aucune valeur propre réelle, deux valeurs singulières égales à 1. Cisaillement (1 1 ; 0 1) : λ = 1, 1 mais σ = 1,618 et 0,618.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« La valeur propre demande une direction invariante, la valeur singulière demande un étirement maximal, donc elles ne coïncident qu'en cas symétrique, donc en général σ ≠ λ même pour une matrice carrée. »</p></div></div></details><details><summary><span class="q">Q</span><span>Quel signal indique qu'il faut sortir les valeurs singulières plutôt que les valeurs propres ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Trois marqueurs : (1) matrice <b>rectangulaire</b> (données n × p) ; (2) question d'<b>approximation de rang faible</b> ou de compression ; (3) question de <b>conditionnement</b> ou de stabilité numérique (κ = σ<sub>max</sub>/σ<sub>min</sub>). Côté valeurs propres : Markov, PageRank, stabilité d'une dynamique.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« La SVD parle d'étirement et de rang, donc dès qu'on compresse, approxime ou mesure la sensibilité, on sort les σ ; les valeurs propres parlent d'invariance sous itération, donc on les sort pour la dynamique. »</p></div></div></details><details><summary><span class="q">Q</span><span>Extraire des directions en formant AᵀA ou en travaillant directement sur A : lequel, et pourquoi ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Directement sur A (SVD). Former AᵀA <b>élève le conditionnement au carré</b> : κ(AᵀA) = κ(A)². κ est le facteur d'amplification des erreurs relatives : une perturbation de 10⁻¹⁶ devient 10⁻¹⁶ × κ².</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Les valeurs singulières de AᵀA sont les carrés de celles de A, donc leur rapport est élevé au carré, donc toute erreur d'arrondi est amplifiée quadratiquement, donc on évite de former AᵀA explicitement. »</p></div></div></details></section><section class="sec" style="--ac:var(--green)"><div class="sec-head"><span class="n">04</span><h2>PCA</h2></div><details><summary><span class="q">Q</span><span>Pourquoi doit-on centrer avant une PCA ? Que se passe-t-il sinon ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Le centrage fait de AᵀA une <b>covariance</b> : Ĉ = AᵀA/(n − 1) n'est vraie que si les colonnes sont de moyenne nulle. Sans centrage, Σ x<sub>ij</sub>x<sub>ik</sub> est un moment non centré, dominé par le produit des moyennes : PC1 pointe vers le centre de gravité au lieu de la direction d'étalement.</p><p class="ex">A = (1 2 ; −1 0 ; 0 −2), colonnes centrées : AᵀA = (2 2 ; 2 8), Ĉ = (1 1 ; 1 4). Le facteur 1/(n − 1) ne change pas les vecteurs propres.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« AᵀA est le produit scalaire des colonnes, donc ce n'est une covariance que si les colonnes sont centrées, donc sans centrage on mesure de la position au lieu de la variance. »</p></div></div></details><details><summary><span class="q">Q</span><span>Quand seulement centrer, quand aussi standardiser ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Centrer toujours. Unités <b>hétérogènes</b> → standardiser = PCA sur la corrélation. Unités <b>homogènes</b> (pixels, canaux) → centrer suffit = PCA sur la covariance. Le fit (moyennes, écarts-types, axes) se calcule sur le train seul, dans un Pipeline.</p><p class="ex">Salaire (variance ~10⁶) et ancienneté (variance ~10) : sans standardisation PC1 = l'axe salaire, rien appris. À l'inverse, standardiser des pixels amplifie le bruit des directions à faible variance.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« La PCA sur covariance n'est pas invariante par changement d'échelle, donc des unités hétérogènes laissent la plus grande variance numérique capter PC1, donc on standardise ; des unités homogènes portent une information dans leur échelle, donc on la garde. »</p></div></div></details><details><summary><span class="q">Q</span><span>Vocabulaire PCA : composantes principales, lien avec la SVD, interprétation des valeurs propres ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Les vecteurs propres de la covariance sont les <b>composantes principales</b> = colonnes de V dans A = UΣVᵀ. La valeur propre = <b>variance des données projetées</b> sur cet axe. Trois formulations d'un seul calcul : diagonaliser la covariance = SVD des données centrées.</p><p class="ex">λ = (6, 2) : PC1 capture 6/8 = 75 % de la variance. La positivité des λ (des variances) rend légitime la part expliquée σ<sub>i</sub>²/Σσ<sub>j</sub>².</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« La covariance centrée vaut AᵀA/(n−1), donc ses vecteurs propres sont les colonnes de V de la SVD, donc chaque λ est la variance projetée sur l'axe correspondant. »</p></div></div></details></section><section class="sec" style="--ac:var(--coral)"><div class="sec-head"><span class="n">05</span><h2>Calcul différentiel — jacobienne, chain rule, backprop</h2></div><details><summary><span class="q">Q</span><span>Au-delà de sa taille : qu'<i>est</i> la jacobienne d'une fonction en un point ?</span><span class="chev">›</span></summary><div class="body"><p class="def">L'application linéaire qui approxime f autour de ce point : bouger l'entrée de δ bouge la sortie de Jδ. Taille (sorties × entrées).</p><p class="ex">g(x,y) = (x + 2y, xy) en (3,2) : J = (1 2 ; 2 3).</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Au voisinage d'un point, f se comporte comme une application linéaire, donc sa jacobienne est cette application, donc δ en entrée donne Jδ en sortie. »</p></div></div></details><details><summary><span class="q">Q</span><span>Chain rule matricielle : où s'évalue la jacobienne de f dans J<sub>f∘g</sub>(x) ?</span><span class="chev">›</span></summary><div class="body"><p class="def">J<sub>f∘g</sub>(x) = J<sub>f</sub>(g(x)) · J<sub>g</sub>(x). La jacobienne de f s'évalue au <b>point d'arrivée de g</b>, jamais en x — piège le plus fréquent.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« f reçoit g(x), pas x, donc sa linéarisation se prend en g(x), donc les jacobiennes se composent en s'évaluant chacune là où sa fonction agit. »</p></div></div></details><details><summary><span class="q">Q</span><span>Dans la descente de gradient, pourquoi −∇f et non +∇f ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Le gradient pointe vers la plus forte montée : le gain d'un pas unitaire dans la direction u vaut ⟨∇f, u⟩, maximal quand u = ∇f/‖∇f‖ (Cauchy-Schwarz). Descendre = prendre l'opposé.</p><p class="ex">En (2,5) avec ∇f = (4,3), le meilleur pas unitaire est (0,8 ; 0,6) = ∇f/5 ; la descente prend (−0,8 ; −0,6).</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« La variation de f pour un pas u vaut le produit scalaire avec le gradient, donc elle est maximale dans la direction du gradient, donc minimale dans la direction opposée. »</p></div></div></details><details><summary><span class="q">Q</span><span>Pourquoi la backpropagation parcourt-elle le graphe depuis la sortie ?</span><span class="chev">›</span></summary><div class="body"><p class="def">La <b>loss est un scalaire</b>, donc ∂L/∂z est un vecteur ligne (1 × m), donc chaque étape est un produit vecteur-matrice — un <i>vector-Jacobian product</i>. Argument de coût, pas de maths : le produit est associatif.</p><p class="ex">J₁J₂J₃ de shapes (1,m), (m,m), (m,n) : depuis la loss O(m² + mn) ; depuis l'entrée O(m²n). Un facteur m — toute la différence entre mode reverse et mode forward.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« La loss est un scalaire, donc son gradient par rapport à la dernière couche est une ligne, donc chaque produit reste ligne × matrice, donc on ne propage jamais une matrice pleine. »</p></div><div class="trap"><div class="lbl">Piège</div>Dire « la <i>sortie</i> est un vecteur ». Un classifieur ImageNet sort 1 000 logits et la backprop y fait une seule passe : ce qui est scalaire, c'est ce qui vient après la sortie. La jacobienne complète de la sortie coûterait 1 000 passes.</div></div></details></section><footer>Réactivation, pas découverte. Cartes sources : tags algebre::eigen, maths::algebre::svd, diagonalisation, algebre-lineaire, analyse (gradient, jacobienne, chain rule), ml::pca, deep-learning::backprop, maths::methode. Suite : fiche 08 (tenseurs et numérique).</footer></main>
+</div></section>
+<section class="view" id="v-deck"><div class="rail" id="rail"></div>
+  <div class="stage" id="stage"><button class="nav" id="prev" aria-label="Question précédente">‹</button>
+    <div class="deck"><div class="card" id="card">
+      <div class="face front"><div class="br"></div><div class="qtxt"></div><div class="cta"><span class="say">À la craie : réponds à voix haute, avec les « donc », avant de retourner la fiche.</span><button class="btn flip" id="flipBtn">Retourner <kbd>espace</kbd></button></div></div>
+      <div class="face back"><div class="br"></div><div class="ans"></div><div class="rate"><span class="lbl">Ta réponse orale, comparée à la fiche :</span><button class="btn again" data-r="again">Encore <kbd>1</kbd></button><button class="btn hard" data-r="hard">Difficile <kbd>2</kbd></button><button class="btn good" data-r="good">Bien <kbd>3</kbd></button></div></div>
+    </div></div><button class="nav" id="next" aria-label="Question suivante">›</button></div>
+  <div class="recap" id="recap" style="display:none"><h2>Fin du parcours</h2><p class="p">Réactivation, pas découverte : une question qui résiste est une carte à refondre, pas un cours à refaire.</p><div class="bars" id="bars"></div><div class="weak" id="weak"></div><div class="btns"><button class="btn" id="replay">Rejouer les faibles</button><button class="btn ghostb" id="restart">Tout recommencer</button></div></div>
+</section>
+<section class="view carte" id="v-carte"><section class="panel"><h2>Le tronc et les branches</h2><div class="mapscroll"><svg viewBox="0 0 760 410" xmlns="http://www.w3.org/2000/svg" role="img"><style>.bt{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:700}.leaf{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px}.rt{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;font-weight:700}.lk{fill:none;stroke-width:1.6;opacity:.7}</style><rect x="104" y="18" width="552" height="34" rx="6" fill="#101822" stroke="#E9EDF3" stroke-width="1.5"/><text class="rt" x="380" y="40" text-anchor="middle" fill="#E9EDF3">quelle direction est conservée, et par combien est-elle étirée ?</text><path class="lk" d="M380,52 C380,70 126,60 126,100" stroke="#54C8B8"/><rect x="23" y="100" width="206" height="32" rx="6" fill="#101822" stroke="#54C8B8" stroke-width="1.5"/><text class="bt" x="126" y="121" text-anchor="middle" fill="#54C8B8">applications linéaires</text><line x1="8" y1="150" x2="12" y2="150" stroke="#54C8B8" stroke-width="1.5"/><text class="leaf" x="16" y="154">Ax = combinaison des colonnes</text><line x1="8" y1="172" x2="12" y2="172" stroke="#54C8B8" stroke-width="1.5"/><text class="leaf" x="16" y="176">noyau ≠ {0} → information dét</text><line x1="8" y1="194" x2="12" y2="194" stroke="#54C8B8" stroke-width="1.5"/><text class="leaf" x="16" y="198">affine ≠ linéaire : f(0) ≠ 0</text><line x1="8" y1="216" x2="12" y2="216" stroke="#54C8B8" stroke-width="1.5"/><text class="leaf" x="16" y="220">borne sur un min : témoin</text><path class="lk" d="M380,52 C380,70 379,60 379,100" stroke="#B49CF6"/><rect x="304" y="100" width="150" height="32" rx="6" fill="#101822" stroke="#B49CF6" stroke-width="1.5"/><text class="bt" x="379" y="121" text-anchor="middle" fill="#B49CF6">valeurs propres</text><line x1="261" y1="150" x2="265" y2="150" stroke="#B49CF6" stroke-width="1.5"/><text class="leaf" x="269" y="154">det(A − λI) = 0 : pourquoi</text><line x1="261" y1="172" x2="265" y2="172" stroke="#B49CF6" stroke-width="1.5"/><text class="leaf" x="269" y="176">P⁻¹ traduit, D étire, P recom</text><line x1="261" y1="194" x2="265" y2="194" stroke="#B49CF6" stroke-width="1.5"/><text class="leaf" x="269" y="198">Aᵏw → direction u₁, norme λ₁ᵏ</text><line x1="261" y1="216" x2="265" y2="216" stroke="#B49CF6" stroke-width="1.5"/><text class="leaf" x="269" y="220">signal : itération + long ter</text><path class="lk" d="M380,52 C380,70 632,60 632,100" stroke="#6FA6E8"/><rect x="561" y="100" width="142" height="32" rx="6" fill="#101822" stroke="#6FA6E8" stroke-width="1.5"/><text class="bt" x="632" y="121" text-anchor="middle" fill="#6FA6E8">spectral / SVD</text><line x1="514" y1="150" x2="518" y2="150" stroke="#6FA6E8" stroke-width="1.5"/><text class="leaf" x="522" y="154">symétrique ⇒ λ réelles, P ort</text><line x1="514" y1="172" x2="518" y2="172" stroke="#6FA6E8" stroke-width="1.5"/><text class="leaf" x="522" y="176">rectangulaire : Av = λv malfo</text><line x1="514" y1="194" x2="518" y2="194" stroke="#6FA6E8" stroke-width="1.5"/><text class="leaf" x="522" y="198">σ_i = √λ_i(AᵀA)</text><line x1="514" y1="216" x2="518" y2="216" stroke="#6FA6E8" stroke-width="1.5"/><text class="leaf" x="522" y="220">κ(AᵀA) = κ(A)²</text><path class="lk" d="M380,52 C380,220 126,210 126,250" stroke="#7BD88F"/><rect x="99" y="250" width="54" height="32" rx="6" fill="#101822" stroke="#7BD88F" stroke-width="1.5"/><text class="bt" x="126" y="271" text-anchor="middle" fill="#7BD88F">PCA</text><line x1="8" y1="300" x2="12" y2="300" stroke="#7BD88F" stroke-width="1.5"/><text class="leaf" x="16" y="304">centrer : sinon PC1 = centre </text><line x1="8" y1="322" x2="12" y2="322" stroke="#7BD88F" stroke-width="1.5"/><text class="leaf" x="16" y="326">hétérogène → standardiser (co</text><line x1="8" y1="344" x2="12" y2="344" stroke="#7BD88F" stroke-width="1.5"/><text class="leaf" x="16" y="348">composantes = colonnes de V</text><line x1="8" y1="366" x2="12" y2="366" stroke="#7BD88F" stroke-width="1.5"/><text class="leaf" x="16" y="370">λ_i = variance projetée</text><path class="lk" d="M380,52 C380,220 379,210 379,250" stroke="#F0796B"/><rect x="280" y="250" width="198" height="32" rx="6" fill="#101822" stroke="#F0796B" stroke-width="1.5"/><text class="bt" x="379" y="271" text-anchor="middle" fill="#F0796B">jacobienne / backprop</text><line x1="261" y1="300" x2="265" y2="300" stroke="#F0796B" stroke-width="1.5"/><text class="leaf" x="269" y="304">J = application linéaire loca</text><line x1="261" y1="322" x2="265" y2="322" stroke="#F0796B" stroke-width="1.5"/><text class="leaf" x="269" y="326">J_f(g(x)) · J_g(x)</text><line x1="261" y1="344" x2="265" y2="344" stroke="#F0796B" stroke-width="1.5"/><text class="leaf" x="269" y="348">−∇f : plus forte descente</text><line x1="261" y1="366" x2="265" y2="366" stroke="#F0796B" stroke-width="1.5"/><text class="leaf" x="269" y="370">loss scalaire ⇒ ligne × matri</text></svg></div><p class="caption">Tronc commun : une matrice est une action sur les vecteurs. Les valeurs propres disent quelles directions survivent à l'action itérée ; la SVD étend l'idée aux matrices rectangulaires ; la PCA en est l'application aux covariances ; la jacobienne est la même idée, localement, pour une fonction non linéaire.</p></section><div class="grid" id="grid"></div></section>
+</div><script>
+const all=document.querySelectorAll('details');
+const oa=document.getElementById('openAll'),ca=document.getElementById('closeAll');
+
+
+(function(){const btn=document.getElementById('themeBtn');if(!btn)return;const body=document.body;
+ const alt=btn.dataset.alt, base=btn.dataset.base, cls=btn.dataset.cls;
+ function apply(on){body.classList.toggle(cls,on);btn.textContent=on?base:alt;btn.setAttribute('aria-pressed',String(on));}
+ apply(window.matchMedia&&window.matchMedia(btn.dataset.query).matches);
+ btn.onclick=()=>apply(!body.classList.contains(cls));})();
+
+(function(){
+  const body=document.body, rm=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const RL={again:'encore',hard:'difficile',good:'bien'};
+  // ---------- shared model, built from the Labo sections ----------
+  const secs=[...document.querySelectorAll('#v-labo .sec')];
+  const cards=[]; secs.forEach((s,bi)=>{const br=s.querySelector('h2').textContent, ac=s.getAttribute('style');
+    s.querySelectorAll('details').forEach(d=>{d.id='q'+(cards.length+1);
+      cards.push({bi,br,ac,el:d,q:d.querySelector('summary span:nth-child(2)').innerHTML,a:d.querySelector('.body').innerHTML,rating:null});});});
+  const listeners=[]; function setRating(k,r){cards[k].rating=r; listeners.forEach(f=>f());}
+  // ---------- dictée des « donc » ----------
+  function dictee(root){root.querySelectorAll('.board .say').forEach(say=>{
+    const parts=say.innerHTML.split(/(\sdonc\s)/); if(parts.length<3)return; let out=parts[0];
+    for(let i=1;i<parts.length;i+=2)out+=`<span class="dz hid"><span class="donc">${parts[i]}</span>${parts[i+1]||''}</span>`;
+    say.innerHTML=out; const d=document.createElement('div'); d.className='dict'; d.textContent='Dictée : dis la suite à voix haute, puis clique pour vérifier — maillon par maillon.'; say.parentNode.appendChild(d);
+    say.querySelectorAll('.dz').forEach(z=>z.addEventListener('click',()=>z.classList.remove('hid')));});}
+  dictee(document.getElementById('v-labo'));
+  cards.forEach(c=>c.el.addEventListener('toggle',()=>{if(!c.el.open)c.el.querySelectorAll('.dz').forEach(z=>z.classList.add('hid'));}));
+  (function(){const btn=document.getElementById('dictBtn');
+    function set(on){body.classList.toggle('dictee',on);btn.setAttribute('aria-pressed',String(on));btn.textContent=on?'Dictée des « donc » : on':'Dictée des « donc » : off';}
+    set(true); btn.onclick=()=>set(!body.classList.contains('dictee'));})();
+  // ---------- tabs ----------
+  document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+    document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===b.dataset.v));});
+  const goTab=id=>document.querySelector(`.tabs button[data-v="${id}"]`).click();
+  // ---------- labo : sidebar tree + grade buttons ----------
+  (function(){
+    const tree=document.getElementById('tree'), redo=document.getElementById('redo'), scoreEl=document.getElementById('score');
+    const pan=document.createElement('div'); pan.className='branch'; pan.setAttribute('style','--ac:var(--yellow)');
+    pan.innerHTML=`<div class="bh"><i></i>Les trois panneaux</div><ul>${[...document.querySelectorAll('#v-labo .widget')].map((w,i)=>{w.id='pan'+(i+1);return `<li><a href="#pan${i+1}">${w.querySelector('h2').textContent.split(' : ')[0]}</a></li>`;}).join('')}</ul>`;
+    tree.insertBefore(pan,redo);
+    secs.forEach((s,bi)=>{const b=document.createElement('div'); b.className='branch'; b.setAttribute('style',s.getAttribute('style'));
+      const ks=cards.map((c,k)=>c.bi===bi?k:-1).filter(k=>k>=0);
+      b.innerHTML=`<div class="bh"><i></i>${cards[ks[0]].br}<small id="bc${bi}"></small></div><ul>${ks.map(k=>{const q=cards[k].q.replace(/<[^>]+>/g,'');return `<li><a href="#${cards[k].el.id}" data-k="${k}">${q.length>70?q.slice(0,68)+'…':q}</a></li>`;}).join('')}</ul>`;
+      tree.insertBefore(b,redo);});
+    tree.querySelectorAll('a[data-k]').forEach(a=>a.onclick=()=>{cards[+a.dataset.k].el.open=true;});
+    cards.forEach((c,k)=>{const g=document.createElement('div'); g.className='grade';
+      g.innerHTML=`<span>Tu l'avais ?</span><button class="again">encore</button><button class="hard">difficile</button><button class="good">✓ bien</button>`;
+      c.el.querySelector('.body').appendChild(g);
+      g.querySelectorAll('button').forEach(btn=>btn.onclick=()=>{const r=btn.className.split(' ')[0]; setRating(k,c.rating===r?null:r);});});
+    function refresh(){
+      const n=r=>cards.filter(c=>c.rating===r).length;
+      scoreEl.innerHTML=`<b>${n('good')}</b> bien · <b>${n('hard')}</b> difficile · <b>${n('again')}</b> encore · ${cards.length-n('good')-n('hard')-n('again')} non jugées`;
+      redo.disabled=!(n('again')+n('hard'));
+      secs.forEach((s,bi)=>{const ks=cards.filter(c=>c.bi===bi); document.getElementById('bc'+bi).textContent=`${ks.filter(c=>c.rating==='good').length}/${ks.length}`;});
+      cards.forEach((c,k)=>{const a=tree.querySelector(`a[data-k="${k}"]`); a.className=c.rating||'';
+        c.el.querySelectorAll('.grade button').forEach(x=>x.classList.toggle('on',x.classList.contains(c.rating)));});}
+    listeners.push(refresh); refresh();
+    redo.onclick=()=>{cards.forEach(c=>c.el.open=c.rating==='again'||c.rating==='hard'); const f=cards.find(c=>c.el.open); if(f)f.el.scrollIntoView({behavior:rm?'auto':'smooth',block:'start'});};
+    document.getElementById('openAll').onclick=()=>cards.forEach(c=>c.el.open=true);
+    document.getElementById('closeAll').onclick=()=>cards.forEach(c=>c.el.open=false);
+  })();
+  // ---------- parcours (deck) ----------
+  (function(){
+    let i=0, order=cards.map((_,k)=>k), pos=0, flipped=false;
+    const card=document.getElementById('card'), front=card.querySelector('.front'), back=card.querySelector('.back');
+    const rail=document.getElementById('rail'), recap=document.getElementById('recap'), stage=document.getElementById('stage');
+    function drawRail(){
+      const W=Math.max(760,cards.length*54), x0=30, dx=(W-60)/(cards.length-1); let h='';
+      secs.forEach((s,bi)=>{const ks=cards.map((c,k)=>c.bi===bi?k:-1).filter(k=>k>=0); const a=x0+ks[0]*dx,b=x0+ks[ks.length-1]*dx;
+        h+=`<line x1="${a}" y1="30" x2="${b}" y2="30" stroke="var(--ac)" stroke-width="5" stroke-linecap="round" style="${s.getAttribute('style')}"/>`;
+        let lb=cards[ks[0]].br.split(' — ')[0]; if(lb.length>17)lb=lb.slice(0,16)+'…'; const anc=bi===0?'start':bi===secs.length-1?'end':'middle', tx=anc==='start'?a-6:anc==='end'?b+6:(a+b)/2;
+        h+=`<text x="${tx}" y="${bi%2?50:14}" text-anchor="${anc}">${String(bi+1).padStart(2,'0')} ${lb}</text>`;});
+      cards.forEach((c,k)=>{h+=`<g class="st ${c.rating?'rated-'+c.rating:''} ${k===i?'cur':''}" data-k="${k}" style="${c.ac}"><circle cx="${x0+k*dx}" cy="30" r="6" stroke="var(--ac)"/></g>`;});
+      rail.innerHTML=`<svg viewBox="0 0 ${W} 58" xmlns="http://www.w3.org/2000/svg">${h}</svg>`;
+      const cur=rail.querySelector('.st.cur'); if(cur){const bx=cur.getBoundingClientRect(),rb=rail.getBoundingClientRect(); if(bx.left<rb.left+40||bx.right>rb.right-40)rail.scrollLeft+=bx.left-rb.left-rb.width/2;}
+      rail.querySelectorAll('.st').forEach(g=>g.onclick=()=>{pos=order.indexOf(+g.dataset.k);if(pos<0){order=cards.map((_,k)=>k);pos=+g.dataset.k;}show();});}
+    function fit(){const f=flipped?back:front; f.style.position='relative'; const h=Math.max(380,Math.min(f.scrollHeight+2,window.innerHeight*.78)); f.style.position=''; card.style.height=h+'px';}
+    function show(){
+      i=order[pos]; const c=cards[i]; flipped=false; card.classList.remove('flipped'); recap.style.display='none'; stage.style.display='';
+      card.setAttribute('style',c.ac);
+      front.querySelector('.br').innerHTML=`<i>Q</i>${c.br}<small>${pos+1} / ${order.length}</small>`;
+      front.querySelector('.qtxt').innerHTML=c.q;
+      back.querySelector('.br').innerHTML=`${c.br}<small>${pos+1} / ${order.length}</small>`;
+      back.querySelector('.ans').innerHTML=c.a; back.scrollTop=0; dictee(back);
+      drawRail(); fit();}
+    function flip(){flipped=!flipped;card.classList.toggle('flipped',flipped);fit();}
+    function rate(r){setRating(i,r); if(pos<order.length-1){pos++;show();}else finish();}
+    function finish(){
+      stage.style.display='none'; recap.style.display='';
+      document.getElementById('bars').innerHTML=secs.map((s,bi)=>{const ks=cards.filter(c=>c.bi===bi); const n=r=>ks.filter(c=>c.rating===r).length;
+        return `<div class="bar" style="${s.getAttribute('style')}"><span>${ks[0].br.split(' — ')[0]}</span><div class="tr"><i style="width:${100*n('good')/ks.length}%;background:var(--good)"></i><i style="width:${100*n('hard')/ks.length}%;background:var(--hard)"></i><i style="width:${100*n('again')/ks.length}%;background:var(--again)"></i></div><small>${n('good')}/${ks.length}</small></div>`;}).join('');
+      const weak=cards.map((c,k)=>({c,k})).filter(o=>o.c.rating&&o.c.rating!=='good'); const wk=document.getElementById('weak');
+      wk.innerHTML=weak.length?`<h3>À reprendre (${weak.length})</h3>`+weak.map(o=>`<a href="#" data-k="${o.k}" style="${o.c.ac}">${o.c.q.replace(/<[^>]+>/g,'')}</a>`).join(''):'<h3>Tout est passé en « bien ». La fiche a fait son travail : ferme-la.</h3>';
+      wk.querySelectorAll('a').forEach(a=>a.onclick=e=>{e.preventDefault();order=cards.map((_,k)=>k);pos=+a.dataset.k;show();});
+      document.getElementById('replay').disabled=!weak.length;
+      document.getElementById('replay').onclick=()=>{order=weak.map(o=>o.k);pos=0;show();};
+      document.getElementById('restart').onclick=()=>{cards.forEach(c=>c.rating=null);listeners.forEach(f=>f());order=cards.map((_,k)=>k);pos=0;show();};
+      drawRail();}
+    document.getElementById('flipBtn').onclick=flip;
+    back.querySelectorAll('.rate .btn').forEach(b=>b.onclick=()=>rate(b.dataset.r));
+    document.getElementById('prev').onclick=()=>{if(pos>0){pos--;show();}};
+    document.getElementById('next').onclick=()=>{if(pos<order.length-1){pos++;show();}};
+    window.addEventListener('resize',fit);
+    document.addEventListener('keydown',e=>{if(!document.getElementById('v-deck').classList.contains('on')||e.target.tagName==='BUTTON'&&e.key===' ')return;
+      if(e.key===' '||e.key==='Enter'){e.preventDefault();flip();}
+      else if(e.key==='ArrowRight'){if(pos<order.length-1){pos++;show();}}
+      else if(e.key==='ArrowLeft'){if(pos>0){pos--;show();}}
+      else if(flipped&&['1','2','3'].includes(e.key))rate({1:'again',2:'hard',3:'good'}[e.key]);});
+    listeners.push(drawRail);
+    window.gotoCard=k=>{order=cards.map((_,k)=>k);pos=k;show();goTab('v-deck');};
+    show();
+  })();
+  // ---------- carte : grid ----------
+  (function(){const g=document.getElementById('grid');
+    function draw(){g.innerHTML=cards.map((c,k)=>`<button class="chip ${c.rating?'rated-'+c.rating:''}" data-k="${k}" style="${c.ac}">${c.q.replace(/<[^>]+>/g,'')}<small>${c.br.split(' — ')[0]} · ${c.rating?RL[c.rating]:'non jugée'}</small></button>`).join('');
+      g.querySelectorAll('.chip').forEach(b=>b.onclick=()=>window.gotoCard(+b.dataset.k));}
+    listeners.push(draw); draw();})();
+})();
+
+(function(){const tree=document.getElementById('tree'); const br=[...tree.querySelectorAll('.branch')];
+  br.forEach(b=>{if(!b.querySelector('li'))b.remove();});
+  const many=document.querySelectorAll('#v-labo .sec details').length>25;
+  tree.querySelectorAll('.branch').forEach((b,i)=>{b.querySelector('.bh').addEventListener('click',e=>{if(e.target.tagName==='A')return;b.classList.toggle('fold');}); if(many&&i>0)b.classList.add('fold');});
+  tree.querySelectorAll('a[data-k]').forEach(a=>a.addEventListener('click',()=>a.closest('.branch').classList.remove('fold')));
+})();
+</script></body></html>

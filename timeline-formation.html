@@ -1,0 +1,739 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Timeline formation ML/LLM · 51 semaines · v4 tableau (11/09)</title>
+<style>
+    :root{
+    --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+    --base:var(--board); --panel:var(--board2); --panel2:#162220; --card:var(--board2); --card2:#162220;
+    --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93;
+    --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+    --p1:#9FE0D2; --p2:#A7CCEB; --p3:#C8B6F5; --p4:#F0D178; --p6:#F3A28F;
+    --algo:#A7CCEB; --ml:#9FE0D2; --couches:#C8B6F5; --bloc:#EDE8DA;
+    --arte:#B9E2C4; --deci:#F0D178; --cp:#F3A28F;
+    --teal:#9FE0D2; --blue:#A7CCEB; --violet:#C8B6F5; --green:#B9E2C4; --amber:#F0D178; --coral:#F3A28F;
+    --mono:ui-monospace,Menlo,Consolas,monospace;
+    --body:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+    --serif:Georgia,"Iowan Old Style","Times New Roman",serif;
+    --colw:30px; --lw:104px;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--board);color:var(--ink);font-family:var(--body);-webkit-font-smoothing:antialiased;min-height:100vh;
+    background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+  .wrap{max-width:1180px;margin:0 auto}
+
+  /* ---------- header ---------- */
+  .eyebrow{font-family:var(--mono);font-size:10.5px;letter-spacing:.3em;text-transform:uppercase;color:var(--faint)}
+  h1{font-family:var(--serif);font-size:clamp(22px,3.6vw,34px);font-weight:500;letter-spacing:0;margin-top:7px;line-height:1.1}
+  h1 span{color:var(--p1)}
+  .sub{color:var(--muted);font-size:13px;margin-top:8px;max-width:74ch}
+  .sub b{color:var(--ink);font-weight:600}
+
+  .bar{display:flex;flex-wrap:wrap;gap:7px;align-items:center;margin:18px 0 12px}
+  .chip{font-family:var(--mono);font-size:11px;color:var(--muted);background:var(--panel);
+    border:1px solid var(--line2);border-radius:20px;padding:5px 11px;cursor:pointer;transition:.15s;
+    display:inline-flex;align-items:center;gap:6px}
+  .chip i{width:8px;height:8px;border-radius:2px;background:var(--cc);display:inline-block}
+  .chip.on{color:var(--ink);border-color:var(--cc)}
+  .chip:not(.on){opacity:.45}
+  .sp{flex:1}
+  .btn{font-family:var(--mono);font-size:11px;color:var(--muted);background:transparent;
+    border:1px solid var(--line2);border-radius:8px;padding:5px 11px;cursor:pointer;transition:.15s}
+  .btn:hover,.btn.on{color:var(--base);background:var(--p1);border-color:var(--p1);font-weight:700}
+
+  /* ---------- rail ---------- */
+  .rail{display:flex;border:1px solid var(--line);border-radius:14px;overflow:hidden;
+    background:linear-gradient(180deg,var(--panel),var(--panel2))}
+  .labels{width:var(--lw);flex:none;border-right:1px solid var(--line2);background:rgba(0,0,0,.18);z-index:3}
+  .scroll{overflow-x:auto;overflow-y:hidden;flex:1;position:relative;scrollbar-width:thin}
+  .scroll::-webkit-scrollbar{height:8px}
+  .scroll::-webkit-scrollbar-thumb{background:var(--line2);border-radius:8px}
+  .grid{display:grid;grid-template-columns:repeat(var(--n),var(--colw));position:relative;min-width:100%}
+
+  .rw{display:contents}
+  .lb{display:flex;align-items:center;justify-content:flex-end;padding:0 10px;
+    font-family:var(--mono);font-size:9.5px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);
+    border-bottom:1px solid rgba(255,255,255,.04)}
+  .lb.strong{color:var(--muted)}
+  .cell{border-bottom:1px solid rgba(255,255,255,.04);border-right:1px solid rgba(255,255,255,.035);
+    position:relative;display:flex;align-items:center;justify-content:center;cursor:pointer}
+  .cell.q{box-shadow:inset -1px 0 0 var(--line2)}
+
+  /* hauteurs */
+  .h-mon{height:22px}.h-pha{height:24px}.h-blk{height:19px}.h-mil{height:30px}
+  .h-bloc{height:38px}.h-lane{height:20px}.h-num{height:20px}
+
+  .mon{font-family:var(--mono);font-size:9.5px;color:var(--faint);letter-spacing:.14em;
+    justify-content:flex-start;padding-left:5px;text-transform:uppercase}
+  .mon.first{color:var(--muted)}
+
+  .pha{font-family:var(--mono);font-size:9px;letter-spacing:.12em;color:var(--base);font-weight:700;
+    background:var(--pc);justify-content:flex-start;padding-left:6px;white-space:nowrap;overflow:hidden;
+    border-right:0;text-transform:uppercase}
+  .pha.mid{opacity:.92}
+  .pha.body{background:color-mix(in srgb,var(--pc) 30%, transparent)}
+
+  /* bande des blocs B1→B8 : découpage pédagogique interne à la Phase 2 */
+  .blk{font-family:var(--mono);font-size:9px;letter-spacing:.1em;font-weight:700;color:var(--pc);
+    justify-content:flex-start;padding-left:6px;white-space:nowrap;overflow:hidden;border-right:0;
+    background:color-mix(in srgb,var(--pc) 13%, transparent)}
+  .blk.start{box-shadow:inset 2px 0 0 var(--pc)}
+  .blk.none{background:transparent}
+
+  .mil i{width:11px;height:11px;transform:rotate(45deg);background:var(--mc);display:block;
+    box-shadow:0 0 9px var(--mc);border-radius:2px}
+  .mil.multi i{width:13px;height:13px}
+
+  .bar-b{width:calc(100% - 7px);background:linear-gradient(180deg,rgba(200,214,238,.9),rgba(200,214,238,.35));
+    border-radius:2px 2px 0 0;align-self:flex-end;margin-bottom:0}
+  .dot{width:9px;height:9px;border-radius:50%;background:var(--dc);opacity:.9}
+  .dot.two{width:9px;height:9px;box-shadow:0 0 0 3px color-mix(in srgb,var(--dc) 25%, transparent)}
+  .num{font-family:var(--mono);font-size:9px;color:var(--faint)}
+
+  .cell.sel{background:rgba(255,255,255,.09)}
+  .cell:hover{background:rgba(255,255,255,.05)}
+  .col-sel{position:absolute;top:0;bottom:0;width:var(--colw);border-left:1px solid var(--p1);
+    border-right:1px solid var(--p1);background:rgba(159,224,210,.08);pointer-events:none;z-index:2}
+  .today{position:absolute;top:0;bottom:0;width:2px;background:var(--p6);z-index:2;pointer-events:none;
+    box-shadow:0 0 10px var(--p6)}
+  /* l'étiquette vit en BAS : en haut elle recouvrait le nom du mois (la ligne du jour
+     tombe forcément dans une colonne, donc sur un libellé de mois une semaine sur quatre) */
+  .today::after{content:"AUJ.";position:absolute;bottom:2px;left:4px;font-family:var(--mono);font-size:8px;
+    letter-spacing:.14em;color:var(--p6);background:var(--base);border:1px solid var(--p6);
+    border-radius:3px;padding:0 3px;line-height:1.5;z-index:3;white-space:nowrap}
+  .off .cell{background:repeating-linear-gradient(45deg,transparent 0 4px,rgba(237,232,218,.06) 4px 8px)}
+
+  /* ---------- panneau ---------- */
+  .panel{margin-top:14px;border:1px solid var(--line);border-left:3px solid var(--pc,var(--p1));
+    border-radius:13px;background:linear-gradient(180deg,var(--panel),var(--panel2));overflow:hidden}
+  .p-top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line)}
+  .p-top .dt{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--pc,var(--p1))}
+  .p-top .tt{font-size:15px;font-weight:600;flex:1;min-width:180px}
+  .p-top .hrs{font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.06em}
+  .bdg{font-family:var(--mono);font-size:9px;letter-spacing:.1em;padding:2px 7px;border-radius:20px;border:1px solid currentColor}
+  .bdg.arte{color:var(--arte)}.bdg.deci{color:var(--deci)}.bdg.cp{color:var(--cp)}
+  .nav{display:flex;gap:5px}
+  .nav button{font-family:var(--mono);font-size:12px;color:var(--muted);background:transparent;
+    border:1px solid var(--line2);border-radius:7px;width:28px;height:26px;cursor:pointer}
+  .nav button:hover{color:var(--ink);border-color:var(--p1)}
+
+  .row{display:grid;grid-template-columns:48px 62px 56px 174px minmax(0,1fr);gap:4px 11px;
+    align-items:start;padding:7px 16px 9px}
+  .row.newday{border-top:1px solid var(--line2);padding-top:11px;margin-top:2px}
+  .row.newday:first-child{border-top:0;margin-top:0}
+  .row.sameday .day{color:rgba(90,108,144,.45)}
+  .row .day{font-family:var(--mono);font-size:10px;color:var(--faint);padding-top:3px;
+    letter-spacing:.05em;text-transform:uppercase}
+  .row .kk{font-family:var(--mono);font-size:9px;letter-spacing:.07em;padding-top:4px;
+    text-transform:uppercase;color:var(--kc)}
+  .row .hr{font-family:var(--mono);font-size:10.5px;letter-spacing:.02em;color:var(--muted);
+    text-align:right;padding-top:2px}
+  .row .hr.dflt{color:var(--faint)}
+  .row .hr.none{opacity:.28}
+  .row .ti{min-width:0;font-size:12.8px;font-weight:600;color:var(--kc);line-height:1.35;
+    overflow-wrap:break-word;border-left:2px solid var(--kc);padding-left:9px}
+  .row .tx{font-size:13.6px;min-width:0;overflow-wrap:break-word;color:var(--muted)}
+  .row .tx b{color:var(--ink)}
+  .row .tx b{font-weight:600}
+  .row .tx em{font-style:normal;color:var(--muted)}
+  .row.deci .tx,.row.arte .tx{border-left:2px solid var(--kc);padding-left:10px}
+  .row.hid{display:none}
+  .empty{padding:16px;color:var(--faint);font-size:13px}
+  @media(max-width:900px){
+    .row{grid-template-columns:44px 58px 52px minmax(0,1fr)}
+    .row .ti{grid-column:4}
+    .row .tx{grid-column:4}
+  }
+  @media(max-width:640px){
+    :root{--lw:76px}
+    .row{grid-template-columns:auto auto 1fr;gap:3px 8px;padding:10px 13px}
+    .row .ti{grid-column:1/-1;border-left:0;padding-left:0}
+    .row .tx{grid-column:1/-1}
+  }
+  .hint{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-top:10px;letter-spacing:.03em}
+
+  /* ---------- créneau libre & backlog Fluent Python ---------- */
+  .libre{margin-top:34px;border:1px solid var(--line);border-radius:14px;
+    background:linear-gradient(180deg,var(--card),var(--card2));overflow:hidden}
+  .libre>header{display:flex;flex-wrap:wrap;gap:10px 16px;align-items:baseline;
+    padding:15px 18px;border-bottom:1px solid var(--line)}
+  .libre h2{font-family:var(--serif);font-size:18px;font-weight:500}
+  .libre .opt{font-family:var(--mono);font-size:10px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--amber);border:1px solid rgba(232,176,75,.4);border-radius:20px;padding:2px 9px}
+  .libre .lede{padding:14px 18px 4px;font-size:13.5px;color:var(--muted);max-width:78ch;line-height:1.6}
+  .libre .lede b{color:var(--ink)}
+  .bktabs{display:flex;flex-wrap:wrap;gap:8px;padding:12px 18px 2px}
+  .bktabs button{font-family:var(--mono);font-size:11px;letter-spacing:.06em;color:var(--muted);
+    background:transparent;border:1px solid var(--line2);border-radius:20px;padding:5px 13px;cursor:pointer;transition:.15s}
+  .bktabs button:hover{color:var(--ink)}
+  .bktabs button.on{color:var(--base);background:var(--bc);border-color:var(--bc);font-weight:700}
+  .bk[hidden]{display:none}
+  .bktabs .bkhint{font-family:var(--mono);font-size:10px;color:var(--faint);align-self:center;letter-spacing:.04em}
+  .fp{padding:4px 18px 18px}
+  .bd{display:grid;grid-template-columns:44px minmax(0,1fr);gap:4px 12px;padding:9px 0;align-items:start;
+    border-top:1px solid var(--line)}
+  .bd:first-of-type{border-top:0}
+  .bd .rk{font-family:var(--mono);font-size:14px;font-weight:700;color:var(--fc);text-align:center}
+  .bd .nm{font-size:13.4px;font-weight:600;color:var(--ink)}
+  .bd .vol{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-left:7px;font-weight:400}
+  .bd .why{grid-column:2;font-size:13px;color:var(--muted);line-height:1.55}
+  .bd .why em{color:var(--amber);font-style:normal}
+  .bd.blanc .nm::after{content:"À BLANC";font-family:var(--mono);font-size:8.5px;letter-spacing:.12em;
+    color:var(--teal);border:1px solid var(--teal);border-radius:20px;padding:1px 5px;margin-left:8px;vertical-align:1px}
+  @media(max-width:640px){.bd{grid-template-columns:1fr}.bd .why{grid-column:1}}
+  .fpgrp{margin-top:14px}
+  .fpgrp>h3{font-family:var(--mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;
+    color:var(--faint);margin-bottom:8px;padding-bottom:5px;border-bottom:1px solid var(--line)}
+  .tk{display:grid;grid-template-columns:64px minmax(0,1fr);gap:4px 12px;padding:8px 0;align-items:start}
+  .tk .id{font-family:var(--mono);font-size:11px;font-weight:700;color:var(--fc);padding-top:1px}
+  .tk .ch{font-size:13.4px;font-weight:600;color:var(--ink)}
+  .tk .pp{font-family:var(--mono);font-size:10.5px;color:var(--faint);margin-left:7px;font-weight:400}
+  .tk .why{grid-column:2;font-size:13px;color:var(--muted);line-height:1.55}
+  .tk .why em{color:var(--amber);font-style:normal}
+  .excl{margin-top:18px;border:1px dashed var(--line2);border-radius:10px;padding:12px 14px;
+    font-size:12.8px;color:var(--faint);line-height:1.65}
+  .excl b{color:var(--muted);font-weight:600}
+  @media(max-width:640px){
+    .tk{grid-template-columns:1fr;gap:2px}
+    .tk .why{grid-column:1}
+  }
+  @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
+  :focus-visible{outline:2px solid var(--p1);outline-offset:2px}
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <div class="eyebrow">Formation ML/LLM · 51 semaines · 08/09/2026 → 27/08/2027</div>
+  <h1>La <span>timeline</span> jusqu'aux candidatures</h1>
+  <p class="sub">Cibles par ordre : <b>research engineer AI safety</b> → research engineer IA/ML → FDE / applied AI.
+  Chaque colonne est une semaine. La barre claire mesure les <b>heures de bloc principal</b>, les points marquent les
+  <b>drills</b>, les losanges les <b>jalons</b>. Clique une semaine — ou navigue aux flèches ← →.</p>
+
+  <div class="bar">
+    <button class="chip on" data-k="bloc" style="--cc:var(--bloc)"><i></i>bloc</button>
+    <button class="chip on" data-k="algo" style="--cc:var(--algo)"><i></i>algo</button>
+    <button class="chip on" data-k="ml" style="--cc:var(--ml)"><i></i>ml coding</button>
+    <button class="chip on" data-k="couches" style="--cc:var(--couches)"><i></i>couches</button>
+    <button class="chip on" data-k="arte" style="--cc:var(--arte)"><i></i>artefact</button>
+    <button class="chip on" data-k="deci" style="--cc:var(--deci)"><i></i>décision</button>
+    <span class="sp"></span>
+    <button class="btn" id="zoom">Zoom +</button>
+    <button class="btn" id="goToday">↦ aujourd'hui</button>
+    <button class="btn" id="goNext">◆ prochain jalon</button>
+  </div>
+
+  <div class="rail">
+    <div class="labels" id="labels"></div>
+    <div class="scroll" id="scroll"><div class="grid" id="grid"></div></div>
+  </div>
+
+  <div class="panel" id="panel"></div>
+
+  <section class="libre">
+<header><h2>Le créneau libre — les deux backlogs</h2><span class="opt">jamais obligatoire</span></header>
+<p class="lede">Environ 1 h, début ou fin d'après-midi, selon les réunions — <b>jamais obligatoire</b>. La règle de routage complète (ce qui passe en premier, le plafond hebdomadaire, ce qui n'entre jamais ici) vit dans TickTick, dans <b>🎟 Backlog dev web</b> : une seule source, pour qu'elle ne diverge pas.</p>
+<div class="bktabs" id="bktabs">
+  <button data-bk="fp" class="on" style="--bc:var(--violet)">🐍 Fluent Python · 23</button>
+  <button data-bk="bd" style="--bc:var(--blue)">🌐 boot.dev &amp; tickets learn · 12</button>
+  <span class="bkhint">un seul à la fois — clique pour basculer</span>
+</div>
+<div class="fp bk" id="bk-fp">
+<p class="lede" style="padding-left:0">23 tickets, <b>pagination vérifiée sur le PDF</b> (2<sup>e</sup> éd.). Un ticket se coche quand la section est lue <b>et</b> qu'un idiome en a été écrit dans la semaine — lue seule, elle ne compte pas. À ~30 min hebdomadaires tu en traiteras une quinzaine d'ici janvier : c'est une <b>réserve ordonnée</b>, pas une liste à finir.</p>
+<div class="fpgrp" style="--fc:var(--teal)"><h3>B1 · micrograd + makemore 1 — 21/09 → 05/10</h3>
+<div class="tk"><span class="id">FP-01</span><span class="ch">ch. 1 · Python Data Model, intégral<span class="pp">p. 3–18</span></span><span class="why"><code>Value.__repr__</code> et <code>__add__</code>. Le seul chapitre que Ramalho recommande à tout lecteur, quoi qu'il arrive.</span></div>
+<div class="tk"><span class="id">FP-02</span><span class="ch">ch. 16 · Operator Overloading 101 → Unary Operators<span class="pp">p. 562–568</span></span><span class="why"><code>__add__</code>, <code>__mul__</code>, <code>__pow__</code>, <code>__neg__</code>, <code>__sub__</code>, <code>__truediv__</code>.</span></div>
+<div class="tk"><span class="id">FP-03</span><span class="ch">ch. 16 · Overloading + → Wrapping-Up Arithmetic Operators<span class="pp">p. 568–577</span></span><span class="why">Opérateurs réfléchis. <code>2 * v</code> échoue sans <code>__rmul__</code> — tu vas rencontrer le bug avant de lire la section. <em>Pagination corrigée le 10/09 : la matière commence p. 568, pas 576.</em></span></div>
+<div class="tk"><span class="id">FP-04</span><span class="ch">ch. 9 · Variable Scope Rules → Closures → nonlocal<span class="pp">p. 308–316</span></span><span class="why"><code>_backward</code> <b>est</b> une closure. Le cœur conceptuel de micrograd, pas un à-côté.</span></div>
+</div>
+<div class="fpgrp" style="--fc:var(--violet)"><h3>B2 · makemore 2 — 05/10 → 16/10</h3>
+<div class="tk"><span class="id">FP-05</span><span class="ch">ch. 17 · Iterables vs Iterators → generator function → genexps<span class="pp">p. 599–613</span></span><span class="why">Construction du dataset, minibatchs.</span></div>
+<div class="tk"><span class="id">FP-06</span><span class="ch">ch. 2 · Why Slices and Ranges Exclude the Last Item + Slice Objects<span class="pp">p. 47–49</span></span><span class="why"><code>view(-1,6)</code>, indices de contexte, et la convention de tranche que tu poses avant chaque TAP.</span></div>
+<div class="tk"><span class="id">FP-2b</span><span class="ch">ch. 2 · Arrays → Memory Views → NumPy<span class="pp">p. 59–67</span></span><span class="why">Ramalho construit un <code>memoryview</code> sur un <code>array</code>, modifie un octet, voit la valeur changer des deux côtés. Le pont buffer / vue / copie en Python pur — il éclaire <code>keepdim</code>, la contiguïté et le bug « <code>view</code> échoue là où <code>reshape</code> passe ». <em>Ajouté après lecture du PDF complet.</em></span></div>
+</div>
+<div class="fpgrp" style="--fc:var(--blue)"><h3>B3 · makemore 3 — 19/10 → 30/10</h3>
+<div class="tk"><span class="id">FP-07</span><span class="ch">ch. 5 · Overview of Data Class Builders → @dataclass field options<span class="pp">p. 164–186</span></span><span class="why">Objets de configuration d'expérience.</span></div>
+<div class="tk"><span class="id">FP-08</span><span class="ch">ch. 6 · Variables Are Not Boxes → Identity & Aliases → Copies Are Shallow<span class="pp">p. 202–216</span></span><span class="why"><em>Recentré le 10/09 :</em> le déclencheur est le modèle d'<b>aliasing</b> (202–207), pas seulement les copies superficielles — c'est lui qui explique vue-vs-copie en torch, tes trois cartes déjà en deck. Puis le dict de config partagé entre runs (214–216).</span></div>
+</div>
+<div class="fpgrp" style="--fc:var(--green)"><h3>B4 · makemore 4, backprop manuel — 02/11 → 13/11</h3>
+<div class="tk"><span class="id">FP-09</span><span class="ch">ch. 7 · Higher-Order Functions → operator → functools.partial<span class="pp">p. 234–249</span></span><span class="why">Comparaison de gradients, fonctions de vérification.</span></div>
+<div class="tk"><span class="id">FP-10</span><span class="ch">ch. 8 · Gradual Typing in Practice → Generic Collections → ABCs<span class="pp">p. 255–280</span></span><span class="why">Annoter les repos from-scratch, mypy sur tinygraph.</span></div>
+</div>
+<div class="fpgrp" style="--fc:var(--coral)"><h3>B5–B8 · GPT, BPE, from-scratch — 16/11 → 08/01</h3>
+<div class="tk"><span class="id">FP-11</span><span class="ch">ch. 11 · Object Representations → __format__ / __hash__ → __slots__<span class="pp">p. 364–388</span></span><span class="why">Classes de modules propres.</span></div>
+<div class="tk"><span class="id">FP-12</span><span class="ch">ch. 12 · Protocols and Duck Typing → __getitem__ slice-aware → __getattr__<span class="pp">p. 402–411</span></span><span class="why">Comment <code>nn.Module</code> expose ses paramètres. <em>Le dynamique est en 408–411.</em></span></div>
+<div class="tk"><span class="id">FP-13</span><span class="ch">ch. 13 · Two Kinds of Protocols → Goose Typing → Static Protocols<span class="pp">p. 434–476</span></span><span class="why">Ce qu'est vraiment <code>nn.Module</code> ; socle pour lire du code de labo.</span></div>
+<div class="tk"><span class="id">FP-14</span><span class="ch">ch. 4 · Byte Essentials → Basic Encoders/Decoders<span class="pp">p. 120–128</span></span><span class="why">Le BPE opère sur des <b>octets UTF-8</b>. Seul ticket hors ordre du livre : chapitre de la Partie I, déclencheur en novembre.</span></div>
+<div class="tk"><span class="id">FP-15</span><span class="ch">ch. 18 · Context Managers and with Blocks → @contextmanager<span class="pp">p. 658–668</span></span><span class="why"><code>torch.no_grad()</code> <b>est</b> un context manager.</span></div>
+</div>
+<div class="fpgrp" style="--fc:var(--amber)"><h3>Phase 3 · LLM engineering — dès le 12/01</h3>
+<div class="tk"><span class="id">FP-16</span><span class="ch">ch. 9 · Implementing a Simple Decorator → functools.cache / lru_cache<span class="pp">p. 317–323</span></span><span class="why">Caching d'inférence.</span></div>
+<div class="tk"><span class="id">FP-17</span><span class="ch">ch. 9 · Single Dispatch → Parameterized Decorators<span class="pp">p. 324–335</span></span><span class="why">Registries de handlers.</span></div>
+<div class="tk"><span class="id">FP-18</span><span class="ch">ch. 19 · Processes, Threads and the GIL → The Real Impact of the GIL<span class="pp">p. 699–713</span></span><span class="why">Serving, batching.</span></div>
+<div class="tk"><span class="id">FP-19</span><span class="ch">ch. 21 · Downloading with asyncio → Throttling with a Semaphore<span class="pp">p. 782–794</span></span><span class="why">Appels LLM concurrents avec rate limit — ton quotidien.</span></div>
+<div class="tk"><span class="id">FP-20</span><span class="ch">ch. 21 · Asynchronous Generator Functions → Async Comprehensions<span class="pp">p. 812–818</span></span><span class="why">Streaming de tokens.</span></div>
+<div class="tk"><span class="id">FP-21</span><span class="ch">ch. 21 · A FastAPI Web Service<span class="pp">p. 799–804</span></span><span class="why">Ton stack.</span></div>
+<div class="tk"><span class="id">FP-22</span><span class="ch">ch. 15 · TypedDict → Overloaded Signatures<span class="pp">p. 519–534</span></span><span class="why">Schémas d'API, structured outputs.</span></div>
+</div>
+<div class="excl"><b>Exclus, à ne pas réintroduire —</b> ch. 3 dicts/sets (acquis) · ch. 10 design patterns par fonctions · ch. 14 héritage multiple · ch. 20 Concurrent Executors (redondant avec 19 et 21) · ch. 22 attributs dynamiques, <code>cached_property</code> comprise — le décorateur seul s'apprend en trois minutes de doc le jour venu · ch. 23 descripteurs · ch. 24 métaclasses : aucun round de labo ne les teste, et Ramalho prévient lui-même que l'abstraction prématurée vaut l'optimisation prématurée · ch. 17 <code>yield from</code> (631–634) — le tri topologique de micrograd s'écrit en DFS simple ; si le code le réclame, le ticket sera émis à ce moment-là.</div>
+</div>
+<div class="fp bk" id="bk-bd">
+<p class="lede" style="padding-left:0">Deux moitiés d'un même système. <b>Pull</b> : les tickets Linear « learn » que Claude Code produit après chaque itération Relaycat — prioritaires, un concept rencontré s'apprend mieux qu'un concept anticipé. <b>Push</b> : boot.dev, où tout est codé à la main, contrepoids au workflow agentique. Objectif : bases solides en software engineering, niveau <b>moyen</b> en web — savoir build correctement avec Claude Code, pas en autonomie complète.</p>
+<div class="bd blanc" style="--fc:var(--amber)"><span class="rk">⓪</span><span class="nm">Learn Pandas<span class="vol">105 leçons</span></span><span class="why">L'objet de l'item est <b>le verdict</b>, pas le cours. Pandas n'a pas été touché depuis quelques années, et l'incertitude coûte de l'espace mental en permanence — numpy et torch ont été levés de la même façon, en une séance. <em>Point de décision fixé d'avance : après ~2 h ou le premier tiers, on tranche. Revient vite → déprioriser ou exclure. Résiste vraiment → continuer.</em></span></div><div class="bd blanc" style="--fc:var(--teal)"><span class="rk">①</span><span class="nm">Learn TypeScript<span class="vol">105 leçons</span></span><span class="why">Refait il y a longtemps. Prérequis de toute la chaîne web.</span></div><div class="bd blanc" style="--fc:var(--teal)"><span class="rk">②</span><span class="nm">Learn HTTP Clients<span class="vol">53 leçons</span></span><span class="why">Fetch, async, erreurs. Vérification plus qu'apprentissage.</span></div><div class="bd" style="--fc:var(--teal)"><span class="rk">③</span><span class="nm">Learn HTTP Servers<span class="vol">44 restantes · ~20 h</span></span><span class="why">Entamé (8/52). Routes, middleware, auth — le squelette de ce que Claude Code écrit dans Medusa. Tombe vers <b>décembre</b>, quand REL-6/7 multiplient routes et middlewares.</span></div><div class="bd" style="--fc:var(--green)"><span class="rk">④</span><span class="nm">Memory Management in C<span class="vol">102 leçons · 24 h</span></span><span class="why">Le seul cours du catalogue qui construit des bases au sens strict : pile, tas, pointeurs, GC. Rien à voir avec le web, tout à voir avec l'objectif software engineering. <em>À l'hiver, quand la Phase 2 rend la mémoire concrète — il rejoint Fluent Python ch. 6 et la contiguïté des tenseurs.</em></span></div><div class="bd" style="--fc:var(--green)"><span class="rk">⑤</span><span class="nm">JS runtime — sur ticket<span class="vol">pas le cours</span></span><span class="why"><b>Pas les 113 leçons.</b> TypeScript couvre déjà syntaxe et structures ; ce qu'il ne touche pas, c'est la sémantique d'exécution — <code>this</code> et sa liaison, prototypes, event loop, coercion, closures en boucle. Exactement les bugs invisibles au typage que Claude Code produit sans les signaler.</span></div><div class="bd" style="--fc:var(--coral)"><span class="rk">⑥</span><span class="nm">File Servers and CDNs<span class="vol">43 leçons</span></span><span class="why">Déclencheur : la slice images fournisseur de Relaycat.</span></div><div class="bd" style="--fc:var(--coral)"><span class="rk">⑦</span><span class="nm">Pub/Sub RabbitMQ (TS)<span class="vol">37 leçons · 32 h</span></span><span class="why">Déclencheur : Relaycat sort du synchrone. Cher pour 37 leçons.</span></div><div class="bd" style="--fc:var(--coral)"><span class="rk">⑧</span><span class="nm">Web Security (TS)<span class="vol">105 leçons</span></span><span class="why">Marketplace avec paiement en ligne : non négociable avant qu'un euro transite. Mais la slice paiement est à ~1 an — <em>le lire maintenant, c'est le relire plus tard.</em> À programmer 2–3 mois avant.</span></div><div class="bd" style="--fc:var(--muted)"><span class="rk">⑨</span><span class="nm">Learn SQL<span class="vol">95 leçons</span></span><span class="why">Fond de file : déjà maîtrisé.</span></div><div class="bd" style="--fc:var(--muted)"><span class="rk">⑩</span><span class="nm">Learn Docker<span class="vol">43 leçons</span></span><span class="why">Fond de file : bases acquises, suffisantes pour Relaycat.</span></div><div class="bd" style="--fc:var(--muted)"><span class="rk">⑪</span><span class="nm">CI/CD Actions + Docker + TS<span class="vol">36 leçons</span></span><span class="why">Fond de file : au-delà des bases.</span></div><div class="excl"><b>Exclus, à ne pas réintroduire —</b> toute la piste Python hors Pandas (dix ans de métier, plus Fluent Python en parallèle) · toute la piste Go : le stack est TypeScript et le fil rouge coding est Python, un troisième langage ne sert pas l'objectif · Kubernetes (hors plan de formation) · Git et Linux (métier) · Power BI, Find a Job · First et Second Personal Project — Relaycat <em>est</em> le projet personnel · Pokedex, Web Scraper, Blog Aggregator : déjà fait ou redondant avec Relaycat.</div>
+<div class="excl" style="border-style:solid;border-color:var(--line)"><b>Volume —</b> ~65 h pour ⓪ à ⑤, à ~2 h par semaine dans le créneau : environ <b>30 semaines</b>. C'est le rythme, pas un retard.</div>
+</div>
+</section>
+<p class="hint"><b>Cadence (11/09)</b> : mar <b>build</b> 3 h → mer <b>comprendre</b> 2 h → jeu <b>prouver</b> 2 h · ven <b>tampon</b> 8h → <b>revue</b> 9h → <b>cartes</b> 10h · drills 08h—09h lun→jeu (algo lun/jeu, ML mar/mer) · weekend : un jour à zéro, l'autre léger · la grille est un défaut, pas un contrat.</p>
+<p class="hint">← → semaine · ↑ ↓ jalon · trame hachurée = semaine blanche · colonne créneau : <b style="color:var(--muted)">08h—09h</b> grisé = créneau drill par défaut (lun→jeu, règle du 08/09) · <b style="color:var(--muted)">—</b> = pas d'horaire propre (jalon)</p>
+
+</div>
+<script>
+/* ---------------------------------------------------------------- données */
+const PH = {
+  p1:{n:"Phase 1 · clôture", c:"--p1"},
+  p2:{n:"Phase 2 · DL & transformers from scratch", c:"--p2"},
+  p3:{n:"Phase 3 · LLM engineering orienté evals", c:"--p3"},
+  p4:{n:"Phase 4 · system design", c:"--p4"},
+  p6:{n:"Phase 6 · mocks & candidatures", c:"--p6"}
+};
+const KC={bloc:"--bloc",algo:"--algo",ml:"--ml",couches:"--couches",arte:"--arte",deci:"--deci"};
+const KL={bloc:"bloc",algo:"algo",ml:"ml code",couches:"couches",arte:"artefact",deci:"décision"};
+
+// h = heures de bloc ; d = {algo, ml, couches} nb de drills ; m = jalons ; off = semaine blanche
+const W = [
+{d:"07/09", p:"p1", t:"S9 · socle inférentiel + pont PyTorch", h:7, dr:{algo:2,ml:1}, m:[["cp","Calibration à blanc 10/09 — 71 % pondéré"],["deci","Consigner le nouveau cadre dans TickTick"]], r:[
+ ["mar 08","algo","<b>LC 11 — Container With Most Water</b>, chrono 30 min. Premier invariant d'<em>échange</em> après trois fenêtres : justifier qu'on jette une borne sans perdre l'optimum."],
+ ["mar 08","bloc","3 h — <b>socle inférentiel + NLL</b> : H₀ sur trois situations, distribution d'échantillonnage, p-value, TCL standardisé, témoin atteignable, α/β. Puis pont vers makemore 1.","09h—12h"],
+ ["mer 09","algo","<b>TAP LC 424</b>, créneau de preuve hebdo — démonstration du pas clause par clause, pourquoi I₃ ne découle pas de I₂."],
+ ["mer 09","bloc","2 h — <b>PyTorch shapes &amp; cross-entropy</b> : keepdim, C[X], view(-1,6), CE reconstruite puis cassée à +100.","09h—11h"],
+ ["jeu 10","ml","<b>Test numpy S4</b> — reshape(-1) ordre C, transpose 3D et strides, vue vs copie. Prédire avant d'exécuter."],
+ ["jeu 10","bloc","2 h — <b>calibration à blanc</b> : 17 questions posées sur 20, <b>23,5/34 brut (69 %) · 71 % pondéré</b> par la pertinence entretien. Dette S8 payée (Q13, 2/2). Diagnostic : <b>3 fils transversaux, pas 15 trous</b> — A objet aléatoire · B loss ⇔ bruit ⇔ prior ⇔ λI · C critère sensible vs escalier. Scope réduit : élagage CCP, SDP, White, PCA non centrée, hessienne XGBoost, Elastic Net.","09h—11h"],
+ ["ven 11","bloc","<b>Fil A — objet aléatoire, IC, comparaison de modèles</b> : le 95 % porte sur la procédure, pas sur l'intervalle en main · McNemar / bootstrap apparié (l'objet aléatoire est le test set) · multiplicité = max biaisé vers le haut, même geste que le témoin atteignable. Format fiche interactive, ~5 cartes. <em>Le seul fil qui dort toute la P2 avant de redevenir central en P3 : les quiz du vendredi le maintiennent.</em>","08h—12h"],
+ ["ven 11","deci","★ <b>Consigner dans TickTick</b> : périmètre algo fermé, conteneur Artefacts, ⚡ amendés en piste ML, note d'arbitrage QLoRA."]]},
+
+{d:"14/09", p:"p1", t:"Remédiation 3 fils · re-mesure · ouverture Phase 2", h:9, dr:{algo:2,ml:2}, m:[["cp","Re-mesure 3 fils 17/09 — gate 6/8"],["deci","P2 le 21/09, ou décalage au 28/09"]], r:[
+ ["lun 14","algo","<b>LC 11 J1</b> — étude et déroulement : worked example en tableau de trace, self-explanation à voix haute sur l'argument d'échange (« aucune paire contenant la borne éliminée ne peut battre le maximum courant »). Pas de chrono."],
+ ["mar 15","ml","⚡ <b>Rappel torch à blanc</b>, 8 shapes ou bugs à prédire avant exécution, sans doc ni relecture du 09/09 : C[X] avec X (32,3), view(-1,6), normalisation sans keepdim, CE à +100, view vs reshape. <em>Le 2+2 est avancé d'une semaine : le trou torch est 10/09 → 22/09, il se paie dans le créneau drill, pas en tâche greffée.</em>"],
+ ["mar 15","bloc","<b>Fil B — loss ⇔ hypothèse de bruit ⇔ prior ⇔ λI</b> : cross-entropy = MLE Bernoulli + convexité · colinéarité → XᵀX singulière, λI décale toutes les valeurs propres · séparation parfaite (le MLE n'existe pas, la L2 le sauve) · prior noyé quand n → ∞ · gradient GBM ≠ résidus, learning rate = régularisation. ~7 cartes. <em>Ex-checkpoint, repurposé : la calibration du 10/09 a déjà mesuré. Socle conceptuel de micrograd et makemore.</em>","09h—12h"],
+ ["mer 16","ml","⚡ <b>Torch — reprise des ratés du mardi</b> puis cross_entropy reconstruite à la main puis cassée à +100. <em>Remplace le dernier créneau de preuve de la P1 — arbitrage assumé le 10/09 : LC 209 (raté de S8) et le TAP hebdo sautent, la continuité torch passe devant.</em>"],
+ ["mer 16","bloc","<b>Fil C + résiduel</b> : Gini/entropie vs accuracy (critère en escalier, gain nul) — le même argument que L1 vs L2 et log-loss vs MSE, à faire PRODUIRE · odds ratio vs effet marginal β·p(1−p) · précision sans terme en TN · TCL trop lent sur événements rares. ~6 cartes. <em>Séminaire annulé.</em>","09h—11h30"],
+ ["jeu 17","algo","<b>LC 11 J2</b> — réécriture sans support, chrono 30 min, à voix haute. La mesure du critère de sortie. <em>Nouveau cycle acté le 10/09 : J1 étude et déroulement, J2 réécriture chronométrée. Plus de tentative à l'aveugle capée.</em>"],
+ ["jeu 17","bloc","⛑ <b>Re-mesure 3 fils</b> — 8 questions orales, mêmes concepts sous un autre habit (règle du 04/09 : on ne mesure pas le bachotage). Puis 11h push des ~18 cartes, doublons vérifiés, bury + sync. <em>Jour de bureau : si le créneau ne tient pas, bascule sur le 18 en amputant l'ouverture — la re-mesure ne saute pas, elle porte la décision.</em>","09h—11h45"],
+ ["jeu 17","deci","★ <b>≥ 6/8 ⟹ Phase 2 le 21/09</b>, cascade B1→B8 et P3/P4/P6 intacts. <b>&lt; 6/8 ⟹ décalage au 28/09</b> acté ce jour-là, cascade réécrit. <em>La semaine de prolongation prévue par la règle des 80 % est payée dans les créneaux récupérés (11, 15, 16), pas en poussant la Phase 2.</em>"],
+ ["ven 18","bloc","08h <b>tampon</b> · 09h <b>revue</b> (chaîne, débrief, ajustements) · 10h—12h <b>Ouverture P2</b> : torch vérifié, GPU réellement alloué, repo P2, corpus FR, TP livrés, 4 règles de tutorat actées. <em>Premier vendredi au nouveau rituel en trois temps.</em>","08h—12h"],
+ ["ven 18","deci","★ Ouvrir le repo <b>from-scratch</b> (squelette + 1 test qui passe) · inscription <b>BlueDot</b> · valider le périmètre algo fermé. <em>Le créneau de preuve du mercredi disparaît ici définitivement — plus aucune démonstration de boucle après cette date.</em>","","Ouvrir le repo from-scratch"]]},
+
+{d:"21/09", p:"p2", t:"B1 · micrograd + makemore 1", h:7, dr:{algo:2,ml:2}, r:[
+ ["lun 21","algo","<b>LC 20 / 155 — stack</b>, J1 : étude et déroulement. Nouvelle famille, échauffement rapide."],
+ ["mar 22","ml","<b>softmax stable</b> en numpy, de mémoire : soustraction du max, log-sum-exp, cas +100."],
+ ["mar 22","bloc","3 h — <b>tp_micrograd</b> : Value, dunder, fermetures _backward, tri topologique, MLP, boucle. Asserts de Karpathy, loss &lt; 0,01.","09h—12h"],
+ ["mer 23","ml","<b>Pont numpy → torch</b> (15 min) puis reprise du test S4 sur les items ratés. <em>Avancé du 24 pour libérer le jeudi à l'algo.</em>"],
+ ["mer 23","bloc","2 h — chain rule au tableau, trois chemins dont une variable utilisée deux fois (le bug <em>=</em> vs <em>+=</em>). ⛑ grads manuels = grads du code.","09h—11h"],
+ ["jeu 24","algo","<b>LC 20 J2</b> — réécriture sans support, chrono."],
+ ["jeu 24","bloc","2 h — <b>tp_makemore1</b> : bigram par comptage, échantillonnage, NLL 2,454 puis réseau ≈ 2,48. <em>Exception nommée : le jeudi est normalement le jour « prouver » (réimplémentation sans support) ; ici un build, parce que la semaine blanche du 28/09 impose de compresser B1.</em>","09h—11h"],
+ ["ven 25","bloc","08h <b>tampon</b> (ce qui a débordé, sinon libre) · 09h <b>revue</b> · 10h <b>cartes B1</b> : accumulation des gradients, tri topologique, tanh, NLL 2,454 vs 2,48. <em>Fluent Python n'est plus ici : créneau libre, sur ticket.</em>","08h—11h"]]},
+
+{d:"28/09", p:"p2", t:"Voyage 29/09 → 03/10 — semaine blanche", h:0, dr:{ml:1}, off:1, r:[
+ ["lun 28","ml","⚡ <b>Dernier contact torch avant 8 jours</b> — reprise des items ratés de la semaine (softmax stable, pont numpy→torch), rien de neuf. <em>Le créneau 08h—09h du lundi reste disponible même en semaine blanche : c'est à partir de 9h que le lundi est pris.</em>","08h—09h"],
+ ["lun 28","bloc","Pas de bloc : le lundi est pris dès 09h par la préparation du cours aux Ponts. Départ le 29, Anki en déplacement uniquement."]]},
+
+{d:"05/10", p:"p2", t:"B2 · makemore 2 (Bengio 2003)", h:8, dr:{algo:2,ml:2}, r:[
+ ["lun 05","algo","<b>LC 33 — Search in Rotated Sorted Array</b>, J1 : étude et déroulement. L'invariant de recherche binaire est le plus exigeant du lot."],
+ ["lun 05","bloc","1 h — <b>micrograd → torch</b> : le même réseau jouet réécrit en PyTorch en ~20 lignes, gradients comparés terme à terme avec ton engine.py (loss.backward() ≡ ce que tu as écrit à la main). Clôt B1 <em>et</em> rallume les tenseurs au retour de la semaine blanche, la veille de makemore 2. <em>Le pont que Karpathy ne fait pas explicitement.</em>","09h—10h"],
+ ["mar 06","ml","⚡ <b>broadcasting + keepdim</b> : normaliser 27×27 par lignes, puis provoquer le bug sans keepdim et le nommer. <em>Nourrit tp_makemore2, qui tourne à 09h le même jour.</em>"],
+ 
+ ["mar 06","bloc","3 h — makemore 1 <b>de mémoire</b> + le premier « DONC » de P2 à voix haute (comptage lissé ≡ réseau régularisé, même vraisemblance). Puis tp_makemore2.","09h—12h"],
+ ["mer 07","ml","⚡ <b>cross_entropy reconstruite</b> à la main puis cassée avec des logits à +100."],
+ ["mer 07","bloc","2 h — minibatchs, balayage de LR en 10^lr, split train/dev/test. Cible dev loss ≈ 2,17.","09h—11h"],
+ ["jeu 08","algo","<b>LC 33 J2</b> — réécriture sans support, chrono. <em>Le drill ⚡ indexation fancy est supprimé : C[X] et view(-1,6) auront été vus quatre fois (09/09, 15/09, 16/09, 28/09) et le bloc de 09h les emploie en vrai.</em>"],
+ ["jeu 08","bloc","2 h — makemore 2 de mémoire + séance LR / overfitting / embeddings 2-d.","09h—11h"]]},
+
+{d:"12/10", p:"p2", t:"B2 · makemore 3 — le bloc le plus dense", h:7, dr:{algo:2,ml:2}, m:[["cp","Point de rupture n°1 du plan"]], r:[
+ ["lun 12","algo","<b>LC 206 — Reverse Linked List</b>, J1 : étude et déroulement."],
+ ["mar 13","ml","⚡ <b>statistiques par dimension</b> — mean/std sur le bon axe, keepdim, ce que ça change au batchnorm."],
+ ["mar 13","bloc","3 h — <b>vidéo intégrale makemore 3</b> (elle enseigne la posture de diagnostic) + loss initiale trop haute, tanh saturée, init Kaiming.","09h—12h"],
+ ["mer 14","ml","<b>init Kaiming à la main</b> : d'où sort le gain, le calculer pour tanh et relu, vérifier la variance des activations."],
+ ["mer 14","bloc","2 h — batchnorm, pièges train/eval, histogrammes d'activations, ratio update/data.","09h—11h"],
+ ["jeu 15","algo","<b>LC 206 J2</b> — réécriture sans support, chrono."],
+ ["jeu 15","bloc","2 h — makemore 3 sans support ; au tableau : pourquoi l'init contrôle les gradients.","09h—11h"]]},
+
+{d:"19/10", p:"p2", t:"B3 · makemore 4 — backprop ninja", h:7, dr:{algo:2,ml:2}, r:[
+ ["lun 19","algo","★ <b>LC 200 — Number of Islands</b>, J1 : étude et déroulement. <em>Les graphes sont la lacune N1 de juillet, jamais fermée. Avancés au 19/10 par le décalage du 10/09.</em>"],
+ ["mar 20","ml","⚡ <b>tril, masked_fill, softmax stable</b> — ils nourrissent directement l'attention du 03/11."],
+ ["mar 20","bloc","3 h — vidéo intégrale + backprop manuelle à travers cross-entropy et tanh.","09h—12h"],
+ ["mer 21","ml","<b>Adam de mémoire</b> en numpy : momentum, second moment, correction de biais, AdamW. Cible &lt; 15 min."],
+ ["mer 21","bloc","2 h — batchnorm manuel, backward complet. ⛑ <b>tous les <em>cmp</em> exacts sans regarder</b>.","09h—11h"],
+ ["jeu 22","algo","<b>LC 200 J2</b> — réécriture sans support, chrono. Le point de mesure le plus important du trimestre."],
+ ["jeu 22","bloc","2 h socratique — optimizers SGD → momentum → Adam → AdamW, learning rate schedules.","09h—11h"]]},
+
+{d:"26/10", p:"p2", t:"B3 · régularisation + méthodologie expérimentale", h:7, dr:{algo:2,ml:2}, m:[["cp","Mini-checkpoint : backprop + debug PyTorch"]], r:[
+ ["lun 26","algo","<b>Reprise à froid — LC 20 ou LC 33</b>, chrono, sans étude préalable. <em>Seul format qui mesure le critère de sortie (« medium inconnu &lt; 30 min ») : un J2 mesure toujours un problème étudié 3 jours avant.</em>"],
+ ["mar 27","ml","<b>layernorm from scratch</b> + son backward ; différence opérationnelle avec batchnorm."],
+ ["mar 27","bloc","3 h — dropout, weight decay, vanishing/exploding. Puis ★ <b>méthodologie expérimentale</b> : seeds, logging structuré, script d'ablation batchnorm on/off × 3 seeds, README de run.","09h—12h"],
+ ["mer 28","ml","🔥 <b>debug PyTorch en direct</b> — Claude casse une boucle d'entraînement, tu trouves. Format qu'aucune vidéo ne prépare."],
+ ["mer 28","bloc","2 h ⛑ mini-checkpoint : backprop au tableau + le debug ci-contre.","09h—11h"],
+ ["jeu 29","algo","<b>Reprise libre</b> — créneau libéré par le passage au cycle J1/J2 : reprise d'un raté du mois, ou second passage sur les graphes si LC 200 J2 a coincé."],
+ ["jeu 29","bloc","2 h — Illustrated Transformer + maths de l'attention. <b>Corpus FR prêt et GPU testé</b> — pas en décembre.","09h—11h"]]},
+
+{d:"02/11", p:"p2", t:"B4 · Let's build GPT — attention ★ cœur du plan", h:7, dr:{algo:2,ml:2}, r:[
+ ["lun 02","algo","<b>LC 207 — Course Schedule</b> (tri topologique), J1 : étude et déroulement."],
+ ["mar 03","ml","<b>Attention une tête</b> en numpy : masque causal, moyenne pondérée, scaling 1/√d. Écrire avant de regarder."],
+ ["mar 03","bloc","3 h — vidéo 1/2 : bigram torch, l'astuce mathématique de la self-attention, une tête.","09h—12h"],
+ ["mer 04","ml","<b>Multi-head</b> : découpage des têtes, concat, projection de sortie. Prédire toutes les shapes avant."],
+ ["mer 04","bloc","2 h — vidéo 2/2 : multi-head, feedforward, résiduel, layernorm, assemblage.","09h—11h"],
+ ["jeu 05","algo","<b>LC 207 J2</b> — réécriture sans support, chrono."],
+ ["jeu 05","bloc","2 h — run d'entraînement sur le corpus FR (GPU) + revue reviewer du code.","09h—11h"]]},
+
+{d:"09/11", p:"p2", t:"Maroc 10 → 17/11 — semaine blanche", h:0, dr:{algo:1}, off:1, r:[
+ ["lun 09","algo","<b>LC 133 — Clone Graph</b>, J1 : étude et déroulement. Drill seul, rien d'autre cette semaine."]]},
+
+{d:"16/11", p:"p2", t:"B4 · attention de mémoire, chronométrée", h:4, dr:{algo:2,ml:1}, m:[["cp","Critère de sortie : bloc attention &lt; 30 min"],["deci","Go / no-go du repo from-scratch"]], r:[
+ ["mar 17","algo","<b>LC 133 J2</b> — réécriture sans support, chrono. Retour de voyage, reprise douce."],
+ ["mer 18","ml","<b>Attention causale multi-head chronométrée</b>, sans doc. Cible &lt; 25 min, shapes justifiées. <em>Critère de sortie du plan.</em>"],
+ ["mer 18","bloc","2 h ⛑ <b>bloc attention de mémoire &lt; 30 min</b>, puis le modèle entier.","09h—11h"],
+ ["jeu 19","algo","<b>LC 215 — Kth Largest</b> (heap), J1 : étude et déroulement."],
+ ["jeu 19","bloc","2 h — run + README nanoGPT ; Raschka ch. 3-4 en appui.","09h—11h"],
+ ["ven 20","deci","★ <b>Go / no-go from-scratch</b> : si les composants de novembre n'ont pas un test <em>allclose</em> qui tourne, l'artefact est abandonné plutôt que traîné jusqu'en janvier."]]},
+
+{d:"23/11", p:"p2", t:"B5 · tokenizer BPE", h:7, dr:{algo:2,ml:2}, r:[
+ ["lun 23","algo","<b>LC 215 J2</b> — réécriture sans support, chrono."],
+ ["mar 24","ml","⚡ <b>gather / scatter</b> — le geste sous-jacent à cross_entropy et au sampling."],
+ ["mar 24","bloc","3 h — vidéo BPE en entier (la seule sans équivalent écrit) + tp_bpe : merges, encode/decode.","09h—12h"],
+ ["mer 25","ml","<b>BPE encode de mémoire</b>, cible &lt; 20 min."],
+ ["mer 25","bloc","2 h — regex de découpage GPT-2/GPT-4, tokens spéciaux.","09h—11h"],
+ ["jeu 26","algo","<b>LC 56 — Merge Intervals</b>, J1 : étude et déroulement."],
+ ["jeu 26","bloc","2 h ⛑ BPE de mémoire + pourquoi les LLM ratent l'arithmétique, arbitrage de taille de vocabulaire.","09h—11h"]]},
+
+{d:"30/11", p:"p2", t:"B6 · ARENA ch. 1 — transformer + mech interp", h:7, dr:{algo:2,ml:2}, r:[
+ ["lun 30","algo","<b>LC 56 J2</b> — réécriture sans support, chrono."],
+ ["mar 01","ml","<b>Hooks TransformerLens</b> — poser un hook, lire une activation, la patcher. Couplé à ARENA 1.2."],
+ ["mar 01","bloc","3 h — ARENA 1.1 en passage rapide (vérification, pas apprentissage) puis 1.2 : hooks.","09h—12h"],
+ ["mer 02","ml","<b>KV cache</b> implémenté : ce que ça change aux shapes du masque, et le gain en FLOPs."],
+ ["mer 02","bloc","2 h — ARENA 1.2, exercices induction heads.","09h—11h"],
+ ["jeu 03","algo","<b>LC 300 — LIS</b> (DP 1D), J1 : étude et déroulement. Dernier pattern du périmètre fermé."],
+ ["jeu 03","bloc","2 h — ARENA 1.2, fin. <em>ARENA 1.3+ (SAE) exclu : optionnel en P3.</em>","09h—11h"]]},
+
+{d:"07/12", p:"p2", t:"B7 · réplication induction heads ★ premier artefact safety", h:7, dr:{algo:2,ml:2}, m:[["deci","Format et canal de publication"]], r:[
+ ["lun 07","algo","<b>LC 300 J2</b> — réécriture sans support, chrono."],
+ ["mar 08","ml","<b>top-k / nucleus sampling</b> from scratch + température. Question d'entretien fréquente."],
+ ["mar 08","bloc","3 h — modèle attention-only 2 couches avec <b>ton</b> code ; entraînement × 3 seeds. Les seeds sont une question d'inférence, pas un luxe.","09h—12h"],
+ ["mer 09","ml","<b>Score de prefix-matching</b> implémenté proprement — couplé au bloc, réutilisable tel quel dans le rapport."],
+ ["mer 09","bloc","2 h — score d'in-context learning, courbe de phase change en cours d'entraînement.","09h—11h"],
+ ["jeu 10","algo","<b>Clôture du périmètre algo</b> — reprise du raté le plus coûteux des 8 familles. À partir d'ici : maintenance seulement."],
+ ["jeu 10","bloc","2 h — 1 couche vs 2 couches, dispersion sur les seeds. Claude en <em>reviewer de rapport</em>.","09h—11h"],
+ ["ven 11","deci","★ <b>Format et canal arrêtés</b> : blog canonique + LessWrong, structure « ce que dit le paper / ce que j'obtiens / où ça diverge »."]]},
+
+{d:"14/12", p:"p2", t:"B7 · rédaction du rapport — vacances dès le 16", h:3, dr:{algo:1}, m:[["arte","Rapport de réplication induction heads"]], r:[
+ ["lun 14","algo","Reprise libre d'un raté du trimestre. Léger."],
+ ["mar 15","bloc","3 h — <b>rapport de réplication rédigé</b>. Format imposé, pas un tutoriel.","09h—12h"],
+ ["mar 15","arte","★ <b>Artefact n°1 terminé.</b> Publication après le checkpoint, pas avant."],
+ ["mer 16","bloc","Vacances 16 → 22/12. 23-24/12 tampon optionnel, non programmé."]]},
+
+{d:"21/12", p:"p2", t:"Vacances", h:0, dr:{}, off:1, r:[
+ ["—","bloc","Rien. Le tampon des 23-24/12 reste optionnel et non programmé."]]},
+
+{d:"28/12", p:"p2", t:"B8 · marge — la seule de toute la phase", h:7, dr:{ml:2}, r:[
+ ["mar 29","bloc","3 h — rattrapage libre ou avance sur le rapport. <em>Cette semaine est mangée en priorité par makemore 3 et la réplication si elles ont débordé.</em>","09h—12h"],
+ ["mer 30","bloc","2 h — fiche interactive P2 : backprop, init/batchnorm, attention.","09h—11h"],
+ ["mer 30","ml","<b>Attention chronométrée</b> et <b>Adam chronométré</b> — répétition sèche des critères de sortie."],
+ ["jeu 31","bloc","2 h — Anki global P2.","09h—11h"]]},
+
+{d:"04/01", p:"p2", t:"B8 · checkpoint Phase 2 et bascule", h:7, dr:{}, m:[["cp","Checkpoint P2 — seuil 80 %"],["deci","Arbitrage QLoRA + programme figé P3"],["arte","nanoGPT · from-scratch · rapport publiés"]], r:[
+ ["mar 05","bloc","3 h — rapport et README finalisés ; bloc attention chronométré en calibration. <em>On ne bachote pas un checkpoint.</em>","09h—12h"],
+ ["mer 06","bloc","2 h ⛑ <b>CHECKPOINT P2</b> : ① attention au tableau avec les maths ② bloc réécrit &lt; 30 min ③ <b>debug PyTorch en direct</b> ④ 20 questions à 80 %.","09h—11h"],
+ ["mer 06","deci","★ <b>&lt; 80 % ⟹ prolongation ciblée d'une semaine</b>, P3 démarre le 19/01."],
+ ["jeu 07","bloc","2 h — débrief + <b>programme figé P3</b> écrit dans TickTick avant toute explication : items, niveaux, durées, exclusions nommées.","09h—11h"],
+ ["jeu 07","deci","★ <b>Arbitrage QLoRA</b> : 3 semaines justifiées par Datadog + Mistral, Datadog est sorti. Alternative : réplication DPO + eval Inspect, plus proche de la cible n°1."],
+ ["jeu 07","deci","★ Reprogrammer les conteneurs P3, encore datés du 01/02/2027 dans TickTick."],
+ ["ven 08","arte","★ <b>Publication</b> : rapport (blog + LessWrong), repo nanoGPT, repo from-scratch."]]}
+];
+
+/* ---- 2027 : blocs de plusieurs semaines, même contenu répété sur la plage ---- */
+const BLOCKS = [
+ {from:"11/01", n:5, p:"p3", t:"P3-A · evals, observabilité, Inspect", h:7, dr:{algo:1,ml:1,couches:2},
+  m:{"11/01":[["arte","Harness d'eval Chanel formalisé"]]}, r:[
+  ["bloc","bloc","Benchmarks vs evals produit · LLM-as-judge et ses biais · construction d'un harness · monitoring. <b>Re-sollicite le socle inférentiel</b> : significativité, biais du juge. Framework Inspect / UK AISI."],
+  ["bloc","arte","Le <b>harness d'eval de Chanel</b> se formalise ici en réponse d'entretien — l'artefact au plus fort ROI sur toutes les cibles."],
+  ["drill","couches","<b>LRU cache</b> puis sa version thread-safe · <b>rate limiter</b> (token bucket) · <b>KV store avec TTL</b>. 60 min, spécification qui s'épaissit à chaque niveau."],
+  ["drill","ml","Reprise chronométrée des composants from-scratch + <b>debug PyTorch</b> une semaine sur deux."],
+  ["drill","algo","1 par semaine, uniquement des reprises de ratés. Le périmètre est fermé : on maintient, on n'étend plus."]]},
+
+ {from:"15/02", n:4, p:"p3", t:"P3-B · fine-tuning, SFT → DPO", h:7, dr:{algo:1,ml:1,couches:2}, r:[
+  ["bloc","bloc","LoRA / QLoRA et leurs maths · quand fine-tuner vs RAG vs prompting · SFT, DPO, RLHF · lecture guidée des papers (LoRA, QLoRA, DPO, InstructGPT)."],
+  ["bloc","deci","Contenu exact dépendant de l'arbitrage du 07/01. <em>Hypothèse par défaut : réplication DPO à la place du projet QLoRA de 3 semaines.</em>"],
+  ["drill","couches","<b>Scheduler de tâches</b> · <b>parseur/CLI à spec croissante</b> · lecture de code inconnu (le HM call inclut une revue d'échantillons dans plusieurs langages)."],
+  ["drill","ml","Composants LoRA implémentés à la main : décomposition bas-rang, injection dans une couche linéaire."]]},
+
+ {from:"15/03", n:5, p:"p3", t:"P3-C · inference, optimisation, publications", h:7, dr:{algo:1,ml:1,couches:2},
+  m:{"15/03":[["deci","Réactivation de la veille marché"]], "05/04":[["arte","training-loop-bugs + 2ᵉ artefact safety"]]}, r:[
+  ["bloc","bloc","KV cache · continuous batching · quantization GPTQ/AWQ, int8/int4 · spéculative decoding · vLLM en pratique, coûts et latence."],
+  ["drill","couches","Les 20 bugs de <b>training-loop-bugs</b> se fabriquent ici, en drill — l'artefact est un sous-produit, pas un projet en plus."],
+  ["—","arte","★ Publication de <b>training-loop-bugs</b> (GitHub + HN) et du second artefact safety (<b>réplication DPO ou eval Inspect</b>, blog + LessWrong)."],
+  ["—","deci","★ <b>Réactivation de la veille marché et employeurs</b> — la Phase 6 passe sous les 6 mois, condition posée le 24/08/2026."]]},
+
+ {from:"19/04", n:4, p:"p4", t:"P4 · fondamentaux distribués + TypeScript ciblé", h:6, dr:{algo:1,couches:1}, r:[
+  ["bloc","bloc","Load balancing, caching, sharding, réplication, consistency, queues, idempotence, rate limiting. Alex Xu en lecture ciblée. <b>Lister d'abord ce que le cours aux Ponts a déjà payé.</b>"],
+  ["bloc","bloc","<b>TypeScript ciblé (~8 h, just-in-time)</b> : Handbook sélectif + Total TypeScript free tier. Payé par le projet réel, pas par un bloc programmé."],
+  ["drill","couches","Format entretien complet : un problème en 4 niveaux, 90 min, une fois par semaine."]]},
+
+ {from:"17/05", n:3, p:"p4", t:"P4 · ML system design, monitoring, A/B testing", h:6, dr:{couches:1}, r:[
+  ["bloc","bloc","Serving patterns, feature stores, training/serving skew, monitoring, retraining, A/B testing. <b>Troisième passage du socle inférentiel.</b>"],
+  ["bloc","bloc","Substrat des mocks : le harness d'eval, Centravy / Relaycat, le projet pro."]]},
+
+ {from:"07/06", n:1, p:"p4", t:"P4 · LLM system design + ⛑ checkpoint", h:6, dr:{couches:1},
+  m:{"07/06":[["cp","Mock LLM system design, 45 min"]]}, r:[
+  ["bloc","bloc","RAG à 10 M documents · plateforme de serving LLM · pipeline d'agents. Méthode imposée : cadrage → estimation → composants → trade-offs → bottlenecks."],
+  ["bloc","bloc","⛑ Mock de 45 min tenu avec une structure claire, sans notes."]]},
+
+ {from:"14/06", n:5, p:"p6", t:"Phase 6 · mocks intensifs", h:8, dr:{algo:1,ml:2,couches:2}, r:[
+  ["mocks","bloc","Alternance quotidienne : <b>pair programming ML</b> (le format réel : PyTorch efficace, pas d'arbre binaire à inverser) · debug de training loop · problème en 4 niveaux + concurrence · ML/DL depth · system design · behavioral technique."],
+  ["mocks","bloc","Révision Anki : backlog complet des 12 mois."],
+  ["mocks","bloc","<b>Narratif</b> : pourquoi la safety, pourquoi ce labo, une décision d'architecture difficile — et les 6 artefacts défendus ligne par ligne."]]},
+
+ {from:"19/07", n:6, p:"p6", t:"★ Critères de sortie puis départ des candidatures", h:5, dr:{},
+  m:{"19/07":[["deci","GO / NO-GO candidatures"]]}, r:[
+  ["—","deci","★ Cocher les critères : medium inconnu &lt; 30 min 3/3 · attention multi-head sans doc &lt; 25 min · backprop et attention au tableau · 4 bugs sur 5 en 30 min · LRU thread-safe &lt; 40 min avec test · BPE &lt; 20 min, Adam &lt; 15 min · un rapport de réplication qui dit où ça diverge · harness d'eval défendu 15 min."],
+  ["—","bloc","Départ des candidatures. Les process durent 4 à 8 semaines : les premiers entretiens sont l'entraînement le plus utile."]]}
+];
+
+/* ---------------------------------------------------- expansion en semaines */
+function mondays(startISO, n){
+  const out=[], d=new Date(startISO);
+  for(let i=0;i<n;i++){ out.push(new Date(d)); d.setDate(d.getDate()+7); }
+  return out;
+}
+const fr2 = x => String(x).padStart(2,'0');
+const key = dt => `${fr2(dt.getDate())}/${fr2(dt.getMonth()+1)}`;
+const MOIS=["janv","févr","mars","avril","mai","juin","juil","août","sept","oct","nov","déc"];
+
+const DATES = mondays("2026-09-07", 51);
+const byKey = {}; W.forEach(w=>byKey[w.d]=w);
+BLOCKS.forEach(b=>{
+  const i0 = DATES.findIndex(d=>key(d)===b.from);
+  for(let i=0;i<b.n;i++){
+    const k = key(DATES[i0+i]);
+    byKey[k] = {d:k, p:b.p, t:b.t + (b.n>1?` · ${i+1}/${b.n}`:""), h:b.h, dr:b.dr,
+                m:(b.m&&b.m[k])||null, r:b.r.map(x=>x.slice())};
+  }
+});
+const WK = DATES.map(dt=>{
+  const k=key(dt);
+  return byKey[k] || {d:k, p:"p3", t:"—", h:0, dr:{}, r:[]};
+});
+
+/* ---------------------------------------------------------------- rendu */
+const grid=document.getElementById('grid'), labels=document.getElementById('labels');
+grid.style.setProperty('--n', WK.length);
+const cv = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+
+const ROWS=[
+  {cls:"h-mon",  lb:""},
+  {cls:"h-pha",  lb:"phase"},
+  {cls:"h-blk",  lb:"bloc"},
+  {cls:"h-mil",  lb:"jalons"},
+  {cls:"h-bloc", lb:"bloc · heures"},
+  {cls:"h-lane", lb:"algo"},
+  {cls:"h-lane", lb:"ml coding"},
+  {cls:"h-lane", lb:"couches"},
+  {cls:"h-num",  lb:""}
+];
+labels.innerHTML = ROWS.map(r=>`<div class="lb ${r.cls} ${r.lb?'strong':''}">${r.lb}</div>`).join('');
+
+let html="";
+// 1 mois
+WK.forEach((w,i)=>{
+  const dt=DATES[i], first = i===0 || dt.getMonth()!==DATES[i-1].getMonth();
+  html+=`<div class="cell h-mon mon ${first?'first':''}" data-i="${i}">${first?MOIS[dt.getMonth()]:''}</div>`;
+});
+// 2 phase
+WK.forEach((w,i)=>{
+  const start = i===0 || WK[i-1].p!==w.p;
+  html+=`<div class="cell h-pha pha ${start?'':'body'}" style="--pc:${cv(PH[w.p].c)}" data-i="${i}">${start?PH[w.p].n.split(' · ')[0]:''}</div>`;
+});
+// 2b blocs B1→B8 (report du dernier bloc déclaré : une semaine blanche appartient à son bloc)
+let curBlk=null;   // NB: ne pas nommer « cur » — collision avec le curseur du panneau plus bas
+const BLK = WK.map(w=>{ const m=/^B(\d)\b/.exec(w.t); if(m) curBlk='B'+m[1];
+  else if(w.p!=='p2') curBlk=null; return curBlk; });
+WK.forEach((w,i)=>{
+  const b=BLK[i], start = b && (i===0 || BLK[i-1]!==b);
+  html+=`<div class="cell h-blk blk ${b?'':'none'} ${start?'start':''}" style="--pc:${cv(PH[w.p].c)}" data-i="${i}">${start?b:''}</div>`;
+});
+// 3 jalons
+WK.forEach((w,i)=>{
+  let inner="";
+  if(w.m&&w.m.length){
+    const t=w.m[0][0];
+    inner=`<i style="--mc:${cv('--'+t)}"></i>`;
+  }
+  html+=`<div class="cell h-mil mil ${w.m&&w.m.length>1?'multi':''}" data-i="${i}">${inner}</div>`;
+});
+// 4 bloc heures
+WK.forEach((w,i)=>{
+  const hh = Math.round((w.h/8)*32);
+  html+=`<div class="cell h-bloc ${w.off?'offc':''}" data-i="${i}" data-k="bloc">${w.h?`<div class="bar-b" style="height:${hh}px"></div>`:''}</div>`;
+});
+// 5-7 lanes
+["algo","ml","couches"].forEach(k=>{
+  WK.forEach((w,i)=>{
+    const n=(w.dr&&w.dr[k])||0;
+    html+=`<div class="cell h-lane" data-i="${i}" data-k="${k}">${n?`<span class="dot ${n>1?'two':''}" style="--dc:${cv('--'+k)}"></span>`:''}</div>`;
+  });
+});
+// 8 numéro
+WK.forEach((w,i)=>{
+  html+=`<div class="cell h-num num" data-i="${i}">${w.d.slice(0,2)}</div>`;
+});
+grid.innerHTML=html;
+
+// hachures sur semaines blanches
+WK.forEach((w,i)=>{ if(w.off) grid.querySelectorAll(`.cell[data-i="${i}"]`).forEach(c=>{
+  c.style.background='repeating-linear-gradient(45deg,transparent 0 4px,rgba(255,255,255,.05) 4px 8px)';}); });
+
+// curseur + aujourd'hui
+const sel=document.createElement('div'); sel.className='col-sel'; grid.appendChild(sel);
+const today=document.createElement('div'); today.className='today'; grid.appendChild(today);
+function place(){
+  const w=grid.querySelector('.cell').getBoundingClientRect().width;
+  sel.style.left=(cur*w)+'px'; sel.style.width=w+'px';
+  today.style.left=(0*w + w*(3/7))+'px';   // jeudi 10/09/2026
+}
+
+/* nom canonique des problèmes du périmètre fermé (08/09) — pour que « LC 300 J3 » dise « LIS » */
+const LCNAME={11:"Container With Most Water",20:"Valid Parentheses (stack)",155:"Min Stack",
+  33:"Search in Rotated Sorted Array",206:"Reverse Linked List",200:"Number of Islands",
+  207:"Course Schedule (tri topo)",133:"Clone Graph",215:"Kth Largest (heap)",
+  56:"Merge Intervals",300:"LIS (DP 1D)",424:"Longest Repeating Char Replacement",
+  209:"Minimum Size Subarray Sum",643:"Maximum Average Subarray",167:"Two Sum II"};
+
+/* titre court d'une ligne : explicite (r[4]) sinon premier <b>…</b> significatif, sinon début du texte */
+function titleOf(r){
+  const cap = t => t.length>44 ? t.slice(0,42).trim()+'…' : t;
+  // seulement quand la ligne PORTE sur le problème : piste algo, et mention en tête de texte
+  const raw = r[2].replace(/<[^>]+>/g,'').replace(/^[★⚠️⛑⚡🔥\s]+/,'');
+  const lc = raw.match(/^(TAP\s+)?LC\s*(\d+)(\s*\/\s*(\d+))?/);
+  if(r[1]==='algo' && lc && LCNAME[+lc[2]]){
+    const num = lc[4] ? `LC ${lc[2]}/${lc[4]}` : `LC ${lc[2]}`;
+    const j = raw.match(/\bJ([123])\b/);
+    return cap(`${lc[1]?'TAP ':''}${num} ${LCNAME[+lc[2]]}${j?' · J'+j[1]:''}`);
+  }
+  if(r[4]) return cap(r[4]);
+  const bolds = [...r[2].matchAll(/<b>(.*?)<\/b>/g)].map(m=>m[1].replace(/<[^>]+>/g,'').trim());
+  const first = r[2].search(/<b>/);
+  const b = (first>=0 && first<28) ? bolds.find(x=>x.length>=5) : null;
+  if(b) return cap(b);
+  const plain = r[2].replace(/<[^>]+>/g,'')
+    .replace(/^[★⚠️⛑⚡🔥\s]+/,'')
+    .replace(/^\d+\s*h(\s+\S+)?\s*[—-]\s*/,'')   // « 3 h — », « 2 h socratique — »
+    .replace(/^\d+\s*h\s*⛑\s*/,'').replace(/^[★⚠️⛑⚡🔥\s]+/,'').trim();
+  return cap(plain.split(/\.\s|[:·]/)[0].trim());
+}
+
+/* -------------------------------------------------------------- panneau */
+const panel=document.getElementById('panel');
+let cur=0, hidden=new Set();
+function draw(){
+  const w=WK[cur], pc=cv(PH[w.p].c);
+  panel.style.setProperty('--pc',pc);
+  const badges=(w.m||[]).map(m=>`<span class="bdg ${m[0]==='cp'?'cp':m[0]}">${m[1]}</span>`).join('');
+  let prevDay=null;
+  const rows=(w.r||[]).map(r=>{
+    const vis = !hidden.has(r[1]);
+    const nd = vis && r[0]!==prevDay; if(vis) prevDay = r[0];
+    const drill=['algo','ml','couches'].includes(r[1]);
+    const hr = r[3] || (drill?'08h—09h':'');
+    const cls = r[3]?'':(drill?'dflt':'none');
+    const ti = titleOf(r);
+    let tx = r[2];
+    if(!r[4]){
+      const m = tx.match(/<b>(.*?)<\/b>/);
+      if(m && m[1].replace(/<[^>]+>/g,'').trim().length>=5 && tx.indexOf(m[0])<26){
+        const cut = tx.replace(m[0],'§').replace(/^[^§]*§\s*[:,—–-]?\s*/,'');
+        const plain = cut.replace(/<[^>]+>/g,'').trim();
+        // on n'ampute que si le reste se tient seul : assez long, et ne s'ouvrant pas sur une suite de phrase
+        if(plain.length>=28 && !/^[+(,:;—–-]/.test(plain) && !/^(puis|et|ou)\b/i.test(plain))
+          tx = cut.charAt(0).toUpperCase()+cut.slice(1);
+      }
+    }
+    return `
+    <div class="row ${r[1]} ${nd?'newday':'sameday'} ${hidden.has(r[1])?'hid':''}" data-k="${r[1]}" style="--kc:${cv(KC[r[1]])}">
+      <span class="day">${r[0]}</span><span class="hr ${cls}">${hr||'—'}</span><span class="kk">${KL[r[1]]}</span><span class="ti" title="${ti.replace(/"/g,'&quot;')}">${ti}</span><span class="tx">${tx}</span>
+    </div>`;}).join('') || `<div class="empty">Semaine sans contenu programmé.</div>`;
+  panel.innerHTML=`
+    <div class="p-top">
+      <span class="dt">sem. ${w.d}</span>
+      <span class="tt">${w.t}</span>
+      ${badges}
+      <span class="hrs">${w.h} h de bloc</span>
+      <span class="nav"><button id="prev">←</button><button id="next">→</button></span>
+    </div>${rows}`;
+  document.getElementById('prev').onclick=()=>go(cur-1);
+  document.getElementById('next').onclick=()=>go(cur+1);
+  grid.querySelectorAll('.cell.sel').forEach(c=>c.classList.remove('sel'));
+  place();
+}
+function go(i){
+  cur=Math.max(0,Math.min(WK.length-1,i));
+  draw();
+  const w=grid.querySelector('.cell').getBoundingClientRect().width;
+  const sc=document.getElementById('scroll');
+  const x=cur*w, vis=sc.clientWidth;
+  if(x<sc.scrollLeft+40||x>sc.scrollLeft+vis-80) sc.scrollTo({left:Math.max(0,x-vis/2),behavior:'smooth'});
+}
+grid.addEventListener('click',e=>{const c=e.target.closest('.cell'); if(c) go(+c.dataset.i);});
+
+/* filtres : masquent les lignes du panneau ET les marques du rail */
+document.querySelectorAll('.chip').forEach(c=>{
+  c.onclick=()=>{
+    c.classList.toggle('on');
+    const k=c.dataset.k, on=c.classList.contains('on');
+    on?hidden.delete(k):hidden.add(k);
+    if(KC[k]&&['bloc','algo','ml','couches'].includes(k))
+      grid.querySelectorAll(`.cell[data-k="${k}"] > *`).forEach(el=>el.style.visibility=on?'visible':'hidden');
+    if(k==='arte'||k==='deci')
+      grid.querySelectorAll('.mil > i').forEach(el=>el.style.visibility =
+        (hidden.has('arte')&&hidden.has('deci'))?'hidden':'visible');
+    draw();
+  };
+});
+
+/* zoom, aujourd'hui, jalon suivant */
+let zoomed=false;
+document.getElementById('zoom').onclick=e=>{
+  zoomed=!zoomed;
+  document.documentElement.style.setProperty('--colw', zoomed?'56px':'30px');
+  e.target.textContent=zoomed?'Zoom −':'Zoom +';
+  e.target.classList.toggle('on',zoomed);
+  requestAnimationFrame(()=>go(cur));
+};
+document.getElementById('goToday').onclick=()=>go(0);
+document.getElementById('goNext').onclick=()=>{
+  for(let i=cur+1;i<WK.length;i++) if(WK[i].m){return go(i);}
+  for(let i=0;i<WK.length;i++) if(WK[i].m){return go(i);}
+};
+document.addEventListener('keydown',e=>{
+  if(e.key==='ArrowRight'){go(cur+1);e.preventDefault();}
+  if(e.key==='ArrowLeft'){go(cur-1);e.preventDefault();}
+  if(e.key==='ArrowDown'){for(let i=cur+1;i<WK.length;i++) if(WK[i].m){go(i);break;} e.preventDefault();}
+  if(e.key==='ArrowUp'){for(let i=cur-1;i>=0;i--) if(WK[i].m){go(i);break;} e.preventDefault();}
+});
+window.addEventListener('resize',place);
+go(0);
+
+/* ---------------------------------------------- filtres des deux backlogs */
+(function(){
+  const tabs=document.getElementById('bktabs'); if(!tabs) return;
+  const btns=[...tabs.querySelectorAll('button')];
+  const show=k=>btns.forEach(b=>{
+    const on = b.dataset.bk===k;
+    b.classList.toggle('on',on);
+    const box=document.getElementById('bk-'+b.dataset.bk);
+    if(box) box.hidden=!on;              // exclusif : la page ne fait jamais 35 lignes d'affilée
+  });
+  btns.forEach(b=>b.onclick=()=>show(b.dataset.bk));
+  show('fp');
+})();
+</script>
+</body>
+</html>

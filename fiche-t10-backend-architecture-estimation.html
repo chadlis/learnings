@@ -1,0 +1,413 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="fiche" content="serie=thematique;numero=10;statut=v1"><title>Backend, architecture & estimation système — fiche thématique</title><style>
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4;
+  --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --green:#B9E2C4; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --grid:rgba(38,72,124,.11); --red:#B8322A; --pen:#1E4E9E; --pen2:#163A7A; --hl:rgba(255,222,64,.55);
+  --again:#B93A5A; --hard:#B7791F; --good:#1F7A44;
+  --node:#1A2925; --axis:rgba(237,232,218,.4);
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44;
+  --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --green:#1F7A44; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12); --node:#FFFFFF; --axis:rgba(30,42,54,.45)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+.app{max-width:1200px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 48px}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.top .title{font-size:13.5px;color:var(--faint);flex:1 1 100%;margin-bottom:4px}
+.top .title b{font-family:var(--serif);font-size:17px;color:var(--chalk);font-weight:400;text-shadow:0 0 1px var(--dust);margin-right:6px}
+.tabs{display:flex;gap:2px;margin-right:auto;border-bottom:2px solid var(--line2)}
+.tabs button{font:500 14px var(--serif);color:var(--muted);background:transparent;border:0;border-bottom:3px solid transparent;margin-bottom:-2px;padding:8px 16px;cursor:pointer}
+.tabs button[aria-selected="true"]{color:var(--chalk);border-bottom-color:var(--yellow);text-shadow:0 0 1px var(--dust)}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.view{display:none}.view.on{display:block}
+/* ---- rail : a chalk line with stations ---- */
+.rail{margin:22px 0 4px;overflow-x:auto;padding:10px 2px 6px}
+.rail svg{display:block;min-width:760px;width:100%;height:auto;filter:url(#chalkf)}
+.rail .st{cursor:pointer}
+.rail .st circle{fill:var(--board);stroke-width:2.5}
+.rail .st.rated-again circle{fill:var(--pink);stroke:var(--pink)}
+.rail .st.rated-hard circle{fill:var(--yellow);stroke:var(--yellow)}
+.rail .st.rated-good circle{fill:var(--mint);stroke:var(--mint)}
+.rail .st.cur circle{r:8;stroke-width:3.5}
+.rail text{font:600 11px var(--sans);fill:var(--muted)}
+/* ---- stage ---- */
+.stage{margin-top:14px;display:grid;grid-template-columns:44px minmax(0,1fr) 44px;gap:12px;align-items:center}
+.nav{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line2);background:transparent;color:var(--muted);font-size:20px;cursor:pointer}
+.nav:hover{color:var(--yellow);border-color:var(--yellow)}
+.deck{position:relative;min-height:380px}
+.card{position:relative;min-height:380px;transition:height .3s}
+.face{position:absolute;inset:0;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .3s,transform .3s,visibility 0s .3s;display:flex;flex-direction:column;overflow:hidden}
+.card:not(.flipped) .face.front,.card.flipped .face.back{opacity:1;visibility:visible;transform:none;transition:opacity .3s,transform .3s,visibility 0s}
+/* front : the question written in chalk, framed on the board */
+.front{border:2px solid var(--line2);border-radius:4px;padding:22px 28px 22px}
+.front .br{display:flex;align-items:center;gap:10px;font:600 13px var(--sans);color:var(--ac)}
+.front .br i{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--ac);display:grid;place-items:center;font-size:12px}
+.front .br small{margin-left:auto;font-weight:500;color:var(--faint);font-variant-numeric:tabular-nums}
+.front .qtxt{font-family:var(--serif);font-size:clamp(24px,3.6vw,34px);line-height:1.28;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:auto 0;padding:26px 0}
+.front .cta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:auto}
+.front .cta .say{font-size:13.5px;color:var(--faint);max-width:40ch}
+.btn{font:600 14px var(--sans);border-radius:3px;padding:11px 18px;cursor:pointer;border:1.5px solid transparent}
+.btn.flip{margin-left:auto;background:transparent;color:var(--yellow);border-color:var(--yellow)}
+.btn.flip:hover{background:var(--yellow);color:var(--board)}
+kbd{font:11px var(--mono);opacity:.75;margin-left:6px;border:1px solid currentColor;border-radius:3px;padding:0 4px}
+/* back : the index card, board formulation goes back on the board */
+.back{background:var(--card);color:var(--cardink);border-radius:3px;padding:18px 22px 20px 24px;overflow:auto;
+  box-shadow:0 14px 26px -14px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);
+  background-image:repeating-linear-gradient(0deg,transparent 0 27px,var(--cardline) 27px 28px);background-position:0 10px}
+.back::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--ac);border-radius:3px 0 0 3px}
+.back .br{display:flex;align-items:center;gap:10px;font:600 12.5px var(--sans);color:var(--ac);filter:saturate(1.4) brightness(.72);margin-bottom:8px}
+body.white .back .br{filter:none}
+.back .br small{margin-left:auto;font-weight:500;color:var(--cardmuted);filter:none;font-variant-numeric:tabular-nums}
+.ans{font-size:15.5px;line-height:1.55}
+.ans p{margin-bottom:10px}.ans p:last-child{margin-bottom:0}
+.ans .def::before,.ans .intu::before,.ans .ex::before,.ans .step::before{font:600 11px var(--sans);letter-spacing:.06em;color:var(--ac);filter:saturate(1.4) brightness(.72);margin-right:8px}
+body.white .ans .def::before,body.white .ans .intu::before,body.white .ans .ex::before,body.white .ans .step::before{filter:none}
+.ans .def::before{content:"déf."}.ans .intu::before{content:"intuition"}.ans .ex::before{content:"ex."}.ans .step::before{content:"pas à pas"}
+.ans .intu,.ans .ex,.ans .step{color:var(--cardmuted)}
+.ans .m,.ans .up,.ans .hat{color:var(--cardink)}
+.ans table.t{font-family:var(--sans);border-collapse:collapse;width:100%;margin:6px 0 14px;font-size:14px;background:var(--card)}
+.ans table.t th,.ans table.t td{border:1px solid var(--cardline);padding:6px 9px;text-align:left;vertical-align:top}
+.ans table.t th{font-size:11px;letter-spacing:.06em;color:var(--cardmuted);font-weight:600}
+.ans table.t td.num{font-family:var(--mono)}
+.ans .chain{font-family:var(--mono);font-size:13.5px;line-height:1.9;padding:8px 12px;border-left:2px solid var(--ac);margin:8px 0 12px;background:rgba(34,48,43,.05)}
+.ans .chain b{color:var(--ac);filter:saturate(1.4) brightness(.72);font-weight:700}
+.ans .trap{border:1.5px solid var(--red);border-radius:3px;padding:10px 13px;margin-top:14px;font-size:14px;background:rgba(184,50,42,.06);transform:rotate(-.3deg)}
+.ans .trap .lbl{font:700 11px var(--sans);letter-spacing:.08em;color:var(--red);margin-bottom:3px}
+.ans .trap b{color:var(--red)}
+.ans .board{margin:14px 0 0 -24px;margin-right:-22px;padding:14px 22px 14px 24px;background:var(--board2);color:var(--chalk);border-top:1px solid var(--line)}
+.ans .board .lbl{font:600 11.5px var(--sans);letter-spacing:.08em;color:var(--yellow);margin-bottom:8px}
+.ans .board .say{font-family:var(--serif);font-size:19px;line-height:1.55;color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.ans .board .say .m,.ans .board .say .up,.ans .board .say .hat{color:var(--chalk)}
+.ans .board .say .dz{cursor:pointer;transition:filter .25s}
+body.dictee .ans .board .say .dz.hid{filter:blur(6px);color:var(--yellow);user-select:none}
+.ans .board .donc{color:var(--yellow);font-weight:700}
+.ans .board .dict{margin-top:8px;font:12.5px var(--sans);color:var(--faint)}
+body:not(.dictee) .ans .board .dict{display:none}
+.rate{display:flex;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--cardline);flex-wrap:wrap}
+.rate .lbl{width:100%;font-size:12.5px;color:var(--cardmuted)}
+.rate .btn{flex:1;min-width:120px;color:#fff}
+.rate .again{background:var(--again)}.rate .hard{background:var(--hard)}.rate .good{background:var(--good)}
+/* ---- recap : written on the board ---- */
+.recap{border:2px solid var(--line2);border-radius:4px;padding:26px 28px;margin-top:14px}
+.recap h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.recap .p{color:var(--muted);font-size:14.5px;margin-bottom:18px}
+.bars{display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:200px 1fr 60px;gap:12px;align-items:center;font-size:14px}
+.bar .tr{height:9px;border-radius:2px;background:var(--line);overflow:hidden;display:flex}
+.bar .tr i{display:block;height:100%}
+.bar small{color:var(--faint);text-align:right;font-variant-numeric:tabular-nums}
+.weak{margin-top:22px}
+.weak h3{font:600 14px var(--sans);color:var(--muted);margin-bottom:8px}
+.weak a{display:block;color:var(--cardink);text-decoration:none;padding:9px 12px;background:var(--card);margin-bottom:6px;font-size:14.5px;border-left:4px solid var(--ac);border-radius:2px}
+.weak a:hover{background:var(--cardsoft)}
+.recap .btns{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+.recap .btn{background:var(--yellow);color:var(--board)}
+.recap .btn:disabled{opacity:.4;cursor:default}
+.recap .btn.ghostb{background:transparent;color:var(--ink);border-color:var(--line2)}
+/* ---- labo : millimetre-paper sheets pinned on the board (carnet structure) ---- */
+.labo .intro{font-family:var(--serif);font-size:15.5px;line-height:1.6;color:var(--muted);max-width:66ch;margin:24px 0 6px}
+.labo .intro b{color:var(--ink);font-weight:600}
+.panel{margin:30px 0 0}
+.panel h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:10px;letter-spacing:-.005em}
+.panel h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--yellow);vertical-align:middle;margin-right:10px}
+.frame{border:1px solid var(--cardline);border-radius:3px;background:
+  repeating-linear-gradient(0deg,var(--grid) 0 1px,transparent 1px 12px),
+  repeating-linear-gradient(90deg,var(--grid) 0 1px,transparent 1px 12px),var(--card);
+  color:var(--cardink);box-shadow:0 14px 26px -14px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2)}
+.frame .plot{padding:6px 4px 0}
+.frame .plot text{fill:var(--cardmuted)!important}
+.frame .plot line[stroke="rgba(255,255,255,.28)"]{stroke:rgba(34,48,43,.45)!important}
+.frame .plot [fill="#54C8B8"],.frame .plot [stroke="#54C8B8"]{fill:#0F8A7C;stroke:#0F8A7C}
+.frame .plot text[fill="#54C8B8"]{fill:#0F8A7C!important}.frame .plot text[fill="#B49CF6"]{fill:#6B46C1!important}.frame .plot text[fill="#F0796B"]{fill:#C0392B!important}.frame .plot text[fill="#E8B04B"]{fill:#B7791F!important}
+.frame .plot line[stroke="#54C8B8"]{stroke:#0F8A7C!important}.frame .plot line[stroke="#B49CF6"]{stroke:#6B46C1!important}.frame .plot line[stroke="#F0796B"]{stroke:#C0392B!important}.frame .plot line[stroke="#E8B04B"]{stroke:#B7791F!important}
+.plot .hv{fill:#6B46C1;opacity:.7}.plot .hp{fill:#1F7A44;opacity:.8}.plot .hu{fill:#C0392B;opacity:.4}.plot .hc{fill:#C0392B;opacity:.7}.plot .dot{fill:#B7791F}
+.sampctl{display:flex;flex-wrap:wrap;gap:8px;padding:12px 14px;border-bottom:1px solid var(--cardline);background:var(--card)}
+.sampctl button{font:500 13px var(--sans);color:var(--cardink);background:var(--cardsoft);border:1px solid var(--cardline);border-radius:3px;padding:6px 12px;cursor:pointer}
+.sampctl button:hover{border-color:var(--pen);color:var(--pen)}
+.readout{display:flex;flex-wrap:wrap;gap:6px 22px;padding:11px 14px;border-top:1px solid var(--cardline);font:13px var(--sans);color:var(--cardmuted);background:var(--card)}
+.readout b{color:var(--cardink);font-weight:600;font-variant-numeric:tabular-nums}
+.readout .hot b{color:#B7791F}.readout .win b{color:#1F7A44}.readout .bad b{color:#C0392B}
+.wcap{padding:12px 16px 14px;font-family:var(--serif);font-size:15px;line-height:1.55;color:var(--cardmuted);background:var(--card);border-top:1px solid var(--cardline)}
+.wcap b{color:var(--cardink)}
+.wcap .m,.wcap .up,.wcap .hat{color:var(--cardink)}
+/* ---- carte ---- */
+.carte .panel h2::before{display:none}
+.mapscroll svg{filter:url(#chalkf)}
+.mapscroll svg text{text-shadow:0 0 1px var(--dust)}
+.mapscroll svg rect{fill:transparent!important;stroke-width:2}
+.mapscroll svg .lk,.mapscroll svg .lk2{opacity:.85;stroke-width:2}
+.caption{font-size:14px;color:var(--muted);margin-top:8px;max-width:66ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin-top:22px}
+.chip{background:var(--card);color:var(--cardink);border:0;border-left:4px solid var(--ac);border-radius:2px;padding:10px 12px;font-size:13.5px;line-height:1.35;cursor:pointer;text-align:left;font-family:var(--sans)}
+.chip small{display:block;color:var(--cardmuted);font-size:11.5px;margin-top:4px}
+.chip.rated-again small{color:var(--again)}.chip.rated-hard small{color:var(--hard)}.chip.rated-good small{color:var(--good)}
+#src{display:none}
+footer{margin-top:44px;padding-top:14px;border-top:1.5px solid var(--line2);font-size:12.5px;color:var(--faint);line-height:1.7;max-width:70ch}
+:focus-visible{outline:2px solid var(--yellow);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.card,.face,.dz{transition:none!important}}
+@media(max-width:640px){kbd{display:none}.stage{grid-template-columns:1fr}.nav{display:none}.front{padding:18px 16px}.back{padding:16px 16px 18px 18px}.ans .board{margin-left:-18px;margin-right:-16px}.bar{grid-template-columns:120px 1fr 50px}.tabs{margin-left:0;width:100%}}
+
+/* ---- labo : sidebar + full flow ---- */
+.cols{display:grid;grid-template-columns:270px minmax(0,1fr);gap:44px;margin-top:22px}
+.tree{position:sticky;top:14px;align-self:start;font-family:var(--sans);font-size:13.5px;max-height:calc(100vh - 28px);overflow:auto;padding-right:6px}
+.tree .root{font-family:var(--serif);font-size:16px;line-height:1.3;color:var(--chalk);text-shadow:0 0 1px var(--dust);padding:0 0 12px 12px;border-left:2px solid var(--yellow);margin-bottom:14px}
+.tree .score{font-size:12px;color:var(--faint);margin-bottom:16px;padding-left:14px}
+.tree .score b{color:var(--ink)}
+.branch{margin:0 0 12px}
+.branch .bh{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--ink);padding:4px 0}
+.branch .bh i{width:9px;height:9px;border-radius:50%;background:var(--ac);flex:none}
+.branch .bh small{margin-left:auto;font-weight:400;color:var(--faint);font-variant-numeric:tabular-nums}
+.branch ul{list-style:none;margin:2px 0 0 4px;border-left:1px solid var(--line2);padding-left:11px}
+.branch li a{display:block;color:var(--muted);text-decoration:none;padding:3px 0;line-height:1.35}
+.branch li a:hover{color:var(--yellow)}
+.branch li a.good{color:var(--mint);text-decoration:line-through;text-decoration-color:var(--line2)}
+.branch li a.again{color:var(--pink);font-weight:600}
+.branch li a.hard{color:var(--yellow)}
+.branch li a::before{content:"";display:inline-block;width:6px;height:6px;border:1px solid var(--line2);border-radius:1px;margin:0 8px 1px -15px;background:var(--board)}
+.branch li a.good::before{background:var(--mint);border-color:var(--mint)}
+.branch li a.again::before{background:var(--pink);border-color:var(--pink)}
+.branch li a.hard::before{background:var(--yellow);border-color:var(--yellow)}
+.tree .redo{margin-top:8px;width:100%;font:600 13px var(--sans);color:var(--pink);background:transparent;border:1.5px dashed var(--pink);border-radius:3px;padding:8px;cursor:pointer}
+.tree .redo:disabled{opacity:.35;cursor:default}
+.tree .tools{display:flex;gap:6px;margin-top:8px}
+.tree .tools button{flex:1;font:500 12.5px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px;cursor:pointer}
+.content{min-width:0}
+/* sections : chalk questions, index cards */
+.sec{margin-top:48px;scroll-margin-top:14px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-head .n{font-family:var(--serif);font-size:30px;color:var(--ac);text-shadow:0 0 1px var(--dust);line-height:1}
+.sec-head h2{font-family:var(--serif);font-weight:400;font-size:26px;color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.sec-head::after{content:"";flex:1;height:2px;background:var(--ac);opacity:.6;margin-left:6px;align-self:center;border-radius:2px;filter:url(#chalkf)}
+details{margin:14px 0 0;scroll-margin-top:14px}
+summary{list-style:none;cursor:pointer;padding:10px 0;display:flex;gap:14px;align-items:flex-start;font-family:var(--serif);font-size:20px;line-height:1.35;color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+summary::-webkit-details-marker{display:none}
+summary .q{font:600 13px var(--sans);color:var(--ac);flex:none;margin-top:8px;text-shadow:none;border:1.5px solid var(--ac);border-radius:50%;width:24px;height:24px;display:grid;place-items:center}
+summary .chev{margin-left:auto;flex:none;color:var(--faint);transition:transform .2s;margin-top:4px;text-shadow:none;font-family:var(--sans)}
+details[open] summary .chev{transform:rotate(90deg)}
+summary:hover{color:var(--yellow)}
+.body{background:var(--card);color:var(--cardink);border-radius:3px;padding:18px 20px 20px 22px;margin:6px 0 10px 38px;font-size:15.5px;line-height:1.55;position:relative;
+  box-shadow:0 12px 24px -12px rgba(0,0,0,.55),0 1px 0 rgba(0,0,0,.2);
+  background-image:repeating-linear-gradient(0deg,transparent 0 27px,var(--cardline) 27px 28px);background-position:0 8px}
+.body::before{content:"";position:absolute;left:-1px;top:0;bottom:0;width:4px;background:var(--ac);border-radius:3px 0 0 3px}
+.body p{margin-bottom:10px}.body p:last-child{margin-bottom:0}
+.body .def::before,.body .intu::before,.body .ex::before,.body .step::before{font:600 11px var(--sans);letter-spacing:.06em;color:var(--ac);filter:saturate(1.4) brightness(.72);margin-right:8px}
+body.white .body .def::before,body.white .body .intu::before,body.white .body .ex::before,body.white .body .step::before{filter:none}
+.body .def::before{content:"déf."}.body .intu::before{content:"intuition"}.body .ex::before{content:"ex."}.body .step::before{content:"pas à pas"}
+.body .intu,.body .ex,.body .step{color:var(--cardmuted)}
+.body .m,.body .up,.body .hat{color:var(--cardink)}
+.body table.t{font-family:var(--sans);border-collapse:collapse;width:100%;margin:6px 0 14px;font-size:14px;background:var(--card)}
+.body table.t th,.body table.t td{border:1px solid var(--cardline);padding:6px 9px;text-align:left;vertical-align:top}
+.body table.t th{font-size:11px;letter-spacing:.06em;color:var(--cardmuted);font-weight:600}
+.body table.t td.num{font-family:var(--mono)}
+.body .chain{font-family:var(--mono);font-size:13.5px;line-height:1.9;padding:8px 12px;border-left:2px solid var(--ac);margin:8px 0 12px;background:rgba(34,48,43,.05)}
+.body .chain b{color:var(--ac);filter:saturate(1.4) brightness(.72);font-weight:700}
+.body .trap{border:1.5px solid var(--red);border-radius:3px;padding:10px 13px;margin-top:14px;font-size:14px;background:rgba(184,50,42,.06);transform:rotate(-.3deg)}
+.body .trap .lbl{font:700 11px var(--sans);letter-spacing:.08em;color:var(--red);margin-bottom:3px}
+.body .trap b{color:var(--red)}
+.body .board{margin:14px 0 0 -22px;margin-right:-20px;padding:14px 20px 14px 22px;background:var(--board2);color:var(--chalk);border-top:1px solid var(--line)}
+.body .board .lbl{font:600 11.5px var(--sans);letter-spacing:.08em;color:var(--yellow);margin-bottom:8px}
+.body .board .say{font-family:var(--serif);font-size:19px;line-height:1.55;color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.body .board .say .m,.body .board .say .up,.body .board .say .hat{color:var(--chalk)}
+.body .board .say .dz{cursor:pointer;transition:filter .25s}
+body.dictee .body .board .say .dz.hid{filter:blur(6px);color:var(--yellow);user-select:none}
+.body .board .donc{color:var(--yellow);font-weight:700}
+.body .board .dict{margin-top:8px;font:12.5px var(--sans);color:var(--faint)}
+body:not(.dictee) .body .board .dict{display:none}
+.grade{display:flex;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid var(--cardline);font-family:var(--sans);align-items:center;flex-wrap:wrap}
+.grade span{font-size:12.5px;color:var(--cardmuted);margin-right:4px}
+.grade button{font:600 12.5px var(--sans);border-radius:3px;padding:5px 12px;cursor:pointer;border:1px solid var(--cardline);background:var(--card);color:var(--cardmuted)}
+.grade button.on.again{background:var(--again);border-color:var(--again);color:#fff}
+.grade button.on.hard{background:var(--hard);border-color:var(--hard);color:#fff}
+.grade button.on.good{background:var(--good);border-color:var(--good);color:#fff}
+.labo footer{margin-top:44px}
+#v-deck,#v-carte{max-width:960px;margin:0 auto}
+@media(max-width:900px){.cols{grid-template-columns:1fr;gap:20px}.tree{position:static;max-height:300px;border:1.5px solid var(--line2);border-radius:3px;padding:12px}}
+@media(max-width:520px){.body{margin-left:0;padding:14px 14px 16px 16px}.body .board{margin-left:-16px;margin-right:-14px}summary{font-size:18px}}
+
+.m{font-family:var(--math);font-style:italic;white-space:nowrap}
+.up{font-style:normal;font-family:var(--math)}
+sup,sub{font-size:.72em;line-height:0}
+.hat{display:inline-block;position:relative;font-style:normal;font-family:var(--math)}
+.hat::before{content:"ˆ";position:absolute;top:-.58em;left:50%;transform:translateX(-50%);font-size:.85em;color:inherit}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;font-family:var(--math);line-height:1.1;margin:0 3px}
+.frac>span{padding:0 4px}.frac>span:first-child{border-bottom:1px solid currentColor}
+.mapscroll{overflow-x:auto}.mapscroll svg{display:block;min-width:680px;width:100%;height:auto}
+.plot svg{display:block;width:100%;max-width:640px;margin:0 auto;height:auto}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+svg [fill="#101822"]{fill:var(--node)} svg [stroke="#54C8B8"]{stroke:var(--teal)} svg [fill="#54C8B8"]{fill:var(--teal)}
+svg [stroke="#B49CF6"]{stroke:var(--violet)} svg [fill="#B49CF6"]{fill:var(--violet)}
+svg [stroke="#6FA6E8"]{stroke:var(--blue)} svg [fill="#6FA6E8"]{fill:var(--blue)}
+svg [stroke="#7BD88F"]{stroke:var(--green)} svg [fill="#7BD88F"]{fill:var(--green)}
+svg [stroke="#F0796B"]{stroke:var(--coral)} svg [fill="#F0796B"]{fill:var(--coral)}
+svg [stroke="#E8B04B"]{stroke:var(--amber)} svg [fill="#E8B04B"]{fill:var(--amber)}
+svg [fill="#E9EDF3"]{fill:var(--ink)} svg [fill="#5E6C84"]{fill:var(--faint)} svg .leaf{fill:var(--muted)}
+svg [stroke="rgba(255,255,255,.28)"]{stroke:var(--axis)}
+
+.branch .bh{cursor:pointer;user-select:none}.branch.fold ul{display:none}.branch .bh::after{content:"▾";margin-left:6px;color:var(--faint);font-size:11px}.branch.fold .bh::after{content:"▸"}
+</style></head>
+<body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="chalkf" x="-2%" y="-2%" width="104%" height="104%">
+<feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="2" seed="7" result="n"/>
+<feDisplacementMap in="SourceGraphic" in2="n" scale="1.2" xChannelSelector="R" yChannelSelector="G"/></filter></svg><div class="ledge" aria-hidden="true"></div><div class="app">
+<div class="top">
+  <div class="title"><b>Backend, architecture & estimation système</b> fiche thématique 10 · 16 questions · v1 du 11/09/2026 · couvre les cartes Anki « swe » architecture::*, db::*, deploiement, git::*, process, workflows, testing::evidence, llm::rag, llm::vector-search, system-design::estimation</div>
+  <div class="tabs" role="tablist"><button role="tab" data-v="v-labo" aria-selected="true">Labo</button><button role="tab" data-v="v-deck" aria-selected="false">Parcours</button><button role="tab" data-v="v-carte" aria-selected="false">Carte</button></div>
+  <button class="tb" id="dictBtn" aria-pressed="true">Dictée des « donc » : on</button>
+  <button class="tb" id="themeBtn" data-cls="white" data-alt="Tableau blanc" data-base="Tableau noir" data-query="(prefers-color-scheme: light)" aria-pressed="false">Tableau blanc</button>
+</div>
+<section class="view on labo" id="v-labo"><div class="cols">
+  <nav class="tree" id="tree" aria-label="Le tronc et les branches"><div class="root">« quelle garantie tient encore quand le code change, et combien ça coûte à l'échelle ? »</div><div class="score" id="score"></div>
+    <button class="redo" id="redo" disabled>Rouvrir seulement les faibles</button><div class="tools"><button id="openAll">Tout déplier</button><button id="closeAll">Tout replier</button></div></nav>
+  <main class="content"><p class="intro">Fil rouge : une plateforme e-commerce à modules isolés (type Medusa 2.0), une migration de colonne à déployer sans coupure, un montant de 899,99 € à stocker, et un RAG à <b>N = 10⁷</b> embeddings de dimension 1 536 qu'il faut interroger en moins de 100 ms.</p><section class="sec" style="--ac:var(--teal)"><div class="sec-head"><span class="n">01</span><h2>Données — contraintes, migrations, argent</h2></div><details><summary><span class="q">Q</span><span>Invariant garanti par une contrainte de base ou par le chemin d'écriture applicatif : quelle différence ?</span><span class="chev">›</span></summary><div class="body"><p class="def">La contrainte s'applique à <b>toute</b> écriture, y compris celles qui n'existent pas encore — un script, un autre service, un dev futur. Le chemin applicatif ne protège que les écritures qui passent par lui. Corollaire : une garantie absente et <b>connue</b> se compense (test, note, condition de réouverture).</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Une contrainte vit avec les données, donc elle survit à tout nouveau code ; une validation vit dans un chemin, donc elle meurt au premier contournement. »</p></div></div></details><details><summary><span class="q">Q</span><span>Un ORM fait du soft delete (deleted_at). Quelle conséquence sur une contrainte d'unicité ?</span><span class="chev">›</span></summary><div class="body"><p class="def">L'unicité doit devenir un <b>index partiel</b>, restreint aux lignes vivantes (<code>WHERE deleted_at IS NULL</code>). Sinon il devient impossible de recréer un enregistrement avec un e-mail déjà utilisé puis supprimé.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Les lignes supprimées restent dans la table, donc elles participent à l'unicité, donc il faut exclure les lignes mortes de l'index. »</p></div></div></details><details><summary><span class="q">Q</span><span>Une migration commitée et déjà appliquée ailleurs est incorrecte. Que faire ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Ajouter une <b>nouvelle migration corrective</b> ; ne jamais modifier une migration déjà appliquée : les environnements qui l'ont jouée ne la rejoueront pas, et leur schéma divergerait du code.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Une migration appliquée est un fait dans chaque base, donc la réécrire crée deux histoires, donc on avance par une nouvelle migration. »</p></div></div></details><details><summary><span class="q">Q</span><span>Renommer une colonne sans interruption, migration et déploiement non atomiques : comment ?</span><span class="chev">›</span></summary><div class="body"><p class="def"><b>Expand / contract</b>, en déploiements séparés : 1. Expand — ajouter la nouvelle colonne, nullable, écrire dans les deux. 2. Backfill. 3. Basculer les lectures. 4. Contract — supprimer l'ancienne. Chaque étape est déployable et réversible, et aucune ne casse la version précédente du code.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Pendant le déploiement deux versions du code coexistent, donc le schéma doit satisfaire les deux, donc on ajoute avant de retirer et on retire seulement quand plus rien ne lit l'ancien. »</p></div></div></details><details><summary><span class="q">Q</span><span>Pourquoi jamais un montant dans un flottant, et qu'est-ce qu'un test de relecture ne prouve pas ?</span><span class="chev">›</span></summary><div class="body"><p class="def">0,1 est périodique en binaire : 0,1 + 0,2 ≠ 0,3, et les sommes dérivent. Stocker en <b>centimes entiers</b>. Un test qui écrit 899.99 via JSON, relit et compare ne distingue pas un stockage exact d'un stockage flottant : la perte a lieu une fois à la conversion du littéral, identiquement des deux côtés — il prouve la fidélité du stockage, pas l'exactitude de la représentation.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« La fraction décimale n'est pas finie en base 2, donc chaque montant porte une erreur, donc on stocke des entiers ; et un aller-retour ne voit pas une erreur commise avant lui, donc il ne teste pas la représentation. »</p></div></div></details></section><section class="sec" style="--ac:var(--violet)"><div class="sec-head"><span class="n">02</span><h2>Frontières — modules, transactions, DSL, flags</h2></div><details><summary><span class="q">Q</span><span>Architecture à modules isolés : pourquoi interdire une clé étrangère entre deux modules ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Pour qu'un module reste <b>remplaçable</b> : ses données pourraient un jour ne plus vivre dans la même base (autre schéma, autre service, autre techno). Une FK inter-modules soude les deux au même moteur. Les liens se font par identifiants et via l'API du module. Une FK reste possible à l'intérieur d'un module.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Une FK est une promesse du moteur de base, donc elle suppose une base commune, donc elle interdit de sortir un module, donc on la remplace par un lien logique. »</p></div></div></details><details><summary><span class="q">Q</span><span>Une opération enchaîne des écritures dont certaines hors base (fichier S3, API tierce). Que garantit une transaction ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Une transaction ne sait annuler que les écritures de <b>sa propre</b> base : ni supprimer un fichier ni annuler un appel HTTP. Il faut des <b>étapes de compensation</b> explicites (motif <i>saga</i>). Prix : l'état n'est jamais atomique, seulement éventuellement cohérent.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Le rollback n'atteint que ce que la base contrôle, donc chaque effet externe doit avoir son geste inverse, donc on orchestre une saga. »</p></div></div></details><details><summary><span class="q">Q</span><span>Dans un DSL qui construit un graphe d'exécution (workflow, DAG, TF 1.x), pourquoi les if et for ordinaires ne font-ils pas ce qu'on croit ?</span><span class="chev">›</span></summary><div class="body"><p class="def">La fonction s'exécute <b>une seule fois, au chargement</b>, pour construire le graphe — pas à chaque exécution. Un if y choisit une branche pour toujours, un for déroule ses itérations dans le graphe. Le contournement est une primitive qui diffère le calcul (transform() en Medusa, tf.cond).</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Le code Python décrit le graphe et ne l'exécute pas, donc toute condition évaluée en Python est figée à la construction, donc il faut une primitive du DSL pour brancher au runtime. »</p></div></div></details><details><summary><span class="q">Q</span><span>Une feature derrière un flag touche vingt endroits. Comment éviter vingt if (flag) ?</span><span class="chev">›</span></summary><div class="body"><p class="def"><b>Branch by abstraction</b> : extraire une interface, écrire deux implémentations qui la respectent, brancher <b>une fois</b> à l'endroit de résolution. Retirer le flag = effacer la fonction de résolution et une implémentation, au lieu de traquer vingt conditions.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Vingt conditions dispersées sont vingt points de dérive, donc on concentre le choix en un point derrière une interface, donc le retrait du flag devient une suppression locale. »</p></div></div></details></section><section class="sec" style="--ac:var(--blue)"><div class="sec-head"><span class="n">03</span><h2>Livraison — trunk-based, rebase, tests</h2></div><details><summary><span class="q">Q</span><span>Trunk-based development : quel paramètre détermine le coût de l'intégration ?</span><span class="chev">›</span></summary><div class="body"><p class="def">La <b>durée de vie des branches</b> — ni le nombre de développeurs, ni la taille du changement. Le coût d'un merge croît avec ce qui a divergé pendant la vie de la branche. D'où la règle des 24-48 h. Corollaire contre-intuitif : plus il y a de parallélisme, plus il faut intégrer souvent.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« La divergence s'accumule avec le temps, donc plus la branche vit longtemps plus le merge coûte, donc on raccourcit les branches plutôt que les changements. »</p></div></div></details><details><summary><span class="q">Q</span><span>Après un rebase, <code>git status -sb</code> affiche [ahead 8, behind 8]. Que s'est-il passé, que faire ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Le même nombre des deux côtés signe une <b>réécriture d'historique</b>, pas un travail divergent : le rebase a recréé les 8 commits avec de nouveaux hashes, la branche distante a les anciens. Faire <code>git push --force-with-lease</code>. Surtout pas <code>git pull</code> : en merge il réintègre les vieux commits en double, en rebase il les rejoue.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Un rebase change les identités des commits, donc le remote et le local ont deux versions des mêmes changements, donc on écrase le remote avec un force protégé. »</p></div></div></details><details><summary><span class="q">Q</span><span>Un test vérifie qu'une route renvoie la bonne ressource par id, avec une seule ligne en base. Que prouve-t-il ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Rien : avec une seule ligne, « renvoyer la première ligne » passe aussi, comme un filtre partiel puis recherche en mémoire. Un test ne démontre une sélection que si le jeu contient des <b>alternatives plausibles</b> que le bug choisirait.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Un test discrimine entre implémentations, donc il faut des données où la mauvaise implémentation donne un autre résultat, donc au moins deux lignes dont une piège. »</p></div></div></details></section><section class="sec" style="--ac:var(--green)"><div class="sec-head"><span class="n">04</span><h2>Estimation à l'échelle — RAG, IVF, FLOP</h2></div><details><summary><span class="q">Q</span><span>RAG, N = 10⁷ embeddings de dimension 1 536, top-10 pour une requête : coût de la recherche exacte ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Brute force : distance de q à <b>chacun</b> des N vecteurs, N·d = 1,5·10¹⁰ multiplications-additions, puis un top-k en O(N log k). Sur un CPU à 10¹⁰ FLOP/s : de l'ordre de la seconde par requête — inacceptable à 100 ms. Règle de composition : hors boucle → « + », dans la boucle → « × ».</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Chaque vecteur coûte d opérations et il y en a N, donc N·d par requête, donc à 10⁷ × 1 536 on est à 10¹⁰ opérations, donc il faut un index. »</p></div></div></details><details><summary><span class="q">Q</span><span>Comment un index IVF évite-t-il le scan complet ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Hors ligne : k-means sur les N vecteurs, chacun rangé dans la cellule de son centroïde. En ligne : comparer q aux k centroïdes, puis scanner les nprobe cellules les plus proches (≈ N/k vecteurs chacune). Coût ≈ k + nprobe·N/k (fois d). Deux temps séquentiels, donc les coûts s'additionnent. Approché : le vrai voisin peut être dans une cellule voisine.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« On paie d'abord la comparaison aux centroïdes, puis le scan d'une fraction, donc k + N/k, donc on troque un peu de rappel contre un facteur √N de vitesse. »</p></div></div></details><details><summary><span class="q">Q</span><span>IVF, nprobe = 1, coût k + N/k : quel k, et pourquoi ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Les deux termes varient en sens inverse, <b>donc</b> l'optimum les égalise, <b>donc</b> k = √N. Coût 2√N ≈ 6 300 vecteurs au lieu de 10⁷. Dérivation : f'(k) = 1 − N/k² = 0. L'argument d'équilibrage vaut pour tout coût en a·k + b/k.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Un terme croît en k et l'autre décroît en 1/k, donc le minimum est atteint quand ils sont égaux, donc k = √N. »</p></div></div></details><details><summary><span class="q">Q</span><span>Tu as estimé un nombre de FLOP. Comment passer au temps, et quelle confusion coûte cher au tableau ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Diviser un <b>travail</b> par un <b>débit</b> : temps = FLOP / (FLOP/s de la machine). FLOP est une quantité, FLOP/s une vitesse — les confondre donne des temps absurdes. Ordres de grandeur : CPU 10¹⁰-10¹¹ FLOP/s, GPU 10¹³-10¹⁴.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Un travail se mesure en opérations et une machine en opérations par seconde, donc leur quotient est un temps, donc on vérifie les unités avant le chiffre. »</p></div></div></details></section><footer>Réactivation, pas découverte. Cartes sources : tags architecture::*, db::*, deploiement::zero-downtime, git::*, process::trunk-based, workflows, testing::evidence, llm::rag, llm::vector-search, system-design::estimation. Fiche jumelle : fiche 11 (HTTP, web, sécurité).</footer></main>
+</div></section>
+<section class="view" id="v-deck"><div class="rail" id="rail"></div>
+  <div class="stage" id="stage"><button class="nav" id="prev" aria-label="Question précédente">‹</button>
+    <div class="deck"><div class="card" id="card">
+      <div class="face front"><div class="br"></div><div class="qtxt"></div><div class="cta"><span class="say">À la craie : réponds à voix haute, avec les « donc », avant de retourner la fiche.</span><button class="btn flip" id="flipBtn">Retourner <kbd>espace</kbd></button></div></div>
+      <div class="face back"><div class="br"></div><div class="ans"></div><div class="rate"><span class="lbl">Ta réponse orale, comparée à la fiche :</span><button class="btn again" data-r="again">Encore <kbd>1</kbd></button><button class="btn hard" data-r="hard">Difficile <kbd>2</kbd></button><button class="btn good" data-r="good">Bien <kbd>3</kbd></button></div></div>
+    </div></div><button class="nav" id="next" aria-label="Question suivante">›</button></div>
+  <div class="recap" id="recap" style="display:none"><h2>Fin du parcours</h2><p class="p">Réactivation, pas découverte : une question qui résiste est une carte à refondre, pas un cours à refaire.</p><div class="bars" id="bars"></div><div class="weak" id="weak"></div><div class="btns"><button class="btn" id="replay">Rejouer les faibles</button><button class="btn ghostb" id="restart">Tout recommencer</button></div></div>
+</section>
+<section class="view carte" id="v-carte"><section class="panel"><h2>Le tronc et les branches</h2><div class="mapscroll"><svg viewBox="0 0 760 410" xmlns="http://www.w3.org/2000/svg" role="img"><style>.bt{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:700}.leaf{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px}.rt{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;font-weight:700}.lk{fill:none;stroke-width:1.6;opacity:.7}</style><rect x="30" y="18" width="700" height="34" rx="6" fill="#101822" stroke="#E9EDF3" stroke-width="1.5"/><text class="rt" x="380" y="40" text-anchor="middle" fill="#E9EDF3">quelle garantie tient encore quand le code change, et combien ça coûte à l&#x27;échelle ?</text><path class="lk" d="M380,52 C380,70 190,60 190,100" stroke="#54C8B8"/><rect x="147" y="100" width="86" height="32" rx="6" fill="#101822" stroke="#54C8B8" stroke-width="1.5"/><text class="bt" x="190" y="121" text-anchor="middle" fill="#54C8B8">données</text><line x1="8" y1="150" x2="12" y2="150" stroke="#54C8B8" stroke-width="1.5"/><text class="leaf" x="16" y="154">contrainte DB : toute écriture, même future</text><line x1="8" y1="172" x2="12" y2="172" stroke="#54C8B8" stroke-width="1.5"/><text class="leaf" x="16" y="176">soft delete → index partiel</text><line x1="8" y1="194" x2="12" y2="194" stroke="#54C8B8" stroke-width="1.5"/><text class="leaf" x="16" y="198">migration appliquée : jamais modifiée</text><line x1="8" y1="216" x2="12" y2="216" stroke="#54C8B8" stroke-width="1.5"/><text class="leaf" x="16" y="220">expand / contract en deux déploiements</text><path class="lk" d="M380,52 C380,70 570,60 570,100" stroke="#B49CF6"/><rect x="515" y="100" width="110" height="32" rx="6" fill="#101822" stroke="#B49CF6" stroke-width="1.5"/><text class="bt" x="570" y="121" text-anchor="middle" fill="#B49CF6">frontières</text><line x1="388" y1="150" x2="392" y2="150" stroke="#B49CF6" stroke-width="1.5"/><text class="leaf" x="396" y="154">pas de FK entre modules</text><line x1="388" y1="172" x2="392" y2="172" stroke="#B49CF6" stroke-width="1.5"/><text class="leaf" x="396" y="176">hors-DB → compensation (saga)</text><line x1="388" y1="194" x2="392" y2="194" stroke="#B49CF6" stroke-width="1.5"/><text class="leaf" x="396" y="198">DSL : if/for exécutés une fois</text><line x1="388" y1="216" x2="392" y2="216" stroke="#B49CF6" stroke-width="1.5"/><text class="leaf" x="396" y="220">branch by abstraction</text><path class="lk" d="M380,52 C380,220 190,210 190,250" stroke="#6FA6E8"/><rect x="139" y="250" width="102" height="32" rx="6" fill="#101822" stroke="#6FA6E8" stroke-width="1.5"/><text class="bt" x="190" y="271" text-anchor="middle" fill="#6FA6E8">livraison</text><line x1="8" y1="300" x2="12" y2="300" stroke="#6FA6E8" stroke-width="1.5"/><text class="leaf" x="16" y="304">coût = durée de vie des branches</text><line x1="8" y1="322" x2="12" y2="322" stroke="#6FA6E8" stroke-width="1.5"/><text class="leaf" x="16" y="326">ahead N / behind N = réécriture</text><line x1="8" y1="344" x2="12" y2="344" stroke="#6FA6E8" stroke-width="1.5"/><text class="leaf" x="16" y="348">force-with-lease, pas pull</text><line x1="8" y1="366" x2="12" y2="366" stroke="#6FA6E8" stroke-width="1.5"/><text class="leaf" x="16" y="370">un test avec une ligne ne prouve rien</text><path class="lk" d="M380,52 C380,220 570,210 570,250" stroke="#7BD88F"/><rect x="515" y="250" width="110" height="32" rx="6" fill="#101822" stroke="#7BD88F" stroke-width="1.5"/><text class="bt" x="570" y="271" text-anchor="middle" fill="#7BD88F">estimation</text><line x1="388" y1="300" x2="392" y2="300" stroke="#7BD88F" stroke-width="1.5"/><text class="leaf" x="396" y="304">brute force : N·d par requête</text><line x1="388" y1="322" x2="392" y2="322" stroke="#7BD88F" stroke-width="1.5"/><text class="leaf" x="396" y="326">IVF : k + N/k, optimum k = √N</text><line x1="388" y1="344" x2="392" y2="344" stroke="#7BD88F" stroke-width="1.5"/><text class="leaf" x="396" y="348">hors boucle + ; dans la boucle ×</text><line x1="388" y1="366" x2="392" y2="366" stroke="#7BD88F" stroke-width="1.5"/><text class="leaf" x="396" y="370">temps = FLOP / (FLOP/s)</text></svg></div><p class="caption">Quatre branches : les données (contraintes, soft delete, migrations, argent), les frontières (modules, transactions distribuées, DSL, flags), le flux de livraison (trunk-based, rebase, tests qui prouvent), et l'estimation à l'échelle (brute force, IVF, FLOP → temps).</p></section><div class="grid" id="grid"></div></section>
+</div><script>
+const all=document.querySelectorAll('details');
+const oa=document.getElementById('openAll'),ca=document.getElementById('closeAll');
+
+
+(function(){const btn=document.getElementById('themeBtn');if(!btn)return;const body=document.body;
+ const alt=btn.dataset.alt, base=btn.dataset.base, cls=btn.dataset.cls;
+ function apply(on){body.classList.toggle(cls,on);btn.textContent=on?base:alt;btn.setAttribute('aria-pressed',String(on));}
+ apply(window.matchMedia&&window.matchMedia(btn.dataset.query).matches);
+ btn.onclick=()=>apply(!body.classList.contains(cls));})();
+
+(function(){
+  const body=document.body, rm=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const RL={again:'encore',hard:'difficile',good:'bien'};
+  // ---------- shared model, built from the Labo sections ----------
+  const secs=[...document.querySelectorAll('#v-labo .sec')];
+  const cards=[]; secs.forEach((s,bi)=>{const br=s.querySelector('h2').textContent, ac=s.getAttribute('style');
+    s.querySelectorAll('details').forEach(d=>{d.id='q'+(cards.length+1);
+      cards.push({bi,br,ac,el:d,q:d.querySelector('summary span:nth-child(2)').innerHTML,a:d.querySelector('.body').innerHTML,rating:null});});});
+  const listeners=[]; function setRating(k,r){cards[k].rating=r; listeners.forEach(f=>f());}
+  // ---------- dictée des « donc » ----------
+  function dictee(root){root.querySelectorAll('.board .say').forEach(say=>{
+    const parts=say.innerHTML.split(/(\sdonc\s)/); if(parts.length<3)return; let out=parts[0];
+    for(let i=1;i<parts.length;i+=2)out+=`<span class="dz hid"><span class="donc">${parts[i]}</span>${parts[i+1]||''}</span>`;
+    say.innerHTML=out; const d=document.createElement('div'); d.className='dict'; d.textContent='Dictée : dis la suite à voix haute, puis clique pour vérifier — maillon par maillon.'; say.parentNode.appendChild(d);
+    say.querySelectorAll('.dz').forEach(z=>z.addEventListener('click',()=>z.classList.remove('hid')));});}
+  dictee(document.getElementById('v-labo'));
+  cards.forEach(c=>c.el.addEventListener('toggle',()=>{if(!c.el.open)c.el.querySelectorAll('.dz').forEach(z=>z.classList.add('hid'));}));
+  (function(){const btn=document.getElementById('dictBtn');
+    function set(on){body.classList.toggle('dictee',on);btn.setAttribute('aria-pressed',String(on));btn.textContent=on?'Dictée des « donc » : on':'Dictée des « donc » : off';}
+    set(true); btn.onclick=()=>set(!body.classList.contains('dictee'));})();
+  // ---------- tabs ----------
+  document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+    document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===b.dataset.v));});
+  const goTab=id=>document.querySelector(`.tabs button[data-v="${id}"]`).click();
+  // ---------- labo : sidebar tree + grade buttons ----------
+  (function(){
+    const tree=document.getElementById('tree'), redo=document.getElementById('redo'), scoreEl=document.getElementById('score');
+    const pan=document.createElement('div'); pan.className='branch'; pan.setAttribute('style','--ac:var(--yellow)');
+    pan.innerHTML=`<div class="bh"><i></i>Les trois panneaux</div><ul>${[...document.querySelectorAll('#v-labo .widget')].map((w,i)=>{w.id='pan'+(i+1);return `<li><a href="#pan${i+1}">${w.querySelector('h2').textContent.split(' : ')[0]}</a></li>`;}).join('')}</ul>`;
+    tree.insertBefore(pan,redo);
+    secs.forEach((s,bi)=>{const b=document.createElement('div'); b.className='branch'; b.setAttribute('style',s.getAttribute('style'));
+      const ks=cards.map((c,k)=>c.bi===bi?k:-1).filter(k=>k>=0);
+      b.innerHTML=`<div class="bh"><i></i>${cards[ks[0]].br}<small id="bc${bi}"></small></div><ul>${ks.map(k=>{const q=cards[k].q.replace(/<[^>]+>/g,'');return `<li><a href="#${cards[k].el.id}" data-k="${k}">${q.length>70?q.slice(0,68)+'…':q}</a></li>`;}).join('')}</ul>`;
+      tree.insertBefore(b,redo);});
+    tree.querySelectorAll('a[data-k]').forEach(a=>a.onclick=()=>{cards[+a.dataset.k].el.open=true;});
+    cards.forEach((c,k)=>{const g=document.createElement('div'); g.className='grade';
+      g.innerHTML=`<span>Tu l'avais ?</span><button class="again">encore</button><button class="hard">difficile</button><button class="good">✓ bien</button>`;
+      c.el.querySelector('.body').appendChild(g);
+      g.querySelectorAll('button').forEach(btn=>btn.onclick=()=>{const r=btn.className.split(' ')[0]; setRating(k,c.rating===r?null:r);});});
+    function refresh(){
+      const n=r=>cards.filter(c=>c.rating===r).length;
+      scoreEl.innerHTML=`<b>${n('good')}</b> bien · <b>${n('hard')}</b> difficile · <b>${n('again')}</b> encore · ${cards.length-n('good')-n('hard')-n('again')} non jugées`;
+      redo.disabled=!(n('again')+n('hard'));
+      secs.forEach((s,bi)=>{const ks=cards.filter(c=>c.bi===bi); document.getElementById('bc'+bi).textContent=`${ks.filter(c=>c.rating==='good').length}/${ks.length}`;});
+      cards.forEach((c,k)=>{const a=tree.querySelector(`a[data-k="${k}"]`); a.className=c.rating||'';
+        c.el.querySelectorAll('.grade button').forEach(x=>x.classList.toggle('on',x.classList.contains(c.rating)));});}
+    listeners.push(refresh); refresh();
+    redo.onclick=()=>{cards.forEach(c=>c.el.open=c.rating==='again'||c.rating==='hard'); const f=cards.find(c=>c.el.open); if(f)f.el.scrollIntoView({behavior:rm?'auto':'smooth',block:'start'});};
+    document.getElementById('openAll').onclick=()=>cards.forEach(c=>c.el.open=true);
+    document.getElementById('closeAll').onclick=()=>cards.forEach(c=>c.el.open=false);
+  })();
+  // ---------- parcours (deck) ----------
+  (function(){
+    let i=0, order=cards.map((_,k)=>k), pos=0, flipped=false;
+    const card=document.getElementById('card'), front=card.querySelector('.front'), back=card.querySelector('.back');
+    const rail=document.getElementById('rail'), recap=document.getElementById('recap'), stage=document.getElementById('stage');
+    function drawRail(){
+      const W=Math.max(760,cards.length*54), x0=30, dx=(W-60)/(cards.length-1); let h='';
+      secs.forEach((s,bi)=>{const ks=cards.map((c,k)=>c.bi===bi?k:-1).filter(k=>k>=0); const a=x0+ks[0]*dx,b=x0+ks[ks.length-1]*dx;
+        h+=`<line x1="${a}" y1="30" x2="${b}" y2="30" stroke="var(--ac)" stroke-width="5" stroke-linecap="round" style="${s.getAttribute('style')}"/>`;
+        let lb=cards[ks[0]].br.split(' — ')[0]; if(lb.length>17)lb=lb.slice(0,16)+'…'; const anc=bi===0?'start':bi===secs.length-1?'end':'middle', tx=anc==='start'?a-6:anc==='end'?b+6:(a+b)/2;
+        h+=`<text x="${tx}" y="${bi%2?50:14}" text-anchor="${anc}">${String(bi+1).padStart(2,'0')} ${lb}</text>`;});
+      cards.forEach((c,k)=>{h+=`<g class="st ${c.rating?'rated-'+c.rating:''} ${k===i?'cur':''}" data-k="${k}" style="${c.ac}"><circle cx="${x0+k*dx}" cy="30" r="6" stroke="var(--ac)"/></g>`;});
+      rail.innerHTML=`<svg viewBox="0 0 ${W} 58" xmlns="http://www.w3.org/2000/svg">${h}</svg>`;
+      const cur=rail.querySelector('.st.cur'); if(cur){const bx=cur.getBoundingClientRect(),rb=rail.getBoundingClientRect(); if(bx.left<rb.left+40||bx.right>rb.right-40)rail.scrollLeft+=bx.left-rb.left-rb.width/2;}
+      rail.querySelectorAll('.st').forEach(g=>g.onclick=()=>{pos=order.indexOf(+g.dataset.k);if(pos<0){order=cards.map((_,k)=>k);pos=+g.dataset.k;}show();});}
+    function fit(){const f=flipped?back:front; f.style.position='relative'; const h=Math.max(380,Math.min(f.scrollHeight+2,window.innerHeight*.78)); f.style.position=''; card.style.height=h+'px';}
+    function show(){
+      i=order[pos]; const c=cards[i]; flipped=false; card.classList.remove('flipped'); recap.style.display='none'; stage.style.display='';
+      card.setAttribute('style',c.ac);
+      front.querySelector('.br').innerHTML=`<i>Q</i>${c.br}<small>${pos+1} / ${order.length}</small>`;
+      front.querySelector('.qtxt').innerHTML=c.q;
+      back.querySelector('.br').innerHTML=`${c.br}<small>${pos+1} / ${order.length}</small>`;
+      back.querySelector('.ans').innerHTML=c.a; back.scrollTop=0; dictee(back);
+      drawRail(); fit();}
+    function flip(){flipped=!flipped;card.classList.toggle('flipped',flipped);fit();}
+    function rate(r){setRating(i,r); if(pos<order.length-1){pos++;show();}else finish();}
+    function finish(){
+      stage.style.display='none'; recap.style.display='';
+      document.getElementById('bars').innerHTML=secs.map((s,bi)=>{const ks=cards.filter(c=>c.bi===bi); const n=r=>ks.filter(c=>c.rating===r).length;
+        return `<div class="bar" style="${s.getAttribute('style')}"><span>${ks[0].br.split(' — ')[0]}</span><div class="tr"><i style="width:${100*n('good')/ks.length}%;background:var(--good)"></i><i style="width:${100*n('hard')/ks.length}%;background:var(--hard)"></i><i style="width:${100*n('again')/ks.length}%;background:var(--again)"></i></div><small>${n('good')}/${ks.length}</small></div>`;}).join('');
+      const weak=cards.map((c,k)=>({c,k})).filter(o=>o.c.rating&&o.c.rating!=='good'); const wk=document.getElementById('weak');
+      wk.innerHTML=weak.length?`<h3>À reprendre (${weak.length})</h3>`+weak.map(o=>`<a href="#" data-k="${o.k}" style="${o.c.ac}">${o.c.q.replace(/<[^>]+>/g,'')}</a>`).join(''):'<h3>Tout est passé en « bien ». La fiche a fait son travail : ferme-la.</h3>';
+      wk.querySelectorAll('a').forEach(a=>a.onclick=e=>{e.preventDefault();order=cards.map((_,k)=>k);pos=+a.dataset.k;show();});
+      document.getElementById('replay').disabled=!weak.length;
+      document.getElementById('replay').onclick=()=>{order=weak.map(o=>o.k);pos=0;show();};
+      document.getElementById('restart').onclick=()=>{cards.forEach(c=>c.rating=null);listeners.forEach(f=>f());order=cards.map((_,k)=>k);pos=0;show();};
+      drawRail();}
+    document.getElementById('flipBtn').onclick=flip;
+    back.querySelectorAll('.rate .btn').forEach(b=>b.onclick=()=>rate(b.dataset.r));
+    document.getElementById('prev').onclick=()=>{if(pos>0){pos--;show();}};
+    document.getElementById('next').onclick=()=>{if(pos<order.length-1){pos++;show();}};
+    window.addEventListener('resize',fit);
+    document.addEventListener('keydown',e=>{if(!document.getElementById('v-deck').classList.contains('on')||e.target.tagName==='BUTTON'&&e.key===' ')return;
+      if(e.key===' '||e.key==='Enter'){e.preventDefault();flip();}
+      else if(e.key==='ArrowRight'){if(pos<order.length-1){pos++;show();}}
+      else if(e.key==='ArrowLeft'){if(pos>0){pos--;show();}}
+      else if(flipped&&['1','2','3'].includes(e.key))rate({1:'again',2:'hard',3:'good'}[e.key]);});
+    listeners.push(drawRail);
+    window.gotoCard=k=>{order=cards.map((_,k)=>k);pos=k;show();goTab('v-deck');};
+    show();
+  })();
+  // ---------- carte : grid ----------
+  (function(){const g=document.getElementById('grid');
+    function draw(){g.innerHTML=cards.map((c,k)=>`<button class="chip ${c.rating?'rated-'+c.rating:''}" data-k="${k}" style="${c.ac}">${c.q.replace(/<[^>]+>/g,'')}<small>${c.br.split(' — ')[0]} · ${c.rating?RL[c.rating]:'non jugée'}</small></button>`).join('');
+      g.querySelectorAll('.chip').forEach(b=>b.onclick=()=>window.gotoCard(+b.dataset.k));}
+    listeners.push(draw); draw();})();
+})();
+
+(function(){const tree=document.getElementById('tree'); const br=[...tree.querySelectorAll('.branch')];
+  br.forEach(b=>{if(!b.querySelector('li'))b.remove();});
+  const many=document.querySelectorAll('#v-labo .sec details').length>25;
+  tree.querySelectorAll('.branch').forEach((b,i)=>{b.querySelector('.bh').addEventListener('click',e=>{if(e.target.tagName==='A')return;b.classList.toggle('fold');}); if(many&&i>0)b.classList.add('fold');});
+  tree.querySelectorAll('a[data-k]').forEach(a=>a.addEventListener('click',()=>a.closest('.branch').classList.remove('fold')));
+})();
+</script></body></html>

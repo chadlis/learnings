@@ -1,0 +1,413 @@
+<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="fiche" content="serie=thematique;numero=02;statut=v1"><title>Inférence fréquentiste — fiche thématique</title><style>
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4;
+  --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --green:#B9E2C4; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --grid:rgba(38,72,124,.11); --red:#B8322A; --pen:#1E4E9E; --pen2:#163A7A; --hl:rgba(255,222,64,.55);
+  --again:#B93A5A; --hard:#B7791F; --good:#1F7A44;
+  --node:#1A2925; --axis:rgba(237,232,218,.4);
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44;
+  --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --green:#1F7A44; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12); --node:#FFFFFF; --axis:rgba(30,42,54,.45)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;min-height:100vh;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+.app{max-width:1200px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 48px}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:12px;flex-wrap:wrap}
+.top .title{font-size:13.5px;color:var(--faint);flex:1 1 100%;margin-bottom:4px}
+.top .title b{font-family:var(--serif);font-size:17px;color:var(--chalk);font-weight:400;text-shadow:0 0 1px var(--dust);margin-right:6px}
+.tabs{display:flex;gap:2px;margin-right:auto;border-bottom:2px solid var(--line2)}
+.tabs button{font:500 14px var(--serif);color:var(--muted);background:transparent;border:0;border-bottom:3px solid transparent;margin-bottom:-2px;padding:8px 16px;cursor:pointer}
+.tabs button[aria-selected="true"]{color:var(--chalk);border-bottom-color:var(--yellow);text-shadow:0 0 1px var(--dust)}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.view{display:none}.view.on{display:block}
+/* ---- rail : a chalk line with stations ---- */
+.rail{margin:22px 0 4px;overflow-x:auto;padding:10px 2px 6px}
+.rail svg{display:block;min-width:760px;width:100%;height:auto;filter:url(#chalkf)}
+.rail .st{cursor:pointer}
+.rail .st circle{fill:var(--board);stroke-width:2.5}
+.rail .st.rated-again circle{fill:var(--pink);stroke:var(--pink)}
+.rail .st.rated-hard circle{fill:var(--yellow);stroke:var(--yellow)}
+.rail .st.rated-good circle{fill:var(--mint);stroke:var(--mint)}
+.rail .st.cur circle{r:8;stroke-width:3.5}
+.rail text{font:600 11px var(--sans);fill:var(--muted)}
+/* ---- stage ---- */
+.stage{margin-top:14px;display:grid;grid-template-columns:44px minmax(0,1fr) 44px;gap:12px;align-items:center}
+.nav{width:44px;height:44px;border-radius:50%;border:1.5px solid var(--line2);background:transparent;color:var(--muted);font-size:20px;cursor:pointer}
+.nav:hover{color:var(--yellow);border-color:var(--yellow)}
+.deck{position:relative;min-height:380px}
+.card{position:relative;min-height:380px;transition:height .3s}
+.face{position:absolute;inset:0;opacity:0;visibility:hidden;transform:translateY(8px);transition:opacity .3s,transform .3s,visibility 0s .3s;display:flex;flex-direction:column;overflow:hidden}
+.card:not(.flipped) .face.front,.card.flipped .face.back{opacity:1;visibility:visible;transform:none;transition:opacity .3s,transform .3s,visibility 0s}
+/* front : the question written in chalk, framed on the board */
+.front{border:2px solid var(--line2);border-radius:4px;padding:22px 28px 22px}
+.front .br{display:flex;align-items:center;gap:10px;font:600 13px var(--sans);color:var(--ac)}
+.front .br i{width:22px;height:22px;border-radius:50%;border:1.5px solid var(--ac);display:grid;place-items:center;font-size:12px}
+.front .br small{margin-left:auto;font-weight:500;color:var(--faint);font-variant-numeric:tabular-nums}
+.front .qtxt{font-family:var(--serif);font-size:clamp(24px,3.6vw,34px);line-height:1.28;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:auto 0;padding:26px 0}
+.front .cta{display:flex;align-items:center;gap:12px;flex-wrap:wrap;margin-top:auto}
+.front .cta .say{font-size:13.5px;color:var(--faint);max-width:40ch}
+.btn{font:600 14px var(--sans);border-radius:3px;padding:11px 18px;cursor:pointer;border:1.5px solid transparent}
+.btn.flip{margin-left:auto;background:transparent;color:var(--yellow);border-color:var(--yellow)}
+.btn.flip:hover{background:var(--yellow);color:var(--board)}
+kbd{font:11px var(--mono);opacity:.75;margin-left:6px;border:1px solid currentColor;border-radius:3px;padding:0 4px}
+/* back : the index card, board formulation goes back on the board */
+.back{background:var(--card);color:var(--cardink);border-radius:3px;padding:18px 22px 20px 24px;overflow:auto;
+  box-shadow:0 14px 26px -14px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);
+  background-image:repeating-linear-gradient(0deg,transparent 0 27px,var(--cardline) 27px 28px);background-position:0 10px}
+.back::before{content:"";position:absolute;left:0;top:0;bottom:0;width:4px;background:var(--ac);border-radius:3px 0 0 3px}
+.back .br{display:flex;align-items:center;gap:10px;font:600 12.5px var(--sans);color:var(--ac);filter:saturate(1.4) brightness(.72);margin-bottom:8px}
+body.white .back .br{filter:none}
+.back .br small{margin-left:auto;font-weight:500;color:var(--cardmuted);filter:none;font-variant-numeric:tabular-nums}
+.ans{font-size:15.5px;line-height:1.55}
+.ans p{margin-bottom:10px}.ans p:last-child{margin-bottom:0}
+.ans .def::before,.ans .intu::before,.ans .ex::before,.ans .step::before{font:600 11px var(--sans);letter-spacing:.06em;color:var(--ac);filter:saturate(1.4) brightness(.72);margin-right:8px}
+body.white .ans .def::before,body.white .ans .intu::before,body.white .ans .ex::before,body.white .ans .step::before{filter:none}
+.ans .def::before{content:"déf."}.ans .intu::before{content:"intuition"}.ans .ex::before{content:"ex."}.ans .step::before{content:"pas à pas"}
+.ans .intu,.ans .ex,.ans .step{color:var(--cardmuted)}
+.ans .m,.ans .up,.ans .hat{color:var(--cardink)}
+.ans table.t{font-family:var(--sans);border-collapse:collapse;width:100%;margin:6px 0 14px;font-size:14px;background:var(--card)}
+.ans table.t th,.ans table.t td{border:1px solid var(--cardline);padding:6px 9px;text-align:left;vertical-align:top}
+.ans table.t th{font-size:11px;letter-spacing:.06em;color:var(--cardmuted);font-weight:600}
+.ans table.t td.num{font-family:var(--mono)}
+.ans .chain{font-family:var(--mono);font-size:13.5px;line-height:1.9;padding:8px 12px;border-left:2px solid var(--ac);margin:8px 0 12px;background:rgba(34,48,43,.05)}
+.ans .chain b{color:var(--ac);filter:saturate(1.4) brightness(.72);font-weight:700}
+.ans .trap{border:1.5px solid var(--red);border-radius:3px;padding:10px 13px;margin-top:14px;font-size:14px;background:rgba(184,50,42,.06);transform:rotate(-.3deg)}
+.ans .trap .lbl{font:700 11px var(--sans);letter-spacing:.08em;color:var(--red);margin-bottom:3px}
+.ans .trap b{color:var(--red)}
+.ans .board{margin:14px 0 0 -24px;margin-right:-22px;padding:14px 22px 14px 24px;background:var(--board2);color:var(--chalk);border-top:1px solid var(--line)}
+.ans .board .lbl{font:600 11.5px var(--sans);letter-spacing:.08em;color:var(--yellow);margin-bottom:8px}
+.ans .board .say{font-family:var(--serif);font-size:19px;line-height:1.55;color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.ans .board .say .m,.ans .board .say .up,.ans .board .say .hat{color:var(--chalk)}
+.ans .board .say .dz{cursor:pointer;transition:filter .25s}
+body.dictee .ans .board .say .dz.hid{filter:blur(6px);color:var(--yellow);user-select:none}
+.ans .board .donc{color:var(--yellow);font-weight:700}
+.ans .board .dict{margin-top:8px;font:12.5px var(--sans);color:var(--faint)}
+body:not(.dictee) .ans .board .dict{display:none}
+.rate{display:flex;gap:8px;margin-top:20px;padding-top:16px;border-top:1px solid var(--cardline);flex-wrap:wrap}
+.rate .lbl{width:100%;font-size:12.5px;color:var(--cardmuted)}
+.rate .btn{flex:1;min-width:120px;color:#fff}
+.rate .again{background:var(--again)}.rate .hard{background:var(--hard)}.rate .good{background:var(--good)}
+/* ---- recap : written on the board ---- */
+.recap{border:2px solid var(--line2);border-radius:4px;padding:26px 28px;margin-top:14px}
+.recap h2{font-family:var(--serif);font-weight:400;font-size:30px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.recap .p{color:var(--muted);font-size:14.5px;margin-bottom:18px}
+.bars{display:grid;gap:10px}
+.bar{display:grid;grid-template-columns:200px 1fr 60px;gap:12px;align-items:center;font-size:14px}
+.bar .tr{height:9px;border-radius:2px;background:var(--line);overflow:hidden;display:flex}
+.bar .tr i{display:block;height:100%}
+.bar small{color:var(--faint);text-align:right;font-variant-numeric:tabular-nums}
+.weak{margin-top:22px}
+.weak h3{font:600 14px var(--sans);color:var(--muted);margin-bottom:8px}
+.weak a{display:block;color:var(--cardink);text-decoration:none;padding:9px 12px;background:var(--card);margin-bottom:6px;font-size:14.5px;border-left:4px solid var(--ac);border-radius:2px}
+.weak a:hover{background:var(--cardsoft)}
+.recap .btns{display:flex;gap:8px;margin-top:20px;flex-wrap:wrap}
+.recap .btn{background:var(--yellow);color:var(--board)}
+.recap .btn:disabled{opacity:.4;cursor:default}
+.recap .btn.ghostb{background:transparent;color:var(--ink);border-color:var(--line2)}
+/* ---- labo : millimetre-paper sheets pinned on the board (carnet structure) ---- */
+.labo .intro{font-family:var(--serif);font-size:15.5px;line-height:1.6;color:var(--muted);max-width:66ch;margin:24px 0 6px}
+.labo .intro b{color:var(--ink);font-weight:600}
+.panel{margin:30px 0 0}
+.panel h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:10px;letter-spacing:-.005em}
+.panel h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--yellow);vertical-align:middle;margin-right:10px}
+.frame{border:1px solid var(--cardline);border-radius:3px;background:
+  repeating-linear-gradient(0deg,var(--grid) 0 1px,transparent 1px 12px),
+  repeating-linear-gradient(90deg,var(--grid) 0 1px,transparent 1px 12px),var(--card);
+  color:var(--cardink);box-shadow:0 14px 26px -14px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2)}
+.frame .plot{padding:6px 4px 0}
+.frame .plot text{fill:var(--cardmuted)!important}
+.frame .plot line[stroke="rgba(255,255,255,.28)"]{stroke:rgba(34,48,43,.45)!important}
+.frame .plot [fill="#54C8B8"],.frame .plot [stroke="#54C8B8"]{fill:#0F8A7C;stroke:#0F8A7C}
+.frame .plot text[fill="#54C8B8"]{fill:#0F8A7C!important}.frame .plot text[fill="#B49CF6"]{fill:#6B46C1!important}.frame .plot text[fill="#F0796B"]{fill:#C0392B!important}.frame .plot text[fill="#E8B04B"]{fill:#B7791F!important}
+.frame .plot line[stroke="#54C8B8"]{stroke:#0F8A7C!important}.frame .plot line[stroke="#B49CF6"]{stroke:#6B46C1!important}.frame .plot line[stroke="#F0796B"]{stroke:#C0392B!important}.frame .plot line[stroke="#E8B04B"]{stroke:#B7791F!important}
+.plot .hv{fill:#6B46C1;opacity:.7}.plot .hp{fill:#1F7A44;opacity:.8}.plot .hu{fill:#C0392B;opacity:.4}.plot .hc{fill:#C0392B;opacity:.7}.plot .dot{fill:#B7791F}
+.sampctl{display:flex;flex-wrap:wrap;gap:8px;padding:12px 14px;border-bottom:1px solid var(--cardline);background:var(--card)}
+.sampctl button{font:500 13px var(--sans);color:var(--cardink);background:var(--cardsoft);border:1px solid var(--cardline);border-radius:3px;padding:6px 12px;cursor:pointer}
+.sampctl button:hover{border-color:var(--pen);color:var(--pen)}
+.readout{display:flex;flex-wrap:wrap;gap:6px 22px;padding:11px 14px;border-top:1px solid var(--cardline);font:13px var(--sans);color:var(--cardmuted);background:var(--card)}
+.readout b{color:var(--cardink);font-weight:600;font-variant-numeric:tabular-nums}
+.readout .hot b{color:#B7791F}.readout .win b{color:#1F7A44}.readout .bad b{color:#C0392B}
+.wcap{padding:12px 16px 14px;font-family:var(--serif);font-size:15px;line-height:1.55;color:var(--cardmuted);background:var(--card);border-top:1px solid var(--cardline)}
+.wcap b{color:var(--cardink)}
+.wcap .m,.wcap .up,.wcap .hat{color:var(--cardink)}
+/* ---- carte ---- */
+.carte .panel h2::before{display:none}
+.mapscroll svg{filter:url(#chalkf)}
+.mapscroll svg text{text-shadow:0 0 1px var(--dust)}
+.mapscroll svg rect{fill:transparent!important;stroke-width:2}
+.mapscroll svg .lk,.mapscroll svg .lk2{opacity:.85;stroke-width:2}
+.caption{font-size:14px;color:var(--muted);margin-top:8px;max-width:66ch}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(230px,1fr));gap:8px;margin-top:22px}
+.chip{background:var(--card);color:var(--cardink);border:0;border-left:4px solid var(--ac);border-radius:2px;padding:10px 12px;font-size:13.5px;line-height:1.35;cursor:pointer;text-align:left;font-family:var(--sans)}
+.chip small{display:block;color:var(--cardmuted);font-size:11.5px;margin-top:4px}
+.chip.rated-again small{color:var(--again)}.chip.rated-hard small{color:var(--hard)}.chip.rated-good small{color:var(--good)}
+#src{display:none}
+footer{margin-top:44px;padding-top:14px;border-top:1.5px solid var(--line2);font-size:12.5px;color:var(--faint);line-height:1.7;max-width:70ch}
+:focus-visible{outline:2px solid var(--yellow);outline-offset:2px}
+@media (prefers-reduced-motion:reduce){.card,.face,.dz{transition:none!important}}
+@media(max-width:640px){kbd{display:none}.stage{grid-template-columns:1fr}.nav{display:none}.front{padding:18px 16px}.back{padding:16px 16px 18px 18px}.ans .board{margin-left:-18px;margin-right:-16px}.bar{grid-template-columns:120px 1fr 50px}.tabs{margin-left:0;width:100%}}
+
+/* ---- labo : sidebar + full flow ---- */
+.cols{display:grid;grid-template-columns:270px minmax(0,1fr);gap:44px;margin-top:22px}
+.tree{position:sticky;top:14px;align-self:start;font-family:var(--sans);font-size:13.5px;max-height:calc(100vh - 28px);overflow:auto;padding-right:6px}
+.tree .root{font-family:var(--serif);font-size:16px;line-height:1.3;color:var(--chalk);text-shadow:0 0 1px var(--dust);padding:0 0 12px 12px;border-left:2px solid var(--yellow);margin-bottom:14px}
+.tree .score{font-size:12px;color:var(--faint);margin-bottom:16px;padding-left:14px}
+.tree .score b{color:var(--ink)}
+.branch{margin:0 0 12px}
+.branch .bh{display:flex;align-items:center;gap:8px;font-weight:600;color:var(--ink);padding:4px 0}
+.branch .bh i{width:9px;height:9px;border-radius:50%;background:var(--ac);flex:none}
+.branch .bh small{margin-left:auto;font-weight:400;color:var(--faint);font-variant-numeric:tabular-nums}
+.branch ul{list-style:none;margin:2px 0 0 4px;border-left:1px solid var(--line2);padding-left:11px}
+.branch li a{display:block;color:var(--muted);text-decoration:none;padding:3px 0;line-height:1.35}
+.branch li a:hover{color:var(--yellow)}
+.branch li a.good{color:var(--mint);text-decoration:line-through;text-decoration-color:var(--line2)}
+.branch li a.again{color:var(--pink);font-weight:600}
+.branch li a.hard{color:var(--yellow)}
+.branch li a::before{content:"";display:inline-block;width:6px;height:6px;border:1px solid var(--line2);border-radius:1px;margin:0 8px 1px -15px;background:var(--board)}
+.branch li a.good::before{background:var(--mint);border-color:var(--mint)}
+.branch li a.again::before{background:var(--pink);border-color:var(--pink)}
+.branch li a.hard::before{background:var(--yellow);border-color:var(--yellow)}
+.tree .redo{margin-top:8px;width:100%;font:600 13px var(--sans);color:var(--pink);background:transparent;border:1.5px dashed var(--pink);border-radius:3px;padding:8px;cursor:pointer}
+.tree .redo:disabled{opacity:.35;cursor:default}
+.tree .tools{display:flex;gap:6px;margin-top:8px}
+.tree .tools button{flex:1;font:500 12.5px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px;cursor:pointer}
+.content{min-width:0}
+/* sections : chalk questions, index cards */
+.sec{margin-top:48px;scroll-margin-top:14px}
+.sec-head{display:flex;align-items:baseline;gap:14px;margin-bottom:8px}
+.sec-head .n{font-family:var(--serif);font-size:30px;color:var(--ac);text-shadow:0 0 1px var(--dust);line-height:1}
+.sec-head h2{font-family:var(--serif);font-weight:400;font-size:26px;color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.sec-head::after{content:"";flex:1;height:2px;background:var(--ac);opacity:.6;margin-left:6px;align-self:center;border-radius:2px;filter:url(#chalkf)}
+details{margin:14px 0 0;scroll-margin-top:14px}
+summary{list-style:none;cursor:pointer;padding:10px 0;display:flex;gap:14px;align-items:flex-start;font-family:var(--serif);font-size:20px;line-height:1.35;color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+summary::-webkit-details-marker{display:none}
+summary .q{font:600 13px var(--sans);color:var(--ac);flex:none;margin-top:8px;text-shadow:none;border:1.5px solid var(--ac);border-radius:50%;width:24px;height:24px;display:grid;place-items:center}
+summary .chev{margin-left:auto;flex:none;color:var(--faint);transition:transform .2s;margin-top:4px;text-shadow:none;font-family:var(--sans)}
+details[open] summary .chev{transform:rotate(90deg)}
+summary:hover{color:var(--yellow)}
+.body{background:var(--card);color:var(--cardink);border-radius:3px;padding:18px 20px 20px 22px;margin:6px 0 10px 38px;font-size:15.5px;line-height:1.55;position:relative;
+  box-shadow:0 12px 24px -12px rgba(0,0,0,.55),0 1px 0 rgba(0,0,0,.2);
+  background-image:repeating-linear-gradient(0deg,transparent 0 27px,var(--cardline) 27px 28px);background-position:0 8px}
+.body::before{content:"";position:absolute;left:-1px;top:0;bottom:0;width:4px;background:var(--ac);border-radius:3px 0 0 3px}
+.body p{margin-bottom:10px}.body p:last-child{margin-bottom:0}
+.body .def::before,.body .intu::before,.body .ex::before,.body .step::before{font:600 11px var(--sans);letter-spacing:.06em;color:var(--ac);filter:saturate(1.4) brightness(.72);margin-right:8px}
+body.white .body .def::before,body.white .body .intu::before,body.white .body .ex::before,body.white .body .step::before{filter:none}
+.body .def::before{content:"déf."}.body .intu::before{content:"intuition"}.body .ex::before{content:"ex."}.body .step::before{content:"pas à pas"}
+.body .intu,.body .ex,.body .step{color:var(--cardmuted)}
+.body .m,.body .up,.body .hat{color:var(--cardink)}
+.body table.t{font-family:var(--sans);border-collapse:collapse;width:100%;margin:6px 0 14px;font-size:14px;background:var(--card)}
+.body table.t th,.body table.t td{border:1px solid var(--cardline);padding:6px 9px;text-align:left;vertical-align:top}
+.body table.t th{font-size:11px;letter-spacing:.06em;color:var(--cardmuted);font-weight:600}
+.body table.t td.num{font-family:var(--mono)}
+.body .chain{font-family:var(--mono);font-size:13.5px;line-height:1.9;padding:8px 12px;border-left:2px solid var(--ac);margin:8px 0 12px;background:rgba(34,48,43,.05)}
+.body .chain b{color:var(--ac);filter:saturate(1.4) brightness(.72);font-weight:700}
+.body .trap{border:1.5px solid var(--red);border-radius:3px;padding:10px 13px;margin-top:14px;font-size:14px;background:rgba(184,50,42,.06);transform:rotate(-.3deg)}
+.body .trap .lbl{font:700 11px var(--sans);letter-spacing:.08em;color:var(--red);margin-bottom:3px}
+.body .trap b{color:var(--red)}
+.body .board{margin:14px 0 0 -22px;margin-right:-20px;padding:14px 20px 14px 22px;background:var(--board2);color:var(--chalk);border-top:1px solid var(--line)}
+.body .board .lbl{font:600 11.5px var(--sans);letter-spacing:.08em;color:var(--yellow);margin-bottom:8px}
+.body .board .say{font-family:var(--serif);font-size:19px;line-height:1.55;color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.body .board .say .m,.body .board .say .up,.body .board .say .hat{color:var(--chalk)}
+.body .board .say .dz{cursor:pointer;transition:filter .25s}
+body.dictee .body .board .say .dz.hid{filter:blur(6px);color:var(--yellow);user-select:none}
+.body .board .donc{color:var(--yellow);font-weight:700}
+.body .board .dict{margin-top:8px;font:12.5px var(--sans);color:var(--faint)}
+body:not(.dictee) .body .board .dict{display:none}
+.grade{display:flex;gap:8px;margin-top:16px;padding-top:12px;border-top:1px solid var(--cardline);font-family:var(--sans);align-items:center;flex-wrap:wrap}
+.grade span{font-size:12.5px;color:var(--cardmuted);margin-right:4px}
+.grade button{font:600 12.5px var(--sans);border-radius:3px;padding:5px 12px;cursor:pointer;border:1px solid var(--cardline);background:var(--card);color:var(--cardmuted)}
+.grade button.on.again{background:var(--again);border-color:var(--again);color:#fff}
+.grade button.on.hard{background:var(--hard);border-color:var(--hard);color:#fff}
+.grade button.on.good{background:var(--good);border-color:var(--good);color:#fff}
+.labo footer{margin-top:44px}
+#v-deck,#v-carte{max-width:960px;margin:0 auto}
+@media(max-width:900px){.cols{grid-template-columns:1fr;gap:20px}.tree{position:static;max-height:300px;border:1.5px solid var(--line2);border-radius:3px;padding:12px}}
+@media(max-width:520px){.body{margin-left:0;padding:14px 14px 16px 16px}.body .board{margin-left:-16px;margin-right:-14px}summary{font-size:18px}}
+
+.m{font-family:var(--math);font-style:italic;white-space:nowrap}
+.up{font-style:normal;font-family:var(--math)}
+sup,sub{font-size:.72em;line-height:0}
+.hat{display:inline-block;position:relative;font-style:normal;font-family:var(--math)}
+.hat::before{content:"ˆ";position:absolute;top:-.58em;left:50%;transform:translateX(-50%);font-size:.85em;color:inherit}
+.frac{display:inline-flex;flex-direction:column;align-items:center;vertical-align:middle;font-family:var(--math);line-height:1.1;margin:0 3px}
+.frac>span{padding:0 4px}.frac>span:first-child{border-bottom:1px solid currentColor}
+.mapscroll{overflow-x:auto}.mapscroll svg{display:block;min-width:680px;width:100%;height:auto}
+.plot svg{display:block;width:100%;max-width:640px;margin:0 auto;height:auto}
+@media (prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+svg [fill="#101822"]{fill:var(--node)} svg [stroke="#54C8B8"]{stroke:var(--teal)} svg [fill="#54C8B8"]{fill:var(--teal)}
+svg [stroke="#B49CF6"]{stroke:var(--violet)} svg [fill="#B49CF6"]{fill:var(--violet)}
+svg [stroke="#6FA6E8"]{stroke:var(--blue)} svg [fill="#6FA6E8"]{fill:var(--blue)}
+svg [stroke="#7BD88F"]{stroke:var(--green)} svg [fill="#7BD88F"]{fill:var(--green)}
+svg [stroke="#F0796B"]{stroke:var(--coral)} svg [fill="#F0796B"]{fill:var(--coral)}
+svg [stroke="#E8B04B"]{stroke:var(--amber)} svg [fill="#E8B04B"]{fill:var(--amber)}
+svg [fill="#E9EDF3"]{fill:var(--ink)} svg [fill="#5E6C84"]{fill:var(--faint)} svg .leaf{fill:var(--muted)}
+svg [stroke="rgba(255,255,255,.28)"]{stroke:var(--axis)}
+
+.branch .bh{cursor:pointer;user-select:none}.branch.fold ul{display:none}.branch .bh::after{content:"▾";margin-left:6px;color:var(--faint);font-size:11px}.branch.fold .bh::after{content:"▸"}
+</style></head>
+<body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="chalkf" x="-2%" y="-2%" width="104%" height="104%">
+<feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="2" seed="7" result="n"/>
+<feDisplacementMap in="SourceGraphic" in2="n" scale="1.2" xChannelSelector="R" yChannelSelector="G"/></filter></svg><div class="ledge" aria-hidden="true"></div><div class="app">
+<div class="top">
+  <div class="title"><b>Inférence fréquentiste</b> fiche thématique 02 · 28 questions · v1 du 11/09/2026 · couvre les cartes Anki « swe » stats::lgn-tcl, convergence, echantillonnage, ic, student, tests, p-value, mcnemar, bootstrap, rigueur</div>
+  <div class="tabs" role="tablist"><button role="tab" data-v="v-labo" aria-selected="true">Labo</button><button role="tab" data-v="v-deck" aria-selected="false">Parcours</button><button role="tab" data-v="v-carte" aria-selected="false">Carte</button></div>
+  <button class="tb" id="dictBtn" aria-pressed="true">Dictée des « donc » : on</button>
+  <button class="tb" id="themeBtn" data-cls="white" data-alt="Tableau blanc" data-base="Tableau noir" data-query="(prefers-color-scheme: light)" aria-pressed="false">Tableau blanc</button>
+</div>
+<section class="view on labo" id="v-labo"><div class="cols">
+  <nav class="tree" id="tree" aria-label="Le tronc et les branches"><div class="root">« qu'est-ce qui varierait si je refaisais l'expérience ? »</div><div class="score" id="score"></div>
+    <button class="redo" id="redo" disabled>Rouvrir seulement les faibles</button><div class="tools"><button id="openAll">Tout déplier</button><button id="closeAll">Tout replier</button></div></nav>
+  <main class="content"><p class="intro">Fil rouge : un classifieur A fait <b>87,2 %</b> et un classifieur B <b>88,1 %</b> sur le même test set de <b>5 000 images</b>, avec 52 images où A seul a bon et 98 où B seul a bon. Toute l'inférence répond à une seule question : ce qui bouge quand on retire un autre test set.</p><section class="sec" style="--ac:var(--teal)"><div class="sec-head"><span class="n">01</span><h2>LGN et TCL — ce qui converge, et vers quoi</h2></div><details><summary><span class="q">Q</span><span>Énonce le TCL sous forme standardisée et explique pourquoi on recentre et redilate.</span><span class="chev">›</span></summary><div class="body"><p class="def">√n (X̄<sub>n</sub> − μ)/σ → N(0, 1) en loi. Le −μ recentre, le √n/σ redilate : ensemble ils retirent le n de la cible.</p><p class="intu">Sans eux, la cible N(μ, σ²/n) dépendrait encore de n — donc aucune vraie limite. Forme pratique : X̄<sub>n</sub> ≈ N(μ, σ²/n), une approximation pour n grand. La LGN, elle, est une vraie limite : X̄<sub>n</sub> → μ, cible fixe.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« La moyenne empirique a pour centre μ et pour largeur σ/√n, donc pour obtenir une limite fixe on soustrait μ et on multiplie par √n/σ, donc l'objet standardisé converge en loi vers N(0,1). »</p></div></div></details><details><summary><span class="q">Q</span><span>Que dit le TCL de plus que la loi des grands nombres ?</span><span class="chev">›</span></summary><div class="body"><p class="def">La LGN donne la <b>destination</b> (X̄<sub>n</sub> → μ) ; le TCL donne la <b>forme et la vitesse</b> de l'approche : fluctuations gaussiennes d'ordre σ/√n.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« La LGN dit où va la moyenne, donc rien sur l'erreur ; le TCL dit que l'écart, dilaté par √n, est gaussien, donc il permet un quantile, donc un IC et un test. »</p></div></div></details><details><summary><span class="q">Q</span><span>LGN et TCL : quelle hypothèse chacun exige-t-il sur X ?</span><span class="chev">›</span></summary><div class="body"><p class="def">LGN : μ fini. TCL : μ et σ² finis — plus exigeant.</p><p class="intu">Faible vs forte LGN : faible = convergence en probabilité (limite hors du P), forte = presque sûre (limite dans le P). On garde la faible parce qu'elle survit où la forte tombe.</p><p class="ex">Cauchy (pas de μ) casse les deux : la moyenne de n tirages reste une Cauchy. Pareto à μ fini mais σ² infini vérifie la LGN, pas le TCL.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Le TCL a besoin d'une variance pour standardiser, donc il exige σ² fini, donc une loi à queue lourde vérifie parfois la LGN sans vérifier le TCL. »</p></div></div></details><details><summary><span class="q">Q</span><span>Après le TCL, quand on dit « c'est gaussien », qu'est-ce qui est gaussien exactement ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Pas X̄<sub>n</sub> elle-même (un scalaire sur un échantillon donné), mais sa <b>distribution d'échantillonnage</b> — la loi de X̄<sub>n</sub> si l'on répétait « n tirages → une moyenne ». Elle ne dépend pas de la loi de départ.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« La moyenne obtenue est un nombre, donc elle n'a pas de loi ; c'est la procédure répétée qui en a une, donc c'est cette distribution d'échantillonnage qui tend vers une cloche. »</p></div></div></details><details><summary><span class="q">Q</span><span>Distribution d'échantillonnage de X̄<sub>n</sub> : parmi centre, largeur et forme, lesquels sont exacts à tout n, lesquels sont asymptotiques ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Centre (E[X̄] = μ, linéarité) et largeur (Var = σ²/n, indépendance) sont <b>exacts à tout n</b>. La forme gaussienne est <b>asymptotique</b> (TCL).</p><p class="intu">Connaître deux moments ne détermine pas une distribution : sans la forme, pas de quantile, donc ni IC ni test.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« La linéarité donne le centre et l'indépendance donne la largeur à tout n, donc seule la forme manque, donc c'est le TCL qui l'apporte, asymptotiquement. »</p></div></div></details><details><summary><span class="q">Q</span><span>Test de validité d'un énoncé asymptotique : quel indice révèle qu'il est mal posé ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Si l'indice n apparaît <b>à droite de la flèche</b>, dans la cible, l'énoncé est invalide : la cible bouge en même temps que la suite. Défaut purement logique, sans probabilités.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Une limite exige une cible fixe, donc si n figure dans la cible il n'y a pas de limite, donc il faut standardiser jusqu'à ce que n disparaisse à droite. »</p></div></div></details><details><summary><span class="q">Q</span><span>Pour diviser l'écart-type de la moyenne empirique par k, de combien multiplier n ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Par k². L'écart-type de X̄ est σ/√n.</p><p class="intu">La précision se paie au carré — au-delà d'un point, gagner en précision devient économiquement absurde.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« L'erreur-type décroît en 1/√n, donc diviser l'erreur par k demande de multiplier n par k², donc quadrupler les données ne divise l'incertitude que par deux. »</p></div></div></details></section><section class="sec" style="--ac:var(--violet)"><div class="sec-head"><span class="n">02</span><h2>Intervalles de confiance</h2></div><details><summary><span class="q">Q</span><span>D'où vient l'IC à 95 % pour μ ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Du pivot du TCL : P(−1,96 &lt; √n(X̄ − μ)/σ &lt; 1,96) ≈ 0,95, qu'on retourne en μ ∈ [X̄ ± 1,96 σ/√n].</p><p class="intu">Le 1,96 vient de la forme (quantile de N(0,1)) ; le σ/√n vient de la largeur ; le retournement est une simple algèbre sur l'inégalité.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Le pivot standardisé est N(0,1), donc il tombe dans ±1,96 avec probabilité 0,95, donc en isolant μ dans l'inégalité on obtient un intervalle aléatoire qui attrape μ 95 fois sur 100. »</p></div></div></details><details><summary><span class="q">Q</span><span>σ inconnu, remplacé par l'écart-type empirique s : quelle loi suit le pivot, et pourquoi n − 1 ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Student à n − 1 degrés de liberté. s est lui-même bruité → queues plus lourdes → quantile plus large que 1,96.</p><p class="ex">Coefficient à 95 % : 2,26 à n = 10 ; 2,06 à n = 26 ; 2,00 à n = 61. Le n − 1 vient de la contrainte Σ(x<sub>i</sub> − x̄) = 0 : un degré de liberté est consommé par x̄.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Remplacer σ par s ajoute du bruit au dénominateur, donc le pivot a des queues plus lourdes qu'une gaussienne, donc on lit le quantile dans une Student à n − 1 degrés de liberté, qui rejoint 1,96 quand n grandit. »</p></div></div></details><details><summary><span class="q">Q</span><span>Signal : IC sur une proportion avec p̂ proche de 0 ou 1 (0 erreur sur 200). Que fais-tu ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Wilson (ou bootstrap) plutôt que Wald. Wald remplace p par p̂ dans l'écart-type <i>avant</i> de retourner l'inégalité : rayon nul en p̂ = 0, couverture &lt; 95 % près des bords. Wilson retourne l'inégalité avec le vrai p dans SE (second degré en p).</p><p class="ex">0 sur 200 : Wald [0 ; 0], Wilson [0 ; 1,9 %]. Règle des trois : borne haute ≈ 3/n. 0,872 sur 5 000 : Wald [86,3 ; 88,1], Wilson [86,2 ; 88,1] — au centre les deux coïncident.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Wald plugue p̂ dans SE avant de retourner l'inégalité, donc en p̂ = 0 le rayon est nul, donc l'intervalle est vide de sens ; Wilson garde p dans SE, donc résout un second degré, donc reste dans [0,1]. »</p></div></div></details><details><summary><span class="q">Q</span><span>IC à 95 % = [0,96 ; 1,84]. « 95 % de chances que β<sub>1</sub> soit dedans » — quelle est l'erreur ?</span><span class="chev">›</span></summary><div class="body"><p class="def">La phrase met une probabilité sur β<sub>1</sub>, qui est <b>fixe</b>. Pour <i>cet</i> intervalle, β<sub>1</sub> est dedans ou pas. Le 95 % est la fréquence à laquelle la <b>procédure</b> attrape β<sub>1</sub> sur des échantillons répétés.</p><p class="intu">Pendant bayésien : l'intervalle de crédibilité, où θ a une distribution et le 95 % porte sur θ.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Le paramètre est une constante et l'intervalle est aléatoire, donc la probabilité porte sur l'intervalle, donc « 95 % » décrit la procédure sur des répétitions, pas ce résultat-ci. »</p></div></div></details><details><summary><span class="q">Q</span><span>Quelle structure d'erreur commune entre « p = 0,01 donc 1 % de chances que H₀ soit vraie » et « 95 % de chances que μ soit dans l'IC » ?</span><span class="chev">›</span></summary><div class="body"><p class="def">La même <b>inversion du conditionnement</b> : une probabilité sur les données ou la procédure devient une probabilité sur le paramètre. p-value : P(données | H₀) → P(H₀ | données). IC : P(l'intervalle attrape μ) → P(μ ∈ cet intervalle).</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« En fréquentiste le paramètre est fixe, donc aucune probabilité ne peut porter sur lui, donc toute phrase qui met un pourcentage sur H₀ ou sur μ a inversé le conditionnement. »</p></div></div></details><details><summary><span class="q">Q</span><span>Le non-biais E[β̂<sub>1</sub>] = β<sub>1</sub> est une propriété de quoi — et que dit-il de la largeur ?</span><span class="chev">›</span></summary><div class="body"><p class="def">De la <b>procédure</b>, pas d'une estimation. Il signifie que le centre de la distribution d'échantillonnage est le vrai β<sub>1</sub>. Rien sur la largeur : centre et largeur sont deux paramètres indépendants d'une même courbe.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Le non-biais dit que la moyenne des estimations sur les répétitions vaut β<sub>1</sub>, donc c'est une propriété du centre, donc une estimation non biaisée peut être très loin du vrai si la variance est grande. »</p></div></div></details></section><section class="sec" style="--ac:var(--blue)"><div class="sec-head"><span class="n">03</span><h2>Tests d'hypothèse</h2></div><details><summary><span class="q">Q</span><span>Comment poser H₀ et H₁, et qu'est-ce qui fixe la direction de H₁ ?</span><span class="chev">›</span></summary><div class="body"><p class="def">H₀ = le statu quo, toujours une égalité. H₁ porte le soupçon ; sa direction vient de la <b>question posée</b>. « Est-ce différent ? » → bilatéral (≠) ; « trop grand ? » → unilatéral (&gt;).</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« H₀ décrit le monde où rien ne se passe, donc c'est une égalité sur le paramètre, donc H₁ est ce qu'on cherche à établir et sa direction vient de la question, pas des données. »</p></div></div></details><details><summary><span class="q">Q</span><span>Une hypothèse nulle porte sur quoi — avec ou sans chapeau ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Sur le <b>paramètre inconnu de la population</b>, sans chapeau — jamais sur l'estimation. β̂<sub>1</sub> est une donnée, on l'a sous les yeux ; on ne fait pas d'hypothèse sur ce qu'on observe.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Une hypothèse porte sur ce qu'on ne connaît pas, donc sur β<sub>1</sub> sans chapeau, donc la statistique observée sert de preuve, pas d'hypothèse. »</p></div><div class="trap"><div class="lbl">Piège</div>Écrire H₀ : β̂<sub>1</sub> = 0. C'est faire une hypothèse sur un nombre déjà tombé.</div></div></details><details><summary><span class="q">Q</span><span>Régression <code>ventes ~ budget_TV</code> sur 200 marchés : produis la chaîne complète modèle → paramètre → statistique → H₀ / H₁.</span><span class="chev">›</span></summary><div class="body"><p class="def">Modèle : Y = β₀ + β₁X + ε. Paramètre : β₁, constante fixe et inconnue. Statistique : t = β̂₁/SE(β̂₁). H₀ : β₁ = 0 contre H₁ : β₁ ≠ 0.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Le modèle définit le paramètre β₁, donc l'hypothèse porte sur β₁, donc la statistique doit rapporter β̂₁ à son bruit, donc t = β̂₁/SE, comparable à une Student. »</p></div><div class="trap"><div class="lbl">Piège</div>β̂₁ seul n'est pas une statistique de test : il n'est comparable à aucune loi tabulée tant qu'il n'est pas rapporté à sa SE. Et écrire Y = β₁X + β₀ sans ε, c'est écrire une droite, pas un modèle.</div></div></details><details><summary><span class="q">Q</span><span>α et p-value : lequel est fixé avant, lequel est mesuré — et qu'est-ce que α ?</span><span class="chev">›</span></summary><div class="body"><p class="def">α = P(rejeter H₀ | H₀ vraie), taux de faux positifs, fixé avant. La p-value est mesurée sur les données.</p><p class="ex">α = la limite de vitesse, décidée d'avance ; p = ta vitesse mesurée.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« α est un taux d'erreur qu'on accepte, donc une décision prise avant les données ; la p-value est la surprise des données sous H₀, donc calculée après. »</p></div></div></details><details><summary><span class="q">Q</span><span>Définis précisément la p-value — et pourquoi « aussi extrême ou plus » plutôt que la probabilité exacte du résultat ?</span><span class="chev">›</span></summary><div class="body"><p class="def">P(observer un résultat au moins aussi extrême que l'observé | H₀ vraie). Avec beaucoup d'issues, chaque valeur exacte est petite, même la plus banale : la proba ponctuelle ne distingue plus rien.</p><p class="ex">50 piles sur 100 ≈ 8 % alors que c'est le résultat le plus normal ; la masse à ≥ 62 ≈ 1 % est ce qui est surprenant.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Sous H₀ la statistique a une loi, donc on mesure la masse au-delà de l'observé, donc la p-value est une queue, pas un point — et c'est une probabilité des données, jamais de H₀. »</p></div></div></details><details><summary><span class="q">Q</span><span>Régression, p = 0,03 sur la pente : que signifie exactement cette phrase ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Si β₁ était réellement nulle, 3 % des échantillons donneraient une pente au moins aussi éloignée de 0 que celle observée. Ce qui est « extrême », c'est la statistique β̂₁ mesurée par son éloignement à 0.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« On se place dans le monde de H₀, donc on regarde la distribution de β̂₁ sous β₁ = 0, donc p = 0,03 est la part de cette distribution au-delà de l'observé. »</p></div></div></details><details><summary><span class="q">Q</span><span>Que signifie une p-value élevée — et que ne signifie-t-elle PAS ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Données compatibles avec H₀ → on ne rejette pas. <b>Non-rejet ≠ H₀ vraie</b> : absence de preuve ≠ preuve d'absence. Cause typique : n trop petit pour détecter l'effet.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Une p-value élevée dit que les données ne contredisent pas H₀, donc rien de plus, donc l'effet peut exister et n être trop petit pour le voir. »</p></div></div></details><details><summary><span class="q">Q</span><span>Erreurs de type I et II : définition, probabilité, et peut-on réduire les deux à la fois ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Type I = rejeter H₀ vraie (faux positif), probabilité α. Type II = ne pas rejeter H₀ fausse (faux négatif), probabilité β ; puissance = 1 − β. À n fixé, déplacer le seuil transfère l'erreur d'un côté à l'autre. Seul levier qui réduit les deux : <b>augmenter n</b>.</p><p class="intu">Procès : type I = condamner un innocent, type II = acquitter un coupable. Mécanisme : σ/√n rétrécit, les distributions sous H₀ et H₁ se séparent.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Le seuil est un unique curseur entre deux distributions qui se chevauchent, donc le déplacer échange α contre β, donc seul n, qui resserre les deux distributions, réduit les deux. »</p></div></div></details><details><summary><span class="q">Q</span><span>En quoi le seuil d'un classifieur (0,5 vs 0,8) est-il le même objet que le choix de α ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Dans les deux cas un unique curseur déplace deux erreurs en sens inverse sans jamais les réduire toutes deux. Les statistiques produisent toute la courbe (ROC, courbe de puissance) ; choisir le point est un choix <b>métier</b>.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Un seuil échange faux positifs contre faux négatifs, donc la statistique ne peut que décrire le trade-off, donc la valeur du seuil vient du coût des erreurs, pas des données. »</p></div></div></details></section><section class="sec" style="--ac:var(--green)"><div class="sec-head"><span class="n">04</span><h2>Comparer deux systèmes — apparié, McNemar, bootstrap</h2></div><details><summary><span class="q">Q</span><span>Signal : deux systèmes produisent une mesure binaire sur les mêmes items. Quel design, quel test, quel geste ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Design <b>apparié</b>, test de <b>McNemar</b> sur les seuls discordants. Geste : conditionner sur une nuisance pour la faire disparaître — ici la difficulté globale des items, absorbée par b + c.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Les deux systèmes voient les mêmes items, donc les mesures sont appariées, donc on compare sur les seuls désaccords, donc la difficulté du jeu de test s'annule. »</p></div></div></details><details><summary><span class="q">Q</span><span>v1 : 340/500, v2 : 355/500 sur le même jeu. Comment tester la différence ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Quatre cas par question ; les concordants n'apportent rien. Sous H₀, b | (b + c) ~ Binomiale(b + c, ½) : on teste si les désaccords sont équilibrés. Statistique (b − c)²/(b + c) ~ χ² à 1 ddl.</p><p class="ex">Fil rouge : 52 vs 98 désaccords sur 150 → (98 − 52)²/150 = 14,1, p ≈ 0,0002.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Conditionnellement à la discordance, H₀ donne une pièce équilibrée, donc b suit une binomiale de paramètre ½, donc un déséquilibre marqué entre b et c rejette H₀. »</p></div></div></details><details><summary><span class="q">Q</span><span>Ton z pour tester d = 0 et ton IC sur d utilisent-ils la même erreur-type ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Non. Le test calcule le bruit sous H₀ : SE = √(π̂/n). L'IC ne suppose rien sur d : SE = √((π̂ − d̂²)/n). L'écart compte quand d² pèse devant π.</p><p class="ex">5 000 images, 150 désaccords, d̂ = −0,0092 : d̂² = 0,00008 ≪ π̂ = 0,03 → 0,2449 vs 0,2446 point, indiscernable. Réponse d'entretien : « non, mais ici ça ne change rien, et voici pourquoi ».</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Le bruit se calcule dans le monde qu'on décrit, donc le test pose d = 0 dans la variance et l'IC met d̂, donc les deux SE diffèrent de d̂², négligeable quand π domine. »</p></div></div></details><details><summary><span class="q">Q</span><span>Sur quel principe repose la légitimité du bootstrap ?</span><span class="chev">›</span></summary><div class="body"><p class="def">Le <b>plug-in appliqué à la distribution entière</b> : l'échantillon, vu comme distribution empirique F̂, tient lieu de population F ; tirer avec remise dans F̂ simule « refaire l'expérience ». Justifié par F̂ → F.</p><p class="intu">Ne crée pas d'information : petit n ou échantillon biaisé sont reproduits tels quels. Chaque rééchantillon omet ≈ 37 % des observations. B ne règle que l'erreur Monte Carlo : 200 pour un SE, ≥ 1 000 pour un IC à 95 %.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« La population est inconnue mais l'échantillon la représente, donc on remplace F par F̂, donc rééchantillonner avec remise reproduit l'aléa du tirage initial. »</p></div></div></details><details><summary><span class="q">Q</span><span>Tu compares le F1 de A et B par bootstrap sur le même test set. Quelle est l'unité rééchantillonnée ?</span><span class="chev">›</span></summary><div class="body"><p class="def">La <b>paire</b> : l'exemple i avec ses deux réponses. Rééchantillonner A et B séparément casse le lien et perd la covariance. Même logique pour les dépendances : tirer des vidéos entières, pas des frames.</p><p class="ex">Fil rouge : apparié SE = 0,25 point, 0 exclu de l'IC ; séparé SE = 0,66 point, 0 inclus. Le bootstrap apparié retrouve McNemar sans le connaître.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Les deux mesures viennent du même tirage, donc elles sont corrélées, donc on tire des indices et on emporte les deux réponses, donc la covariance est conservée et l'IC se resserre. »</p></div></div></details><details><summary><span class="q">Q</span><span>Un classifieur fait 87,2 % sur 5 000 images. D'où vient l'erreur-type de cette accuracy ?</span><span class="chev">›</span></summary><div class="body"><p class="def">L'accuracy est la moyenne de n Bernoulli(p) — une par image — donc SE = √(p(1 − p)/n), avec p̂ plugué. Poche : SE ≤ 1/(2√n).</p><p class="ex">√(0,872 × 0,128 / 5 000) ≈ 0,47 point, soit ±0,9 point à 95 %. Hypothèse cachée : images iid — des frames d'une même vidéo sous-estiment SE.</p><div class="board"><div class="lbl">Au tableau</div><p class="say">« Chaque image est un Bernoulli de paramètre p, donc l'accuracy est une moyenne, donc la linéarité donne le centre p et l'indépendance donne la variance p(1−p)/n. »</p></div></div></details></section><footer>Réactivation, pas découverte. Cartes sources : deck « 01 maths-stats », tags stats::lgn-tcl, convergence, echantillonnage, ic, student, tests, p-value, mcnemar, bootstrap, rigueur. Fiche jumelle : fiche S9 « fil A — objet aléatoire ».</footer></main>
+</div></section>
+<section class="view" id="v-deck"><div class="rail" id="rail"></div>
+  <div class="stage" id="stage"><button class="nav" id="prev" aria-label="Question précédente">‹</button>
+    <div class="deck"><div class="card" id="card">
+      <div class="face front"><div class="br"></div><div class="qtxt"></div><div class="cta"><span class="say">À la craie : réponds à voix haute, avec les « donc », avant de retourner la fiche.</span><button class="btn flip" id="flipBtn">Retourner <kbd>espace</kbd></button></div></div>
+      <div class="face back"><div class="br"></div><div class="ans"></div><div class="rate"><span class="lbl">Ta réponse orale, comparée à la fiche :</span><button class="btn again" data-r="again">Encore <kbd>1</kbd></button><button class="btn hard" data-r="hard">Difficile <kbd>2</kbd></button><button class="btn good" data-r="good">Bien <kbd>3</kbd></button></div></div>
+    </div></div><button class="nav" id="next" aria-label="Question suivante">›</button></div>
+  <div class="recap" id="recap" style="display:none"><h2>Fin du parcours</h2><p class="p">Réactivation, pas découverte : une question qui résiste est une carte à refondre, pas un cours à refaire.</p><div class="bars" id="bars"></div><div class="weak" id="weak"></div><div class="btns"><button class="btn" id="replay">Rejouer les faibles</button><button class="btn ghostb" id="restart">Tout recommencer</button></div></div>
+</section>
+<section class="view carte" id="v-carte"><section class="panel"><h2>Le tronc et les branches</h2><div class="mapscroll"><svg viewBox="0 0 760 410" xmlns="http://www.w3.org/2000/svg" role="img"><style>.bt{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13.5px;font-weight:700}.leaf{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:12.5px}.rt{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:13px;font-weight:700}.lk{fill:none;stroke-width:1.6;opacity:.7}</style><rect x="144" y="18" width="472" height="34" rx="6" fill="#101822" stroke="#E9EDF3" stroke-width="1.5"/><text class="rt" x="380" y="40" text-anchor="middle" fill="#E9EDF3">qu&#x27;est-ce qui varierait si je refaisais l&#x27;expérience ?</text><path class="lk" d="M380,52 C380,70 190,60 190,100" stroke="#54C8B8"/><rect x="139" y="100" width="102" height="32" rx="6" fill="#101822" stroke="#54C8B8" stroke-width="1.5"/><text class="bt" x="190" y="121" text-anchor="middle" fill="#54C8B8">LGN / TCL</text><line x1="8" y1="150" x2="12" y2="150" stroke="#54C8B8" stroke-width="1.5"/><text class="leaf" x="16" y="154">LGN : μ fini ; TCL : σ² fini aussi</text><line x1="8" y1="172" x2="12" y2="172" stroke="#54C8B8" stroke-width="1.5"/><text class="leaf" x="16" y="176">standardiser retire n de la cible</text><line x1="8" y1="194" x2="12" y2="194" stroke="#54C8B8" stroke-width="1.5"/><text class="leaf" x="16" y="198">n dans la cible ⇒ énoncé invalide</text><line x1="8" y1="216" x2="12" y2="216" stroke="#54C8B8" stroke-width="1.5"/><text class="leaf" x="16" y="220">forme = gaussienne, quelle que soit la loi</text><path class="lk" d="M380,52 C380,70 570,60 570,100" stroke="#B49CF6"/><rect x="547" y="100" width="46" height="32" rx="6" fill="#101822" stroke="#B49CF6" stroke-width="1.5"/><text class="bt" x="570" y="121" text-anchor="middle" fill="#B49CF6">IC</text><line x1="388" y1="150" x2="392" y2="150" stroke="#B49CF6" stroke-width="1.5"/><text class="leaf" x="396" y="154">pivot du TCL : ±1,96 σ/√n</text><line x1="388" y1="172" x2="392" y2="172" stroke="#B49CF6" stroke-width="1.5"/><text class="leaf" x="396" y="176">σ inconnu → Student n−1</text><line x1="388" y1="194" x2="392" y2="194" stroke="#B49CF6" stroke-width="1.5"/><text class="leaf" x="396" y="198">Wald casse près de 0 ou 1 → Wilson</text><line x1="388" y1="216" x2="392" y2="216" stroke="#B49CF6" stroke-width="1.5"/><text class="leaf" x="396" y="220">95 % = propriété de la procédure</text><path class="lk" d="M380,52 C380,220 190,210 190,250" stroke="#6FA6E8"/><rect x="155" y="250" width="70" height="32" rx="6" fill="#101822" stroke="#6FA6E8" stroke-width="1.5"/><text class="bt" x="190" y="271" text-anchor="middle" fill="#6FA6E8">tests</text><line x1="8" y1="300" x2="12" y2="300" stroke="#6FA6E8" stroke-width="1.5"/><text class="leaf" x="16" y="304">H₀ = statu quo, égalité, sans chapeau</text><line x1="8" y1="322" x2="12" y2="322" stroke="#6FA6E8" stroke-width="1.5"/><text class="leaf" x="16" y="326">α fixé avant ; p mesurée après</text><line x1="8" y1="344" x2="12" y2="344" stroke="#6FA6E8" stroke-width="1.5"/><text class="leaf" x="16" y="348">type I = α, type II = β ; seul levier : n</text><line x1="8" y1="366" x2="12" y2="366" stroke="#6FA6E8" stroke-width="1.5"/><text class="leaf" x="16" y="370">non-rejet ≠ H₀ vraie</text><path class="lk" d="M380,52 C380,220 570,210 570,250" stroke="#7BD88F"/><rect x="479" y="250" width="182" height="32" rx="6" fill="#101822" stroke="#7BD88F" stroke-width="1.5"/><text class="bt" x="570" y="271" text-anchor="middle" fill="#7BD88F">apparié / bootstrap</text><line x1="388" y1="300" x2="392" y2="300" stroke="#7BD88F" stroke-width="1.5"/><text class="leaf" x="396" y="304">même items → apparié</text><line x1="388" y1="322" x2="392" y2="322" stroke="#7BD88F" stroke-width="1.5"/><text class="leaf" x="396" y="326">McNemar : discordants seuls, b vs c</text><line x1="388" y1="344" x2="392" y2="344" stroke="#7BD88F" stroke-width="1.5"/><text class="leaf" x="396" y="348">test : SE sous H₀ ; IC : SE avec d̂</text><line x1="388" y1="366" x2="392" y2="366" stroke="#7BD88F" stroke-width="1.5"/><text class="leaf" x="396" y="370">bootstrap = plug-in de F̂ ; unité = la paire</text></svg></div><p class="caption">Le tronc : l'échantillon est un tirage, donc toute statistique a une distribution. LGN/TCL donnent la forme ; l'IC et le test en sont deux lectures ; le design apparié et le bootstrap sont deux façons de « refaire l'expérience ».</p></section><div class="grid" id="grid"></div></section>
+</div><script>
+const all=document.querySelectorAll('details');
+const oa=document.getElementById('openAll'),ca=document.getElementById('closeAll');
+
+
+(function(){const btn=document.getElementById('themeBtn');if(!btn)return;const body=document.body;
+ const alt=btn.dataset.alt, base=btn.dataset.base, cls=btn.dataset.cls;
+ function apply(on){body.classList.toggle(cls,on);btn.textContent=on?base:alt;btn.setAttribute('aria-pressed',String(on));}
+ apply(window.matchMedia&&window.matchMedia(btn.dataset.query).matches);
+ btn.onclick=()=>apply(!body.classList.contains(cls));})();
+
+(function(){
+  const body=document.body, rm=window.matchMedia&&window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  const RL={again:'encore',hard:'difficile',good:'bien'};
+  // ---------- shared model, built from the Labo sections ----------
+  const secs=[...document.querySelectorAll('#v-labo .sec')];
+  const cards=[]; secs.forEach((s,bi)=>{const br=s.querySelector('h2').textContent, ac=s.getAttribute('style');
+    s.querySelectorAll('details').forEach(d=>{d.id='q'+(cards.length+1);
+      cards.push({bi,br,ac,el:d,q:d.querySelector('summary span:nth-child(2)').innerHTML,a:d.querySelector('.body').innerHTML,rating:null});});});
+  const listeners=[]; function setRating(k,r){cards[k].rating=r; listeners.forEach(f=>f());}
+  // ---------- dictée des « donc » ----------
+  function dictee(root){root.querySelectorAll('.board .say').forEach(say=>{
+    const parts=say.innerHTML.split(/(\sdonc\s)/); if(parts.length<3)return; let out=parts[0];
+    for(let i=1;i<parts.length;i+=2)out+=`<span class="dz hid"><span class="donc">${parts[i]}</span>${parts[i+1]||''}</span>`;
+    say.innerHTML=out; const d=document.createElement('div'); d.className='dict'; d.textContent='Dictée : dis la suite à voix haute, puis clique pour vérifier — maillon par maillon.'; say.parentNode.appendChild(d);
+    say.querySelectorAll('.dz').forEach(z=>z.addEventListener('click',()=>z.classList.remove('hid')));});}
+  dictee(document.getElementById('v-labo'));
+  cards.forEach(c=>c.el.addEventListener('toggle',()=>{if(!c.el.open)c.el.querySelectorAll('.dz').forEach(z=>z.classList.add('hid'));}));
+  (function(){const btn=document.getElementById('dictBtn');
+    function set(on){body.classList.toggle('dictee',on);btn.setAttribute('aria-pressed',String(on));btn.textContent=on?'Dictée des « donc » : on':'Dictée des « donc » : off';}
+    set(true); btn.onclick=()=>set(!body.classList.contains('dictee'));})();
+  // ---------- tabs ----------
+  document.querySelectorAll('.tabs button').forEach(b=>b.onclick=()=>{document.querySelectorAll('.tabs button').forEach(x=>x.setAttribute('aria-selected',x===b));
+    document.querySelectorAll('.view').forEach(v=>v.classList.toggle('on',v.id===b.dataset.v));});
+  const goTab=id=>document.querySelector(`.tabs button[data-v="${id}"]`).click();
+  // ---------- labo : sidebar tree + grade buttons ----------
+  (function(){
+    const tree=document.getElementById('tree'), redo=document.getElementById('redo'), scoreEl=document.getElementById('score');
+    const pan=document.createElement('div'); pan.className='branch'; pan.setAttribute('style','--ac:var(--yellow)');
+    pan.innerHTML=`<div class="bh"><i></i>Les trois panneaux</div><ul>${[...document.querySelectorAll('#v-labo .widget')].map((w,i)=>{w.id='pan'+(i+1);return `<li><a href="#pan${i+1}">${w.querySelector('h2').textContent.split(' : ')[0]}</a></li>`;}).join('')}</ul>`;
+    tree.insertBefore(pan,redo);
+    secs.forEach((s,bi)=>{const b=document.createElement('div'); b.className='branch'; b.setAttribute('style',s.getAttribute('style'));
+      const ks=cards.map((c,k)=>c.bi===bi?k:-1).filter(k=>k>=0);
+      b.innerHTML=`<div class="bh"><i></i>${cards[ks[0]].br}<small id="bc${bi}"></small></div><ul>${ks.map(k=>{const q=cards[k].q.replace(/<[^>]+>/g,'');return `<li><a href="#${cards[k].el.id}" data-k="${k}">${q.length>70?q.slice(0,68)+'…':q}</a></li>`;}).join('')}</ul>`;
+      tree.insertBefore(b,redo);});
+    tree.querySelectorAll('a[data-k]').forEach(a=>a.onclick=()=>{cards[+a.dataset.k].el.open=true;});
+    cards.forEach((c,k)=>{const g=document.createElement('div'); g.className='grade';
+      g.innerHTML=`<span>Tu l'avais ?</span><button class="again">encore</button><button class="hard">difficile</button><button class="good">✓ bien</button>`;
+      c.el.querySelector('.body').appendChild(g);
+      g.querySelectorAll('button').forEach(btn=>btn.onclick=()=>{const r=btn.className.split(' ')[0]; setRating(k,c.rating===r?null:r);});});
+    function refresh(){
+      const n=r=>cards.filter(c=>c.rating===r).length;
+      scoreEl.innerHTML=`<b>${n('good')}</b> bien · <b>${n('hard')}</b> difficile · <b>${n('again')}</b> encore · ${cards.length-n('good')-n('hard')-n('again')} non jugées`;
+      redo.disabled=!(n('again')+n('hard'));
+      secs.forEach((s,bi)=>{const ks=cards.filter(c=>c.bi===bi); document.getElementById('bc'+bi).textContent=`${ks.filter(c=>c.rating==='good').length}/${ks.length}`;});
+      cards.forEach((c,k)=>{const a=tree.querySelector(`a[data-k="${k}"]`); a.className=c.rating||'';
+        c.el.querySelectorAll('.grade button').forEach(x=>x.classList.toggle('on',x.classList.contains(c.rating)));});}
+    listeners.push(refresh); refresh();
+    redo.onclick=()=>{cards.forEach(c=>c.el.open=c.rating==='again'||c.rating==='hard'); const f=cards.find(c=>c.el.open); if(f)f.el.scrollIntoView({behavior:rm?'auto':'smooth',block:'start'});};
+    document.getElementById('openAll').onclick=()=>cards.forEach(c=>c.el.open=true);
+    document.getElementById('closeAll').onclick=()=>cards.forEach(c=>c.el.open=false);
+  })();
+  // ---------- parcours (deck) ----------
+  (function(){
+    let i=0, order=cards.map((_,k)=>k), pos=0, flipped=false;
+    const card=document.getElementById('card'), front=card.querySelector('.front'), back=card.querySelector('.back');
+    const rail=document.getElementById('rail'), recap=document.getElementById('recap'), stage=document.getElementById('stage');
+    function drawRail(){
+      const W=Math.max(760,cards.length*54), x0=30, dx=(W-60)/(cards.length-1); let h='';
+      secs.forEach((s,bi)=>{const ks=cards.map((c,k)=>c.bi===bi?k:-1).filter(k=>k>=0); const a=x0+ks[0]*dx,b=x0+ks[ks.length-1]*dx;
+        h+=`<line x1="${a}" y1="30" x2="${b}" y2="30" stroke="var(--ac)" stroke-width="5" stroke-linecap="round" style="${s.getAttribute('style')}"/>`;
+        let lb=cards[ks[0]].br.split(' — ')[0]; if(lb.length>17)lb=lb.slice(0,16)+'…'; const anc=bi===0?'start':bi===secs.length-1?'end':'middle', tx=anc==='start'?a-6:anc==='end'?b+6:(a+b)/2;
+        h+=`<text x="${tx}" y="${bi%2?50:14}" text-anchor="${anc}">${String(bi+1).padStart(2,'0')} ${lb}</text>`;});
+      cards.forEach((c,k)=>{h+=`<g class="st ${c.rating?'rated-'+c.rating:''} ${k===i?'cur':''}" data-k="${k}" style="${c.ac}"><circle cx="${x0+k*dx}" cy="30" r="6" stroke="var(--ac)"/></g>`;});
+      rail.innerHTML=`<svg viewBox="0 0 ${W} 58" xmlns="http://www.w3.org/2000/svg">${h}</svg>`;
+      const cur=rail.querySelector('.st.cur'); if(cur){const bx=cur.getBoundingClientRect(),rb=rail.getBoundingClientRect(); if(bx.left<rb.left+40||bx.right>rb.right-40)rail.scrollLeft+=bx.left-rb.left-rb.width/2;}
+      rail.querySelectorAll('.st').forEach(g=>g.onclick=()=>{pos=order.indexOf(+g.dataset.k);if(pos<0){order=cards.map((_,k)=>k);pos=+g.dataset.k;}show();});}
+    function fit(){const f=flipped?back:front; f.style.position='relative'; const h=Math.max(380,Math.min(f.scrollHeight+2,window.innerHeight*.78)); f.style.position=''; card.style.height=h+'px';}
+    function show(){
+      i=order[pos]; const c=cards[i]; flipped=false; card.classList.remove('flipped'); recap.style.display='none'; stage.style.display='';
+      card.setAttribute('style',c.ac);
+      front.querySelector('.br').innerHTML=`<i>Q</i>${c.br}<small>${pos+1} / ${order.length}</small>`;
+      front.querySelector('.qtxt').innerHTML=c.q;
+      back.querySelector('.br').innerHTML=`${c.br}<small>${pos+1} / ${order.length}</small>`;
+      back.querySelector('.ans').innerHTML=c.a; back.scrollTop=0; dictee(back);
+      drawRail(); fit();}
+    function flip(){flipped=!flipped;card.classList.toggle('flipped',flipped);fit();}
+    function rate(r){setRating(i,r); if(pos<order.length-1){pos++;show();}else finish();}
+    function finish(){
+      stage.style.display='none'; recap.style.display='';
+      document.getElementById('bars').innerHTML=secs.map((s,bi)=>{const ks=cards.filter(c=>c.bi===bi); const n=r=>ks.filter(c=>c.rating===r).length;
+        return `<div class="bar" style="${s.getAttribute('style')}"><span>${ks[0].br.split(' — ')[0]}</span><div class="tr"><i style="width:${100*n('good')/ks.length}%;background:var(--good)"></i><i style="width:${100*n('hard')/ks.length}%;background:var(--hard)"></i><i style="width:${100*n('again')/ks.length}%;background:var(--again)"></i></div><small>${n('good')}/${ks.length}</small></div>`;}).join('');
+      const weak=cards.map((c,k)=>({c,k})).filter(o=>o.c.rating&&o.c.rating!=='good'); const wk=document.getElementById('weak');
+      wk.innerHTML=weak.length?`<h3>À reprendre (${weak.length})</h3>`+weak.map(o=>`<a href="#" data-k="${o.k}" style="${o.c.ac}">${o.c.q.replace(/<[^>]+>/g,'')}</a>`).join(''):'<h3>Tout est passé en « bien ». La fiche a fait son travail : ferme-la.</h3>';
+      wk.querySelectorAll('a').forEach(a=>a.onclick=e=>{e.preventDefault();order=cards.map((_,k)=>k);pos=+a.dataset.k;show();});
+      document.getElementById('replay').disabled=!weak.length;
+      document.getElementById('replay').onclick=()=>{order=weak.map(o=>o.k);pos=0;show();};
+      document.getElementById('restart').onclick=()=>{cards.forEach(c=>c.rating=null);listeners.forEach(f=>f());order=cards.map((_,k)=>k);pos=0;show();};
+      drawRail();}
+    document.getElementById('flipBtn').onclick=flip;
+    back.querySelectorAll('.rate .btn').forEach(b=>b.onclick=()=>rate(b.dataset.r));
+    document.getElementById('prev').onclick=()=>{if(pos>0){pos--;show();}};
+    document.getElementById('next').onclick=()=>{if(pos<order.length-1){pos++;show();}};
+    window.addEventListener('resize',fit);
+    document.addEventListener('keydown',e=>{if(!document.getElementById('v-deck').classList.contains('on')||e.target.tagName==='BUTTON'&&e.key===' ')return;
+      if(e.key===' '||e.key==='Enter'){e.preventDefault();flip();}
+      else if(e.key==='ArrowRight'){if(pos<order.length-1){pos++;show();}}
+      else if(e.key==='ArrowLeft'){if(pos>0){pos--;show();}}
+      else if(flipped&&['1','2','3'].includes(e.key))rate({1:'again',2:'hard',3:'good'}[e.key]);});
+    listeners.push(drawRail);
+    window.gotoCard=k=>{order=cards.map((_,k)=>k);pos=k;show();goTab('v-deck');};
+    show();
+  })();
+  // ---------- carte : grid ----------
+  (function(){const g=document.getElementById('grid');
+    function draw(){g.innerHTML=cards.map((c,k)=>`<button class="chip ${c.rating?'rated-'+c.rating:''}" data-k="${k}" style="${c.ac}">${c.q.replace(/<[^>]+>/g,'')}<small>${c.br.split(' — ')[0]} · ${c.rating?RL[c.rating]:'non jugée'}</small></button>`).join('');
+      g.querySelectorAll('.chip').forEach(b=>b.onclick=()=>window.gotoCard(+b.dataset.k));}
+    listeners.push(draw); draw();})();
+})();
+
+(function(){const tree=document.getElementById('tree'); const br=[...tree.querySelectorAll('.branch')];
+  br.forEach(b=>{if(!b.querySelector('li'))b.remove();});
+  const many=document.querySelectorAll('#v-labo .sec details').length>25;
+  tree.querySelectorAll('.branch').forEach((b,i)=>{b.querySelector('.bh').addEventListener('click',e=>{if(e.target.tagName==='A')return;b.classList.toggle('fold');}); if(many&&i>0)b.classList.add('fold');});
+  tree.querySelectorAll('a[data-k]').forEach(a=>a.addEventListener('click',()=>a.closest('.branch').classList.remove('fold')));
+})();
+</script></body></html>
