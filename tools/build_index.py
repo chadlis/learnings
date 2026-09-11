@@ -16,6 +16,7 @@ Le nombre de questions est le nombre de balises <details> du fichier.
 
 from __future__ import annotations
 
+import hashlib
 import html
 import pathlib
 import re
@@ -201,6 +202,101 @@ def render_timeline() -> str:
     )
 
 
+
+# --------------------------------------------------------------------------
+# PWA : manifeste, service worker, icône — injectés dans chaque page
+# --------------------------------------------------------------------------
+
+DEBUT_PWA = "<!--pwa-->"
+FIN_PWA = "<!--/pwa-->"
+
+
+def bloc_pwa(prefixe: str) -> str:
+    """Le bloc <head> commun. `prefixe` remonte jusqu'à la racine du site.
+
+    Tout est en chemin relatif pour que les fiches restent ouvrables en file://.
+    Le service worker n'est enregistré que sur http(s) : en file:// l'API
+    n'existe pas, on ne tente rien et rien n'échoue.
+    """
+    p = prefixe
+    return (
+        DEBUT_PWA
+        + '<link rel="manifest" href="%smanifest.webmanifest">' % p
+        + '<link rel="icon" type="image/svg+xml" href="%sicone-fiches.svg">' % p
+        + '<link rel="apple-touch-icon" href="%sapple-touch-icon.png">' % p
+        + '<meta name="theme-color" content="#20312C">'
+        + '<meta name="mobile-web-app-capable" content="yes">'
+        + '<meta name="apple-mobile-web-app-capable" content="yes">'
+        + '<meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">'
+        + '<meta name="apple-mobile-web-app-title" content="Fiches">'
+        + "<script>if('serviceWorker' in navigator&&location.protocol.startsWith('http')){"
+        + "window.addEventListener('load',function(){"
+        + "navigator.serviceWorker.register('%ssw.js',{scope:'%s'}).catch(function(){});});}</script>" % (p, p or "./")
+        + FIN_PWA
+    )
+
+
+def injecte_pwa(chemin: pathlib.Path) -> bool:
+    """Pose (ou remet à jour) le bloc PWA dans le <head>. Idempotent."""
+    prefixe = "../" * len(chemin.relative_to(ROOT).parent.parts)
+    texte = chemin.read_text(encoding="utf-8")
+    bloc = bloc_pwa(prefixe)
+
+    if DEBUT_PWA in texte:
+        avant, reste = texte.split(DEBUT_PWA, 1)
+        _, apres = reste.split(FIN_PWA, 1)
+        nouveau = avant + bloc + apres
+    else:
+        m = re.search(r"</head>", texte, re.I)
+        if not m:
+            print(f"  ! {chemin}: pas de </head>, bloc PWA non injecté", file=sys.stderr)
+            return False
+        nouveau = texte[: m.start()] + "\n" + bloc + "\n" + texte[m.start():]
+
+    if nouveau != texte:
+        chemin.write_text(nouveau, encoding="utf-8")
+        return True
+    return False
+
+
+def fichiers_du_site() -> list[pathlib.Path]:
+    """Tout ce qui est servi, sw.js excepté (c'est lui qui porte la version)."""
+    noms = ["index.html", "timeline-formation.html", "manifest.webmanifest",
+            "icone-fiches.svg", "apple-touch-icon.png"]
+    fichiers = [ROOT / n for n in noms if (ROOT / n).exists()]
+    fichiers += sorted(ROOT.glob("fiches/*/fiche-*.html"))
+    return fichiers
+
+
+def maj_service_worker() -> None:
+    """Réécrit la version du cache : 'fiches-v<n>-<empreinte>'.
+
+    L'empreinte est celle du contenu servi ; le compteur <n> n'avance que
+    lorsqu'elle change. Rejouer le script sans rien modifier ne touche donc
+    pas à sw.js — le script reste idempotent.
+    """
+    sw = ROOT / "sw.js"
+    if not sw.exists():
+        return
+    h = hashlib.sha256()
+    for f in fichiers_du_site():
+        h.update(f.relative_to(ROOT).as_posix().encode())
+        h.update(f.read_bytes())
+    empreinte = h.hexdigest()[:16]
+
+    texte = sw.read_text(encoding="utf-8")
+    m = re.search(r"const CACHE = 'fiches-v(\d+)-([0-9a-f]+)';", texte)
+    if not m:
+        print("  ! sw.js: ligne 'const CACHE' introuvable", file=sys.stderr)
+        return
+    if m.group(2) == empreinte:
+        return
+    version = int(m.group(1)) + 1
+    nouveau = texte[: m.start()] + "const CACHE = 'fiches-v%d-%s';" % (version, empreinte) + texte[m.end():]
+    sw.write_text(nouveau, encoding="utf-8")
+    print("sw.js : cache fiches-v%d-%s" % (version, empreinte))
+
+
 # --------------------------------------------------------------------------
 # gabarit : HTML/CSS repris tel quel de l'index d'origine
 # --------------------------------------------------------------------------
@@ -214,7 +310,8 @@ h2{font-family:Georgia,serif;font-weight:400;font-size:19px;margin:30px 0 10px;c
 h3{font:600 11.5px "Avenir Next",Avenir,"Segoe UI",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:36px 0 4px}
 .it{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;background:var(--card);color:var(--cardink);text-decoration:none;padding:12px 16px;border-radius:3px;margin-bottom:8px;box-shadow:0 10px 20px -14px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--yellow))}
 .it:hover{transform:translateY(-1px)}.it .k{font-family:Georgia,serif;font-size:20px;color:#4E5A55}.it .t{font-size:15.5px;font-weight:500}.it .t small{display:block;font-weight:400;font-size:12.5px;color:#4E5A55;margin-top:2px}.it .n{font-size:12.5px;color:#4E5A55;text-align:right}
-footer{margin-top:36px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}</style></head>
+footer{margin-top:36px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}</style>
+{pwa}</head>
 <body><h1>Formation ML/LLM — <span>fiches</span></h1><p class="sub">La timeline pour savoir où tu es ; puis les fiches rangées comme les decks Anki « swe » : chaque bloc couvre les cartes du deck correspondant. Ouvre, réponds à voix haute, note-toi.</p>{timeline}
 <h3>Par deck Anki</h3>{decks}{archives}
 <footer>Un fichier HTML autonome par entrée, ouvrable hors ligne. Convention : <code>/timeline-formation.html</code> · <code>/fiches/semaine/fiche-sNN-&lt;sujet&gt;.html</code> · <code>/fiches/theme/fiche-tNN-&lt;sujet&gt;.html</code> · <code>/fiches/archives/</code>. La version vit dans le titre, pas dans le nom. Index généré par <code>tools/build_index.py</code> — ne pas éditer à la main.</footer></body></html>
@@ -223,6 +320,15 @@ footer{margin-top:36px;color:var(--faint);font-size:13px;border-top:1.5px solid 
 
 def build() -> None:
     fiches = collect()
+
+    # le bloc PWA est posé par le script, jamais à la main
+    touches = [p for p in sorted(ROOT.glob("fiches/*/fiche-*.html")) if injecte_pwa(p)]
+    for nom in ("timeline-formation.html",):
+        if (ROOT / nom).exists() and injecte_pwa(ROOT / nom):
+            touches.append(ROOT / nom)
+    if touches:
+        print("bloc PWA posé dans %d fichier(s)" % len(touches))
+
     # Le gabarit contient du CSS plein d'accolades : substitution littérale,
     # pas str.format().
     page = TEMPLATE
@@ -230,6 +336,7 @@ def build() -> None:
         ("{timeline}", render_timeline()),
         ("{decks}", render_decks(fiches)),
         ("{archives}", render_archives(fiches)),
+        ("{pwa}", bloc_pwa("")),
     ):
         page = page.replace(cle, valeur)
     cible = ROOT / "index.html"
@@ -239,6 +346,7 @@ def build() -> None:
         print("index.html régénéré (%d fiches)" % len(fiches))
     else:
         print("index.html déjà à jour (%d fiches)" % len(fiches))
+    maj_service_worker()
 
 
 if __name__ == "__main__":

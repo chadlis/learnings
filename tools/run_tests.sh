@@ -23,4 +23,6 @@ sleep 1
 
 node "$racine/tools/test_ratings.mjs" "http://127.0.0.1:$port"
 echo
+node "$racine/tools/test_pwa.mjs" "http://127.0.0.1:$port"
+echo
 node "$racine/tools/test_ratings.mjs" "file://$racine"
