@@ -71,9 +71,14 @@ figcaption{font-size:.9rem;color:var(--ink2);margin-top:.6rem;line-height:1.45}
 .fil b{color:var(--ink);font-weight:700}
 .retenir{font-size:1.3rem;font-style:italic;margin:2.6rem 0;padding:1.3rem 1rem;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);text-align:center;background:rgba(255,255,255,.6)}
 @media(max-width:1100px){.page{grid-template-columns:1fr;gap:0}nav.echelle{display:none}aside.marge{display:none}}
-@media(max-width:640px){body{font-size:16.5px}header h1{font-size:2.2rem}h2{font-size:1.4rem}}
+@media(max-width:640px){body{font-size:16.5px}header h1{font-size:2.2rem}h2{font-size:1.4rem}
+  /* un tableau plus large que l'écran défile dans sa propre boîte, il ne
+     pousse plus la page : le corps du texte ne défile jamais à l'horizontale */
+  table{display:block;overflow-x:auto;max-width:100%}}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
+
+<!--pwa--><link rel="manifest" href="../../manifest.webmanifest"><link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg"><link rel="apple-touch-icon" href="../../apple-touch-icon.png"><meta name="theme-color" content="#20312C"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Fiches"><script>if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',function(){navigator.serviceWorker.register('../../sw.js',{scope:'../../'}).catch(function(){});});}</script><!--/pwa-->
 </head>
 <body>
 <div class="page">
@@ -374,7 +379,7 @@ function drawSetFast(n){var bb=Math.round(n*P_BOTH+Math.sqrt(n*P_BOTH*(1-P_BOTH)
   el('line',{x1:L,y1:H-B,x2:W-R,y2:H-B,stroke:INK},s);el('line',{x1:L,y1:T,x2:L,y2:H-B,stroke:INK},s);
   [0,0.25,0.5,0.75,1].forEach(function(r){txt(s,X(r),H-B+16,fr(r,2),{ta:'middle',fs:11,fill:FA});});
   txt(s,W-R,H-B+32,'ρ, corrélation des erreurs de A et B',{ta:'end',fs:11,fill:FA,fi:'italic'});
-  var d='';for(var r=0;r<=1.0001;r+=0.01)d+=(d?'L':'M')+X(r)+','+Y(Math.sqrt(2*s2*(1-r)));
+  var d='';for(var r=0;r<=1.0001;r+=0.01)d+=(d?'L':'M')+X(Math.min(r,1))+','+Y(Math.sqrt(2*s2*Math.max(0,1-r)));
   el('path',{d:d,fill:'none',stroke:BR,'stroke-width':2.4},s);
   [[0,'non apparié : 0,66'],[0.86,'ici : 0,25']].forEach(function(pt){var r=pt[0],v=Math.sqrt(2*s2*(1-r));el('circle',{cx:X(r),cy:Y(v),r:5,fill:r?BR:SEL},s);txt(s,X(r)+(r?-8:8),Y(v)-10,pt[1],{ta:r?'end':'start',fs:12,fw:'bold',fill:r?BR:SEL});});
   txt(s,X(0.3),Y(0.25),'SE(d̂) = √(2s²(1−ρ)),  1 − ρ = π / (2p(1−p))',{fs:12,fi:'italic'});
