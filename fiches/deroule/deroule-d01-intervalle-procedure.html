@@ -1,0 +1,487 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>L’intervalle porte sur la procédure — cas 1</title>
+<style>
+:root{
+  --paper:#FBFAF6; --grid:rgba(28,36,48,.055); --ink:#1C2430; --ink2:#4A5460; --faint:#8A93A0;
+  --rule:rgba(28,36,48,.16);
+  --bruit:#1F5FA8; --bruitbg:rgba(31,95,168,.10);
+  --sel:#B23A2C; --selbg:rgba(178,58,44,.10);
+  --vrai:#2E7D4F; --vraibg:rgba(46,125,79,.12);
+  --serif:"Iowan Old Style","Charter","Palatino Linotype",Palatino,Georgia,serif;
+}
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{margin:0;font-family:var(--serif);color:var(--ink);font-size:18px;line-height:1.6;
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px}
+.page{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:150px minmax(0,46rem) 1fr;gap:2.4rem;padding:2.5rem 1.4rem 6rem}
+nav.echelle{position:sticky;top:2rem;align-self:start;font-size:.86rem;line-height:1.3}
+nav.echelle a{display:block;color:var(--ink2);text-decoration:none;padding:.5rem 0 .5rem .9rem;border-left:2px solid var(--rule)}
+nav.echelle a.on{color:var(--ink);border-left-color:var(--ink);font-weight:700}
+nav.echelle a small{display:block;color:var(--faint);font-weight:400;font-style:italic}
+nav.echelle .titre{font-style:italic;color:var(--faint);padding:0 0 .6rem}
+main{min-width:0}
+aside.marge{align-self:start;position:sticky;top:2rem;font-size:.86rem;color:var(--ink2);line-height:1.45;padding-top:6rem}
+.note{margin:0 0 1.4rem;padding-left:.8rem;border-left:2px solid var(--sel)}
+.note b{color:var(--sel)}
+header{margin-bottom:2.6rem}
+header h1{font-size:3rem;line-height:1;margin:0 0 .8rem;font-weight:700;letter-spacing:-.02em}
+header p{margin:.3rem 0;color:var(--ink2);font-size:1rem}
+.legend{display:flex;gap:1.4rem;flex-wrap:wrap;margin-top:1rem;font-size:.95rem}
+.legend span::before{content:"";display:inline-block;width:1.1em;height:.55em;margin-right:.4em;border-radius:1px;vertical-align:.05em}
+.legend .b::before{background:var(--bruit)} .legend .s::before{background:var(--sel)} .legend .v::before{background:var(--vrai)}
+section{scroll-margin-top:1.5rem}
+h2{font-size:1.7rem;margin:3.4rem 0 .6rem;line-height:1.15;display:grid;grid-template-columns:2.6rem 1fr;gap:.7rem;align-items:baseline}
+h2 .n{font-size:2.6rem;font-weight:700;line-height:1;color:var(--faint);font-variant-numeric:tabular-nums}
+h2 small{display:block;font-size:.9rem;color:var(--faint);font-weight:400;font-style:italic;margin-top:.2rem}
+h3{font-size:1.12rem;margin:2rem 0 .5rem}
+p{margin:0 0 1rem}
+.m{font-style:italic}
+.f{display:block;text-align:center;margin:1rem 0;font-size:1.12rem;font-style:italic}
+.f b{font-style:normal}
+sub,sup{font-size:.7em;line-height:0}
+table{border-collapse:collapse;width:100%;margin:1rem 0 1.4rem;font-size:.95rem;background:rgba(255,255,255,.7)}
+th,td{padding:.45rem .6rem;text-align:left;vertical-align:top;border-bottom:1px solid var(--rule)}
+th{font-weight:700;border-bottom:2px solid var(--ink)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.bruit{color:var(--bruit)} .sel{color:var(--sel)} .vrai{color:var(--vrai)}
+.hb{background:var(--bruitbg)} .hs{background:var(--selbg)} .hv{background:var(--vraibg)}
+.brique{margin:1.4rem 0;padding:.7rem 1rem;border:1.5px solid var(--ink);background:#fff;border-radius:2px;font-size:1rem}
+.brique b{display:block}
+.tableau{margin:1.6rem 0;padding:1.2rem 1.4rem;background:var(--ink);color:#F6F7F4;border-radius:2px;line-height:1.55}
+.tableau .faux{color:#E9B3AA;margin-top:.8rem;display:block;font-size:.97rem}
+figure{margin:1.6rem 0 2rem;padding:1rem;background:#fff;border:1px solid var(--rule);border-radius:3px}
+figure svg{width:100%;height:auto;display:block}
+figcaption{font-size:.9rem;color:var(--ink2);margin-top:.6rem;line-height:1.45}
+.ctrl{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin:0 0 .7rem;font-size:.92rem}
+.ctrl button{font:inherit;font-size:.9rem;padding:.4rem .85rem;border:1.5px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer;border-radius:2px}
+.ctrl button.prim{background:var(--ink);color:#fff}
+.ctrl button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.ctrl button:focus-visible{outline:3px solid var(--bruit);outline-offset:2px}
+.ctrl .stat{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--ink2)}
+.porte{margin-top:3rem;padding:1.2rem 1.4rem;border:2px dashed var(--ink);border-radius:2px;background:rgba(255,255,255,.6)}
+.retenir{font-size:1.3rem;font-style:italic;margin:2.6rem 0;padding:1.3rem 1rem;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);text-align:center;background:rgba(255,255,255,.6)}
+@media(max-width:1100px){.page{grid-template-columns:1fr;gap:0}nav.echelle{display:none}aside.marge{display:none}}
+@media(max-width:640px){body{font-size:16.5px}header h1{font-size:2.2rem}h2{font-size:1.4rem}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="page">
+<nav class="echelle" aria-label="Échelle des marches">
+  <div class="titre">l'échelle</div>
+  <a href="#m0">Marche 0<small>la question, les niveaux, les mots</small></a>
+  <a href="#m1">Marche 1<small>les briques : espérance, variance, deux règles</small></a>
+  <a href="#m2">Marche 2<small>la moyenne de n tirages</small></a>
+  <a href="#m3">Marche 3<small>l'accuracy, le plug-in, le TCL</small></a>
+  <a href="#m4">Marche 4<small>l'intervalle et sa lecture</small></a>
+  <a href="#m5">Marche 5<small>Wald contre Wilson</small></a>
+  <a href="#fin">Au tableau<small>phrases, cassures</small></a>
+  <a href="#suite">La porte<small>vers le cas 2</small></a>
+</nav>
+
+<main>
+
+<header>
+  <h1>L'intervalle<br>porte sur la procédure</h1>
+  <p>Cas 1 du fil A. Déroulé autoporteur de la chaîne accuracy → SE → IC, tenue le 11/09/2026. À lire lentement, une fois, en jouant avec chaque figure.</p>
+  <div class="legend"><span class="b">le bruit, ce qui vient du tirage</span><span class="s">la lecture fausse, ce qu'on est tenté de dire</span><span class="v">la vraie valeur, fixe</span></div>
+</header>
+
+<section id="m0">
+<h2><span class="n">0</span><span>La question unique et les trois niveaux<small>le décor, et la source de presque toutes les confusions</small></span></h2>
+
+<p>Une seule question organise toute l'inférence : <b>qu'est-ce qui varierait si je refaisais l'expérience ?</b> Tout ce qui suit est une manière de répondre à cette question de façon chiffrée.</p>
+
+<p>Le décor. Un classifieur d'images, fixé, entraîné, on n'y touche plus. Un test set de <span class="m">n</span> = 5 000 images tirées de la population des images que le modèle rencontrera. Il en classe correctement 4 360 : accuracy <b>87,2 %</b>. Tu veux écrire dans ton rapport ce que vaut ce modèle, avec une marge honnête.</p>
+
+<figure id="fig-niveaux"></figure>
+
+<p>Les probabilités vivent au niveau 2. Une fois le nombre tombé, il n'y a plus de probabilité : 87,2 est un nombre, il ne fluctue pas, il est. La quasi-totalité des phrases fausses sur les intervalles de confiance vient d'un glissement entre les niveaux 2 et 3, et la figure des cent équipes, plus bas, existe pour le rendre impossible.</p>
+
+<h3>Le vocabulaire, fixé avant tout calcul</h3>
+<table>
+<tr><th>objet</th><th>notation</th><th>statut</th><th>ne pas confondre avec</th></tr>
+<tr><td>vraie accuracy, sur toutes les images possibles</td><td class="vrai m">p</td><td>fixe, inconnue</td><td>l'accuracy mesurée</td></tr>
+<tr><td>accuracy mesurée sur ce test set</td><td class="m">p̂</td><td>aléatoire au niveau 2, un nombre au niveau 3</td><td class="m">p</td></tr>
+<tr><td>résultat sur l'image <span class="m">i</span></td><td class="m">X<sub>i</sub> ∈ {0, 1}</td><td>aléatoire</td><td class="m">p̂</td></tr>
+<tr><td>dispersion d'<b>une</b> observation</td><td class="m">σ = √(p(1−p))</td><td>ne dépend pas de <span class="m">n</span></td><td class="m">SE</td></tr>
+<tr><td>dispersion de l'<b>estimateur</b></td><td class="bruit m">SE = σ/√n</td><td>rétrécit en 1/√n</td><td class="m">σ</td></tr>
+<tr><td>SE estimée</td><td class="m">SÊ = √(p̂(1−p̂)/n)</td><td>ce qu'on peut calculer</td><td>SE, qui contient <span class="m">p</span> inconnu</td></tr>
+</table>
+<p>La ligne σ contre SE est celle qui se mélange le plus. σ dit à quel point <i>une image</i> est imprévisible ; SE dit à quel point <i>ta moyenne sur 5 000 images</i> est imprévisible. Le premier ne bouge pas quand tu ajoutes des images ; le second rétrécit.</p>
+</section>
+
+<section id="m1">
+<h2><span class="n">1</span><span>Les briques, une par une<small>rien n'est utilisé avant d'être posé ; deux règles portent tout</small></span></h2>
+
+<p><b>Variable aléatoire.</b> Le résultat numérique d'une expérience pas encore faite. Après tirage, ce n'est plus une variable aléatoire, c'est une réalisation. <span class="m">X<sub>i</sub></span>, « le modèle a-t-il bon sur l'image numéro <span class="m">i</span> », est une variable aléatoire tant que l'image <span class="m">i</span> n'est pas tirée.</p>
+
+<p><b>Espérance.</b> <span class="m">E[X] = Σ<sub>v</sub> v·P(X = v)</span>. Le centre de gravité de la loi. Propriété cardinale : <b>linéaire, toujours, sans condition</b>. <span class="m">E[aX + bY] = aE[X] + bE[Y]</span> que <span class="m">X</span> et <span class="m">Y</span> soient indépendants ou non. Retiens que c'est la seule brique qui ne demande rien.</p>
+
+<p><b>Variance.</b> <span class="m">Var(X) = E[(X − E[X])<sup>2</sup>]</span>. La dispersion autour du centre. Pourquoi le carré, et pas l'écart tout court ? Deux raisons, pas une, et la figure montre la première.</p>
+
+<figure id="fig-carre"></figure>
+
+<p>La seconde raison est celle qui compte pour la suite : le carré donne l'<b>additivité</b> (règle 2 ci-dessous). Avec la valeur absolue, on aurait bien une mesure de dispersion, mais la dispersion d'une somme ne se calculerait plus à partir des dispersions des termes. Formule de calcul équivalente, en une ligne : développer <span class="m">(X − μ)<sup>2</sup> = X<sup>2</sup> − 2μX + μ<sup>2</sup></span>, prendre l'espérance, <span class="m">Var(X) = E[X<sup>2</sup>] − E[X]<sup>2</sup></span>.</p>
+
+<p><b>Écart-type.</b> <span class="m">σ = √Var</span>. Il remet dans l'unité de <span class="m">X</span> (des points d'accuracy, pas des points carrés). Discipline : <b>calculer en variance, interpréter en écart-type</b>. Les variances s'ajoutent, les écarts-types non.</p>
+
+<div class="brique"><b>Règle 1 — changement d'échelle</b><span class="m">Var(aX) = a<sup>2</sup>·Var(X)</span>. Diviser une variable par 10 divise sa variance par 100, son écart-type par 10. Preuve en une ligne : <span class="m">(aX − aμ)<sup>2</sup> = a<sup>2</sup>(X − μ)<sup>2</sup></span>, puis linéarité de l'espérance.</div>
+
+<div class="brique"><b>Règle 2 — variance d'une somme</b><span class="m">Var(X ± Y) = Var(X) + Var(Y) ± 2·Cov(X, Y)</span>. <b>Indépendance ⇒ Cov = 0</b>, et alors les variances s'ajoutent. Retiens cette formule : elle contient à elle seule le <span class="m">1/n</span> de l'erreur-type (cas 1) et tout l'appariement (cas 2).</div>
+
+<figure id="fig-regles"></figure>
+
+<p><b>Bernoulli(<span class="m">p</span>).</b> <span class="m">X</span> vaut 1 avec probabilité <span class="m">p</span>, 0 sinon. <span class="m">E[X] = 1·p + 0·(1−p) = p</span>. Comme <span class="m">X<sup>2</sup> = X</span> (un 0 ou un 1 au carré ne change pas), <span class="m">E[X<sup>2</sup>] = p</span>, donc <span class="m">Var(X) = p − p<sup>2</sup> = p(1−p)</span>. Nulle en 0 et en 1, maximale (0,25) en 0,5 : un modèle toujours juste ne fluctue pas, un modèle qui a une chance sur deux fluctue le plus.</p>
+</section>
+
+<section id="m2">
+<h2><span class="n">2</span><span>La moyenne de n tirages iid<small>brique unique : Var(X̄) = σ²/n, et d'où vient chaque n</small></span></h2>
+
+<p><span class="m">X<sub>1</sub>, …, X<sub>n</sub></span> indépendants et de même loi, chacun d'espérance <span class="m">μ</span> et de variance <span class="m">σ<sup>2</sup></span>. <span class="m">X̄ = (1/n) Σ X<sub>i</sub></span>.</p>
+
+<p><b>Maillon 1.</b> <span class="m">E[X̄] = (1/n) Σ E[X<sub>i</sub>] = (1/n)·n·μ = μ</span>. Règle : linéarité. Aucune indépendance requise. L'estimateur est <b>sans biais</b>.</p>
+
+<p><b>Maillon 2, en trois pas séparés.</b></p>
+<span class="f">Var(X̄) = Var((1/<span class="m">n</span>)·Σ<span class="m">X<sub>i</sub></span>) = (1/<span class="m">n</span><sup>2</sup>)·Var(Σ<span class="m">X<sub>i</sub></span>)</span>
+<p>Règle 1, avec <span class="m">a = 1/n</span>. D'où le <span class="m">n<sup>2</sup></span>.</p>
+<span class="f">Var(Σ<span class="m">X<sub>i</sub></span>) = Σ Var(<span class="m">X<sub>i</sub></span>) = <span class="m">n</span>·σ<sup>2</sup></span>
+<p>Règle 2, avec toutes les covariances nulles parce que les <span class="m">X<sub>i</sub></span> sont indépendants. C'est le seul endroit de la chaîne où l'indépendance sert.</p>
+<span class="f">Var(X̄) = <span class="m">n</span>σ<sup>2</sup>/<span class="m">n</span><sup>2</sup> = σ<sup>2</sup>/<span class="m">n</span>, donc SE = σ/√<span class="m">n</span></span>
+<p>Le <span class="m">n<sup>2</sup></span> de la règle 1 contre le <span class="m">n</span> de la règle 2 : il en reste un. « Pourquoi <span class="m">n</span> et pas <span class="m">n<sup>2</sup></span> ? » attend exactement cette simplification.</p>
+
+<figure id="fig-racine"></figure>
+
+<div class="brique"><b>Deux points d'attention sur ce maillon</b>Covariances positives (frames consécutives d'une même vidéo, reformulations d'une même question) : la règle 2 garde ses termes 2Cov, la vraie variance est <i>plus grande</i> que σ²/n, et la SE calculée ment par optimisme. Et la loi de la racine carrée : diviser l'incertitude par 2 demande <b>4 fois</b> plus de données, par 10 demande 100 fois plus. La figure le montre : la courbe s'aplatit vite.</div>
+</section>
+
+<section id="m3">
+<h2><span class="n">3</span><span>Appliquer à l'accuracy, puis le plug-in, puis le TCL<small>le maillon qui saute le plus souvent, et la circularité placée là où elle surgit</small></span></h2>
+
+<p><b>L'accuracy est une moyenne empirique de Bernoulli.</b> C'est le maillon que l'on oublie de dire, et une fois dit, tout ce qui précède s'applique sans rien changer. Niveau 1 : <span class="m">p</span>. Niveau 2 : tirer 5 000 images iid, <span class="m">X<sub>i</sub> ~ Bernoulli(p)</span>, <span class="m">p̂ = (1/n) Σ X<sub>i</sub></span>. Donc <span class="m">E[p̂] = p</span> et <span class="m">Var(p̂) = p(1−p)/n</span>, en remplaçant σ² par sa valeur Bernoulli.</p>
+
+<p>Le même <span class="m">p</span> pour toutes les images n'est pas un postulat : c'est la conséquence de rendre aléatoire le tirage de l'image. Les images ont des difficultés différentes ; avant tirage, chaque position a la même probabilité de succès, la moyenne des difficultés sur la population. C'est déroulé en détail dans la page du cas 3, section « Rappel ».</p>
+
+<h3>Le plug-in, exactement là où il apparaît</h3>
+<p>La formule <span class="m">SE = √(p(1−p)/n)</span> contient <span class="m">p</span>. Tu ne connais pas <span class="m">p</span>, c'est précisément ce que tu cherches. Circularité. On la résout en remplaçant <span class="m">p</span> par <span class="m">p̂</span> : <span class="m">SÊ = √(p̂(1−p̂)/n)</span>. Pourquoi c'est légitime : <span class="m">p̂</span> tend vers <span class="m">p</span> quand <span class="m">n</span> grandit, et surtout la fonction <span class="m">p(1−p)</span> est <b>plate près de son sommet</b>, donc se tromper un peu sur <span class="m">p</span> change très peu la SE.</p>
+
+<figure id="fig-plugin"></figure>
+
+<p><b>Fil rouge.</b> <span class="m">√(0,872 × 0,128 / 5000) = √(0,1116/5000) = √(2,23·10<sup>−5</sup>) = 0,00472</span>, soit <b>0,47 point</b>. Formule de poche : <span class="m">SE ≤ 1/(2√n)</span>, atteinte en <span class="m">p</span> = 0,5 ; pour <span class="m">n</span> = 5 000, 0,71 point au pire. Où ça casse : <span class="m">p̂</span> près de 0 ou 1. Zéro erreur sur 100 images donne SÊ = 0, absurde. Règle : <span class="m">np̂ ≥ 10</span> et <span class="m">n(1−p̂) ≥ 10</span>, sinon Wilson (marche 5).</p>
+
+<h3>Le TCL : la forme du bruit</h3>
+<p>Chaque <span class="m">X<sub>i</sub></span> ne prend que deux valeurs, et pourtant leur moyenne suit, pour <span class="m">n</span> grand, une loi gaussienne : <span class="m">p̂ ≈ N(p, SE<sup>2</sup>)</span>. C'est le théorème central limite. On ne le démontre pas ici, on le regarde se produire.</p>
+
+<figure id="fig-tcl"></figure>
+
+<p>Conséquence directe, au niveau 2 : <span class="m">P(|p̂ − p| ≤ 1,96·SE) ≈ 0,95</span>. Dans 95 % des tirages, la mesure tombe à moins de 1,96 SE de la vérité. Cette phrase parle de <span class="m">p̂</span>, qui est aléatoire, et de <span class="m">p</span>, qui est fixe. Retiens l'ordre : c'est la mesure qui bouge autour de la vérité, pas la vérité autour de la mesure.</p>
+</section>
+
+<section id="m4">
+<h2><span class="n">4</span><span>L'intervalle et sa lecture<small>retourner une inégalité, puis ne pas se tromper de niveau</small></span></h2>
+
+<p><span class="m">|p̂ − p| ≤ 1,96·SE</span> se lit dans les deux sens. « <span class="m">p̂</span> est à moins de 1,96 SE de <span class="m">p</span> » est la même phrase que « <span class="m">p</span> est à moins de 1,96 SE de <span class="m">p̂</span> ». On retourne donc l'inégalité et on remplace SE par SÊ :</p>
+<span class="f">IC<sub>95</sub> = <span class="m">p̂</span> ± 1,96·SÊ = 0,872 ± 1,96 × 0,00472 = 0,872 ± 0,0093 = <b>[86,3 % ; 88,1 %]</b></span>
+
+<p>L'intervalle est centré sur <span class="m">p̂</span> parce qu'il répond à « où est <span class="m">p</span> ? ». Un intervalle centré sur une valeur hypothétique <span class="m">p<sub>0</sub></span> répondrait à une autre question, « les données sont-elles compatibles avec <span class="m">p<sub>0</sub></span> ? », et s'appellerait un test.</p>
+
+<h3>Cent équipes, cent intervalles</h3>
+<p>Voici l'image mentale qui rend la lecture stable. Cent équipes mesurent le même modèle, chacune sur son propre test set de 5 000 images. Chacune calcule son intervalle. La vraie valeur <span class="m">p</span> est la même pour toutes, et aucune ne la connaît.</p>
+
+<figure id="fig-equipes"></figure>
+
+<div class="tableau">
+<em>« La procédure qui fabrique cet intervalle capture la vraie valeur dans 95 % des répétitions. »</em>
+<span class="faux"><b>Phrase fausse tentante</b> : « il y a 95 % de chances que p soit dans [86,3 ; 88,1] ». Tentante parce que c'est ce qu'on <i>veut</i> savoir, et parce que la phrase juste semble pinailler. Fausse parce qu'elle met une probabilité sur un fait fixe : p est un nombre, il est dans cet intervalle ou il n'y est pas, c'est déjà joué, tu ne le sais simplement pas. Le 95 % est une propriété de la recette, pas de l'intervalle en main. Mettre une probabilité sur p est possible, mais c'est un autre cadre, bayésien, qui demande une loi a priori sur p.</span>
+</div>
+
+<p>Le 95 % vit au niveau 2. L'intervalle [86,3 ; 88,1] vit au niveau 3. Tu es l'une des cent équipes, tu ne sais pas laquelle, et tout ce que tu peux dire c'est que tu as suivi une recette qui réussit 95 fois sur 100.</p>
+
+<div class="brique"><b>Piège : la borne haute qui touche un autre modèle</b>La borne haute de A tombe à 88,1. Un modèle B affiche 88,1 sur le même test set. On n'en conclut <i>rien</i> : comparer deux modèles est un autre problème, avec un autre objet aléatoire et une covariance qu'on ne peut pas ignorer. C'est le cas 2, et sa porte est en bas de page.</div>
+</section>
+
+<section id="m5">
+<h2><span class="n">5</span><span>Wald contre Wilson<small>accepter le plug-in ou le refuser</small></span></h2>
+
+<p>L'intervalle <span class="m">p̂ ± 1,96·SÊ</span> a un nom : <b>Wald</b>. Il accepte le plug-in de la marche 3 sans discuter. Ordre à ne pas inverser : le plug-in vient d'abord, Wald est le nom de l'intervalle qui le prend tel quel. Dire « grâce à Wald on remplace <span class="m">p</span> par <span class="m">p̂</span> » met la conclusion avant la prémisse.</p>
+
+<p><b>Wilson</b> refuse le plug-in. Il garde <span class="m">p</span> inconnu dans la SE et cherche tous les <span class="m">p</span> tels que <span class="m">|p̂ − p| ≤ 1,96·√(p(1−p)/n)</span>. C'est une inéquation du second degré en <span class="m">p</span>, dont la solution est un intervalle légèrement décalé vers 0,5 et jamais hors de [0, 1]. Autrement dit : Wilson est le test inversé, Wald est l'approximation du test inversé.</p>
+
+<p>Pour <span class="m">n</span> = 5 000 et <span class="m">p̂</span> = 0,872, les deux donnent [86,3 ; 88,1] au dixième près. Ils divergent quand le plug-in casse : petit <span class="m">n</span>, <span class="m">p̂</span> près de 0 ou 1.</p>
+
+<figure id="fig-wilson"></figure>
+
+<p>Lecture de la figure : à <span class="m">n</span> = 100 et <span class="m">p</span> = 0,98, Wald donne [95,3 ; 100,7] — une borne au-delà de 100 %, et surtout une couverture réelle bien en dessous de 95 %, parce que quand le tirage donne 0 erreur, SÊ = 0 et l'intervalle se réduit à un point qui rate presque sûrement. Wilson donne [93,0 ; 99,4] et tient sa promesse. La règle <span class="m">np̂ ≥ 10</span> et <span class="m">n(1−p̂) ≥ 10</span> est le seuil au-delà duquel on peut se permettre Wald.</p>
+</section>
+
+<section id="fin">
+<h2><span class="n">▮</span><span>Où chaque maillon casse</span></h2>
+<table>
+<tr><th>#</th><th>maillon</th><th>hypothèse</th><th>ce qui casse</th></tr>
+<tr><td>1</td><td>définir <span class="m">p</span></td><td>une population cible</td><td>confondre le test set et la population : p n'est pas « l'accuracy sur ces 5 000 »</td></tr>
+<tr><td>2</td><td>expliciter l'expérience</td><td>test set tiré, modèle fixe</td><td>réentraîner ⇒ un autre objet aléatoire, une autre variance (seeds)</td></tr>
+<tr><td>3</td><td><span class="m">X<sub>i</sub></span> Bernoulli iid</td><td>indépendance, même population</td><td>frames corrélées ⇒ SE sous-estimée ; strates ⇒ p non unique</td></tr>
+<tr><td>4</td><td>accuracy = moyenne</td><td>—</td><td>ne pas le reconnaître, et chercher une formule spéciale</td></tr>
+<tr><td>5</td><td><span class="m">E[p̂] = p</span></td><td>modèle choisi avant le tirage</td><td class="sel">choisir le meilleur de k sur ce test set ⇒ biais du max (cas 3)</td></tr>
+<tr><td>6</td><td>σ²/n</td><td>indépendance (règle 2)</td><td>idem 3</td></tr>
+<tr><td>7</td><td>plug-in</td><td>n grand, p loin des bords</td><td>p̂ près de 0/1 ⇒ Wilson</td></tr>
+<tr><td>8</td><td>TCL</td><td>np̂ ≥ 10, n(1−p̂) ≥ 10</td><td>sinon test exact (binomial)</td></tr>
+<tr><td>9</td><td>IC</td><td>—</td><td class="sel">lire le 95 % sur l'intervalle en main</td></tr>
+<tr><td>10</td><td>comparaison</td><td>garder la covariance</td><td>deux IC séparés ⇒ cas 2</td></tr>
+</table>
+
+<p class="retenir">Chaque fois que tu calcules une métrique, demande-toi de quoi elle est la moyenne, et sur quel tirage.</p>
+</section>
+
+<section id="suite">
+<div class="porte">
+<h3 style="margin-top:0">La porte vers le cas 2</h3>
+<p style="margin:0">Deux modèles A et B, 87,2 et 88,1 sur le <i>même</i> test set. L'erreur naturelle est de dessiner les deux intervalles de cette page et de regarder s'ils se chevauchent. Ils se chevauchent, et pourtant B est significativement meilleur. Le cas 2 explique pourquoi : la question porte sur un seul objet, la différence, et les deux mesures partagent le même tirage.</p>
+</div>
+</section>
+
+</main>
+
+<aside class="marge">
+  <div class="note"><b>Les trois niveaux</b><br>Monde : p. Procédure : « tirer 5 000 images, mesurer ». Résultat : 87,2. Le 95 % vit au deuxième, l'intervalle au troisième.</div>
+  <div class="note"><b>Deux règles portent tout</b><br>Var(aX) = a²Var(X) et Var(X±Y) = VarX + VarY ± 2Cov. Le 1/n vient de la première contre la seconde ; l'appariement du cas 2 vient du terme Cov.</div>
+  <div class="note"><b>La circularité assumée</b><br>SE contient p, on y met p̂. Légitime parce que p(1−p) est plat au sommet. Ça casse aux bords : Wilson.</div>
+</aside>
+
+</div>
+<script>
+(function(){
+'use strict';
+var NS='http://www.w3.org/2000/svg';
+var BR='#1F5FA8',SEL='#B23A2C',VR='#2E7D4F',INK='#1C2430',FA='#8A93A0',GR='#D3D7DD';
+function el(n,a,p){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+function txt(p,x,y,s,o){o=o||{};var t=el('text',{x:x,y:y,'font-family':'inherit','font-size':o.fs||13,fill:o.fill||INK,'text-anchor':o.ta||'start','font-style':o.fi||'normal','font-weight':o.fw||'normal'},p);if(o.tr)t.setAttribute('transform',o.tr);t.textContent=s;return t;}
+function fr(x,d){return x.toFixed(d).replace('.',',');}
+function erf(x){var s=x<0?-1:1;x=Math.abs(x);var t=1/(1+0.3275911*x);var y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y;}
+function Phi(x){return 0.5*(1+erf(x/Math.SQRT2));}
+function phi(x){return Math.exp(-x*x/2)/Math.sqrt(2*Math.PI);}
+function randn(){var u=1-Math.random(),v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function binom(n,p){if(n>200){var v=n*p+Math.sqrt(n*p*(1-p))*randn();return Math.max(0,Math.min(n,Math.round(v)));}var k=0;for(var i=0;i<n;i++)if(Math.random()<p)k++;return k;}
+function ctrlBar(fig){var c=document.createElement('div');c.className='ctrl';fig.appendChild(c);return c;}
+function btn(c,label,fn,prim){var b=document.createElement('button');b.textContent=label;if(prim)b.className='prim';b.onclick=fn;c.appendChild(b);return b;}
+function stat(c){var s=document.createElement('span');s.className='stat';c.appendChild(s);return s;}
+function cap(fig,html){var c=document.createElement('figcaption');c.innerHTML=html;fig.appendChild(c);return c;}
+
+/* niveaux */
+(function(){
+  var fig=document.getElementById('fig-niveaux');
+  var W=640,H=230;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Les trois niveaux'},fig);
+  var rows=[['le monde','vraie accuracy p, sur toutes les images possibles',VR,'fixe, inconnu'],['la procédure','tirer 5 000 images · compter les bonnes réponses',BR,'aléatoire : ici vivent SE, TCL, le 95 %'],['le résultat en main','87,2 %',INK,'un nombre, plus aléatoire']];
+  rows.forEach(function(r,i){var y=30+i*70;el('rect',{x:10,y:y,width:W-20,height:52,fill:'#fff',stroke:r[2],'stroke-width':1.5,rx:3},s);txt(s,24,y+22,r[0],{fw:'bold',fs:14,fill:r[2]});txt(s,24,y+42,r[3],{fs:12,fill:FA,fi:'italic'});txt(s,W-24,y+32,r[1],{ta:'end',fs:14});if(i<2)el('path',{d:'M'+(W/2)+','+(y+52)+' v12 l-5,-5 m5,5 l5,-5',fill:'none',stroke:INK},s);});
+  cap(fig,'Le monde est fixe. La procédure est aléatoire : c\'est en la répétant en pensée qu\'on obtient des probabilités. Le résultat est un nombre. Chaque phrase de cette page vit à un niveau précis ; les erreurs sont des phrases qui changent de niveau en cours de route.');
+})();
+
+/* pourquoi le carré */
+(function(){
+  var fig=document.getElementById('fig-carre');var c=ctrlBar(fig);
+  var W=640,H=250;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Les écarts s annulent, les écarts carrés non'},fig);
+  var g=el('g',{},s);
+  function draw(){
+    while(g.firstChild)g.removeChild(g.firstChild);
+    var vals=[];for(var i=0;i<8;i++)vals.push(Math.round(randn()*20)/10);var m=vals.reduce(function(a,b){return a+b},0)/8;vals=vals.map(function(v){return Math.round((v-m)*10)/10});
+    var L=40,mid=110,sc=22;
+    txt(g,L,22,'huit écarts à la moyenne, x − μ',{fs:12,fill:FA,fi:'italic'});
+    el('line',{x1:L,y1:mid,x2:340,y2:mid,stroke:INK},g);
+    var sum=0,sum2=0;
+    vals.forEach(function(v,i){var x=L+12+i*36;var h=v*sc;el('rect',{x:x,y:v>0?mid-h:mid,width:22,height:Math.abs(h),fill:v>0?BR:SEL,opacity:.65},g);txt(g,x+11,v>0?mid-h-4:mid+Math.abs(h)+12,(v>0?'+':'')+fr(v,1),{ta:'middle',fs:10.5});sum+=v;sum2+=v*v;});
+    txt(g,L,mid+80,'somme des écarts = '+fr(sum,1)+'  (toujours 0 : le centre les annule)',{fs:12,fill:SEL});
+    /* squares */
+    var Lx=380;txt(g,Lx,22,'les mêmes écarts, au carré',{fs:12,fill:FA,fi:'italic'});
+    el('line',{x1:Lx,y1:mid+40,x2:W-20,y2:mid+40,stroke:INK},g);
+    var mx=Math.max.apply(null,vals.map(function(v){return v*v}))||1;
+    vals.forEach(function(v,i){var x=Lx+8+i*29;var h=v*v/mx*110;el('rect',{x:x,y:mid+40-h,width:20,height:h,fill:INK,opacity:.55},g);});
+    txt(g,Lx,mid+80,'somme des carrés = '+fr(sum2,2)+'  ÷ 8 = '+fr(sum2/8,2)+' : la variance',{fs:12});
+    txt(g,Lx,mid+98,'√ = '+fr(Math.sqrt(sum2/8),2)+' : l\'écart-type',{fs:12});
+  }
+  btn(c,'Tirer huit autres valeurs',draw,true);draw();
+  cap(fig,'À gauche, les écarts à la moyenne : par construction du centre de gravité, leur somme vaut zéro, quelle que soit la dispersion. Une « dispersion moyenne » calculée sans carré vaudrait toujours 0. Le carré rend tous les termes positifs ; la valeur absolue le ferait aussi, mais elle ne donnerait pas la règle 2.');
+})();
+
+/* règles 1 et 2 */
+(function(){
+  var fig=document.getElementById('fig-regles');var c=ctrlBar(fig);
+  var W=640,H=280;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Règle 1 et règle 2 en histogrammes'},fig);
+  var g=el('g',{},s);var mode=0;
+  function hist(vals,lo,hi,nb){var h=new Array(nb).fill(0);vals.forEach(function(v){var i=Math.floor((v-lo)/(hi-lo)*nb);if(i>=0&&i<nb)h[i]++;});return h;}
+  function panel(x0,y0,w,ph,title,vals,col,lo,hi,label){
+    var nb=40,h=hist(vals,lo,hi,nb),mx=Math.max.apply(null,h),bw=w/nb,base=y0+ph-18;
+    txt(g,x0,y0+10,title,{fs:12,fw:'bold'});
+    for(var i=0;i<nb;i++)el('rect',{x:x0+i*bw,y:base-h[i]/mx*(ph-40),width:bw-0.5,height:h[i]/mx*(ph-40),fill:col,opacity:.6},g);
+    el('line',{x1:x0,y1:base,x2:x0+w,y2:base,stroke:INK},g);
+    var m=vals.reduce(function(a,b){return a+b},0)/vals.length,v=vals.reduce(function(a,b){return a+(b-m)*(b-m)},0)/vals.length;
+    txt(g,x0+w,y0+10,label+' : var = '+fr(v,2)+', σ = '+fr(Math.sqrt(v),2),{ta:'end',fs:11,fill:col});
+    [lo,(lo+hi)/2,hi].forEach(function(t,i){txt(g,x0+i*w/2,base+13,fr(t,0),{ta:'middle',fs:10,fill:FA});});
+  }
+  function draw(){
+    while(g.firstChild)g.removeChild(g.firstChild);var N=6000;
+    var X=[],Y=[];for(var i=0;i<N;i++){X.push(2*randn());Y.push(2*randn());}
+    if(mode===0){
+      panel(20,10,290,120,'X, écart-type 2',X,BR,-8,8,'X');
+      panel(330,10,290,120,'X/2',X.map(function(v){return v/2}),SEL,-8,8,'X/2');
+      panel(20,150,290,120,'2X',X.map(function(v){return 2*v}),SEL,-8,8,'2X');
+      txt(g,330,190,'règle 1 : Var(aX) = a²·Var(X)',{fs:13,fw:'bold'});txt(g,330,212,'diviser par 2 → variance ÷ 4, σ ÷ 2',{fs:12});txt(g,330,232,'multiplier par 2 → variance × 4, σ × 2',{fs:12});
+      txt(g,330,262,'même échelle horizontale partout',{fs:11,fill:FA,fi:'italic'});
+    }else{
+      panel(20,10,290,120,'X et Y indépendants, σ = 2 chacun',X,BR,-8,8,'X');
+      panel(330,10,290,120,'X + Y',X.map(function(v,i){return v+Y[i]}),SEL,-8,8,'X+Y');
+      var Z=X.map(function(v,i){return 0.9*v+0.44*Y[i]});
+      panel(20,150,290,120,'X + Z, avec Z corrélé à X (ρ ≈ 0,9)',X.map(function(v,i){return v+Z[i]}),SEL,-8,8,'X+Z');
+      txt(g,330,190,'règle 2 : Var(X+Y) = VarX + VarY + 2Cov',{fs:13,fw:'bold'});txt(g,330,212,'indépendants : 4 + 4 = 8, σ = 2,83',{fs:12});txt(g,330,232,'corrélés : 4 + 4 + 2·3,6 ≈ 15, σ ≈ 3,9',{fs:12});
+      txt(g,330,262,'la covariance positive élargit la somme',{fs:11,fill:FA,fi:'italic'});
+    }
+  }
+  var b1=btn(c,'Règle 1 : changer d\'échelle',function(){mode=0;b1.setAttribute('aria-pressed','true');b2.setAttribute('aria-pressed','false');draw();});
+  var b2=btn(c,'Règle 2 : additionner',function(){mode=1;b2.setAttribute('aria-pressed','true');b1.setAttribute('aria-pressed','false');draw();});
+  b1.setAttribute('aria-pressed','true');btn(c,'Retirer',draw);draw();
+  cap(fig,'Règle 1 : l\'histogramme de X/2 est deux fois plus étroit, sa variance quatre fois plus petite. Règle 2 : la somme de deux variables indépendantes est plus large que chacune, mais moins que ce qu\'on croirait, parce que les hasards se compensent parfois ; si les deux bougent ensemble, la compensation disparaît et la somme s\'élargit. C\'est ce terme 2Cov qui fera tout le cas 2.');
+})();
+
+/* loi de la racine */
+(function(){
+  var fig=document.getElementById('fig-racine');
+  var W=640,H=250;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'SE en fonction de n'},fig);
+  var L=50,R=20,T=24,B=40,nmax=20000;
+  function X(n){return L+n/nmax*(W-L-R);}function Y(se){return H-B-se/3*(H-T-B);}
+  var p=0.872,sig=Math.sqrt(p*(1-p));
+  [0,1,2,3].forEach(function(v){txt(s,L-6,Y(v)+4,v+' pt',{ta:'end',fs:11,fill:FA});el('line',{x1:L,y1:Y(v),x2:W-R,y2:Y(v),stroke:GR},s);});
+  el('line',{x1:L,y1:H-B,x2:W-R,y2:H-B,stroke:INK},s);el('line',{x1:L,y1:T,x2:L,y2:H-B,stroke:INK},s);
+  [0,5000,10000,15000,20000].forEach(function(n){txt(s,X(n),H-B+16,n.toLocaleString('fr-FR'),{ta:'middle',fs:11,fill:FA});});
+  var d='';for(var n=100;n<=nmax;n+=50){var se=100*sig/Math.sqrt(n);d+=(d?'L':'M')+X(n)+','+Y(Math.min(se,3));}
+  el('path',{d:d,fill:'none',stroke:BR,'stroke-width':2.4},s);
+  [[1250,'0,94'],[5000,'0,47'],[20000,'0,24']].forEach(function(pt){var n=pt[0],se=100*sig/Math.sqrt(n);el('circle',{cx:X(n),cy:Y(se),r:5,fill:BR},s);txt(s,X(n)+8,Y(se)-8,'n = '+n.toLocaleString('fr-FR')+' → SE = '+pt[1],{fs:11.5,fill:BR});});
+  txt(s,X(9000),Y(1.9),'SE = σ/√n avec σ = √(0,872·0,128) = 0,334',{fs:12,fi:'italic'});
+  txt(s,X(9000),Y(1.6),'× 4 sur n ⇒ ÷ 2 sur SE',{fs:12,fw:'bold'});
+  txt(s,W-R,H-B+32,'n, taille du test set',{ta:'end',fs:11,fill:FA,fi:'italic'});
+  cap(fig,'De 1 250 à 5 000 images, on divise la SE par deux. De 5 000 à 20 000, encore par deux. Chaque division par deux coûte quatre fois plus d\'annotation. La courbe s\'aplatit : passé quelques milliers d\'exemples, la précision se paie très cher.');
+})();
+
+/* plug-in */
+(function(){
+  var fig=document.getElementById('fig-plugin');
+  var W=640,H=250;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'La fonction p(1-p) est plate au sommet'},fig);
+  var L=50,R=20,T=24,B=40;
+  function X(p){return L+p*(W-L-R);}function Y(v){return H-B-v/0.26*(H-T-B);}
+  el('line',{x1:L,y1:H-B,x2:W-R,y2:H-B,stroke:INK},s);el('line',{x1:L,y1:T,x2:L,y2:H-B,stroke:INK},s);
+  [0,0.1,0.2,0.25].forEach(function(v){txt(s,L-6,Y(v)+4,fr(v,2),{ta:'end',fs:11,fill:FA});el('line',{x1:L,y1:Y(v),x2:W-R,y2:Y(v),stroke:GR},s);});
+  [0,0.25,0.5,0.75,1].forEach(function(p){txt(s,X(p),H-B+16,fr(p,2),{ta:'middle',fs:11,fill:FA});});
+  var d='';for(var p=0;p<=1.0001;p+=0.01)d+=(d?'L':'M')+X(p)+','+Y(p*(1-p));
+  el('path',{d:d,fill:'none',stroke:INK,'stroke-width':2},s);
+  /* flat zone */
+  el('rect',{x:X(0.8),y:T,width:X(0.95)-X(0.8),height:H-T-B,fill:BR,opacity:.08},s);
+  [[0.80,'0,160','0,57 pt'],[0.872,'0,112','0,47 pt'],[0.90,'0,090','0,42 pt']].forEach(function(pt,i){var p=pt[0];el('circle',{cx:X(p),cy:Y(p*(1-p)),r:5,fill:i===1?SEL:BR},s);txt(s,X(p)+(i===2?8:-8),Y(p*(1-p))-(i===1?14:0)+(i===0?22:0),'p = '+fr(p,3)+' → p(1−p) = '+pt[1]+', SE = '+pt[2],{ta:i===2?'start':'end',fs:11,fill:i===1?SEL:BR});});
+  txt(s,X(0.5),Y(0.25)-8,'sommet 0,25 en p = 0,5',{ta:'middle',fs:11,fill:FA,fi:'italic'});
+  txt(s,W-R,H-B+32,'p',{ta:'end',fs:11,fill:FA,fi:'italic'});
+  /* dangerous zone */
+  el('rect',{x:X(0.97),y:T,width:X(1)-X(0.97),height:H-T-B,fill:SEL,opacity:.12},s);txt(s,X(0.985),T+14,'bords',{ta:'middle',fs:10,fill:SEL});
+  el('rect',{x:X(0),y:T,width:X(0.03)-X(0),height:H-T-B,fill:SEL,opacity:.12},s);
+  cap(fig,'La SE dépend de p par la fonction p(1−p). Entre 0,80 et 0,95, la courbe descend doucement : se tromper de 7 points sur p ne change la SE que de 0,15 point. C\'est ce qui rend le plug-in inoffensif au milieu. Aux bords, la courbe plonge vers zéro : un p̂ proche de 1 donne une SE minuscule, et l\'intervalle de Wald ment.');
+})();
+
+/* TCL */
+(function(){
+  var fig=document.getElementById('fig-tcl');var c=ctrlBar(fig);c.innerHTML='<span>n =</span>';
+  var W=640,H=250,L=40,R=20,T=28,B=40;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Distribution de p chapeau pour plusieurs n'},fig);
+  var cp=cap(fig,'');var p=0.872;var btns=[];
+  function draw(n){
+    while(s.firstChild)s.removeChild(s.firstChild);
+    var se=Math.sqrt(p*(1-p)/n),REP=4000,vals=[];for(var r=0;r<REP;r++)vals.push(binom(n,p)/n);
+    var lo=n<50?0:Math.max(0,p-4.5*se),hi=n<50?1:Math.min(1,p+4.5*se),nb=n<50?n+1:50;
+    var h=new Array(nb).fill(0);vals.forEach(function(v){var i=n<50?Math.round(v*n):Math.floor((v-lo)/(hi-lo)*nb);if(i>=0&&i<nb)h[i]++;});
+    var mx=Math.max.apply(null,h),base=H-B,bw=(W-L-R)/nb;
+    function X(v){return L+(v-lo)/(hi-lo)*(W-L-R);}
+    for(var i=0;i<nb;i++){var x=n<50?X(i/n)-bw/2:L+i*bw;el('rect',{x:x,y:base-h[i]/mx*(H-T-B),width:Math.max(bw-1,1),height:h[i]/mx*(H-T-B),fill:BR,opacity:.55},s);}
+    el('line',{x1:L,y1:base,x2:W-R,y2:base,stroke:INK},s);
+    /* gaussian overlay */
+    if(n>=30){var d='';var scale=(H-T-B)/mx*REP*((hi-lo)/nb);for(var v=lo;v<=hi;v+=(hi-lo)/200){var dens=phi((v-p)/se)/se;d+=(d?'L':'M')+X(v)+','+(base-dens*scale);}el('path',{d:d,fill:'none',stroke:SEL,'stroke-width':2.2},s);
+      el('line',{x1:X(p-1.96*se),y1:base,x2:X(p-1.96*se),y2:T+10,stroke:SEL,'stroke-dasharray':'3 3'},s);el('line',{x1:X(p+1.96*se),y1:base,x2:X(p+1.96*se),y2:T+10,stroke:SEL,'stroke-dasharray':'3 3'},s);
+      var inside=vals.filter(function(v){return Math.abs(v-p)<=1.96*se}).length/REP;
+      txt(s,X(p),T+4,'p ± 1,96 SE contient '+Math.round(inside*1000)/10+' % des p̂',{ta:'middle',fs:12,fill:SEL,fw:'bold'});}
+    el('line',{x1:X(p),y1:base,x2:X(p),y2:T+16,stroke:VR,'stroke-width':1.5},s);txt(s,X(p),T+28,'p = 0,872',{ta:'middle',fs:11,fill:VR});
+    var ticks=n<50?[0,0.25,0.5,0.75,1]:[p-3*se,p-1.5*se,p,p+1.5*se,p+3*se];ticks.forEach(function(t){txt(s,X(t),base+16,fr(t*100,1)+' %',{ta:'middle',fs:10.5,fill:FA});});
+    cp.innerHTML='4 000 test sets de n = '+n+' images, chacun donnant un p̂. À n = 1, deux barres : 0 ou 1. À n = 5, cinq valeurs possibles, asymétriques. À n = 30, la cloche apparaît déjà. À n = 5 000, l\'histogramme est indiscernable de la gaussienne N(p, SE²) en rouge, SE = '+fr(se*100,2)+' point. Le TCL, c\'est ça : la forme de la moyenne oublie la forme des briques.';
+  }
+  [1,5,30,500,5000].forEach(function(n){var b=btn(c,n.toLocaleString('fr-FR'),function(){btns.forEach(function(x){x.setAttribute('aria-pressed','false')});b.setAttribute('aria-pressed','true');draw(n);});b.setAttribute('aria-pressed',n===5000?'true':'false');btns.push(b);});
+  draw(5000);
+})();
+
+/* cent équipes */
+(function(){
+  var fig=document.getElementById('fig-equipes');var c=ctrlBar(fig);var st=stat(c);
+  var W=640,H=420;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Cent intervalles de confiance, environ 95 contiennent p'},fig);
+  var g=el('g',{},s);var p=0.872,n=5000,tot=0,miss=0,mine=null,data=[],m=0;
+  var L=60,R=20,lo=0.855,hi=0.89;
+  function X(v){return L+(v-lo)/(hi-lo)*(W-L-R);}
+  function gen(){data=[];m=0;for(var i=0;i<100;i++){var ph=binom(n,p)/n,se=Math.sqrt(ph*(1-ph)/n),a=ph-1.96*se,b=ph+1.96*se,ok=(a<=p&&p<=b);if(!ok)m++;data.push({ph:ph,a:a,b:b,ok:ok});}tot+=100;miss+=m;}
+  function render(){
+    while(g.firstChild)g.removeChild(g.firstChild);
+    var top=30,rowH=3.6;
+    el('line',{x1:X(p),y1:top-8,x2:X(p),y2:top+100*rowH+6,stroke:VR,'stroke-width':1.5},g);txt(g,X(p),top-14,'p = 87,2, que personne ne connaît',{ta:'middle',fs:11,fill:VR});
+    data.forEach(function(d,i){var y=top+i*rowH+1.5;el('line',{x1:X(d.a),y1:y,x2:X(d.b),y2:y,stroke:d.ok?BR:SEL,'stroke-width':d.ok?1.4:2.4,opacity:d.ok?.65:1},g);el('circle',{cx:X(d.ph),cy:y,r:1.4,fill:d.ok?BR:SEL},g);
+      if(i===mine){el('rect',{x:X(d.a)-3,y:y-4,width:X(d.b)-X(d.a)+6,height:8,fill:'none',stroke:INK,'stroke-width':1.2},g);txt(g,X(d.b)+8,y+3,'toi : ['+fr(d.a*100,1)+' ; '+fr(d.b*100,1)+']  — contient p ? tu ne le sais pas',{fs:10.5,fill:INK});}});
+    var by=top+100*rowH+22;[0.86,0.87,0.88,0.89].forEach(function(v){txt(g,X(v),by,fr(v*100,1),{ta:'middle',fs:10.5,fill:FA});});
+    txt(g,L,by+22,'cette fois : '+m+' intervalles sur 100 ratent p.   cumul : '+miss+' ratés sur '+tot+' = '+fr(100*miss/tot,1)+' %  (attendu 5 %)',{fs:12,fw:'bold'});
+    txt(g,L,by+40,'chaque équipe a suivi la même recette ; celles en rouge ont eu un tirage malchanceux, et rien dans leurs données ne le leur dit.',{fs:11,fill:FA,fi:'italic'});
+    st.textContent=tot+' équipes';
+  }
+  btn(c,'Cent nouvelles équipes',function(){mine=null;gen();render();},true);
+  btn(c,'Me désigner une équipe au hasard',function(){mine=Math.floor(Math.random()*100);render();});
+  gen();render();
+  cap(fig,'Cent test sets, cent p̂, cent intervalles p̂ ± 1,96 SÊ. Environ 95 contiennent la vraie valeur, environ 5 (rouges) la ratent. Le 95 % est le taux de réussite de la recette. Ton intervalle à toi est l\'une de ces lignes : il contient p ou non, c\'est joué, et aucune probabilité ne s\'attache plus à lui. « Me désigner une équipe » : tu vois ton intervalle, tu ne vois toujours pas s\'il contient p. C\'est exactement ta situation réelle, sauf que dans la réalité la ligne verte est invisible.');
+})();
+
+/* Wald vs Wilson */
+(function(){
+  var fig=document.getElementById('fig-wilson');var c=ctrlBar(fig);
+  var W=640,H=300;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Couverture de Wald et Wilson'},fig);
+  var g=el('g',{},s);var cp=cap(fig,'');
+  var cases=[{n:100,p:0.98},{n:100,p:0.9},{n:30,p:0.9},{n:5000,p:0.872}];var cur=0;var z=1.96;
+  function wald(k,n){var ph=k/n,se=Math.sqrt(ph*(1-ph)/n);return [ph-z*se,ph+z*se];}
+  function wilson(k,n){var ph=k/n,z2=z*z;var ce=(ph+z2/(2*n))/(1+z2/n);var hw=z/(1+z2/n)*Math.sqrt(ph*(1-ph)/n+z2/(4*n*n));return [ce-hw,ce+hw];}
+  function draw(){
+    while(g.firstChild)g.removeChild(g.firstChild);var C=cases[cur],n=C.n,p=C.p;
+    var REP=4000,cw=0,cwi=0;for(var r=0;r<REP;r++){var k=binom(n,p);var a=wald(k,n),b=wilson(k,n);if(a[0]<=p&&p<=a[1])cw++;if(b[0]<=p&&p<=b[1])cwi++;}
+    var lo=Math.max(0,p-0.12),hi=Math.min(1.02,p+0.06);if(n>=1000){lo=p-0.02;hi=p+0.02;}
+    var L=110,R=20;function X(v){return L+(v-lo)/(hi-lo)*(W-L-R);}
+    txt(g,20,24,'n = '+n+', vrai p = '+fr(p,3)+' : 4 000 tirages, couverture réelle des deux recettes',{fs:12.5});
+    /* bars */
+    var rows=[['Wald',cw/REP,BR],['Wilson',cwi/REP,VR]];
+    rows.forEach(function(rw,i){var y=50+i*40;txt(g,20,y+16,rw[0],{fs:13,fw:'bold',fill:rw[2]});el('rect',{x:110,y:y,width:400,height:24,fill:'#EFEFEC'},g);el('rect',{x:110,y:y,width:400*rw[1],height:24,fill:rw[2],opacity:.6},g);txt(g,520,y+16,fr(100*rw[1],1)+' %',{fs:13,fw:'bold',fill:rw[2]});});
+    el('line',{x1:110+380,y1:44,x2:110+380,y2:130,stroke:INK,'stroke-dasharray':'3 3'},g);txt(g,110+380,142,'95 % promis',{ta:'middle',fs:11});
+    /* example intervals for k = observed most likely */
+    var k=Math.round(n*p);var a=wald(k,n),b=wilson(k,n);var y0=200;
+    txt(g,20,y0-14,'pour '+k+' bons sur '+n+' (p̂ = '+fr(k/n,3)+') :',{fs:12,fill:FA,fi:'italic'});
+    el('line',{x1:X(lo),y1:y0+40,x2:X(hi),y2:y0+40,stroke:INK},g);
+    [lo,(lo+hi)/2,hi].forEach(function(v){txt(g,X(v),y0+56,fr(v*100,1)+' %',{ta:'middle',fs:10.5,fill:FA});});
+    el('line',{x1:X(p),y1:y0-4,x2:X(p),y2:y0+40,stroke:VR,'stroke-dasharray':'3 3'},g);
+    el('line',{x1:X(a[0]),y1:y0+6,x2:X(Math.min(a[1],hi)),y2:y0+6,stroke:BR,'stroke-width':4},g);txt(g,20,y0+10,'Wald  ['+fr(a[0]*100,1)+' ; '+fr(a[1]*100,1)+']',{fs:11.5,fill:BR});
+    el('line',{x1:X(b[0]),y1:y0+24,x2:X(b[1]),y2:y0+24,stroke:VR,'stroke-width':4},g);txt(g,20,y0+28,'Wilson ['+fr(b[0]*100,1)+' ; '+fr(b[1]*100,1)+']',{fs:11.5,fill:VR});
+    if(a[1]>1)txt(g,X(hi)-4,y0+2,'> 100 %',{ta:'end',fs:10,fill:SEL});
+    cp.innerHTML=(n*(1-p)<10?'Ici n(1−p) = '+fr(n*(1-p),0)+' < 10 : la règle dit « pas Wald », et la couverture le confirme, Wald tient bien moins que 95 %. Quand le tirage donne 0 ou 1 erreur, SÊ est quasi nulle, l\'intervalle de Wald se réduit presque à un point, et rate. Wilson, qui n\'a jamais remplacé p par p̂ dans la SE, tient sa promesse.':'Ici np̂ et n(1−p̂) dépassent 10 : Wald et Wilson coïncident, et couvrent tous deux ≈ 95 %. Le plug-in est inoffensif, comme le prévoyait la platitude de p(1−p).');
+  }
+  var btns=[];cases.forEach(function(C,i){var b=btn(c,'n = '+C.n+', p = '+fr(C.p,2),function(){cur=i;btns.forEach(function(x){x.setAttribute('aria-pressed','false')});b.setAttribute('aria-pressed','true');draw();});b.setAttribute('aria-pressed',i===0?'true':'false');btns.push(b);});
+  draw();
+})();
+
+/* nav */
+(function(){
+  var links=Array.prototype.slice.call(document.querySelectorAll('nav.echelle a'));
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'))});
+  if(!('IntersectionObserver' in window))return;
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){links.forEach(function(a){a.classList.remove('on')});links[secs.indexOf(e.target)].classList.add('on');}});},{rootMargin:'-30% 0px -60% 0px'});
+  secs.forEach(function(sc){io.observe(sc)});
+})();
+})();
+</script>
+</body>
+</html>

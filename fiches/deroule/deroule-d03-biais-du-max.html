@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Le biais du max — déroulé pas à pas</title>
+<style>
+:root{
+  --paper:#FBFAF6; --grid:rgba(28,36,48,.055); --ink:#1C2430; --ink2:#4A5460; --faint:#8A93A0;
+  --rule:rgba(28,36,48,.16);
+  --bruit:#1F5FA8; --bruitbg:rgba(31,95,168,.10);
+  --sel:#B23A2C; --selbg:rgba(178,58,44,.10);
+  --vrai:#2E7D4F; --vraibg:rgba(46,125,79,.12);
+  --serif:"Iowan Old Style","Charter","Palatino Linotype",Palatino,Georgia,serif;
+}
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{margin:0;font-family:var(--serif);color:var(--ink);font-size:18px;line-height:1.6;
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px}
+.page{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:150px minmax(0,46rem) 1fr;gap:2.4rem;padding:2.5rem 1.4rem 6rem}
+nav.echelle{position:sticky;top:2rem;align-self:start;font-size:.86rem;line-height:1.3}
+nav.echelle a{display:block;color:var(--ink2);text-decoration:none;padding:.5rem 0 .5rem .9rem;border-left:2px solid var(--rule)}
+nav.echelle a.on{color:var(--ink);border-left-color:var(--ink);font-weight:700}
+nav.echelle a small{display:block;color:var(--faint);font-weight:400;font-style:italic}
+nav.echelle .titre{font-style:italic;color:var(--faint);padding:0 0 .6rem}
+main{min-width:0}
+aside.marge{align-self:start;position:sticky;top:2rem;font-size:.86rem;color:var(--ink2);line-height:1.45;padding-top:6rem}
+.note{margin:0 0 1.4rem;padding-left:.8rem;border-left:2px solid var(--sel)}
+.note b{color:var(--sel)}
+header{margin-bottom:2.6rem}
+header h1{font-size:3rem;line-height:1;margin:0 0 .8rem;font-weight:700;letter-spacing:-.02em}
+header p{margin:.3rem 0;color:var(--ink2);font-size:1rem}
+.legend{display:flex;gap:1.4rem;flex-wrap:wrap;margin-top:1rem;font-size:.95rem}
+.legend span::before{content:"";display:inline-block;width:1.1em;height:.55em;margin-right:.4em;border-radius:1px;vertical-align:.05em}
+.legend .b::before{background:var(--bruit)} .legend .s::before{background:var(--sel)} .legend .v::before{background:var(--vrai)}
+section{scroll-margin-top:1.5rem}
+h2{font-size:1.7rem;margin:3.4rem 0 .6rem;line-height:1.15;display:grid;grid-template-columns:2.6rem 1fr;gap:.7rem;align-items:baseline}
+h2 .n{font-size:2.6rem;font-weight:700;line-height:1;color:var(--faint);font-variant-numeric:tabular-nums}
+h2 small{display:block;font-size:.9rem;color:var(--faint);font-weight:400;font-style:italic;margin-top:.2rem}
+h3{font-size:1.12rem;margin:2rem 0 .5rem}
+p{margin:0 0 1rem}
+.m{font-style:italic}
+.f{display:block;text-align:center;margin:1rem 0;font-size:1.12rem;font-style:italic}
+.f b{font-style:normal}
+sub,sup{font-size:.7em;line-height:0}
+table{border-collapse:collapse;width:100%;margin:1rem 0 1.4rem;font-size:.95rem;background:rgba(255,255,255,.7)}
+th,td{padding:.45rem .6rem;text-align:left;vertical-align:top;border-bottom:1px solid var(--rule)}
+th{font-weight:700;border-bottom:2px solid var(--ink)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.bruit{color:var(--bruit)} .sel{color:var(--sel)} .vrai{color:var(--vrai)}
+.hb{background:var(--bruitbg)} .hs{background:var(--selbg)} .hv{background:var(--vraibg)}
+.brique{margin:1.4rem 0;padding:.7rem 1rem;border:1.5px solid var(--ink);background:#fff;border-radius:2px;font-size:1rem}
+.brique b{display:block}
+.tableau{margin:1.6rem 0;padding:1.2rem 1.4rem;background:var(--ink);color:#F6F7F4;border-radius:2px;line-height:1.55}
+.tableau .faux{color:#E9B3AA;margin-top:.8rem;display:block;font-size:.97rem}
+figure{margin:1.6rem 0 2rem;padding:1rem;background:#fff;border:1px solid var(--rule);border-radius:3px}
+figure svg{width:100%;height:auto;display:block}
+figcaption{font-size:.9rem;color:var(--ink2);margin-top:.6rem;line-height:1.45}
+.ctrl{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin:0 0 .7rem;font-size:.92rem}
+.ctrl button{font:inherit;font-size:.9rem;padding:.4rem .85rem;border:1.5px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer;border-radius:2px}
+.ctrl button.prim{background:var(--ink);color:#fff}
+.ctrl button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.ctrl button:focus-visible{outline:3px solid var(--bruit);outline-offset:2px}
+.ctrl .stat{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--ink2)}
+.porte{margin-top:3rem;padding:1.2rem 1.4rem;border:2px dashed var(--ink);border-radius:2px;background:rgba(255,255,255,.6)}
+.retenir{font-size:1.3rem;font-style:italic;margin:2.6rem 0;padding:1.3rem 1rem;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);text-align:center;background:rgba(255,255,255,.6)}
+@media(max-width:1100px){.page{grid-template-columns:1fr;gap:0}nav.echelle{display:none}aside.marge{display:none}}
+@media(max-width:640px){body{font-size:16.5px}header h1{font-size:2.2rem}h2{font-size:1.4rem}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="page">
+<nav class="echelle" aria-label="Échelle des marches">
+  <div class="titre">l'échelle</div>
+  <a href="#m0">Marche 0<small>la question, les niveaux, les mots</small></a>
+  <a href="#rappel">Rappel<small>accuracy → SE, règles nommées</small></a>
+  <a href="#m1">Marche 1<small>le max de deux</small></a>
+  <a href="#m2">Marche 2<small>de 2 à 40</small></a>
+  <a href="#m2b">La course<small>E sur quoi ?</small></a>
+  <a href="#m3">Marche 3<small>la gagnante retestée</small></a>
+  <a href="#fin">Au tableau<small>phrases, cassures</small></a>
+  <a href="#m4">Marche 4<small>porte fermée</small></a>
+</nav>
+
+<main>
+
+<header>
+  <h1>Le biais<br>du max</h1>
+  <p>Cas 3 du fil A. Déroulé autoporteur des marches 0 à 3, telles qu'elles ont été tenues le 14/09/2026. À lire lentement, une fois, en jouant avec chaque figure.</p>
+  <div class="legend"><span class="b">le bruit, ce qui vient du tirage</span><span class="s">la sélection, ce qui vient du geste</span><span class="v">la vraie valeur, fixe</span></div>
+</header>
+
+<section id="m0">
+<h2><span class="n">0</span><span>La question unique et les trois niveaux<small>rien de nouveau ici, juste le décor posé proprement</small></span></h2>
+
+<p>Une seule question organise tout, comme pour les cas 1 et 2 : <b>qu'est-ce qui varierait si je refaisais l'expérience ?</b> La nouveauté du cas 3 tient en une ligne. La réponse n'est plus seulement « le score varierait ». C'est aussi <b>« l'identité de la gagnante varierait »</b>. Le choix a été fait sur le tirage, donc le choix fait partie de ce qui bouge.</p>
+
+<p>Le décor, pris dans ton métier. Tu règles un RAG : 5 tailles de chunk × 8 valeurs de top-k, soit 40 configurations. Ton eval set contient <span class="m">n</span> = 5 000 questions annotées. Tu lances les 40, tu gardes la meilleure, elle affiche 90,9 %, tu l'écris dans ta slide.</p>
+
+<figure id="fig-niveaux"></figure>
+
+<h3>Le cas témoin</h3>
+<p>Pour isoler le mécanisme on prend le pire cas pédagogique : <b>les 40 configs se valent exactement, toutes valent 90,0 % en vérité.</b> Ce n'est pas réaliste, c'est un témoin. On veut savoir ce que la procédure affiche <i>quand il n'y a rien à trouver</i>. Si elle affiche quand même un beau chiffre, tu sais que le beau chiffre ne prouve rien.</p>
+
+<h3>Le vocabulaire, fixé avant tout calcul</h3>
+<table>
+<tr><th>objet</th><th>notation</th><th>statut</th><th>ne pas confondre avec</th></tr>
+<tr><td>vraie accuracy d'une config</td><td class="vrai m">p</td><td>fixe, inconnue</td><td>le score affiché</td></tr>
+<tr><td>score mesuré d'une config</td><td class="m">p̂</td><td>aléatoire, dépend du tirage</td><td class="m">p</td></tr>
+<tr><td>bruit de mesure</td><td class="bruit m">b = p̂ − p</td><td>aléatoire, centré</td><td>le biais</td></tr>
+<tr><td>erreur-type</td><td class="m">SE = √(p(1−p)/n)</td><td>écart-type de <span class="m">p̂</span>, donc de <span class="m">b</span></td><td class="m">σ = √(p(1−p))</td></tr>
+<tr><td>biais</td><td class="m">E[p̂] − p</td><td>décalage <b>systématique</b> de l'espérance</td><td>le bruit, qui est aléatoire</td></tr>
+<tr><td>estimand</td><td></td><td>la quantité qu'on <b>prétend</b> estimer</td><td>l'estimateur, la formule qu'on calcule</td></tr>
+</table>
+
+<p>Deux distinctions font tout le cas 3. <b>Bruit contre biais</b> : le bruit est une variable aléatoire centrée qui rétrécit en <span class="m">1/√n</span> ; le biais est un nombre, un décalage de l'espérance, que <span class="m">n</span> ne fait pas bouger. <b>Estimand contre estimateur</b> : « biaisé » ne veut rien dire tout seul, un estimateur est biaisé <i>par rapport à</i> un estimand. Le même nombre peut être sans biais pour une question et biaisé pour une autre. C'est ta remarque sur les dés, « c'est normal, c'est le max », et elle était juste.</p>
+</section>
+
+<section id="rappel">
+<h2><span class="n">↻</span><span>La chaîne accuracy → SE, chaque règle nommée<small>refaite parce que trois briques étaient écrasées en une le 14/09</small></span></h2>
+
+<p>Une config fixée <b>à l'avance</b>, un eval set de <span class="m">n</span> questions.</p>
+
+<figure id="fig-chaine"></figure>
+
+<p><b>Maillon 1.</b> Chaque question <span class="m">i</span> donne <span class="m">X<sub>i</sub></span> = 1 si la réponse est bonne, 0 sinon. Hypothèse : questions tirées indépendamment dans la même population, donc <span class="m">X<sub>i</sub></span> iid ~ Bernoulli(<span class="m">p</span>). L'accuracy est <span class="m">p̂ = (1/n) Σ X<sub>i</sub></span>. <b>Reconnaître que l'accuracy est une moyenne empirique</b> est le maillon qui débloque tout.</p>
+
+<h3>Le même <span class="m">p</span> pour toutes les questions : hypothèse ou conséquence ?</h3>
+
+<p>Écrire <span class="m">X<sub>i</sub> ~ Bernoulli(p)</span> avec le <b>même</b> <span class="m">p</span> pour les 5 000 questions semble affirmer que les questions se valent. Elles ne se valent pas, et pourtant le même <span class="m">p</span> est correct. Le « même <span class="m">p</span> » n'est pas un postulat supplémentaire : c'est une conséquence du choix de rendre aléatoire <b>le tirage de la question</b>.</p>
+
+<p><b>Cas extrême, pour voir.</b> Population de 10 questions. Le modèle en réussit <i>toujours</i> 7, en rate <i>toujours</i> 3. Aucune question ne porte « 0,7 » : chacune a θ = 1 ou θ = 0. Tire une question au hasard : tu réponds juste si tu tombes sur une des 7, donc <span class="m">P(X = 1) = 0,7</span>. Or <span class="m">X</span> ne prend que deux valeurs. Une variable à deux valeurs avec <span class="m">P(X = 1) = 0,7</span> <i>est</i> une Bernoulli(0,7), par définition. Le 0,7 est la moyenne des θ sur la population, et cette moyenne existe même si aucune question individuelle ne la porte.</p>
+
+<p><b>Avec des θ intermédiaires.</b> Cinq questions de difficultés 0,99 · 0,95 · 0,90 · 0,70 · 0,40. Pour que <span class="m">X = 1</span> il faut tomber sur une question <b>et</b> la réussir, donc on somme sur les cinq cas : <span class="m">⅕·0,99 + ⅕·0,95 + ⅕·0,90 + ⅕·0,70 + ⅕·0,40 = 3,94/5 = 0,788</span>. C'est <span class="m">E[θ(q)]</span>, la moyenne des difficultés pondérée par la probabilité de tirer chaque question. Fais bouger le tirage dans la figure : la population ne change pas, <span class="m">p</span> si.</p>
+
+<figure id="fig-melange"></figure>
+
+<p>Une fois que tu regardes <span class="m">X<sub>i</sub></span> — juste ou faux — sans regarder <i>quelle</i> question est tombée, l'information « facile ou dure » a disparu dans le 0 ou le 1. Il ne reste qu'une pièce truquée à <span class="m">p</span>. La chaîne ne se sert de rien d'autre. Et le <span class="m">p</span> est le même à chaque position parce que le <b>mécanisme de tirage</b> est le même à la position 1, à la position 2 et à la position 5 000 — pas parce que les questions se ressembleraient.</p>
+
+<div class="brique"><b>Ce qui casserait vraiment le maillon</b>Questions non tirées identiquement : 300 faciles d'un fichier puis 200 dures d'un autre, dans un ordre connu — les <span class="m">X<sub>i</sub></span> ne sont plus identiquement distribués, il faut stratifier. Modèle qui change en cours de route (apprentissage en ligne, cache qui se remplit) : <span class="m">p</span> n'est plus fixe. Reformulations d'une même question : là c'est l'<i>indépendance</i> qui casse, pas le « même <span class="m">p</span> ».</div>
+
+<div class="brique"><b>L'autre modèle d'aléa, honnêtement</b>On pourrait aussi traiter les 5 000 questions comme <b>fixes</b> et ne rendre aléatoire que la réponse du modèle. Alors Var(<span class="m">p̂</span>) = Σθ<sub>i</sub>(1−θ<sub>i</sub>)/<span class="m">n</span><sup>2</sup>, <i>plus petite</i> que <span class="m">p(1−p)/n</span> — la figure le montre. Deux modèles d'aléa, deux SE, aucun n'est faux. Le nôtre répond à « qu'est-ce qui varie si je re-tire un eval set », c'est-à-dire à la question unique, et c'est celui qu'il faut pour généraliser à des questions nouvelles. L'autre répond à « qu'est-ce qui varie si je relance sur ces 5 000-là », question plus étroite.</div>
+
+<p><b>Maillon 2.</b> <span class="m">E[p̂] = (1/n) Σ E[X<sub>i</sub>] = p</span>, par linéarité de l'espérance, qui vaut <b>toujours</b>, aucune indépendance requise. Donc <span class="m">p̂</span> est sans biais. Ceci suppose tacitement qu'aucune sélection n'a été faite sur le tirage : c'est l'hypothèse que le cas 3 casse.</p>
+
+<p><b>Maillon 3, en trois briques séparées.</b></p>
+<span class="f">Var(<span class="m">p̂</span>) = Var((1/<span class="m">n</span>) Σ <span class="m">X<sub>i</sub></span>) = (1/<span class="m">n</span><sup>2</sup>) Var(Σ <span class="m">X<sub>i</sub></span>)</span>
+<p>Règle 1, <span class="m">Var(aX) = a<sup>2</sup>Var(X)</span>. D'où le <span class="m">n<sup>2</sup></span> au dénominateur. Rien à voir avec l'indépendance.</p>
+<span class="f">Var(Σ <span class="m">X<sub>i</sub></span>) = Σ Var(<span class="m">X<sub>i</sub></span>) = <span class="m">n</span> · Var(<span class="m">X<sub>1</sub></span>)</span>
+<p>Règle 2, <span class="m">Var(X+Y) = Var X + Var Y + 2Cov</span>, avec <b>indépendance ⇒ Cov = 0</b>. Ici, et seulement ici, l'indépendance sert. Des questions corrélées cassent ce maillon et sous-estiment la variance.</p>
+<span class="f">Var(<span class="m">X<sub>1</sub></span>) = <span class="m">E[X<sub>1</sub><sup>2</sup>] − E[X<sub>1</sub>]<sup>2</sup> = p − p<sup>2</sup> = p(1−p)</span></span>
+<p>Propre à Bernoulli, parce que <span class="m">X<sup>2</sup> = X</span> quand <span class="m">X</span> ne vaut que 0 ou 1. Assemblage : <span class="m">n·p(1−p)/n<sup>2</sup> = p(1−p)/n</span>. Le <span class="m">n<sup>2</sup></span> de la règle 1 et le <span class="m">n</span> de la règle 2 se simplifient en un seul <span class="m">n</span>. « Pourquoi <span class="m">n</span> et pas <span class="m">n<sup>2</sup></span> ? » attend cette simplification.</p>
+
+<p><b>Maillon 4, le plug-in.</b> La formule contient <span class="m">p</span>, inconnu. On substitue <span class="m">p̂</span> : <span class="m">SÊ = √(p̂(1−p̂)/n)</span>. Légitime parce que <span class="m">p̂ → p</span> et que <span class="m">p(1−p)</span> est plate près de son sommet. Ordre à ne pas inverser : <b>le plug-in vient d'abord</b>, et <i>Wald</i> est le nom de l'intervalle qui l'accepte (<span class="m">p̂ ± 1,96 SÊ</span>). <i>Wilson</i> le refuse, garde <span class="m">p</span> inconnu et inverse le test.</p>
+
+<p><b>Fil rouge.</b> <span class="m">n</span> = 5 000, <span class="m">p</span> = 0,90 : <span class="m">SE = √(0,09/5000) = √(1,8·10<sup>−5</sup>) = 0,00424</span>, soit <b>0,42 point</b>. Avec 500 questions : <span class="m">√(0,09/500) = 0,0134</span> = <b>1,34 point</b>. SE en points, pas en fraction ; un eval set de 500 items a une précision de l'ordre du point.</p>
+
+<p><b>Maillon 5, TCL.</b> Pour <span class="m">n</span> grand, <span class="m">p̂ ≈ N(p, SE<sup>2</sup>)</span>, donc le bruit <span class="bruit m">b = p̂ − p ≈ N(0, SE<sup>2</sup>)</span>. Cette gaussienne centrée sera le « dé » de toute la suite.</p>
+</section>
+
+<section id="m1">
+<h2><span class="n">1</span><span>Le max de deux, sans aucune probabilité<small>brique unique : prendre le max d'objets aléatoires décale vers le haut</small></span></h2>
+
+<p>Deux dés à six faces, indépendants. Tu ne gardes que le plus haut. Chaque dé vaut 3,5 en moyenne. Le max, lui, vaut combien ? Avant de compter, lance. Regarde la moyenne du max se stabiliser, et où.</p>
+
+<figure id="fig-des"></figure>
+
+<p>Le comptage exact confirme ce que le lancer montre. Sur la ligne <span class="m">i</span> de la grille 6 × 6, la valeur <span class="m">i</span> apparaît <span class="m">i</span> fois (pour <span class="m">j ≤ i</span>), puis <span class="m">j = i+1 … 6</span> donnent leurs propres valeurs. Somme des 36 max = 161. <b>E[max] = 161/36 = 4,47</b>, soit <b>+0,97 au-dessus de 3,5</b>, alors qu'aucun dé n'est truqué.</p>
+
+<p>Et ta remarque, qui est le pivot de toute la page : <i>c'est normal, c'est le max</i>. Oui. 4,47 est un estimateur parfait de E[max de deux dés]. Il n'est « trop haut » que si tu l'annonces comme la valeur d'un dé. <b>L'erreur n'est pas de calculer le max. L'erreur est de calculer un max et de l'annoncer comme une moyenne.</b></p>
+
+<h3>Transposition à deux configs</h3>
+<p>Deux configs valant toutes deux <span class="vrai">90,0 %</span>. Chaque score s'écrit <span class="m">p̂ = 90,0 + <span class="bruit">b</span></span> avec <span class="bruit m">b ~ N(0, 0,42<sup>2</sup>)</span>. Tu reportes le plus haut. Comme les vraies valeurs sont égales, reporter <span class="m">max(90,0 + b<sub>1</sub>, 90,0 + b<sub>2</sub>)</span> revient à reporter <span class="m">90,0 + max(b<sub>1</sub>, b<sub>2</sub>)</span>. Le geste se réduit au max des bruits. Même expérience que les dés, avec des gaussiennes à la place des faces.</p>
+
+<figure id="fig-deux"></figure>
+
+<p><b>Fréquence du dépassement.</b> Le max est négatif seulement si les deux bruits le sont, ce qui arrive avec probabilité ½ × ½ = ¼ (indépendance ⇒ produit). Donc <span class="m">P(max > 0) = 1 − ¼ = <b>3/4</b></span>. Pas 1 : rien n'interdit deux tirages malchanceux en même temps. Le geste ne garantit rien sur un tirage, il <b>déplace la distribution</b>.</p>
+
+<p><b>Ampleur du dépassement.</b> Identité algébrique, vraie pour tous réels : <span class="m">max(a,b) = (a+b)/2 + |a−b|/2</span>. Le max dépasse la moyenne de la moitié de l'écart. Les bruits sont centrés, donc <span class="m">E[max] = E|b<sub>1</sub> − b<sub>2</sub>| / 2</span>. Or <span class="m">b<sub>1</sub> − b<sub>2</sub></span> est gaussien de variance 2SE² (règle 2), et pour un gaussien centré <span class="m">E|X| = σ<sub>X</sub>√(2/π)</span>. D'où <span class="m">E[max] = SE·√2·√(2/π)/2 = <b>SE/√π ≈ 0,56 SE</b></span>. Avec SE = 0,42 : +0,24 point. Fréquence et ampleur sont deux quantités : 3/4 des fois au-dessus, et de 0,56 SE en moyenne.</p>
+
+<div class="brique"><b>Nuance à garder pour plus tard</b>Deux dés sont indépendants ; deux configs mesurées sur le <i>même</i> eval set ont des bruits corrélés (un fichier tombé facile remonte les deux). L'identité le montre : si <span class="m">b<sub>1</sub></span> et <span class="m">b<sub>2</sub></span> bougent ensemble, <span class="m">|b<sub>1</sub> − b<sub>2</sub>|</span> rétrécit et le gonflement avec. Tout ce qui suit calcule la version indépendante, une <b>borne haute</b>. C'est l'appariement du cas 2 qui revient.</div>
+</section>
+
+<section id="m2">
+<h2><span class="n">2</span><span>De 2 à 40<small>brique unique : P(max ≤ t) = P(toutes ≤ t) = Φ(t)<sup>k</sup></small></span></h2>
+
+<p>C'est le geste de la marche 1, « passer par : toutes en dessous », écrit une fois pour toutes. Le max de <span class="m">k</span> bruits est sous un seuil <span class="m">t</span> si et seulement si <b>chacun</b> l'est. Par indépendance, le « et » devient un produit :</p>
+<span class="f">P(max ≤ <span class="m">t</span>) = P(<span class="m">b<sub>1</sub></span> ≤ <span class="m">t</span>) · … · P(<span class="m">b<sub>k</sub></span> ≤ <span class="m">t</span>) = Φ(<span class="m">t</span>/SE)<sup><span class="m">k</span></sup></span>
+<p>La seule formule nouvelle de la page. La figure la montre telle qu'elle est : un produit qui fond à chaque config ajoutée.</p>
+
+<figure id="fig-produit"></figure>
+
+<h3>Le calcul unique</h3>
+<p>40 configs valant toutes 90,0 %. Probabilité que la gagnante dépasse 1,96 SE au-dessus de 90,0, autrement dit qu'elle <i>paraisse</i> significativement meilleure que 90 % alors que l'effet est nul :</p>
+<span class="f">P(max > 1,96 SE) = 1 − Φ(1,96)<sup>40</sup> = 1 − 0,975<sup>40</sup> = 1 − 0,363 = <b>0,64</b></span>
+<p>Détail : ln(0,975) = −0,0253 ; × 40 = −1,013 ; exp = 0,363. <b>Deux fois sur trois</b>, la gagnante de 40 configs identiques franchit le seuil de significativité. Le lecteur de ta slide voit une amélioration « significative » là où il n'y a rien.</p>
+
+<h3>Repères, donnés et non dérivés</h3>
+<table>
+<tr><th class="num">k</th><th class="num">E[max] / SE</th><th class="num">biais, SE = 0,42</th><th class="num">biais, SE = 1,34 (n = 500)</th></tr>
+<tr><td class="num">2</td><td class="num">0,56</td><td class="num">0,24 pt</td><td class="num">0,76 pt</td></tr>
+<tr><td class="num">10</td><td class="num">1,54</td><td class="num">0,65 pt</td><td class="num">2,1 pt</td></tr>
+<tr><td class="num">40</td><td class="num">2,16</td><td class="num"><b>0,91 pt</b></td><td class="num"><b>2,9 pt</b></td></tr>
+<tr><td class="num">100</td><td class="num">2,51</td><td class="num">1,05 pt</td><td class="num">3,4 pt</td></tr>
+</table>
+<p>Le biais croît lentement avec <span class="m">k</span> (de 40 à 100 configs : +0,35 SE) mais <b>linéairement avec SE</b>. Petit eval set et beaucoup de configs, c'est le pire mélange, et c'est la situation ordinaire des evals LLM.</p>
+
+<figure id="fig-maxk"></figure>
+</section>
+
+<section id="m2b">
+<h2><span class="n">2′</span><span>La course des 40 et la colonne responsable<small>« E sur quoi ? » : la question qui a bloqué</small></span></h2>
+
+<p>Voici ton sweep dans le cas témoin. Quarante configs, toutes à 90,0 en vérité (la ligne verte). Chaque barre est le bruit tiré pour cette config : à droite quand le tirage l'a favorisée, à gauche quand il l'a desservie. La gagnante est en rouge. <b>Retire l'eval set</b> et regarde deux choses : le score de la gagnante, et <i>qui</i> gagne.</p>
+
+<figure id="fig-course"></figure>
+
+<p>Qu'est-ce qui a mis la gagnante en haut ? <b>La longueur de sa barre bleue.</b> La vraie valeur est la même pour toutes : elle ne peut pas départager. Tout le classement est fabriqué par le bruit. Tu crois trier des configs, tu tries des bruits. D'où la décomposition de ton chiffre : 90,9 = <span class="vrai">90,0</span> + <span class="bruit">0,91</span>. La première partie appartient à la config, la seconde à l'eval set. Et ce +0,91 n'a rien d'exceptionnel : c'est le plus grand de 40 tirages d'écart-type 0,42, dont l'espérance est 2,16 × 0,42 = 0,91. <b>C'est la valeur attendue du geste.</b></p>
+
+<h3>« E sur quoi ? »</h3>
+<p>L'espérance est prise sur <b>les répétitions de l'expérience entière</b> : nouveau tirage, les 40 bruits sont retirés d'un coup, une nouvelle gagnante émerge. C'est ce que fait le bouton. Mais il faut dire <i>de quelle variable aléatoire</i> on prend l'espérance, et deux candidates se confondent en français :</p>
+
+<table>
+<tr><th></th><th>variable A</th><th>variable B</th></tr>
+<tr><td>définition</td><td>le bruit de <b>chunk 1024 / k=10</b>, config nommée avant d'ouvrir le fichier</td><td>le bruit de <b>la config que j'ai retenue</b></td></tr>
+<tr><td>en formule</td><td class="m">b<sub>17</sub></td><td class="m">max(b<sub>1</sub>, …, b<sub>40</sub>)</td></tr>
+<tr><td>sur mille répétitions</td><td>moyenne <b>0</b></td><td>moyenne <b class="sel">+0,91</b></td></tr>
+<tr><td>identité stable ?</td><td>oui, toujours la 17</td><td>non : tantôt la 17, tantôt la 3, tantôt la 39</td></tr>
+</table>
+
+<p>Même expérience, même aléa, deux nombres. Dans B, « la config que j'ai retenue » n'est pas une config : c'est une <b>règle de désignation</b>, « celle qui a le plus gros bruit ». Une fonction du tirage. Et l'espérance d'une fonction du tirage n'a aucune raison de valoir l'espérance de ses composantes : E[chaque dé] = 3,5, E[max] = 4,47.</p>
+
+<p>Image mentale, pour que ça tienne : mille équipes font le même sweep sur mille eval sets. Chacune reporte 90,9 en moyenne. Mais chacune a une gagnante différente.</p>
+
+<figure id="fig-mille"></figure>
+
+<p>Ce que tu as mesuré est une propriété de la <b>procédure</b> (« lance 40, garde le max »), pas de la config. C'est le mouvement du cas 1 : l'IC à 95 % porte sur la procédure qui le fabrique, pas sur l'intervalle en main. <b>Les 40 mesures sont sans biais. Leur max ne l'est pas.</b> Aucune n'est fausse, et pourtant le résultat l'est.</p>
+
+<div class="brique"><b>Piège nommé : la K-fold ne répare pas ça</b>Une CV à 5 folds moyenne chaque score sur 5 morceaux : le bruit passe de 0,42 à 0,42/√5 ≈ 0,19 point. Chaque estimation est plus précise. Mais tu prends toujours le max sur 40 : biais ≈ 2,16 × 0,19 ≈ 0,4 point au lieu de 0,9. Réduit, pas supprimé. <b>Précision de mesure et biais de sélection sont deux axes indépendants.</b> Rien dans « mesurer mieux » ne défait « choisir sur ce qu'on a mesuré ».</div>
+</section>
+
+<section id="m3">
+<h2><span class="n">3</span><span>La gagnante retestée<small>brique unique : un bruit tiré après la sélection est indépendant d'elle, donc centré</small></span></h2>
+
+<p>Tu retiens la gagnante. Tu régénères un eval set frais de 5 000 questions, jamais vu, et tu remesures cette seule config. Remonte à la course et appuie sur <b>Remesurer la gagnante</b> : sa barre est retirée, avec un bruit neuf.</p>
+
+<p>Tu attends <b>90,0 %</b>. Exactement la vraie valeur. Le nouveau bruit est tiré après que le choix a été fait : la sélection a travaillé sur l'ancien tirage, elle n'a aucune prise sur celui-ci. C'est un bruit ordinaire, centré. Sur ce tirage précis tu obtiendras 90,3 ou 89,6, pas 90,0 pile : le bruit n'est pas nul, il est <i>centré</i>. C'est la distinction que tu as faite toi-même, et elle est la bonne.</p>
+
+<figure id="fig-cibles"></figure>
+
+<table>
+<tr><th></th><th>tirage de la sélection</th><th>tirage frais</th></tr>
+<tr><td>bruit présent ?</td><td>oui</td><td>oui</td></tr>
+<tr><td>E[bruit]</td><td class="sel"><b>+0,91</b>, sélectionné</td><td class="bruit"><b>0</b>, non sélectionné</td></tr>
+<tr><td>réalisation</td><td>+0,91</td><td>inconnue, ±0,42 autour de 0</td></tr>
+<tr><td>nature de l'erreur</td><td class="sel">systématique, toujours dans le même sens</td><td class="bruit">aléatoire, s'annule en moyenne, rétrécit en 1/√n</td></tr>
+</table>
+
+<p>Ce qui disparaît n'est donc pas le bruit, c'est le <b>biais</b>. La remesure reste bruitée mais devient sans biais. Tu convertis une erreur systématique en erreur aléatoire, et c'est tout l'intérêt : l'aléatoire se réduit en agrandissant l'échantillon, le systématique non. Agrandis l'eval set à 50 000 questions en continuant de sélectionner dessus : SE tombe à 0,13, le biais devient 2,16 × 0,13 = 0,28, toujours 2,16 SE. <b>Le biais ne se dilue pas avec <span class="m">n</span>, il se dilue avec la séparation des tirages.</b></p>
+
+<p><b>Régression vers la moyenne.</b> Le nom du phénomène. Ce qui a été retenu pour son extrémité revient à sa vraie valeur quand on le remesure indépendamment, parce que l'extrémité appartenait au tirage, pas à l'objet. Le chiffre qui pique : si tu remesures les 40 sur l'eval set frais, ta gagnante regagne <b>une fois sur 40</b>. Le hasard pur. La sélection n'a rien sélectionné.</p>
+
+<h3>La réparation en découle</h3>
+<p>Si un bruit tiré après la sélection est centré, alors il faut <b>un tirage que la sélection n'a pas vu</b>. Ce n'est pas une convention, c'est forcé par la brique.</p>
+
+<figure id="fig-split"></figure>
+
+<p>La règle : <b>tout regard sur le test set pour prendre une décision le transforme en validation set.</b> Un deuxième coup d'œil, c'est <span class="m">k</span> = 2, et le gonflement recommence. Version cross-validation : la <i>nested CV</i>, boucle interne pour sélectionner sur le train, boucle externe sur un fold jamais vu par la boucle interne. Détail qui surprend en entretien : la boucle externe n'évalue pas une config, elle évalue <b>la procédure</b> « faire une CV interne et prendre la meilleure », et chaque fold externe peut élire une config différente. C'est littéralement la variable B.</p>
+
+<p><b>Le prix.</b> Couper 5 000 questions en deux moitiés divise <span class="m">n</span> par 2, donc multiplie chaque SE par √2 : 0,42 → 0,59 point. Tu perds 40 % de précision sur chaque mesure. Tu échanges de la <b>précision</b> contre de la <b>validité</b>, et c'est toujours le bon échange : une mesure précise et biaisée te ment avec assurance, une mesure bruitée et honnête te dit où elle est incertaine.</p>
+</section>
+
+<section id="fin">
+<h2><span class="n">▮</span><span>La lecture correcte, avec la phrase au tableau</span></h2>
+
+<div class="tableau">
+<em>« Chaque mesure individuelle est sans biais. Mais “la gagnante” n'est pas une config fixée, c'est une fonction du tirage, le max de k bruits centrés, et un max de variables centrées n'est pas centré. Son score est gonflé d'environ E[max]·SE, soit 2,16 SE pour k = 40. La seule réparation est de mesurer sur un tirage que la sélection n'a pas vu ; le prix est un SE multiplié par √2. »</em>
+<span class="faux"><b>Phrase fausse tentante</b> : « sélectionner sur le test set donne toujours un score gonflé ». Tentante parce que le biais est bien systématique. Fausse parce qu'elle confond biais et bruit : une fois sur quatre (k = 2) le max est en dessous de la vraie valeur. Le geste déplace l'espérance, il ne garantit rien sur un tirage.</span>
+<span class="faux"><b>Deuxième phrase fausse tentante</b> : « avec plus de données, ou une cross-validation, le problème disparaît ». Tentante parce que ça réduit le bruit. Fausse parce que le biais reste 2,16 SE quel que soit SE : il se dilue avec la séparation des tirages, pas avec n.</span>
+</div>
+
+<h3>Où chaque maillon casse</h3>
+<table>
+<tr><th>#</th><th>maillon</th><th>hypothèse</th><th>ce qui casse</th></tr>
+<tr><td>1</td><td>accuracy = moyenne de Bernoulli iid</td><td>questions indépendantes</td><td>reformulations d'une même question ⇒ SE sous-estimée</td></tr>
+<tr><td>2</td><td><span class="m">E[p̂] = p</span></td><td><b>config fixée avant le tirage</b></td><td class="sel">config choisie sur le tirage ⇒ cas 3</td></tr>
+<tr><td>3</td><td>SE = √(p(1−p)/n)</td><td>règle 1 + règle 2 + Bernoulli</td><td>écraser les trois briques ⇒ « pourquoi n et pas n² ? » sans réponse</td></tr>
+<tr><td>4</td><td>bruit ≈ N(0, SE²)</td><td>n grand, p loin de 0 et 1</td><td>petit eval set ⇒ Wilson, et un biais du max en points entiers</td></tr>
+<tr><td>5</td><td>P(max ≤ t) = Φ(t)<sup>k</sup></td><td>bruits indépendants</td><td>même eval set pour les k configs ⇒ bruits corrélés ⇒ le calcul est une borne haute</td></tr>
+<tr><td>6</td><td>biais ≈ E[max]·SE</td><td>vraies valeurs égales (cas témoin)</td><td>écarts réels entre configs ⇒ le biais diminue mais reste (marche 4)</td></tr>
+<tr><td>7</td><td>remesure centrée</td><td>tirage <b>jamais vu</b> par la sélection</td><td class="sel">un seul regard décisionnel sur le test set ⇒ il redevient validation</td></tr>
+<tr><td>8</td><td>split</td><td>accepter SE × √2</td><td>refuser le prix ⇒ garder un chiffre précis et faux</td></tr>
+</table>
+
+<p class="retenir">Chaque fois que tu reportes un score, demande-toi si le choix de ce que tu reportes a été fait sur le même tirage que la mesure.</p>
+</section>
+
+<section id="m4">
+<div class="porte">
+<h3 style="margin-top:0">Marche 4, la porte non franchie</h3>
+<p style="margin:0">Les marches 1 à 3 sont tenues. La marche 4, les ponts, est reportée à la revue du 18/09 et n'est pas déroulée ici parce que tu ne l'as pas encore tentée. Elle attaque le maillon 6 (vraies valeurs différentes) et le maillon 7 (ce que le bootstrap voit et ne voit pas), avec trois situations : le bootstrap autour de la gagnante, le peeking d'un A/B test, le prompt tuné 30 fois sur un eval set de 200 items. Chacune se résout avec la seule question : <i>où est le max, et sur quoi est-il pris ?</i></p>
+</div>
+</section>
+
+</main>
+
+<aside class="marge">
+  <div class="note"><b>Pourquoi des figures à boutons</b><br>Chaque figure pose la question unique à ta place : elle refait l'expérience. Ce que tu vois bouger est ce qui est aléatoire.</div>
+  <div class="note"><b>Deux couleurs, pas trois idées</b><br>Bleu : tout ce qui changerait avec un autre eval set. Rouge : tout ce qui vient d'avoir choisi. Le cas 3 est la rencontre des deux.</div>
+  <div class="note"><b>Le mot qui a bloqué</b><br>« E » sans dire de quelle variable. La course des 40 répond : E de la barre rouge, pas E d'une barre bleue fixée.</div>
+</aside>
+
+</div>
+<script>
+(function(){
+'use strict';
+var NS='http://www.w3.org/2000/svg';
+var BR='#1F5FA8',SEL='#B23A2C',VR='#2E7D4F',INK='#1C2430',FA='#8A93A0',GR='#D3D7DD';
+function el(n,a,p){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+function txt(p,x,y,s,o){o=o||{};var t=el('text',{x:x,y:y,'font-family':'inherit','font-size':o.fs||13,fill:o.fill||INK,'text-anchor':o.ta||'start','font-style':o.fi||'normal','font-weight':o.fw||'normal'},p);if(o.tr)t.setAttribute('transform',o.tr);t.textContent=s;return t;}
+function fr(x,d){return x.toFixed(d).replace('.',',');}
+function erf(x){var s=x<0?-1:1;x=Math.abs(x);var t=1/(1+0.3275911*x);var y=1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x);return s*y;}
+function Phi(x){return 0.5*(1+erf(x/Math.SQRT2));}
+function phi(x){return Math.exp(-x*x/2)/Math.sqrt(2*Math.PI);}
+function randn(){var u=1-Math.random(),v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function ctrlBar(fig){var c=document.createElement('div');c.className='ctrl';fig.appendChild(c);return c;}
+function btn(c,label,fn,prim){var b=document.createElement('button');b.textContent=label;if(prim)b.className='prim';b.onclick=fn;c.appendChild(b);return b;}
+function stat(c){var s=document.createElement('span');s.className='stat';c.appendChild(s);return s;}
+function cap(fig,html){var c=document.createElement('figcaption');c.innerHTML=html;fig.appendChild(c);return c;}
+
+/* niveaux */
+(function(){
+  var fig=document.getElementById('fig-niveaux');
+  var W=640,H=230;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Les trois niveaux'},fig);
+  var rows=[
+    ['le monde','40 vraies valeurs, toutes 90,0',VR,'fixe, inconnu'],
+    ['la procédure','tirer 5 000 questions · mesurer les 40 · garder la plus haute',BR,'aléatoire'],
+    ['le résultat en main','90,9 %  et  « c\'est chunk 1024 / k=10 »',INK,'deux faits, plus aléatoires']];
+  rows.forEach(function(r,i){var y=30+i*70;
+    el('rect',{x:10,y:y,width:W-20,height:52,fill:'#fff',stroke:r[2],'stroke-width':1.5,rx:3},s);
+    txt(s,24,y+22,r[0],{fw:'bold',fs:14,fill:r[2]});txt(s,24,y+42,r[3],{fs:12,fill:FA,fi:'italic'});
+    if(i===1){el('rect',{x:W-24-124,y:y+18,width:124,height:20,fill:'rgba(178,58,44,.16)',rx:2},s);}
+    txt(s,W-24,y+32,r[1],{ta:'end',fs:14});
+    if(i<2)el('path',{d:'M'+(W/2)+','+(y+52)+' v12 l-5,-5 m5,5 l5,-5',fill:'none',stroke:INK},s);
+  });
+  txt(s,W-24,100+64,'le geste nouveau du cas 3 ↑',{ta:'end',fs:11,fill:SEL,fi:'italic'});
+  cap(fig,'Les probabilités vivent au niveau 2. Le cas 3 y ajoute un geste, en rouge. Une fois le nombre tombé, il n\'y a plus de probabilité, mais il y a maintenant <i>deux</i> faits tombés : le score, et l\'identité de la gagnante.');
+})();
+
+/* chaîne */
+(function(){
+  var fig=document.getElementById('fig-chaine');
+  var W=640,H=150;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Chaîne accuracy vers SE'},fig);
+  var steps=[['Xᵢ ~ Bern(p)','iid'],['p̂ = ⅟ₙ Σ Xᵢ','moyenne'],['E[p̂] = p','linéarité'],['Var = p(1−p)/n','règle 1 · règle 2 · Bernoulli'],['SÊ = √(p̂(1−p̂)/n)','plug-in']];
+  var bw=112,gap=(W-20-5*bw)/4;
+  steps.forEach(function(st,i){var x=10+i*(bw+gap);
+    el('rect',{x:x,y:40,width:bw,height:48,fill:'#fff',stroke:i===3?SEL:INK,'stroke-width':i===3?2:1.2,rx:3},s);
+    txt(s,x+bw/2,68,st[0],{ta:'middle',fs:12.5,fi:'italic'});
+    txt(s,x+bw/2,110,st[1],{ta:'middle',fs:11,fill:i===3?SEL:FA});
+    if(i<4)el('path',{d:'M'+(x+bw+2)+',64 h'+(gap-4)+' l-5,-4 m5,4 l-5,4',fill:'none',stroke:INK},s);
+  });
+  txt(s,10+3*(bw+gap)+bw/2,135,'le maillon écrasé le 14/09 : trois règles, pas une',{ta:'middle',fs:11,fill:SEL,fi:'italic'});
+  txt(s,W/2,22,'sous chaque boîte, la règle qui autorise le passage',{ta:'middle',fs:12,fill:FA,fi:'italic'});
+})();
+
+
+/* mélange : d'où vient le p unique */
+(function(){
+  var fig=document.getElementById('fig-melange');if(!fig)return;
+  var c=ctrlBar(fig);var st=stat(c);
+  var W=640,H=300;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Une population de difficultés donne un seul p'},fig);
+  var g=el('g',{},s);
+  var TH=[0.99,0.95,0.90,0.70,0.40];
+  var modes=[
+    {n:'uniforme',w:[.2,.2,.2,.2,.2]},
+    {n:'surtout des faciles',w:[.4,.3,.2,.07,.03]},
+    {n:'surtout des dures',w:[.05,.07,.18,.3,.40]},
+    {n:'tout ou rien (θ = 1 ou 0)',w:[.7,0,0,0,.3],th:[1,1,1,0,0]}
+  ];
+  var cur=0,draws=[],nJ=0,n1=0;
+  var cp=cap(fig,'');
+  function draw(last){
+    while(g.firstChild)g.removeChild(g.firstChild);
+    var M=modes[cur],th=M.th||TH;
+    /* population */
+    txt(g,20,22,'la population de questions : chacune a sa difficulté θ',{fs:12,fill:FA,fi:'italic'});
+    var bx=20,bw=108,p=0;
+    for(var i=0;i<5;i++){
+      var x=bx+i*(bw+8),h=Math.round(M.w[i]*100);
+      el('rect',{x:x,y:34,width:bw,height:52,fill:'#fff',stroke:(last&&last.q===i)?SEL:GR,'stroke-width':(last&&last.q===i)?2.5:1,rx:3},g);
+      /* fill proportion = theta */
+      el('rect',{x:x+1,y:34+52-50*th[i]-1,width:bw-2,height:50*th[i],fill:VR,opacity:.18},g);
+      txt(g,x+bw/2,54,'θ = '+fr(th[i],2),{ta:'middle',fs:12});
+      txt(g,x+bw/2,76,'tirée '+h+' %',{ta:'middle',fs:11,fill:FA});
+      p+=M.w[i]*th[i];
+    }
+    /* mixing arrows */
+    for(var i=0;i<5;i++){var x=bx+i*(bw+8)+bw/2;el('path',{d:'M'+x+',90 C'+x+',110 '+(W/2)+',110 '+(W/2)+',126',fill:'none',stroke:GR},g);}
+    /* the coin */
+    el('rect',{x:W/2-150,y:128,width:300,height:44,fill:'#fff',stroke:INK,'stroke-width':2,rx:3},g);
+    txt(g,W/2,148,'ce que voit la chaîne : X ~ Bernoulli(p)',{ta:'middle',fs:13});
+    txt(g,W/2,165,'p = Σ wᵢ·θᵢ = '+fr(p,3),{ta:'middle',fs:13,fw:'bold',fill:SEL});
+    /* draw result */
+    if(last){txt(g,W/2,196,'tirage : question '+(last.q+1)+' (θ = '+fr(th[last.q],2)+')  →  X = '+last.x,{ta:'middle',fs:12.5,fill:last.x?VR:SEL});}
+    /* tally */
+    var ty=214;txt(g,20,ty,'fréquence observée de X = 1 :',{fs:12});
+    if(nJ){var f=n1/nJ;
+      el('rect',{x:230,y:ty-11,width:300,height:14,fill:'#EFEFEC'},g);
+      el('rect',{x:230,y:ty-11,width:300*f,height:14,fill:SEL,opacity:.6},g);
+      el('line',{x1:230+300*p,y1:ty-16,x2:230+300*p,y2:ty+7,stroke:INK,'stroke-width':2},g);
+      txt(g,540,ty,fr(f,3),{fs:12.5,fw:'bold'});
+      txt(g,230+300*p,ty+20,'p = '+fr(p,3),{ta:'middle',fs:11,fill:INK});}
+    /* two variance models */
+    var vy=262,vA=p*(1-p),vB=0;for(var i=0;i<5;i++)vB+=M.w[i]*th[i]*(1-th[i]);
+    txt(g,20,vy,'variance d\'un X, selon ce qu\'on rend aléatoire :',{fs:12});
+    txt(g,20,vy+20,'question tirée + réponse  →  p(1−p) = '+fr(vA,3),{fs:12,fill:BR});
+    txt(g,340,vy+20,'questions fixes, réponse seule  →  '+fr(vB,3),{fs:12,fill:FA});
+    st.textContent=nJ+' tirages';
+    cp.innerHTML='Cinq questions de difficultés différentes, chacune avec sa chance d\'être tirée. La chaîne ne voit pas la population : elle voit une seule pièce truquée à p = Σ wᵢθᵢ. Change le tirage — la population est identique, p bouge, parce que p est une propriété du <i>couple</i> population + tirage. Dernier mode : sept questions toujours réussies, trois toujours ratées, aucune ne porte 0,7, et pourtant p = 0,7. En bas, les deux modèles d\'aléa : p(1−p) est plus grand, parce qu\'il compte aussi l\'incertitude sur <i>quelle</i> question tombe.';
+  }
+  function tirer(k){var M=modes[cur],th=M.th||TH,last=null;
+    for(var j=0;j<k;j++){var u=Math.random(),acc=0,q=4;for(var i=0;i<5;i++){acc+=M.w[i];if(u<acc){q=i;break;}}
+      var x=Math.random()<th[q]?1:0;nJ++;n1+=x;last={q:q,x:x};}
+    draw(last);}
+  btn(c,'Tirer une question',function(){tirer(1)},true);
+  btn(c,'× 500',function(){tirer(500)});
+  var mb=btn(c,'Changer le tirage',function(){cur=(cur+1)%modes.length;nJ=0;n1=0;mb.textContent='Tirage : '+modes[cur].n;draw(null);});
+  mb.textContent='Tirage : '+modes[cur].n;
+  draw(null);
+})();
+
+/* dés */
+(function(){
+  var fig=document.getElementById('fig-des');var c=ctrlBar(fig);
+  var W=640,H=310;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Lancer deux dés et garder le max'},fig);
+  var st=stat(c);
+  var n=0,sumMax=0,sumOne=0;var hist=[0,0,0,0,0,0];
+  var pips={1:[[0,0]],2:[[-1,-1],[1,1]],3:[[-1,-1],[0,0],[1,1]],4:[[-1,-1],[1,-1],[-1,1],[1,1]],5:[[-1,-1],[1,-1],[0,0],[-1,1],[1,1]],6:[[-1,-1],[1,-1],[-1,0],[1,0],[-1,1],[1,1]]};
+  var g=el('g',{},s);
+  function die(x,y,v,hi){el('rect',{x:x,y:y,width:64,height:64,rx:9,fill:'#fff',stroke:hi?SEL:INK,'stroke-width':hi?3:1.5},g);pips[v].forEach(function(p){el('circle',{cx:x+32+p[0]*17,cy:y+32+p[1]*17,r:5.5,fill:hi?SEL:INK},g);});}
+  function draw(a,b){
+    while(g.firstChild)g.removeChild(g.firstChild);
+    if(a){die(30,30,a,a>=b);die(120,30,b,b>a);txt(g,107,72,'|',{ta:'middle',fs:24,fill:FA});
+      txt(g,107,125,'reporté : '+Math.max(a,b),{ta:'middle',fs:15,fw:'bold',fill:SEL});}
+    else txt(g,107,72,'lance',{ta:'middle',fs:14,fill:FA,fi:'italic'});
+    var L=240,base=200,bw=44,mx=Math.max(1,Math.max.apply(null,hist));
+    txt(g,L,26,'ce que tu reportes (le max), sur '+n+' lancers',{fs:12,fill:FA,fi:'italic'});
+    for(var v=1;v<=6;v++){var h=hist[v-1]/mx*140;el('rect',{x:L+(v-1)*bw,y:base-h,width:bw-6,height:h,fill:SEL,opacity:.65},g);txt(g,L+(v-1)*bw+(bw-6)/2,base+16,v,{ta:'middle',fs:12});}
+    el('line',{x1:L,y1:base,x2:L+6*bw,y2:base,stroke:INK},g);
+    function X(v){return L+(v-1)*bw+(bw-6)/2;}
+    el('line',{x1:X(3.5),y1:base+24,x2:X(3.5),y2:base+50,stroke:INK,'stroke-dasharray':'3 3'},g);txt(g,X(3.5),base+64,'un dé : 3,5',{ta:'middle',fs:11});
+    el('line',{x1:X(4.472),y1:base+24,x2:X(4.472),y2:base+50,stroke:FA,'stroke-dasharray':'3 3'},g);txt(g,X(4.472),base+64,'exact : 4,47',{ta:'middle',fs:11,fill:FA});
+    if(n){var m=sumMax/n;el('line',{x1:X(m),y1:base+2,x2:X(m),y2:base+50,stroke:SEL,'stroke-width':2.5},g);txt(g,X(m),base+86,'moyenne du max : '+fr(m,2),{ta:'middle',fs:12,fw:'bold',fill:SEL});}
+    if(n){txt(g,30,160,'moyenne des faces tirées : '+fr(sumOne/(2*n),2),{fs:12});txt(g,30,182,'moyenne des max reportés : '+fr(sumMax/n,2),{fs:12,fill:SEL,fw:'bold'});txt(g,30,204,'écart : +'+fr(sumMax/n-sumOne/(2*n),2),{fs:12,fill:SEL});}
+    st.textContent=n+' lancers';
+  }
+  function roll(k){var a,b;for(var i=0;i<k;i++){a=1+Math.floor(Math.random()*6);b=1+Math.floor(Math.random()*6);var m=Math.max(a,b);n++;sumMax+=m;sumOne+=a+b;hist[m-1]++;}draw(a,b);}
+  btn(c,'Lancer',function(){roll(1)},true);btn(c,'× 100',function(){roll(100)});btn(c,'× 1 000',function(){roll(1000)});btn(c,'Remettre à zéro',function(){n=0;sumMax=0;sumOne=0;hist=[0,0,0,0,0,0];draw();});
+  draw();
+  cap(fig,'Les faces tirées ont bien 3,5 de moyenne : les dés sont honnêtes. Le nombre que tu reportes, lui, se stabilise vers 4,47. Le décalage n\'est pas dans les dés, il est dans le geste « garder le plus haut ». L\'histogramme montre aussi <i>pourquoi</i> : un 6 est reporté dès qu\'un seul des deux dés le donne, 11 couples sur 36 ; un 1 n\'est reporté que si les deux le donnent, 1 couple sur 36.');
+})();
+
+/* deux bruits */
+(function(){
+  var fig=document.getElementById('fig-deux');var c=ctrlBar(fig);var st=stat(c);
+  var W=640,H=290;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Deux bruits gaussiens, on garde le max'},fig);
+  var g=el('g',{},s);var n=0,pos=0,sum=0;var L=40,R=20,xmin=-3,xmax=3;
+  function X(t){return L+(t-xmin)/(xmax-xmin)*(W-L-R);}
+  var bins={};
+  function draw(b1,b2){
+    while(g.firstChild)g.removeChild(g.firstChild);
+    var y0=110;el('line',{x1:L,y1:y0,x2:W-R,y2:y0,stroke:INK},g);
+    for(var t=-3;t<=3;t++){el('line',{x1:X(t),y1:y0,x2:X(t),y2:y0+5,stroke:INK},g);txt(g,X(t),y0+18,t===0?'90,0':(t>0?'+':'')+t+' SE',{ta:'middle',fs:11,fill:t===0?VR:FA});}
+    el('line',{x1:X(0),y1:y0-70,x2:X(0),y2:y0,stroke:VR,'stroke-dasharray':'3 3'},g);
+    txt(g,L,30,'les deux bruits de ce tirage',{fs:12,fill:FA,fi:'italic'});
+    if(b1!==undefined){var mx=Math.max(b1,b2);[b1,b2].forEach(function(b){el('circle',{cx:X(b),cy:y0-30,r:9,fill:b===mx?SEL:'#fff',stroke:b===mx?SEL:BR,'stroke-width':2},g);txt(g,X(b),y0-46,(b>0?'+':'')+fr(b,2),{ta:'middle',fs:11,fill:b===mx?SEL:BR});});
+      txt(g,X(mx),y0-62,'reporté',{ta:'middle',fs:11,fill:SEL,fw:'bold'});}
+    var base=270;txt(g,L,150,'tous les max reportés jusqu\'ici',{fs:12,fill:FA,fi:'italic'});
+    el('line',{x1:X(0),y1:158,x2:X(0),y2:base,stroke:VR,'stroke-dasharray':'3 3'},g);
+    for(var k in bins){var cnt=Math.min(bins[k],13);for(var i=0;i<cnt;i++)el('circle',{cx:X(k*0.15+0.075),cy:base-6-i*8.5,r:3.6,fill:SEL,opacity:.55},g);}
+    el('line',{x1:L,y1:base+2,x2:W-R,y2:base+2,stroke:INK},g);
+    if(n){var m=sum/n;el('line',{x1:X(m),y1:158,x2:X(m),y2:base,stroke:SEL,'stroke-width':2},g);txt(g,X(m)+6,166,'moyenne '+(m>0?'+':'')+fr(m,2)+' SE',{fs:12,fill:SEL,fw:'bold'});
+      txt(g,W-R,166,'au-dessus de 90,0 : '+Math.round(100*pos/n)+' %',{ta:'end',fs:12,fill:SEL});
+      txt(g,W-R,182,'attendu : 75 %, moyenne +0,56 SE',{ta:'end',fs:11,fill:FA,fi:'italic'});}
+    st.textContent=n+' tirages';
+  }
+  function go(k){var b1,b2;for(var i=0;i<k;i++){b1=randn();b2=randn();var m=Math.max(b1,b2);n++;sum+=m;if(m>0)pos++;var bi=Math.floor(m/0.15);bins[bi]=(bins[bi]||0)+1;}draw(b1,b2);}
+  btn(c,'Tirer un eval set',function(){go(1)},true);btn(c,'× 100',function(){go(100)});btn(c,'Remettre à zéro',function(){n=0;pos=0;sum=0;bins={};draw();});
+  draw();
+  cap(fig,'Chaque tirage produit deux bruits centrés (bleu). Tu reportes le plus haut (rouge). Les points rouges empilés sont la loi du nombre que tu reportes : trois quarts à droite de 90,0, centrée à +0,56 SE. Une fois sur quatre, les deux bruits sont négatifs et le max l\'est aussi : le geste déplace, il ne garantit pas.');
+})();
+
+/* produit Φ^k */
+(function(){
+  var fig=document.getElementById('fig-produit');
+  var W=640,H=250;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Probabilité qu aucune des k configs ne dépasse le seuil'},fig);
+  var L=44,R=20,T=24,B=40,K=100;
+  function X(k){return L+(k-1)/(K-1)*(W-L-R);}function Y(p){return H-B-p*(H-T-B);}
+  [0,.25,.5,.75,1].forEach(function(p){txt(s,L-6,Y(p)+4,Math.round(p*100)+' %',{ta:'end',fs:11,fill:FA});el('line',{x1:L,y1:Y(p),x2:W-R,y2:Y(p),stroke:GR},s);});
+  el('line',{x1:L,y1:H-B,x2:W-R,y2:H-B,stroke:INK},s);el('line',{x1:L,y1:T,x2:L,y2:H-B,stroke:INK},s);
+  [1,10,20,40,60,80,100].forEach(function(k){txt(s,X(k),H-B+16,k,{ta:'middle',fs:11,fill:FA});});
+  txt(s,W-R,H-B+32,'k, nombre de configs comparées',{ta:'end',fs:11,fill:FA,fi:'italic'});
+  var d1='',d2='';for(var k=1;k<=K;k++){var q=Math.pow(0.975,k);d1+=(k===1?'M':'L')+X(k)+','+Y(q);d2+=(k===1?'M':'L')+X(k)+','+Y(1-q);}
+  el('path',{d:d2+' L'+X(K)+','+Y(0)+' L'+X(1)+','+Y(0)+'Z',fill:SEL,opacity:.10},s);
+  el('path',{d:d1,fill:'none',stroke:INK,'stroke-width':1.6,'stroke-dasharray':'5 3'},s);
+  el('path',{d:d2,fill:'none',stroke:SEL,'stroke-width':2.6},s);
+  var q40=1-Math.pow(0.975,40);
+  el('line',{x1:X(40),y1:H-B,x2:X(40),y2:Y(q40),stroke:SEL,'stroke-dasharray':'2 3'},s);el('circle',{cx:X(40),cy:Y(q40),r:5,fill:SEL},s);
+  txt(s,X(40)+8,Y(q40)-8,'k = 40 : 1 − 0,975⁴⁰ = 64 %',{fs:12,fw:'bold',fill:SEL});
+  txt(s,X(2)+8,Y(0.975)+4,'0,975 : une config seule, seuil non franchi 97,5 % du temps',{fs:11,fill:INK});
+  txt(s,X(60),Y(0.06)-8,'0,975ᵏ : aucune ne franchit',{fs:11,fill:INK,fi:'italic'});
+  txt(s,X(55),Y(0.86),'1 − 0,975ᵏ : au moins une franchit',{fs:11,fill:SEL,fi:'italic'});
+  cap(fig,'La courbe pointillée est le produit Φ(1,96)<sup>k</sup> = 0,975<sup>k</sup> : la probabilité qu\'<i>aucune</i> des k configs ne dépasse 1,96 SE. Elle fond de 2,5 % à chaque config ajoutée. Son complément, en rouge, est la probabilité que la gagnante paraisse significative pour un effet nul. À k = 40, deux fois sur trois.');
+})();
+
+/* max de k */
+(function(){
+  var fig=document.getElementById('fig-maxk');var c=ctrlBar(fig);c.innerHTML='<span>k =</span>';
+  var W=640,H=240,L=40,R=20,T=24,B=40;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Densité du max de k bruits'},fig);
+  var cp=cap(fig,'');var xmin=-3,xmax=4.5;
+  function X(t){return L+(t-xmin)/(xmax-xmin)*(W-L-R);}function Y(d){return H-B-d/0.75*(H-T-B);}
+  var btns=[];[1,2,10,40,100].forEach(function(k){var b=btn(c,k,function(){btns.forEach(function(x){x.setAttribute('aria-pressed','false')});b.setAttribute('aria-pressed','true');draw(k);});b.setAttribute('aria-pressed',k===40?'true':'false');btns.push(b);});
+  function draw(k){
+    while(s.firstChild)s.removeChild(s.firstChild);
+    el('line',{x1:L,y1:H-B,x2:W-R,y2:H-B,stroke:INK},s);
+    for(var t=-3;t<=4;t++)txt(s,X(t),H-B+16,t===0?'90,0':(t>0?'+':'')+t+' SE',{ta:'middle',fs:11,fill:t===0?VR:FA});
+    var d0='',dk='',E=0,dt=0.01,pOver=1-Math.pow(Phi(1.96),k);
+    for(var t=-8;t<=8;t+=dt)E+=t*k*phi(t)*Math.pow(Phi(t),k-1)*dt;
+    var area='M'+X(1.96)+','+Y(0);
+    for(var t=xmin;t<=xmax;t+=0.02){var fk=k*phi(t)*Math.pow(Phi(t),k-1);d0+=(d0?'L':'M')+X(t)+','+Y(phi(t));dk+=(dk?'L':'M')+X(t)+','+Y(fk);if(t>=1.96)area+='L'+X(t)+','+Y(fk);}
+    area+='L'+X(xmax)+','+Y(0)+'Z';
+    el('path',{d:area,fill:SEL,opacity:.15},s);
+    el('path',{d:d0,fill:'none',stroke:BR,'stroke-width':1.6,'stroke-dasharray':k===1?'':'4 3'},s);
+    el('path',{d:dk,fill:'none',stroke:SEL,'stroke-width':2.4},s);
+    el('line',{x1:X(1.96),y1:Y(0),x2:X(1.96),y2:T,stroke:INK,'stroke-dasharray':'2 3'},s);txt(s,X(1.96)+4,T+10,'seuil 1,96 SE',{fs:11});
+    el('line',{x1:X(E),y1:Y(0),x2:X(E),y2:Y(0.5),stroke:SEL},s);txt(s,X(E)+5,Y(0.5)-4,'E[max] = '+fr(E,2)+' SE',{fs:12,fill:SEL,fw:'bold'});
+    txt(s,X(3.3),Y(0.09),'P(max > 1,96 SE) = '+Math.round(pOver*100)+' %',{fs:12,fill:SEL,ta:'middle',fi:'italic'});
+    txt(s,X(-2.6),Y(0.3),'une config fixée',{fs:11,fill:BR,fi:'italic'});
+    cp.innerHTML='Densité du max de k = '+k+' bruits (rouge), contre celle d\'un bruit fixé à l\'avance (bleu). Elle s\'obtient en dérivant Φ(t)<sup>k</sup> : k·φ(t)·Φ(t)<sup>k−1</sup>. Plus k grandit, plus la loi glisse vers la droite et se resserre : le max devient <i>prévisible</i>, et prévisiblement gonflé.';
+  }
+  draw(40);
+})();
+
+/* la course des 40 */
+(function(){
+  var fig=document.getElementById('fig-course');var c=ctrlBar(fig);var st=stat(c);
+  var K=40,SE=0.42;var W=640,H=470;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Quarante configs, la gagnante et sa remesure'},fig);
+  var g=el('g',{},s);var L=140,R=30,xmin=88.6,xmax=91.4,top=44,rowH=8.2;
+  function X(v){return L+(v-xmin)/(xmax-xmin)*(W-L-R);}
+  var noise=[],win=-1,retest=null,hist=[],sumWin=0,sumRe=0,nWin=0,nRe=0;
+  var names=[];var chunks=[256,512,1024,2048,4096],ks=[1,2,3,5,8,10,15,20];chunks.forEach(function(ch){ks.forEach(function(k){names.push('chunk '+ch+' / k='+k)})});
+  function draw(){
+    while(g.firstChild)g.removeChild(g.firstChild);
+    var base=top+K*rowH;
+    el('line',{x1:X(90),y1:top-14,x2:X(90),y2:base+4,stroke:VR,'stroke-width':1.5},g);txt(g,X(90),top-20,'vrai : 90,0 pour toutes',{ta:'middle',fs:11,fill:VR});
+    [89,89.5,90.5,91].forEach(function(v){txt(g,X(v),base+16,fr(v,1),{ta:'middle',fs:10.5,fill:FA});el('line',{x1:X(v),y1:base,x2:X(v),y2:base+4,stroke:FA},g);});
+    el('line',{x1:L,y1:base,x2:W-R,y2:base,stroke:INK},g);
+    for(var i=0;i<K;i++){var y=top+i*rowH;var isW=i===win;
+      txt(g,L-8,y+7,names[i],{ta:'end',fs:9.5,fill:isW?SEL:(i===16?INK:FA),fw:(isW||i===16)?'bold':'normal'});
+      if(noise.length){var v=90+noise[i];var x1=Math.min(X(90),X(v)),w=Math.abs(X(v)-X(90));
+        el('rect',{x:x1,y:y+1,width:Math.max(w,1),height:rowH-2.5,fill:isW?SEL:BR,opacity:isW?.9:.5},g);
+        if(isW){txt(g,X(v)+6,y+7.5,'affiché '+fr(v,2),{fs:11,fw:'bold',fill:SEL});
+          if(retest!==null){var rv=90+retest;el('rect',{x:Math.min(X(90),X(rv)),y:y+1,width:Math.max(Math.abs(X(rv)-X(90)),1),height:rowH-2.5,fill:'none',stroke:BR,'stroke-width':1.5,'stroke-dasharray':'3 2'},g);
+            txt(g,X(v)+6,y+22,'eval set frais : '+fr(rv,2),{fs:11,fw:'bold',fill:BR});}}
+      }
+    }
+    txt(g,L-8,top-20,'config 17 en noir : le témoin fixé d\'avance',{ta:'end',fs:9.5,fill:INK,fi:'italic'});
+    var hy=base+38;txt(g,L,hy-6,'qui a gagné, tirage après tirage',{fs:11,fill:FA,fi:'italic'});
+    var sq=10;hist.slice(-46).forEach(function(h,j){el('rect',{x:L+j*(sq+1),y:hy,width:sq,height:sq,fill:'hsl('+(h*360/K)+',55%,52%)'},g);txt(g,L+j*(sq+1)+sq/2,hy+sq+10,h+1,{ta:'middle',fs:7,fill:FA});});
+    if(nWin)txt(g,L,hy+40,'moyenne des scores affichés par la gagnante : '+fr(90+sumWin/nWin,2)+'   (attendu 90,91)',{fs:11.5,fill:SEL,fw:'bold'});
+    if(nRe)txt(g,L,hy+58,'moyenne des remesures sur tirage frais : '+fr(90+sumRe/nRe,2)+'   (attendu 90,00)',{fs:11.5,fill:BR,fw:'bold'});
+    st.textContent=nWin+' tirages, '+nRe+' remesures';
+  }
+  function tirer(){noise=[];var b=-1e9;win=-1;for(var i=0;i<K;i++){var e=SE*randn();noise.push(e);if(e>b){b=e;win=i;}}retest=null;hist.push(win);sumWin+=b;nWin++;draw();}
+  function remesurer(){if(!noise.length)tirer();retest=SE*randn();sumRe+=retest;nRe++;draw();}
+  function auto(k){for(var i=0;i<k;i++){tirer();remesurer();}}
+  btn(c,'Retirer l\'eval set',tirer,true);btn(c,'Remesurer la gagnante sur un eval set frais',remesurer);btn(c,'× 100 des deux',function(){auto(100)});
+  tirer();
+  cap(fig,'Quarante barres bleues : les bruits d\'un tirage. La gagnante en rouge est simplement la barre la plus longue vers la droite. Retire l\'eval set plusieurs fois : la couleur de la bande « qui a gagné » change presque à chaque fois, et la moyenne des scores affichés s\'installe vers 90,9. Remesure la gagnante sur un tirage frais : sa nouvelle barre (pointillé bleu) retombe autour de 90,0. La config 17, fixée d\'avance, est une barre bleue comme les autres, de moyenne 90,0. Variable A, c\'est elle. Variable B, c\'est la barre rouge.');
+})();
+
+/* mille équipes */
+(function(){
+  var fig=document.getElementById('fig-mille');
+  var cols=12,rows=6,K=40,SE=0.42;var cw=50,ch=44,W=cols*cw+10,H=rows*ch+30;
+  var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'72 équipes, 72 gagnantes différentes'},fig);
+  var wins={},sum=0;
+  for(var r=0;r<rows;r++)for(var q=0;q<cols;q++){var x0=5+q*cw,y0=5+r*ch;var b=-1e9,wi=-1,ns=[];for(var i=0;i<K;i++){var e=SE*randn();ns.push(e);if(e>b){b=e;wi=i;}}
+    sum+=b;wins[wi]=(wins[wi]||0)+1;
+    el('rect',{x:x0,y:y0,width:cw-4,height:ch-4,fill:'#fff',stroke:GR},s);
+    for(var i=0;i<K;i++){var hgt=Math.max(0,ns[i]+1.3)/2.6*(ch-14);el('rect',{x:x0+2+i*(cw-8)/K,y:y0+ch-6-hgt,width:(cw-8)/K-0.4,height:hgt,fill:i===wi?SEL:BR,opacity:i===wi?1:.35},s);}
+    txt(s,x0+cw/2-2,y0+10,fr(90+b,1),{ta:'middle',fs:8.5,fill:SEL,fw:'bold'});
+  }
+  var distinct=Object.keys(wins).length;
+  txt(s,5,H-6,'72 équipes, même sweep, même vérité. Score moyen des gagnantes : '+fr(90+sum/72,2)+'. Configs différentes élues : '+distinct+'.',{fs:11.5,fill:INK});
+  cap(fig,'Chaque vignette est une équipe avec son eval set : 40 barres, la plus haute en rouge, son score affiché au-dessus. Presque toutes reportent plus de 90,0. Presque aucune n\'a la même gagnante. Il n\'y a personne derrière 90,9 : c\'est la recette qui parle. Recharge la page pour retirer les 72.');
+})();
+
+/* cibles */
+(function(){
+  var fig=document.getElementById('fig-cibles');
+  var W=640,H=260;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Biais contre bruit, deux cibles'},fig);
+  function target(cx,cy,title,sub,pts,col){
+    [70,50,30,12].forEach(function(r,i){el('circle',{cx:cx,cy:cy,r:r,fill:i%2?'#fff':'#F1F2EE',stroke:GR},s);});
+    el('circle',{cx:cx,cy:cy,r:3,fill:VR},s);
+    pts.forEach(function(p){el('circle',{cx:cx+p[0],cy:cy+p[1],r:4.5,fill:col,opacity:.8},s);});
+    var mx=0,my=0;pts.forEach(function(p){mx+=p[0];my+=p[1]});mx/=pts.length;my/=pts.length;
+    el('line',{x1:cx,y1:cy,x2:cx+mx,y2:cy+my,stroke:col,'stroke-width':2},s);el('circle',{cx:cx+mx,cy:cy+my,r:3,fill:'#fff',stroke:col,'stroke-width':2},s);
+    txt(s,cx,cy+95,title,{ta:'middle',fs:13,fw:'bold',fill:col});txt(s,cx,cy+113,sub,{ta:'middle',fs:11,fill:FA,fi:'italic'});
+  }
+  var ptsA=[],ptsB=[];for(var i=0;i<18;i++){ptsA.push([40+14*randn(),-32+14*randn()]);ptsB.push([16*randn(),16*randn()]);}
+  target(170,110,'tirage de la sélection','dispersé ET décalé : bruit + biais',ptsA,SEL);
+  target(470,110,'tirage frais','dispersé, centré : bruit seul',ptsB,BR);
+  txt(s,320,110,'→',{ta:'middle',fs:26,fill:FA});txt(s,320,132,'remesurer',{ta:'middle',fs:11,fill:FA,fi:'italic'});
+  txt(s,320,246,'le centre vert est la vraie valeur ; le petit cercle, la moyenne des impacts',{ta:'middle',fs:11,fill:FA,fi:'italic'});
+  cap(fig,'Dix-huit répétitions de la même mesure. À gauche, la gagnante mesurée sur le tirage qui l\'a élue : les impacts sont dispersés (bruit) <i>et</i> leur centre est décalé (biais). À droite, la même config sur un tirage frais : toujours dispersés, mais autour du centre. Ce qui a disparu, c\'est le trait, pas la dispersion.');
+})();
+
+/* split */
+(function(){
+  var fig=document.getElementById('fig-split');
+  var W=640,H=250;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Découper l eval set : validation brûlée, test ouvert une fois'},fig);
+  txt(s,20,24,'avant : un seul eval set, 5 000 questions, sélection et mesure dessus',{fs:12.5});
+  el('rect',{x:20,y:34,width:600,height:30,fill:'rgba(178,58,44,.18)',stroke:SEL,'stroke-width':1.5},s);
+  txt(s,320,54,'40 configs se battent ici ET la gagnante y est mesurée  →  90,9, gonflé de 0,9',{ta:'middle',fs:12,fill:SEL});
+  el('path',{d:'M320,70 v18 l-5,-5 m5,5 l5,-5',fill:'none',stroke:INK},s);
+  txt(s,20,112,'après : le même fichier, coupé',{fs:12.5});
+  el('rect',{x:20,y:122,width:296,height:30,fill:'rgba(178,58,44,.18)',stroke:SEL,'stroke-width':1.5},s);
+  el('rect',{x:324,y:122,width:296,height:30,fill:'rgba(46,125,79,.16)',stroke:VR,'stroke-width':1.5},s);
+  for(var x=24;x<316;x+=10)el('line',{x1:x,y1:150,x2:x+8,y2:124,stroke:SEL,opacity:.25},s);
+  txt(s,168,142,'validation · 2 500 · les 40 se battent',{ta:'middle',fs:12,fill:SEL});
+  txt(s,472,142,'test · 2 500 · ouvert une fois, sur la gagnante',{ta:'middle',fs:12,fill:VR});
+  txt(s,168,170,'brûlé : son chiffre ne mesure plus rien',{ta:'middle',fs:11,fill:SEL,fi:'italic'});
+  txt(s,472,170,'honnête : bruit centré, sans biais',{ta:'middle',fs:11,fill:VR,fi:'italic'});
+  txt(s,20,206,'le prix, en largeur de bruit :',{fs:12});
+  el('rect',{x:200,y:196,width:84,height:14,fill:BR,opacity:.5},s);txt(s,290,207,'SE = 0,42  (n = 5 000)',{fs:11.5});
+  el('rect',{x:200,y:218,width:119,height:14,fill:BR,opacity:.5},s);txt(s,325,229,'SE = 0,59  (n = 2 500, × √2)',{fs:11.5});
+  cap(fig,'Le fichier de validation est brûlé par la sélection : c\'est là que vit le +0,9. Le test n\'a jamais été regardé pour décider, donc son bruit est centré. En échange, chaque moitié a un bruit √2 fois plus large. Précision contre validité : toujours le bon échange.');
+})();
+
+/* nav */
+(function(){
+  var links=Array.prototype.slice.call(document.querySelectorAll('nav.echelle a'));
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'))});
+  if(!('IntersectionObserver' in window))return;
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){links.forEach(function(a){a.classList.remove('on')});links[secs.indexOf(e.target)].classList.add('on');}});},{rootMargin:'-30% 0px -60% 0px'});
+  secs.forEach(function(sc){io.observe(sc)});
+})();
+})();
+</script>
+</body>
+</html>

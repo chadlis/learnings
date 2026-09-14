@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comparer deux modèles sur le même tirage — cas 2</title>
+<style>
+:root{
+  --paper:#FBFAF6; --grid:rgba(28,36,48,.055); --ink:#1C2430; --ink2:#4A5460; --faint:#8A93A0;
+  --rule:rgba(28,36,48,.16);
+  --bruit:#1F5FA8; --bruitbg:rgba(31,95,168,.10);
+  --sel:#B23A2C; --selbg:rgba(178,58,44,.10);
+  --vrai:#2E7D4F; --vraibg:rgba(46,125,79,.12);
+  --serif:"Iowan Old Style","Charter","Palatino Linotype",Palatino,Georgia,serif;
+}
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{margin:0;font-family:var(--serif);color:var(--ink);font-size:18px;line-height:1.6;
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px}
+.page{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:150px minmax(0,46rem) 1fr;gap:2.4rem;padding:2.5rem 1.4rem 6rem}
+nav.echelle{position:sticky;top:2rem;align-self:start;font-size:.86rem;line-height:1.3}
+nav.echelle a{display:block;color:var(--ink2);text-decoration:none;padding:.5rem 0 .5rem .9rem;border-left:2px solid var(--rule)}
+nav.echelle a.on{color:var(--ink);border-left-color:var(--ink);font-weight:700}
+nav.echelle a small{display:block;color:var(--faint);font-weight:400;font-style:italic}
+nav.echelle .titre{font-style:italic;color:var(--faint);padding:0 0 .6rem}
+main{min-width:0}
+aside.marge{align-self:start;position:sticky;top:2rem;font-size:.86rem;color:var(--ink2);line-height:1.45;padding-top:6rem}
+.note{margin:0 0 1.4rem;padding-left:.8rem;border-left:2px solid var(--sel)}
+.note b{color:var(--sel)}
+header{margin-bottom:2.6rem}
+header h1{font-size:3rem;line-height:1;margin:0 0 .8rem;font-weight:700;letter-spacing:-.02em}
+header p{margin:.3rem 0;color:var(--ink2);font-size:1rem}
+.legend{display:flex;gap:1.4rem;flex-wrap:wrap;margin-top:1rem;font-size:.95rem}
+.legend span::before{content:"";display:inline-block;width:1.1em;height:.55em;margin-right:.4em;border-radius:1px;vertical-align:.05em}
+.legend .b::before{background:var(--bruit)} .legend .s::before{background:var(--sel)} .legend .v::before{background:var(--vrai)}
+section{scroll-margin-top:1.5rem}
+h2{font-size:1.7rem;margin:3.4rem 0 .6rem;line-height:1.15;display:grid;grid-template-columns:2.6rem 1fr;gap:.7rem;align-items:baseline}
+h2 .n{font-size:2.6rem;font-weight:700;line-height:1;color:var(--faint);font-variant-numeric:tabular-nums}
+h2 small{display:block;font-size:.9rem;color:var(--faint);font-weight:400;font-style:italic;margin-top:.2rem}
+h3{font-size:1.12rem;margin:2rem 0 .5rem}
+p{margin:0 0 1rem}
+.m{font-style:italic}
+.f{display:block;text-align:center;margin:1rem 0;font-size:1.12rem;font-style:italic}
+.f b{font-style:normal}
+sub,sup{font-size:.7em;line-height:0}
+table{border-collapse:collapse;width:100%;margin:1rem 0 1.4rem;font-size:.95rem;background:rgba(255,255,255,.7)}
+th,td{padding:.45rem .6rem;text-align:left;vertical-align:top;border-bottom:1px solid var(--rule)}
+th{font-weight:700;border-bottom:2px solid var(--ink)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.bruit{color:var(--bruit)} .sel{color:var(--sel)} .vrai{color:var(--vrai)}
+.hb{background:var(--bruitbg)} .hs{background:var(--selbg)} .hv{background:var(--vraibg)}
+.brique{margin:1.4rem 0;padding:.7rem 1rem;border:1.5px solid var(--ink);background:#fff;border-radius:2px;font-size:1rem}
+.brique b{display:block}
+.tableau{margin:1.6rem 0;padding:1.2rem 1.4rem;background:var(--ink);color:#F6F7F4;border-radius:2px;line-height:1.55}
+.tableau .faux{color:#E9B3AA;margin-top:.8rem;display:block;font-size:.97rem}
+figure{margin:1.6rem 0 2rem;padding:1rem;background:#fff;border:1px solid var(--rule);border-radius:3px}
+figure svg{width:100%;height:auto;display:block}
+figcaption{font-size:.9rem;color:var(--ink2);margin-top:.6rem;line-height:1.45}
+.ctrl{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin:0 0 .7rem;font-size:.92rem}
+.ctrl button{font:inherit;font-size:.9rem;padding:.4rem .85rem;border:1.5px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer;border-radius:2px}
+.ctrl button.prim{background:var(--ink);color:#fff}
+.ctrl button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.ctrl button:focus-visible{outline:3px solid var(--bruit);outline-offset:2px}
+.ctrl .stat{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--ink2)}
+.porte{margin-top:3rem;padding:1.2rem 1.4rem;border:2px dashed var(--ink);border-radius:2px;background:rgba(255,255,255,.6)}
+.retenir{font-size:1.3rem;font-style:italic;margin:2.6rem 0;padding:1.3rem 1rem;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);text-align:center;background:rgba(255,255,255,.6)}
+@media(max-width:1100px){.page{grid-template-columns:1fr;gap:0}nav.echelle{display:none}aside.marge{display:none}}
+@media(max-width:640px){body{font-size:16.5px}header h1{font-size:2.2rem}h2{font-size:1.4rem}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+</style>
+</head>
+<body>
+<div class="page">
+<nav class="echelle" aria-label="Échelle des marches">
+  <div class="titre">l'échelle</div>
+  <a href="#m0">Marche 0<small>la question, un seul objet</small></a>
+  <a href="#m1">Marche 1<small>l'erreur des deux intervalles</small></a>
+  <a href="#m2">Marche 2<small>le bruit partagé</small></a>
+  <a href="#m3">Marche 3<small>le calcul apparié : Dᵢ</small></a>
+  <a href="#m4">Marche 4<small>McNemar : la même chaîne sous H₀</small></a>
+  <a href="#m5">Marche 5<small>le bootstrap apparié</small></a>
+  <a href="#fin">Au tableau<small>phrases, cassures</small></a>
+  <a href="#suite">La porte<small>vers le cas 3</small></a>
+</nav>
+
+<main>
+
+<header>
+  <h1>Comparer deux modèles<br>sur le même tirage</h1>
+  <p>Cas 2 du fil A. Déroulé autoporteur de la comparaison appariée, tenue le 11/09/2026 : la différence comme objet unique, la covariance qu'on ne peut pas ignorer, McNemar, bootstrap. À lire lentement, une fois, en jouant avec chaque figure.</p>
+  <div class="legend"><span class="b">le bruit du tirage, et ce qu'il a de partagé</span><span class="s">l'erreur naturelle : traiter A et B séparément</span><span class="v">la vraie valeur, fixe</span></div>
+</header>
+
+<section id="m0">
+<h2><span class="n">0</span><span>La question unique, et un seul objet<small>ce qui change par rapport au cas 1 : il y a une covariance</small></span></h2>
+
+<p>Même question qu'au cas 1 : <b>qu'est-ce qui varierait si je refaisais l'expérience ?</b> Mais l'expérience a changé. Deux classifieurs A et B, fixés. Un seul test set de <span class="m">n</span> = 5 000 images. A affiche 87,2 %, B affiche 88,1 %. Sur les 5 000 images, les deux modèles sont d'accord 4 850 fois ; sur 52 images A seul a bon ; sur 98 images B seul a bon.</p>
+
+<p>La question qu'on pose n'est pas « que vaut A ? » ni « que vaut B ? ». C'est « B est-il meilleur que A ? ». Cette question porte sur <b>un</b> objet : la différence <span class="m">d = p<sub>A</sub> − p<sub>B</sub></span>. C'est ce paramètre-là qui vit au niveau 1.</p>
+
+<figure id="fig-niveaux"></figure>
+
+<h3>Le vocabulaire, fixé avant tout calcul</h3>
+<table>
+<tr><th>objet</th><th>notation</th><th>statut</th><th>ne pas confondre avec</th></tr>
+<tr><td>vraies accuracies</td><td class="vrai m">p<sub>A</sub>, p<sub>B</sub></td><td>fixes, inconnues</td><td>87,2 et 88,1</td></tr>
+<tr><td>vraie différence</td><td class="vrai m">d = p<sub>A</sub> − p<sub>B</sub></td><td>fixe, inconnue : <b>l'objet de la question</b></td><td>la différence observée</td></tr>
+<tr><td>résultat de A, de B sur l'image <span class="m">i</span></td><td class="m">X<sub>i</sub>, Y<sub>i</sub> ∈ {0, 1}</td><td>aléatoires, <b>mêmes images</b></td><td></td></tr>
+<tr><td>différence sur l'image <span class="m">i</span></td><td class="m">D<sub>i</sub> = X<sub>i</sub> − Y<sub>i</sub> ∈ {−1, 0, +1}</td><td>aléatoire : la brique du cas 2</td><td class="m">X<sub>i</sub></td></tr>
+<tr><td>différence observée</td><td class="m">d̂ = p̂<sub>A</sub> − p̂<sub>B</sub> = (1/n) Σ D<sub>i</sub></td><td>aléatoire au niveau 2</td><td class="m">d</td></tr>
+<tr><td>bruit de A, bruit de B</td><td class="bruit m">e<sub>A</sub> = p̂<sub>A</sub> − p<sub>A</sub>, e<sub>B</sub> = p̂<sub>B</sub> − p<sub>B</sub></td><td>aléatoires, <b>corrélés</b></td><td>deux bruits indépendants</td></tr>
+<tr><td>taux de désaccord</td><td class="m">π = P(D<sub>i</sub> ≠ 0)</td><td>fixe ; ici estimé à 150/5000 = 0,03</td><td>la différence</td></tr>
+</table>
+</section>
+
+<section id="m1">
+<h2><span class="n">1</span><span>L'erreur naturelle : deux intervalles séparés<small>et les deux raisons pour lesquelles elle est fausse</small></span></h2>
+
+<p>On sort la recette du cas 1 deux fois. A : <span class="m">SÊ<sub>A</sub></span> = √(0,872·0,128/5000) = 0,47 point, IC = [86,3 ; 88,1]. B : <span class="m">SÊ<sub>B</sub></span> = √(0,881·0,119/5000) = 0,46 point, IC = [87,2 ; 89,0]. Les deux intervalles se chevauchent largement. Conclusion tentante : « pas de différence significative ».</p>
+
+<figure id="fig-chevauchement"></figure>
+
+<p>C'est faux, pour deux raisons distinctes qu'il faut savoir nommer séparément.</p>
+
+<p><b>Raison 1, la question.</b> Deux intervalles répondent à deux questions (« où est <span class="m">p<sub>A</sub></span> ? », « où est <span class="m">p<sub>B</sub></span> ? »). La question posée est une troisième (« où est <span class="m">d</span> ? »), et elle demande son propre intervalle. Regarder un chevauchement, c'est un test approximatif et conservateur, même quand les mesures sont indépendantes : deux IC à 95 % qui se touchent à peine correspondent à peu près à un test à 99 %, pas à 95 %.</p>
+
+<p><b>Raison 2, la covariance.</b> Règle 2 du cas 1 : <span class="m">Var(p̂<sub>A</sub> − p̂<sub>B</sub>) = Var(p̂<sub>A</sub>) + Var(p̂<sub>B</sub>) − 2·Cov(p̂<sub>A</sub>, p̂<sub>B</sub>)</span>. Regarder les deux IC séparément, c'est faire comme si Cov = 0. Or les deux modèles sont mesurés <b>sur les mêmes images</b>, et la covariance est fortement positive. Ignorer le terme −2Cov, c'est surestimer la variance de la différence, donc élargir l'intervalle, donc rater des différences réelles.</p>
+</section>
+
+<section id="m2">
+<h2><span class="n">2</span><span>Le bruit partagé<small>brique unique : deux mesures sur le même tirage bougent ensemble, et leur différence bouge moins</small></span></h2>
+
+<p>Écris chaque mesure comme vraie valeur plus bruit : <span class="m">p̂<sub>A</sub> = p<sub>A</sub> + <span class="bruit">e<sub>A</sub></span></span>, <span class="m">p̂<sub>B</sub> = p<sub>B</sub> + <span class="bruit">e<sub>B</sub></span></span>. Le bruit vient du tirage : un test set tombé « facile » (beaucoup d'images nettes) remonte les deux modèles ; un test set tombé « dur » les descend tous les deux. Même tirage, même chance, donc <span class="m">e<sub>A</sub></span> et <span class="m">e<sub>B</sub></span> sont corrélés positivement.</p>
+
+<p>La différence observée s'écrit alors <span class="m">d̂ = (p<sub>A</sub> − p<sub>B</sub>) + (<span class="bruit">e<sub>A</sub> − e<sub>B</sub></span>)</span>. La part commune des deux bruits <b>se soustrait</b>. Ce qui reste, c'est seulement la part où les deux modèles réagissent différemment au tirage. Précision honnête : l'annulation est <i>partielle</i>, proportionnelle à la corrélation des erreurs.</p>
+
+<figure id="fig-partage"></figure>
+
+<p>Dans la figure, chaque point est un test set : ses coordonnées sont les deux accuracies mesurées. Sur le même tirage, le nuage s'étire le long de la diagonale — quand A monte, B monte. La différence, lue perpendiculairement à la diagonale, est étroite. Avec deux test sets distincts, le nuage devient rond, et la différence est large. Même quantité de données, même vérité, deux précisions.</p>
+
+<div class="brique"><b>Apparié n'est pas randomisé</b>Deux axes orthogonaux à ne pas mélanger. <i>Apparié</i> (mêmes unités pour les deux traitements) est une affaire de <b>précision</b>. <i>Randomisé</i> (les unités sont affectées au hasard aux traitements) est une affaire de <b>causalité</b>. A contre B sur un test set est apparié mais non randomisé : le test dit lequel est meilleur, pas pourquoi. Un A/B test web est randomisé mais non apparié : chaque utilisateur ne voit qu'un bras.</div>
+</section>
+
+<section id="m3">
+<h2><span class="n">3</span><span>Le calcul apparié : la brique Dᵢ<small>encore une moyenne empirique, et l'effectif qui compte n'est pas 5 000</small></span></h2>
+
+<p>La brique nouvelle : sur chaque image, on ne regarde plus deux 0/1, on regarde <b>un</b> nombre, <span class="m">D<sub>i</sub> = X<sub>i</sub> − Y<sub>i</sub></span>, qui vaut −1, 0 ou +1.</p>
+
+<figure id="fig-mosaique"></figure>
+
+<table>
+<tr><th>situation</th><th class="num"><span class="m">D<sub>i</sub></span></th><th class="num"><span class="m">D<sub>i</sub><sup>2</sup></span></th><th class="num">effectif</th></tr>
+<tr><td>accord (les deux bons, ou les deux faux)</td><td class="num">0</td><td class="num">0</td><td class="num">4 850</td></tr>
+<tr><td>A seul a bon</td><td class="num">+1</td><td class="num">1</td><td class="num">52</td></tr>
+<tr><td>B seul a bon</td><td class="num">−1</td><td class="num">1</td><td class="num">98</td></tr>
+</table>
+
+<p><b>Maillon 1.</b> <span class="m">d̂ = (1/n) Σ D<sub>i</sub> = (52 − 98)/5000 = −46/5000 = <b>−0,92 point</b></span>. Cohérent avec 87,2 − 88,1. Et c'est <b>encore une moyenne empirique</b> : toute la chaîne du cas 1 s'applique, avec <span class="m">D<sub>i</sub></span> à la place de <span class="m">X<sub>i</sub></span>. <span class="m">E[d̂] = d</span> par linéarité ; <span class="m">Var(d̂) = Var(D<sub>i</sub>)/n</span> par les règles 1 et 2.</p>
+
+<p><b>Maillon 2, la variance de <span class="m">D<sub>i</sub></span>.</b> Formule de calcul : <span class="m">Var(D<sub>i</sub>) = E[D<sub>i</sub><sup>2</sup>] − E[D<sub>i</sub>]<sup>2</sup></span>. Or <span class="m">D<sub>i</sub><sup>2</sup></span> vaut 1 exactement quand les modèles sont en désaccord, donc <span class="m">E[D<sub>i</sub><sup>2</sup>] = π</span>, le taux de désaccord. Et <span class="m">E[D<sub>i</sub>] = d</span>. D'où :</p>
+<span class="f">Var(<span class="m">D<sub>i</sub></span>) = π − <span class="m">d</span><sup>2</sup></span>
+<p><b>Le maillon central du cas 2 :</b> les 4 850 accords sont <i>absents</i> de cette variance. Ils contribuent 0 à <span class="m">D<sub>i</sub></span> et 0 à <span class="m">D<sub>i</sub><sup>2</sup></span>. L'effectif qui porte l'information, ce n'est pas 5 000, c'est 150. Deux modèles qui se trompent sur les mêmes images ne s'aident pas à se départager : ils ne donnent aucune information l'un sur l'autre.</p>
+
+<p><b>Maillon 3, plug-in.</b> <span class="m">π̂ = 150/5000 = 0,03</span>, <span class="m">d̂ = −0,0092</span>. <span class="m">SÊ<sub>d̂</sub> = √((0,03 − 0,0092<sup>2</sup>)/5000) = √(0,02992/5000) = √(5,98·10<sup>−6</sup>) = 0,00245</span>, soit <b>0,245 point</b>.</p>
+
+<p><b>Comparaison avec le non-apparié.</b> Si on avait ignoré la covariance : <span class="m">√(SÊ<sub>A</sub><sup>2</sup> + SÊ<sub>B</sub><sup>2</sup>) = √(0,47<sup>2</sup> + 0,46<sup>2</sup>) ≈ 0,66 point</span>. Le bruit est divisé par presque 3 grâce à l'appariement.</p>
+
+<p><b>Maillon 4, l'intervalle et le z.</b> <span class="m">z = d̂ / SÊ = −0,0092 / 0,00245 ≈ <b>−3,8</b></span>. <span class="m">IC<sub>95</sub>(d) = −0,92 ± 1,96 × 0,245 = <b>[−1,40 ; −0,44] point</b></span>. Il exclut 0 : B est significativement meilleur. En non-apparié, <span class="m">z ≈ −0,92/0,66 ≈ −1,4</span>, IC = [−2,2 ; +0,4], contient 0. <b>Même donnée, conclusion opposée.</b> La covariance n'est pas un raffinement, elle décide.</p>
+
+<figure id="fig-rho"></figure>
+
+<p>Le lien général, pour le tableau : <span class="m">Var(d̂) = 2s<sup>2</sup>(1 − ρ)</span> où <span class="m">s<sup>2</sup></span> est la variance moyenne d'une mesure et ρ la corrélation des erreurs. Ici ρ ≈ 0,86. Et <span class="m">1 − ρ = π / (2p(1−p))</span> : la corrélation est d'autant plus forte que le taux de désaccord est petit. Contre-intuitif mais vrai : <b>deux modèles proches sont plus faciles à départager</b>, parce qu'ils sont en désaccord sur peu d'images, et ces quelques images parlent fort.</p>
+</section>
+
+<section id="m4">
+<h2><span class="n">4</span><span>McNemar : la même chaîne sous H₀<small>SE estimée contre SE sous l'hypothèse nulle</small></span></h2>
+
+<p>Le test de McNemar n'est pas une recette à part. C'est cette chaîne, avec une seule différence : on calcule la SE <b>en supposant que H₀ est vraie</b> (<span class="m">d = 0</span>) au lieu de la calculer avec le <span class="m">d̂</span> observé.</p>
+
+<p>Sous H₀, <span class="m">d = 0</span>, donc <span class="m">Var(D<sub>i</sub>) = π − 0 = π</span>, et <span class="m">Var(d̂) = π/n</span>. En comptages, avec <span class="m">b</span> = 52 et <span class="m">c</span> = 98 : <span class="m">d̂ = (b − c)/n</span>, <span class="m">π̂ = (b + c)/n</span>, donc</p>
+<span class="f"><span class="m">z</span> = <span class="m">d̂</span> / √(π̂/<span class="m">n</span>) = ((<span class="m">b</span>−<span class="m">c</span>)/<span class="m">n</span>) / (√(<span class="m">b</span>+<span class="m">c</span>)/<span class="m">n</span>) = (<span class="m">b</span> − <span class="m">c</span>) / √(<span class="m">b</span> + <span class="m">c</span>) = −46 / √150 = <b>−3,76</b></span>
+<p><span class="m">n</span> a disparu. Seuls les désaccords comptent, et la formule le dit tout haut. La valeur diffère à peine du −3,8 précédent, parce que <span class="m">d̂<sup>2</sup></span> est négligeable devant π. La distinction devient importante quand l'effet est grand par rapport au taux de désaccord.</p>
+
+<figure id="fig-mcnemar"></figure>
+
+<div class="brique"><b>SE sous H₀ contre SE estimée : laquelle, quand</b>Pour un <b>test</b> (« les données sont-elles compatibles avec d = 0 ? »), on calcule la dispersion <i>telle qu'elle serait si H₀ était vraie</i> : c'est cohérent, on se place dans le monde de H₀ pour voir si l'observation y est surprenante. Pour un <b>intervalle</b> (« où est d ? »), H₀ n'a pas de rôle, on utilise la SE estimée. Deux questions, deux SE, et elles ne coïncident que quand d̂ est petit. Même distinction que Wilson (test inversé) contre Wald (SE plug-in) au cas 1.</div>
+</section>
+
+<section id="m5">
+<h2><span class="n">5</span><span>Le bootstrap apparié<small>simuler « refaire l'expérience » au lieu de le calculer</small></span></h2>
+
+<p>La chaîne ci-dessus marche parce que <span class="m">d̂</span> est une moyenne. Pour une métrique qui n'en est pas une (F1, AUC, un win-rate jugé par un LLM), il n'y a pas de formule fermée pour la SE. Le bootstrap contourne : <b>la population, je ne l'ai pas ; l'échantillon est ma meilleure approximation de la population, alors je tire dedans.</b></p>
+
+<p>Recette : tirer 5 000 images <i>avec remise</i> dans le test set, recalculer la métrique, recommencer B fois, lire la dispersion des B valeurs. C'est la question unique, exécutée : chaque rééchantillon est un « et si j'avais eu un autre test set ».</p>
+
+<figure id="fig-bootstrap"></figure>
+
+<p><b>La subtilité qui fait tout, et qui est la même que la marche 2 :</b> on rééchantillonne <b>les paires</b> <span class="m">(X<sub>i</sub>, Y<sub>i</sub>)</span>, c'est-à-dire des images entières, pas la colonne de A et la colonne de B séparément. Rééchantillonner séparément casserait le lien entre les deux mesures sur une même image, donc effacerait la covariance, donc retomberait sur la SE non appariée de 0,66. Le bootstrap apparié retrouve 0,245 : il ne sait rien de la formule <span class="m">π − d<sup>2</sup></span>, il la redécouvre en refaisant l'expérience.</p>
+
+<div class="brique"><b>Ce que le bootstrap ne voit pas</b>Il rééchantillonne le tirage que tu as. Si ce tirage a déjà servi à choisir (sélectionner la meilleure de k configs), le bootstrap tourne autour d'une valeur déjà gonflée et produit un intervalle centré au mauvais endroit. C'est la cécité du bootstrap, marche 4 du cas 3.</div>
+</section>
+
+<section id="fin">
+<h2><span class="n">▮</span><span>La lecture correcte, avec la phrase au tableau</span></h2>
+
+<div class="tableau">
+<em>« La question porte sur un seul objet, la différence. Les deux mesures partagent le tirage, donc leurs bruits sont corrélés et la règle 2 garde son terme −2Cov. Le calcul apparié passe par Dᵢ = Xᵢ − Yᵢ, dont la variance est π − d² : seuls les désaccords portent l'information. Ici l'appariement divise la SE par presque trois, et fait passer la conclusion de “pas significatif” à “significatif”. »</em>
+<span class="faux"><b>Phrase fausse tentante</b> : « les deux intervalles se chevauchent, donc pas de différence ». Tentante parce que c'est ce que montrent les deux barres, et parce que ça réutilise le cas 1 tel quel. Fausse parce qu'elle change d'objet (deux paramètres au lieu d'un) et jette la covariance.</span>
+<span class="faux"><b>Deuxième phrase fausse tentante</b> : « 5 000 images, donc l'écart de 0,9 point est bien mesuré ». Tentante parce que n est grand. Fausse parce que l'effectif informatif est 150, celui des désaccords ; la précision de la comparaison vient de là, pas de n.</span>
+</div>
+
+<h3>Où chaque maillon casse</h3>
+<table>
+<tr><th>#</th><th>maillon</th><th>hypothèse</th><th>ce qui casse</th></tr>
+<tr><td>1</td><td>un seul objet, <span class="m">d</span></td><td>—</td><td class="sel">comparer deux IC ⇒ mauvaise question, test conservateur</td></tr>
+<tr><td>2</td><td>règle 2 avec Cov</td><td>mêmes images</td><td class="sel">supposer Cov = 0 ⇒ SE × 2,7, différence ratée</td></tr>
+<tr><td>3</td><td><span class="m">D<sub>i</sub></span> iid</td><td>images indépendantes</td><td>frames corrélées ⇒ SE sous-estimée (comme au cas 1)</td></tr>
+<tr><td>4</td><td>Var(<span class="m">D<sub>i</sub></span>) = π − d²</td><td>—</td><td>compter n au lieu des désaccords ⇒ fausse confiance</td></tr>
+<tr><td>5</td><td>plug-in de π et d</td><td>désaccords ≥ 10 environ</td><td>b + c petit ⇒ test exact binomial sur b contre b+c</td></tr>
+<tr><td>6</td><td>SE sous H₀ vs estimée</td><td>savoir quelle question on pose</td><td>mélanger test et intervalle</td></tr>
+<tr><td>7</td><td>bootstrap</td><td>rééchantillonner les <b>paires</b></td><td>rééchantillonner par colonne ⇒ covariance perdue</td></tr>
+<tr><td>8</td><td>apparié ≠ randomisé</td><td>—</td><td>conclure « B est meilleur parce que » : la comparaison ne dit pas pourquoi</td></tr>
+<tr><td>9</td><td>modèles fixés avant le tirage</td><td>pas de sélection</td><td class="sel">B est « le meilleur de 40 » ⇒ cas 3</td></tr>
+</table>
+
+<p class="retenir">Quand tu compares, demande-toi d'abord quel est l'objet unique, puis ce que les deux mesures ont en commun dans leur tirage.</p>
+</section>
+
+<section id="suite">
+<div class="porte">
+<h3 style="margin-top:0">La porte vers le cas 3</h3>
+<p style="margin:0">Tout ce qui précède suppose que A et B ont été choisis <i>avant</i> d'ouvrir le test set. Si B est en réalité la meilleure de 40 configurations essayées sur ce même test set, ses 88,1 % sont gonflés, l'appariement n'y change rien, et le bootstrap ne le voit pas. C'est le biais du max, cas 3.</p>
+</div>
+</section>
+
+</main>
+
+<aside class="marge">
+  <div class="note"><b>L'objet unique</b><br>Pas p_A et p_B : d = p_A − p_B. Une question, un paramètre, un intervalle.</div>
+  <div class="note"><b>Le terme qui décide</b><br>−2Cov dans la règle 2. Même tirage ⇒ Cov > 0 ⇒ la différence est plus précise que ne le disent les deux IC.</div>
+  <div class="note"><b>L'effectif qui compte</b><br>150 désaccords, pas 5 000 images. Les 4 850 accords ne portent aucune information sur la différence.</div>
+</aside>
+
+</div>
+<script>
+(function(){
+'use strict';
+var NS='http://www.w3.org/2000/svg';
+var BR='#1F5FA8',SEL='#B23A2C',VR='#2E7D4F',INK='#1C2430',FA='#8A93A0',GR='#D3D7DD';
+function el(n,a,p){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+function txt(p,x,y,s,o){o=o||{};var t=el('text',{x:x,y:y,'font-family':'inherit','font-size':o.fs||13,fill:o.fill||INK,'text-anchor':o.ta||'start','font-style':o.fi||'normal','font-weight':o.fw||'normal'},p);if(o.tr)t.setAttribute('transform',o.tr);t.textContent=s;return t;}
+function fr(x,d){return x.toFixed(d).replace('.',',');}
+function phi(x){return Math.exp(-x*x/2)/Math.sqrt(2*Math.PI);}
+function randn(){var u=1-Math.random(),v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function ctrlBar(fig){var c=document.createElement('div');c.className='ctrl';fig.appendChild(c);return c;}
+function btn(c,label,fn,prim){var b=document.createElement('button');b.textContent=label;if(prim)b.className='prim';b.onclick=fn;c.appendChild(b);return b;}
+function stat(c){var s=document.createElement('span');s.className='stat';c.appendChild(s);return s;}
+function cap(fig,html){var c=document.createElement('figcaption');c.innerHTML=html;fig.appendChild(c);return c;}
+/* generative model of the paired test set: 4 cells */
+var N=5000,P_BOTH=0.8616,P_AONLY=0.0104,P_BONLY=0.0196; /* both wrong = rest */
+function drawSet(n){var bb=0,a=0,b=0;for(var i=0;i<n;i++){var u=Math.random();if(u<P_BOTH)bb++;else if(u<P_BOTH+P_AONLY)a++;else if(u<P_BOTH+P_AONLY+P_BONLY)b++;}return {pA:(bb+a)/n,pB:(bb+b)/n,a:a,b:b};}
+/* faster normal approx for repeated draws */
+function drawSetFast(n){var bb=Math.round(n*P_BOTH+Math.sqrt(n*P_BOTH*(1-P_BOTH))*randn());var rest=n-bb;var pa=P_AONLY/(1-P_BOTH),pb=P_BONLY/(1-P_BOTH);var a=Math.round(rest*pa+Math.sqrt(rest*pa*(1-pa))*randn());var b=Math.round((rest-a)*(pb/(1-pa))+Math.sqrt((rest-a)*(pb/(1-pa))*(1-pb/(1-pa)))*randn());a=Math.max(0,a);b=Math.max(0,b);return {pA:(bb+a)/n,pB:(bb+b)/n,a:a,b:b};}
+
+/* niveaux */
+(function(){
+  var fig=document.getElementById('fig-niveaux');
+  var W=640,H=230;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Les trois niveaux du cas 2'},fig);
+  var rows=[['le monde','d = p_A − p_B, la vraie différence',VR,'fixe, inconnu : un seul paramètre'],['la procédure','tirer 5 000 images · mesurer A et B sur ces mêmes images · soustraire',BR,'aléatoire, et les deux mesures partagent le tirage'],['le résultat en main','87,2 − 88,1 = −0,9 point  ·  52 contre 98 désaccords',INK,'des nombres, plus aléatoires']];
+  rows.forEach(function(r,i){var y=30+i*70;el('rect',{x:10,y:y,width:W-20,height:52,fill:'#fff',stroke:r[2],'stroke-width':1.5,rx:3},s);txt(s,24,y+22,r[0],{fw:'bold',fs:14,fill:r[2]});txt(s,24,y+42,r[3],{fs:12,fill:FA,fi:'italic'});txt(s,W-24,y+32,r[1],{ta:'end',fs:13.5});if(i<2)el('path',{d:'M'+(W/2)+','+(y+52)+' v12 l-5,-5 m5,5 l5,-5',fill:'none',stroke:INK},s);});
+  cap(fig,'La procédure mesure deux choses sur un même tirage, puis les soustrait. Ce « même tirage » est toute la différence avec le cas 1 : il crée une covariance, et la covariance change la conclusion.');
+})();
+
+/* chevauchement */
+(function(){
+  var fig=document.getElementById('fig-chevauchement');
+  var W=640,H=230;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Deux intervalles qui se chevauchent, et l intervalle de la différence qui exclut zéro'},fig);
+  var L=60,R=20,lo=85.8,hi=89.5;function X(v){return L+(v-lo)/(hi-lo)*(W-L-R);}
+  txt(s,L,22,'les deux intervalles du cas 1, pris séparément',{fs:12,fill:FA,fi:'italic'});
+  el('line',{x1:L,y1:100,x2:W-R,y2:100,stroke:INK},s);[86,87,88,89].forEach(function(v){txt(s,X(v),116,v+' %',{ta:'middle',fs:11,fill:FA});});
+  el('line',{x1:X(86.3),y1:48,x2:X(88.1),y2:48,stroke:SEL,'stroke-width':6,opacity:.6},s);el('circle',{cx:X(87.2),cy:48,r:4,fill:SEL},s);txt(s,X(86.3)-6,52,'A',{ta:'end',fs:13,fw:'bold',fill:SEL});
+  el('line',{x1:X(87.2),y1:76,x2:X(89.0),y2:76,stroke:SEL,'stroke-width':6,opacity:.6},s);el('circle',{cx:X(88.1),cy:76,r:4,fill:SEL},s);txt(s,X(87.2)-6,80,'B',{ta:'end',fs:13,fw:'bold',fill:SEL});
+  el('rect',{x:X(87.2),y:40,width:X(88.1)-X(87.2),height:44,fill:SEL,opacity:.08},s);txt(s,X(87.65),36,'chevauchement',{ta:'middle',fs:10.5,fill:SEL});
+  /* difference axis */
+  var L2=60,lo2=-2.5,hi2=1;function X2(v){return L2+(v-lo2)/(hi2-lo2)*(W-L2-R);}
+  txt(s,L2,150,'l\'intervalle de la différence d = p_A − p_B, calculé en apparié',{fs:12,fill:FA,fi:'italic'});
+  el('line',{x1:L2,y1:200,x2:W-R,y2:200,stroke:INK},s);[-2,-1,0,1].forEach(function(v){txt(s,X2(v),216,(v>0?'+':'')+v+' pt',{ta:'middle',fs:11,fill:FA});});
+  el('line',{x1:X2(0),y1:160,x2:X2(0),y2:200,stroke:VR,'stroke-dasharray':'3 3'},s);txt(s,X2(0)+4,170,'0 = pas de différence',{fs:10.5,fill:VR});
+  el('line',{x1:X2(-1.40),y1:184,x2:X2(-0.44),y2:184,stroke:BR,'stroke-width':6,opacity:.8},s);el('circle',{cx:X2(-0.92),cy:184,r:4,fill:BR},s);txt(s,X2(-1.40)-6,188,'[−1,40 ; −0,44]',{ta:'end',fs:11.5,fill:BR,fw:'bold'});
+  cap(fig,'En haut, la lecture naturelle : A et B se chevauchent, « rien à conclure ». En bas, la bonne question : l\'intervalle de la différence exclut zéro nettement. Ce ne sont pas deux interprétations d\'un même calcul, ce sont deux calculs, et le premier répond à côté.');
+})();
+
+/* bruit partagé */
+(function(){
+  var fig=document.getElementById('fig-partage');var c=ctrlBar(fig);var st=stat(c);
+  var W=640,H=330;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Nuage des deux accuracies mesurées, apparié ou non'},fig);
+  var g=el('g',{},s);var mode='same',pts=[];
+  var L=50,T=20,sz=250,lo=85.6,hi=89.6;
+  function X(v){return L+(v-lo)/(hi-lo)*sz;}function Y(v){return T+sz-(v-lo)/(hi-lo)*sz;}
+  function tirer(k){for(var i=0;i<k;i++){var d;if(mode==='same')d=drawSetFast(N);else{var s1=drawSetFast(N),s2=drawSetFast(N);d={pA:s1.pA,pB:s2.pB};}pts.push([d.pA*100,d.pB*100]);}render();}
+  function render(){
+    while(g.firstChild)g.removeChild(g.firstChild);
+    el('rect',{x:L,y:T,width:sz,height:sz,fill:'#fff',stroke:INK},g);
+    for(var v=86;v<=89;v++){txt(g,X(v),T+sz+14,v,{ta:'middle',fs:10.5,fill:FA});txt(g,L-6,Y(v)+4,v,{ta:'end',fs:10.5,fill:FA});}
+    txt(g,L+sz/2,T+sz+30,'accuracy de A',{ta:'middle',fs:11,fill:FA,fi:'italic'});txt(g,14,T+sz/2,'accuracy de B',{ta:'middle',fs:11,fill:FA,fi:'italic',tr:'rotate(-90 14 '+(T+sz/2)+')'});
+    el('line',{x1:X(lo),y1:Y(lo+0.9),x2:X(hi-0.9),y2:Y(hi),stroke:VR,'stroke-dasharray':'3 3'},g);txt(g,X(hi-0.9)-4,Y(hi)+12,'B = A + 0,9',{ta:'end',fs:10,fill:VR});
+    el('circle',{cx:X(87.2),cy:Y(88.1),r:5,fill:'none',stroke:VR,'stroke-width':2},g);
+    pts.slice(-400).forEach(function(p){el('circle',{cx:X(p[0]),cy:Y(p[1]),r:2.6,fill:BR,opacity:.45},g);});
+    /* difference histogram at right */
+    var hx=340,hw=280,hlo=-2.8,hhi=1.0;function HX(v){return hx+(v-hlo)/(hhi-hlo)*hw;}
+    txt(g,hx,T+12,'différence mesurée  p̂_A − p̂_B',{fs:12,fw:'bold'});
+    var nb=38,h=new Array(nb).fill(0);pts.forEach(function(p){var d=p[0]-p[1];var i=Math.floor((d-hlo)/(hhi-hlo)*nb);if(i>=0&&i<nb)h[i]++;});
+    var mx=Math.max(1,Math.max.apply(null,h)),base=T+200,bw=hw/nb;
+    for(var i=0;i<nb;i++)el('rect',{x:hx+i*bw,y:base-h[i]/mx*150,width:bw-1,height:h[i]/mx*150,fill:mode==='same'?BR:SEL,opacity:.6},g);
+    el('line',{x1:hx,y1:base,x2:hx+hw,y2:base,stroke:INK},g);[-2,-1,0,1].forEach(function(v){txt(g,HX(v),base+14,(v>0?'+':'')+v,{ta:'middle',fs:10.5,fill:FA});});
+    el('line',{x1:HX(-0.9),y1:base,x2:HX(-0.9),y2:T+24,stroke:VR,'stroke-dasharray':'3 3'},g);el('line',{x1:HX(0),y1:base,x2:HX(0),y2:T+24,stroke:FA,'stroke-dasharray':'2 3'},g);
+    if(pts.length>1){var ds=pts.map(function(p){return p[0]-p[1]}),m=ds.reduce(function(a,b){return a+b},0)/ds.length,v=ds.reduce(function(a,b){return a+(b-m)*(b-m)},0)/ds.length;
+      txt(g,hx,base+40,'écart-type observé de la différence : '+fr(Math.sqrt(v),2)+' pt',{fs:12,fw:'bold',fill:mode==='same'?BR:SEL});
+      txt(g,hx,base+58,'attendu : 0,245 (même tirage) · 0,66 (tirages séparés)',{fs:11,fill:FA,fi:'italic'});
+      var r=0,ma=pts.reduce(function(a,p){return a+p[0]},0)/pts.length,mb=pts.reduce(function(a,p){return a+p[1]},0)/pts.length,va=0,vb=0;pts.forEach(function(p){r+=(p[0]-ma)*(p[1]-mb);va+=(p[0]-ma)*(p[0]-ma);vb+=(p[1]-mb)*(p[1]-mb);});
+      txt(g,hx,base+78,'corrélation des deux mesures ρ = '+fr(r/Math.sqrt(va*vb),2),{fs:12});}
+    st.textContent=pts.length+' test sets';
+  }
+  var b1=btn(c,'Même test set pour A et B',function(){mode='same';pts=[];b1.setAttribute('aria-pressed','true');b2.setAttribute('aria-pressed','false');tirer(200);});
+  var b2=btn(c,'Un test set pour A, un autre pour B',function(){mode='sep';pts=[];b2.setAttribute('aria-pressed','true');b1.setAttribute('aria-pressed','false');tirer(200);});
+  b1.setAttribute('aria-pressed','true');btn(c,'+ 200 test sets',function(){tirer(200)},true);
+  tirer(200);
+  cap(fig,'Chaque point est un test set de 5 000 images, avec les deux accuracies mesurées dessus. Le cercle vert est la vérité (87,2 ; 88,1). Même test set : le nuage s\'allonge le long de la diagonale — un tirage facile remonte A et B ensemble — et la différence, à droite, est serrée (0,25 pt). Deux test sets distincts : le nuage devient rond, la corrélation tombe à zéro, et la différence s\'étale (0,66 pt). Même vérité, même n, précision divisée par 2,7.');
+})();
+
+/* mosaïque */
+(function(){
+  var fig=document.getElementById('fig-mosaique');
+  var W=640,H=270;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Les 5000 images en quatre cases, seules deux comptent'},fig);
+  var L=40,T=30,sz=210;var tot=5000,bb=4308,aonly=52,bonly=98,ww=542;
+  /* mosaic: width split by A right/wrong, height by B */
+  var pA=(bb+aonly)/tot; var wA=sz*pA,wNA=sz-wA;
+  var hB_A=bb/(bb+aonly)*sz, hB_NA=bonly/(bonly+ww)*sz;
+  function cell(x,y,w,h,col,op,label,sub,tcol){el('rect',{x:x,y:y,width:w,height:h,fill:col,opacity:op,stroke:'#fff'},s);if(label)txt(s,x+w/2,y+h/2+(sub?-2:4),label,{ta:'middle',fs:w<30||h<26?9:12,fill:tcol||INK,fw:'bold'});if(sub)txt(s,x+w/2,y+h/2+14,sub,{ta:'middle',fs:9.5,fill:tcol||INK});}
+  cell(L,T,wA,hB_A,'#DCE3EA',1,'les deux bons','4 308 · Dᵢ = 0');
+  cell(L,T+hB_A,wA,sz-hB_A,SEL,.75,'A seul','52 · +1','#fff');
+  cell(L+wA,T,wNA,hB_NA,SEL,.75,'B seul','98 · −1','#fff');
+  cell(L+wA,T+hB_NA,wNA,sz-hB_NA,'#DCE3EA',1,'','');txt(s,L+wA+wNA/2,T+hB_NA+(sz-hB_NA)/2+4,'faux',{ta:'middle',fs:10,fill:INK});
+  txt(s,L+wA/2,T+sz+16,'A a bon (87,2 %)',{ta:'middle',fs:11,fill:FA});txt(s,L+wA+wNA/2,T+sz+16,'A faux',{ta:'middle',fs:10,fill:FA});
+  txt(s,L-6,T+hB_A/2,'B bon',{ta:'end',fs:10,fill:FA});txt(s,L-6,T+hB_A+(sz-hB_A)/2,'B faux',{ta:'end',fs:10,fill:FA});
+  /* right side explanation */
+  var rx=300;
+  txt(s,rx,T+10,'ce que la variance de Dᵢ voit',{fs:12,fw:'bold'});
+  el('rect',{x:rx,y:T+22,width:14,height:14,fill:'#DCE3EA'},s);txt(s,rx+20,T+33,'4 850 accords → Dᵢ = 0, Dᵢ² = 0 : contribution nulle',{fs:11.5});
+  el('rect',{x:rx,y:T+46,width:14,height:14,fill:SEL,opacity:.75},s);txt(s,rx+20,T+57,'150 désaccords → Dᵢ² = 1 : toute l\'information',{fs:11.5});
+  txt(s,rx,T+92,'E[Dᵢ²] = 150/5000 = π̂ = 0,03',{fs:12.5,fi:'italic'});
+  txt(s,rx,T+112,'E[Dᵢ] = (52 − 98)/5000 = d̂ = −0,0092',{fs:12.5,fi:'italic'});
+  txt(s,rx,T+140,'Var(Dᵢ) = π − d² = 0,03 − 0,00008 = 0,0299',{fs:12.5,fw:'bold'});
+  txt(s,rx,T+160,'SE(d̂) = √(0,0299 / 5000) = 0,245 pt',{fs:12.5,fw:'bold',fill:BR});
+  txt(s,rx,T+195,'les cases grises couvrent 97 % de la surface',{fs:11,fill:FA,fi:'italic'});
+  txt(s,rx,T+211,'et pèsent zéro dans la comparaison',{fs:11,fill:FA,fi:'italic'});
+  cap(fig,'Les 5 000 images en quatre cases, surface proportionnelle à l\'effectif. Les deux cases rouges, minuscules, sont les seules où A et B diffèrent : ce sont elles, et elles seules, qui alimentent la variance de la différence. Quand on lit « n = 5 000 », il faut entendre « 150 images informatives ».');
+})();
+
+/* rho */
+(function(){
+  var fig=document.getElementById('fig-rho');
+  var W=640,H=240;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'SE de la différence en fonction de la corrélation'},fig);
+  var L=50,R=20,T=24,B=40;function X(r){return L+r*(W-L-R);}function Y(v){return H-B-v/1.0*(H-T-B);}
+  var s2=(0.4725*0.4725+0.458*0.458)/2;
+  [0,0.25,0.5,0.75,1].forEach(function(v){txt(s,L-6,Y(v)+4,fr(v,2)+' pt',{ta:'end',fs:11,fill:FA});el('line',{x1:L,y1:Y(v),x2:W-R,y2:Y(v),stroke:GR},s);});
+  el('line',{x1:L,y1:H-B,x2:W-R,y2:H-B,stroke:INK},s);el('line',{x1:L,y1:T,x2:L,y2:H-B,stroke:INK},s);
+  [0,0.25,0.5,0.75,1].forEach(function(r){txt(s,X(r),H-B+16,fr(r,2),{ta:'middle',fs:11,fill:FA});});
+  txt(s,W-R,H-B+32,'ρ, corrélation des erreurs de A et B',{ta:'end',fs:11,fill:FA,fi:'italic'});
+  var d='';for(var r=0;r<=1.0001;r+=0.01)d+=(d?'L':'M')+X(r)+','+Y(Math.sqrt(2*s2*(1-r)));
+  el('path',{d:d,fill:'none',stroke:BR,'stroke-width':2.4},s);
+  [[0,'non apparié : 0,66'],[0.86,'ici : 0,25']].forEach(function(pt){var r=pt[0],v=Math.sqrt(2*s2*(1-r));el('circle',{cx:X(r),cy:Y(v),r:5,fill:r?BR:SEL},s);txt(s,X(r)+(r?-8:8),Y(v)-10,pt[1],{ta:r?'end':'start',fs:12,fw:'bold',fill:r?BR:SEL});});
+  txt(s,X(0.3),Y(0.25),'SE(d̂) = √(2s²(1−ρ)),  1 − ρ = π / (2p(1−p))',{fs:12,fi:'italic'});
+  txt(s,X(0.3),Y(0.15),'ρ ↑ quand le taux de désaccord π ↓',{fs:12});
+  cap(fig,'La SE de la différence en fonction de la corrélation des erreurs. À ρ = 0 on retrouve la formule non appariée. Plus les deux modèles sont d\'accord (π petit), plus ρ est grand, plus la différence est précise. Deux modèles proches sont plus faciles à départager qu\'on ne le croit.');
+})();
+
+/* McNemar */
+(function(){
+  var fig=document.getElementById('fig-mcnemar');var c=ctrlBar(fig);var st=stat(c);
+  var W=640,H=250;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Distribution de z sous H0 et valeur observée'},fig);
+  var g=el('g',{},s);var zs=[];
+  var L=40,R=20,T=24,B=40,lo=-5,hi=5;function X(t){return L+(t-lo)/(hi-lo)*(W-L-R);}function Y(v){return H-B-v/0.45*(H-T-B);}
+  function tirer(k){for(var i=0;i<k;i++){var b=0,cc=0;for(var j=0;j<150;j++){if(Math.random()<0.5)b++;else cc++;}zs.push((b-cc)/Math.sqrt(150));}render();}
+  function render(){
+    while(g.firstChild)g.removeChild(g.firstChild);
+    el('line',{x1:L,y1:H-B,x2:W-R,y2:H-B,stroke:INK},g);for(var t=-4;t<=4;t+=2)txt(g,X(t),H-B+16,t,{ta:'middle',fs:11,fill:FA});
+    var nb=40,h=new Array(nb).fill(0);zs.forEach(function(z){var i=Math.floor((z-lo)/(hi-lo)*nb);if(i>=0&&i<nb)h[i]++;});
+    var mx=Math.max(1,Math.max.apply(null,h)),bw=(W-L-R)/nb;
+    for(var i=0;i<nb;i++)el('rect',{x:L+i*bw,y:H-B-h[i]/mx*(H-T-B)*0.9,width:bw-1,height:h[i]/mx*(H-T-B)*0.9,fill:BR,opacity:.5},g);
+    var d='';for(var t=lo;t<=hi;t+=0.05)d+=(d?'L':'M')+X(t)+','+Y(phi(t));el('path',{d:d,fill:'none',stroke:INK,'stroke-width':1.6,'stroke-dasharray':'4 3'},g);
+    el('line',{x1:X(-3.76),y1:H-B,x2:X(-3.76),y2:T+10,stroke:SEL,'stroke-width':2.5},g);txt(g,X(-3.76)+6,T+20,'observé : z = −3,76',{fs:12,fw:'bold',fill:SEL});
+    el('line',{x1:X(-1.96),y1:H-B,x2:X(-1.96),y2:T+40,stroke:FA,'stroke-dasharray':'2 3'},g);el('line',{x1:X(1.96),y1:H-B,x2:X(1.96),y2:T+40,stroke:FA,'stroke-dasharray':'2 3'},g);txt(g,X(0),T+50,'±1,96 : la zone où H₀ n\'est pas surprise',{ta:'middle',fs:11,fill:FA});
+    var ext=zs.filter(function(z){return Math.abs(z)>=3.76}).length;
+    if(zs.length)txt(g,W-R,H-B-8,'|z| ≥ 3,76 dans '+ext+' mondes-H₀ sur '+zs.length+'  (attendu ≈ 0,02 %)',{ta:'end',fs:11.5,fill:SEL});
+    st.textContent=zs.length+' mondes où H₀ est vraie';
+  }
+  btn(c,'Simuler 500 mondes où H₀ est vraie',function(){tirer(500)},true);btn(c,'Remettre à zéro',function(){zs=[];render();});
+  tirer(500);
+  cap(fig,'Dans un monde où A et B se valent, chacun des 150 désaccords tombe à pile ou face. On simule ce monde : b et c à pile ou face sur 150, puis z = (b − c)/√150. L\'histogramme est la loi de z sous H₀ ; la courbe pointillée est la gaussienne standard qu\'il approche. Le trait rouge est ce qu\'on a observé. Presque aucun monde-H₀ ne produit un z aussi extrême : c\'est ça, une p-value minuscule.');
+})();
+
+/* bootstrap */
+(function(){
+  var fig=document.getElementById('fig-bootstrap');var c=ctrlBar(fig);var st=stat(c);
+  var W=640,H=270;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Bootstrap apparié et bootstrap par colonnes'},fig);
+  var g=el('g',{},s);var mode='paired',vals=[];
+  /* observed data: D values: 52 (+1), 98 (-1), 4850 (0). columns: A: 4360 ones; B: 4406 ones */
+  var L=40,R=20,T=24,B=40,lo=-2.8,hi=1.0;function X(v){return L+(v-lo)/(hi-lo)*(W-L-R);}
+  function resample(){
+    if(mode==='paired'){var b=0,cc=0;for(var i=0;i<N;i++){var u=Math.random()*N;if(u<52)b++;else if(u<150)cc++;}return (b-cc)/N*100;}
+    else{var a=0,bb=0;for(var i=0;i<N;i++){if(Math.random()*N<4360)a++;if(Math.random()*N<4406)bb++;}return (a-bb)/N*100;}
+  }
+  function tirer(k){for(var i=0;i<k;i++)vals.push(resample());render();}
+  function render(){
+    while(g.firstChild)g.removeChild(g.firstChild);
+    el('line',{x1:L,y1:H-B,x2:W-R,y2:H-B,stroke:INK},g);[-2,-1,0,1].forEach(function(v){txt(g,X(v),H-B+16,(v>0?'+':'')+v+' pt',{ta:'middle',fs:11,fill:FA});});
+    var nb=44,h=new Array(nb).fill(0);vals.forEach(function(v){var i=Math.floor((v-lo)/(hi-lo)*nb);if(i>=0&&i<nb)h[i]++;});
+    var mx=Math.max(1,Math.max.apply(null,h)),bw=(W-L-R)/nb;
+    for(var i=0;i<nb;i++)el('rect',{x:L+i*bw,y:H-B-h[i]/mx*(H-T-B)*0.85,width:bw-1,height:h[i]/mx*(H-T-B)*0.85,fill:mode==='paired'?BR:SEL,opacity:.6},g);
+    el('line',{x1:X(-0.92),y1:H-B,x2:X(-0.92),y2:T,stroke:VR,'stroke-width':1.5},g);txt(g,X(-0.92),T-6,'d̂ observé = −0,92',{ta:'middle',fs:11,fill:VR});
+    el('line',{x1:X(0),y1:H-B,x2:X(0),y2:T+30,stroke:FA,'stroke-dasharray':'2 3'},g);
+    if(vals.length>2){var sv=vals.slice().sort(function(a,b){return a-b}),q1=sv[Math.floor(0.025*sv.length)],q2=sv[Math.floor(0.975*sv.length)],m=vals.reduce(function(a,b){return a+b},0)/vals.length,v=vals.reduce(function(a,b){return a+(b-m)*(b-m)},0)/vals.length;
+      el('line',{x1:X(q1),y1:T+40,x2:X(q2),y2:T+40,stroke:mode==='paired'?BR:SEL,'stroke-width':5},g);
+      txt(g,X(q1)-6,T+44,fr(q1,2),{ta:'end',fs:11,fill:mode==='paired'?BR:SEL});txt(g,X(q2)+6,T+44,fr(q2,2),{fs:11,fill:mode==='paired'?BR:SEL});
+      txt(g,W-R,T+70,'écart-type bootstrap : '+fr(Math.sqrt(v),3)+' pt',{ta:'end',fs:12.5,fw:'bold',fill:mode==='paired'?BR:SEL});
+      txt(g,W-R,T+88,mode==='paired'?'formule appariée : 0,245':'formule non appariée : 0,66',{ta:'end',fs:11,fill:FA,fi:'italic'});
+      txt(g,W-R,T+106,'IC bootstrap 95 % : ['+fr(q1,2)+' ; '+fr(q2,2)+']'+(q2<0?' — exclut 0':' — contient 0'),{ta:'end',fs:11.5});}
+    st.textContent=vals.length+' rééchantillons';
+  }
+  var b1=btn(c,'Rééchantillonner les paires (images)',function(){mode='paired';vals=[];b1.setAttribute('aria-pressed','true');b2.setAttribute('aria-pressed','false');tirer(300);});
+  var b2=btn(c,'Rééchantillonner A et B séparément',function(){mode='cols';vals=[];b2.setAttribute('aria-pressed','true');b1.setAttribute('aria-pressed','false');tirer(300);});
+  b1.setAttribute('aria-pressed','true');btn(c,'+ 300',function(){tirer(300)},true);
+  tirer(300);
+  cap(fig,'À gauche du bouton : on tire 5 000 images avec remise dans le test set, en emportant pour chacune les deux résultats (A, B), et on recalcule la différence. L\'écart-type des différences bootstrap retrouve 0,245 sans connaître la formule. Rééchantillonner les colonnes séparément détruit le lien entre A et B sur une même image : on retombe sur 0,66, et l\'intervalle contient zéro. Le bootstrap n\'est juste que s\'il refait la vraie expérience, et la vraie expérience tire des images, pas des colonnes.');
+})();
+
+/* nav */
+(function(){
+  var links=Array.prototype.slice.call(document.querySelectorAll('nav.echelle a'));
+  var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'))});
+  if(!('IntersectionObserver' in window))return;
+  var io=new IntersectionObserver(function(es){es.forEach(function(e){if(e.isIntersecting){links.forEach(function(a){a.classList.remove('on')});links[secs.indexOf(e.target)].classList.add('on');}});},{rootMargin:'-30% 0px -60% 0px'});
+  secs.forEach(function(sc){io.observe(sc)});
+})();
+})();
+</script>
+</body>
+</html>
