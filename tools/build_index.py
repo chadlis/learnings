@@ -4,14 +4,18 @@
 Python 3, bibliothèque standard uniquement. Idempotent : deux exécutions de
 suite produisent exactement le même fichier. Ajouter une fiche ne demande
 aucune édition manuelle de l'index — il suffit de déposer le fichier dans
-fiches/semaine/ ou fiches/theme/ avec ses métadonnées et de relancer le script.
+fiches/semaine/, fiches/theme/ ou fiches/deroule/ avec ses métadonnées et de
+relancer le script.
 
 Métadonnées lues dans le <head> de chaque fiche :
     <title>…</title>                              titre affiché (version incluse)
     <meta name="fiche" content="serie=…;numero=…"> série et numéro
     <meta name="deck" content="01">                deck Anki (obligatoire)
     <meta name="sous-titre" content="…">           ligne secondaire (optionnel)
-Le nombre de questions est le nombre de balises <details> du fichier.
+Le libellé de droite est calculé, jamais écrit à la main : le nombre de
+balises <details> pour une fiche (« 28 q. »), le nombre de marches du rail
+et de <figure> pour un déroulé (« 6 marches · 8 fig. »), qui ne pose pas de
+questions.
 """
 
 from __future__ import annotations
@@ -37,12 +41,18 @@ DECKS = [
 ]
 DECK_ORDER = {d: i for i, (d, _, _) in enumerate(DECKS)}
 
-# Dossiers scannés : (chemin relatif, série par défaut, rang de tri, archive ?)
+# Dossiers scannés : (chemin, motif, série par défaut, rang de tri, archive ?)
+# Le rang ordonne les entrées d'un même deck : les déroulés viennent après les
+# fiches thématiques, parce qu'ils se lisent une fois la fiche connue.
 SOURCES = [
-    ("fiches/semaine", "semaine", 0, False),
-    ("fiches/theme", "thematique", 1, False),
-    ("fiches/archives", "archive", 2, True),
+    ("fiches/semaine", "fiche-*.html", "semaine", 0, False),
+    ("fiches/theme", "fiche-*.html", "thematique", 1, False),
+    ("fiches/archives", "fiche-*.html", "archive", 2, True),
+    ("fiches/deroule", "deroule-*.html", "deroule", 3, False),
 ]
+
+# Préfixe du badge de gauche, par série. Le vide laisse le numéro nu.
+BADGES = {"thematique": "", "deroule": "D", "semaine": "S"}
 
 
 # --------------------------------------------------------------------------
@@ -65,9 +75,21 @@ def meta(head: str, name: str) -> str | None:
 def short_title(title: str) -> str:
     """« Probabilités & lois — fiche thématique » → « Probabilités & lois ».
 
-    La version vit dans le <title> ; on retire seulement le suffixe de série.
+    La version vit dans le <title> ; on retire seulement le suffixe de série,
+    « — fiche … » pour une fiche, « — déroulé » pour un déroulé.
     """
-    return re.sub(r"\s+—\s+fiche\b.*$", "", title).strip()
+    return re.sub(r"\s+—\s+(fiche|déroulé)\b.*$", "", title).strip()
+
+
+def compte_marches(text: str) -> int:
+    """Les marches d'un déroulé, comptées sur son rail de navigation.
+
+    Le rail est la seule liste exhaustive des sections ; celles qui ne sont pas
+    des marches (« Rappel », « La course », « Au tableau ») y portent leur nom
+    et ne sont donc pas comptées.
+    """
+    nav = re.search(r'<nav[^>]*class="echelle".*?</nav>', text, re.S | re.I)
+    return len(re.findall(r">\s*Marche\b", nav.group(0))) if nav else 0
 
 
 def read_fiche(path: pathlib.Path, serie_default: str, rank: int, archive: bool) -> dict:
@@ -87,8 +109,10 @@ def read_fiche(path: pathlib.Path, serie_default: str, rank: int, archive: bool)
     serie = champs.get("serie", serie_default)
     numero = champs.get("numero", "")
     if not numero:
-        m = re.match(r"fiche-[st](\d+)", path.name)
+        m = re.match(r"(?:fiche|deroule)-[std](\d+)", path.name)
         numero = m.group(1) if m else "00"
+
+    prefixe = BADGES.get(serie, "S")
 
     deck = meta(head, "deck")
     if deck is None and not archive:
@@ -102,21 +126,31 @@ def read_fiche(path: pathlib.Path, serie_default: str, rank: int, archive: bool)
         "numero": numero,
         "deck": deck,
         "questions": text.count("<details"),
+        "figures": len(re.findall(r"<figure\b", text)),
+        "marches": compte_marches(text),
         "rank": rank,
         "archive": archive,
-        "badge": ("S" + numero.lstrip("0") if serie != "thematique" else numero),
+        "badge": prefixe + numero.lstrip("0") if prefixe else numero,
     }
 
 
 def collect() -> list[dict]:
     fiches = []
-    for rel, serie, rank, archive in SOURCES:
+    for rel, motif, serie, rank, archive in SOURCES:
         d = ROOT / rel
         if not d.is_dir():
             continue
-        for p in sorted(d.glob("fiche-*.html")):
+        for p in sorted(d.glob(motif)):
             fiches.append(read_fiche(p, serie, rank, archive))
     return fiches
+
+
+def fichiers_fiches() -> list[pathlib.Path]:
+    """Tous les fichiers scannés, quel que soit leur motif de nom."""
+    out: list[pathlib.Path] = []
+    for rel, motif, *_ in SOURCES:
+        out += (ROOT / rel).glob(motif)
+    return sorted(out)
 
 
 # --------------------------------------------------------------------------
@@ -125,6 +159,14 @@ def collect() -> list[dict]:
 
 def esc(s: str) -> str:
     return html.escape(s, quote=False)
+
+
+def note(f: dict) -> str:
+    """Le libellé de droite. Un déroulé ne pose aucune question : on annonce la
+    longueur de la montée et le nombre de figures à manipuler."""
+    if f["serie"] == "deroule":
+        return "%d marches · %d fig." % (f["marches"], f["figures"])
+    return "%d q." % f["questions"]
 
 
 def item(f: dict, note: str) -> str:
@@ -150,7 +192,7 @@ def render_decks(fiches: list[dict]) -> str:
             continue
         out.append(
             '<div style="--ac:var(--%s)"><h2>%s</h2>%s</div>'
-            % (couleur, libelle, "".join(item(f, "%d q." % f["questions"]) for f in groupe))
+            % (couleur, libelle, "".join(item(f, note(f)) for f in groupe))
         )
 
     orphelines = sorted(
@@ -160,7 +202,7 @@ def render_decks(fiches: list[dict]) -> str:
     if orphelines:
         out.append(
             '<div style="--ac:var(--faint)"><h2>❓ à classer</h2>%s</div>'
-            % "".join(item(f, "%d q." % f["questions"]) for f in orphelines)
+            % "".join(item(f, note(f)) for f in orphelines)
         )
     return "".join(out)
 
@@ -264,7 +306,7 @@ def fichiers_du_site() -> list[pathlib.Path]:
     noms = ["index.html", "timeline-formation.html", "manifest.webmanifest",
             "icone-fiches.svg", "apple-touch-icon.png"]
     fichiers = [ROOT / n for n in noms if (ROOT / n).exists()]
-    fichiers += sorted(ROOT.glob("fiches/*/fiche-*.html"))
+    fichiers += fichiers_fiches()
     return fichiers
 
 
@@ -314,7 +356,7 @@ footer{margin-top:36px;color:var(--faint);font-size:13px;border-top:1.5px solid 
 {pwa}</head>
 <body><h1>Formation ML/LLM — <span>fiches</span></h1><p class="sub">La timeline pour savoir où tu es ; puis les fiches rangées comme les decks Anki « swe » : chaque bloc couvre les cartes du deck correspondant. Ouvre, réponds à voix haute, note-toi.</p>{timeline}
 <h3>Par deck Anki</h3>{decks}{archives}
-<footer>Un fichier HTML autonome par entrée, ouvrable hors ligne. Convention : <code>/timeline-formation.html</code> · <code>/fiches/semaine/fiche-sNN-&lt;sujet&gt;.html</code> · <code>/fiches/theme/fiche-tNN-&lt;sujet&gt;.html</code> · <code>/fiches/archives/</code>. La version vit dans le titre, pas dans le nom. Index généré par <code>tools/build_index.py</code> — ne pas éditer à la main.</footer></body></html>
+<footer>Un fichier HTML autonome par entrée, ouvrable hors ligne. Convention : <code>/timeline-formation.html</code> · <code>/fiches/semaine/fiche-sNN-&lt;sujet&gt;.html</code> · <code>/fiches/theme/fiche-tNN-&lt;sujet&gt;.html</code> · <code>/fiches/deroule/deroule-dNN-&lt;sujet&gt;.html</code> · <code>/fiches/archives/</code>. La version vit dans le titre, pas dans le nom. Index généré par <code>tools/build_index.py</code> — ne pas éditer à la main.</footer></body></html>
 """
 
 
@@ -322,7 +364,7 @@ def build() -> None:
     fiches = collect()
 
     # le bloc PWA est posé par le script, jamais à la main
-    touches = [p for p in sorted(ROOT.glob("fiches/*/fiche-*.html")) if injecte_pwa(p)]
+    touches = [p for p in fichiers_fiches() if injecte_pwa(p)]
     for nom in ("timeline-formation.html",):
         if (ROOT / nom).exists() and injecte_pwa(ROOT / nom):
             touches.append(ROOT / nom)
