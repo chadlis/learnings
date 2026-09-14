@@ -1,5 +1,6 @@
 #!/bin/sh
-# Lance tools/test_ratings.mjs sur un serveur local puis en file://.
+# Lance les tests (notes, service worker, déroulés) sur un serveur local
+# puis en file://.
 # playwright est une dépendance de développement : si elle est absente, on saute.
 set -e
 racine=$(cd "$(dirname "$0")/.." && pwd)
@@ -26,3 +27,8 @@ echo
 node "$racine/tools/test_pwa.mjs" "http://127.0.0.1:$port"
 echo
 node "$racine/tools/test_ratings.mjs" "file://$racine"
+
+echo
+node "$racine/tools/test_deroules.mjs" "http://127.0.0.1:$port"
+echo
+node "$racine/tools/test_deroules.mjs" "file://$racine"
