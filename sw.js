@@ -5,7 +5,7 @@
 //   hors ligne, et se recharge instantanément).
 // La version du cache est réécrite par tools/build_index.py : elle ne change
 // que lorsque le contenu du site change, ce qui purge l'ancien cache.
-const CACHE = 'fiches-v2-98e78d54e9e74559';
+const CACHE = 'fiches-v4-98c89c7aacdb4b73';
 
 // Coquille minimale mise en cache dès l'installation.
 const COQUILLE = ['./', 'index.html', 'manifest.webmanifest', 'icone-fiches.svg', 'apple-touch-icon.png'];
