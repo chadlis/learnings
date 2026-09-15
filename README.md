@@ -1,8 +1,12 @@
 # Fiches ML/LLM
 
-Fiches de révision de la formation ML/LLM. Un fichier HTML autonome par fiche :
+Fiches de révision de la formation ML/LLM. Un fichier HTML autonome par entrée :
 zéro dépendance, zéro CDN, zéro build. Chaque fichier s'ouvre en `file://`
 comme sur le site publié.
+
+Deux genres cohabitent. Une **fiche** se travaille : on ouvre, on répond à voix
+haute, on se note. Un **déroulé** se lit : un chapitre suivi, une fois, avec des
+figures à manipuler et aucune question posée.
 
 ## Structure
 
@@ -13,20 +17,27 @@ manifest.webmanifest                installation sur l'écran d'accueil
 sw.js                               service worker (cache hors ligne) — version GÉNÉRÉE
 icone-fiches.svg / apple-touch-icon.png
 fiches/
-  semaine/    fiche-sNN-<sujet>.html    fiches de semaine (série courante)
-  theme/      fiche-tNN-<sujet>.html    fiches thématiques
-  archives/                             anciens formats, gardés pour mémoire
+  semaine/    fiche-sNN-<sujet>.html      fiches de semaine (série courante)
+  theme/      fiche-tNN-<sujet>.html      fiches thématiques
+  deroule/    deroule-dNN-<sujet>.html    déroulés : lecture suivie, figures
+  archives/                               anciens formats, gardés pour mémoire
+a-integrer/                           boîte aux lettres : brouillons à intégrer
+CLAUDE.md                             procédure d'intégration (côté agent)
 tools/
-  build_index.py    régénère l'index + le bloc PWA + la version du cache
-  test_ratings.mjs  test headless : noter, recharger, oublier
-  test_pwa.mjs      test headless : service worker, hors ligne
+  build_index.py     régénère l'index + le bloc PWA + la version du cache
+  test_ratings.mjs   test headless : noter, recharger, oublier
+  test_pwa.mjs       test headless : service worker, hors ligne
+  test_deroules.mjs  test headless : figures, boutons, responsive
 ```
+
+`a-integrer/` n'est ni versionné ni publié : c'est un sas, il a vocation à être
+vide.
 
 ## Convention de nommage
 
 `fiche-sNN-<sujet>.html` pour les semaines, `fiche-tNN-<sujet>.html` pour les
-thèmes. `NN` sur deux chiffres, `<sujet>` en minuscules sans accents, mots
-séparés par des tirets.
+thèmes, `deroule-dNN-<sujet>.html` pour les déroulés. `NN` sur deux chiffres,
+`<sujet>` en minuscules sans accents, mots séparés par des tirets.
 
 **La version vit dans le `<title>`, jamais dans le nom de fichier.** Une fiche
 révisée garde son URL : les liens, les favoris et le cache hors ligne survivent
@@ -51,17 +62,25 @@ Dans le `<head>` de chaque fiche :
 inconnu atterrit dans une section « à classer » — elle n'est jamais perdue,
 mais elle se voit.
 
-Le nombre de questions affiché est le nombre de balises `<details>` du fichier.
+Un déroulé porte `serie=deroule` et son `<title>` se termine par `— déroulé`.
+
+Le libellé de droite est calculé, jamais écrit à la main : le nombre de balises
+`<details>` pour une fiche (« 28 q. »), le nombre de marches du rail de
+navigation et de balises `<figure>` pour un déroulé (« 6 marches · 8 fig. »).
 
 ## Ajouter une fiche
 
-1. Déposer le fichier dans `fiches/semaine/` ou `fiches/theme/`, avec son
-   `<title>` et ses `<meta>`.
+1. Déposer le fichier dans `fiches/semaine/`, `fiches/theme/` ou
+   `fiches/deroule/`, avec son `<title>` et ses `<meta>`.
 2. `make index`
 3. `git add` + `git commit` + `git push` — Cloudflare Pages déploie tout seul.
 
 `make hooks` (une fois par clone) installe un hook `pre-commit` qui lance
 l'étape 2 et rattrape les oublis.
+
+Plus simple : déposer le fichier brut dans `a-integrer/` et demander
+l'intégration à Claude, qui suit la procédure de `CLAUDE.md` — renommage,
+métadonnées, liens, index, tests, commit, push.
 
 `make index` fait trois choses, toutes idempotentes : régénérer `index.html`,
 poser le bloc `<!--pwa-->…<!--/pwa-->` dans le `<head>` de chaque fiche, et
