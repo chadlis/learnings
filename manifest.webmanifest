@@ -11,8 +11,8 @@
   "background_color": "#20312C",
   "theme_color": "#20312C",
   "icons": [
-    { "src": "./icone-fiches.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
-    { "src": "./icone-fiches.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" },
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "any" },
+    { "src": "./icon.svg", "sizes": "any", "type": "image/svg+xml", "purpose": "maskable" },
     { "src": "./apple-touch-icon.png", "sizes": "180x180", "type": "image/png", "purpose": "any" }
   ]
 }

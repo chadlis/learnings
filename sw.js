@@ -5,17 +5,17 @@
 //   hors ligne, et se recharge instantanément).
 // La version du cache est réécrite par tools/build_index.py : elle ne change
 // que lorsque le contenu du site change, ce qui purge l'ancien cache.
-const CACHE = 'fiches-v4-98c89c7aacdb4b73';
+const CACHE = 'sheets-v2-403aff75debd8281';
 
 // Coquille minimale mise en cache dès l'installation.
-const COQUILLE = ['./', 'index.html', 'manifest.webmanifest', 'icone-fiches.svg', 'apple-touch-icon.png'];
+const SHELL = ['./', 'index.html', 'manifest.webmanifest', 'icon.svg', 'apple-touch-icon.png'];
 
 self.addEventListener('install', (e) => {
   e.waitUntil(
     caches.open(CACHE)
       // addAll() est tout-ou-rien : on met en cache fichier par fichier pour
       // qu'une ressource manquante ne fasse pas échouer l'installation.
-      .then((c) => Promise.all(COQUILLE.map((u) => c.add(u).catch(() => {}))))
+      .then((c) => Promise.all(SHELL.map((u) => c.add(u).catch(() => {}))))
       .then(() => self.skipWaiting())
   );
 });
@@ -33,11 +33,11 @@ self.addEventListener('fetch', (e) => {
   if (req.method !== 'GET') return;
   const url = new URL(req.url);
   if (url.origin !== location.origin) return;
-  const estIndex = url.pathname.endsWith('/') || url.pathname.endsWith('/index.html');
-  e.respondWith(estIndex ? reseauDabord(req) : cacheDabord(req));
+  const isIndex = url.pathname.endsWith('/') || url.pathname.endsWith('/index.html');
+  e.respondWith(isIndex ? networkFirst(req) : cacheFirst(req));
 });
 
-async function cacheDabord(req) {
+async function cacheFirst(req) {
   const c = await caches.open(CACHE);
   const hit = await c.match(req, { ignoreSearch: true });
   if (hit) return hit;
@@ -46,7 +46,7 @@ async function cacheDabord(req) {
   return res;
 }
 
-async function reseauDabord(req) {
+async function networkFirst(req) {
   const c = await caches.open(CACHE);
   try {
     const res = await fetch(req);

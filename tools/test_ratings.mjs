@@ -10,9 +10,9 @@ const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
 
 const BASE = (process.argv[2] || 'http://127.0.0.1:8777').replace(/\/$/, '');
-const FICHE = process.argv[3] || 'fiches/theme/fiche-t01-probabilites-lois.html';
-const URL = BASE + '/' + FICHE;
-const KEY = 'fiche:' + FICHE.split('/').pop() + ':ratings';
+const SHEET = process.argv[3] || 'sheets/topics/sheet-t01-probabilites-lois.html';
+const URL = BASE + '/' + SHEET;
+const KEY = 'sheet:' + SHEET.split('/').pop() + ':ratings';
 
 const fail = (m) => { console.error('✗ ' + m); process.exitCode = 1; };
 const ok = (m) => console.log('✓ ' + m);
@@ -34,18 +34,18 @@ const stored = await page.evaluate((k) => localStorage.getItem(k), KEY);
 if (stored !== '{"0":"again","2":"good"}') fail(`localStorage : attendu {"0":"again","2":"good"}, obtenu ${stored}`);
 else ok('notes écrites sous ' + KEY);
 
-const scoreAvant = await page.locator('#score').innerText();
+const scoreBefore = await page.locator('#score').innerText();
 
 await page.reload();
 await openAll();
 
-const classe = (n, r) => page.locator('#v-labo details').nth(n).locator('.grade button.' + r).getAttribute('class');
-if (!(await classe(0, 'again')).includes('on')) fail('carte 0 non restaurée'); else ok('carte 0 restaurée : encore');
-if (!(await classe(2, 'good')).includes('on')) fail('carte 2 non restaurée'); else ok('carte 2 restaurée : bien');
+const ratingClass = (n, r) => page.locator('#v-labo details').nth(n).locator('.grade button.' + r).getAttribute('class');
+if (!(await ratingClass(0, 'again')).includes('on')) fail('carte 0 non restaurée'); else ok('carte 0 restaurée : encore');
+if (!(await ratingClass(2, 'good')).includes('on')) fail('carte 2 non restaurée'); else ok('carte 2 restaurée : bien');
 
-const scoreApres = await page.locator('#score').innerText();
-if (scoreAvant !== scoreApres) fail(`score non restauré :\n  avant ${scoreAvant}\n  après ${scoreApres}`);
-else ok('score restauré : ' + scoreApres.replace(/\s+/g, ' '));
+const scoreAfter = await page.locator('#score').innerText();
+if (scoreBefore !== scoreAfter) fail(`score non restauré :\n  avant ${scoreBefore}\n  après ${scoreAfter}`);
+else ok('score restauré : ' + scoreAfter.replace(/\s+/g, ' '));
 
 // « Oublier mes notes »
 page.once('dialog', (d) => d.accept());

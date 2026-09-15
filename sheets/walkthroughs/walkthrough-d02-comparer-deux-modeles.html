@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="fiche" content="serie=deroule;numero=02;statut=v1"><meta name="deck" content="01"><meta name="sous-titre" content="cas 2 du fil A — déroulé suivi, pas d’auto-test">
+<meta name="sheet" content="series=walkthrough;number=02;status=v1"><meta name="deck" content="01"><meta name="subtitle" content="cas 2 du fil A — déroulé suivi, pas d’auto-test">
 <title>Comparer deux modèles sur le même tirage — déroulé</title>
 <style>
 :root{
@@ -78,7 +78,7 @@ figcaption{font-size:.9rem;color:var(--ink2);margin-top:.6rem;line-height:1.45}
 @media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
 </style>
 
-<!--pwa--><link rel="manifest" href="../../manifest.webmanifest"><link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg"><link rel="apple-touch-icon" href="../../apple-touch-icon.png"><meta name="theme-color" content="#20312C"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Fiches"><script>if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',function(){navigator.serviceWorker.register('../../sw.js',{scope:'../../'}).catch(function(){});});}</script><!--/pwa-->
+<!--pwa--><link rel="manifest" href="../../manifest.webmanifest"><link rel="icon" type="image/svg+xml" href="../../icon.svg"><link rel="apple-touch-icon" href="../../apple-touch-icon.png"><meta name="theme-color" content="#20312C"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Fiches"><script>if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',function(){navigator.serviceWorker.register('../../sw.js',{scope:'../../'}).catch(function(){});});}</script><!--/pwa-->
 </head>
 <body>
 <div class="page">
@@ -97,7 +97,7 @@ figcaption{font-size:.9rem;color:var(--ink2);margin-top:.6rem;line-height:1.45}
 <main>
 
 <header>
-  <nav class="fil" aria-label="Fil d’Ariane"><a href="../../index.html">← Index des fiches</a><span>Fil A, inférence fréquentiste : <a href="deroule-d01-intervalle-procedure.html">cas 1</a> · <b>cas 2</b> · <a href="deroule-d03-biais-du-max.html">cas 3</a></span></nav>
+  <nav class="fil" aria-label="Fil d’Ariane"><a href="../../index.html">← Index des fiches</a><span>Fil A, inférence fréquentiste : <a href="walkthrough-d01-intervalle-procedure.html">cas 1</a> · <b>cas 2</b> · <a href="walkthrough-d03-biais-du-max.html">cas 3</a></span></nav>
   <h1>Comparer deux modèles<br>sur le même tirage</h1>
   <p>Cas 2 du fil A. Déroulé autoporteur de la comparaison appariée, tenue le 11/09/2026 : la différence comme objet unique, la covariance qu'on ne peut pas ignorer, McNemar, bootstrap. À lire lentement, une fois, en jouant avec chaque figure.</p>
   <div class="legend"><span class="b">le bruit du tirage, et ce qu'il a de partagé</span><span class="s">l'erreur naturelle : traiter A et B séparément</span><span class="v">la vraie valeur, fixe</span></div>
@@ -241,7 +241,7 @@ figcaption{font-size:.9rem;color:var(--ink2);margin-top:.6rem;line-height:1.45}
 <section id="suite">
 <div class="porte">
 <h3 style="margin-top:0">La porte vers le cas 3</h3>
-<p style="margin:0">Tout ce qui précède suppose que A et B ont été choisis <i>avant</i> d'ouvrir le test set. Si B est en réalité la meilleure de 40 configurations essayées sur ce même test set, ses 88,1 % sont gonflés, l'appariement n'y change rien, et le bootstrap ne le voit pas. C'est <a href="deroule-d03-biais-du-max.html">le biais du max, cas 3</a>.</p>
+<p style="margin:0">Tout ce qui précède suppose que A et B ont été choisis <i>avant</i> d'ouvrir le test set. Si B est en réalité la meilleure de 40 configurations essayées sur ce même test set, ses 88,1 % sont gonflés, l'appariement n'y change rien, et le bootstrap ne le voit pas. C'est <a href="walkthrough-d03-biais-du-max.html">le biais du max, cas 3</a>.</p>
 </div>
 </section>
 

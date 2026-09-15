@@ -2,9 +2,9 @@
 # Régénère index.html à partir des fiches présentes, puis l'ajoute au commit.
 # Installation : make hooks
 set -e
-racine=$(git rev-parse --show-toplevel)
-python3 "$racine/tools/build_index.py" >&2
-cd "$racine"
+root=$(git rev-parse --show-toplevel)
+python3 "$root/tools/build_index.py" >&2
+cd "$root"
 for f in index.html sw.js; do
   [ -f "$f" ] && ! git diff --quiet -- "$f" && git add "$f" && echo "pre-commit: $f régénéré et ajouté" >&2
 done

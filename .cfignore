@@ -3,5 +3,5 @@ Makefile
 README.md
 tools/
 .githooks/
-a-integrer/
+inbox/
 CLAUDE.md

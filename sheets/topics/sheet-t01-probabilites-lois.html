@@ -1,5 +1,5 @@
 <!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="fiche" content="serie=thematique;numero=01;statut=v1"><meta name="deck" content="01"><title>Probabilités & lois — fiche thématique</title><style>
+<meta name="sheet" content="series=topic;number=01;status=v1"><meta name="deck" content="01"><title>Probabilités & lois — fiche thématique</title><style>
 :root{
   --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
   --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
@@ -261,7 +261,7 @@ svg [stroke="rgba(255,255,255,.28)"]{stroke:var(--axis)}
 
 .branch .bh{cursor:pointer;user-select:none}.branch.fold ul{display:none}.branch .bh::after{content:"▾";margin-left:6px;color:var(--faint);font-size:11px}.branch.fold .bh::after{content:"▸"}
 </style>
-<!--pwa--><link rel="manifest" href="../../manifest.webmanifest"><link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg"><link rel="apple-touch-icon" href="../../apple-touch-icon.png"><meta name="theme-color" content="#20312C"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Fiches"><script>if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',function(){navigator.serviceWorker.register('../../sw.js',{scope:'../../'}).catch(function(){});});}</script><!--/pwa-->
+<!--pwa--><link rel="manifest" href="../../manifest.webmanifest"><link rel="icon" type="image/svg+xml" href="../../icon.svg"><link rel="apple-touch-icon" href="../../apple-touch-icon.png"><meta name="theme-color" content="#20312C"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Fiches"><script>if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',function(){navigator.serviceWorker.register('../../sw.js',{scope:'../../'}).catch(function(){});});}</script><!--/pwa-->
 </head>
 <body><svg width="0" height="0" style="position:absolute" aria-hidden="true"><filter id="chalkf" x="-2%" y="-2%" width="104%" height="104%">
 <feTurbulence type="fractalNoise" baseFrequency="1.2" numOctaves="2" seed="7" result="n"/>
@@ -308,7 +308,7 @@ const oa=document.getElementById('openAll'),ca=document.getElementById('closeAll
       cards.push({bi,br,ac,el:d,q:d.querySelector('summary span:nth-child(2)').innerHTML,a:d.querySelector('.body').innerHTML,rating:null});});});
   const listeners=[]; function setRating(k,r){cards[k].rating=r; saveRatings(); listeners.forEach(f=>f());}
   // ---------- notes persistées d'une session à l'autre ----------
-  const RKEY='fiche:'+(location.pathname.split('/').pop()||'index.html')+':ratings';
+  const RKEY='sheet:'+(location.pathname.split('/').pop()||'index.html')+':ratings';
   function saveRatings(){try{const o={};cards.forEach((c,k)=>{if(c.rating)o[k]=c.rating;});localStorage.setItem(RKEY,JSON.stringify(o));}catch(e){}}
   function loadRatings(){try{const o=JSON.parse(localStorage.getItem(RKEY)||'{}');cards.forEach((c,k)=>{if(RL[o[k]])c.rating=o[k];});}catch(e){}}
   function forgetRatings(){try{localStorage.removeItem(RKEY);}catch(e){}cards.forEach(c=>c.rating=null);listeners.forEach(f=>f());}

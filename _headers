@@ -18,13 +18,13 @@
 
 # Les fiches n'ont pas de nom versionné : revalidation systématique, le cache
 # hors ligne est assuré par le service worker, pas par le cache HTTP.
-/fiches/*
+/sheets/*
   Cache-Control: public, max-age=0, must-revalidate
-/timeline-formation.html
+/timeline.html
   Cache-Control: public, max-age=0, must-revalidate
 
 # Les icônes changent rarement.
-/icone-fiches.svg
+/icon.svg
   Cache-Control: public, max-age=86400
 /apple-touch-icon.png
   Cache-Control: public, max-age=86400

@@ -2,7 +2,7 @@
 
 Dépôt de fiches de révision de la formation ML/LLM. Le `README.md` décrit le
 projet côté humain ; ce fichier décrit **quoi faire**, et notamment quoi faire
-d'un fichier déposé dans `a-integrer/`.
+d'un fichier déposé dans `inbox/`.
 
 ## Autonomie
 
@@ -36,29 +36,30 @@ chose à faire devant un fichier à intégrer.
 | --- | --- | --- |
 | but | s'auto-tester à voix haute | lire une fois, lentement |
 | signes | `<details>`, `class="q"`, onglets Labo/Parcours/Carte | `nav.echelle` (rail des marches), `<figure>` à boutons |
-| chemin | `fiches/theme/fiche-tNN-<sujet>.html`<br>`fiches/semaine/fiche-sNN-<sujet>.html` | `fiches/deroule/deroule-dNN-<sujet>.html` |
+| chemin | `sheets/topics/sheet-tNN-<sujet>.html`<br>`sheets/weekly/sheet-wNN-<sujet>.html` | `sheets/walkthroughs/walkthrough-dNN-<sujet>.html` |
 | `<title>` | `<sujet> — fiche thématique` | `<sujet> — déroulé` |
-| `serie=` | `thematique` / `semaine` | `deroule` |
-| badge | `02` | `D2` |
+| `series=` | `topic` / `weekly` | `walkthrough` |
+| badge | `02` (topic) · `W2` (weekly) | `D2` |
 | libellé de droite | `28 q.` (nombre de `<details>`) | `6 marches · 8 fig.` (liens « Marche » du rail, balises `<figure>`) |
 
 Tout est calculé par `tools/build_index.py` à partir du fichier : ne jamais
 écrire un de ces libellés à la main.
 
-## Intégrer un fichier de `a-integrer/`
+## Intégrer un fichier de `inbox/`
 
 1. **Lire le fichier avant de le déplacer.** Le nom déposé ment souvent : se
    fier au `<title>` et au `<h1>`, jamais au nom de fichier. (Déjà arrivé :
    `deroule-biais-du-max.html` était en réalité le cas 1, l'intervalle.)
 2. **Choisir le genre, la série, le numéro** — le premier libre dans la série.
    `<sujet>` en minuscules, sans accents, mots séparés par des tirets.
-3. **Déplacer et renommer** vers `fiches/<serie>/`.
+3. **Déplacer et renommer** vers `sheets/topics/`, `sheets/weekly/` ou
+   `sheets/walkthroughs/`.
 4. **Poser les métadonnées** dans le `<head>`, juste après le `viewport` :
 
    ```html
-   <meta name="fiche" content="serie=thematique;numero=02;statut=v1">
+   <meta name="sheet" content="series=topic;number=02;status=v1">
    <meta name="deck" content="01">
-   <meta name="sous-titre" content="ligne secondaire, optionnelle">
+   <meta name="subtitle" content="ligne secondaire, optionnelle">
    ```
 
    `deck` détermine la section de l'index : `00` 3 fils · `01` maths-stats ·
@@ -66,12 +67,12 @@ Tout est calculé par `tools/build_index.py` à partir du fichier : ne jamais
    + system design · `06` coding patterns · `08` web. Un `deck` inconnu envoie
    la fiche dans une section « à classer » : jamais perdue, mais visible.
 5. **Harmoniser le `<title>`** selon le tableau ci-dessus. La précision perdue
-   (« cas 2 », « v1 du 11/09 ») va dans `sous-titre`, que l'index affiche.
+   (« cas 2 », « v1 du 11/09 ») va dans `subtitle`, que l'index affiche.
 6. **Câbler les liens**, en relatif : retour vers `../../index.html`, et liens
    vers les fiches sœurs quand le texte les mentionne déjà. Transformer une
    mention textuelle en vrai lien vaut mieux qu'ajouter un encadré.
 7. **`make index`**, puis les vérifications ci-dessous, puis commit et push.
-8. **Vider `a-integrer/`** : le fichier d'origine a été déplacé, pas copié.
+8. **Vider `inbox/`** : le fichier d'origine a été déplacé, pas copié.
 
 ## Vérifier avant de commiter
 
@@ -83,15 +84,15 @@ make test      # playwright headless : notes, service worker, déroulés
 
 Et à l'œil :
 
-- `grep -nE '(src|href)="https?://|@import' fiches/**/*.html` doit être vide.
+- `grep -nE '(src|href)="https?://|@import' sheets/**/*.html` doit être vide.
 - `git diff index.html` doit être **purement additif** : aucune entrée
   existante ne disparaît ni ne change de libellé. Le vérifier en comparant les
   entrées parsées, pas en lisant le diff — l'index tient sur une seule ligne.
 - Pour un déroulé : chaque `<figure>` doit produire du SVG au clic. Les boutons
   sont créés en JS, un `grep '<button'` en trouve **zéro** — seul
-  `tools/test_deroules.mjs` les voit.
+  `tools/test_walkthroughs.mjs` les voit.
 - Responsive : le rail `nav.echelle` s'efface sous 1100 px, et rien ne doit
-  déborder à l'horizontale à 390 px (`tools/test_deroules.mjs` le mesure).
+  déborder à l'horizontale à 390 px (`tools/test_walkthroughs.mjs` le mesure).
 
 `make test` saute silencieusement si playwright est absent. Il est là :
 `PLAYWRIGHT_PATH=$(echo ~/.npm/_npx/*/node_modules/playwright)`.
@@ -109,7 +110,7 @@ Et à l'œil :
   faux.
 - `sw.js` est cache-first sauf pour l'index : il n'y a **pas** de liste de
   précache à tenir à jour. Il suffit qu'un fichier entre dans
-  `fichiers_fiches()` pour qu'il compte dans l'empreinte du cache.
+  `sheet_files()` pour qu'il compte dans l'empreinte du cache.
 - Ajouter une série au builder demande de toucher `SOURCES` (chemin + motif de
   glob), `BADGES` et `note()` — et rien d'autre : les globs sont centralisés
-  dans `fichiers_fiches()`.
+  dans `sheet_files()`.
