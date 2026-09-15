@@ -84,12 +84,21 @@ def short_title(title: str) -> str:
 def count_steps(text: str) -> int:
     """Les marches d'un déroulé, comptées sur son rail de navigation.
 
-    Le rail est la seule liste exhaustive des sections ; celles qui ne sont pas
-    des marches (« Rappel », « La course », « Au tableau ») y portent leur nom
-    et ne sont donc pas comptées.
+    Le rail est la seule liste exhaustive des sections. Une marche s'y annonce
+    soit « Marche 3 », soit par son seul numéro ; tout ce qui porte un nom
+    (« Rappel », « La course », « Au tableau », « Synthèse ») est une étape
+    hors-marche et n'est pas compté.
     """
     nav = re.search(r'<nav[^>]*class="echelle".*?</nav>', text, re.S | re.I)
-    return len(re.findall(r">\s*Marche\b", nav.group(0))) if nav else 0
+    if not nav:
+        return 0
+    steps = 0
+    for link in re.findall(r"<a\b[^>]*>(.*?)</a>", nav.group(0), re.S | re.I):
+        label = re.sub(r"<small\b.*?</small>", "", link, flags=re.S | re.I)
+        label = re.sub(r"<[^>]+>", "", label).strip()
+        if re.fullmatch(r"(?:Marche\s+)?\d+", label):
+            steps += 1
+    return steps
 
 
 def read_sheet(path: pathlib.Path, series_default: str, rank: int, archive: bool) -> dict:
