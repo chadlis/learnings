@@ -1,2 +1,6 @@
 .DS_Store
 node_modules/
+
+# Boîte aux lettres des fiches à intégrer : le contenu est transitoire.
+a-integrer/*
+!a-integrer/README.md

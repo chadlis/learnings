@@ -3,3 +3,5 @@ Makefile
 README.md
 tools/
 .githooks/
+a-integrer/
+CLAUDE.md
