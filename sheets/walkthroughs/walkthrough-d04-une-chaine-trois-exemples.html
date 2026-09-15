@@ -1,0 +1,457 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="sheet" content="series=walkthrough;number=04;status=v1"><meta name="subtitle" content="fil B, de la vraisemblance à la pénalité — déroulé suivi, pas d’auto-test">
+<meta name="deck" content="01">
+<title>Une chaîne, trois exemples — déroulé</title>
+<style>
+
+:root{
+  --paper:#FBFAF6; --grid:rgba(28,36,48,.055); --ink:#1C2430; --ink2:#4A5460; --faint:#8A93A0;
+  --rule:rgba(28,36,48,.16);
+  --bruit:#1F5FA8; --bruitbg:rgba(31,95,168,.10);
+  --sel:#B23A2C; --selbg:rgba(178,58,44,.10);
+  --vrai:#2E7D4F; --vraibg:rgba(46,125,79,.12);
+  --serif:"Iowan Old Style","Charter","Palatino Linotype",Palatino,Georgia,serif;
+}
+*{box-sizing:border-box}
+html{background:var(--paper)}
+body{margin:0;font-family:var(--serif);color:var(--ink);font-size:18px;line-height:1.6;
+  background-color:var(--paper);
+  background-image:linear-gradient(var(--grid) 1px,transparent 1px),linear-gradient(90deg,var(--grid) 1px,transparent 1px);
+  background-size:28px 28px}
+.page{max-width:1180px;margin:0 auto;display:grid;grid-template-columns:150px minmax(0,46rem) 1fr;gap:2.4rem;padding:2.5rem 1.4rem 6rem}
+nav.echelle{position:sticky;top:2rem;align-self:start;font-size:.86rem;line-height:1.3}
+nav.echelle a{display:block;color:var(--ink2);text-decoration:none;padding:.5rem 0 .5rem .9rem;border-left:2px solid var(--rule)}
+nav.echelle a.on{color:var(--ink);border-left-color:var(--ink);font-weight:700}
+nav.echelle a small{display:block;color:var(--faint);font-weight:400;font-style:italic}
+nav.echelle .titre{font-style:italic;color:var(--faint);padding:0 0 .6rem}
+main{min-width:0}
+aside.marge{align-self:start;position:sticky;top:2rem;font-size:.86rem;color:var(--ink2);line-height:1.45;padding-top:6rem}
+.note{margin:0 0 1.4rem;padding-left:.8rem;border-left:2px solid var(--sel)}
+.note b{color:var(--sel)}
+header{margin-bottom:2.6rem}
+header h1{font-size:3rem;line-height:1;margin:0 0 .8rem;font-weight:700;letter-spacing:-.02em}
+header p{margin:.3rem 0;color:var(--ink2);font-size:1rem}
+.legend{display:flex;gap:1.4rem;flex-wrap:wrap;margin-top:1rem;font-size:.95rem}
+.legend span::before{content:"";display:inline-block;width:1.1em;height:.55em;margin-right:.4em;border-radius:1px;vertical-align:.05em}
+.legend .b::before{background:var(--bruit)} .legend .s::before{background:var(--sel)} .legend .v::before{background:var(--vrai)}
+section{scroll-margin-top:1.5rem}
+h2{font-size:1.7rem;margin:3.4rem 0 .6rem;line-height:1.15;display:grid;grid-template-columns:2.6rem 1fr;gap:.7rem;align-items:baseline}
+h2 .n{font-size:2.6rem;font-weight:700;line-height:1;color:var(--faint);font-variant-numeric:tabular-nums}
+h2 small{display:block;font-size:.9rem;color:var(--faint);font-weight:400;font-style:italic;margin-top:.2rem}
+h3{font-size:1.12rem;margin:2rem 0 .5rem}
+p{margin:0 0 1rem}
+.m{font-style:italic}
+.f{display:block;text-align:center;margin:1rem 0;font-size:1.12rem;font-style:italic}
+.f b{font-style:normal}
+sub,sup{font-size:.7em;line-height:0}
+table{border-collapse:collapse;width:100%;margin:1rem 0 1.4rem;font-size:.95rem;background:rgba(255,255,255,.7)}
+th,td{padding:.45rem .6rem;text-align:left;vertical-align:top;border-bottom:1px solid var(--rule)}
+th{font-weight:700;border-bottom:2px solid var(--ink)}
+td.num,th.num{text-align:right;font-variant-numeric:tabular-nums}
+.bruit{color:var(--bruit)} .sel{color:var(--sel)} .vrai{color:var(--vrai)}
+.hb{background:var(--bruitbg)} .hs{background:var(--selbg)} .hv{background:var(--vraibg)}
+.brique{margin:1.4rem 0;padding:.7rem 1rem;border:1.5px solid var(--ink);background:#fff;border-radius:2px;font-size:1rem}
+.brique b{display:block}
+.tableau{margin:1.6rem 0;padding:1.2rem 1.4rem;background:var(--ink);color:#F6F7F4;border-radius:2px;line-height:1.55}
+.tableau .faux{color:#E9B3AA;margin-top:.8rem;display:block;font-size:.97rem}
+figure{margin:1.6rem 0 2rem;padding:1rem;background:#fff;border:1px solid var(--rule);border-radius:3px}
+figure svg{width:100%;height:auto;display:block}
+figcaption{font-size:.9rem;color:var(--ink2);margin-top:.6rem;line-height:1.45}
+.ctrl{display:flex;gap:.5rem;flex-wrap:wrap;align-items:center;margin:0 0 .7rem;font-size:.92rem}
+.ctrl button{font:inherit;font-size:.9rem;padding:.4rem .85rem;border:1.5px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer;border-radius:2px}
+.ctrl button.prim{background:var(--ink);color:#fff}
+.ctrl button[aria-pressed="true"]{background:var(--ink);color:#fff}
+.ctrl button:focus-visible{outline:3px solid var(--bruit);outline-offset:2px}
+.ctrl .stat{margin-left:auto;font-variant-numeric:tabular-nums;color:var(--ink2)}
+.porte{margin-top:3rem;padding:1.2rem 1.4rem;border:2px dashed var(--ink);border-radius:2px;background:rgba(255,255,255,.6)}
+.porte a,.fil a{color:var(--bruit);text-decoration:underline;text-underline-offset:2px;text-decoration-thickness:1px}
+.fil{font-size:.9rem;color:var(--faint);margin:0 0 1.4rem;display:flex;gap:.4rem 1.1rem;flex-wrap:wrap;align-items:baseline}
+.fil b{color:var(--ink);font-weight:700}
+.retenir{font-size:1.3rem;font-style:italic;margin:2.6rem 0;padding:1.3rem 1rem;border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);text-align:center;background:rgba(255,255,255,.6)}
+@media(max-width:1100px){.page{grid-template-columns:1fr;gap:0}nav.echelle{display:none}aside.marge{display:none}}
+@media(max-width:640px){body{font-size:16.5px}header h1{font-size:2.2rem}h2{font-size:1.4rem}
+  /* un tableau plus large que l'écran défile dans sa propre boîte, il ne
+     pousse plus la page : le corps du texte ne défile jamais à l'horizontale */
+  table{display:block;overflow-x:auto;max-width:100%}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important;animation:none!important}}
+
+.page{grid-template-columns:170px minmax(0,52rem) 1fr}
+.tabs{position:sticky;top:0;z-index:5;background:var(--paper);padding:.6rem 0;margin:0 0 1.2rem;border-bottom:2px solid var(--ink);display:flex;gap:.5rem;flex-wrap:wrap}
+.tabs button{font:inherit;font-size:.95rem;padding:.45rem .9rem;border:1.5px solid var(--ink);background:#fff;color:var(--ink);cursor:pointer;border-radius:2px}
+.tabs button[aria-selected="true"]{background:var(--ink);color:#fff}
+.ex{display:none}.ex.on{display:block}
+.step{display:grid;grid-template-columns:2.2rem 15rem 1fr;gap:.9rem;padding:.9rem 0;border-top:1px solid var(--rule);align-items:start;scroll-margin-top:4.5rem}
+.step .n{font-size:1.6rem;font-weight:700;color:var(--faint);line-height:1;font-variant-numeric:tabular-nums}
+.step .r{font-size:.93rem;color:var(--ink2);line-height:1.45}
+.step .r b{display:block;color:var(--ink);font-size:1rem;margin-bottom:.15rem}
+.step .a{font-size:1rem;line-height:1.5}
+.step .a .f{margin:.4rem 0;font-size:1.06rem}
+.step.key{background:rgba(255,255,255,.7);border-top:2px solid var(--ink);border-bottom:2px solid var(--ink);margin:.6rem 0}
+.step.casse{border-left:3px solid var(--sel);padding-left:.8rem}
+.tag{display:inline-block;font-size:.8rem;padding:.05rem .45rem;border-radius:2px;margin-right:.3rem;vertical-align:.1em}
+.tag.b{background:var(--bruitbg);color:var(--bruit)}.tag.s{background:var(--selbg);color:var(--sel)}.tag.v{background:var(--vraibg);color:var(--vrai)}
+.mini{font-size:.9rem;color:var(--ink2);margin:.3rem 0 0}
+.decor{padding:.8rem 1rem;background:#fff;border:1.5px solid var(--ink);border-radius:2px;margin:0 0 1rem;font-size:1rem}
+.decor b{display:block;font-size:1.1rem}
+figure{margin:.8rem 0 .4rem}
+table.syn td,table.syn th{font-size:.9rem;vertical-align:top}
+input[type=range]{width:180px;vertical-align:middle;accent-color:var(--ink)}
+.ctrl label{display:inline-flex;align-items:center;gap:.5rem}
+.ctrl output{font-variant-numeric:tabular-nums;min-width:3.2em;display:inline-block}
+@media(max-width:900px){.step{grid-template-columns:2rem 1fr}.step .a{grid-column:2}}
+</style>
+
+<!--pwa--><link rel="manifest" href="../../manifest.webmanifest"><link rel="icon" type="image/svg+xml" href="../../icon.svg"><link rel="apple-touch-icon" href="../../apple-touch-icon.png"><meta name="theme-color" content="#20312C"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Fiches"><script>if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',function(){navigator.serviceWorker.register('../../sw.js',{scope:'../../'}).catch(function(){});});}</script><!--/pwa-->
+</head>
+<body>
+<div class="page">
+<nav class="echelle" aria-label="La chaîne">
+  <div class="titre">la chaîne</div>
+  <a href="#s0">0<small>le décor</small></a>
+  <a href="#s1">1<small>hypothèse de bruit</small></a>
+  <a href="#s2">2<small>densité d'une obs.</small></a>
+  <a href="#s3">3<small>produit</small></a>
+  <a href="#s4">4<small>log</small></a>
+  <a href="#s5">5<small>négatif</small></a>
+  <a href="#s6">6<small>jeter → la loss</small></a>
+  <a href="#s7">7<small>minimiser → ce qui casse</small></a>
+  <a href="#s8">8<small>prior sur θ</small></a>
+  <a href="#s9">9<small>−log prior → pénalité</small></a>
+  <a href="#s10">10<small>ce que la pénalité fournit</small></a>
+  <a href="#s11">11<small>β̂ pénalisé, chiffré</small></a>
+  <a href="#syn" class="sep">Synthèse<small>trois exemples côte à côte</small></a>
+</nav>
+
+<main>
+<header>
+  <nav class="fil" aria-label="Fil d’Ariane"><a href="../../index.html">← Index des fiches</a><span><b>Fil B</b>, de la vraisemblance à la pénalité. Le fil A : <a href="walkthrough-d01-intervalle-procedure.html">cas 1</a> · <a href="walkthrough-d02-comparer-deux-modeles.html">cas 2</a> · <a href="walkthrough-d03-biais-du-max.html">cas 3</a></span></nav>
+  <h1>Une chaîne,<br>trois exemples</h1>
+  <p>Fil B. La même chaîne de 11 pas, déroulée entièrement sur un exemple, puis rejouée telle quelle sur deux autres. À gauche de chaque pas, la règle ; à droite, son application chiffrée. Lis l'exemple 1 en entier avant de changer d'onglet.</p>
+  <div class="legend"><span class="b">ce qu'on suppose</span><span class="s">ce qui casse</span><span class="v">ce que les données déterminent</span></div>
+</header>
+
+<div class="tabs" role="tablist">
+  <button role="tab" aria-selected="true" data-ex="e1">Exemple 1 — régression, bruit gaussien</button>
+  <button role="tab" aria-selected="false" data-ex="e2">Exemple 2 — classification, Bernoulli</button>
+  <button role="tab" aria-selected="false" data-ex="e3">Exemple 3 — même régression, bruit de Laplace</button>
+</div>
+
+<!-- ============================ EXEMPLE 1 ============================ -->
+<section class="ex on" id="e1">
+<div class="decor" id="s0"><b>0 · Le décor</b>
+Trois observations, deux features, la seconde vaut exactement deux fois la première.
+<span class="f"><span class="m">x<sub>1</sub> = (1, 2, 3)</span> &nbsp;·&nbsp; <span class="m">x<sub>2</sub> = (2, 4, 6)</span> &nbsp;·&nbsp; <span class="m">y = (1, 2, 3)</span></span>
+Modèle linéaire sans intercept : <span class="m">f(x; β) = β<sub>1</sub>x<sub>1</sub> + β<sub>2</sub>x<sub>2</sub></span>. On cherche <span class="m">β = (β<sub>1</sub>, β<sub>2</sub>)</span>.
+<p class="mini">Pourquoi cet exemple : petit au point de tout calculer à la main, et colinéaire — il fera casser la chaîne au pas 7, exactement là où il faut.</p>
+</div>
+
+<div class="step" id="s1"><div class="n">1</div><div class="r"><b>Hypothèse sur le bruit</b><span class="tag b">supposé</span> C'est le seul endroit où l'on suppose quelque chose. Tout le reste est du calcul.</div>
+<div class="a"><span class="f"><span class="m">y<sub>i</sub> = f(x<sub>i</sub>; β) + ε<sub>i</sub></span>, &nbsp; <span class="bruit m">ε<sub>i</sub> ~ N(0, σ²)</span>, indépendants</span>
+Le bruit est gaussien, de même variance partout, et chaque observation tire le sien.</div></div>
+
+<div class="step" id="s2"><div class="n">2</div><div class="r"><b>Densité d'une observation</b> On modélise <span class="m">y</span> sachant <span class="m">x</span>, jamais <span class="m">x</span>. On injecte <span class="m">ε<sub>i</sub> = y<sub>i</sub> − f(x<sub>i</sub>; β)</span> dans la densité du bruit.</div>
+<div class="a"><span class="f"><span class="m">p(y<sub>i</sub> | x<sub>i</sub>; β) = (1/(σ√(2π))) · exp( −(y<sub>i</sub> − β<sub>1</sub>x<sub>1i</sub> − β<sub>2</sub>x<sub>2i</sub>)² / (2σ²) )</span></span>
+Le <span class="m">2</span> sous <span class="m">σ²</span> fait partie de la gaussienne. Il manquait en séance.</div></div>
+
+<div class="step" id="s3"><div class="n">3</div><div class="r"><b>Produit</b> Observations indépendantes ⇒ la probabilité de les voir toutes est le produit. C'est la <i>vraisemblance</i> <span class="m">L(β)</span> : fonction de <span class="m">β</span>, données fixées.</div>
+<div class="a"><span class="f"><span class="m">L(β) = Π<sub>i=1</sub><sup>3</sup> p(y<sub>i</sub> | x<sub>i</sub>; β)</span></span>
+Où ça casse : séries temporelles, mesures répétées sur un même sujet — le produit ment.</div></div>
+
+<div class="step" id="s4"><div class="n">4</div><div class="r"><b>Log</b> <span class="m">log(ab) = log a + log b</span> : le produit devient une somme. L'argmax ne change pas, le log est croissant.</div>
+<div class="a"><span class="f"><span class="m">ℓ(β) = −3·log(σ√(2π)) − (1/(2σ²)) · Σ<sub>i</sub> (y<sub>i</sub> − β<sub>1</sub>x<sub>1i</sub> − β<sub>2</sub>x<sub>2i</sub>)²</span></span>
+Le <span class="m">3</span> devant la constante : une par observation. Il manquait en séance.</div></div>
+
+<div class="step" id="s5"><div class="n">5</div><div class="r"><b>Négatif</b> Maximiser <span class="m">ℓ</span> = minimiser <span class="m">−ℓ</span>. C'est le signe qui fabrique une <i>loss</i> à partir d'une vraisemblance.</div>
+<div class="a"><span class="f"><span class="m">NLL(β) = 3·log(σ√(2π)) + RSS(β) / (2σ²)</span>, avec <span class="m">RSS(β) = Σ<sub>i</sub> (y<sub>i</sub> − β<sub>1</sub>x<sub>1i</sub> − β<sub>2</sub>x<sub>2i</sub>)²</span></span></div></div>
+
+<div class="step key" id="s6"><div class="n">6</div><div class="r"><b>Jeter → la loss</b> L'argmin ignore une constante additive et un facteur positif. On jette ce qui ne dépend pas de <span class="m">β</span>. Ce qui reste porte un nom.</div>
+<div class="a"><span class="f"><span class="m">argmin<sub>β</sub> NLL(β) = argmin<sub>β</sub> RSS(β)</span> &nbsp;=&nbsp; <b>MSE</b></span>
+Jeté : <span class="m">3·log(σ√(2π))</span> (additif) et <span class="m">1/(2σ²)</span> (multiplicatif positif). <b>La MSE n'a pas été choisie, elle est tombée du bruit gaussien.</b>
+<p class="mini">Sur l'exemple, comme <span class="m">x<sub>2</sub> = 2x<sub>1</sub></span> : <span class="m">f(x<sub>i</sub>) = (β<sub>1</sub> + 2β<sub>2</sub>)·x<sub>1i</sub></span>. Pose <span class="m">s = β<sub>1</sub> + 2β<sub>2</sub></span>. Alors <span class="m">RSS = Σ(y<sub>i</sub> − s·x<sub>1i</sub>)² = 14 − 28s + 14s² = 14(1 − s)²</span>. Les données ne voient que <span class="m">s</span>.</p></div></div>
+
+<div class="step casse" id="s7"><div class="n">7</div><div class="r"><b>Minimiser → ce qui casse</b><span class="tag s">casse</span> Forme fermée <span class="m">β̂ = (XᵀX)⁻¹Xᵀy</span>. Elle demande <span class="m">XᵀX</span> inversible, c'est-à-dire de rang plein, c'est-à-dire sans valeur propre nulle.</div>
+<div class="a"><span class="f"><span class="m">XᵀX = [[14, 28], [28, 56]]</span>, &nbsp; valeurs propres <span class="sel m">0</span> et <span class="m">70</span>, &nbsp; <span class="m">Xᵀy = (14, 28)</span></span>
+Rang 1 sur 2. <b>Non inversible.</b> Le RSS est minimal (nul) pour tout <span class="m">β</span> tel que <span class="m">s = 1</span> : une droite entière de solutions.
+<table>
+<tr><th class="num">β<sub>1</sub></th><th class="num">β<sub>2</sub></th><th class="num">s</th><th>RSS</th><th class="num">‖β‖²</th></tr>
+<tr><td class="num">1</td><td class="num">0</td><td class="num">1</td><td class="vrai">0</td><td class="num">1</td></tr>
+<tr><td class="num">3</td><td class="num">−1</td><td class="num">1</td><td class="vrai">0</td><td class="num">10</td></tr>
+<tr><td class="num">−1</td><td class="num">1</td><td class="num">1</td><td class="vrai">0</td><td class="num">2</td></tr>
+<tr class="hb"><td class="num">0,2</td><td class="num">0,4</td><td class="num">1</td><td class="vrai">0</td><td class="num"><b>0,2</b></td></tr>
+</table>
+Les données ne peuvent pas choisir. La solution n'est pas instable, elle est <b>non identifiable</b>. Et <span class="m">σ</span> a disparu au pas 6 : si tu veux une barre d'erreur sur <span class="m">β̂</span>, il faut le récupérer, <span class="m">σ̂² = RSS/n</span>. Même objet que le SE du fil A.</div></div>
+
+<div class="step" id="s8"><div class="n">8</div><div class="r"><b>Prior sur θ</b><span class="tag b">supposé</span> Deuxième et dernière hypothèse. Une croyance sur <span class="m">β</span> <i>avant</i> de voir les données. Bayes : <span class="m">p(β | données) ∝ L(β) · p(β)</span>.</div>
+<div class="a"><span class="f"><span class="bruit m">β<sub>1</sub>, β<sub>2</sub> ~ N(0, τ²)</span>, indépendants</span>
+« Les coefficients sont modérés et centrés sur zéro. » Défendable ou non — mais c'est une hypothèse sur le monde, pas un artifice.</div></div>
+
+<div class="step" id="s9"><div class="n">9</div><div class="r"><b>−log prior → pénalité</b> Même geste que les pas 4–6, appliqué à <span class="m">β</span> au lieu de <span class="m">y</span>. Le MAP minimise <span class="m">NLL + (−log p(β))</span>.</div>
+<div class="a"><span class="f"><span class="m">−log p(β) = const + ‖β‖² / (2τ²)</span></span>
+<span class="f"><span class="m">argmin<sub>β</sub> [ RSS/(2σ²) + ‖β‖²/(2τ²) ] = argmin<sub>β</sub> [ RSS + λ‖β‖² ]</span>, &nbsp; <b><span class="m">λ = σ²/τ²</span></b></span>
+C'est <b>Ridge</b>. Et <span class="m">λ</span> a un sens : bruit fort ou prior étroit ⇒ <span class="m">λ</span> grand, on croit le prior.</div></div>
+
+<div class="step key" id="s10"><div class="n">10</div><div class="r"><b>Ce que la pénalité fournit</b> Le RSS est constant sur la droite <span class="m">s = 1</span>. <span class="m">λ‖β‖²</span> ne l'est pas. Lui seul décide.</div>
+<div class="a">Sur la droite, <span class="m">(β<sub>1</sub>, β<sub>2</sub>) = (1 + 2t, −t)</span> : <span class="m">‖β‖² = 5t² + 4t + 1</span>, parabole, <b>un</b> minimum en <span class="m">t = −0,4</span> → <span class="m">(0,2 ; 0,4)</span>.
+<figure id="fig-vallee"></figure>
+Côté matrice : <span class="m">(XᵀX + λI)v = (μ + λ)v</span>. Les valeurs propres deviennent <span class="m">λ</span> et <span class="m">70 + λ</span>. Toutes <span class="m">&gt; 0</span> ⇒ inversible. Rien n'est annulé, tout est translaté.
+<p class="mini"><b>Ridge ne combat pas l'overfitting, il rend unique une solution qui ne l'était pas.</b> L'amélioration en test est une conséquence (biais-variance), pas le mécanisme.</p></div></div>
+
+<div class="step" id="s11"><div class="n">11</div><div class="r"><b>β̂ pénalisé, chiffré</b> La forme fermée existe à nouveau.</div>
+<div class="a"><span class="f"><span class="m">β̂ = (XᵀX + λI)⁻¹ Xᵀy</span></span>
+<span class="m">λ = 1</span> : <span class="m">[[15, 28], [28, 57]]</span>, déterminant <span class="m">855 − 784 = 71</span>. <span class="m">β̂<sub>1</sub> = (57·14 − 28·28)/71 = 14/71 = <b>0,197</b></span>, <span class="m">β̂<sub>2</sub> = (15·28 − 28·14)/71 = 28/71 = <b>0,394</b></span>.
+<br>En général : <span class="m">β̂ = (s/5)·(1, 2)</span> avec <span class="m">s = 70/(70 + λ)</span>. <span class="m">λ = 10</span> → <span class="m">(0,175 ; 0,35)</span>. Le point bleu de la figure, tiré vers l'origine quand <span class="m">λ</span> monte.</div></div>
+</section>
+
+<!-- ============================ EXEMPLE 2 ============================ -->
+<section class="ex" id="e2">
+<div class="decor"><b>0 · Le décor</b>
+Quatre points sur une droite, une cible binaire, parfaitement séparables.
+<span class="f"><span class="m">x = (−2, −1, 1, 2)</span> &nbsp;·&nbsp; <span class="m">y = (0, 0, 1, 1)</span></span>
+Modèle : <span class="m">p<sub>i</sub> = σ(β·x<sub>i</sub>)</span>, <span class="m">σ</span> la sigmoïde. On cherche un seul nombre, <span class="m">β</span>.
+<p class="mini">Pourquoi cet exemple : la chaîne est identique à l'exemple 1 jusqu'au pas 6, puis casse autrement au pas 7 — pas « trop de solutions », mais « aucune ».</p>
+</div>
+
+<div class="step"><div class="n">1</div><div class="r"><b>Hypothèse sur le bruit</b><span class="tag b">supposé</span> Pour une cible 0/1, le « bruit » est une loi de Bernoulli dont la moyenne dépend de <span class="m">x</span>.</div>
+<div class="a"><span class="f"><span class="bruit m">y<sub>i</sub> ~ Bernoulli(p<sub>i</sub>)</span>, &nbsp; <span class="m">p<sub>i</sub> = σ(β·x<sub>i</sub>)</span>, indépendants</span></div></div>
+
+<div class="step"><div class="n">2</div><div class="r"><b>Densité d'une observation</b> Une seule formule pour <span class="m">y = 0</span> et <span class="m">y = 1</span>. C'est l'astuce d'écriture qui rend tout mécanique.</div>
+<div class="a"><span class="f"><span class="m">p(y<sub>i</sub> | x<sub>i</sub>; β) = p<sub>i</sub><sup>y<sub>i</sub></sup> (1 − p<sub>i</sub>)<sup>1−y<sub>i</sub></sup></span></span>
+Vaut <span class="m">p<sub>i</sub></span> si <span class="m">y<sub>i</sub> = 1</span>, <span class="m">1 − p<sub>i</sub></span> si <span class="m">y<sub>i</sub> = 0</span>.</div></div>
+
+<div class="step"><div class="n">3</div><div class="r"><b>Produit</b> Identique.</div>
+<div class="a"><span class="f"><span class="m">L(β) = Π<sub>i=1</sub><sup>4</sup> p<sub>i</sub><sup>y<sub>i</sub></sup> (1 − p<sub>i</sub>)<sup>1−y<sub>i</sub></sup></span></span></div></div>
+
+<div class="step"><div class="n">4</div><div class="r"><b>Log</b> Identique. Les exposants descendent devant les logs.</div>
+<div class="a"><span class="f"><span class="m">ℓ(β) = Σ<sub>i</sub> [ y<sub>i</sub> log p<sub>i</sub> + (1 − y<sub>i</sub>) log(1 − p<sub>i</sub>) ]</span></span></div></div>
+
+<div class="step"><div class="n">5</div><div class="r"><b>Négatif</b> Identique.</div>
+<div class="a"><span class="f"><span class="m">NLL(β) = −Σ<sub>i</sub> [ y<sub>i</sub> log p<sub>i</sub> + (1 − y<sub>i</sub>) log(1 − p<sub>i</sub>) ]</span></span></div></div>
+
+<div class="step key"><div class="n">6</div><div class="r"><b>Jeter → la loss</b> Rien à jeter. Bernoulli n'a pas de paramètre de dispersion séparé : sa variance <span class="m">p(1 − p)</span> est fixée par la moyenne.</div>
+<div class="a"><span class="f"><span class="m">NLL(β)</span> &nbsp;=&nbsp; <b>cross-entropy binaire</b>, telle quelle</span>
+<b>La log-loss n'a pas été choisie, elle est tombée de Bernoulli.</b> En séance tu as continué à calculer au lieu de t'arrêter ici.
+<p class="mini">Forme en logits, en posant <span class="m">z<sub>i</sub> = βx<sub>i</sub></span> : <span class="m">NLL = Σ<sub>i</sub> [(1 − y<sub>i</sub>)z<sub>i</sub> + log(1 + e<sup>−z<sub>i</sub></sup>)]</span>. Sur l'exemple : <span class="m">NLL(β) = 2·log(1 + e<sup>−β</sup>) + 2·log(1 + e<sup>−2β</sup>)</span>. C'est ce que calcule <code>BCEWithLogitsLoss</code> — jamais <span class="m">σ</span> puis <span class="m">log</span>, sinon saturation et <span class="m">inf</span>.</p>
+<p class="mini"><span class="tag s">si on avait pris la MSE</span> <span class="m">Σ(y<sub>i</sub> − p<sub>i</sub>)²</span> : (i) bornée par 1 par exemple — faux avec certitude coûte autant que « je ne sais pas » deux fois ; (ii) gradient <span class="m">2(p − y)·p(1 − p)</span>, écrasé là où l'erreur est maximale, contre <span class="m">p − y</span> pour la log-loss ; (iii) non convexe en <span class="m">β</span> : <span class="m">(1 − σ(z))²</span> a une dérivée seconde négative pour <span class="m">z &lt; −ln 2</span>. La log-loss est convexe en <span class="m">z</span> (dérivée seconde <span class="m">p(1−p) &gt; 0</span>), et <span class="m">z</span> est affine en <span class="m">β</span> ⇒ convexe en <span class="m">β</span>.</p></div></div>
+
+<div class="step casse"><div class="n">7</div><div class="r"><b>Minimiser → ce qui casse</b><span class="tag s">casse</span> Pas de forme fermée. On regarde la loss quand <span class="m">β</span> grandit.</div>
+<div class="a">
+<table>
+<tr><th class="num">β</th><th class="num">σ(β·1)</th><th class="num">NLL(β)</th></tr>
+<tr><td class="num">0</td><td class="num">0,5</td><td class="num">2,77</td></tr>
+<tr><td class="num">1</td><td class="num">0,731</td><td class="num">0,880</td></tr>
+<tr><td class="num">2</td><td class="num">0,881</td><td class="num">0,290</td></tr>
+<tr><td class="num">5</td><td class="num">0,993</td><td class="num">0,0135</td></tr>
+<tr><td class="num">10</td><td class="num">0,99995</td><td class="num">0,00009</td></tr>
+</table>
+Décroît vers 0, ne l'atteint jamais. Pour tout <span class="m">β</span>, <span class="m">2β</span> fait mieux. <b>Le MLE n'existe pas</b> : <span class="m">‖β‖ → ∞</span>. Le solveur s'arrête sur <code>max_iter</code> avec un coefficient à <span class="m">10<sup>15</sup></span>. Les données disent « n'importe quelle pente pourvu qu'elle soit infinie » : aucune information sur la confiance.</div></div>
+
+<div class="step"><div class="n">8</div><div class="r"><b>Prior sur θ</b><span class="tag b">supposé</span> Identique.</div>
+<div class="a"><span class="f"><span class="bruit m">β ~ N(0, τ²)</span></span></div></div>
+
+<div class="step"><div class="n">9</div><div class="r"><b>−log prior → pénalité</b> Identique.</div>
+<div class="a"><span class="f"><span class="m">argmin<sub>β</sub> [ NLL(β) + λβ² ]</span></span></div></div>
+
+<div class="step key"><div class="n">10</div><div class="r"><b>Ce que la pénalité fournit</b> La NLL tend vers 0 quand <span class="m">β → ∞</span> ; <span class="m">λβ²</span> tend vers <span class="m">+∞</span>. La somme remonte : un minimum existe. NLL convexe + <span class="m">λβ²</span> strictement convexe : il est unique.</div>
+<div class="a">
+<figure id="fig-separation"></figure>
+Même un <span class="m">λ = 10<sup>−6</sup></span> suffit : il ne change rien près de l'origine, il bloque seulement la fuite à l'infini. <b>La pénalité ne rend pas la solution meilleure, elle la fait exister.</b></div></div>
+
+<div class="step"><div class="n">11</div><div class="r"><b>β̂ pénalisé, chiffré</b> Numériquement (pas de forme fermée).</div>
+<div class="a"><span class="m">λ = 0,01</span> → <span class="m">β̂ = <b>3,41</b></span> &nbsp;·&nbsp; <span class="m">λ = 0,1</span> → <span class="m">β̂ = <b>1,85</b></span> &nbsp;·&nbsp; <span class="m">λ = 1</span> → <span class="m">β̂ = <b>0,71</b></span>.
+<p class="mini">Même phénomène en dimension zéro : 5 succès sur 5 tirages, <span class="m">p̂ = 1</span>, « un échec est impossible ». Un prior Beta — ou le lissage de Laplace <span class="m">(k+1)/(n+2) = 6/7</span> — ramène vers l'intérieur.</p></div></div>
+</section>
+
+<!-- ============================ EXEMPLE 3 ============================ -->
+<section class="ex" id="e3">
+<div class="decor"><b>0 · Le décor</b>
+Exactement les données de l'exemple 1. Une seule chose change : le pas 1.
+<span class="f"><span class="m">x<sub>1</sub> = (1, 2, 3)</span> &nbsp;·&nbsp; <span class="m">x<sub>2</sub> = (2, 4, 6)</span> &nbsp;·&nbsp; <span class="m">y = (1, 2, 3)</span></span>
+<p class="mini">Pourquoi cet exemple : voir qu'en changeant <i>uniquement</i> l'hypothèse de bruit, toute la loss change, et qu'en changeant uniquement le prior, toute la pénalité change — et pas au même endroit.</p>
+</div>
+
+<div class="step"><div class="n">1</div><div class="r"><b>Hypothèse sur le bruit</b><span class="tag b">supposé</span> Queues lourdes : on s'attend à quelques gros écarts.</div>
+<div class="a"><span class="f"><span class="bruit m">ε<sub>i</sub> ~ Laplace(0, b)</span>, densité <span class="m">(1/(2b)) · exp(−|ε|/b)</span></span></div></div>
+
+<div class="step"><div class="n">2</div><div class="r"><b>Densité d'une observation</b> Même injection.</div>
+<div class="a"><span class="f"><span class="m">p(y<sub>i</sub> | x<sub>i</sub>; β) = (1/(2b)) · exp( −|y<sub>i</sub> − β<sub>1</sub>x<sub>1i</sub> − β<sub>2</sub>x<sub>2i</sub>| / b )</span></span></div></div>
+
+<div class="step"><div class="n">3</div><div class="r"><b>Produit</b> Identique.</div><div class="a"><span class="f"><span class="m">L(β) = Π<sub>i</sub> p(y<sub>i</sub> | x<sub>i</sub>; β)</span></span></div></div>
+
+<div class="step"><div class="n">4</div><div class="r"><b>Log</b> Identique.</div><div class="a"><span class="f"><span class="m">ℓ(β) = −3·log(2b) − (1/b) · Σ<sub>i</sub> |y<sub>i</sub> − β<sub>1</sub>x<sub>1i</sub> − β<sub>2</sub>x<sub>2i</sub>|</span></span></div></div>
+
+<div class="step"><div class="n">5</div><div class="r"><b>Négatif</b> Identique.</div><div class="a"><span class="f"><span class="m">NLL(β) = 3·log(2b) + (1/b) · Σ<sub>i</sub> |y<sub>i</sub> − f(x<sub>i</sub>; β)|</span></span></div></div>
+
+<div class="step key"><div class="n">6</div><div class="r"><b>Jeter → la loss</b> Constante additive et facteur <span class="m">1/b &gt; 0</span> jetés.</div>
+<div class="a"><span class="f"><span class="m">argmin<sub>β</sub> Σ<sub>i</sub> |y<sub>i</sub> − f(x<sub>i</sub>; β)|</span> &nbsp;=&nbsp; <b>MAE</b></span>
+Gaussienne → carré, Laplace → valeur absolue. <b>La forme de la loss est la forme de l'exposant de la densité.</b> MSE contre MAE est un choix de bruit, pas de loss.
+<p class="mini"><b>Et ce n'est pas la même cible.</b> Le minimiseur de la MSE est la <b>moyenne</b> conditionnelle ; celui de la MAE est la <b>médiane</b> conditionnelle. Pas « la même quantité estimée plus prudemment » : une autre quantité. Sur une distribution asymétrique (revenus, durées), elles ne coïncident pas, et la question « laquelle veux-tu prédire ? » se pose avant toute considération de robustesse. Voir l'encadré sous le pas 7.</p></div></div>
+
+<div class="step casse"><div class="n">7</div><div class="r"><b>Minimiser → ce qui casse</b><span class="tag s">casse</span> Même colinéarité, même droite plate.</div>
+<div class="a">Toujours <span class="m">f(x<sub>i</sub>) = s·x<sub>1i</sub></span>, <span class="m">s = β<sub>1</sub> + 2β<sub>2</sub></span>. MAE nulle pour tout <span class="m">s = 1</span>. Même droite de solutions qu'à l'exemple 1 : changer le bruit n'a rien changé <i>ici</i>, la casse vient des <span class="m">x</span>, pas du bruit.</div></div>
+
+<div class="brique"><b>Quand supposer Laplace plutôt que gaussien ?</b>
+<p class="mini" style="margin:.5rem 0"><b>Le mécanisme, en un chiffre.</b> Un résidu de 10 contre un résidu de 1 : la gaussienne le paie <b>100 fois</b> plus cher, Laplace <b>10 fois</b>. Sous MSE, l'influence d'un point n'est pas bornée — un seul aberrant déplace la solution arbitrairement loin. Sous MAE, elle l'est. On suppose Laplace quand on croit que de gros écarts arrivent <i>normalement</i>, pas exceptionnellement.</p>
+<table>
+<tr><th>situation</th><th>pourquoi les queues sont lourdes</th></tr>
+<tr><td>revenus, sinistres, temps de réponse, tailles de fichiers</td><td>la cible elle-même a des queues lourdes ; la gaussienne est démentie par les données</td></tr>
+<tr><td>erreurs de saisie, capteurs défaillants</td><td>un prix à 1 000 000 € au lieu de 100 000, un GPS en multipath : rare mais énorme</td></tr>
+<tr><td>labels de crowdsourcing</td><td>quelques annotateurs se trompent franchement</td></tr>
+<tr><td>ETA, durées de trajet</td><td>les embouteillages font une queue massive à droite ; on veut la médiane, pas la moyenne tirée vers le haut</td></tr>
+<tr><td>reconstruction d'image</td><td>la L2 floute, la L1 garde net : la moyenne de deux hypothèses de contour est un contour flou, la médiane en choisit un</td></tr>
+<tr><td>bruit impulsionnel (salt-and-pepper)</td><td>littéralement le modèle Laplace : la plupart des pixels intacts, quelques-uns complètement faux</td></tr>
+<tr><td>rendements financiers</td><td>kurtosis élevée ; supposer gaussien est l'erreur classique du domaine</td></tr>
+<tr><td>population à régimes mélangés</td><td>un sous-groupe rare et très différent qu'on ne veut pas laisser dicter le modèle</td></tr>
+</table>
+<p class="mini" style="margin:.5rem 0"><span class="tag s">le prix</span> Si le bruit est <i>réellement</i> gaussien, la MAE perd en efficacité : la médiane a une variance environ <b>1,57 fois</b> celle de la moyenne (<span class="m">2/π ≈ 64 %</span>). On paie en précision une robustesse dont on n'avait pas besoin. Et le gradient de <span class="m">|r|</span> est constant : il ne s'éteint pas près de l'optimum, la convergence oscille, et la fonction n'est pas dérivable en 0.</p>
+<p class="mini" style="margin:.5rem 0"><b>Le compromis : Huber.</b> Quadratique près de zéro (efficacité gaussienne, gradient qui s'éteint), linéaire au-delà d'un seuil <span class="m">δ</span> (influence bornée). Défaut de la régression robuste, et l'option « robuste » du gradient boosting.</p>
+<p class="mini" style="margin:.5rem 0"><b>Comment trancher sur des données réelles.</b> Ajuster avec la MSE, puis QQ-plot des résidus contre la normale : si les extrémités décrochent de la diagonale, ou si la kurtosis excède nettement 3, l'hypothèse gaussienne est fausse. Puis comparer les deux ajustements : s'ils divergent beaucoup, quelques points dictent le résultat.</p>
+<p class="mini" style="margin:.5rem 0"><span class="tag v">ce qu'il faut savoir dire</span> Personne ne dit « je suppose un bruit de Laplace » : on choisit la MAE parce qu'elle est robuste, et l'hypothèse est reconstituée après coup. Savoir faire le trajet dans ce sens — de la loss vers l'hypothèse qu'elle implique — permet de répondre « <i>la MAE suppose des queues exponentielles et estime la médiane</i> » plutôt que « <i>la MAE est plus robuste</i> ».</p>
+</div>
+
+<div class="step"><div class="n">8</div><div class="r"><b>Prior sur θ</b><span class="tag b">supposé</span> Cette fois, un prior qui croit à la <i>sparsité</i> : beaucoup de coefficients exactement nuls, quelques-uns forts.</div>
+<div class="a"><span class="f"><span class="bruit m">β<sub>1</sub>, β<sub>2</sub> ~ Laplace(0, τ)</span></span></div></div>
+
+<div class="step"><div class="n">9</div><div class="r"><b>−log prior → pénalité</b> Même geste, valeur absolue au lieu du carré.</div>
+<div class="a"><span class="f"><span class="m">−log p(β) = const + (|β<sub>1</sub>| + |β<sub>2</sub>|) / τ</span> &nbsp;⇒&nbsp; <span class="m">argmin<sub>β</sub> [ loss + λ‖β‖<sub>1</sub> ]</span></span>
+C'est le <b>Lasso</b> (ici sur une MAE, mais le pas 9 ne dépend pas de la loss du pas 6).</div></div>
+
+<div class="step key"><div class="n">10</div><div class="r"><b>Ce que la pénalité fournit</b> Même rôle : trancher sur la droite plate. Mais elle tranche <i>ailleurs</i>.</div>
+<div class="a">Sur la droite, <span class="m">(β<sub>1</sub>, β<sub>2</sub>) = (1 + 2t, −t)</span> : <span class="m">‖β‖<sub>1</sub> = |1 + 2t| + |t|</span>. Minimum en <span class="m">t = −0,5</span> → <span class="m">(<b>0</b> ; 0,5)</span>, valeur <span class="m">0,5</span>.
+<table>
+<tr><th>prior</th><th>pénalité</th><th>point choisi sur la droite</th><th>lecture</th></tr>
+<tr><td>gaussien</td><td class="m">‖β‖²</td><td class="m">(0,2 ; 0,4)</td><td>répartit entre les deux features colinéaires</td></tr>
+<tr><td>Laplace</td><td class="m">‖β‖<sub>1</sub></td><td class="m">(0 ; 0,5)</td><td>en éteint une, garde l'autre</td></tr>
+</table>
+<b>Le critère ajouté doit correspondre à ce que tu crois du monde.</b> Effets diffus ⇒ L2. Vérité sparse ⇒ L1. Ce n'est pas artificiel, c'est explicite — donc discutable et remplaçable.</div></div>
+
+<div class="step"><div class="n">11</div><div class="r"><b>β̂ pénalisé, chiffré</b> Pas de forme fermée pour L1 (la valeur absolue n'est pas dérivable en 0), c'est justement ce qui permet des zéros exacts.</div>
+<div class="a">Pour <span class="m">λ</span> petit, <span class="m">β̂ ≈ (0 ; 0,5)</span> ; quand <span class="m">λ</span> monte, <span class="m">β̂<sub>2</sub></span> descend vers 0 et <span class="m">β̂<sub>1</sub></span> reste exactement à 0.</div></div>
+</section>
+
+<!-- ============================ SYNTHÈSE ============================ -->
+<section id="syn">
+<h2><span class="n">▮</span><span>Les trois exemples côte à côte</span></h2>
+<table class="syn">
+<tr><th>pas</th><th>Ex. 1 — gaussien</th><th>Ex. 2 — Bernoulli</th><th>Ex. 3 — Laplace</th></tr>
+<tr><td>1 · bruit</td><td class="bruit">ε ~ N(0, σ²)</td><td class="bruit">y ~ Bernoulli(σ(βx))</td><td class="bruit">ε ~ Laplace(0, b)</td></tr>
+<tr><td>2–5 · densité, produit, log, négatif</td><td colspan="3" style="text-align:center;color:var(--faint);font-style:italic">le même geste, sans exception</td></tr>
+<tr><td>6 · la loss qui tombe</td><td><b>MSE</b> ; σ² jeté</td><td><b>cross-entropy</b> ; rien à jeter</td><td><b>MAE</b> ; b jeté</td></tr>
+<tr><td>6b · ce qu'on estime</td><td>la <b>moyenne</b> conditionnelle</td><td>la <b>probabilité</b> conditionnelle</td><td>la <b>médiane</b> conditionnelle</td></tr>
+<tr><td>7 · ce qui casse</td><td class="sel">infinité de solutions (colinéarité, valeur propre 0)</td><td class="sel">aucune solution (séparation parfaite, ‖β‖ → ∞)</td><td class="sel">infinité de solutions (même droite)</td></tr>
+<tr><td>8 · prior</td><td class="bruit">β ~ N(0, τ²)</td><td class="bruit">β ~ N(0, τ²)</td><td class="bruit">β ~ Laplace(0, τ)</td></tr>
+<tr><td>9 · la pénalité qui tombe</td><td><b>λ‖β‖²</b>, λ = σ²/τ²</td><td><b>λβ²</b></td><td><b>λ‖β‖<sub>1</sub></b></td></tr>
+<tr><td>10 · ce qu'elle fournit</td><td>tranche : norme minimale (0,2 ; 0,4) ; spectre translaté, inversible</td><td>rend coercif : le minimum existe et est unique</td><td>tranche : sparse (0 ; 0,5)</td></tr>
+<tr><td>11 · β̂</td><td>(0,197 ; 0,394) à λ = 1</td><td>3,41 à λ = 0,01</td><td>≈ (0 ; 0,5) à λ petit</td></tr>
+</table>
+
+<div class="tableau">
+<em>« La loss est la trace du bruit ; la pénalité est la trace du prior. La vraisemblance seule ne détermine pas toujours de solution — trop, ou aucune — et la pénalité fournit ce qui manque. »</em>
+<span class="faux"><b>Phrase fausse tentante</b> : « on régularise pour éviter l'overfitting ». C'est la conséquence, pas le mécanisme. Le mécanisme est aux pas 7 et 10 : existence et unicité.</span>
+</div>
+
+<p class="retenir">Devant une loss ou une pénalité : de quel bruit, de quel prior est-elle la trace ? Et que fournit-elle que les données ne fournissaient pas ?</p>
+
+<div class="porte">
+<h3 style="margin-top:0">Pour rejouer la chaîne seul</h3>
+<p style="margin:0">Prends l'exemple 1, remplace <span class="m">y</span> par <span class="m">(1, 2, 4)</span> — la colinéarité des <span class="m">x</span> ne bouge pas. Refais les pas 6, 7, 10, 11. Puis prends l'exemple 2 avec <span class="m">y = (0, 1, 0, 1)</span> — plus séparable — et vois ce qui change au pas 7.</p>
+<p style="margin:.9rem 0 0">Puis retour à l’<a href="../../index.html">index des fiches</a>, ou à la <a href="../topics/sheet-t03-vraisemblance-mle-map.html">fiche 03</a> pour te tester sur la même chaîne, question par question.</p>
+</div>
+</section>
+
+</main>
+
+<aside class="marge">
+  <div class="note"><b>Deux hypothèses, pas plus</b><br>pas 1 (bruit) et pas 8 (prior). Tout le reste est du calcul.</div>
+  <div class="note"><b>Le geste 3-4-5-6</b><br>produit → log → négatif → jeter. Identique dans les trois exemples, identique pour le prior.</div>
+  <div class="note"><b>Deux façons de casser</b><br>trop de solutions (ex. 1, 3) ou aucune (ex. 2). La pénalité répare les deux.</div>
+  <div class="note"><b>Moyenne ou médiane</b><br>MSE → moyenne conditionnelle. MAE → médiane conditionnelle. Changer de bruit change la cible, pas seulement la robustesse.</div>
+  <div class="note"><b>+λI translate</b><br>chaque valeur propre monte de λ. Rien n'est annulé. Le Lasso annule des coefficients, autre objet.</div>
+</aside>
+</div>
+<script>
+(function(){
+'use strict';
+var NS='http://www.w3.org/2000/svg';
+var BR='#1F5FA8',SEL='#B23A2C',VR='#2E7D4F',INK='#1C2430',FA='#8A93A0',GR='#D3D7DD',BRBG='rgba(31,95,168,.10)',SELBG='rgba(178,58,44,.12)';
+function el(n,a,p){var e=document.createElementNS(NS,n);for(var k in a)e.setAttribute(k,a[k]);if(p)p.appendChild(e);return e;}
+function txt(p,x,y,s,o){o=o||{};var t=el('text',{x:x,y:y,'font-family':'inherit','font-size':o.fs||13,fill:o.fill||INK,'text-anchor':o.ta||'start','font-style':o.fi||'normal','font-weight':o.fw||'normal'},p);if(o.tr)t.setAttribute('transform',o.tr);t.textContent=s;return t;}
+function fr(x,d){return x.toFixed(d).replace('.',',');}
+function sig(z){return 1/(1+Math.exp(-z));}
+function lse(z){return z>0?z+Math.log1p(Math.exp(-z)):Math.log1p(Math.exp(z));} /* log(1+e^z), stable */
+function ctrlBar(fig){var c=document.createElement('div');c.className='ctrl';fig.appendChild(c);return c;}
+function btn(c,label,fn,prim){var b=document.createElement('button');b.textContent=label;if(prim)b.className='prim';b.onclick=fn;c.appendChild(b);return b;}
+function slider(c,label,min,max,step,val,fmt){var l=document.createElement('label');l.textContent=label+' ';var i=document.createElement('input');i.type='range';i.min=min;i.max=max;i.step=step;i.value=val;var o=document.createElement('output');l.appendChild(i);l.appendChild(o);c.appendChild(l);i._out=o;i._fmt=fmt||function(v){return v;};return i;}
+function stat(c){var s=document.createElement('span');s.className='stat';c.appendChild(s);return s;}
+function cap(fig,html){var c=document.createElement('figcaption');c.innerHTML=html;fig.appendChild(c);return c;}
+function clear(g){while(g.firstChild)g.removeChild(g.firstChild);}
+function axes(g,x0,y0,w,h,xl,yl){el('line',{x1:x0,y1:y0+h,x2:x0+w,y2:y0+h,stroke:INK},g);el('line',{x1:x0,y1:y0,x2:x0,y2:y0+h,stroke:INK},g);if(xl)txt(g,x0+w,y0+h+30,xl,{ta:'end',fs:12,fi:'italic',fill:FA});if(yl)txt(g,x0,y0-8,yl,{ta:'start',fs:12,fi:'italic',fill:FA});}
+function path(g,pts,col,w,dash){var d='';for(var i=0;i<pts.length;i++)d+=(i?'L':'M')+pts[i][0].toFixed(1)+','+pts[i][1].toFixed(1);var p=el('path',{d:d,fill:'none',stroke:col,'stroke-width':w||2},g);if(dash)p.setAttribute('stroke-dasharray',dash);return p;}
+function on(fig,ok){if(!fig)return false;if(ok)return true;fig.innerHTML='<figcaption>figure indisponible</figcaption>';return false;}
+
+/* ---------- 5a. la vallée plate ---------- */
+(function(){
+  var fig=document.getElementById('fig-vallee');if(!fig)return;var c=ctrlBar(fig);
+  var sl=slider(c,'\u03bb',-2,2,0.05,-2,function(v){return v<=-2?'0':fr(Math.pow(10,v),2);});
+  var st=stat(c);
+  var W=660,H=400;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'La vall\u00e9e plate du RSS et le point choisi par Ridge'},fig);
+  var L=70,T=20,w=520,h=340;var b0=-1.4,b1=2.0,c0=-1.0,c1=1.2;
+  function X(b){return L+(b-b0)/(b1-b0)*w;}function Y(v){return T+h-(v-c0)/(c1-c0)*h;}
+  /* fond : RSS comme dégradé de lignes parallèles */
+  for(var k=-1.5;k<=3.5;k+=0.25){var col=Math.abs(k-1)<1e-9?VR:GR;var p1=[X(b0),Y((k-b0)/2)],p2=[X(b1),Y((k-b1)/2)];path(s,[p1,p2],col,Math.abs(k-1)<1e-9?3:1);}
+  txt(s,X(1.55),Y(-0.2)-6,'RSS = 0 : \u03b2\u2081 + 2\u03b2\u2082 = 1',{fs:12,fill:VR,fw:'bold'});
+  txt(s,X(1.7)+4,Y(-0.85)+4,'RSS = 14',{fs:11,fill:FA,fi:'italic'});txt(s,X(1.7)+4,Y(0.15)+4,'RSS = 14',{fs:11,fill:FA,fi:'italic'});
+  /* cercles de norme */
+  var cp=el('clipPath',{id:'clipv'},s);el('rect',{x:L,y:T,width:w,height:h},cp);var gc=el('g',{'clip-path':'url(#clipv)'},s);
+  [0.2,0.5,1].forEach(function(n2){var r=Math.sqrt(n2);var pts=[];for(var a=0;a<=2*Math.PI+0.01;a+=0.05)pts.push([X(r*Math.cos(a)),Y(r*Math.sin(a))]);path(gc,pts,BR,1,'3 3');});
+  txt(s,X(0)-6,Y(-1)-4,'\u2016\u03b2\u2016\u00b2 = 1',{ta:'end',fs:11,fill:BR,fi:'italic'});txt(s,X(0)-6,Y(-Math.sqrt(0.5))-4,'0,5',{ta:'end',fs:11,fill:BR,fi:'italic'});txt(s,X(0)-6,Y(-Math.sqrt(0.2))-4,'0,2',{ta:'end',fs:11,fill:BR,fi:'italic'});
+  axes(s,L,T,w,h,'\u03b2\u2081','\u03b2\u2082');
+  el('line',{x1:X(0),y1:T,x2:X(0),y2:T+h,stroke:FA,'stroke-width':.7},s);el('line',{x1:L,y1:Y(0),x2:L+w,y2:Y(0),stroke:FA,'stroke-width':.7},s);
+  /* points de la table */
+  [[1,0],[3,-1],[-1,1]].forEach(function(p){if(p[0]<=b1&&p[0]>=b0)el('circle',{cx:X(p[0]),cy:Y(p[1]),r:4,fill:'#fff',stroke:VR,'stroke-width':1.5},s);});
+  el('circle',{cx:X(0.2),cy:Y(0.4),r:5,fill:BR},s);txt(s,X(0.2)+10,Y(0.4)-10,'(0,2 ; 0,4) norme minimale sur la ligne verte',{fs:11,fill:BR});
+  var d=el('g',{},s);
+  function draw(){clear(d);var v=parseFloat(sl.value);var lam=v<=-2?0:Math.pow(10,v);sl._out.textContent=sl._fmt(v);var sc=70/(70+lam);var p=[sc/5,2*sc/5];
+    path(d,[[X(0),Y(0)],[X(p[0]),Y(p[1])]],SEL,1.5,'2 2');
+    el('circle',{cx:X(p[0]),cy:Y(p[1]),r:6,fill:SEL},d);
+    var rss=14*(1-sc)*(1-sc),n2=p[0]*p[0]+p[1]*p[1];
+    st.textContent='Ridge : s = '+fr(sc,3)+' \u00b7 \u03b2\u0302 = ('+fr(p[0],3)+' ; '+fr(p[1],3)+') \u00b7 RSS = '+fr(rss,3)+' \u00b7 \u2016\u03b2\u2016\u00b2 = '+fr(n2,3);}
+  sl.oninput=draw;draw();
+  cap(fig,'Le plan des coefficients. Les lignes grises sont les niveaux du RSS : parall\u00e8les, parce que les donn\u00e9es ne voient que \u03b2\u2081 + 2\u03b2\u2082. La ligne verte est le fond de la vall\u00e9e, RSS = 0 partout dessus \u2014 les points blancs sont des lignes de la table, tous \u00e0 RSS nul. Les cercles bleus sont les niveaux de \u2016\u03b2\u2016\u00b2. Ridge choisit le point de la ligne verte qui touche le plus petit cercle (bleu), puis, quand \u03bb monte, le tire vers l\u2019origine le long du rayon rouge : le RSS remonte un peu, la norme baisse beaucoup. \u00c0 \u03bb = 0 il reste sur la ligne verte.');
+})();
+/* ---------- 6. séparation parfaite ---------- */
+(function(){
+  var fig=document.getElementById('fig-separation');if(!fig)return;var c=ctrlBar(fig);
+  var lams=[0,0.001,0.01,0.1,1];var cur=0;var bts=[];var st=stat(c);
+  lams.forEach(function(l,i){bts.push(btn(c,'\u03bb = '+(l===0?'0':String(l).replace('.',',')),function(){cur=i;draw();}));});
+  var W=660,H=270;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'Log-loss en fonction de \u03b2 sous s\u00e9paration parfaite'},fig);
+  var g=el('g',{},s);var L=60,T=30,w=560,h=190,B1=8,YM=3;
+  function X(b){return L+b/B1*w;}function Y(v){return T+h-Math.min(v,YM)/YM*h;}
+  function ll(b){return 2*(lse(-b)+lse(-2*b));}
+  function draw(){clear(g);bts.forEach(function(b,i){b.setAttribute('aria-pressed',i===cur);});var lam=lams[cur];
+    axes(g,L,T,w,h,'\u03b2 (tout \u03b2 > 0 s\u00e9pare parfaitement)','loss');
+    [0,1,2,3].forEach(function(v){txt(g,L-8,Y(v)+4,fr(v,1),{ta:'end',fs:11,fill:FA});});[0,2,4,6,8].forEach(function(b){txt(g,X(b),T+h+16,b,{ta:'middle',fs:11,fill:FA});});
+    var p0=[],p1=[];for(var b=0;b<=B1;b+=0.04){p0.push([X(b),Y(ll(b))]);p1.push([X(b),Y(ll(b)+lam*b*b)]);}
+    path(g,p0,FA,1.5,'4 3');txt(g,X(6.5),Y(0.15)-6,'log-loss seule \u2192 0, jamais atteint',{fs:11,fill:FA,fi:'italic'});
+    if(lam>0){path(g,p1,INK,2.5);var best=0,bv=1e9;for(var b=0.01;b<=B1;b+=0.005){var v=ll(b)+lam*b*b;if(v<bv){bv=v;best=b;}}
+      el('line',{x1:X(best),y1:T,x2:X(best),y2:T+h,stroke:SEL,'stroke-dasharray':'3 3'},g);el('circle',{cx:X(best),cy:Y(bv),r:6,fill:SEL},g);
+      txt(g,X(best)+8,T+16,'minimum en \u03b2\u0302 = '+fr(best,2),{fs:12,fill:SEL,fw:'bold'});
+      st.textContent='+ \u03bb\u03b2\u00b2 : la courbe remonte, un minimum existe et il est unique';}
+    else{txt(g,X(1),T+16,'pas de minimum : \u2016\u03b2\u2016 \u2192 \u221e',{fs:12,fill:SEL,fw:'bold'});st.textContent='le MLE n\u2019existe pas';}}
+  draw();
+  cap(fig,'Quatre points parfaitement s\u00e9par\u00e9s, une pente \u03b2. En pointill\u00e9, la log-loss seule : elle descend vers 0 sans s\u2019arr\u00eater, le solveur suit et \u03b2 file \u00e0 l\u2019infini. Clique sur un \u03bb : le terme \u03bb\u03b2\u00b2 relève la courbe loin de l\u2019origine, la somme devient coercive, et un minimum appara\u00eet \u2014 unique, parce que la somme est strictement convexe. Avec \u03bb = 0,001, \u03b2\u0302 est d\u00e9j\u00e0 fini. La p\u00e9nalit\u00e9 ne rend pas la solution \u00ab meilleure \u00bb : elle la fait exister.');
+})();
+
+/* ---------- tabs ---------- */
+(function(){var bs=[].slice.call(document.querySelectorAll('.tabs button'));bs.forEach(function(b){b.onclick=function(){bs.forEach(function(x){x.setAttribute('aria-selected',x===b);});document.querySelectorAll('.ex').forEach(function(s){s.classList.toggle('on',s.id===b.dataset.ex);});window.scrollTo({top:0});};});})();
+/* ---------- nav active ---------- */
+(function(){var links=[].slice.call(document.querySelectorAll('nav.echelle a'));var secs=links.map(function(a){return document.querySelector(a.getAttribute('href'));});
+  function upd(){var y=window.scrollY+120;var idx=0;secs.forEach(function(s,i){if(s&&s.offsetTop<=y)idx=i;});links.forEach(function(a,i){a.classList.toggle('on',i===idx);});}
+  window.addEventListener('scroll',upd,{passive:true});upd();})();
+})();
+</script>
+</body>
+</html>
