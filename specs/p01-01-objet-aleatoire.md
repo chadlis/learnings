@@ -112,3 +112,4 @@ Corrections faites d'office en écrivant la sheet (à valider) :
    l'estimateur, p(x ; π) et non p(x | π)) — c'est la seule façon d'adresser la scorie
    du 15/09 sans la raconter. À retirer si le bloc prérequis doit rester strictement
    du rappel de contenu.
+- **Wilson sur 872/1 000 corrigé après coup** : la sheet annonçait [0,851 ; 0,892], le calcul donne [0,84986 ; 0,89129] soit **[0,850 ; 0,891]** (z = 1,96, la borne basse de Wilson est sous celle de Wald, pas confondue avec elle). Corrigé dans la sheet. Repéré en écrivant w01-04, qui rejoue les mêmes chiffres.
