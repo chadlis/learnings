@@ -10,7 +10,7 @@ prereq: [p00-02, p00-03]
 anki: [stats::vraisemblance, stats::mle, ml::regression-lineaire, ml::logistique, dl::cross-entropy]
 bridges: [b05, b06]
 next: p02-02
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -85,3 +85,11 @@ Trois exemples, tous minuscules, calculés à la main :
 
 ## Exclusions
 Pas de prior ici (p02-02). Pas de Huber au-delà du nom. Pas de KL (p08-03).
+
+## Questions pour la revue
+- **Chiffres du spec : tous vérifiés, aucun faux.** Script de contrôle : RSS(β) = 14 − 28β + 14β² = 14(1 − β)², β̂ = 1 ; NLL(β) = 2 log(1 + e⁻ᵝ) + 2 log(1 + e⁻²ᵝ) (identique au calcul point par point), NLL(0) = 4 log 2 = 2,773, décroissante, pente toujours < 0 ; softmax(2, 0, −1) = (0,8438 ; 0,1142 ; 0,0420), −log 0,844 = 0,1698, −log 0,042 = 3,1698 ; L(p) = p³, argmax 1 ; MSE ↔ moyenne et MAE ↔ médiane vérifiés sur y = (1, 2, 3, 4, 20) (moyenne 6, médiane 3, argmin uniques). Rien à corriger dans le spec.
+- **Écart assumé sur la figure 1.** Le spec demandait un seul `plot` portant les densités *et* leurs −log. Sur un seul cadre les densités (≤ 0,5) sont écrasées contre l'axe face aux −log (jusqu'à 8,9). La figure est donc en **deux panneaux superposés** partageant le même curseur `r` : densité en haut, −log en pointillé en bas. À valider.
+- **Curseur ajouté à la figure 2** (le spec n'en demandait pas) : il donne L(p) et log L(p) en lecture directe et rend visible que l'argmax ne bouge pas.
+- **Où placer le pointeur p08-02** (overflow float32, 0 au lieu de nan). Il est au pas 5, dans la remarque sur le sous-débordement — pas dans « où ça casse », puisque le spec le déclare hors périmètre. À confirmer.
+- **Somme ou moyenne ?** La sheet écrit la cross-entropy en somme (−Σ log p_yᵢ), conformément au geste du MLE ; les frameworks moyennent par défaut. Faut-il le dire ici, ou est-ce le sujet d'une autre sheet ?
+- **`ml::regression-lineaire`** est repris tel quel du frontmatter ; vérifier que le tag existe bien sous cette forme dans Anki (les autres tags de la liste sont déjà utilisés par p01-03 et p03-01).
