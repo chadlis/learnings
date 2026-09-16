@@ -10,7 +10,7 @@ prereq: [p04-02]
 anki: [algebre::spectral, algebre::svd, algebre::conditionnement, algebre::valeurs-singulieres]
 bridges: [b06]
 next: p04-04
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -77,3 +77,37 @@ X₂ = [[1, 0], [0, 1], [1, 1], [2, 1]] : σ = (2,80 ; 1,07), κ = 2,62 — bien
 
 ## Exclusions
 Pas de démonstration du spectral ni de la SVD, pas de pseudo-inverse au-delà du nom, pas de SVD randomisée détaillée.
+
+## Questions pour la revue
+
+Tous les chiffres de l'exemple fil rouge ont été revérifiés en arithmétique exacte
+(`fractions.Fraction`, polynôme caractéristique, recomposition UΣVᵀ comparée à X) :
+4,30 / 0,697 / κ = 6,17 pour C, √70 = 8,37 et κ = 71 à λ = 1 pour D4, σ = (2,80 ; 1,07)
+et κ = 2,62 pour X₂. **Aucun n'est faux**, rien n'a été corrigé. Restent trois arbitrages.
+
+1. **« κ = 71 ⇒ ~κ itérations » — le facteur exact dépend de deux conventions.**
+   À η = 1/κ pour diviser la **loss** par 100, la formule du spec (κ·ln 100 / 2) donne
+   **163** pas à κ = 71 (exact : 162). w03-01 compte **114** pas parce qu'il prend
+   η = 0,02 (et non 1/71) et vise un facteur dix sur l'**écart**, pas cent sur la loss.
+   Les deux sont justes et proportionnels à κ, mais les deux chiffres cohabitent
+   maintenant dans le dépôt. La sheet écrit « proportionnel à κ », donne 163 dans la
+   figure 3 et réconcilie explicitement avec 114 dans sa légende. Est-ce la lecture
+   voulue, ou faut-il aligner la figure 3 sur les conventions de w03-01 ?
+
+2. **Figure 4 recoupe la figure 3 de p04-02**, qui trace déjà κ = (70 + λ)/λ et sa chute.
+   Pour ne pas redire, la figure 4 a été recentrée sur l'**écart κ contre κ²** : courbe
+   bleue κ(X_λ) = √((70 + λ)/λ), ce qu'on factorise en QR/SVD sur la matrice empilée
+   [X ; √λ I], contre courbe rouge κ(XᵀX + λI) = (70 + λ)/λ, son carré. À λ = 1 :
+   8,43 contre 71. La légende renvoie à p04-02#s7 pour la chute elle-même. Le cadrage
+   « matrice empilée » est-il le bon, ou préfères-tu un κ(X) contre κ(X)² générique,
+   sans le détour par la formulation ridge ?
+
+3. **Figure 2 : presets limités à det ≥ 0** (A = [[2,1],[0,3]], cisaillement, B singulière).
+   C'est ce qui garantit que V *et* U sont des rotations, donc que l'animation en trois
+   temps est vraiment rotation → étirement → rotation. Une matrice de déterminant négatif
+   ferait de U un miroir et casserait la lecture. Manque-t-il un cas que tu voulais voir ?
+
+Note de mise en œuvre : comme en p04-01 et p04-02, `SL.plane` ne sert qu'au décor de
+départ et toute la scène d'arrivée est redessinée en coordonnées écran — sans quoi
+le preset singulier B (σ₂ = 0) disparaîtrait au lieu de s'effondrer sur une droite.
+`assets/sheetlib.js` n'a pas été touché.
