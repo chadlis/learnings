@@ -7,3 +7,5 @@ Pour chaque spec `ready` de la partie :
 - si un sous-agent échoue deux fois, note l'id et continue.
 
 À la fin : `python3 tools/build_index.py`, un commit `chore(index): partie $ARGUMENTS`, puis un tableau id · chemin · FAIL/WARN · questions pour la revue. Ne produis jamais une sheet dont le spec est `stub`.
+
+**Le statut d'un spec ne se change jamais de `stub` à `ready` par Claude Code ; seul Salah le fait en déposant un spec complet.** Un stub sauté se note dans le rapport, il ne se remplit pas.

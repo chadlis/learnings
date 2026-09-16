@@ -10,7 +10,7 @@ prereq: [p03-02, p07-01, p02-01]
 anki: [ml::boosting, ml::gradient-boosting, ml::learning-rate-boosting, ml::rf-vs-gb]
 bridges: [b01]
 next: p07-04
-status: ready
+status: stub
 ---
 
 ## Question de la chaîne

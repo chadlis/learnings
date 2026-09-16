@@ -10,7 +10,7 @@ prereq: [p04-01, p05-01, p01-04, p07-04]
 anki: [algebre::temoin, ml::r2, stats::multiplicite]
 bridges: []
 next: 
-status: ready
+status: stub
 ---
 ## Format bridge
 Une seule figure (le mécanisme), puis une ligne par domaine : règle | où on l'a vue (lien vers le pas exact) | ce qui change. Résumé en 3 lignes, phrase d'entretien, chaîne verbalisée de 4 maillons « même argument, autre habit ». Pas de chaîne numérotée longue : le pont relie, il ne redémontre pas.

@@ -10,7 +10,7 @@ prereq: [p08-03]
 anki: [python::flottants, dl::numerique, dl::log-sum-exp]
 bridges: []
 next: p08-03
-status: ready
+status: stub
 ---
 
 ## Question de la chaîne

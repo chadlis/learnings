@@ -10,7 +10,7 @@ prereq: [p03-02, p04-04]
 anki: [ml::kmeans, ml::lloyd, ml::kmeans-plus-plus]
 bridges: [b01]
 next: p08-01
-status: ready
+status: stub
 ---
 
 ## Question de la chaîne

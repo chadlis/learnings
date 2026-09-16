@@ -10,7 +10,7 @@ prereq: [p08-02]
 anki: [python::numpy, dl::pytorch, dl::broadcasting, dl::strides]
 bridges: []
 next: c00
-status: ready
+status: stub
 ---
 
 ## Question de la chaîne

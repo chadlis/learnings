@@ -10,7 +10,7 @@ prereq: [p03-02, p05-01, p05-02, p02-02, p04-03]
 anki: [ml::optimisation, ml::ols, ml::logistique, algebre::conditionnement]
 bridges: []
 next: 
-status: ready
+status: stub
 ---
 ## Format bridge
 Une seule figure (le mécanisme), puis une ligne par domaine : règle | où on l'a vue (lien vers le pas exact) | ce qui change. Résumé en 3 lignes, phrase d'entretien, chaîne verbalisée de 4 maillons « même argument, autre habit ». Pas de chaîne numérotée longue : le pont relie, il ne redémontre pas.

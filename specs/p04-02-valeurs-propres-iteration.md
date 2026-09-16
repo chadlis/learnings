@@ -10,7 +10,7 @@ prereq: [p04-01]
 anki: [algebre::eigen, algebre::power-iteration, algebre::markov]
 bridges: [b06]
 next: p04-03
-status: ready
+status: stub
 ---
 
 ## Question de la chaîne

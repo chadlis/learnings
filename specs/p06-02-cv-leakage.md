@@ -10,7 +10,7 @@ prereq: [p06-01, p01-04]
 anki: [ml::cv, ml::loocv, ml::leakage, ml::validation]
 bridges: [b03, b04]
 next: p06-03
-status: ready
+status: stub
 ---
 
 ## Question de la chaîne

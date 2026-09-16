@@ -10,7 +10,7 @@ prereq: [p04-02]
 anki: [algebre::spectral, algebre::svd, algebre::conditionnement]
 bridges: [b06]
 next: p04-04
-status: ready
+status: stub
 ---
 
 ## Question de la chaîne

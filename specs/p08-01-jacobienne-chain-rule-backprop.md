@@ -10,7 +10,7 @@ prereq: [p04-01, p03-02]
 anki: [analyse::gradient-jacobienne, dl::backprop, analyse::chain-rule]
 bridges: [b01]
 next: p08-02
-status: ready
+status: stub
 ---
 
 ## Question de la chaîne

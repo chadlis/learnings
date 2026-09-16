@@ -10,7 +10,7 @@ prereq: [p03-01, p00-03]
 anki: [ml::arbres, ml::gini, ml::entropie, ml::profondeur]
 bridges: [b05]
 next: p07-02
-status: ready
+status: stub
 ---
 
 ## Question de la chaîne

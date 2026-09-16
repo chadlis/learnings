@@ -10,7 +10,7 @@ prereq: [p06-03, p05-02, p00-03]
 anki: [ml::calibration, ml::brier, ml::desequilibre, ml::seuil-cout]
 bridges: []
 next: p07-01
-status: ready
+status: stub
 ---
 
 ## Question de la chaîne

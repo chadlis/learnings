@@ -10,7 +10,7 @@ prereq: [p00-03, p05-02]
 anki: [ml::metriques, ml::roc-auc, ml::pr-auc, ml::seuil]
 bridges: []
 next: p06-04
-status: ready
+status: stub
 ---
 
 ## Question de la chaîne

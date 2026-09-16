@@ -10,7 +10,7 @@ prereq: []
 anki: [algebre::matrice, algebre::noyau, algebre::affine, algebre::temoin]
 bridges: [b02]
 next: p04-02
-status: ready
+status: stub
 ---
 
 ## Question de la chaîne

@@ -10,7 +10,7 @@ prereq: [p01-01, p00-02]
 anki: [ml::biais-variance, ml::overfitting, ml::underfitting]
 bridges: [b03]
 next: p06-02
-status: ready
+status: stub
 ---
 
 ## Question de la chaîne

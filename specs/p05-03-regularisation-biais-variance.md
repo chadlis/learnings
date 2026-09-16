@@ -10,7 +10,7 @@ prereq: [p02-02, p06-01]
 anki: [ml::ridge, ml::lasso, ml::biais-variance, ml::cv]
 bridges: [b03]
 next: p06-01
-status: ready
+status: stub
 ---
 
 ## Question de la chaîne

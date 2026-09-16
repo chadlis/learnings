@@ -10,7 +10,7 @@ prereq: [p02-01, p08-02]
 anki: [dl::cross-entropy, dl::entropie, dl::kl, dl::perplexite]
 bridges: [b05]
 next: p08-04
-status: ready
+status: stub
 ---
 
 ## Question de la chaîne

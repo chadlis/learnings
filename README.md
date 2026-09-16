@@ -1,5 +1,9 @@
 # Fiches ML/LLM
 
+**Site publié : <https://learnings-ek5.pages.dev/>** — déployé par Cloudflare
+Pages à chaque push sur `main`. L'adresse ne change pas ; le nom de projet de
+`wrangler.toml` n'en est pas l'URL.
+
 Fiches de révision de la formation ML/LLM. Un fichier HTML autonome par entrée :
 zéro dépendance, zéro CDN, zéro build. Chaque fichier s'ouvre en `file://`
 comme sur le site publié.

@@ -10,7 +10,7 @@ prereq: [p07-01, p01-05, p06-01]
 anki: [ml::bagging, ml::random-forest, ml::oob, ml::variance-moyenne]
 bridges: [b03, b04]
 next: p07-03
-status: ready
+status: stub
 ---
 
 ## Question de la chaîne

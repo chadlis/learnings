@@ -10,7 +10,7 @@ prereq: [p02-01, p04-01, p00-02]
 anki: [ml::regression-lineaire, ml::ols, ml::r2]
 bridges: [b02, b06]
 next: p05-02
-status: ready
+status: stub
 ---
 
 ## Question de la chaîne

@@ -10,7 +10,7 @@ prereq: [p02-01, p03-01, p05-01]
 anki: [ml::logistique, ml::odds-ratio, ml::effet-marginal]
 bridges: [b06]
 next: p05-03
-status: ready
+status: stub
 ---
 
 ## Question de la chaîne
