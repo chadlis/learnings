@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Tenseurs : ruban, strides, vue vs copie, broadcasting — chaîne</title>
+<meta name="sheet" content="series=chain;part=08;number=04;status=v1">
+<meta name="part" content="08 · Calcul, numérique, tenseurs">
+<meta name="subtitle" content="un tenseur est une grille posée sur un ruban de mémoire, pas un objet mathématique">
+<meta name="prereq" content="p08-02">
+<meta name="anki" content="python::tenseurs,python::broadcasting,python::strides,python::keepdim">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ---- marques propres à cette chaîne (ruban, formes alignées, matrices) ---- */
+.note{font-size:14px;color:var(--cardmuted);border-top:1px solid var(--cardline);margin-top:10px;padding-top:8px}
+.note b{color:var(--cardink)}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tw table{min-width:330px}
+.eq.mono{font-family:var(--mono);font-size:13px;white-space:pre;overflow-x:auto;line-height:1.5}
+.sl-plot .cell{fill:var(--cardsoft);stroke:rgba(34,48,43,.35);stroke-width:1}
+.sl-plot .cell.rub{fill:var(--card)}
+.sl-plot .cell.on{fill:rgba(240,209,120,.55);stroke:var(--pen);stroke-width:2.2}
+.sl-plot .cell.copy{fill:rgba(184,50,42,.10);stroke:var(--red)}
+.sl-plot .cell.ghost{fill:none;stroke-dasharray:4 3;stroke:rgba(34,48,43,.35)}
+.sl-plot .cell.res{fill:rgba(31,122,68,.12);stroke:var(--green)}
+.sl-plot .cell.bad{fill:rgba(184,50,42,.10);stroke:var(--red);stroke-width:2}
+.sl-plot .cell.row{fill:rgba(240,209,120,.35);stroke:var(--pen);stroke-width:2}
+.sl-plot text.cellv{font-family:var(--mono);font-size:11.5px;fill:var(--cardink)}
+.sl-plot text.cellv.on{fill:var(--pen);font-weight:700}
+.sl-plot text.cellv.dim{fill:var(--cardmuted)}
+.sl-plot text.axl{font-family:var(--sans);font-size:11.5px;fill:var(--cardmuted)}
+.sl-plot text.axl.strong{fill:var(--cardink);font-weight:600}
+.sl-plot text.ok{fill:var(--green);font-family:var(--sans);font-size:15px;font-weight:700}
+.sl-plot text.ko{fill:var(--red);font-family:var(--sans);font-size:15px;font-weight:700}
+.sl-plot text.err{fill:var(--red);font-family:var(--sans);font-size:14px;font-weight:600}
+.sl-plot .link{stroke:var(--red);stroke-width:1.8;stroke-dasharray:4 3;fill:none}
+.sl-plot .brace{stroke:rgba(34,48,43,.45);stroke-width:1.4;fill:none}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 08 · Calcul, numérique, tenseurs › chaîne 04</div>
+  <h1>Un tenseur est un <span>ruban</span>, une forme et des <span>pas</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Pourquoi <code>reshape</code> est gratuit et <code>transpose</code> casse <code>view</code>, pourquoi <code>M / M.sum(1)</code> normalise les mauvaises lignes sans lever d'erreur, et comment lire une opération sur les axes sans se tromper. L'idée unique : <b>un tenseur est une forme et des pas posés sur un ruban de mémoire</b> — les métadonnées bougent, le ruban presque jamais. Fil rouge : <code>arange(24).reshape(2, 3, 4)</code>, ses pas (12, 4, 1), et la matrice 1…9 qu'on normalise deux fois — une fois faux, une fois juste.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="chain-p08-02-flottants-lse.html#s8">p08-02 · Flottants, dtypes</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>python::tenseurs</code><code>python::broadcasting</code><code>python::strides</code><code>python::keepdim</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="chain-p08-03-cross-entropy-entropie-kl.html#s8">p08-03 · les formes de la loss</a></li>
+    <li><a href="../../map.html#p04-01">p04-01 · Une matrice est une action</a></li>
+    <li><a href="../../map.html#c00">c00 · TAP — invariant, variant</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>Un dtype, une taille fixe.</b> Un tenseur a un type et toutes ses cases font la même taille : float32 = 4 octets, int64 = 8 (<a href="chain-p08-02-flottants-lse.html#s8">p08-02, pas 8</a>). C'est cette uniformité qui rend l'arithmétique d'offset possible — sans elle, pas de pas constants.</li>
+      <li><b>Indexation à partir de 0</b>, et <code>a:b</code> exclut <code>b</code>. <code>::2</code> prend une case sur deux. Aucune autre convention n'est supposée.</li>
+      <li><b>Une somme consomme son indice.</b> Σ<sub><span class="m">i</span></sub> <span class="m">x</span><sub><span class="m">i</span></sub> n'a plus d'indice <span class="m">i</span> : le pas 4 n'est que cette phrase, écrite en formes.</li>
+      <li><b>La loss attend des formes précises.</b> <code>F.cross_entropy</code> veut des logits (<span class="m">N</span>, <span class="m">C</span>) et des cibles (<span class="m">N</span>,) en indices (<a href="chain-p08-03-cross-entropy-entropie-kl.html#s8">p08-03, pas 8</a>). Le pas 8 d'ici est la méthode pour vérifier ça avant de lancer.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>La mémoire est un <b>ruban</b> unidimensionnel de cases typées. La forme (shape) et les pas (strides) sont des <b>métadonnées</b> posées dessus, pas le contenu.</span>
+      <b>H2</b><span>PyTorch et NumPy suivent les <b>mêmes règles</b> ici. Seule l'unité change : les pas se comptent <b>en éléments</b> côté PyTorch, <b>en octets</b> côté NumPy.</span>
+      <b>H3</b><span>Ordre <b>row-major</b> (ordre C) : le <b>dernier axe est contigu</b>, son pas vaut 1. Fortran / channels-last existent et ne sont pas traités ici.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor : ce n'est pas un cube</h3>
+    <p>On écrit <code>t = arange(24).reshape(2, 3, 4)</code> et on pense à un pavé de 2 × 3 × 4. La machine, elle, a alloué <b>24 cases à la suite</b> et retenu trois nombres pour savoir s'y déplacer. Le pavé n'existe nulle part.</p>
+    <p>Toutes les surprises de la suite — <code>view</code> qui refuse, une division qui normalise les colonnes — viennent de cet écart entre l'image mentale et l'objet réel.</p>
+    <p class="say">« Il n'y a pas de cube en mémoire : il y a un ruban de 24 cases et une règle pour y naviguer. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le fil rouge</div>
+    <p>Le ruban, en float32 : 24 cases × 4 octets = <b>96 octets</b> contigus.</p>
+    <div class="eq">ruban : 0 · 1 · 2 · 3 · 4 · 5 · … · 21 · 22 · 23</div>
+    <div class="tw"><table>
+      <tr><th>objet</th><th>ce que c'est</th></tr>
+      <tr><td>le ruban (<code>storage</code>)</td><td>24 cases, jamais réorganisées</td></tr>
+      <tr><td><code>shape</code></td><td>(2, 3, 4) — métadonnée</td></tr>
+      <tr><td><code>stride</code></td><td>(12, 4, 1) — métadonnée</td></tr>
+      <tr><td><code>storage_offset</code></td><td>0 — où commence la vue</td></tr>
+    </table></div>
+    <p>Trois tenseurs différents peuvent partager le même ruban. Ce sont trois jeux de métadonnées, pas trois copies.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Le ruban et les pas <span class="tag tronc">tronc</span></h3>
+    <p>La forme dit combien d'axes et de quelle taille. Les <b>pas</b> (strides) disent de combien de cases on avance quand un indice augmente de 1. Lire une case, c'est une somme :</p>
+    <div class="eq">offset(<span class="m">i</span>, <span class="m">j</span>, <span class="m">k</span>) = <span class="m">i</span>·<span class="m">s</span><sub>0</sub> + <span class="m">j</span>·<span class="m">s</span><sub>1</sub> + <span class="m">k</span>·<span class="m">s</span><sub>2</sub></div>
+    <p>En row-major, chaque pas est le <b>produit des tailles à sa droite</b> : <span class="m">s</span><sub>2</sub> = 1, <span class="m">s</span><sub>1</sub> = 4, <span class="m">s</span><sub>0</sub> = 3·4 = 12. Le dernier axe est donc contigu, le premier saute un bloc entier.</p>
+    <p class="say">« La mémoire est un ruban, donc une position multi-indice est un offset linéaire, donc chaque axe a un pas, donc un tenseur est une forme plus des pas posés sur un ruban. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — (2, 3, 4)</div>
+    <div class="tw"><table>
+      <tr><th>axe</th><th>taille</th><th>pas</th><th>+1 sur cet indice saute…</th></tr>
+      <tr><td>0</td><td>2</td><td>12</td><td>un bloc de 3 × 4 cases</td></tr>
+      <tr><td>1</td><td>3</td><td>4</td><td>une ligne de 4 cases</td></tr>
+      <tr class="hl"><td>2</td><td>4</td><td>1</td><td>une case — contigu</td></tr>
+    </table></div>
+    <p><code>t[1, 2, 3]</code> → 1·12 + 2·4 + 3 = <b>23</b> : la dernière case du ruban. Aucune recherche, une multiplication-addition.</p>
+    <div class="note"><b>Unités.</b> <code>t.stride()</code> vaut (12, 4, 1) en PyTorch — <i>en éléments</i>. <code>a.strides</code> vaut (48, 16, 4) en NumPy float32 — <i>en octets</i>. Même ruban, même géométrie, un facteur <code>itemsize</code> = 4.</div>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — le ruban ne bouge pas, les pas changent</div>
+    <div class="sl-ctl" id="f1presets"></div>
+    <div id="f1plot" class="wide"></div>
+    <div id="f1sliders"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">En haut la <b>grille logique</b> (chaque case porte la valeur qu'elle lit), en bas le <b>ruban</b>. Le curseur parcourt la vue dans l'ordre logique (dernier axe d'abord) et le trait rouge montre quelle case du ruban est lue. Sur une vue contiguë la case lue avance d'un cran à chaque fois ; sur <code>transpose(0,1)</code> elle <b>saute</b> — c'est exactement ce que <code>view</code> refuse. Seul <code>.contiguous()</code> change le ruban : il en fabrique un neuf, dans l'ordre de lecture.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Vue = mêmes cases, autres métadonnées <span class="tag tronc">tronc</span></h3>
+    <p><code>reshape</code> compatible, <code>view</code>, <code>transpose</code>, <code>t[:, ::2]</code>, <code>t[None]</code> ne touchent pas au ruban : ils posent d'autres métadonnées dessus. C'est gratuit, et <b>modifier la vue modifie l'original</b>.</p>
+    <p><code>view</code> exige en plus que le ruban se relise <b>d'un trait</b> : il refuse dès que la vue n'est plus contiguë. <code>transpose</code> échange deux pas et casse cet ordre ; <code>.contiguous()</code> recopie dans un ruban neuf, et <code>reshape</code> le fait pour vous — silencieusement.</p>
+    <p class="say">« Changer la forme sans copier est possible tant que le ruban se relit dans l'ordre, donc transpose casse cet ordre, donc view refuse et reshape copie. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — trois vues du même ruban</div>
+    <div class="tw"><table>
+      <tr><th>opération</th><th>shape</th><th>strides</th><th>contigu</th><th><code>view(-1)</code></th></tr>
+      <tr><td><code>t</code></td><td>(2,3,4)</td><td>(12,4,1)</td><td>oui</td><td>ok</td></tr>
+      <tr class="hl"><td><code>transpose(0,1)</code></td><td>(3,2,4)</td><td>(4,12,1)</td><td><b>non</b></td><td><b>refuse</b></td></tr>
+      <tr><td><code>t[:,::2]</code></td><td>(2,2,4)</td><td>(12,8,1)</td><td>non</td><td>refuse</td></tr>
+      <tr><td><code>reshape(6,4)</code></td><td>(6,4)</td><td>(4,1)</td><td>oui</td><td>ok</td></tr>
+    </table></div>
+    <p><code>t[:, ::2]</code> lit une ligne sur deux : pas doublé (4 → 8), zéro copie, contenu 0–3, 8–11, 12–15, 20–23.</p>
+    <p><code>x.view(-1, k)</code> : le −1 est <i>déduit</i> (24 cases, <span class="m">k</span> = 4 ⇒ 6 lignes), mais il n'excuse rien — la contiguïté reste exigée. Après un <code>transpose</code>, écrire <code>.contiguous().view(-1, k)</code> ou <code>.reshape(-1, k)</code>.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Réduire consomme un axe</h3>
+    <p><code>sum(axis=k)</code>, <code>mean</code>, <code>max</code>, <code>argmax</code> <b>retirent</b> l'axe <span class="m">k</span> : le résultat a une dimension de moins et les axes suivants se décalent d'un cran vers la gauche.</p>
+    <p><code>keepdim=True</code> laisse à sa place un axe de <b>taille 1</b>. Vide de contenu, plein de sens : c'est lui qui dira au broadcasting sur quel axe se recaler — indispensable dès qu'on va rediviser (pas 6).</p>
+    <p class="say">« Réduire un axe le fait disparaître, donc le résultat ne s'aligne plus sur l'original à cet endroit, donc on garde un axe de taille 1 pour rediviser. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — réductions de t</div>
+    <div class="tw"><table>
+      <tr><th>expression</th><th>shape</th><th>contenu</th></tr>
+      <tr class="hl"><td><code>t.sum(1)</code></td><td>(2, 4)</td><td>12, 15, 18, 21 ; 48, 51, 54, 57</td></tr>
+      <tr><td><code>t.sum(1, keepdim=True)</code></td><td>(2, 1, 4)</td><td>les mêmes, un axe en plus</td></tr>
+      <tr><td><code>t.sum((0, 1))</code></td><td>(4,)</td><td>60, 66, 72, 78</td></tr>
+      <tr><td><code>t.sum()</code></td><td>() — scalaire</td><td>276</td></tr>
+    </table></div>
+    <p>Vérification : 12 = 0 + 4 + 8, les trois cases d'indice <span class="m">k</span> = 0 dans le premier bloc. Et 276 = 23·24/2, la somme du ruban entier.</p>
+    <p>La forme (2, 4) et la forme (2, 1, 4) contiennent <b>les mêmes huit nombres</b>. Elles ne se comportent pas pareil une ligne plus bas — c'est tout le pas 6.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Broadcasting : aligner par la droite, étirer les 1 <span class="tag tronc">tronc</span></h3>
+    <p>Deux formes sont compatibles si, <b>alignées sur leur dernier axe</b>, chaque paire est égale ou contient un 1. Les axes manquants à gauche sont complétés par des 1.</p>
+    <div class="eq">(2, 3, 4) + (4,) → (2, 3, 4) et (1, 1, 4) → ✓ &nbsp;&nbsp; résultat (2, 3, 4)</div>
+    <p>Un 1 est <b>étiré</b> : il est relu avec un pas de <b>0</b>, la même case servie autant de fois qu'il faut. Rien n'est copié — le broadcasting est du stride, pas de la mémoire.</p>
+    <p class="say">« L'alignement part de la droite, donc un vecteur de longueur 4 s'applique au dernier axe, donc pour viser un autre axe il faut placer des 1 explicites. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — quatre essais sur (2, 3, 4)</div>
+    <div class="tw"><table>
+      <tr><th>second opérande</th><th>complété</th><th>verdict</th></tr>
+      <tr><td>(4,)</td><td>(1, 1, 4)</td><td>✓ — s'applique au dernier axe</td></tr>
+      <tr class="hl"><td>(3,)</td><td>(1, 1, 3)</td><td><b>erreur</b> — 4 ≠ 3 sur le dernier axe</td></tr>
+      <tr><td>(3, 1)</td><td>(1, 3, 1)</td><td>✓ — vise bien l'axe du milieu</td></tr>
+      <tr><td>(2, 1, 4)</td><td>(2, 1, 4)</td><td>✓ — l'axe 1 est étiré ×3</td></tr>
+    </table></div>
+    <p>Le cas (3,) est instructif : l'intention était « une valeur par ligne », mais l'alignement par la droite vise les colonnes. Ici les tailles diffèrent, donc ça plante. Le pas 6 montre le cas où elles coïncident — et où ça ne plante pas.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — la règle en une image</div>
+    <div class="sl-ctl" id="f2presets"></div>
+    <div id="f2plot" class="wide"></div>
+    <div id="f2sliders"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Les deux formes sont <b>collées à droite</b>. Chaque colonne reçoit un ✓ (tailles égales, ou un 1 qui s'étire) ou un ✗. Les axes en <b>pointillé</b> sont les 1 implicites des formes plus courtes : (4,) devient (1, 1, 4). Baisse le dernier axe de B à 3 avec A à 4 pour voir le ✗ ; mets B à (1, 3, 1) pour viser l'axe du milieu. La ligne du bas donne la forme résultat et marque les axes lus avec un <b>pas de 0</b>.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Le bug silencieux <span class="tag tronc">tronc</span></h3>
+    <p><code>M.sum(1)</code> a perdu l'axe 1 : sa forme est <b>(3,)</b>, pas (3, 1). Alignée par la droite sur (3, 3), elle se pose donc sur les <b>colonnes</b>. <code>M / M.sum(1)</code> divise la colonne <span class="m">j</span> par la somme de la <b>ligne</b> <span class="m">j</span> : formes compatibles, aucune erreur levée, résultat faux.</p>
+    <p>Avec <code>keepdim=True</code> la forme est (3, 1) : le 1 est sur le dernier axe et s'étire sur les colonnes, l'axe 3 se pose sur les lignes. Chaque ligne est divisée par sa propre somme.</p>
+    <p class="say">« La somme sur les lignes a perdu son axe, donc elle s'aligne sur les colonnes, donc chaque colonne est divisée par la mauvaise somme, donc on garde l'axe. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — M = 1…9, sommes de lignes 6, 15, 24</div>
+    <div class="tw"><table>
+      <tr><th>ligne</th><th><code>M / M.sum(1)</code> ⇒ Σ</th><th><code>keepdim=True</code> ⇒ Σ</th></tr>
+      <tr><td>0</td><td>0,167 ; 0,133 ; 0,125 ⇒ 0,425</td><td>0,167 ; 0,333 ; 0,5 ⇒ 1</td></tr>
+      <tr class="hl"><td>1</td><td>0,667 ; 0,333 ; 0,25 ⇒ <b>1,25</b></td><td>0,267 ; 0,333 ; 0,4 ⇒ 1</td></tr>
+      <tr><td>2</td><td>1,167 ; 0,533 ; 0,375 ⇒ 2,075</td><td>0,292 ; 0,333 ; 0,375 ⇒ 1</td></tr>
+    </table></div>
+    <p>Sans <code>keepdim</code> : 1/6 ; 2/15 ; 3/24 sur la première ligne — trois dénominateurs différents. Les lignes somment à 0,425, 1,25 et 2,075 au lieu de 1 : ce sont des « probabilités » qui n'en sont pas. Rien n'a planté.</p>
+    <p>C'est exactement la ligne <code>P = N / N.sum(1, keepdim=True)</code> d'une table de bigrammes, et la même erreur dans un softmax ou une batchnorm écrits à la main. Le symptôme n'est jamais une exception : c'est une loss qui refuse de descendre.</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — le bug qui ne plante pas</div>
+    <div class="sl-ctl" id="f3ctl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div id="f3sliders"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">À gauche <span class="m">M</span> = 1…9 et le vecteur des sommes de lignes (6, 15, 24), dessiné <b>là où le broadcasting le pose</b> : en dessous, sur les colonnes, quand sa forme est (3,) ; à gauche, sur les lignes, quand elle est (3, 1). À droite le résultat et ses sommes de lignes — <b>vertes à 1</b>, rouges sinon. Le curseur choisit la ligne surlignée : suis-la jusqu'aux diviseurs pour voir lesquels l'ont divisée.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Masques et indexation : qui copie</h3>
+    <p>Une vue doit pouvoir se décrire par une forme, des pas et un offset. Le slicing et <code>t[:, None]</code> le peuvent : ce sont des vues. Un choix <b>arbitraire</b> de cases, lui, ne s'écrit pas ainsi.</p>
+    <p>D'où la règle : l'<b>indexation avancée</b> — masque booléen <code>t[mask]</code>, liste d'indices <code>t[idx]</code> — <b>copie toujours</b>. Un masque de la forme du tenseur ne peut pas rendre un rectangle : il <b>aplatit</b> et rend un 1-D.</p>
+    <p class="say">« Une vue se décrit par une forme et des pas, donc un choix arbitraire de cases ne s'écrit pas ainsi, donc l'indexation avancée copie, et un masque plein aplatit. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — sur t (2, 3, 4)</div>
+    <div class="tw"><table>
+      <tr><th>expression</th><th>shape</th><th>vue ou copie</th></tr>
+      <tr><td><code>t[:, 0]</code></td><td>(2, 4)</td><td>vue — strides (12, 1)</td></tr>
+      <tr><td><code>t[:, None]</code></td><td>(2, 1, 3, 4)</td><td>vue — un axe de taille 1 inséré</td></tr>
+      <tr class="hl"><td><code>t[t % 7 == 0]</code></td><td>(4,)</td><td><b>copie</b> — aplati : 0, 7, 14, 21</td></tr>
+      <tr><td><code>t[[1, 0]]</code></td><td>(2, 3, 4)</td><td><b>copie</b> — indices avancés</td></tr>
+    </table></div>
+    <p>Conséquence pratique : <code>t[mask] += 1</code> modifie bien <code>t</code> (PyTorch réécrit à travers l'index), mais <code>u = t[mask] ; u += 1</code> ne modifie que la copie. Avec une vue, les deux modifient l'original.</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Lire une opération sur les axes</h3>
+    <p>La méthode, avant de lancer : écrire les formes des deux opérandes ; les <b>aligner par la droite</b> ; marquer les axes consommés par une réduction et les 1 qui vont s'étirer ; comparer à la forme attendue.</p>
+    <p><code>einsum</code> fait la même chose avec des <b>noms</b> : chaque lettre est un axe, une lettre répétée à gauche et absente à droite est <b>sommée</b>, une lettre présente des deux côtés est portée.</p>
+    <div class="eq"><code>einsum('bij,bjk-&gt;bik')</code> : <span class="m">b</span> porté, <span class="m">j</span> sommé, <span class="m">i</span> et <span class="m">k</span> gardés</div>
+    <p class="say">« Une erreur d'axes ne lève pas d'exception, donc on écrit les formes avant de lancer, donc on aligne par la droite et on marque les axes consommés, donc la forme attendue se vérifie sur le papier. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — la vérification du pas 6, au stylo</div>
+    <div class="eq mono">M            (3, 3)
+M.sum(1)        (3,)   ← axe 1 consommé
+aligné :     (3,  3)
+                (   3)  ← les colonnes
+voulu :      (3,  1)   ← une par ligne</div>
+    <p>Trois lignes écrites, le bug est vu sans exécuter.</p>
+    <p><b>einsum, chiffré.</b> <span class="m">A</span> de forme (8, 4, 5), <span class="m">B</span> de forme (8, 5, 6) : <code>einsum('bij,bjk-&gt;bik')</code> rend (8, 4, 6). L'axe <span class="m">j</span> = 5 est sommé, <span class="m">b</span> = 8 est porté ; 8 · 4 · 5 · 6 = <b>960</b> multiplications. Les mêmes formes en <code>@</code> font la même chose sans les noms — et sans la relecture.</p>
+  </div>
+</div>
+
+<div class="step" id="s9">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Le même mécanisme qui rend tout gratuit rend tout silencieux : partage de mémoire et compatibilité de formes ne préviennent jamais.</p>
+    <p class="say">« Une vue partage le ruban et le broadcasting accepte tout ce qui s'aligne, donc les deux erreurs typiques ne lèvent pas d'exception, donc la seule défense est d'écrire les formes et de savoir qui partage quoi. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>Vue modifiée = original modifié.</b> <code>y = x.view(...)</code> puis <code>y += 1</code> change <code>x</code>. C'est l'avantage (zéro copie) et le piège (aliasing) : dès qu'on veut un tenseur indépendant, <code>.clone()</code> — pas <code>.reshape()</code>, qui ne copie que <i>parfois</i>.</li>
+      <li><b>Copies cachées.</b> <code>reshape</code> sur non contigu, indexation avancée, <code>.T</code> suivi d'un <code>view</code> impossible, <code>torch.cat</code> : le coût mémoire double sans avertissement. Sur un batch d'activations, c'est la différence entre tenir et ne pas tenir.</li>
+      <li><b>Réduction sans <code>keepdim</code> suivie d'une division.</b> Le pas 6, et il se produit chaque fois qu'on normalise à la main : softmax, batchnorm, table de bigrammes. Formes valides, résultat faux, loss qui stagne.</li>
+      <li><b>Ordre des axes convention-dépendant.</b> (<span class="m">B</span>, <span class="m">T</span>, <span class="m">C</span>) pour un transformeur, (<span class="m">B</span>, <span class="m">C</span>, <span class="m">T</span>) pour une convolution 1-D. Un <code>transpose</code> oublié passe <b>sans erreur</b> dès que deux tailles coïncident — <span class="m">B</span> = <span class="m">C</span> sur un petit test, et le bug n'apparaît qu'à l'échelle.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Tenseur = <b>forme + pas</b> posés sur un ruban ; offset = Σ indice × pas ; en row-major le dernier axe est contigu.</li>
+    <li><b>Vue</b> = mêmes cases (reshape compatible, view, transpose, slicing, <code>None</code>) ; <b>copie</b> = ruban neuf (contiguous, indexation avancée, reshape sur non contigu).</li>
+    <li><code>transpose</code> casse la contiguïté ⇒ <code>view</code> refuse ; <code>.contiguous()</code> ou <code>.reshape()</code> recopient.</li>
+    <li>Réduire <b>consomme</b> un axe ; <code>keepdim=True</code> le garde en taille 1 pour pouvoir rediviser.</li>
+    <li>Broadcasting : aligner par la <b>droite</b>, chaque paire égale ou 1 ; le 1 s'étire avec un pas de 0, sans copie.</li>
+    <li><code>M / M.sum(1)</code> est <b>valide et faux</b> ; <code>keepdim=True</code> répare. Écrire les formes avant de lancer.</li>
+  </ol>
+</div>
+<div class="phrase">« Un tenseur est une forme et des pas posés sur un ruban de mémoire ; reshape, transpose et slicing ne déplacent rien, ils changent les pas, ce qui rend view gratuit et le casse dès que le ruban ne se relit plus dans l'ordre. Le broadcasting aligne par la droite et étire les 1 sans copier ; c'est pourquoi une somme sans keepdim, divisée ensuite, normalise les colonnes au lieu des lignes sans lever d'erreur. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Que valent les pas de <code>arange(24).reshape(2,3,4)</code>, et l'offset de <code>[1,2,3]</code> ?</div><div class="a hid">(12, 4, 1) — produit des tailles à droite. Offset = 1·12 + 2·4 + 3 = <b>23</b>, la dernière case.</div></li>
+    <li><div class="q">Pourquoi <code>transpose</code> puis <code>view</code> échoue-t-il ?</div><div class="a hid">Transpose échange deux pas : (4, 12, 1) ne décroît plus, la vue n'est plus contiguë. <code>view</code> exige de relire le ruban d'un trait. <code>.contiguous()</code> ou <code>.reshape()</code> recopient.</div></li>
+    <li><div class="q"><code>x[:, ::2]</code> : vue ou copie ?</div><div class="a hid">Vue : pas doublé sur l'axe 1 (4 → 8), shape (2, 2, 4), zéro octet copié — et écrire dedans écrit dans <code>x</code>.</div></li>
+    <li><div class="q">La règle du broadcasting en une phrase.</div><div class="a hid">Aligner les formes par la droite, compléter à gauche par des 1 ; chaque paire égale ou contenant un 1 ; le 1 s'étire avec un pas de 0, sans copie.</div></li>
+    <li><div class="q">Que fait <code>M / M.sum(1)</code> sur une 3×3 ?</div><div class="a hid">La somme a la forme (3,), elle s'aligne sur les colonnes : la colonne <span class="m">j</span> est divisée par la somme de la ligne <span class="m">j</span>. Valide, faux — les lignes somment à 0,425 ; 1,25 ; 2,075. <code>keepdim=True</code> donne (3, 1) et répare.</div></li>
+    <li><div class="q"><code>sum(1)</code> sur (2, 3, 4) : quelle forme ? et avec <code>keepdim</code> ?</div><div class="a hid">(2, 4) — l'axe 1 est consommé et les suivants se décalent. Avec <code>keepdim=True</code> : (2, 1, 4), mêmes nombres, place gardée.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="chain-p08-02-flottants-lse.html#s8"><b>p08-02, pas 8 — dtypes</b><small>ce qu'il y a dans une case du ruban : float32 sur 4 octets, et pourquoi toutes les cases font la même taille</small></a>
+    <a href="chain-p08-03-cross-entropy-entropie-kl.html#s8"><b>p08-03, pas 8 — les formes de la loss</b><small><code>F.cross_entropy</code> attend (N, C) et (N,) : le pas 8 d'ici est la méthode qui vérifie ces formes avant l'appel</small></a>
+    <a href="chain-p08-01-jacobienne-chain-rule-backprop.html#s7"><b>p08-01, pas 7 — accumulation</b><small>le <code>+=</code> de la backprop écrit à travers des vues : même partage de mémoire, vu du côté des gradients</small></a>
+    <a href="../../map.html#p04-01"><b>p04-01 — une matrice est une action</b><small>l'autre lecture, complémentaire : ici une matrice est un rectangle posé sur un ruban, là c'est une transformation de l'espace</small></a>
+    <a href="../../map.html#c00"><b>c00 — TAP, invariant, variant</b><small>la suite : écrire l'invariant d'une boucle, c'est le même geste que vérifier une forme avant de lancer</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>python::tenseurs</code> (ruban, shape, storage_offset, vue vs copie) · <code>python::strides</code> (offset = Σ indice × pas, row-major, contiguïté, <code>view</code> vs <code>reshape</code>) · <code>python::broadcasting</code> (alignement par la droite, 1 étiré à pas 0, cas compatibles et incompatibles) · <code>python::keepdim</code> (un axe consommé, (2, 4) vs (2, 1, 4), <code>M / M.sum(1)</code>).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p08-04 · v1 du 16/09/2026 · Prérequis : p08-02. Suite : <a href="../../map.html#c00">c00 TAP — invariant, variant, coût</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ---------- petits utilitaires communs aux trois figures ---------- */
+const E=SL.el;
+function clear(svg){while(svg.firstChild)svg.removeChild(svg.firstChild);}
+function box(svg,x,y,w,h,cls){return E('rect',{x,y,width:w,height:h,rx:2,class:'cell '+(cls||'')},svg);}
+function txt(svg,x,y,t,cls,anchor){const e=E('text',{x,y,class:cls||'axl','text-anchor':anchor||'middle'},svg);e.textContent=t;return e;}
+function prod(a){return a.reduce((u,v)=>u*v,1);}
+function cstr(sh){const s=[];let acc=1;for(let i=sh.length-1;i>=0;i--){s[i]=acc;acc*=sh[i];}return s;}
+function shp(a){return a.length===1?'('+a[0]+',)':'('+a.join(', ')+')';}
+function pressed(list,k){list.forEach((b,i)=>b.setAttribute('aria-pressed',String(i===k)));}
+
+/* ===== Figure 1 — le ruban ne bouge pas, les pas changent ===== */
+(function(){
+const W=690,Hp=282;
+const P1=SL.plot(document.getElementById('f1plot'),{x:[0,1],y:[0,1],w:W,h:Hp});
+P1.svg.querySelectorAll('.sl-axis').forEach(e=>e.remove());
+const svg=P1.dyn;
+const R0=Array.from({length:24},(_,i)=>i);
+const RC=[];for(let a=0;a<3;a++)for(let b=0;b<2;b++)for(let c=0;c<4;c++)RC.push(a*4+b*12+c);
+const VS=[
+  {n:'reshape(2,3,4)',sh:[2,3,4],st:[12,4,1],rub:R0,copie:false},
+  {n:'transpose(0,1)',sh:[3,2,4],st:[4,12,1],rub:R0,copie:false},
+  {n:'t[:, ::2]',sh:[2,2,4],st:[12,8,1],rub:R0,copie:false},
+  {n:'reshape(6,4)',sh:[6,4],st:[4,1],rub:R0,copie:false},
+  {n:'.contiguous()',sh:[3,2,4],st:[8,4,1],rub:RC,copie:true}
+];
+let cur=0;
+const out=document.getElementById('f1out');
+function multi(k,sh){const idx=[];for(let a=sh.length-1;a>=0;a--){idx[a]=k%sh[a];k=(k-idx[a])/sh[a];}return idx;}
+function draw(k){
+  const v=VS[cur],sh=v.sh,st=v.st,n=prod(sh);
+  if(k>n-1)k=n-1;
+  const contig=st.join()===cstr(sh).join();
+  clear(svg);
+  txt(svg,16,22,'grille logique — la vue',"axl strong",'start');
+  txt(svg,W-16,22,v.copie?'ruban NEUF : les cases ont été recopiées':'même ruban qu’au départ','axl','end');
+  /* --- grille logique --- */
+  const P=sh.length===3?sh[0]:1, R=sh.length===3?sh[1]:sh[0], C=sh[sh.length-1];
+  const cw=27,ch=22,gapP=18;
+  const totW=P*C*cw+(P-1)*gapP, gx0=(W-totW)/2, gy0=52;
+  const idx=multi(k,sh), off=idx.reduce((s,q,a)=>s+q*st[a],0), val=v.rub[off];
+  let hiCell=null;
+  for(let p=0;p<P;p++){
+    const bx=gx0+p*(C*cw+gapP);
+    if(sh.length===3)txt(svg,bx+C*cw/2,gy0-8,'axe 0 = '+p,'axl');
+    for(let r=0;r<R;r++)for(let c=0;c<C;c++){
+      const id=sh.length===3?[p,r,c]:[r,c];
+      const o=id.reduce((s,q,a)=>s+q*st[a],0);
+      const on=id.join()===idx.join();
+      const x=bx+c*cw,y=gy0+r*ch;
+      box(svg,x,y,cw-2,ch-2,on?'on':'');
+      txt(svg,x+(cw-2)/2,y+ch-8,String(v.rub[o]),'cellv'+(on?' on':''));
+      if(on)hiCell={x:x+(cw-2)/2,y:y+ch-2};
+    }
+  }
+  if(sh.length===2)txt(svg,gx0+C*cw/2,gy0-8,'un seul bloc','axl');
+  /* --- ruban : le trait de lecture d'abord, les libellés par-dessus --- */
+  const rw=26,rx0=22,ry=208;
+  if(hiCell)E('line',{x1:hiCell.x,y1:hiCell.y,x2:rx0+off*rw+(rw-2)/2,y2:ry,class:'link'},svg);
+  txt(svg,16,198,'ruban mémoire — 24 cases à la suite',"axl strong",'start');
+  for(let i=0;i<24;i++){
+    const on=i===off;
+    box(svg,rx0+i*rw,ry,rw-2,24,'rub '+(on?'on':(v.copie?'copy':'')));
+    txt(svg,rx0+i*rw+(rw-2)/2,ry+16,String(v.rub[i]),'cellv'+(on?' on':''));
+  }
+  for(let i=0;i<24;i+=4)txt(svg,rx0+i*rw+(rw-2)/2,ry+38,'case '+i,'axl');
+  txt(svg,16,272,'lecture n° '+k+' : t['+idx.join(', ')+'] → case '+off+' → valeur '+val,'axl strong','start');
+  /* --- readouts --- */
+  out.innerHTML=
+    `<div>shape<b>${shp(sh)}</b></div>`+
+    `<div>strides<b>${shp(st)}</b></div>`+
+    `<div class="${contig?'pos':'zero'}">contiguë<b>${contig?'oui':'non'}</b></div>`+
+    `<div class="${v.copie?'zero':'pos'}">mémoire<b>${v.copie?'copie':'vue'}</b></div>`+
+    `<div class="${contig?'pos':'zero'}">.view(-1)<b>${contig?'ok':'refuse'}</b></div>`;
+}
+const sl=SL.slider(document.getElementById('f1sliders'),{label:'case lue',min:0,max:23,step:1,value:0,fmt:v=>'n° '+v},draw);
+const pre=document.getElementById('f1presets');
+const btns=VS.map((v,i)=>{const b=document.createElement('button');b.className='tb';b.textContent=v.n;b.onclick=()=>{cur=i;pressed(btns,i);
+  const n=prod(VS[i].sh);sl.input.max=n-1;if(sl.get()>n-1)sl.set(n-1);else draw(sl.get());};pre.appendChild(b);return b;});
+pressed(btns,0);draw(0);
+})();
+
+/* ===== Figure 2 — la règle du broadcasting en une image ===== */
+(function(){
+const P2=SL.plot(document.getElementById('f2plot'),{x:[0,1],y:[0,1],w:600,h:270});
+P2.svg.querySelectorAll('.sl-axis').forEach(e=>e.remove());
+const svg=P2.dyn;
+const out=document.getElementById('f2out');
+const A=[2,3,4],B=[1,1,4];
+const colX=i=>214+i*114, colW=110;
+function firstReal(s){let f=s.length-1;for(let i=0;i<s.length;i++)if(s[i]!==1){f=i;break;}return f;}
+function written(s){return shp(s.slice(firstReal(s)));}
+function row(y,s,cls){
+  const fr=firstReal(s);
+  for(let i=0;i<3;i++){
+    const g=i<fr;
+    box(svg,colX(i),y,colW,34,(g?'ghost ':'')+(cls&&cls[i]?cls[i]:''));
+    txt(svg,colX(i)+colW/2,y+23,String(s[i]),'cellv'+(g?' dim':''));
+  }
+}
+function draw(){
+  clear(svg);
+  txt(svg,16,22,'les deux formes, collées à droite','axl strong','start');
+  txt(svg,584,22,'axes en pointillé : les 1 implicites','axl','end');
+  txt(svg,200,63,'A','axl strong','end');txt(svg,200,79,written(A),'axl','end');
+  txt(svg,200,115,'B','axl strong','end');txt(svg,200,131,written(B),'axl','end');
+  txt(svg,200,170,'règle','axl strong','end');
+  txt(svg,200,222,'résultat','axl strong','end');
+  const verd=[],res=[],stre=[];
+  for(let i=0;i<3;i++){
+    if(A[i]===B[i]){verd.push(['ok','égal']);res.push(A[i]);stre.push('');}
+    else if(A[i]===1){verd.push(['ok','A étiré ×'+B[i]]);res.push(B[i]);stre.push('A');}
+    else if(B[i]===1){verd.push(['ok','B étiré ×'+A[i]]);res.push(A[i]);stre.push('B');}
+    else{verd.push(['ko','incompatible']);res.push(null);stre.push('');}
+  }
+  const bad=verd.some(v=>v[0]==='ko');
+  row(48,A,verd.map(v=>v[0]==='ko'?'bad':''));
+  row(100,B,verd.map(v=>v[0]==='ko'?'bad':''));
+  for(let i=0;i<3;i++){
+    txt(svg,colX(i)+colW/2,170,verd[i][0]==='ok'?'✓':'✗',verd[i][0]);
+    txt(svg,colX(i)+colW/2,188,verd[i][1],'axl');
+  }
+  if(bad){
+    txt(svg,colX(0)+1.5*colW+5,225,'erreur : les formes ne sont pas compatibles','err');
+  }else{
+    for(let i=0;i<3;i++){
+      box(svg,colX(i),204,colW,34,'res');
+      txt(svg,colX(i)+colW/2,227,String(res[i]),'cellv');
+      if(stre[i])txt(svg,colX(i)+colW/2,254,stre[i]+' lu à pas 0','axl');
+    }
+  }
+  out.innerHTML=
+    `<div>A<b>${written(A)}</b></div>`+
+    `<div>B<b>${written(B)}</b></div>`+
+    `<div class="${bad?'zero':'pos'}">résultat<b>${bad?'erreur':shp(res)}</b></div>`+
+    `<div>axes à pas 0<b>${bad?'—':(stre.some(Boolean)?stre.map((x,i)=>x?'axe '+i+' : '+x:'').filter(Boolean).join(' · '):'aucun')}</b></div>`;
+}
+const sa=[],sb=[];
+const host=document.getElementById('f2sliders');
+for(let i=0;i<3;i++)sa.push(SL.slider(host,{label:'A · axe '+i,min:1,max:4,step:1,value:A[i]},v=>{A[i]=v;draw();}));
+for(let i=0;i<3;i++)sb.push(SL.slider(host,{label:'B · axe '+i,min:1,max:4,step:1,value:B[i]},v=>{B[i]=v;draw();}));
+const pre=document.getElementById('f2presets');
+const PRE2=[['(2,3,4) + (4,)',[2,3,4],[1,1,4]],['+ (3,)',[2,3,4],[1,1,3]],['+ (3,1)',[2,3,4],[1,3,1]],['+ (2,1,4)',[2,3,4],[2,1,4]],['(3,3) + (3,)',[1,3,3],[1,1,3]]];
+const pb=PRE2.map(([n,a,b],k)=>{const bt=document.createElement('button');bt.className='tb';bt.textContent=n;
+  bt.onclick=()=>{pressed(pb,k);for(let i=0;i<3;i++){sa[i].set(a[i]);sb[i].set(b[i]);}draw();};
+  pre.appendChild(bt);return bt;});
+pressed(pb,0);draw();
+})();
+
+/* ===== Figure 3 — le bug qui ne plante pas ===== */
+(function(){
+const P3=SL.plot(document.getElementById('f3plot'),{x:[0,1],y:[0,1],w:620,h:232});
+P3.svg.querySelectorAll('.sl-axis').forEach(e=>e.remove());
+const svg=P3.dyn;
+const out=document.getElementById('f3out');
+const M=[[1,2,3],[4,5,6],[7,8,9]];
+const rows=M.map(r=>r.reduce((a,b)=>a+b,0));
+let mode='sans',hi=1;
+const MX=96,MY=54,CW=40,CH=28,RX=300,RW=62,SX=492,SW=74;
+function draw(){
+  clear(svg);
+  const res=M.map((r,i)=>r.map((x,j)=>mode==='sans'?x/rows[j]:x/rows[i]));
+  const sums=res.map(r=>r.reduce((a,b)=>a+b,0));
+  /* M */
+  txt(svg,MX+1.5*CW,42,'M — forme (3, 3)','axl strong');
+  for(let i=0;i<3;i++)for(let j=0;j<3;j++){
+    box(svg,MX+j*CW,MY+i*CH,CW-2,CH-2,i===hi?'row':'');
+    txt(svg,MX+j*CW+(CW-2)/2,MY+i*CH+19,String(M[i][j]),'cellv');
+  }
+  /* le vecteur des sommes, posé là où le broadcasting le pose */
+  if(mode==='sans'){
+    for(let j=0;j<3;j++){
+      box(svg,MX+j*CW,MY+3*CH+14,CW-2,CH-2,'on');
+      txt(svg,MX+j*CW+(CW-2)/2,MY+3*CH+33,String(rows[j]),'cellv on');
+    }
+    txt(svg,MX+1.5*CW,MY+3*CH+58,'M.sum(1) → forme (3,)','axl');
+    txt(svg,MX+1.5*CW,MY+3*CH+74,'collée à droite ⇒ sur les colonnes','axl');
+  }else{
+    for(let i=0;i<3;i++){
+      box(svg,MX-52,MY+i*CH,44,CH-2,i===hi?'on':'');
+      txt(svg,MX-52+22,MY+i*CH+19,String(rows[i]),'cellv'+(i===hi?' on':''));
+    }
+    txt(svg,MX+1.5*CW,MY+3*CH+22,'M.sum(1, keepdim=True) → (3, 1)','axl');
+    txt(svg,MX+1.5*CW,MY+3*CH+38,'le 1 s’étire ⇒ sur les lignes','axl');
+  }
+  txt(svg,264,MY+1.5*CH+6,'=','axl strong');
+  /* résultat */
+  txt(svg,RX+1.5*RW,42,mode==='sans'?'M / M.sum(1)':'M / M.sum(1, keepdim=True)','axl strong');
+  for(let i=0;i<3;i++)for(let j=0;j<3;j++){
+    box(svg,RX+j*RW,MY+i*CH,RW-2,CH-2,i===hi?'row':'');
+    txt(svg,RX+j*RW+(RW-2)/2,MY+i*CH+19,SL.fmt(res[i][j],3),'cellv');
+  }
+  /* sommes de lignes */
+  txt(svg,SX+SW/2,42,'Σ de la ligne','axl strong');
+  for(let i=0;i<3;i++){
+    const ok=Math.abs(sums[i]-1)<1e-9;
+    box(svg,SX,MY+i*CH,SW,CH-2,ok?'res':'bad');
+    txt(svg,SX+SW/2,MY+i*CH+19,SL.fmt(sums[i],3),'cellv');
+  }
+  txt(svg,SX+SW/2,MY+3*CH+22,mode==='sans'?'aucune ne vaut 1':'toutes valent 1','axl');
+  out.innerHTML=sums.map((s,i)=>{const ok=Math.abs(s-1)<1e-9;
+    return `<div class="${ok?'pos':'zero'}">somme de la ligne ${i}<b>${SL.fmt(s,3)}</b></div>`;}).join('');
+}
+const ctl=document.getElementById('f3ctl');
+const bs=[['M / M.sum(1)','sans'],['M / M.sum(1, keepdim=True)','avec']].map(([n,m],k)=>{
+  const b=document.createElement('button');b.className='tb';b.textContent=n;
+  b.onclick=()=>{mode=m;pressed(bs,k);draw();};ctl.appendChild(b);return b;});
+pressed(bs,0);
+SL.slider(document.getElementById('f3sliders'),{label:'ligne surlignée',min:0,max:2,step:1,value:1,fmt:v=>'i = '+v},v=>{hi=v;draw();});
+})();
+})();
+</script>
+</body>
+</html>

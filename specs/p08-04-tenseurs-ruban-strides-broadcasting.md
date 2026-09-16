@@ -10,7 +10,7 @@ prereq: [p08-02]
 anki: [python::tenseurs, python::broadcasting, python::strides, python::keepdim]
 bridges: []
 next: c00
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -79,3 +79,9 @@ t = arange(24), reshape(2, 3, 4) : shape (2, 3, 4), strides (12, 4, 1) — avanc
 
 ## Exclusions
 Pas de CUDA/streams, pas d'autograd ici (p08-01), pas d'einsum au-delà d'une ligne, pas de channels_last ni de layout mémoire GPU.
+
+## Questions pour la revue
+- **Tous les chiffres du fil rouge ont été revérifiés par script** (stdlib seule, mini-tenseur ruban + shape + strides ; numpy absent du venv) : strides (12, 4, 1), offset 23, transpose (3, 2, 4)/(4, 12, 1) non contigu, `t[:, ::2]` (2, 2, 4)/(12, 8, 1), `sum(1)` → (2, 4) et (2, 1, 4), les quatre cas de broadcasting, et les sommes de lignes 0,425 / 1,25 / 2,075 puis 1 / 1 / 1. **Aucune correction nécessaire.**
+- **Figure 1 : un cinquième bouton, `.contiguous()`.** Le spec en demandait quatre ; la légende exigée parlait de la recopie, invisible sans un état où le ruban change. Le bouton montre le ruban neuf (ordre de lecture de la transposée) avec `mémoire = copie` et `view(-1) = ok`. À valider ou à retirer.
+- **Figure 2 : pas de curseur « rang de B ».** Le spec proposait « 1 pour absent » ; un curseur qui fait disparaître un axe crée des curseurs sans effet. À la place B garde trois curseurs 1–4, les 1 de tête sont dessinés en pointillé (« les 1 implicites ») et la forme *écrite* est affichée à côté — (1, 1, 4) s'annonce « (4,) ». Même règle, zéro zone morte. À valider.
+- **`t[:, None]` : forme donnée, pas les strides.** Le pas 7 annonce (2, 1, 3, 4) et « une vue », sans écrire le stride de l'axe inséré, qui est un détail d'implémentation. Dire si la valeur doit y figurer.
