@@ -324,29 +324,30 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <div class="step" id="s7">
   <div class="rule">
     <h3>Habit 3 — la pénalité</h3>
-    <p>Minimiser <span class="m">L</span>(<span class="m">θ</span>) + <span class="m">λ</span>·pen(<span class="m">θ</span>). La force de rappel vers 0 est la dérivée de la pénalité :</p>
+    <p>Minimiser <span class="m">L</span>(<span class="m">θ</span>) + <span class="m">λ</span>·pen(<span class="m">θ</span>) — la loss <b>sans ½</b>, la pénalité pesée par <span class="m">λ</span> seul. La force de rappel vers 0 est la dérivée de la pénalité :</p>
     <div class="eq">L2 : d(<span class="m">θ</span>²)/d<span class="m">θ</span> = 2<span class="m">θ</span> → 0 quand <span class="m">θ</span> → 0 &nbsp;&nbsp;&nbsp; L1 : d|<span class="m">θ</span>|/d<span class="m">θ</span> = ±1, constante</div>
     <p>L2 est sensible partout <i>sauf</i> près de 0, où sa pente s'évanouit : le poids ralentit sans jamais arriver. L1 garde une pente constante jusqu'à 0 : le poids arrive. Et il y <b>reste</b> : en 0, |<span class="m">θ</span>| a un <b>coude</b>, la pénalité tire vers 0 depuis les deux côtés avec la force <span class="m">λ</span> — un <b>mur des deux côtés</b>. Le poids ne repart que si la loss pousse plus fort que <span class="m">λ</span> : |<span class="m">L</span>′(0)| &gt; <span class="m">λ</span>. C'est la même règle lue à l'envers : là où la pente de la loss est trop faible, c'est le mur qui gagne.</p>
     <p class="say">« La pénalité tire avec sa dérivée, donc L2 tire de moins en moins près de zéro et le poids n'y arrive jamais, donc L1 tire à force constante et le poids atteint exactement zéro dès que la loss ne pousse plus plus fort que λ. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — un seul paramètre</div>
-    <p>Loss <span class="m">L</span>(<span class="m">θ</span>) = ½(<span class="m">θ</span> − 1)² : les données veulent <span class="m">θ</span> = 1.</p>
-    <div class="eq">L2 : <span class="hat"><span class="m">θ</span></span> = 1/(1 + 2<span class="m">λ</span>) &nbsp;&nbsp;&nbsp; L1 : <span class="hat"><span class="m">θ</span></span> = max(0, 1 − <span class="m">λ</span>)</div>
+    <p>Loss <span class="m">L</span>(<span class="m">θ</span>) = (<span class="m">θ</span> − 1)² : les données veulent <span class="m">θ</span> = 1. Sa pente en 0 vaut <span class="m">L</span>′(0) = −2, donc |<span class="m">L</span>′(0)| = <b>2</b> — c'est le seuil que <span class="m">λ</span> doit franchir.</p>
+    <div class="eq">L2 : <span class="hat"><span class="m">θ</span></span> = 1/(1 + <span class="m">λ</span>) &nbsp;&nbsp;&nbsp; L1 : <span class="hat"><span class="m">θ</span></span> = max(0, 1 − <span class="m">λ</span>/2)</div>
     <table>
       <tr><th><span class="m">λ</span></th><th>L2</th><th>L1</th></tr>
-      <tr><td>0,25</td><td>0,667</td><td>0,75</td></tr>
-      <tr><td>0,5</td><td>0,5</td><td>0,5</td></tr>
-      <tr class="hl"><td>1</td><td>0,333</td><td><b>0</b></td></tr>
-      <tr><td>4</td><td>0,111</td><td>0</td></tr>
+      <tr><td>0,5</td><td>0,667</td><td>0,75</td></tr>
+      <tr><td>1</td><td>0,5</td><td>0,5</td></tr>
+      <tr class="hl"><td>2</td><td>0,333</td><td><b>0</b></td></tr>
+      <tr><td>8</td><td>0,111</td><td>0</td></tr>
     </table>
-    <p>L2 tend vers 0 sans l'atteindre ; L1 y est <b>exactement</b> dès <span class="m">λ</span> ≥ 1. Sur <span class="m">p</span> paramètres, c'est la sélection de variables du Lasso.</p>
+    <p>L2 tend vers 0 sans l'atteindre ; L1 y est <b>exactement</b> dès <span class="m">λ</span> ≥ 2 — c'est-à-dire dès que le mur <span class="m">λ</span> égale la poussée |<span class="m">L</span>′(0)| = 2. Sur <span class="m">p</span> paramètres, c'est la sélection de variables du Lasso.</p>
+    <div class="note"><b>Convention.</b> L'objectif est écrit <span class="m">L</span>(<span class="m">θ</span>) + <span class="m">λ</span>·pen(<span class="m">θ</span>), loss <b>sans</b> facteur ½. Un ½ devant la loss, ou un ½ devant la pénalité, déplace tous les seuils en <span class="m">λ</span> d'un facteur 2 sans rien changer au mécanisme — mais rend les chiffres de deux fiches incomparables. Toutes les sheets de ce dépôt suivent cette convention.</div>
   </div>
   <div class="fig" id="fig3">
     <div class="lbl">Figure 3 — où s'arrête le poids</div>
     <div id="f3plot" class="wide"></div>
     <div id="f3sliders"></div>
     <div class="readouts" id="f3out"></div>
-    <p class="cap">Les deux critères pénalisés en fonction de <span class="m">θ</span>, avec leur minimum. Monte <span class="m">λ</span> : le minimum L2 glisse vers 0 en ralentissant, le minimum L1 arrive en 0 et s'y colle — c'est l'angle de |<span class="m">θ</span>| qui le retient.</p>
+    <p class="cap">Les deux critères pénalisés <span class="m">L</span>(<span class="m">θ</span>) + <span class="m">λ</span>·pen(<span class="m">θ</span>) en fonction de <span class="m">θ</span>, avec leur minimum. Monte <span class="m">λ</span> : le minimum L2 glisse vers 0 en ralentissant et n'y arrive jamais, le minimum L1 arrive en 0 <b>à <span class="m">λ</span> = 2</b> et s'y colle — c'est l'angle de |<span class="m">θ</span>| qui le retient, dès que le mur égale la poussée |<span class="m">L</span>′(0)| = 2.</p>
   </div>
 </div>
 
@@ -499,16 +500,21 @@ function draw2(m){P2.clear();P2.vline(m,'');out2.innerHTML='';
 SL.slider(document.getElementById('f2sliders'),{label:'marge m',min:-3,max:3,step:.05,value:-2},draw2);
 
 /* ===== Figure 3 : pénalités ===== */
-const P3=SL.plot(document.getElementById('f3plot'),{x:[-.6,1.6],y:[0,1.6],w:600,h:280,xt:[-.5,0,.5,1,1.5],yt:[.5,1,1.5],xl:'θ',yl:''});
+const P3=SL.plot(document.getElementById('f3plot'),{x:[-.6,1.6],y:[0,2],w:600,h:280,xt:[-.5,0,.5,1,1.5],yt:[.5,1,1.5,2],xl:'θ',yl:''});
 const out3=document.getElementById('f3out');let path3=[];
 function draw3(lam){path3.forEach(p=>p.remove());path3=[];P3.clear();
-  const f2=t=>.5*(t-1)**2+lam*t*t, f1=t=>.5*(t-1)**2+lam*Math.abs(t);
+  const f2=t=>(t-1)**2+lam*t*t, f1=t=>(t-1)**2+lam*Math.abs(t);
   path3.push(P3.fn(f2,'sl-c1'));path3.push(P3.fn(f1,'sl-c2'));
-  const t2=1/(1+2*lam), t1=Math.max(0,1-lam);
+  const t2=1/(1+lam), t1=Math.max(0,1-lam/2);
   P3.vline(t2,'');P3.dot(t2,f2(t2),'sl-c1',6);P3.vline(t1,'');P3.dot(t1,f1(t1),'sl-c2',6);
-  P3.text(1.55,f2(1.55)+.05,'L2','sl-c1','end');P3.text(1.55,f1(1.55)-.12,'L1','sl-c2','end');
+  /* les deux paraboles sortent du cadre par le haut : on accroche chaque étiquette
+     là où sa courbe croise un niveau intérieur, L2 à droite et L1 à gauche. */
+  const ancre=(f,lvl,droite)=>{let b=null;for(let i=0;i<=120;i++){const x=-.6+2.2*i/120;
+    if(f(x)<=lvl){if(droite)b=x;else if(b===null)b=x;}}return b===null?(droite?1.5:-.5):b;};
+  const a2=ancre(f2,1.55,true), a1=ancre(f1,1.55,false);
+  P3.text(a2,f2(a2)+.1,'L2','sl-c1','end');P3.text(a1,f1(a1)+.1,'L1','sl-c2','start');
   out3.innerHTML=`<div class="pos">minimum L2<b>θ̂ = ${SL.fmt(t2,3)}</b></div><div class="${t1===0?'zero':'pos'}">minimum L1<b>θ̂ = ${SL.fmt(t1,3)}</b></div>`;}
-SL.slider(document.getElementById('f3sliders'),{label:'λ',min:0,max:1.5,step:.05,value:.5},draw3);
+SL.slider(document.getElementById('f3sliders'),{label:'λ',min:0,max:3,step:.05,value:1},draw3);
 
 /* ===== Figure 4 : SVM, marge et supports ===== */
 const svg4=document.getElementById('f4svg');const W4=460,H4=300;

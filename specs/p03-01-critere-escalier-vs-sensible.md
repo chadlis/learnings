@@ -26,3 +26,10 @@ Ce qui a cassé pour Salah (séance du 16/09) : argument produit une fois (Q8.1)
 
 - **Ordre des règles CSS du gold standard** : `@media(max-width:900px){… .side{position:static …}}` est déclaré *avant* `.side{position:sticky …}`. À spécificité égale, la dernière règle gagne : la barre latérale reste `sticky` sur téléphone au lieu de repasser dans le flux. Sans conséquence sur le débordement horizontal (la grille `.wrap`, elle, se replie bien sur une colonne), mais la barre devient une boîte scrollable haute de 100vh. Le correctif tient en un échange de deux lignes ; non appliqué ici parce que le gold standard ne se réécrit pas sans décision — et toutes les sheets produites en recopient le CSS tel quel, donc elles héritent du même comportement.
 
+- **Convention de régularisation, fixée le 16/09** — validé 16/09. L'objectif est `L(θ) + λ·pen(θ)`,
+  loss **sans ½**. Avec `L(θ) = (θ − 1)²` : L2 → θ̂ = 1/(1 + λ), L1 → θ̂ = max(0, 1 − λ/2), zéro exact
+  dès λ ≥ 2 = |L′(0)|. Table du pas 7 : λ = 0,5 → 0,667/0,75 · 1 → 0,5/0,5 · 2 → 0,333/0 · 8 → 0,111/0.
+  Figure 3 : f2 = (t−1)² + λt², f1 = (t−1)² + λ|t|, slider λ ∈ [0, 3], cadre y ∈ [0, 2]. La règle est
+  inscrite dans `SKILL.md` (Règles d'écriture) : toutes les sheets du dépôt s'y conforment, pour que les
+  λ de p03-01 et de p02-02 soient comparables.
+

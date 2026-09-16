@@ -38,6 +38,10 @@ Séries : `chain` (ci-dessus) · `walkthrough` (une seule colonne de marches rè
 - **Chaque pas a son application chiffrée**, avec les chiffres du spec, vérifiés par un script Python avant écriture (matrices, probabilités, sommes). Ne jamais arrondir un résultat qu'on n'a pas calculé.
 - **« Au tableau »** (`p.say`) : prémisse, `donc`, `donc`, résultat nommé. Jamais « parce que ». Le mot `donc` en clair, entouré d'espaces (la dictée découpe dessus). Conclure sur le résultat, pas sur le déroulement.
 - **Figures** : une par intuition, pas une par pas. Chaque figure a un `.lbl`, un `.cap` qui dit quoi manipuler et quoi voir, des readouts. Tout ce qui est dessiné porte une classe (`sl-c1..5`, `hollow`, `chord`, `gain`, `slope`), jamais un `fill` inline. Nombres formatés en français (`SL.fmt`).
+- **Convention de régularisation** : l'objectif s'écrit `L(θ) + λ·pen(θ)`, loss **sans** facteur ½.
+  Un ½ devant la loss ou devant la pénalité déplace tous les seuils en λ d'un facteur 2 sans changer
+  le mécanisme, mais rend les chiffres de deux sheets incomparables. Avec `L(θ) = (θ − 1)²` : L2 donne
+  θ̂ = 1/(1 + λ), L1 donne θ̂ = max(0, 1 − λ/2), et le zéro exact arrive à λ = |L′(0)| = 2.
 - **Hypothèses avant calcul ; scories interdites** : estimateur sans chapeau, `p(x|θ)` en fréquentiste (écrire `p(x ; θ)`), densité intégrée au lieu d'évaluée, chain rule élidée.
 - **Ce qui a cassé pour Salah** (section du spec) : chaque item doit être adressé explicitement par un pas, une figure ou une limite. Ne pas l'écrire dans la sheet comme un journal (« le 15/09 tu as… ») : l'adresser, sans le raconter.
 - **Scope** : ce que le spec exclut n'apparaît pas, même en note. Pas de contenu périssable, pas de tableaux de référence.
