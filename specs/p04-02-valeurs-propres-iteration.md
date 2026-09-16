@@ -10,7 +10,7 @@ prereq: [p04-01]
 anki: [algebre::eigen, algebre::power-iteration, algebre::markov, algebre::diagonalisation]
 bridges: [b06]
 next: p04-03
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -76,3 +76,33 @@ Ridge de p02-02 : XᵀX = [[14, 28], [28, 56]], valeurs propres 0 et 70 ; +λI �
 
 ## Exclusions
 Pas de Jordan au-delà d'une phrase de casse, pas de valeurs propres complexes au-delà d'une phrase, pas d'algorithme QR.
+
+## Questions pour la revue
+- **Chiffres : rien à corriger.** Tout l'exemple fil rouge a été revérifié à la main
+  en `fractions.Fraction` (polynôme caractéristique, noyaux, puissances de matrice,
+  itérés exacts) : λ = 2 et 3 pour A, trace 5 et det 6, Aᵏ(0,1) = (3ᵏ − 2ᵏ ; 3ᵏ) donc
+  (1,3) → (5,9) → (19,27) → (65,81) → (211,243), directions normalisées (0,32 ; 0,95)
+  → (0,49 ; 0,87) → (0,58 ; 0,82) → (0,63 ; 0,78), ratio (2/3)ᵏ ; P de valeurs propres
+  1 et 0,4, π = (5/6 ; 1/6), itérés (0,9 ; 0,1) → (0,86 ; 0,14) → (0,844 ; 0,156) avec
+  un écart exactement en 0,4ᵏ × 1/6 ; XᵀX de valeurs propres 0 et 70. Un seul point de
+  détail : la suite Markov passe par 0,8376 (k = 4) puis 0,835 avant 0,833 — la sheet
+  affiche k = 4 = 0,8376 et annonce 0,8333 comme limite, là où le spec écrivait
+  « → 0,833 » juste après k = 3. Rien de faux, à confirmer comme tel.
+- **Figure 2, normalisation du preset Markov.** Le spec demande les itérés normalisés
+  sur le cercle unité pour les deux presets. Rendu ainsi, le cas Markov était illisible :
+  les itérés somment déjà à 1, leur norme vaut ≈ 0,86, donc points bruts et points
+  normalisés se superposaient. La sheet normalise donc **par la norme pour A** (cercle
+  unité) et **par la somme pour P** (segment des distributions, que P conserve), et le
+  dit dans la légende. À valider — c'est le seul écart au spec.
+- **Figure 1, les directions propres ne sont pas passées en `fixed`.** Les presets
+  changent la matrice, donc les directions changent aussi, alors que le `fixed` de
+  `SL.plane` est figé à la construction ; et le groupe monde de `SL.plane` n'est pas
+  peint du tout quand la matrice est singulière (cas du preset B, λ = 0). Comme dans
+  p04-01, `SL.plane` ne fournit donc que le décor de départ et toute la scène d'arrivée
+  est redessinée en coordonnées écran. Effet voulu : à det = 0 la grille s'effondre sur
+  une droite au lieu de disparaître.
+- **Liens vers des sheets inexistantes.** Le théorème spectral (pas 8) et la suite
+  pointent vers `map.html#p04-03`, et le pont b06 vers `map.html#b06`. Le cadrage de
+  b06 retenu ici : « une forme quadratique est convexe quand ses valeurs propres sont
+  ≥ 0, et la forme fermée existe quand aucune n'est nulle ». À reprendre si le pont
+  b06 est écrit autrement.

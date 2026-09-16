@@ -1,0 +1,723 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Valeurs propres et itération — chaîne</title>
+<meta name="sheet" content="series=chain;part=04;number=02;status=v1">
+<meta name="part" content="04 · Matrice = action">
+<meta name="subtitle" content="les directions qu'une matrice ne tourne pas, et pourquoi elles gouvernent le long terme">
+<meta name="prereq" content="p04-01">
+<meta name="anki" content="algebre::eigen,algebre::power-iteration,algebre::markov,algebre::diagonalisation">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ---- marques propres à cette chaîne (matrices, plan 2D) ---- */
+.mat{display:inline-grid;grid-template-columns:auto auto;gap:1px 14px;font-family:var(--math);border-left:1.6px solid currentColor;border-right:1.6px solid currentColor;padding:3px 7px;margin:0 2px;vertical-align:middle;text-align:right;line-height:1.3}
+.mat.col{grid-template-columns:auto}
+.mat b{font-weight:400;font-style:normal}
+.note{font-size:14px;color:var(--cardmuted);border-top:1px solid var(--cardline);margin-top:10px;padding-top:8px}
+.note b{color:var(--cardink)}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tw table{min-width:320px}
+.sl-plane{display:block;width:100%;max-width:470px;height:auto;margin:0 auto}
+.sl-plane .sl-gridl{stroke:rgba(34,48,43,.1);fill:none}
+#f2plot .sl-world{display:none}
+.sl-plane .sl-unit{fill:none;stroke:rgba(34,48,43,.5);stroke-width:1.3;stroke-dasharray:4 3}
+.sl-plane .tgrid{stroke:rgba(34,48,43,.38);stroke-width:1;fill:none}
+.sl-plane .img{fill:rgba(107,70,193,.2);stroke:#6B46C1;stroke-width:1.8;stroke-linejoin:round}
+.sl-plane .sl-seg.vec{stroke-width:2.6}
+.sl-plane .sl-dot.ring{fill:none!important;stroke:var(--red);stroke-width:2.4}
+.sl-plane .sl-seg.sl-c1{stroke:var(--pen)}
+.sl-plane .sl-seg.sl-c2{stroke:#6B46C1}
+.sl-plane .sl-seg.sl-c3{stroke:var(--red)}
+.sl-plane .sl-seg.sl-c5{stroke:#B7791F}
+.sl-plane .sl-fix{stroke-width:1.6;fill:none;stroke-dasharray:7 5}
+.sl-plane .ax{stroke:rgba(34,48,43,.5);stroke-width:1.2;stroke-dasharray:none}
+.sl-plane text{font-family:var(--sans);font-size:12.5px}
+.sl-plane text.plain{fill:var(--cardmuted)}
+.sl-plane text.strong{font-weight:600}
+/* ---- marques propres à cette chaîne (spectre, itération) ---- */
+.sl-plane .sl-seg.sl-c4{stroke:#1F5FA8}
+.sl-plane .sl-seg.eig{stroke-width:1.8;stroke-dasharray:7 5}
+.sl-plane .circ{fill:none;stroke:rgba(34,48,43,.3);stroke-width:1.2;stroke-dasharray:4 4}
+.sl-plane .simplex{stroke:rgba(34,48,43,.45);stroke-width:1.2;stroke-dasharray:3 4}
+.sl-plane .pale{opacity:.42}
+#f2plot .sl-unit{display:none}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 04 · Matrice = action › chaîne 02</div>
+  <h1>Valeurs <span>propres</span> et <span>itération</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Une matrice tourne et étire presque tout vecteur. Quelques directions échappent à la rotation : <b>sur elles, la matrice n'est qu'un nombre</b>. C'est la seule idée de la chaîne, et elle décide du long terme : appliquer <span class="m">A</span> mille fois ne laisse survivre qu'une direction, la <b>dominante</b>. Fil rouge : <span class="m">A</span> = <span class="mat"><b>2</b><b>1</b><b>0</b><b>3</b></span>, dont les facteurs sont 2 et 3, et la chaîne de Markov <span class="m">P</span> = <span class="mat"><b>0,9</b><b>0,5</b><b>0,1</b><b>0,5</b></span>, dont le facteur 1 porte la distribution stationnaire (5/6 ; 1/6).</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="chain-p04-01-matrice-action.html#s2">p04-01 · <span class="m">Ax</span> = combinaison des colonnes</a></li>
+    <li><a href="chain-p04-01-matrice-action.html#s5">p04-01 · noyau, det = 0, inversibilité</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>algebre::eigen</code><code>algebre::power-iteration</code><code>algebre::markov</code><code>algebre::diagonalisation</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../../map.html#b06">b06 · Convexité et forme fermée</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b><span class="m">Ax</span> est une action.</b> <span class="m">Ax</span> pondère les colonnes de <span class="m">A</span> par les coordonnées de <span class="m">x</span> ; les colonnes sont les images de la base (<a href="chain-p04-01-matrice-action.html#s2">p04-01, pas 2</a>). Ici on ne regarde plus <i>où part la base</i>, mais <i>quelles directions ne bougent pas</i>.</li>
+      <li><b>det = 0 ⇔ noyau non trivial.</b> Le déterminant est l'aire du parallélogramme des colonnes ; nul, il dit que le plan s'écrase et qu'un vecteur non nul part sur zéro (<a href="chain-p04-01-matrice-action.html#s5">p04-01, pas 5</a>). C'est le seul outil utilisé au pas 3.</li>
+      <li><b>Inverse d'une 2 × 2.</b> <span class="m">P</span> = <span class="mat"><b><span class="m">a</span></b><b><span class="m">b</span></b><b><span class="m">c</span></b><b><span class="m">d</span></b></span> a pour inverse (1/det) <span class="mat"><b><span class="m">d</span></b><b>−<span class="m">b</span></b><b>−<span class="m">c</span></b><b><span class="m">a</span></b></span> dès que det ≠ 0. Utilisé une seule fois, au pas 4.</li>
+      <li><b>Transposée et produit scalaire.</b> (<span class="m">A</span><sup>⊤</sup>)<sub><span class="m">ij</span></sub> = <span class="m">A</span><sub><span class="m">ji</span></sub>, et ⟨<span class="m">u</span>, <span class="m">v</span>⟩ = Σ <span class="m">u</span><sub><span class="m">i</span></sub><span class="m">v</span><sub><span class="m">i</span></sub>. Ils n'apparaissent qu'aux pas 6 et 8.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span><span class="m">A</span> est <b>carrée</b>, <span class="m">n</span> × <span class="m">n</span> : entrée et sortie vivent dans le même espace, donc la phrase « <span class="m">Ax</span> est un multiple de <span class="m">x</span> » a un sens, et on peut itérer <span class="m">A</span> sur ses propres sorties. Sans cela, ni valeur propre ni <span class="m">A</span><sup><span class="m">k</span></sup>.</span>
+      <b>H2</b><span><span class="m">A</span> est <b>diagonalisable</b> et possède une valeur propre dominante <b>unique</b> : |<span class="m">λ</span><sub>1</sub>| &gt; |<span class="m">λ</span><sub>2</sub>| ≥ … C'est le cas générique, celui des pas 4 à 7 ; le pas 9 dit ce qui arrive quand l'une ou l'autre tombe.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor : presque tout tourne</h3>
+    <p>Passe une poignée de vecteurs dans <span class="m">A</span> et regarde leur <b>angle</b>, pas leur longueur. Presque tous changent de direction : <span class="m">A</span> les tourne en plus de les étirer.</p>
+    <p>Quelques-uns, non. Ceux-là ressortent sur la même droite, seulement rallongés. Sur eux, <span class="m">A</span> ne fait rien qu'un nombre ne saurait faire.</p>
+    <p class="say">« A déplace chaque vecteur, donc la plupart changent de direction, donc les rares qui gardent la leur sont les seuls sur lesquels A se réduit à un facteur. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — quatre vecteurs passés dans <span class="m">A</span></div>
+    <div class="tw"><table>
+      <tr><th><span class="m">x</span></th><th>angle de <span class="m">x</span></th><th><span class="m">A x</span></th><th>angle de <span class="m">Ax</span></th><th>tourné ?</th></tr>
+      <tr class="hl"><td>(1 ; 0)</td><td>0°</td><td>(2 ; 0)</td><td>0°</td><td><b>non</b> — × 2</td></tr>
+      <tr><td>(0 ; 1)</td><td>90°</td><td>(1 ; 3)</td><td>71,6°</td><td>oui</td></tr>
+      <tr class="hl"><td>(1 ; 1)</td><td>45°</td><td>(3 ; 3)</td><td>45°</td><td><b>non</b> — × 3</td></tr>
+      <tr><td>(1 ; −1)</td><td>−45°</td><td>(1 ; −3)</td><td>−71,6°</td><td>oui</td></tr>
+    </table></div>
+    <p>Deux lignes sur quatre ne tournent pas, et elles ne sont pas choisies au hasard : ce sont les deux seules directions de <span class="m">A</span> qui aient cette propriété. Tout le reste de la chaîne consiste à les trouver sans les deviner, puis à voir qu'elles décident du long terme.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Définition : direction propre, facteur propre <span class="tag tronc">tronc</span></h3>
+    <p>Un vecteur <b>non nul</b> <span class="m">v</span> est un vecteur propre de <span class="m">A</span>, de valeur propre <span class="m">λ</span>, si</p>
+    <div class="eq"><span class="m">A v</span> = <span class="m">λ v</span> &nbsp;,&nbsp; <span class="m">v</span> ≠ 0</div>
+    <p>Tout multiple de <span class="m">v</span> convient aussi : ce qui est propre est une <b>direction</b>, pas un vecteur. Le signe et la taille de <span class="m">λ</span> disent le geste : <span class="m">λ</span> &lt; 0 retourne, |<span class="m">λ</span>| &lt; 1 contracte, <span class="m">λ</span> = 0 <b>écrase</b> la direction sur l'origine.</p>
+    <p class="say">« Sur une direction propre A agit comme un scalaire, donc toute la complexité de A tient dans le choix de ces directions et de leurs facteurs, donc les connaître c'est connaître A. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les deux directions de <span class="m">A</span>, et une valeur propre nulle</div>
+    <p><span class="m">A</span>(1 ; 0) = (2 ; 0) = <b>2</b> · (1 ; 0) &nbsp;·&nbsp; <span class="m">A</span>(1 ; 1) = (3 ; 3) = <b>3</b> · (1 ; 1).</p>
+    <p>Et sur un multiple : <span class="m">A</span>(2 ; 2) = (6 ; 6) = 3 · (2 ; 2). Toute la droite portée par (1 ; 1) est multipliée par 3 — c'est bien une direction qui est propre.</p>
+    <p><b>Le cas <span class="m">λ</span> = 0.</b> Reprenons <span class="m">B</span> = <span class="mat"><b>1</b><b>2</b><b>2</b><b>4</b></span> de <a href="chain-p04-01-matrice-action.html#s5">p04-01</a> : <span class="m">B</span>(2 ; −1) = (0 ; 0) = <b>0</b> · (2 ; −1). Le noyau n'est rien d'autre que la direction propre de valeur propre 0, et det <span class="m">B</span> = 0 en est la trace.</p>
+    <div class="note"><b>Une valeur propre nulle n'est pas une absence de valeur propre.</b> C'est un facteur, et il vaut zéro : la direction n'est pas laissée tranquille, elle est annihilée. C'est ce que le pas 7 relèvera avec <span class="m">λ</span><span class="up">I</span>.</div>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — les deux directions qui ne tournent pas</div>
+    <div class="sl-ctl" id="f1presets"></div>
+    <div id="f1plot" class="wide"></div>
+    <div class="sl-ctl" id="f1align"></div>
+    <div id="f1sliders"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">La grille fine et le carré pointillé sont ceux de <b>départ</b> ; la grille grasse et le parallélogramme sont leur image par la matrice. Fais tourner <b>x</b> (rouge, sur le cercle unité) : <b>A x</b> (bleu) tourne avec lui, sauf quand x tombe sur une des deux <b>droites tiretées</b> — les directions propres. Là, l'écart d'angle passe à 0° (ou 180°) et le facteur affiché <i>est</i> la valeur propre ; les boutons « aligner » y amènent x exactement. Sur <b>B</b>, det = 0 : la grille d'arrivée s'effondre sur une droite, et la direction propre de facteur <b>0</b> envoie x sur l'origine. Sur <b>rotation</b>, aucune droite tiretée : le discriminant est négatif, il n'existe aucune direction réelle fixe.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Les trouver : le polynôme caractéristique</h3>
+    <p>On ne devine pas, on résout. <span class="m">Av</span> = <span class="m">λv</span> se réécrit (<span class="m">A</span> − <span class="m">λ</span><span class="up">I</span>)<span class="m">v</span> = 0 : chercher un <span class="m">v</span> non nul, c'est demander que <span class="m">A</span> − <span class="m">λ</span><span class="up">I</span> ait un <b>noyau non trivial</b>, donc un déterminant nul.</p>
+    <div class="eq">det(<span class="m">A</span> − <span class="m">λ</span><span class="up">I</span>) = 0 &nbsp;(polynôme caractéristique)&nbsp;, puis <span class="m">v</span> ∈ Ker(<span class="m">A</span> − <span class="m">λ</span><span class="up">I</span>)</div>
+    <p>Deux vérifications gratuites, à faire systématiquement : <b>Σ<span class="m">λ</span><sub><span class="m">i</span></sub> = trace</b> et <b>Π<span class="m">λ</span><sub><span class="m">i</span></sub> = det</b>.</p>
+    <p class="say">« Une direction propre est dans le noyau de A moins lambda I, donc ce noyau est non trivial, donc son déterminant est nul, donc lambda est racine du polynôme caractéristique. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — <span class="m">A</span> de bout en bout</div>
+    <p>det <span class="mat"><b>2 − <span class="m">λ</span></b><b>1</b><b>0</b><b>3 − <span class="m">λ</span></b></span> = (2 − <span class="m">λ</span>)(3 − <span class="m">λ</span>) = <span class="m">λ</span>² − 5<span class="m">λ</span> + 6 &nbsp;⇒&nbsp; <span class="m">λ</span> = <b>2</b> ou <b>3</b>.</p>
+    <p>Contrôle : 2 + 3 = 5 = trace <span class="m">A</span> ; 2 × 3 = 6 = det <span class="m">A</span>. Les deux tombent juste.</p>
+    <div class="tw"><table>
+      <tr><th><span class="m">λ</span></th><th><span class="m">A</span> − <span class="m">λ</span><span class="up">I</span></th><th>équation du noyau</th><th>direction</th></tr>
+      <tr><td>2</td><td><span class="mat"><b>0</b><b>1</b><b>0</b><b>1</b></span></td><td><span class="m">v</span><sub>2</sub> = 0</td><td>(1 ; 0)</td></tr>
+      <tr class="hl"><td>3</td><td><span class="mat"><b>−1</b><b>1</b><b>0</b><b>0</b></span></td><td><span class="m">v</span><sub>1</sub> = <span class="m">v</span><sub>2</sub></td><td>(1 ; 1)</td></tr>
+    </table></div>
+    <p>Second exemple, symétrique : <span class="m">S</span> = <span class="mat"><b>3</b><b>1</b><b>1</b><b>3</b></span> donne <span class="m">λ</span>² − 6<span class="m">λ</span> + 8, donc <span class="m">λ</span> = 2 et 4, de directions (1 ; −1) et (1 ; 1). Leur produit scalaire vaut 1 − 1 = <b>0</b> : elles sont orthogonales. Ce n'est pas un hasard — c'est le pas 8.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Diagonaliser, c'est trois actions <span class="tag tronc">tronc</span></h3>
+    <p>S'il existe <span class="m">n</span> directions propres indépendantes, mets-les en colonnes dans <span class="m">P</span> et les facteurs dans <span class="m">D</span> = diag(<span class="m">λ</span><sub>1</sub>, …). Alors</p>
+    <div class="eq"><span class="m">A</span> = <span class="m">P D P</span><sup>−1</sup></div>
+    <p>Lis de <b>droite à gauche</b>, dans l'ordre où ça s'applique à <span class="m">x</span> : <span class="m">P</span><sup>−1</sup> exprime <span class="m">x</span> dans la base propre, <span class="m">D</span> étire chaque coordonnée par son <span class="m">λ</span>, <span class="m">P</span> ramène dans la base de départ.</p>
+    <p class="say">« Changer de base, étirer coordonnée par coordonnée, revenir, donc A n'est qu'une dilatation vue dans une base tournée, donc tout ce qu'on sait faire à une diagonale, on sait le faire à A. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les trois actions sur <span class="m">x</span> = (0 ; 1)</div>
+    <p><span class="m">P</span> = <span class="mat"><b>1</b><b>1</b><b>0</b><b>1</b></span> (colonnes : les directions de <span class="m">λ</span> = 2 puis <span class="m">λ</span> = 3), det <span class="m">P</span> = 1, donc <span class="m">P</span><sup>−1</sup> = <span class="mat"><b>1</b><b>−1</b><b>0</b><b>1</b></span> et <span class="m">D</span> = <span class="mat"><b>2</b><b>0</b><b>0</b><b>3</b></span>.</p>
+    <div class="tw"><table>
+      <tr><th>étape</th><th>calcul</th><th>lecture</th></tr>
+      <tr><td><span class="m">P</span><sup>−1</sup><span class="m">x</span></td><td>(−1 ; 1)</td><td><span class="m">x</span> = −1 · (1 ; 0) + 1 · (1 ; 1)</td></tr>
+      <tr><td><span class="m">D</span>(−1 ; 1)</td><td>(−2 ; 3)</td><td>× 2 sur la première, × 3 sur la seconde</td></tr>
+      <tr class="hl"><td><span class="m">P</span>(−2 ; 3)</td><td><b>(1 ; 3)</b></td><td>= <span class="m">Ax</span> ✓</td></tr>
+    </table></div>
+    <p>Vérification directe du produit : <span class="m">P D P</span><sup>−1</sup> = <span class="mat"><b>2</b><b>1</b><b>0</b><b>3</b></span> = <span class="m">A</span>. Les coefficients −1 et 1 de la première ligne sont les <b>coordonnées propres</b> de <span class="m">x</span> ; elles portent tout le pas suivant.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Puissances : seule la plus grande survit <span class="tag tronc">tronc</span></h3>
+    <p>Les <span class="m">P</span><sup>−1</sup><span class="m">P</span> intermédiaires se télescopent, donc <span class="m">A</span><sup><span class="m">k</span></sup> = <span class="m">P D</span><sup><span class="m">k</span></sup><span class="m">P</span><sup>−1</sup> avec <span class="m">D</span><sup><span class="m">k</span></sup> = diag(<span class="m">λ</span><sub>1</sub><sup><span class="m">k</span></sup>, …). Sur <span class="m">x</span> = Σ <span class="m">c</span><sub><span class="m">i</span></sub><span class="m">v</span><sub><span class="m">i</span></sub> :</p>
+    <div class="eq"><span class="m">A</span><sup><span class="m">k</span></sup><span class="m">x</span> = Σ <span class="m">c</span><sub><span class="m">i</span></sub><span class="m">λ</span><sub><span class="m">i</span></sub><sup><span class="m">k</span></sup><span class="m">v</span><sub><span class="m">i</span></sub> = <span class="m">λ</span><sub>1</sub><sup><span class="m">k</span></sup> [ <span class="m">c</span><sub>1</sub><span class="m">v</span><sub>1</sub> + Σ<sub><span class="m">i</span> ≥ 2</sub> <span class="m">c</span><sub><span class="m">i</span></sub>(<span class="m">λ</span><sub><span class="m">i</span></sub>/<span class="m">λ</span><sub>1</sub>)<sup><span class="m">k</span></sup><span class="m">v</span><sub><span class="m">i</span></sub> ]</div>
+    <p>Le crochet tend vers <span class="m">c</span><sub>1</sub><span class="m">v</span><sub>1</sub> : la direction converge vers <span class="m">v</span><sub>1</sub>, à la vitesse (<span class="m">λ</span><sub>2</sub>/<span class="m">λ</span><sub>1</sub>)<sup><span class="m">k</span></sup>. Appliquer, normaliser, répéter : c'est la <b>power iteration</b>.</p>
+    <p class="say">« Chaque composante est multipliée par sa valeur propre à la puissance k, donc la plus grande écrase les autres, donc l'itération converge vers la direction dominante, d'autant plus vite que l'écart entre lambda 1 et lambda 2 est grand. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — cinq applications de <span class="m">A</span> depuis (0 ; 1)</div>
+    <p>Coordonnées propres : (0 ; 1) = −1 · (1 ; 0) + 1 · (1 ; 1), donc <span class="m">A</span><sup><span class="m">k</span></sup>(0 ; 1) = −2<sup><span class="m">k</span></sup>(1 ; 0) + 3<sup><span class="m">k</span></sup>(1 ; 1) = (3<sup><span class="m">k</span></sup> − 2<sup><span class="m">k</span></sup> ; 3<sup><span class="m">k</span></sup>).</p>
+    <div class="tw"><table>
+      <tr><th><span class="m">k</span></th><th><span class="m">A</span><sup><span class="m">k</span></sup><span class="m">x</span><sub>0</sub></th><th>direction normalisée</th><th>angle</th><th>(2/3)<sup><span class="m">k</span></sup></th></tr>
+      <tr><td>1</td><td>(1 ; 3)</td><td>(0,32 ; 0,95)</td><td>71,6°</td><td>0,667</td></tr>
+      <tr><td>2</td><td>(5 ; 9)</td><td>(0,49 ; 0,87)</td><td>60,9°</td><td>0,444</td></tr>
+      <tr><td>3</td><td>(19 ; 27)</td><td>(0,58 ; 0,82)</td><td>54,9°</td><td>0,296</td></tr>
+      <tr><td>4</td><td>(65 ; 81)</td><td>(0,63 ; 0,78)</td><td>51,3°</td><td>0,198</td></tr>
+      <tr class="hl"><td>5</td><td>(211 ; 243)</td><td>(0,66 ; 0,76)</td><td>49,0°</td><td>0,132</td></tr>
+      <tr><td>∞</td><td>—</td><td><b>(0,71 ; 0,71)</b></td><td><b>45°</b></td><td>0</td></tr>
+    </table></div>
+    <p>La composante sur (1 ; 0) n'a pas disparu — elle vaut encore 32 à <span class="m">k</span> = 5 — mais elle pèse (2/3)<sup>5</sup> = 13 % de l'autre. C'est un <b>rapport</b> qui s'éteint, pas une quantité. Contrôle : <span class="m">A</span><sup>5</sup> = <span class="m">P D</span><sup>5</sup><span class="m">P</span><sup>−1</sup> = <span class="mat"><b>32</b><b>211</b><b>0</b><b>243</b></span>, et sa seconde colonne est bien (211 ; 243).</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — la direction dominante absorbe</div>
+    <div class="sl-ctl" id="f2presets"></div>
+    <div id="f2plot" class="wide"></div>
+    <div class="sl-ctl" id="f2ctl"></div>
+    <div id="f2sliders"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Chaque itéré est <b>renormalisé</b> : seule la direction compte, pas la taille qui explose en 3<sup><span class="m">k</span></sup>. Presse <b>appliquer</b> ou fais glisser <span class="m">k</span> : les points pâles sont le passé, le point plein est l'itéré courant, le <b>cercle violet</b> est la limite et la droite tiretée violette la direction dominante. Les points s'en rapprochent en gardant chaque fois (<span class="m">λ</span><sub>2</sub>/<span class="m">λ</span><sub>1</sub>) de l'écart précédent — d'où un premier pas large et des suivants de plus en plus courts. Sur <b>Markov</b>, la normalisation naturelle n'est pas la norme mais la <b>somme</b>, que <span class="m">P</span> conserve : les itérés glissent le long du segment des distributions vers <span class="m">π</span> = (5/6 ; 1/6), et l'écart affiché vaut exactement 0,4<sup><span class="m">k</span></sup> × 1/6.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Le signal : itération et long terme</h3>
+    <p>Dès qu'un énoncé contient <b>une matrice carrée appliquée en boucle</b> et une question sur l'état final, la réponse est dans le spectre. Chaînes de Markov (<span class="m">λ</span><sub>1</sub> = 1, le vecteur propre <i>est</i> la distribution stationnaire), PageRank, systèmes dynamiques, stabilité d'une récurrence (|<span class="m">λ</span>| &lt; 1 ⇒ elle s'éteint), et le <a href="chain-p03-02-gradient-descente.html#s6">conditionnement d'une descente</a> (<span class="m">λ</span><sub>max</sub>/<span class="m">λ</span><sub>min</sub>).</p>
+    <p class="say">« Itérer multiplie chaque composante par sa valeur propre puissance k, donc le long terme ne dépend que du spectre, donc toute question d'état stationnaire ou de stabilité se lit sur les valeurs propres et nulle part ailleurs. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — la stationnaire d'une chaîne à deux états</div>
+    <p><span class="m">P</span> = <span class="mat"><b>0,9</b><b>0,5</b><b>0,1</b><b>0,5</b></span> avec la convention <b>colonnes = transitions</b> : la colonne 1 dit ce que devient l'état 1 (« 0,9 reste, 0,1 part »), la colonne 2 ce que devient l'état 2. Chaque colonne somme à 1.</p>
+    <p>Trace 1,4 et det 0,45 − 0,05 = 0,4, donc <span class="m">λ</span>² − 1,4<span class="m">λ</span> + 0,4 : <span class="m">λ</span> = <b>1</b> et <b>0,4</b>. Noyau de <span class="m">P</span> − <span class="up">I</span> = <span class="mat"><b>−0,1</b><b>0,5</b><b>0,1</b><b>−0,5</b></span> : la droite (5 ; 1), normalisée à somme 1 → <span class="m">π</span> = <b>(5/6 ; 1/6)</b> ≈ (0,833 ; 0,167).</p>
+    <div class="tw"><table>
+      <tr><th><span class="m">k</span></th><th>état depuis (1 ; 0)</th><th>écart à 5/6</th><th>0,4<sup><span class="m">k</span></sup> × 1/6</th></tr>
+      <tr><td>1</td><td>(0,9 ; 0,1)</td><td>0,0667</td><td>0,0667</td></tr>
+      <tr><td>2</td><td>(0,86 ; 0,14)</td><td>0,0267</td><td>0,0267</td></tr>
+      <tr><td>3</td><td>(0,844 ; 0,156)</td><td>0,0107</td><td>0,0107</td></tr>
+      <tr class="hl"><td>4</td><td>(0,8376 ; 0,1624)</td><td>0,0043</td><td>0,0043</td></tr>
+    </table></div>
+    <p><span class="m">λ</span><sub>1</sub> = 1 ne change pas la taille — c'est pour cela que la masse totale reste 1 — et <span class="m">λ</span><sub>2</sub> = 0,4 dit la vitesse d'oubli de l'état initial.</p>
+    <div class="note"><b>Le piège de la convention.</b> <span class="m">A</span> et <span class="m">A</span><sup>⊤</sup> ont <b>les mêmes valeurs propres</b> (même polynôme caractéristique) mais <b>pas les mêmes vecteurs propres</b>. Ici <span class="m">P</span><span class="m">π</span> = <span class="m">π</span> avec <span class="m">π</span> = (5/6 ; 1/6), tandis que <span class="m">P</span><sup>⊤</sup>(1 ; 1) = (1 ; 1) : même <span class="m">λ</span> = 1, vecteur tout autre. Si la matrice est écrite en <b>lignes = transitions</b> (la convention la plus répandue), la stationnaire est un vecteur propre <b>à gauche</b>, <span class="m">π</span><span class="m">M</span> = <span class="m">π</span>, c'est-à-dire un vecteur propre de <span class="m">M</span><sup>⊤</sup>. Avant de lire un vecteur propre, vérifier de quel côté somment les 1.</div>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Translater le spectre sans rien annuler</h3>
+    <p>Ajouter <span class="m">λ</span><span class="up">I</span> ne change aucun vecteur propre : si <span class="m">Av</span> = <span class="m">λ</span><sub><span class="m">i</span></sub><span class="m">v</span>, alors le même <span class="m">v</span> vérifie</p>
+    <div class="eq">(<span class="m">A</span> + <span class="m">λ</span><span class="up">I</span>)<span class="m">v</span> = <span class="m">Av</span> + <span class="m">λv</span> = (<span class="m">λ</span><sub><span class="m">i</span></sub> + <span class="m">λ</span>)<span class="m">v</span></div>
+    <p>Les <b>directions ne bougent pas</b> ; chaque facteur est décalé de <span class="m">λ</span>. En particulier une valeur propre 0 devient <span class="m">λ</span> ≠ 0 : plus aucune direction n'est écrasée, donc la matrice redevient inversible. C'est le <a href="chain-p02-02-prior-penalite.html#s5">pas 5 de p02-02</a>, vu depuis le spectre.</p>
+    <p class="say">« Ajouter lambda I ajoute lambda à chaque valeur propre sans toucher aux directions, donc la valeur propre nulle devient lambda, donc la matrice redevient inversible, donc rien n'a été annulé — la direction plate a été relevée. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le <span class="m">X</span><sup>⊤</sup><span class="m">X</span> dégénéré du ridge</div>
+    <p>Deux colonnes colinéaires, <span class="m">x</span> = (1, 2, 3) et 2<span class="m">x</span> : <span class="m">X</span><sup>⊤</sup><span class="m">X</span> = <span class="mat"><b>14</b><b>28</b><b>28</b><b>56</b></span>. Trace 70, det 14 · 56 − 28² = 0, donc <span class="m">λ</span> = <b>0</b> et <b>70</b>.</p>
+    <p>Directions : (1 ; 2) pour 70 — <span class="m">X</span><sup>⊤</sup><span class="m">X</span>(1 ; 2) = (70 ; 140) — et (2 ; −1) pour 0, la direction plate, celle où la loss ne courbe pas.</p>
+    <div class="tw"><table>
+      <tr><th><span class="m">λ</span></th><th>petite v.p.</th><th>grande v.p.</th><th><span class="m">κ</span> = grande/petite</th></tr>
+      <tr class="hl"><td>0</td><td><b>0</b></td><td>70</td><td><b>∞</b> — non inversible</td></tr>
+      <tr><td>0,01</td><td>0,01</td><td>70,01</td><td>7 001</td></tr>
+      <tr><td>1</td><td>1</td><td>71</td><td>71</td></tr>
+      <tr><td>10</td><td>10</td><td>80</td><td>8</td></tr>
+    </table></div>
+    <p>(<span class="m">X</span><sup>⊤</sup><span class="m">X</span> + <span class="m">λ</span><span class="up">I</span>)(2 ; −1) = <span class="m">λ</span> · (2 ; −1) : la direction plate est toujours là, avec une courbure enfin non nulle. <b>Relevée, pas supprimée.</b></p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — le spectre glisse, le conditionnement chute</div>
+    <div id="f3plot" class="wide"></div>
+    <div id="f3kplot" class="wide"></div>
+    <div class="sl-ctl" id="f3presets"></div>
+    <div id="f3sliders"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">En haut, les deux valeurs propres de <span class="m">X</span><sup>⊤</sup><span class="m">X</span> + <span class="m">λ</span><span class="up">I</span> : deux droites <b>parallèles</b>, de pente 1, l'écart de 70 entre elles ne bouge jamais — c'est cela, une translation du spectre. En bas, le conditionnement <span class="m">κ</span> = (70 + <span class="m">λ</span>)/<span class="m">λ</span> : il part de l'infini en <span class="m">λ</span> = 0 (le seul point où une direction est écrasée), tombe sous 100 dès <span class="m">λ</span> ≈ 0,7, puis ne gagne presque plus rien. Les readouts rappellent les deux directions propres : elles sont <b>identiques</b> à tous les <span class="m">λ</span>.</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Symétrique : le cas propre</h3>
+    <p><span class="m">A</span> = <span class="m">A</span><sup>⊤</sup> apporte trois cadeaux d'un coup : valeurs propres <b>réelles</b>, directions propres <b>orthogonales</b>, et donc une matrice de passage <span class="m">P</span> orthogonale, où <span class="m">P</span><sup>−1</sup> = <span class="m">P</span><sup>⊤</sup>. C'est le <b>théorème spectral</b>, démontré en <a href="../../map.html#p04-03">p04-03</a> ; ici on l'utilise, on ne le prouve pas.</p>
+    <p>En ML on y est presque toujours : covariances, <span class="m">X</span><sup>⊤</sup><span class="m">X</span>, hessiennes sont symétriques par construction.</p>
+    <p class="say">« Une matrice symétrique a des directions propres orthogonales, donc sa matrice de passage est orthogonale, donc l'inverse est la transposée, donc changer de base ne coûte plus qu'un produit — et les valeurs propres sont réelles, donc ordonnables. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — symétrique contre non symétrique</div>
+    <div class="tw"><table>
+      <tr><th></th><th><span class="m">S</span> = <span class="mat"><b>3</b><b>1</b><b>1</b><b>3</b></span></th><th><span class="m">A</span> = <span class="mat"><b>2</b><b>1</b><b>0</b><b>3</b></span></th></tr>
+      <tr><td>valeurs propres</td><td>2 et 4</td><td>2 et 3</td></tr>
+      <tr><td>directions</td><td>(1 ; −1) et (1 ; 1)</td><td>(1 ; 0) et (1 ; 1)</td></tr>
+      <tr class="hl"><td>produit scalaire</td><td><b>0</b> — orthogonales</td><td>1 — à 45°</td></tr>
+      <tr><td><span class="m">P</span><sup>−1</sup></td><td>= <span class="m">P</span><sup>⊤</sup> (après normalisation)</td><td><span class="mat"><b>1</b><b>−1</b><b>0</b><b>1</b></span> ≠ <span class="m">P</span><sup>⊤</sup></td></tr>
+    </table></div>
+    <p>Sur <span class="m">S</span>, <span class="m">P</span> = (1/√2) <span class="mat"><b>1</b><b>1</b><b>−1</b><b>1</b></span> vérifie <span class="m">P</span><sup>⊤</sup><span class="m">P</span> = <span class="up">I</span> : la base propre est un simple repère tourné, et « changer de base » ne déforme rien. Le <span class="m">X</span><sup>⊤</sup><span class="m">X</span> du pas 7 est dans le même cas : (1 ; 2) · (2 ; −1) = 2 − 2 = <b>0</b>.</p>
+  </div>
+</div>
+
+<div class="step" id="s9">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Tout le raisonnement repose sur deux hypothèses : il existe une <b>base</b> de directions propres, et une <b>dominante unique</b>. Chaque casse est la perte de l'une ou de l'autre.</p>
+    <p class="say">« La diagonalisation suppose une base propre et la power iteration une dominante unique, donc chaque panne vient de la perte d'une de ces deux hypothèses, donc le diagnostic se lit sur le spectre avant d'essayer quoi que ce soit. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>Pas diagonalisable.</b> Le cisaillement <span class="mat"><b>1</b><b>1</b><b>0</b><b>1</b></span> a <span class="m">λ</span> = 1 double mais une <b>seule</b> direction propre, (1 ; 0) : pas de base propre, pas de <span class="m">P D P</span><sup>−1</sup> (bloc de Jordan). L'itération depuis (0 ; 1) donne (1 ; 1), (2 ; 1), (3 ; 1), … : elle converge bien vers (1 ; 0), mais en 1/<span class="m">k</span> et non en ratio — l'angle passe de 45° à 11° en cinq pas, contre 49° pour <span class="m">A</span>.</li>
+      <li><b>Valeurs propres complexes.</b> Une rotation de 90°, <span class="mat"><b>0</b><b>−1</b><b>1</b><b>0</b></span>, a pour polynôme <span class="m">λ</span>² + 1 : discriminant −4, aucune racine réelle, donc <b>aucune direction réelle fixe</b>. Seul le <b>module</b> |<span class="m">λ</span>| a un sens : &lt; 1 la trajectoire spirale vers 0, &gt; 1 elle part à l'infini, = 1 elle tourne indéfiniment.</li>
+      <li><b>|<span class="m">λ</span><sub>1</sub>| = |<span class="m">λ</span><sub>2</sub>|.</b> Avec <span class="m">λ</span> = +1 et −1, le rapport (<span class="m">λ</span><sub>2</sub>/<span class="m">λ</span><sub>1</sub>)<sup><span class="m">k</span></sup> ne décroît pas : il alterne entre +1 et −1. La power iteration <b>oscille</b> entre deux directions sans jamais converger — et une valeur propre dominante répétée avec deux vecteurs propres donne une limite qui dépend du point de départ.</li>
+      <li><b>Non symétrique.</b> Les directions propres ne sont plus orthogonales : <span class="m">P</span><sup>−1</sup> ≠ <span class="m">P</span><sup>⊤</sup>, changer de base coûte une vraie inversion, et le <b>conditionnement de <span class="m">P</span></b> entre dans les erreurs numériques. Deux directions propres presque parallèles rendent la décomposition instable même quand les valeurs propres, elles, sont bien séparées.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li><span class="m">Av</span> = <span class="m">λv</span>, <span class="m">v</span> ≠ 0 : les directions que <span class="m">A</span> <b>ne tourne pas</b> ; <span class="m">λ</span> est le facteur — négatif il retourne, |<span class="m">λ</span>| &lt; 1 il contracte, nul il <b>écrase</b> (c'est le noyau).</li>
+    <li>Les trouver : det(<span class="m">A</span> − <span class="m">λ</span><span class="up">I</span>) = 0, puis le noyau de <span class="m">A</span> − <span class="m">λ</span><span class="up">I</span>. Contrôles gratuits : Σ<span class="m">λ</span> = trace, Π<span class="m">λ</span> = det.</li>
+    <li><span class="m">A</span> = <span class="m">P D P</span><sup>−1</sup> se lit de droite à gauche : <b>changer de base, étirer, revenir</b>.</li>
+    <li><span class="m">A</span><sup><span class="m">k</span></sup> = <span class="m">P D</span><sup><span class="m">k</span></sup><span class="m">P</span><sup>−1</sup> : la plus grande valeur propre survit seule, à la vitesse (<span class="m">λ</span><sub>2</sub>/<span class="m">λ</span><sub>1</sub>)<sup><span class="m">k</span></sup> — power iteration, Markov, PageRank.</li>
+    <li>+<span class="m">λ</span><span class="up">I</span> <b>translate</b> le spectre à directions inchangées ; 0 devient <span class="m">λ</span>, donc inversible. Rien n'est annulé.</li>
+    <li>Symétrique ⇒ valeurs réelles, directions <b>orthogonales</b>, <span class="m">P</span><sup>−1</sup> = <span class="m">P</span><sup>⊤</sup> : le cas de la covariance, de <span class="m">X</span><sup>⊤</sup><span class="m">X</span> et des hessiennes.</li>
+  </ol>
+</div>
+<div class="phrase">« Une valeur propre est un facteur d'étirement sur une direction que la matrice ne tourne pas ; diagonaliser, c'est changer de base pour que la matrice devienne une dilatation. Appliquée mille fois, la matrice ne garde que sa direction dominante, à la vitesse du rapport des deux plus grandes valeurs propres : c'est la distribution stationnaire d'une chaîne de Markov et le PageRank. Et ajouter <span class="m">λ</span><span class="up">I</span> décale tout le spectre de <span class="m">λ</span> sans rien annuler. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Définis valeur et vecteur propres.</div><div class="a hid"><span class="m">Av</span> = <span class="m">λv</span> avec <span class="m">v</span> ≠ 0 : une direction que <span class="m">A</span> ne tourne pas, et son facteur <span class="m">λ</span>.</div></li>
+    <li><div class="q">Comment les trouver, et quelles deux vérifications ?</div><div class="a hid">det(<span class="m">A</span> − <span class="m">λ</span><span class="up">I</span>) = 0, puis le noyau de <span class="m">A</span> − <span class="m">λ</span><span class="up">I</span>. Contrôles : Σ<span class="m">λ</span> = trace, Π<span class="m">λ</span> = det.</div></li>
+    <li><div class="q">Lis <span class="m">A</span> = <span class="m">P D P</span><sup>−1</sup> de droite à gauche.</div><div class="a hid"><span class="m">P</span><sup>−1</sup> : passer en base propre ; <span class="m">D</span> : étirer chaque coordonnée par son <span class="m">λ</span> ; <span class="m">P</span> : revenir.</div></li>
+    <li><div class="q">Que devient <span class="m">A</span><sup><span class="m">k</span></sup><span class="m">x</span>, et à quelle vitesse ?</div><div class="a hid">Ça s'aligne sur la direction dominante <span class="m">v</span><sub>1</sub>, l'erreur décroissant comme (<span class="m">λ</span><sub>2</sub>/<span class="m">λ</span><sub>1</sub>)<sup><span class="m">k</span></sup>.</div></li>
+    <li><div class="q">Que vaut la stationnaire de <span class="m">P</span>, et pourquoi ?</div><div class="a hid">Le vecteur propre de <span class="m">λ</span> = 1 normalisé à somme 1 : (5/6 ; 1/6). Colonnes = transitions ⇒ vecteur propre à droite ; lignes = transitions ⇒ à gauche, donc vecteur propre de <span class="m">M</span><sup>⊤</sup>.</div></li>
+    <li><div class="q">Que fait +<span class="m">λ</span><span class="up">I</span> ?</div><div class="a hid">Il translate chaque valeur propre de <span class="m">λ</span> sans toucher aux directions : 0 devient <span class="m">λ</span>, la matrice redevient inversible.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="../../map.html#b06"><b>b06 · Convexité et forme fermée</b><small>Même mécanisme au signe près : une forme quadratique est convexe quand ses valeurs propres sont ≥ 0, et la forme fermée existe quand aucune n'est nulle. Le pas 7 est exactement la réparation de ce cas.</small></a>
+    <a href="chain-p02-02-prior-penalite.html#s5"><b>p02-02 · Du prior à la pénalité, pas 5</b><small>« +<span class="m">λ</span><span class="up">I</span> translate, n'annule pas » y est démontré côté ridge ; ici c'est la même égalité lue sur le spectre, et la figure 3 en donne le conditionnement.</small></a>
+    <a href="chain-p03-02-gradient-descente.html#s6"><b>p03-02 · Gradient et descente, pas 6</b><small>Le conditionnement <span class="m">λ</span><sub>max</sub>/<span class="m">λ</span><sub>min</sub> qui fixe le nombre d'itérations : ce sont les valeurs propres de la hessienne, et la lenteur de la descente est la power iteration vue de l'autre côté.</small></a>
+    <a href="chain-p04-01-matrice-action.html#s5"><b>p04-01 · Une matrice est une action, pas 5</b><small>Le noyau est la direction propre de valeur propre 0 : « det = 0 » et « une valeur propre nulle » sont la même phrase.</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>algebre::eigen</code> (définition, det(<span class="m">A</span> − <span class="m">λ</span><span class="up">I</span>) = 0, trace et det) · <code>algebre::diagonalisation</code> (<span class="m">P D P</span><sup>−1</sup> lu de droite à gauche, cas symétrique) · <code>algebre::power-iteration</code> (<span class="m">A</span><sup><span class="m">k</span></sup>, vitesse <span class="m">λ</span><sub>2</sub>/<span class="m">λ</span><sub>1</sub>) · <code>algebre::markov</code> (stationnaire, convention lignes/colonnes, vecteur propre à gauche).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p04-02 · v1 du 16/09/2026 · Prérequis : <a href="chain-p04-01-matrice-action.html">p04-01</a>. Suite : <a href="../../map.html#p04-03">p04-03 Spectral, SVD, conditionnement</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outillage commun aux plans (repris de p04-01) =====
+   Le transform SVG du groupe monde n'est pas peint quand la matrice est singulière :
+   SL.plane ne sert donc qu'au décor de départ (grille fine, carré unité, axes), et
+   toute la scène d'arrivée est recalculée en coordonnées écran — det = 0 doit rester
+   visible sous la forme d'un effondrement sur une droite, pas d'une figure vide. */
+const V=(x,y)=>`(${SL.fmt(x,2)} ; ${SL.fmt(y,2)})`;
+const DEG=x=>SL.fmt(x,1)+'°';
+const UNIT=[[0,0],[1,0],[1,1],[0,1]];
+function planeFig(id,o){
+  const W=o.W||440,H=o.H||440,S=o.S||40,CX=W/2,CY=H/2;
+  const pl=SL.plane(document.getElementById(id),{w:W,h:H,scale:S,vectors:[],fixed:o.fixed||[]});
+  const ov=SL.el('g',{},pl.svg);
+  const px=x=>CX+S*x, py=y=>CY-S*y;
+  const cx=v=>Math.max(48,Math.min(W-48,v)), cy=v=>Math.max(15,Math.min(H-8,v));
+  const F={svg:pl.svg,px,py,S,W,H,
+    clear(){while(ov.firstChild)ov.removeChild(ov.firstChild);},
+    quad(p,cls){return SL.el('path',{d:p.map((q,i)=>(i?'L':'M')+px(q[0]).toFixed(1)+' '+py(q[1]).toFixed(1)).join(' ')+' Z',class:cls},ov);},
+    dot(x,y,cls,r){return SL.el('circle',{cx:px(x),cy:py(y),r:r||5.5,class:'sl-dot '+(cls||'')},ov);},
+    circ(x,y,r,cls){return SL.el('circle',{cx:px(x),cy:py(y),r:r*S,class:cls||''},ov);},
+    seg(xa,ya,xb,yb,cls){return SL.el('line',{x1:px(xa),y1:py(ya),x2:px(xb),y2:py(yb),class:'sl-seg '+(cls||'')},ov);},
+    txt(x,y,s,cls,dx,dy,an){
+      let X=px(x)+(dx||0),Y=py(y)+(dy||0),a=an||'start';
+      if(a==='start'&&X>W-96){a='end';}else if(a==='end'&&X<96){a='start';}
+      X=a==='middle'?cx(X):Math.max(8,Math.min(W-8,X));Y=cy(Y);
+      const e=SL.el('text',{x:X,y:Y,class:cls||'','text-anchor':a},ov);e.textContent=s;return e;},
+    grid(M,t){
+      const a=(x,y)=>[M[0]*x+M[1]*y+(t?t[0]:0), M[2]*x+M[3]*y+(t?t[1]:0)];
+      const L=(p,q)=>`M${px(p[0]).toFixed(1)} ${py(p[1]).toFixed(1)}L${px(q[0]).toFixed(1)} ${py(q[1]).toFixed(1)}`;
+      let d='';
+      for(let i=-5;i<=5;i++){d+=L(a(i,-5),a(i,5))+L(a(-5,i),a(5,i));}
+      SL.el('path',{d,class:'tgrid'},ov);
+      F.quad(UNIT.map(u=>a(u[0],u[1])),'img');
+      return a;}};
+  return F;
+}
+function vlabel(F,x,y,s,cls,fx,fy,push,ddy){
+  const n=Math.hypot(x,y),ux=n>1e-6?x/n:fx,uy=n>1e-6?y/n:fy,k=push||0.6;
+  const an=ux>0.35?'start':(ux<-0.35?'end':'middle');
+  F.txt(x+ux*k,y+uy*k,s,cls,an==='start'?3:(an==='end'?-3:0),4+(ddy||0),an);
+}
+function readouts(host,items){host.innerHTML=items.map(i=>`<div class="${i.c||''}">${i.k}<b>${i.v}</b></div>`).join('');}
+function tween(from,to,cb){
+  if(SL.reduced){cb(to.slice());return;}
+  const t0=performance.now();
+  const step=n=>{let u=Math.min(1,(n-t0)/650);u=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;
+    cb(from.map((x,i)=>x+(to[i]-x)*u));if(u<1)requestAnimationFrame(step);};
+  requestAnimationFrame(step);
+}
+/* spectre d'une 2×2 donnée à plat [a,b,c,d] — exact, sans dépendance */
+function eigen(M){
+  const a=M[0],b=M[1],c=M[2],d=M[3],tr=a+d,det=a*d-b*c,disc=tr*tr-4*det;
+  if(disc<-1e-12)return {real:false,tr,det,disc,mod:Math.sqrt(Math.abs(det))};
+  const s=Math.sqrt(Math.max(0,disc)),l=[(tr+s)/2,(tr-s)/2];
+  const vec=lam=>{
+    const r=[[a-lam,b],[c,d-lam]];
+    let v=Math.hypot(r[0][0],r[0][1])>=Math.hypot(r[1][0],r[1][1])?[r[0][1],-r[0][0]]:[r[1][1],-r[1][0]];
+    if(Math.hypot(v[0],v[1])<1e-9)v=[1,0];
+    if(v[0]<-1e-9||(Math.abs(v[0])<1e-9&&v[1]<0))v=[-v[0],-v[1]];
+    const n=Math.hypot(v[0],v[1]);return [v[0]/n,v[1]/n];};
+  return {real:true,tr,det,disc,l,v:[vec(l[0]),vec(l[1])],double:Math.abs(disc)<1e-9};
+}
+function mul(M,x){return [M[0]*x[0]+M[1]*x[1], M[2]*x[0]+M[3]*x[1]];}
+
+/* ===== Figure 1 — les deux directions qui ne tournent pas ===== */
+(function(){
+  const F=planeFig('f1plot',{S:40,fixed:[[1,0,'ax'],[0,1,'ax']]});
+  const out=document.getElementById('f1out'), sh=document.getElementById('f1sliders');
+  const PR=[['A — étire et cisaille',[2,1,0,3]],
+            ['S — symétrique',[3,1,1,3]],
+            ['B — écrase, λ = 0',[1,2,2,4]],
+            ['rotation 90° — complexes',[0,-1,1,0]],
+            ['cisaillement — une seule direction',[1,1,0,1]]];
+  let M=PR[0][1].slice(), ready=false;
+  const btns=PR.map(p=>{const b=SL.h('button','tb',document.getElementById('f1presets'),p[0]);
+    b.onclick=()=>tween(M,p[1],v=>{M=v;draw();});return b;});
+  const al=document.getElementById('f1align');
+  const a1=SL.h('button','tb',al,'aligner x sur la 1ʳᵉ direction propre');
+  const a2=SL.h('button','tb',al,'aligner x sur la 2ᵉ');
+  const sA=SL.slider(sh,{label:'angle de x',min:0,max:360,step:'any',value:20,fmt:v=>DEG(v)},()=>draw());
+  function snap(i){const E=eigen(M);if(!E.real)return;const v=E.v[i];
+    let g=Math.atan2(v[1],v[0])*180/Math.PI;if(g<0)g+=360;sA.set(g);}
+  a1.onclick=()=>snap(0); a2.onclick=()=>snap(1);
+  function draw(){
+    if(!ready)return;
+    const E=eigen(M),th=sA.get()*Math.PI/180;
+    const x=[Math.cos(th),Math.sin(th)], Ax=mul(M,x), nA=Math.hypot(Ax[0],Ax[1]);
+    F.clear();
+    F.grid(M);
+    F.circ(0,0,1,'circ');
+    if(E.real){
+      [0,1].forEach(i=>{
+        if(i===1&&E.double)return;
+        const v=E.v[i],cls=i?'sl-c4':'sl-c2';
+        F.seg(-5*v[0],-5*v[1],5*v[0],5*v[1],'eig '+cls);
+        vlabel(F,3.75*v[0],3.75*v[1],'λ = '+SL.fmt(E.l[i],2),cls+' strong',1,0,0.3,i?12:-6);
+      });
+      if(E.double)F.txt(0,-4.5,'valeur propre double, une seule direction','sl-c4 strong',0,0,'middle');
+    }else{
+      F.txt(0,-4.5,'valeurs propres complexes — aucune direction réelle fixe','sl-c3 strong',0,0,'middle');
+    }
+    F.seg(0,0,x[0],x[1],'vec sl-c3'); F.dot(x[0],x[1],'sl-c3',5.5);
+    vlabel(F,x[0],x[1],'x','sl-c3 strong',1,0,0.45);
+    if(nA<1e-9){F.dot(0,0,'ring sl-c1',9);F.txt(0,0,'A x = 0','sl-c1 strong',13,-11);}
+    else{F.seg(0,0,Ax[0],Ax[1],'vec sl-c1');F.dot(Ax[0],Ax[1],'sl-c1',6);
+         vlabel(F,Ax[0],Ax[1],'A x','sl-c1 strong',1,0,0.5);}
+    const ax=(Math.atan2(x[1],x[0])*180/Math.PI+360)%360;
+    const aa=nA<1e-9?null:(Math.atan2(Ax[1],Ax[0])*180/Math.PI+360)%360;
+    const ec=aa===null?null:Math.abs(((aa-ax+540)%360)-180);
+    const propre=nA<1e-9||(ec!==null&&(ec<0.4||ec>179.6));
+    const fac=propre?(nA<1e-9?0:(ec<90?nA:-nA)):nA;
+    readouts(out,[
+      {k:'angle de x',v:DEG(ax)},
+      {k:'angle de A x',v:aa===null?'— (A x = 0)':DEG(aa)},
+      {k:'écart d\'angle',v:ec===null?'— (écrasé)':DEG(ec),c:(ec!==null&&propre)?'pos':''},
+      {k:'facteur ‖A x‖ / ‖x‖',v:SL.fmt(fac,3)+(propre?' = λ':''),c:propre?(Math.abs(fac)<1e-9?'zero':'pos'):''},
+      {k:'valeurs propres',v:E.real?SL.fmt(E.l[0],2)+' et '+SL.fmt(E.l[1],2):'complexes, |λ| = '+SL.fmt(E.mod,2)},
+      {k:'trace · det',v:SL.fmt(E.tr,2)+' · '+SL.fmt(E.det,2),c:Math.abs(E.det)<1e-9?'zero':''}]);
+    btns.forEach((bt,i)=>bt.setAttribute('aria-pressed',String(PR[i][1].every((v,j)=>Math.abs(v-M[j])<5e-3))));
+    a1.disabled=!E.real; a2.disabled=!E.real||E.double;
+  }
+  ready=true;draw();
+})();
+
+/* ===== Figure 2 — la direction dominante absorbe ===== */
+(function(){
+  const F=planeFig('f2plot',{W:440,H:420,S:160,fixed:[[1,0,'ax'],[0,1,'ax']]});
+  const out=document.getElementById('f2out'), sh=document.getElementById('f2sliders'), ctl=document.getElementById('f2ctl');
+  const PR=[
+    {n:'A — depuis x₀ = (0 ; 1)',M:[2,1,0,3],x0:[0,1],lim:45,dom:'v₁ = (1 ; 1)'},
+    {n:'Markov P — depuis (1 ; 0)',M:[.9,.5,.1,.5],x0:[1,0],lim:Math.atan2(1,5)*180/Math.PI,dom:'π = (5/6 ; 1/6)',mk:true}];
+  const KMAX=12;
+  let cur=0, ready=false;
+  const btns=PR.map((p,i)=>{const b=SL.h('button','tb',document.getElementById('f2presets'),p.n);
+    b.onclick=()=>{cur=i;draw();};return b;});
+  const bA=SL.h('button','tb',ctl,'appliquer une fois ›');
+  const bR=SL.h('button','tb',ctl,'recommencer');
+  const sk=SL.slider(sh,{label:'k (applications)',min:0,max:KMAX,step:1,value:0,fmt:v=>SL.fmt(v,0)},()=>draw());
+  bA.onclick=()=>sk.set(Math.min(KMAX,Math.round(sk.get())+1));
+  bR.onclick=()=>sk.set(0);
+  function draw(){
+    if(!ready)return;
+    const P=PR[cur],M=P.M,k=Math.round(sk.get()),E=eigen(M),v1=E.v[0];
+    F.clear();
+    /* le repère : cercle unité pour A (on normalise par la norme),
+       segment des distributions pour Markov (on normalise par la somme, que P conserve) */
+    if(P.mk){F.seg(1,0,0,1,'simplex');F.txt(.42,.58,'somme = 1','plain',-6,-3,'end');}
+    else{F.circ(0,0,1,'circ');}
+    const v2=E.v[1];
+    F.seg(-1.25*v2[0],-1.25*v2[1],1.25*v2[0],1.25*v2[1],'eig sl-c4 pale');
+    F.seg(-1.25*v1[0],-1.25*v1[1],1.25*v1[0],1.25*v1[1],'eig sl-c2');
+    vlabel(F,-1.02*v1[0],-1.02*v1[1],P.dom,'sl-c2 strong',-1,0,0.1,14);
+    /* la limite : direction dominante sur le cercle, ou π sur le segment */
+    const lim=P.mk?[5/6,1/6]:v1;
+    F.dot(lim[0],lim[1],'hollow sl-c2',8);
+    /* les itérés */
+    let x=P.x0.slice();const raw=[x.slice()];
+    for(let j=0;j<k;j++){x=mul(M,x);raw.push(x.slice());}
+    const show=w=>{if(P.mk){const s=w[0]+w[1];return [w[0]/s,w[1]/s];}
+      const n=Math.hypot(w[0],w[1]);return [w[0]/n,w[1]/n];};
+    raw.forEach((w,j)=>{
+      const u=show(w),last=j===k;
+      F.seg(0,0,u[0],u[1],'vec sl-c3'+(last?'':' pale'));
+      F.dot(u[0],u[1],'sl-c3'+(last?'':' pale'),last?6.5:4);
+    });
+    const u0=show(raw[0]),uk=show(raw[k]);
+    if(k>0)vlabel(F,u0[0],u0[1],'k = 0','plain',1,0,0.22);
+    vlabel(F,uk[0],uk[1],'k = '+k,'sl-c3 strong',1,0,0.22,k>0?16:0);
+    const ang=Math.atan2(uk[1],uk[0])*180/Math.PI, ec=Math.abs(ang-P.lim);
+    const tiles=[{k:'k',v:String(k)}];
+    if(P.mk){
+      tiles.push({k:'état, normalisé à somme 1',v:V(uk[0],uk[1])});
+      tiles.push({k:'angle de la direction',v:DEG(ang)});
+      tiles.push({k:'écart de la 1ʳᵉ composante à 5/6',v:SL.fmt(Math.abs(uk[0]-5/6),6),c:ec<0.02?'pos':''});
+      tiles.push({k:'0,4ᵏ × 1/6 — la prédiction',v:SL.fmt(Math.pow(.4,k)/6,6)});
+    }else{
+      tiles.push({k:'Aᵏ x₀',v:'('+SL.fmt(raw[k][0],0)+' ; '+SL.fmt(raw[k][1],0)+')'});
+      tiles.push({k:'angle de la direction',v:DEG(ang)});
+      tiles.push({k:'écart à 45°',v:DEG(ec),c:ec<0.05?'pos':''});
+      tiles.push({k:'poids relatif de v₂ : (2/3)ᵏ',v:SL.fmt(Math.pow(2/3,k),4)});
+    }
+    readouts(out,tiles);
+    btns.forEach((b,i)=>b.setAttribute('aria-pressed',String(i===cur)));
+    bA.disabled=k>=KMAX;
+  }
+  ready=true;draw();
+})();
+
+/* ===== Figure 3 — le spectre glisse, le conditionnement chute ===== */
+(function(){
+  const Pa=SL.plot(document.getElementById('f3plot'),{x:[0,20],y:[0,95],w:600,h:250,
+    xt:[0,5,10,15,20],yt:[0,20,40,60,80],xl:'λ ajouté',yl:'valeur propre'});
+  Pa.fn(l=>l,'sl-c3');Pa.fn(l=>70+l,'sl-c1');
+  Pa.label(19.5,80,'grande = 70 + λ','sl-c1','end');
+  Pa.label(19.5,5,'petite = λ','sl-c3','end');
+  const Pb=SL.plot(document.getElementById('f3kplot'),{x:[0,20],y:[0,120],w:600,h:220,
+    xt:[0,5,10,15,20],yt:[20,40,60,80,100],xl:'λ ajouté',yl:''});
+  Pb.fn(l=>l>1e-9?(70+l)/l:NaN,'sl-c2',500);
+  Pb.label(19.5,14,'conditionnement κ = (70 + λ) / λ','sl-c2','end');
+  const out=document.getElementById('f3out'), sh=document.getElementById('f3sliders');
+  const PRS=[['λ = 0',0],['λ = 0,01',0.01],['λ = 1',1],['λ = 10',10],['λ = 20',20]];
+  let ready=false;
+  const sL=SL.slider(sh,{label:'λ',min:0,max:20,step:'any',value:1,fmt:v=>SL.fmt(v,3)},()=>draw());
+  const btns=PRS.map(p=>{const b=SL.h('button','tb',document.getElementById('f3presets'),p[0]);
+    b.onclick=()=>sL.set(p[1]);return b;});
+  function draw(){
+    if(!ready)return;
+    const l=sL.get(),z=l<1e-9,k=z?Infinity:(70+l)/l;
+    Pa.clear();Pb.clear();
+    Pa.vline(l,'');
+    Pa.seg(l,l,l,70+l,'gain');
+    Pa.dot(l,l,z?'sl-c3 hollow':'sl-c3',6);
+    Pa.dot(l,70+l,'sl-c1',6);
+    Pa.text(l+(l>13?-0.5:0.5),(70+2*l)/2,'écart 70, constant','',l>13?'end':'start');
+    Pb.vline(l,'');
+    if(k<=114)Pb.dot(l,k,'sl-c2',6);
+    else{Pb.dot(l,114,'sl-c2 hollow',6);Pb.text(l+1.0,98,'κ = '+(z?'∞':SL.fmt(k,0))+' — hors cadre','sl-c2','start');}
+    readouts(out,[
+      {k:'λ ajouté',v:SL.fmt(l,3)},
+      {k:'petite valeur propre',v:SL.fmt(l,3),c:z?'zero':'pos'},
+      {k:'grande valeur propre',v:SL.fmt(70+l,3),c:'pos'},
+      {k:'conditionnement κ',v:z?'∞ — non inversible':SL.fmt(k,1),c:z?'zero':'pos'},
+      {k:'direction plate',v:'(2 ; −1) — inchangée'},
+      {k:'direction raide',v:'(1 ; 2) — inchangée'}]);
+    btns.forEach((b,i)=>b.setAttribute('aria-pressed',String(Math.abs(PRS[i][1]-l)<1e-9)));
+  }
+  ready=true;draw();
+})();
+})();
+</script>
+</body>
+</html>
