@@ -106,8 +106,29 @@ SL.plane=function(host,o){
   el('rect',{x:0,y:0,width:1,height:1,class:'sl-unit','vector-effect':'non-scaling-stroke'},world);
   (o.vectors||[]).forEach(v=>el('line',{x1:0,y1:0,x2:v[0],y2:v[1],class:'sl-vec '+(v[2]||''),'vector-effect':'non-scaling-stroke'},world));
   const fixed=el('g',{class:'sl-fixed'},root);(o.fixed||[]).forEach(v=>el('line',{x1:-5*v[0],y1:-5*v[1],x2:5*v[0],y2:5*v[1],class:'sl-fix '+(v[2]||''),'vector-effect':'non-scaling-stroke'},fixed));
+  /* Écrasement : un navigateur ne peint RIEN d'un groupe dont la matrice est singulière.
+     Or det = 0 est justement le cas intéressant (noyau, rang déficient). On applique la
+     matrice telle quelle, et on dessine en plus l'image du carré unité — un segment, puisque
+     tout s'aplatit sur une droite — hors de `world`, donc épargné par la matrice. */
+  const flat=el('line',{class:'sl-vec sl-flat','vector-effect':'non-scaling-stroke',
+    stroke:'currentColor','stroke-width':3,'stroke-linecap':'round'},root);
+  flat.style.display='none';
+  function collapse(M){
+    const det=M[0]*M[3]-M[1]*M[2];
+    if(Math.abs(det)>1e-6){flat.style.display='none';return;}
+    /* images des quatre sommets du carré unité ; colinéaires puisque det = 0 */
+    const pts=[[0,0],[M[0],M[2]],[M[1],M[3]],[M[0]+M[1],M[2]+M[3]]];
+    let dir=pts.reduce((a,b)=>(b[0]*b[0]+b[1]*b[1])>(a[0]*a[0]+a[1]*a[1])?b:a,[0,0]);
+    const n=Math.hypot(dir[0],dir[1]);
+    if(n<1e-12){dir=[1,0];}else{dir=[dir[0]/n,dir[1]/n];}
+    const ts=pts.map(q=>q[0]*dir[0]+q[1]*dir[1]);
+    const t0=Math.min(...ts),t1=Math.max(...ts);
+    flat.setAttribute('x1',t0*dir[0]);flat.setAttribute('y1',t0*dir[1]);
+    flat.setAttribute('x2',t1*dir[0]);flat.setAttribute('y2',t1*dir[1]);
+    flat.style.display='';
+  }
   let cur=[1,0,0,1];
-  function apply(M){world.setAttribute('transform',`matrix(${M[0]} ${M[2]} ${M[1]} ${M[3]} 0 0)`);cur=M;}
+  function apply(M){world.setAttribute('transform',`matrix(${M[0]} ${M[2]} ${M[1]} ${M[3]} 0 0)`);collapse(M);cur=M;}
   function to(M){if(SL.reduced){apply(M);return;}const a=cur.slice(),t0=performance.now();const step=t=>{let u=Math.min(1,(t-t0)/850);u=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;apply(a.map((x,i)=>x+(M[i]-x)*u));if(u<1)requestAnimationFrame(step);};requestAnimationFrame(step);}
   return {to,apply,svg};
 };
