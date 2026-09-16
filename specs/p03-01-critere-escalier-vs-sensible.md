@@ -24,7 +24,7 @@ Ce qui a cassé pour Salah (séance du 16/09) : argument produit une fois (Q8.1)
 
 ## Questions pour la revue
 
-- **Ordre des règles CSS du gold standard** : `@media(max-width:900px){… .side{position:static …}}` est déclaré *avant* `.side{position:sticky …}`. À spécificité égale, la dernière règle gagne : la barre latérale reste `sticky` sur téléphone au lieu de repasser dans le flux. Sans conséquence sur le débordement horizontal (la grille `.wrap`, elle, se replie bien sur une colonne), mais la barre devient une boîte scrollable haute de 100vh. Le correctif tient en un échange de deux lignes ; non appliqué ici parce que le gold standard ne se réécrit pas sans décision — et toutes les sheets produites en recopient le CSS tel quel, donc elles héritent du même comportement.
+- **Ordre des règles CSS du gold standard** — corrigé le 16/09, validé 16/09 : `@media(max-width:900px){… .side{position:static …}}` est déclaré *avant* `.side{position:sticky …}`. À spécificité égale, la dernière règle gagne : la barre latérale reste `sticky` sur téléphone au lieu de repasser dans le flux. Sans conséquence sur le débordement horizontal (la grille `.wrap`, elle, se replie bien sur une colonne), mais la barre devient une boîte scrollable haute de 100vh. Les deux lignes ont été échangées dans le gold standard, dans `template.html` et, par propagation, dans les douze sheets du standard « tableau noir » : la barre repasse en `static` sous 900 px. Le runner `tools/test_walkthroughs.mjs` le vérifie désormais (sticky à 1280 px, static à 390 px, zéro débordement).
 
 - **Convention de régularisation, fixée le 16/09** — validé 16/09. L'objectif est `L(θ) + λ·pen(θ)`,
   loss **sans ½**. Avec `L(θ) = (θ − 1)²` : L2 → θ̂ = 1/(1 + λ), L1 → θ̂ = max(0, 1 − λ/2), zéro exact

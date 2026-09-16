@@ -72,13 +72,13 @@ for (const path of WALKTHROUGHS) {
   // mesure la propriété qui porte le repli, selon le rail trouvé.
   const sel = (await page.$('nav.echelle')) ? 'nav.echelle'
             : (await page.$('aside.side')) ? 'aside.side' : null;
-  // « papier » : le rail passe à display:none. « tableau noir » : il reste
-  // affiché mais la grille à deux colonnes se replie sur une seule — c'est
-  // cette bascule-là qu'on mesure, pas la position du rail.
-  const read = (s) => page.$eval(s, (n) => (
-    n.matches('nav.echelle') ? getComputedStyle(n).display
-      : getComputedStyle(n.closest('.wrap')).gridTemplateColumns.split(' ').length + ' col.'
-  ));
+  // « papier » : le rail passe à display:none sous 1100px. « tableau noir » :
+  // il quitte le sticky et rentre dans le flux sous 900px. On lit dans chaque
+  // cas la propriété qui porte le repli.
+  const read = (s) => page.$eval(s, (n) => {
+    const cs = getComputedStyle(n);
+    return n.matches('nav.echelle') ? cs.display : cs.position;
+  });
   const railWide = sel ? await read(sel) : 'absent';
   await page.setViewportSize({ width: 390, height: 844 });
   await page.waitForTimeout(150);
@@ -87,7 +87,7 @@ for (const path of WALKTHROUGHS) {
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth
   );
   const railOk = sel === 'nav.echelle' ? (railWide !== 'none' && railNarrow === 'none')
-               : sel === 'aside.side' ? (railWide === '2 col.' && railNarrow === '1 col.')
+               : sel === 'aside.side' ? (railWide === 'sticky' && railNarrow === 'static')
                : false;
 
   const ok = !errors.length && !silent.length && seen > 0 && railOk && overflow <= 0;
