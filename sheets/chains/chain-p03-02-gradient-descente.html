@@ -1,0 +1,530 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gradient et descente — chaîne</title>
+<meta name="sheet" content="series=chain;part=03;number=02;status=v1">
+<meta name="part" content="03 · Critère et descente">
+<meta name="subtitle" content="la porte d'entrée de la Phase 2 : ce que voit un optimiseur">
+<meta name="prereq" content="p04-01,p04-02,p08-01">
+<meta name="anki" content="analyse::gradient-jacobienne,ml::optimisation,ml::learning-rate,algebre::eigen">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ---- additions propres à cette chaîne ---- */
+.sl-lev{fill:none;stroke:rgba(34,48,43,.3);stroke-width:1.1}
+.sl-fn.dash{stroke-dasharray:6 4}
+.sl-seg.traj{stroke:var(--red);stroke-width:1.6}
+.fig .sq .sl-plot{max-width:440px;min-width:320px}
+.card .note{background:var(--cardsoft);border-radius:3px;padding:8px 12px;margin:8px 0;font-size:14.5px}
+.eq .van{opacity:.45;text-decoration:line-through}
+.cap .kp{color:var(--pen);font-weight:600}.cap .kv{color:#6B46C1;font-weight:600}.cap .kr{color:var(--red);font-weight:600}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 03 · Critère et descente › chaîne 02</div>
+  <h1>Le <span>gradient</span> et le <span>pas</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Pourquoi −∇<span class="m">L</span> et pas une autre direction ? Pourquoi un pas trop grand fait diverger ? Quand résout-on d'un coup, quand itère-t-on ? <b>Un optimiseur ne voit de <span class="m">L</span> que sa valeur et sa pente au point où il est : la direction, la longueur du pas et le nombre d'itérations se déduisent tous les trois de la courbure.</b> Deux exemples fil rouge : la parabole <span class="m">L</span>(<span class="m">θ</span>) = (<span class="m">θ</span> − 1)², et le bol allongé du ridge colinéaire de <a href="chain-p02-02-prior-penalite.html">p02-02</a>.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="../../map.html#p04-01">p04-01 · Produit scalaire, Cauchy-Schwarz</a></li>
+    <li><a href="../../map.html#p04-02">p04-02 · Valeurs propres d'une symétrique</a></li>
+    <li><a href="../../map.html#p08-01">p08-01 · Gradient et jacobienne</a></li>
+    <li><a href="chain-p02-02-prior-penalite.html">p02-02 · Du prior à la pénalité</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>analyse::gradient-jacobienne</code><code>ml::optimisation</code><code>ml::learning-rate</code><code>algebre::eigen</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-01-une-seule-descente.html">Une seule descente</a></li>
+    <li><a href="../bridges/bridge-06-convexite-forme-fermee.html">Convexité et forme fermée</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>Produit scalaire et Cauchy-Schwarz</b> (<a href="../../map.html#p04-01">p04-01</a>) : |⟨<span class="m">g</span>, <span class="m">u</span>⟩| ≤ ‖<span class="m">g</span>‖·‖<span class="m">u</span>‖, avec égalité si et seulement si <span class="m">u</span> est colinéaire à <span class="m">g</span>. C'est tout l'argument du pas 2.</li>
+      <li><b>Gradient comme application linéaire locale</b> (<a href="../../map.html#p08-01">p08-01</a>) : <span class="m">L</span>(<span class="m">θ</span> + <span class="m">δ</span>) = <span class="m">L</span>(<span class="m">θ</span>) + ⟨∇<span class="m">L</span>(<span class="m">θ</span>), <span class="m">δ</span>⟩ + <span class="up">o</span>(‖<span class="m">δ</span>‖). Le gradient est la meilleure approximation affine, rien de plus : il ne dit rien à distance.</li>
+      <li><b>Valeurs propres d'une matrice symétrique</b> (<a href="../../map.html#p04-02">p04-02</a>) : base orthonormée de vecteurs propres, <span class="m">Av</span><sub><span class="m">i</span></sub> = <span class="m">λ</span><sub><span class="m">i</span></sub><span class="m">v</span><sub><span class="m">i</span></sub>. Dans cette base un système couplé devient <span class="m">p</span> équations indépendantes — le pas 6 ne fait que ça.</li>
+      <li><b>Le bol du ridge</b> (<a href="chain-p02-02-prior-penalite.html">p02-02</a>) : jeu colinéaire, <span class="m">X</span><sup>⊤</sup><span class="m">X</span> = [[14, 28], [28, 56]] de valeurs propres 0 et 70 ; + <span class="m">λI</span> avec <span class="m">λ</span> = 1 donne [[15, 28], [28, 57]], valeurs propres <b>1</b> et <b>71</b>. Ici on ne le rejustifie pas : on s'en sert comme bol à descendre.</li>
+      <li><b>Un critère n'informe que par sa pente</b> (<a href="chain-p03-01-critere-escalier-vs-sensible.html">p03-01</a>, la chaîne sœur) : là où la dérivée est nulle, rien ne bouge. Cette chaîne-ci suppose la pente non nulle et s'occupe de ce qu'on en fait.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span><span class="m">L</span> est dérivable, et on ne la voit que <b>localement</b> : à chaque itération l'optimiseur reçoit <span class="m">L</span>(<span class="m">θ</span>) et ∇<span class="m">L</span>(<span class="m">θ</span>), jamais la fonction entière.</span>
+      <b>H2</b><span>Le pas <span class="m">η</span> est <b>fixe</b> : aucune recherche linéaire, aucune mémoire de direction. Ce qui relâche cette hypothèse est nommé au pas 7 et appartient à la Phase 2.</span>
+      <b>H3</b><span>Pour toute convergence <b>chiffrée</b>, <span class="m">L</span> est quadratique : <span class="m">L</span>(<span class="m">θ</span>) = ½ <span class="m">θ</span><sup>⊤</sup><span class="m">Aθ</span> − <span class="m">b</span><sup>⊤</sup><span class="m">θ</span>, avec <span class="m">A</span> symétrique définie positive. Sans cette hypothèse les régimes restent vrais localement, les nombres ne le sont plus.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor</h3>
+    <p>Un optimiseur est aveugle. Il est posé en <span class="m">θ</span>, on lui donne deux nombres — la valeur et la pente — et il doit produire le point suivant. Deux décisions, donc : une <b>direction</b> (un vecteur unitaire <span class="m">u</span>) et une <b>longueur</b> (<span class="m">η</span>). Une troisième question suit : combien de fois.</p>
+    <div class="eq"><span class="m">θ</span><sub><span class="m">k</span>+1</sub> = <span class="m">θ</span><sub><span class="m">k</span></sub> + <span class="m">η</span>·<span class="m">u</span><sub><span class="m">k</span></sub></div>
+    <p class="say">« Un optimiseur ne connaît de la loss que sa valeur et sa pente au point courant, donc il doit en tirer une direction et une longueur, donc chacune des règles qui suivent répond à l'une de ces deux questions. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les deux bols fil rouge</div>
+    <p><b>1D.</b> <span class="m">L</span>(<span class="m">θ</span>) = (<span class="m">θ</span> − 1)², minimum en 1, <b>courbure</b> <span class="m">a</span> = <span class="m">L</span>″ = 2. Au point de départ <span class="m">θ</span><sub>0</sub> = 3,5 : <span class="m">L</span> = 6,25 et ∇<span class="m">L</span> = 2(3,5 − 1) = 5.</p>
+    <p><b>2D.</b> Le ridge colinéaire de <a href="chain-p02-02-prior-penalite.html">p02-02</a> à <span class="m">λ</span> = 1 :</p>
+    <div class="eq"><span class="m">A</span> = <span class="m">X</span><sup>⊤</sup><span class="m">X</span> + <span class="m">I</span> = [[15, 28], [28, 57]] &nbsp;·&nbsp; <span class="m">b</span> = <span class="m">X</span><sup>⊤</sup><span class="m">y</span> = (14, 28) &nbsp;·&nbsp; ∇<span class="m">L</span> = <span class="m">Aθ</span> − <span class="m">b</span></div>
+    <p>En <span class="m">θ</span> = (0 ; 0) : <span class="m">L</span> = 0 et ∇<span class="m">L</span> = (−14 ; −28). L'optimiseur ne sait pas encore que la solution est (0,197 ; 0,394), ni qu'elle est atteignable d'un coup.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Pourquoi −∇<span class="m">L</span> <span class="tag tronc">tronc</span></h3>
+    <p>La direction se lit dans le développement au premier ordre. À longueur fixée <span class="m">ε</span>, le gain d'un pas dans la direction unitaire <span class="m">u</span> est le produit scalaire du gradient avec <span class="m">u</span> :</p>
+    <div class="eq"><span class="m">L</span>(<span class="m">θ</span> + <span class="m">εu</span>) − <span class="m">L</span>(<span class="m">θ</span>) = <span class="m">ε</span>⟨∇<span class="m">L</span>, <span class="m">u</span>⟩ + <span class="up">o</span>(<span class="m">ε</span>)</div>
+    <p>Cauchy-Schwarz borne ce produit par ‖∇<span class="m">L</span>‖ en valeur absolue, avec égalité seulement si <span class="m">u</span> est colinéaire à ∇<span class="m">L</span>. La baisse la plus forte est donc en <span class="m">u</span> = −∇<span class="m">L</span>/‖∇<span class="m">L</span>‖, et une direction orthogonale au gradient ne change rien au premier ordre : c'est la ligne de niveau.</p>
+    <p>« Plus forte pente » est relatif à la norme euclidienne. Changer de norme change la direction — c'est le préconditionnement du pas 6.</p>
+    <p class="say">« La variation au premier ordre est le produit scalaire du gradient avec la direction, donc Cauchy-Schwarz la rend extrémale quand la direction est colinéaire au gradient, donc la plus forte baisse par pas unitaire est en moins gradient. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — quatre directions au même point</div>
+    <p>Gradient ∇<span class="m">L</span> = (3 ; 4), de norme 5. Pour chaque direction unitaire, la variation au premier ordre par pas de longueur 1 :</p>
+    <table>
+      <tr><th>direction <span class="m">u</span></th><th>⟨∇<span class="m">L</span>, <span class="m">u</span>⟩</th><th>lecture</th></tr>
+      <tr><td>(1 ; 0)</td><td>+3</td><td>ça monte, mal</td></tr>
+      <tr><td>(0 ; 1)</td><td>+4</td><td>ça monte, plus</td></tr>
+      <tr><td>(0,6 ; 0,8)</td><td>+5</td><td>montée maximale = ‖∇<span class="m">L</span>‖</td></tr>
+      <tr><td>(0,8 ; −0,6)</td><td>0</td><td>ligne de niveau : rien ne bouge</td></tr>
+      <tr class="hl"><td>(−0,6 ; −0,8)</td><td><b>−5</b></td><td>baisse maximale = −‖∇<span class="m">L</span>‖</td></tr>
+    </table>
+    <p>Sur le bol 2D en (0 ; 0) : ∇<span class="m">L</span> = (−14 ; −28), donc −∇<span class="m">L</span> = 14·(1 ; 2), de norme 31,3. La descente part exactement dans la direction (1 ; 2) — celle où vit tout le signal <span class="m">X</span><sup>⊤</sup><span class="m">y</span>.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Le pas <span class="m">η</span> : trois régimes</h3>
+    <p>La direction est fixée ; reste la longueur. Sur une parabole de courbure <span class="m">a</span>, <span class="m">L</span>(<span class="m">θ</span>) = ½<span class="m">a</span>(<span class="m">θ</span> − <span class="m">m</span>)², le gradient vaut <span class="m">a</span>(<span class="m">θ</span> − <span class="m">m</span>) et le pas s'écrit entièrement sur l'écart au minimum :</p>
+    <div class="eq"><span class="m">θ</span><sup>+</sup> − <span class="m">m</span> = (1 − <span class="m">ηa</span>)(<span class="m">θ</span> − <span class="m">m</span>) &nbsp;⇒&nbsp; convergence ⟺ |1 − <span class="m">ηa</span>| &lt; 1 ⟺ 0 &lt; <span class="m">η</span> &lt; 2/<span class="m">a</span></div>
+    <p>Le même facteur à chaque pas : l'écart décroît <b>géométriquement</b>. Son signe donne le régime — positif, la descente arrive par en dessous sans dépasser ; négatif, elle saute de l'autre côté à chaque pas ; de module supérieur à 1, elle saute de plus en plus loin.</p>
+    <p class="say">« L'écart au minimum est multiplié par un moins êta fois la courbure à chaque pas, donc il tend vers zéro si et seulement si ce facteur est de module inférieur à un, donc le pas doit rester sous deux sur la courbure. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — <span class="m">a</span> = 2, départ en <span class="m">θ</span><sub>0</sub> = 3,5 (écart 2,5)</div>
+    <table>
+      <tr><th><span class="m">η</span></th><th>1 − <span class="m">ηa</span></th><th>régime</th><th><span class="m">θ</span> après 8 pas</th></tr>
+      <tr><td>0,25</td><td>+0,5</td><td>monotone</td><td>1,0098</td></tr>
+      <tr><td>0,5</td><td>0</td><td>un seul pas suffit (<span class="m">η</span> = 1/<span class="m">a</span>)</td><td>1</td></tr>
+      <tr><td>0,9</td><td>−0,8</td><td>oscille, converge</td><td>1,419</td></tr>
+      <tr><td>1</td><td>−1</td><td>cycle : 3,5 ↔ −1,5, jamais</td><td>3,5</td></tr>
+      <tr class="hl"><td>1,1</td><td>−1,2</td><td><b>diverge</b></td><td>11,75</td></tr>
+    </table>
+    <p>Le seuil est 2/<span class="m">a</span> = <b>1</b>, et il ne dépend ni du point de départ ni du nombre de pas : c'est une propriété de la courbure seule. À <span class="m">η</span> = 1,1, huit pas suffisent à quadrupler l'écart initial, et trente le portent à 6·10<sup>4</sup>.</p>
+    <div class="note">Un learning rate n'a pas d'unité universelle : il se lit toujours <b>relativement à la courbure</b>. Doubler l'échelle des features quadruple <span class="m">a</span> et divise par quatre le pas admissible.</div>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — les trois régimes du pas</div>
+    <div id="f1plot" class="wide"></div>
+    <div id="f1sliders"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Descente sur <span class="m">L</span>(<span class="m">θ</span>) = (<span class="m">θ</span> − 1)², départ en 3,5. Monte <span class="m">η</span> lentement : jusqu'à 0,5 les points arrivent <b>par un seul côté</b> ; entre 0,5 et 1 ils sautent d'un bord à l'autre en se rapprochant ; au-delà de <span class="kr">1 = 2/<span class="m">a</span></span> ils s'écartent et <b>quittent le cadre</b> — le readout dit à quel pas. Le facteur affiché, 1 − <span class="m">ηa</span>, est le seul nombre qui décide.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Convexité : arriver au bon endroit <span class="tag tronc">tronc</span></h3>
+    <p>Convexe ⇒ tout minimum local est global ; strictement convexe ⇒ il n'y en a qu'un. La descente ne peut plus se tromper d'endroit.</p>
+    <p>Celle de la log-loss en <span class="m">β</span> tient à deux étages, à écrire séparément. Avec <span class="m">z</span> = <span class="m">β</span><sup>⊤</sup><span class="m">x</span> et <span class="m">p</span> = <span class="m">σ</span>(<span class="m">z</span>) :</p>
+    <div class="eq">∂<span class="m">ℓ</span>/∂<span class="m">β</span><sub><span class="m">j</span></sub> = (<span class="up">d</span><span class="m">ℓ</span>/<span class="up">d</span><span class="m">z</span>)·(∂<span class="m">z</span>/∂<span class="m">β</span><sub><span class="m">j</span></sub>) = (<span class="m">p</span> − <span class="m">y</span>)·<span class="m">x</span><sub><span class="m">j</span></sub></div>
+    <div class="eq">∂²<span class="m">ℓ</span>/∂<span class="m">β</span><sub><span class="m">j</span></sub>∂<span class="m">β</span><sub><span class="m">k</span></sub> = (<span class="up">d</span>²<span class="m">ℓ</span>/<span class="up">d</span><span class="m">z</span>²)·<span class="m">x</span><sub><span class="m">j</span></sub><span class="m">x</span><sub><span class="m">k</span></sub> + (<span class="up">d</span><span class="m">ℓ</span>/<span class="up">d</span><span class="m">z</span>)·<span class="van">∂²<span class="m">z</span>/∂<span class="m">β</span><sub><span class="m">j</span></sub>∂<span class="m">β</span><sub><span class="m">k</span></sub></span> = <span class="m">p</span>(1 − <span class="m">p</span>)·<span class="m">x</span><sub><span class="m">j</span></sub><span class="m">x</span><sub><span class="m">k</span></sub></div>
+    <p>Le second terme s'annule, et il faut l'écrire pour le voir : <span class="m">z</span> est affine, sa dérivée seconde est nulle. Reste <span class="m">H</span> = Σ<sub><span class="m">i</span></sub> <span class="m">p</span><sub><span class="m">i</span></sub>(1 − <span class="m">p</span><sub><span class="m">i</span></sub>)<span class="m">x</span><sub><span class="m">i</span></sub><span class="m">x</span><sub><span class="m">i</span></sub><sup>⊤</sup> ⪰ 0.</p>
+    <p class="say">« La dérivée seconde de la log-loss en z vaut p fois un moins p, donc en composant avec z affine le second étage disparaît et la hessienne en bêta vaut la somme des p(1 − p) x x transposé, donc elle est semi-définie positive et tout minimum trouvé est global. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — convexe, et son contre-exemple</div>
+    <p>Log-loss en <span class="m">z</span> : <span class="m">ℓ</span>″ = <span class="m">p</span>(1 − <span class="m">p</span>), maximale en <span class="m">z</span> = 0 (0,25), jamais nulle, écrasée aux extrêmes.</p>
+    <p>Erreur quadratique sur la probabilité (<span class="m">y</span> = 1), <span class="m">g</span>(<span class="m">z</span>) = (1 − <span class="m">p</span>)², la loss du contre-exemple de <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4</a> : deux étages encore, <span class="m">g</span>′ = −2<span class="m">p</span>(1 − <span class="m">p</span>)² puis <span class="m">g</span>″ = −2<span class="m">p</span>(1 − <span class="m">p</span>)²(1 − 3<span class="m">p</span>).</p>
+    <table>
+      <tr><th><span class="m">z</span></th><th><span class="m">p</span> = <span class="m">σ</span>(<span class="m">z</span>)</th><th><span class="m">ℓ</span>″ (log-loss)</th><th><span class="m">g</span>″ (quadratique)</th></tr>
+      <tr class="hl"><td>−2</td><td>0,119</td><td>+0,105</td><td><b>−0,119</b></td></tr>
+      <tr><td>−0,693</td><td>1/3</td><td>+0,222</td><td>0</td></tr>
+      <tr><td>0</td><td>0,5</td><td>+0,250</td><td>+0,125</td></tr>
+      <tr><td>+2</td><td>0,881</td><td>+0,105</td><td>+0,041</td></tr>
+    </table>
+    <p><span class="m">g</span>″ change de signe en <span class="m">p</span> = 1/3, soit <span class="m">z</span> = −<span class="up">ln</span> 2 ≈ −0,693 : la loss quadratique sur la probabilité est <b>non convexe</b> là où le point est mal classé. La log-loss ne l'est jamais. La descente arrive donc au bon endroit ; à quelle vitesse est l'affaire du pas 6.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — une loss convexe et une qui ne l'est pas</div>
+    <div id="f2plot" class="wide"></div>
+    <div id="f2sliders"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Les deux pertes d'un point de classe <span class="m">y</span> = 1, en fonction du score <span class="m">z</span>. Déplace <span class="m">z</span> : la <span class="kp">log-loss</span> a une dérivée seconde toujours strictement positive — le bol est partout un bol. La <span class="kv">quadratique sur la probabilité</span> (pointillé) passe en <b>concave</b> à gauche du trait vertical, en <span class="m">z</span> = −<span class="up">ln</span> 2 : là, la descente longe une bosse au lieu de descendre un bol.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Solution en forme fermée, ou itération</h3>
+    <p>Minimiser, c'est annuler le gradient : ∇<span class="m">L</span>(<span class="m">θ</span>) = 0 est un système de <span class="m">p</span> équations à <span class="m">p</span> inconnues. Tout tient à la nature de ce système.</p>
+    <div class="eq"><b>linéaire en <span class="m">θ</span></b> : (<span class="m">X</span><sup>⊤</sup><span class="m">X</span> + <span class="m">λI</span>)<span class="m">θ</span> = <span class="m">X</span><sup>⊤</sup><span class="m">y</span> &nbsp;⇒&nbsp; <span class="up">solution en forme fermée</span></div>
+    <div class="eq"><b>non linéaire</b> : Σ<sub><span class="m">i</span></sub> (<span class="m">σ</span>(<span class="m">x</span><sub><span class="m">i</span></sub><sup>⊤</sup><span class="m">β</span>) − <span class="m">y</span><sub><span class="m">i</span></sub>)<span class="m">x</span><sub><span class="m">i</span></sub> = 0 &nbsp;⇒&nbsp; <span class="up">on itère</span></div>
+    <p><span class="m">σ</span> emballe <span class="m">β</span> dans une exponentielle : aucune factorisation ne l'en sort. On descend alors le gradient — ou on résout le système <i>linéarisé</i> à chaque itération, c'est Newton, et il faut la hessienne.</p>
+    <p class="say">« Annuler le gradient donne un système d'équations, donc s'il est linéaire en thêta une factorisation le résout d'un coup, donc sinon on itère, et la convexité du pas précédent garantit que cette itération vise le bon point. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — une résolution contre trente itérations</div>
+    <p>Ridge, <span class="m">λ</span> = 1 : le système est [[15, 28], [28, 57]]<span class="m">θ</span> = (14 ; 28), de déterminant 855 − 784 = <b>71</b>.</p>
+    <div class="eq"><span class="hat"><span class="m">θ</span></span><sub>1</sub> = (57·14 − 28·28)/71 = 14/71 = <b>0,197</b> &nbsp;·&nbsp; <span class="hat"><span class="m">θ</span></span><sub>2</sub> = (15·28 − 28·14)/71 = 28/71 = <b>0,394</b></div>
+    <p>Une résolution, zéro itération, zéro learning rate à régler. La logistique sur les mêmes données n'offre pas cette sortie : <span class="hat"><span class="m">β</span></span> ne s'écrit pas, il se calcule.</p>
+    <table>
+      <tr><th></th><th>OLS / ridge</th><th>logistique</th></tr>
+      <tr><td>∇<span class="m">L</span> = 0</td><td>linéaire</td><td>non linéaire (<span class="m">σ</span>)</td></tr>
+      <tr><td>solution</td><td>en forme fermée</td><td>itérative</td></tr>
+      <tr><td>coût</td><td><span class="up">O</span>(<span class="m">p</span>³) une fois</td><td><span class="up">O</span>(<span class="m">np</span>) par pas</td></tr>
+      <tr><td>à régler</td><td>rien</td><td><span class="m">η</span>, nombre de pas</td></tr>
+    </table>
+    <p>« En forme fermée » qualifie la <b>solution</b>, pas le système : le système, lui, est linéaire. Et l'existence d'une forme fermée ne rend pas l'itération inutile — voir la dernière limite.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Conditionnement : le pas d'un seul pour des courbures différentes <span class="tag tronc">tronc</span></h3>
+    <p>Quadratique : ∇<span class="m">L</span> = <span class="m">Aθ</span> − <span class="m">b</span>, et sur l'erreur <span class="m">e</span> = <span class="m">θ</span> − <span class="m">A</span><sup>−1</sup><span class="m">b</span> le pas s'écrit <span class="m">e</span><sup>+</sup> = (<span class="m">I</span> − <span class="m">ηA</span>)<span class="m">e</span>. Dans la base propre de <span class="m">A</span> les coordonnées se séparent, et chacune retrouve le pas 3 avec sa propre courbure :</p>
+    <div class="eq"><span class="m">e</span><sub><span class="m">i</span></sub><sup>+</sup> = (1 − <span class="m">ηλ</span><sub><span class="m">i</span></sub>)<span class="m">e</span><sub><span class="m">i</span></sub> &nbsp;·&nbsp; <span class="m">η</span> &lt; 2/<span class="m">λ</span><sub><span class="up">max</span></sub> &nbsp;⇒&nbsp; 1 − <span class="m">ηλ</span><sub><span class="up">min</span></sub> &gt; 1 − 2/<span class="m">κ</span>, &nbsp; <span class="m">κ</span> = <span class="m">λ</span><sub><span class="up">max</span></sub>/<span class="m">λ</span><sub><span class="up">min</span></sub></div>
+    <p>Un seul <span class="m">η</span> pour toutes les directions : il est <b>borné par la plus raide</b>, et c'est la plus plate qui paie. Sa contraction ne descend pas sous 1 − 2/<span class="m">κ</span>, donc le nombre de pas croît comme <span class="m">κ</span>. Le zigzag est la même chose vue de face : le gradient pointe vers le mur, pas vers le fond de la vallée.</p>
+    <p class="say">« Le pas admissible est borné par la direction la plus raide, donc la direction la plus plate se contracte d'au mieux un moins deux sur kappa, donc le nombre d'itérations croît comme le conditionnement. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le bol du ridge, conditionnement 71</div>
+    <p><span class="m">A</span> = [[15, 28], [28, 57]] : valeurs propres <b>71</b> (vecteur (1 ; 2)/√5, le mur) et <b>1</b> (vecteur (−2 ; 1)/√5, la vallée — la direction de colinéarité que <span class="m">λI</span> a relevée de 0 à 1 en <a href="chain-p02-02-prior-penalite.html">p02-02</a>).</p>
+    <table>
+      <tr><th><span class="m">η</span></th><th>1 − <span class="m">ηλ</span><sub>max</sub></th><th>1 − <span class="m">ηλ</span><sub>min</sub></th><th>pas pour ÷ e</th><th>pas pour ÷ 100</th></tr>
+      <tr><td>1/71 = 0,0141</td><td>0</td><td>0,9859</td><td>71</td><td>325</td></tr>
+      <tr class="hl"><td>2/72 = 0,0278</td><td>−0,972</td><td>0,9722</td><td><b>36</b></td><td><b>163</b></td></tr>
+      <tr><td>2/71 = 0,0282</td><td>−1 (cycle)</td><td>0,9718</td><td>35</td><td>161</td></tr>
+      <tr><td>0,03 &gt; 2/71</td><td>−1,13</td><td>0,970</td><td colspan="2">diverge sur le mur</td></tr>
+    </table>
+    <p>Le meilleur pas fixe est 2/(<span class="m">λ</span><sub>min</sub> + <span class="m">λ</span><sub>max</sub>), et sa contraction vaut (<span class="m">κ</span> − 1)/(<span class="m">κ</span> + 1) = 70/72 : on ne descend pas sous <b>~<span class="m">κ</span>/2 pas</b> par facteur <span class="m">e</span>. Face à la résolution unique du pas 5, ce bol à deux inconnues demande déjà 163 itérations pour deux décimales.</p>
+    <div class="note">Standardiser les features, c'est changer <span class="m">A</span> pour rapprocher ses valeurs propres. C'est du <b>préconditionnement</b> : la même descente sur un bol plus rond.</div>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — le zigzag, et la vallée qu'on remonte à peine</div>
+    <div id="f3plot" class="wide sq"></div>
+    <div class="sl-ctl" id="f3presets"></div>
+    <div id="f3sliders"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Bol <span class="m">A</span> = <span class="up">diag</span>(1, <span class="m">κ</span>), lignes de niveau en ellipses, départ en (3 ; 3), pas <span class="m">η</span> = 1,8/<span class="m">κ</span> (soit 90 % du maximum admissible) et <span class="kr">40 itérations tracées</span>. À <span class="m">κ</span> = 1 le bol est rond et tout est fini en 20 pas. Monte <span class="m">κ</span> : la coordonnée raide continue de s'écraser du même facteur −0,8 — d'où le <b>zigzag vertical</b> — pendant que la coordonnée plate se contracte de 1 − 1,8/<span class="m">κ</span>, de plus en plus près de 1. À <span class="m">κ</span> = 71, après 40 pas, il reste encore un bon tiers du chemin.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Ce qui vient ensuite, et à quoi ça répond</h3>
+    <p>Trois objets de la Phase 2 sont à lire comme des réponses au pas 6 et à H2, pas comme des recettes. Ils sont nommés ici pour qu'ils arrivent déjà classés.</p>
+    <p class="say">« Le zigzag vient d'un pas unique imposé à des courbures différentes, donc amortir la direction ou donner un pas par coordonnée l'atténue, donc SGD, momentum et Adam sont des réponses au conditionnement et au coût, et rien d'autre. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Trois noms, trois réponses</div>
+    <table>
+      <tr><th>objet</th><th>ce qu'il relâche</th><th>à quel pas il répond</th></tr>
+      <tr><td><b>SGD</b></td><td>le gradient exact : il est estimé sur un minibatch</td><td>coût du pas 5 ; le prix est le bruit (limite 2)</td></tr>
+      <tr><td><b>momentum</b></td><td>l'absence de mémoire (H2)</td><td>le zigzag du pas 6</td></tr>
+      <tr><td><b>Adam</b></td><td>le pas unique (H2)</td><td>le <span class="m">κ</span> du pas 6, coordonnée par coordonnée</td></tr>
+    </table>
+    <p>Ce qui se sentira empiriquement en Phase 2 — une courbe de loss qui explose, un balayage de learning rate — est ce que les pas 3 et 6 viennent de dire par le calcul. Le seuil 2/courbure et le facteur <span class="m">κ</span> sont les deux nombres à reconnaître derrière ces courbes.</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>La descente n'a besoin ni de convexité ni d'un gradient exact pour <i>tourner</i>. Ce qui disparaît hors des hypothèses, ce sont les garanties et les nombres, pas l'algorithme.</p>
+    <p class="say">« Ni la convexité ni l'exactitude du gradient ne sont nécessaires pour que l'algorithme tourne, donc il tourne aussi là où plus rien n'est garanti, donc ce qu'on surveille change : la courbe de loss remplace la preuve. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>Non convexe.</b> Un réseau a des minima locaux, des plateaux et surtout des <b>points-selles</b>, où le gradient est nul sans qu'il s'agisse d'un minimum. Le pas 4 ne s'applique plus : on n'a plus de garantie sur le point d'arrivée, seulement sur le fait qu'on descend localement. Phase 2.</li>
+      <li><b>Gradient bruité.</b> Estimé sur un minibatch, il ne s'annule pas au minimum : l'erreur ne tend plus vers zéro mais vers un plancher fixé par la variance et par <span class="m">η</span>. Le pas doit décroître, ou la direction être moyennée.</li>
+      <li><b>Échelles hétérogènes.</b> Multiplier une colonne de <span class="m">X</span> par 10³ multiplie sa courbure dans <span class="m">X</span><sup>⊤</sup><span class="m">X</span> par 10⁶ : <span class="m">κ</span> explose et le pas admissible s'effondre, sans qu'aucun modèle n'ait changé. Standardiser n'est pas un rite, c'est un préconditionnement.</li>
+      <li><b>Forme fermée coûteuse.</b> (<span class="m">X</span><sup>⊤</sup><span class="m">X</span> + <span class="m">λI</span>)<sup>−1</sup> coûte <span class="up">O</span>(<span class="m">p</span>³) et demande de stocker <span class="m">p</span>² coefficients : à <span class="m">p</span> = 10⁴, c'est 10¹² opérations et 10⁸ nombres. On itère alors même là où le pas 5 autorise à résoudre.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>−∇<span class="m">L</span> est la direction de plus forte descente : la variation au premier ordre est ⟨∇<span class="m">L</span>, <span class="m">u</span>⟩, extrémale par Cauchy-Schwarz.</li>
+    <li>Pas <span class="m">η</span> : l'écart est multiplié par (1 − <span class="m">ηa</span>) à chaque itération ; convergence si et seulement si <span class="m">η</span> &lt; 2/courbure, sans oscillation sous 1/courbure.</li>
+    <li>Convexe ⇒ le minimum atteint est global ; strictement convexe ⇒ unique. La log-loss l'est en <span class="m">β</span> : <span class="m">z</span> affine, hessienne Σ <span class="m">p</span>(1 − <span class="m">p</span>)<span class="m">xx</span><sup>⊤</sup>.</li>
+    <li>∇<span class="m">L</span> = 0 linéaire en <span class="m">θ</span> ⇒ solution en forme fermée (OLS, ridge) ; <span class="m">σ</span> non linéaire ⇒ on itère (logistique).</li>
+    <li><span class="m">κ</span> = <span class="m">λ</span><sub>max</sub>/<span class="m">λ</span><sub>min</sub> : le pas est bridé par la direction raide, la plate n'avance que de 1 − 2/<span class="m">κ</span> par pas ⇒ zigzag, et ~<span class="m">κ</span> itérations.</li>
+    <li>SGD, momentum, Adam : les réponses de la Phase 2 au point 5 et au coût du point 4.</li>
+  </ol>
+</div>
+<div class="phrase">« Je descends dans la direction opposée au gradient, celle où la variation au premier ordre est la plus négative. Le pas est borné par la courbure la plus forte, deux sur lambda max ; la direction la moins courbée avance alors très lentement, et le nombre d'itérations croît avec le conditionnement. Quand annuler le gradient donne un système linéaire, je résous d'un coup ; sinon j'itère, et la convexité me garantit que j'arrive au minimum global. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Pourquoi −∇<span class="m">L</span> et pas une autre direction ?</div><div class="a hid">La variation au premier ordre vaut ⟨∇L, u⟩ ; par Cauchy-Schwarz elle est minimale en u = −∇L/‖∇L‖, et nulle le long d'une ligne de niveau.</div></li>
+    <li><div class="q">À quelle condition le pas converge sur une parabole de courbure <span class="m">a</span> ?</div><div class="a hid">L'écart est multiplié par (1 − ηa) : il faut η &lt; 2/a. Monotone sous 1/a, oscillant et convergent entre 1/a et 2/a.</div></li>
+    <li><div class="q">Quand a-t-on une solution en forme fermée ?</div><div class="a hid">Quand ∇L = 0 est linéaire en θ : OLS, ridge — (XᵀX + λI)θ = Xᵀy. La logistique non : σ est non linéaire, on itère.</div></li>
+    <li><div class="q">Que garantit la convexité, et d'où vient celle de la log-loss ?</div><div class="a hid">Minimum local = global, unique si stricte. d²ℓ/dz² = p(1 − p) &gt; 0, et z affine en β annule le second étage de la chain rule : H = Σ p(1 − p) xxᵀ ⪰ 0.</div></li>
+    <li><div class="q">Pourquoi un bol allongé est-il lent ?</div><div class="a hid">η est bridé par λ_max ; la direction λ_min se contracte au mieux de 1 − 2/κ, d'où le zigzag et ~κ itérations. Sur le ridge λ = 1 : κ = 71, 163 pas pour diviser l'erreur par 100.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="../bridges/bridge-01-une-seule-descente.html"><b>Une seule descente</b><small>le même pas θ ← θ − η∇L sur des coefficients, sur une fonction (boosting), sur des centroïdes (Lloyd) : cette chaîne en est le mode d'emploi</small></a>
+    <a href="../bridges/bridge-06-convexite-forme-fermee.html"><b>Convexité et forme fermée</b><small>le pas 5 en est le cœur : quand la pente s'annule en un système linéaire on résout, sinon on itère</small></a>
+    <a href="chain-p03-01-critere-escalier-vs-sensible.html"><b>p03-01 — critère en escalier vs sensible</b><small>la chaîne sœur : elle dit quand la pente existe, celle-ci dit ce qu'on en fait. Sa pénalité L1 et L2 (habit 3) ne se redit pas ici</small></a>
+    <a href="chain-p02-02-prior-penalite.html"><b>p02-02 — du prior à la pénalité</b><small>d'où sortent [[15, 28], [28, 57]] et ses valeurs propres 1 et 71 : + λI relève la direction plate, il ne l'arrondit pas — le κ reste</small></a>
+    <a href="../walkthroughs/walkthrough-p03-01-descente-sur-ridge.html"><b>D5 — la descente sur le ridge, pas à pas</b><small>le déroulé qui refait les itérations de ce bol à la main, coordonnée propre par coordonnée propre</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>analyse::gradient-jacobienne</code> (développement au premier ordre, plus forte pente) · <code>ml::optimisation</code> (forme fermée vs itération, convexité) · <code>ml::learning-rate</code> (seuil 2/courbure, trois régimes) · <code>algebre::eigen</code> (base propre, κ = λ_max/λ_min).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p03-02 · v1 du 16/09/2026 · Prérequis : p04-01, p04-02, p08-01. Suite : <a href="../../map.html#p04-01">p04-01 La matrice comme action</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== Figure 1 : les trois régimes du pas (SL.descent) ===== */
+const A1=2, T0=3.5, XMIN=-2, XMAX=4;
+const f1=t=>(t-1)*(t-1), df1=t=>A1*(t-1);
+const D1=SL.descent(document.getElementById('f1plot'),{f:f1,df:df1,x:[XMIN,XMAX],y:[0,9.6],w:600,h:300,
+  xt:[-2,-1,0,1,2,3,4],yt:[2,4,6,8],xl:'θ',yl:'L(θ) = (θ − 1)²',cls:'sl-c1'});
+const out1=document.getElementById('f1out'), st1={lr:.25,n:12};
+function regime(k){const a=Math.abs(k);
+  if(a<1e-9)return['pas exact','pos'];
+  if(a>1+1e-9)return['divergence','zero'];
+  if(a>1-1e-9)return['cycle, jamais','zero'];
+  return[k>0?'monotone':'oscille, converge','pos'];}
+function draw1(){
+  D1.run(st1.lr,st1.n,T0);
+  const k=1-st1.lr*A1, r=regime(k);
+  let t=T0,sortie=null;
+  for(let i=1;i<=st1.n;i++){t=1+(1-st1.lr*A1)*(t-1);if(sortie===null&&(t<XMIN||t>XMAX))sortie=i;}
+  const ecart=Math.abs(t-1);
+  out1.innerHTML=`<div class="${r[1]}">facteur 1 − ηa<b>${SL.fmt(k,3)}</b></div>`
+    +`<div class="${r[1]}">régime<b>${r[0]}</b></div>`
+    +`<div class="${ecart<1?'pos':'zero'}">écart après ${st1.n} pas<b>${ecart<1e4?SL.fmt(ecart,4):ecart.toExponential(1).replace('.',',')}</b></div>`
+    +`<div class="${sortie===null?'pos':'zero'}">sortie du cadre<b>${sortie===null?'jamais':'pas n° '+sortie}</b></div>`;}
+const sl1=document.getElementById('f1sliders');
+SL.slider(sl1,{label:'pas η',min:.02,max:1.2,step:.01,value:.25},v=>{st1.lr=v;draw1();});
+SL.slider(sl1,{label:'nombre de pas',min:1,max:30,step:1,value:12},v=>{st1.n=v;draw1();});
+
+/* ===== Figure 2 : convexe et non convexe ===== */
+const sig=z=>1/(1+Math.exp(-z));
+const LL=z=>Math.log(1+Math.exp(-z)), LL2=z=>{const p=sig(z);return p*(1-p);};
+const SQ=z=>{const p=sig(z);return (1-p)*(1-p);}, SQ2=z=>{const p=sig(z);return -2*p*(1-p)*(1-p)*(1-3*p);};
+const P2=SL.plot(document.getElementById('f2plot'),{x:[-3,3],y:[0,3.2],w:600,h:300,
+  xt:[-3,-2,-1,0,1,2,3],yt:[1,2,3],xl:'z = xᵀβ (score du point, y = 1)',yl:'perte'});
+P2.fn(LL,'sl-c1');P2.fn(SQ,'sl-c2 dash');
+P2.label(-2.35,2.55,'log-loss','sl-c1');P2.label(-2.6,1.32,'(1 − p)²','sl-c2');
+const ZI=-Math.log(2);
+SL.el('line',{x1:P2.sx(ZI),x2:P2.sx(ZI),y1:P2.sy(0),y2:P2.sy(2.5),class:'sl-seg chord'},P2.layer);
+P2.label(ZI-.08,2.72,'z = −ln 2','sl-c3','end');
+const out2=document.getElementById('f2out');
+function draw2(z){P2.clear();
+  const p=sig(z),l2=LL2(z),s2=SQ2(z);
+  P2.vline(z,'');P2.dot(z,LL(z),'sl-c1',5);P2.dot(z,SQ(z),'sl-c2',5);
+  out2.innerHTML=`<div>p = σ(z)<b>${SL.fmt(p,3)}</b></div>`
+    +`<div class="pos">log-loss : ℓ″<b>${SL.fmt(l2,3)}</b></div>`
+    +`<div class="${s2<0?'zero':'pos'}">quadratique : g″<b>${SL.fmt(s2,3)}</b></div>`
+    +`<div class="${s2<0?'zero':'pos'}">courbure de g en z<b>${s2<0?'concave':'convexe'}</b></div>`;}
+SL.slider(document.getElementById('f2sliders'),{label:'score z',min:-3,max:3,step:.05,value:-2},draw2);
+
+/* ===== Figure 3 : ellipses de niveau et zigzag ===== */
+const P3=SL.plot(document.getElementById('f3plot'),{x:[-4,4],y:[-4,4],w:440,h:432,
+  xt:[-4,-2,0,2,4],yt:[-4,-2,0,2,4],xl:'θ₁ · plate',yl:'θ₂ · raide'});
+const out3=document.getElementById('f3out');
+function steps3(kap,eta,lim){let a=3,b=3;
+  for(let i=1;i<=lim;i++){a*=(1-eta);b*=(1-eta*kap);if(Math.hypot(a,b)<.05)return i;}
+  return null;}
+function draw3(kap){P3.clear();
+  const eta=1.8/kap;
+  for(let k=1;k<=5;k++){const ra=(k/5)*3*Math.sqrt(1+kap), rb=ra/Math.sqrt(kap);
+    SL.el('ellipse',{cx:P3.sx(0),cy:P3.sy(0),rx:Math.abs(P3.sx(ra)-P3.sx(0)),ry:Math.abs(P3.sy(rb)-P3.sy(0)),class:'sl-lev'},P3.dyn);}
+  let a=3,b=3;P3.dot(a,b,'sl-c2',5);
+  for(let i=0;i<40;i++){const na=a*(1-eta), nb=b*(1-eta*kap);
+    P3.seg(a,b,na,nb,'traj');a=na;b=nb;P3.dot(a,b,'sl-c3',2.6);}
+  P3.dot(0,0,'sl-c1 hollow',6);
+  const n=steps3(kap,eta,2000), d=Math.hypot(a,b);
+  out3.innerHTML=`<div>pas η = 1,8/κ<b>${SL.fmt(eta,4)}</b></div>`
+    +`<div class="${1-eta>.9?'zero':'pos'}">contraction plate<b>${SL.fmt(1-eta,4)}</b></div>`
+    +`<div class="pos">contraction raide<b>${SL.fmt(1-eta*kap,2)}</b></div>`
+    +`<div class="${n===null||n>40?'zero':'pos'}">pas pour ‖θ‖ &lt; 0,05<b>${n===null?'> 2 000':n}</b></div>`
+    +`<div class="${d<.05?'pos':'zero'}">‖θ‖ après 40 pas<b>${SL.fmt(d,3)}</b></div>`;}
+const sK=SL.slider(document.getElementById('f3sliders'),{label:'conditionnement κ',min:1,max:100,step:1,value:71},draw3);
+const pre3=document.getElementById('f3presets');
+[['κ = 1 · bol rond',1],['κ = 25',25],['κ = 71 · le ridge',71],['κ = 100',100]].forEach(([n,v])=>{
+  const bt=document.createElement('button');bt.className='tb';bt.textContent=n;bt.onclick=()=>sK.set(v);pre3.appendChild(bt);});
+})();
+</script>
+</body>
+</html>

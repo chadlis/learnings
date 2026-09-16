@@ -10,7 +10,7 @@ prereq: [p04-01, p04-02, p08-01]
 anki: [analyse::gradient-jacobienne, ml::optimisation, ml::learning-rate, algebre::eigen]
 bridges: [b01, b06]
 next: p04-01
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -28,7 +28,7 @@ Pourquoi −∇L ? Pourquoi un pas trop grand diverge ? Quand résout-on en une 
 
 ## Exemple fil rouge
 1D : L(θ) = ½·a·(θ − 1)², a = 2 (courbure). Pas : θ ← θ − η·a(θ − 1) = 1 + (1 − ηa)(θ − 1). Converge ssi |1 − ηa| < 1 ⇔ 0 < η < 2/a = 1. η = 0,25 : facteur 0,5 ; η = 0,9 : 0,8 (oscille) ; η = 1,1 : −1,2, diverge.
-2D : ridge de D4/p02-02 avec λ = 1 : A = XᵀX + I = [[15, 28], [28, 57]], valeurs propres 1 et 71, κ = 71. Pas maximal η < 2/71 = 0,028 ; à ce pas, la direction de valeur propre 1 se contracte de 1 − 0,028 ≈ 0,97 par itération : ~150 itérations pour un facteur e⁻¹. Forme fermée : (0,197 ; 0,394) en une résolution.
+2D : ridge de D4/p02-02 avec λ = 1 : A = XᵀX + I = [[15, 28], [28, 57]], valeurs propres 1 et 71, κ = 71. Pas maximal η < 2/71 = 0,028 ; à ce pas, la direction de valeur propre 1 se contracte de 1 − 0,028 ≈ 0,972 par itération : ~35 itérations (≈ κ/2) pour un facteur e⁻¹, ~161 pour un facteur 100. Forme fermée : (0,197 ; 0,394) en une résolution.
 
 ## Pas de la chaîne
 1. **Le décor.** Un optimiseur ne voit pas L, il voit L(θ) et ∇L(θ). Il doit choisir une direction et une longueur.
@@ -36,7 +36,7 @@ Pourquoi −∇L ? Pourquoi un pas trop grand diverge ? Quand résout-on en une 
 3. **Le pas η.** θ ← θ − η∇L. Sur une parabole de courbure a, le pas contracte l'écart d'un facteur (1 − ηa) : η < 1/a converge sans osciller, 1/a < η < 2/a oscille et converge, η > 2/a diverge. Figure 1. Au tableau : « L'écart au minimum est multiplié par 1 − ηa à chaque pas, donc il tend vers zéro si ce facteur est de module inférieur à 1, donc η doit rester sous 2 sur la courbure. »
 4. **Convexité** [tronc]. Convexe ⇒ tout minimum local est global ; strictement convexe ⇒ unique. La log-loss est convexe en z (dérivée seconde p(1 − p) > 0) et z affine en β ⇒ convexe en β. La descente arrive au bon endroit ; la vitesse est une autre affaire.
 5. **Forme fermée vs itération.** ∇L = 0 est un système ; s'il est linéaire en θ (OLS, ridge : (XᵀX + λI)θ = Xᵀy) on le résout d'un coup ; sinon (logistique : Σ(σ(xᵢᵀβ) − yᵢ)xᵢ = 0, σ non linéaire) on itère. Au tableau : « Annuler le gradient donne des équations, donc si elles sont linéaires en θ on inverse une matrice, donc sinon on descend le gradient sur une fonction convexe. »
-6. **Conditionnement** [tronc]. Quadratique : ∇L = Aθ − b ; dans la base propre chaque direction a sa courbure λᵢ. Un seul η pour toutes : η < 2/λ_max, et la direction λ_min se contracte de (1 − ηλ_min) ≈ 1 − 2λ_min/λ_max. Le nombre de pas est ~κ = λ_max/λ_min. Zigzag : le gradient pointe vers le mur raide, pas vers le fond de la vallée. Figure 2. Au tableau : « Le pas est limité par la direction la plus raide, donc la direction la plus plate avance à peine, donc le nombre d'itérations croît avec le rapport des courbures. »
+6. **Conditionnement** [tronc]. Quadratique : ∇L = Aθ − b ; dans la base propre chaque direction a sa courbure λᵢ. Un seul η pour toutes : η < 2/λ_max, et la direction λ_min se contracte de (1 − ηλ_min) ≈ 1 − 2λ_min/λ_max. Le nombre de pas par facteur e est ~κ/2, et croît donc comme κ = λ_max/λ_min. Zigzag : le gradient pointe vers le mur raide, pas vers le fond de la vallée. Figure 2. Au tableau : « Le pas est limité par la direction la plus raide, donc la direction la plus plate avance à peine, donc le nombre d'itérations croît avec le rapport des courbures. »
 7. **Ce qui vient en Phase 2.** SGD (gradient bruité par minibatch), momentum (mémoire de direction), Adam (pas par coordonnée) sont des réponses au pas 6. Nommer, ne pas développer.
 8. **Où ça casse** [casse].
 
@@ -75,3 +75,10 @@ Pourquoi −∇L ? Pourquoi un pas trop grand diverge ? Quand résout-on en une 
 
 ## Exclusions
 Pas de momentum/Adam au-delà du nom (Phase 2). Pas de line search, pas de Newton au-delà d'une mention en pas 5. Pas de non-convexité détaillée.
+
+## Questions pour la revue
+- **Chiffre corrigé (bloc « Exemple fil rouge »)** : le spec annonçait « ~150 itérations pour un facteur e⁻¹ » sur la direction λ_min = 1 à η = 2/71. Vérifié par script : la contraction vaut 1 − 2/71 = 0,9718, donc −1/ln(0,9718) = **35,0 itérations** (≈ κ/2), et 161 itérations pour un facteur 100. Corrigé ci-dessus et dans la sheet. La formulation « le nombre de pas croît comme κ » reste exacte, c'est la constante qui était fausse.
+- **Numérotation des figures** : dans la sheet elles suivent l'ordre de lecture (fig. 1 = `descent` au pas 3, fig. 2 = log-loss au pas 4, fig. 3 = ellipses au pas 6). Le spec les numérotait 1 / 2 / 3 dans l'ordre descent / ellipses / log-loss. Rien n'est perdu, mais si la carte ou un déroulé cite « figure 2 de p03-02 », c'est la convexité, pas le zigzag.
+- **Figure 3, ce qu'on voit réellement** : à pas fixe le zigzag s'éteint géométriquement (facteur −0,8 par pas) et laisse la place à une reptation horizontale ; le zigzag permanent des dessins classiques suppose une recherche linéaire exacte à chaque pas, exclue par H2. La figure et sa légende disent donc « zigzag puis reptation ». À valider : est-ce le bon compromis, ou faut-il ajouter le cas « pas optimal à chaque itération » ?
+- **Pas 7 et B1–B3** : SGD / momentum / Adam sont nommés et rattachés au pas auquel ils répondent, sans une seule formule (exclusion respectée). Le lien vers micrograd / makemore n'est pas écrit en clair dans la sheet, faute d'un nœud de carte où pointer ; il l'est ici.
+
