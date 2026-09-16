@@ -10,7 +10,7 @@ prereq: [p00-02]
 anki: [stats::bayes, stats::conditionnement, stats::base-rate, ml::metriques]
 bridges: []
 next: p00-04
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -75,3 +75,14 @@ En cotes : LR+ = 0,90/0,05 = 18 ; cote a priori 1:99 ; cote a posteriori 18:99 �
 
 ## Exclusions
 Pas de réseau bayésien, pas de conditionnement continu (densités conditionnelles) au-delà de la mention, pas de Beta (p02-03).
+
+## Questions pour la revue
+- Tous les chiffres du fil rouge ont été revérifiés en exact (fractions) avant écriture :
+  900/100/4 950/94 050, P(+) = 0,0585, P(M | +) = 2/13 = 0,154, 9 000/4 500 → 0,667,
+  LR⁺ = 18, 1:99 × 18 = 18:99 = 18/117. **Aucune correction nécessaire.**
+- Chiffres ajoutés par la sheet, non présents dans le spec, à valider : F1 = 0,263 (prév. 1 %)
+  et 0,766 (10 %), accuracy 0,950 / 0,945, VPN 0,999 / 0,988, LR⁻ = 0,105 → cote 1:940,5 et
+  P(M | −) = 0,00106, bascule VPP = 50 % à 5,26 % de prévalence, VPP 0,885 à 30 %.
+- Placement des figures : la figure 2 (VPP vs prévalence) est posée au pas 6 avec la figure 1,
+  pas au pas 8, pour garder l'ordre de numérotation du spec et parce que les deux disent la
+  même chose — le base rate. Le pas 8 y renvoie. À trancher si la relecture préfère l'inverse.

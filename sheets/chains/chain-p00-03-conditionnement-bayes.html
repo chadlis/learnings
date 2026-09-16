@@ -1,0 +1,575 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Conditionnement et Bayes — chaîne</title>
+<meta name="sheet" content="series=chain;part=00;number=03;status=v1">
+<meta name="part" content="00 · Socle probabiliste">
+<meta name="subtitle" content="socle — inverser un conditionnement sans se tromper de sens">
+<meta name="prereq" content="p00-02">
+<meta name="anki" content="stats::bayes,stats::conditionnement,stats::base-rate,ml::metriques">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 00 · Socle probabiliste › chaîne 03</div>
+  <h1>Conditionnement et <span>Bayes</span> : le <span>base rate</span> décide</h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Un test détecte 90 % des cas et se trompe sur 5 % des sains. Il est positif : quelle est la probabilité d'être un cas ? <b>Sensibilité et spécificité appartiennent au test ; la réponse appartient à la population, et elle dépend d'un nombre que le test ne connaît pas — la prévalence.</b> Fil rouge : 100 000 personnes, prévalence 1 %, qui donnent 900 vrais positifs contre 4 950 faux, donc <span class="m">P</span>(cas | +) = 0,154 et non 0,90.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="chain-p00-02-esperance-variance-densite.html#s1">p00-02 · résumer une loi</a></li>
+    <li><a href="chain-p00-02-esperance-variance-densite.html#s5">p00-02 · indépendance = produit</a></li>
+    <li><a href="chain-p00-02-esperance-variance-densite.html#s6">p00-02 · Cov = 0 ⇏ indépendance</a></li>
+    <li><a href="chain-p00-02-esperance-variance-densite.html#s7">p00-02 · masse vs densité</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::bayes</code><code>stats::conditionnement</code><code>stats::base-rate</code><code>ml::metriques</code></div>
+  <h4>Suites et voisines</h4>
+  <ol>
+    <li><a href="../../map.html#p00-04">p00-04 · Moyenne, LGN, TCL</a></li>
+    <li><a href="../../map.html#p06-03">p06-03 · Seuil, ROC, PR</a></li>
+    <li><a href="chain-p01-02-ic-test-procedure.html">p01-02 · IC et test</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>Événement et probabilité.</b> Un événement est une partie de l'univers ; sa probabilité est une masse entre 0 et 1, et les masses d'une partition somment à 1. On part de là et on la restreint (<a href="chain-p00-02-esperance-variance-densite.html#s1">p00-02, pas 1</a>).</li>
+      <li><b>Indépendance = produit.</b> <span class="m">P</span>(<span class="m">X</span> = <span class="m">x</span>, <span class="m">Y</span> = <span class="m">y</span>) = <span class="m">P</span>(<span class="m">X</span> = <span class="m">x</span>)<span class="m">P</span>(<span class="m">Y</span> = <span class="m">y</span>) : c'est l'hypothèse H2 de p00-02, celle qui annule la covariance et rend la variance additive (<a href="chain-p00-02-esperance-variance-densite.html#s5">p00-02, pas 5</a>). Ici on va voir ce qu'elle veut dire en termes de conditionnement.</li>
+      <li><b>Cov = 0 n'est pas l'indépendance.</b> La corrélation ne voit que le linéaire (<a href="chain-p00-02-esperance-variance-densite.html#s6">p00-02, pas 6</a>) ; l'indépendance, elle, se lit sur les probabilités conditionnelles, et c'est le pas 3 d'ici.</li>
+      <li><b>Tout est discret ici.</b> Malade / sain, positif / négatif : des masses, pas des densités. Le conditionnement continu existe mais n'est pas cette chaîne (<a href="chain-p00-02-esperance-variance-densite.html#s7">p00-02, pas 7</a>).</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>Sensibilité et spécificité sont des propriétés du <b>test</b>, stables d'une population à l'autre. C'est une idéalisation commode : elle isole ce qui voyage de ce qui ne voyage pas.</span>
+      <b>H2</b><span>La prévalence est une propriété de la <b>population</b> testée, et elle change selon qui on teste : dépistage de masse, consultation, service d'urgence. Rien dans le test ne la contient.</span>
+      <b>H3</b><span>Un <b>seul</b> test, appliqué une fois. Répéter le même test n'est pas un second test indépendant, et le pas 3 dira pourquoi ça compte.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor : deux phrases qui se ressemblent</h3>
+    <p>« 90 % des cas sont positifs » et « 90 % des positifs sont des cas ». La première décrit le <b>test</b> : on s'est placé chez les malades et on compte les positifs. La seconde décrit le <b>patient</b> : on s'est placé chez les positifs et on compte les malades.</p>
+    <p>Même intersection, deux dénominateurs différents. Rien n'oblige les deux nombres à coïncider, et ici ils diffèrent d'un facteur six.</p>
+    <p class="say">« Les deux phrases se placent dans des populations différentes, donc elles n'ont pas le même dénominateur, donc l'une est une propriété du test et l'autre une propriété du patient, donc il faut un calcul pour passer de la première à la seconde. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — ce qu'on sait, ce qu'on cherche</div>
+    <table>
+      <tr><th>quantité</th><th>valeur</th><th>à qui elle appartient</th></tr>
+      <tr><td><span class="m">P</span>(+ | <span class="m">M</span>) sensibilité</td><td>0,90</td><td>le test</td></tr>
+      <tr><td><span class="m">P</span>(− | ¬<span class="m">M</span>) spécificité</td><td>0,95</td><td>le test</td></tr>
+      <tr><td><span class="m">P</span>(<span class="m">M</span>) prévalence</td><td>0,01</td><td>la population</td></tr>
+      <tr class="hl"><td><span class="m">P</span>(<span class="m">M</span> | +)</td><td><b>?</b></td><td>la question</td></tr>
+    </table>
+    <p>La réponse spontanée est 0,90 ou « autour de 0,85 ». La réponse est <b>0,154</b>. Les sept pas qui suivent ne font que dérouler pourquoi.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Conditionner = restreindre l'univers <span class="tag tronc">tronc</span></h3>
+    <p>Conditionner par <span class="m">B</span>, c'est jeter tout ce qui n'est pas <span class="m">B</span> puis renormaliser par ce qui reste. Défini dès que <span class="m">P</span>(<span class="m">B</span>) &gt; 0.</p>
+    <div class="eq"><span class="m">P</span>(<span class="m">A</span> | <span class="m">B</span>) = <span class="m">P</span>(<span class="m">A</span> ∩ <span class="m">B</span>) / <span class="m">P</span>(<span class="m">B</span>)</div>
+    <p>Le numérateur est symétrique en <span class="m">A</span> et <span class="m">B</span> ; seul le dénominateur choisit le sens. Toute l'asymétrie du conditionnement tient dans ce dénominateur.</p>
+    <p class="say">« Sachant B, les seuls cas possibles sont ceux de B, donc la probabilité de A est la part de A dans B, donc P(A ∩ B) sur P(B), donc changer de condition ne change que le dénominateur. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le même numérateur, deux dénominateurs</div>
+    <p>Sur 100 000 personnes à 1 % de prévalence : 900 individus sont à la fois malades et positifs.</p>
+    <div class="eq"><span class="m">P</span>(+ | <span class="m">M</span>) = 900 / 1 000 = 0,90 &nbsp;&nbsp;&nbsp; <span class="m">P</span>(<span class="m">M</span> | +) = 900 / 5 850 = 0,154</div>
+    <p>Le 900 ne bouge pas. Ce qui bouge, c'est qu'on divise par les 1 000 malades ou par les 5 850 positifs. Le rapport des deux réponses est exactement le rapport des deux dénominateurs : 5 850/1 000 = 5,85.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Indépendance ⇔ le conditionnement ne change rien</h3>
+    <p>Deux événements sont indépendants quand savoir l'un n'apprend rien sur l'autre :</p>
+    <div class="eq"><span class="m">P</span>(<span class="m">A</span> | <span class="m">B</span>) = <span class="m">P</span>(<span class="m">A</span>) &nbsp;⇔&nbsp; <span class="m">P</span>(<span class="m">A</span> ∩ <span class="m">B</span>) = <span class="m">P</span>(<span class="m">A</span>)<span class="m">P</span>(<span class="m">B</span>)</div>
+    <p>La seconde écriture est symétrique et survit à <span class="m">P</span>(<span class="m">B</span>) = 0. C'est elle, et elle seule, qui autorise à <b>multiplier</b> : la Binomiale, la vraisemblance d'un échantillon iid comme produit (<a href="chain-p02-01-bruit-vraisemblance-loss.html">fil B</a>). Pas d'indépendance, pas de produit.</p>
+    <p class="say">« Indépendance signifie que conditionner ne change rien, donc P(A | B) = P(A), donc P(A ∩ B) = P(A)P(B), donc l'indépendance est exactement la licence de multiplier des probabilités. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — ce test n'est pas indépendant de la maladie</div>
+    <p><span class="m">P</span>(+ | <span class="m">M</span>) = 0,90 alors que <span class="m">P</span>(+) = 0,0585 : savoir qu'on est malade change la probabilité d'être positif d'un facteur 15,4. C'est cet écart qui est l'<b>information</b> apportée par le test.</p>
+    <p>Le cas dégénéré éclaire le reste : un test inutile aurait <span class="m">P</span>(+ | <span class="m">M</span>) = <span class="m">P</span>(+ | ¬<span class="m">M</span>), donc + serait indépendant de <span class="m">M</span>, donc <span class="m">P</span>(<span class="m">M</span> | +) = <span class="m">P</span>(<span class="m">M</span>) = la prévalence. Le pas 7 le relira comme <b>LR = 1</b>.</p>
+    <p>Attention au sens de lecture : Cov = 0 n'est pas l'indépendance (<a href="chain-p00-02-esperance-variance-densite.html#s6">p00-02, pas 6</a>) ; ici c'est la définition par le conditionnement qui sert, pas la corrélation.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Probabilités totales : les positifs viennent de deux sources</h3>
+    <p>Une partition de l'univers — ici <span class="m">M</span> et ¬<span class="m">M</span> — découpe n'importe quel événement en morceaux disjoints qu'on additionne, chacun pesé par le poids de sa branche.</p>
+    <div class="eq"><span class="m">P</span>(+) = <span class="m">P</span>(+ | <span class="m">M</span>)<span class="m">P</span>(<span class="m">M</span>) + <span class="m">P</span>(+ | ¬<span class="m">M</span>)<span class="m">P</span>(¬<span class="m">M</span>)</div>
+    <p>C'est le dénominateur qui manquait au pas 2. Il ne se lit nulle part dans la fiche du test : il faut la prévalence pour le calculer.</p>
+    <p class="say">« Un positif est soit un cas détecté, soit un sain mal classé, donc P(+) additionne les deux voies pondérées par leur poids dans la population, donc le dénominateur de Bayes contient la prévalence. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les deux voies, chiffrées</div>
+    <table>
+      <tr><th>voie</th><th>calcul</th><th>poids</th></tr>
+      <tr><td>cas détecté</td><td>0,90 × 0,01</td><td>0,0090</td></tr>
+      <tr class="hl"><td>sain mal classé</td><td>0,05 × 0,99</td><td><b>0,0495</b></td></tr>
+      <tr><td><span class="m">P</span>(+)</td><td>somme</td><td>0,0585</td></tr>
+    </table>
+    <p>La seconde voie pèse <b>5,5 fois</b> la première. Le test est pourtant bien meilleur sur les malades (0,90) que mauvais sur les sains (0,05) : c'est le 0,99 qui écrase tout.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Bayes = inverser le conditionnement <span class="tag tronc">tronc</span></h3>
+    <p><span class="m">P</span>(<span class="m">M</span> ∩ +) s'écrit dans les deux sens : <span class="m">P</span>(<span class="m">M</span> | +)<span class="m">P</span>(+) = <span class="m">P</span>(+ | <span class="m">M</span>)<span class="m">P</span>(<span class="m">M</span>). On isole :</p>
+    <div class="eq"><span class="m">P</span>(<span class="m">M</span> | +) = <span class="m">P</span>(+ | <span class="m">M</span>)<span class="m">P</span>(<span class="m">M</span>) / <span class="m">P</span>(+)</div>
+    <p>Lecture : <b>posterior ∝ vraisemblance × prior</b>. Le numérateur porte toute l'information, le dénominateur ne fait que ramener la somme à 1.</p>
+    <p class="say">« L'intersection s'écrit dans les deux sens, donc P(M | +)P(+) = P(+ | M)P(M), donc P(M | +) est la vraisemblance fois le prior divisée par la probabilité totale du positif, donc le posterior est proportionnel à vraisemblance × prior. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le calcul, en trois nombres</div>
+    <div class="eq"><span class="m">P</span>(<span class="m">M</span> | +) = 0,0090 / 0,0585 = <b>0,154</b></div>
+    <p>Vérification de la normalisation : <span class="m">P</span>(¬<span class="m">M</span> | +) = 0,0495/0,0585 = 0,846, et 0,154 + 0,846 = 1. Le dénominateur ne fait rien d'autre.</p>
+    <p>Le test a <b>multiplié la croyance par 15,4</b> : de 1 % à 15,4 %. C'est beaucoup — et c'est encore loin de 50 %. Les deux choses sont vraies en même temps, et c'est tout l'intérêt de garder le prior en vue.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>En effectifs, ça se voit <span class="tag tronc">tronc</span></h3>
+    <p>Le même calcul, en personnes plutôt qu'en fractions : 100 000 testés, 1 000 cas et 99 000 sains. Les cas donnent 900 vrais positifs ; les sains, à 5 % d'erreur seulement, en donnent 4 950.</p>
+    <p>Les sains sont 99 fois plus nombreux : leur petit taux d'erreur l'emporte sur le bon taux de détection des cas. Le <b>base rate</b> décide, et aucune amélioration de la sensibilité ne peut le compenser — elle plafonne à 1 000 vrais positifs.</p>
+    <p class="say">« Les sains sont 99 fois plus nombreux, donc même une petite erreur sur eux dépasse une grosse détection sur les cas, donc la majorité des positifs sont des faux, donc la prévalence commande la valeur d'un positif. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le tableau 2 × 2 sur 100 000</div>
+    <table>
+      <tr><th></th><th>test +</th><th>test −</th><th>total</th></tr>
+      <tr><td>malade</td><td><b>900</b></td><td>100</td><td>1 000</td></tr>
+      <tr><td>sain</td><td><b>4 950</b></td><td>94 050</td><td>99 000</td></tr>
+      <tr class="hl"><td>total</td><td>5 850</td><td>94 150</td><td>100 000</td></tr>
+    </table>
+    <p>VPP = 900/5 850 = <b>0,154</b>. Même test, prévalence 10 % : 9 000 vrais positifs contre 4 500 faux, VPP = 9 000/13 500 = <b>0,667</b>. Le test n'a pas changé d'une ligne.</p>
+    <p>Bascule à 50 % : il faut une prévalence de 5,3 % pour que les vrais positifs égalent les faux, avec ce test.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — les effectifs, et où passent les positifs</div>
+    <div id="f1plot" class="wide"></div>
+    <div class="sl-ctl" id="f1presets"></div>
+    <div id="f1sliders"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Barre du haut : la population, coupée en cas (bleu) et sains (violet) — largeurs en <b>racine carrée</b> des effectifs, sinon les cas disparaissent. Barres du bas : les positifs et les négatifs, chacun coupé en vrais et faux, cette fois à l'échelle <b>linéaire</b> — la part bleue de la barre « positifs » <i>est</i> la VPP, lue comme une longueur, et le rouge à côté est le tas de faux positifs. Baisse la prévalence&nbsp;: la part bleue fond alors que sensibilité et spécificité n'ont pas bougé. Regarde le rapport TP/FP, pas les pourcentages du test.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — la VPP en fonction de la prévalence</div>
+    <div id="f2plot" class="wide"></div>
+    <div id="f2sliders"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Sensibilité fixée à 0,90 ; seule la spécificité bouge. La courbe <b>violette</b> est le fil rouge (spécificité 0,95), la <b>bleue</b> suit le curseur. Axe des prévalences en <b>log</b>, de 0,1 % à 50 %, avec les deux repères pointillés du fil rouge, à 1 % et 10 %. À prévalence faible la courbe est écrasée contre zéro : c'est la <b>spécificité</b> seule qui décide, parce que c'est elle qui multiplie le gros effectif. Monte-la jusqu'à 0,999 : la courbe décolle enfin et la VPP à 1 % passe de 15 % à 90 %.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Le même calcul en cotes : un multiplicateur</h3>
+    <p>Écris Bayes pour <span class="m">M</span> et pour ¬<span class="m">M</span>, puis divise : le <span class="m">P</span>(+) disparaît. Reste, en cotes (<span class="m">p</span>/(1−<span class="m">p</span>)) :</p>
+    <div class="eq">cote(<span class="m">M</span> | +) = cote(<span class="m">M</span>) × LR<sup>+</sup> &nbsp;&nbsp;&nbsp; LR<sup>+</sup> = <span class="m">P</span>(+ | <span class="m">M</span>) / <span class="m">P</span>(+ | ¬<span class="m">M</span>) = sensibilité / (1 − spécificité)</div>
+    <p>Le test se résume à un seul nombre, son rapport de vraisemblance ; la population apporte le point de départ. Séparer les deux est ce qui évite l'erreur.</p>
+    <p class="say">« Le dénominateur P(+) est le même dans les deux branches, donc il s'annule dans le rapport, donc la cote a posteriori est la cote a priori multipliée par le rapport de vraisemblance, donc le test est un multiplicateur et la population fixe le point de départ. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — 1:99 × 18 = 18:99</div>
+    <p>LR<sup>+</sup> = 0,90/0,05 = <b>18</b>. Cote a priori = 0,01/0,99 = <b>1:99</b>. Cote a posteriori = 18:99, soit <span class="m">p</span> = 18/117 = <b>0,154</b> — le même nombre qu'au pas 5.</p>
+    <p>Le négatif se lit pareil : LR<sup>−</sup> = (1 − sensibilité)/spécificité = 0,10/0,95 = 0,105. Cote 1:99 × 0,105 = 1:940, donc <span class="m">P</span>(<span class="m">M</span> | −) = 0,00106 et la VPN vaut 99,9 %. À faible prévalence, un négatif est très informatif et un positif ne l'est pas.</p>
+    <p>Repères : LR &gt; 10 déplace fortement, LR entre 2 et 5 déplace un peu, LR = 1 ne déplace rien.</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — l'échelle des cotes</div>
+    <div id="f3plot" class="wide"></div>
+    <div id="f3sliders"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Une seule règle graduée en cotes, en échelle log : le point du haut est la cote a priori (la population), la flèche verte est la multiplication par le LR (le test), le point du bas est la cote a posteriori. Déplace le LR : la flèche penche toujours de la même quantité pour un même LR, où qu'on parte — c'est ce que veut dire « multiplicateur ». Déplace la prévalence : la flèche garde son inclinaison et glisse. À LR = 1 elle devient verticale, et le test n'apprend rien.</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Traduction en métriques de classification</h3>
+    <p>Le même tableau 2 × 2, avec les noms du ML : sensibilité = <b>rappel</b> = TPR ; spécificité = TNR ; 1 − spécificité = <b>FPR</b> ; <span class="m">P</span>(<span class="m">M</span> | +) = <b>précision</b> = VPP.</p>
+    <p>Rappel et FPR se lisent chacun <i>à l'intérieur d'une seule ligne</i> du tableau : les effectifs relatifs des deux lignes n'y entrent pas. La précision a un dénominateur TP + FP qui <b>mélange les deux lignes</b> — pas un seul TN dedans, mais des FP dont le nombre est proportionnel à celui des sains. D'où sa dépendance à la prévalence.</p>
+    <p class="say">« Le rappel se lit dans la ligne des malades et le FPR dans la ligne des sains, donc aucun des deux ne dépend des effectifs relatifs, donc seule la précision, dont le dénominateur mélange les deux lignes, suit la prévalence — donc une précision ne se transporte pas d'une population à une autre. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — même test, deux populations</div>
+    <table>
+      <tr><th>métrique</th><th>formule</th><th>prév. 1 %</th><th>prév. 10 %</th></tr>
+      <tr><td>rappel (sensibilité)</td><td>TP/(TP+FN)</td><td>0,900</td><td>0,900</td></tr>
+      <tr><td>FPR (1 − spécificité)</td><td>FP/(FP+TN)</td><td>0,050</td><td>0,050</td></tr>
+      <tr class="hl"><td>précision (VPP)</td><td>TP/(TP+FP)</td><td><b>0,154</b></td><td><b>0,667</b></td></tr>
+      <tr><td>F1</td><td>2 · préc · rapp / (préc + rapp)</td><td>0,263</td><td>0,766</td></tr>
+      <tr><td>VPN</td><td>TN/(TN+FN)</td><td>0,999</td><td>0,988</td></tr>
+      <tr><td>accuracy</td><td>(TP+TN)/<span class="m">N</span></td><td>0,950</td><td>0,945</td></tr>
+    </table>
+    <p>Les deux premières lignes ne bougent pas d'un chiffre ; les quatre autres bougent. La courbe <b>ROC</b> (TPR contre FPR) est donc insensible à la prévalence, la courbe <b>PR</b> ne l'est pas — c'est pourquoi on préfère la PR en fort déséquilibre (<a href="../../map.html#p06-03">p06-03</a>).</p>
+    <p>L'accuracy, elle, ment doucement : 0,950 ici, alors que prédire « tout le monde est sain » en ferait 0,990.</p>
+  </div>
+</div>
+
+<div class="step" id="s9">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Trois façons de se tromper : importer une prévalence, multiplier des LR qui n'en ont pas le droit, lire le conditionnement à l'envers.</p>
+    <p class="say">« La VPP dépend d'un nombre extérieur au test, donc elle se déplace dès qu'on change de population, donc un chiffre de précision sans sa prévalence ne veut rien dire, donc la première question devant une métrique est : sur quelle population. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>Prévalence importée.</b> Un test étalonné sur des patients symptomatiques (prévalence 30 %, VPP 0,885) déployé en dépistage (1 %) voit sa VPP tomber à 0,154 sans que sensibilité ni spécificité aient bougé. Même piège pour un modèle de fraude : la précision en validation n'est pas la précision en production si le taux de fraude diffère — et il diffère presque toujours.</li>
+      <li><b>Répéter le même test.</b> Ce n'est pas un second test indépendant : les erreurs sont corrélées, elles ont le même mécanisme (même réactif, même seuil, même patient atypique). Le produit des LR suppose l'indépendance conditionnelle du pas 3 ; sans elle, deux positifs successifs valent beaucoup moins que 18 × 18.</li>
+      <li><b>Confondre les deux sens.</b> <span class="m">P</span>(preuve | innocent) petit n'implique pas <span class="m">P</span>(innocent | preuve) petit : c'est le sophisme du procureur, et c'est le pas 2 non fait. Exactement la même erreur que « <span class="m">p</span>-value = <span class="m">P</span>(<span class="m">H</span><sub>0</sub>) » : une <span class="m">p</span>-value est <span class="m">P</span>(données extrêmes ; <span class="m">H</span><sub>0</sub>), jamais l'inverse (<a href="chain-p01-02-ic-test-procedure.html">p01-02</a>).</li>
+      <li><b>Conditionner sur le mauvais événement.</b> <span class="m">P</span>(<span class="m">M</span> | +) demande de se restreindre aux <b>positifs</b>, pas aux cas. Réflexe : devant une probabilité conditionnelle, nommer à voix haute la population du dénominateur avant de calculer quoi que ce soit.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li><span class="m">P</span>(<span class="m">A</span> | <span class="m">B</span>) = <span class="m">P</span>(<span class="m">A</span> ∩ <span class="m">B</span>)/<span class="m">P</span>(<span class="m">B</span>) : restreindre puis renormaliser. Le numérateur est symétrique, le dénominateur choisit le sens.</li>
+    <li>Indépendance ⇔ conditionner ne change rien ⇔ <span class="m">P</span>(<span class="m">A</span> ∩ <span class="m">B</span>) = <span class="m">P</span>(<span class="m">A</span>)<span class="m">P</span>(<span class="m">B</span>) ⇔ licence de multiplier.</li>
+    <li><span class="m">P</span>(+) additionne les deux voies : cas détectés (0,0090) + sains mal classés (0,0495) = 0,0585.</li>
+    <li>Bayes : <span class="m">P</span>(<span class="m">M</span> | +) = <span class="m">P</span>(+ | <span class="m">M</span>)<span class="m">P</span>(<span class="m">M</span>)/<span class="m">P</span>(+) — posterior ∝ vraisemblance × prior.</li>
+    <li>En effectifs : 900 vrais positifs contre 4 950 faux à 1 % de prévalence ⇒ VPP 0,154. Le base rate décide.</li>
+    <li>Cotes : a posteriori = a priori × LR, LR<sup>+</sup> = sens/(1 − spéc) = 18. Le test est un multiplicateur, la population le point de départ.</li>
+    <li>Rappel = sensibilité et FPR = 1 − spécificité ne dépendent pas de la prévalence ; précision = VPP en dépend, donc elle ne se transporte pas.</li>
+  </ol>
+</div>
+<div class="phrase">« Sensibilité et spécificité appartiennent au test ; la probabilité d'être un cas sachant un positif appartient à la population, par Bayes. À 1 % de prévalence, les 99 % de sains produisent plus de faux positifs à 5 % d'erreur que les cas ne produisent de vrais positifs à 90 % de détection : la précision tombe à 15 %. C'est pourquoi une précision ne se transporte pas d'une population à une autre, alors qu'un rappel et un FPR le font. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Que signifie <span class="m">P</span>(<span class="m">A</span> | <span class="m">B</span>), en un geste ?</div><div class="a hid">Restreindre l'univers à B, puis renormaliser : P(A ∩ B)/P(B). Le numérateur est symétrique, seul le dénominateur donne le sens.</div></li>
+    <li><div class="q">D'où vient <span class="m">P</span>(+) = 0,0585 ?</div><div class="a hid">Deux voies : 0,90 × 0,01 = 0,0090 (cas détectés) + 0,05 × 0,99 = 0,0495 (sains mal classés). La seconde pèse 5,5 fois la première.</div></li>
+    <li><div class="q">Que vaut <span class="m">P</span>(<span class="m">M</span> | +) et pourquoi si bas ?</div><div class="a hid">0,0090/0,0585 = 0,154. En effectifs : 4 950 faux positifs contre 900 vrais, puisque les sains sont 99 fois plus nombreux. Le base rate décide.</div></li>
+    <li><div class="q">Refais-le en cotes.</div><div class="a hid">LR⁺ = 0,90/0,05 = 18 ; cote a priori 1:99 ; a posteriori 18:99 = 18/117 = 0,154. Le test multiplie, la population fixe le départ.</div></li>
+    <li><div class="q">Quelle métrique dépend de la prévalence, laquelle non, et par quel mécanisme ?</div><div class="a hid">Précision oui (dénominateur TP + FP : deux lignes mélangées, pas un seul TN). Rappel et FPR non : chacun se lit dans une seule ligne. D'où ROC insensible, PR non.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Voisines</div>
+  <div class="bridges">
+    <a href="../../map.html#p06-03"><b>p06-03 — Seuil, ROC, PR</b><small>le pas 8 poussé jusqu'au bout : la ROC trace TPR contre FPR, deux quantités qui vivent chacune dans une ligne du tableau, donc insensibles à la prévalence ; la courbe PR contient la précision, donc elle bouge avec le base rate</small></a>
+    <a href="chain-p01-02-ic-test-procedure.html"><b>p01-02 — IC et test comme procédures</b><small>« p-value = P(H₀) » est le sophisme du procureur du pas 9 : conditionner sur les données au lieu de conditionner sur l'hypothèse, exactement l'inversion que le pas 2 interdit</small></a>
+    <a href="chain-p02-01-bruit-vraisemblance-loss.html"><b>p02-01 — Du bruit à la loss</b><small>la vraisemblance du numérateur de Bayes y devient une loss ; et le produit sur les observations n'est licite que par l'indépendance du pas 3</small></a>
+    <a href="chain-p02-02-prior-penalite.html"><b>p02-02 — Prior et pénalité</b><small>posterior ∝ vraisemblance × prior lu en logarithme : le prior devient une pénalité et le dénominateur de Bayes, une constante qu'on peut ignorer</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::conditionnement</code> (P(A|B) = P(A∩B)/P(B), indépendance comme licence du produit) · <code>stats::bayes</code> (l'inversion, posterior ∝ vraisemblance × prior, la forme en cotes) · <code>stats::base-rate</code> (le tableau 2 × 2 sur 100 000, VPP 0,154, le sophisme du procureur) · <code>ml::metriques</code> (précision dépend de la prévalence, rappel et FPR non, ROC vs PR).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p00-03 · v1 du 16/09/2026 · Prérequis : <a href="chain-p00-02-esperance-variance-densite.html">p00-02</a>. Suite : <a href="../../map.html#p00-04">p00-04 Moyenne, LGN, TCL</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ---- outils communs aux trois figures ---- */
+const N=100000;
+const ent=v=>String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+const pct=(v,d)=>SL.fmt(v*100,d===undefined?1:d)+' %';
+const vpp=(pr,se,sp)=>se*pr/(se*pr+(1-sp)*(1-pr));
+/* SL.plot écrit ses graduations en clair ; ici les abscisses sont des logs, d'où ces
+   graduations posées à la main dans un groupe .sl-grid pour hériter du style du dépôt. */
+function logticks(P,pairs,ytop){const g=SL.el('g',{class:'sl-grid'},P.layer);
+  pairs.forEach(function(pl){const X=P.sx(Math.log10(pl[0]));
+    SL.el('line',{x1:X,x2:X,y1:P.sy(ytop),y2:P.sy(0)},g);
+    const tx=SL.el('text',{x:X,y:P.sy(0)+16,'text-anchor':'middle',class:'sl-tick'},P.layer);tx.textContent=pl[1];});}
+
+/* ===== Figure 1 : les effectifs ===== */
+(function(){
+const P=SL.plot(document.getElementById('f1plot'),{x:[0,1],y:[0,1],w:620,h:340});
+const out=document.getElementById('f1out');
+const st={prev:.01,se:.90,sp:.95};
+const ROWS=[{y0:.78,y1:.90},{y0:.44,y1:.56},{y0:.10,y1:.22}];
+const FL=3;   /* plancher en pixels : un effectif minuscule reste visible, la barre n'est jamais vide */
+function bar(row,parts,scale){
+  const y0=ROWS[row].y0,y1=ROWS[row].y1;
+  const key=parts.map(p=>scale==='sqrt'?Math.sqrt(Math.max(p.n,0)):Math.max(p.n,0));
+  const tot=key.reduce((a,b)=>a+b,0)||1;
+  const Xa=P.sx(0),Wpx=P.sx(1)-Xa;
+  const brut=key.map(k=>k/tot*Wpx);
+  const manque=brut.reduce((a,w)=>a+Math.max(0,FL-w),0);
+  const large=brut.reduce((a,w)=>a+Math.max(0,w-FL),0)||1;
+  const w=brut.map(v=>v<FL?FL:v-(v-FL)*manque/large);
+  let x=Xa;
+  parts.forEach(function(p,i){
+    SL.el('rect',{x:x,y:P.sy(y1),width:w[i],height:P.sy(y0)-P.sy(y1),class:'sl-dot '+p.cls},P.dyn);
+    x+=w[i];});
+  /* la légende est posée en séquence sous la barre, jamais dans les segments :
+     un segment de 3 px porte quand même son nom, et deux étiquettes ne peuvent pas se croiser */
+  let lx=Xa;const ly=P.sy(y0)+14;
+  parts.forEach(function(p){const txt=p.lab+' · '+ent(p.n);
+    SL.el('rect',{x:lx,y:ly-9,width:9,height:9,class:'sl-dot '+p.cls},P.dyn);
+    const t=SL.el('text',{x:lx+14,y:ly,class:'sl-tick'},P.dyn);t.textContent=txt;
+    lx+=14+txt.length*7+22;});
+}
+function title(row,txt){const t=SL.el('text',{x:P.sx(0),y:P.sy(ROWS[row].y1)-9,class:'sl-lbl'},P.dyn);t.textContent=txt;}
+function draw(){
+  P.clear();
+  const cas=N*st.prev, sains=N-cas;
+  const TP=cas*st.se, FN=cas-TP, FP=sains*(1-st.sp), TN=sains-FP;
+  const pos=TP+FP, neg=FN+TN, v=TP/pos, vn=TN/neg;
+  title(0,'La population testée · '+ent(N)+' personnes');
+  bar(0,[{n:cas,cls:'sl-c1',lab:'cas'},{n:sains,cls:'sl-c2',lab:'sains'}],'sqrt');
+  title(1,'Les positifs · '+ent(pos)+'  —  VPP = '+pct(v));
+  bar(1,[{n:TP,cls:'sl-c1',lab:'vrais positifs'},{n:FP,cls:'sl-c3',lab:'faux positifs'}],'lin');
+  title(2,'Les négatifs · '+ent(neg)+'  —  VPN = '+pct(vn,3));
+  bar(2,[{n:FN,cls:'sl-c5',lab:'faux négatifs'},{n:TN,cls:'sl-c2',lab:'vrais négatifs'}],'lin');
+  out.innerHTML=
+    '<div class="pos">vrais positifs<b>'+ent(TP)+'</b></div>'+
+    '<div class="zero">faux positifs<b>'+ent(FP)+'</b></div>'+
+    '<div>positifs au total<b>'+ent(pos)+'</b></div>'+
+    '<div class="'+(v<.5?'zero':'pos')+'">VPP = P(cas | +)<b>'+pct(v)+'</b></div>'+
+    '<div>faux négatifs<b>'+ent(FN)+'</b></div>'+
+    '<div class="pos">VPN = P(sain | −)<b>'+pct(vn,3)+'</b></div>';
+}
+const host=document.getElementById('f1sliders');
+const sPrev=SL.slider(host,{label:'prévalence',min:-3,max:Math.log10(.5),step:.01,value:-2,fmt:v=>pct(Math.pow(10,v),v<-2.4?2:1)},v=>{st.prev=Math.pow(10,v);draw();});
+const sSe=SL.slider(host,{label:'sensibilité',min:.60,max:.99,step:.01,value:.90},v=>{st.se=v;draw();});
+const sSp=SL.slider(host,{label:'spécificité',min:.85,max:.999,step:.001,value:.95},v=>{st.sp=v;draw();});
+const pre=document.getElementById('f1presets');
+[['dépistage · 1 %',-2,.90,.95],['consultation · 10 %',-1,.90,.95],['urgences · 30 %',Math.log10(.3),.90,.95],['spécificité 0,999',-2,.90,.999]]
+ .forEach(function(q){const bt=document.createElement('button');bt.className='tb';bt.textContent=q[0];
+   bt.onclick=()=>{sSe.set(q[2]);sSp.set(q[3]);sPrev.set(q[1]);};pre.appendChild(bt);});
+draw();
+})();
+
+/* ===== Figure 2 : VPP en fonction de la prévalence ===== */
+(function(){
+const XMIN=-3,XMAX=Math.log10(.5),SE=.90;
+const P=SL.plot(document.getElementById('f2plot'),{x:[XMIN,XMAX],y:[0,1.05],w:620,h:300,xt:[],yt:[.25,.5,.75,1],xl:'prévalence (log)',yl:'VPP = précision'});
+logticks(P,[[.001,'0,1 %'],[.003,'0,3 %'],[.01,'1 %'],[.03,'3 %'],[.1,'10 %'],[.3,'30 %']],1.05);
+P.fn(u=>vpp(Math.pow(10,u),SE,.95),'sl-c2');   /* repère fixe : le fil rouge, spécificité 0,95 */
+const out=document.getElementById('f2out');
+let cur=null;
+function draw(sp){
+  if(cur)cur.remove();
+  cur=P.fn(u=>vpp(Math.pow(10,u),SE,sp),'sl-c1');
+  P.clear();
+  [[.01,'1 %'],[.1,'10 %']].forEach(function(mk){const u=Math.log10(mk[0]),y=vpp(mk[0],SE,sp);
+    P.vline(u,'chord');P.dot(u,y,'sl-c1',5);
+    P.text(u,1.02,mk[1],'sl-c3','middle');});
+  out.innerHTML=
+    '<div class="'+(vpp(.01,SE,sp)<.5?'zero':'pos')+'">VPP à 1 %<b>'+pct(vpp(.01,SE,sp))+'</b></div>'+
+    '<div class="'+(vpp(.1,SE,sp)<.5?'zero':'pos')+'">VPP à 10 %<b>'+pct(vpp(.1,SE,sp))+'</b></div>'+
+    '<div>rappel (inchangé)<b>'+SL.fmt(SE,2)+'</b></div>'+
+    '<div>FPR = 1 − spécificité<b>'+pct(1-sp,2)+'</b></div>'+
+    '<div>LR⁺ = sens/(1 − spéc)<b>'+SL.fmt(SE/(1-sp),1)+'</b></div>'+
+    '<div>prév. pour VPP = 50 %<b>'+pct((1-sp)/(SE+1-sp),2)+'</b></div>';
+}
+SL.slider(document.getElementById('f2sliders'),{label:'spécificité',min:.80,max:.999,step:.001,value:.95},draw);
+})();
+
+/* ===== Figure 3 : l'échelle des cotes ===== */
+(function(){
+const P=SL.plot(document.getElementById('f3plot'),{x:[-3.25,2.25],y:[0,1],w:620,h:270,xt:[],yt:[],xl:'cote (log)',yl:''});
+logticks(P,[[.001,'1:1000'],[.01,'1:100'],[.1,'1:10'],[1,'1:1'],[10,'10:1'],[100,'100:1']],1);
+const YA=.74,YB=.26;
+[[YA,.14,'avant le test — la population','sl-c1'],[YB,-.19,'après le test — le patient','sl-c3']].forEach(function(r){
+  SL.el('line',{x1:P.sx(-3.25),x2:P.sx(2.25),y1:P.sy(r[0]),y2:P.sy(r[0]),class:'sl-axis'},P.layer);
+  P.label(2.2,r[0]+r[1],r[2],r[3],'end');});
+const out=document.getElementById('f3out');
+const st={prev:.01,lr:18};
+const cote=o=>o<1?'1 : '+SL.fmt(1/o,o>.01?1:0):SL.fmt(o,2)+' : 1';
+const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+function draw(){
+  P.clear();
+  const a=st.prev/(1-st.prev), b=a*st.lr;
+  const xa=clamp(Math.log10(a),-3.2,2.2), xb=clamp(Math.log10(b),-3.2,2.2);
+  P.arrow(xa,YA,xb,YB,'gain');
+  P.dot(xa,YA,'sl-c1',6);P.dot(xb,YB,'sl-c3',6);
+  /* à mi-hauteur la flèche est en xa + 0,375·(xb−xa) : poser l'étiquette en xa + 0,5·(xb−xa) + 0,10
+     la place toujours à sa droite, y compris quand la flèche est verticale (LR = 1). */
+  P.text((xa+xb)/2+.10,.56,'× LR = '+SL.fmt(st.lr,1),'','start');
+  P.text(clamp(xa,-2.85,1.85),YA+.07,cote(a),'sl-c1','middle');
+  P.text(clamp(xb,-2.85,1.85),YB-.09,cote(b),'sl-c3','middle');
+  out.innerHTML=
+    '<div>cote a priori<b>'+cote(a)+'</b></div>'+
+    '<div>LR appliqué<b>× '+SL.fmt(st.lr,1)+'</b></div>'+
+    '<div>cote a posteriori<b>'+cote(b)+'</b></div>'+
+    '<div class="'+(b/(1+b)<.5?'zero':'pos')+'">P(cas | +) après le test<b>'+pct(b/(1+b))+'</b></div>'+
+    '<div>P(cas) avant le test (prév.)<b>'+pct(st.prev,2)+'</b></div>'+
+    '<div class="'+(st.lr<1.05?'zero':'pos')+'">croyance multipliée<b>× '+SL.fmt((b/(1+b))/st.prev,2)+'</b></div>';
+}
+const host=document.getElementById('f3sliders');
+SL.slider(host,{label:'prévalence',min:-3,max:Math.log10(.5),step:.01,value:-2,fmt:v=>pct(Math.pow(10,v),v<-2.4?2:1)},v=>{st.prev=Math.pow(10,v);draw();});
+SL.slider(host,{label:'LR⁺',min:1,max:100,step:.5,value:18,fmt:v=>SL.fmt(v,1)},v=>{st.lr=v;draw();});
+})();
+})();
+</script>
+</body>
+</html>
