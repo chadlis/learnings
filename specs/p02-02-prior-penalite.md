@@ -10,7 +10,7 @@ prereq: [p02-01, p04-02]
 anki: [stats::map, stats::regularisation, ml::ridge, ml::lasso, algebre::eigen]
 bridges: [b05, b06, b03]
 next: p02-03
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -80,3 +80,10 @@ Régression colinéaire de D4 : x₁ = (1, 2, 3), x₂ = (2, 4, 6), y = (1, 2, 3
 
 ## Exclusions
 Pas d'Elastic Net au-delà d'une ligne. Pas de chemin de régularisation complet (p05-03). Pas de dérivation de la variance de Ridge.
+
+## Questions pour la revue
+- **Tous les chiffres du spec ont été vérifiés par script et sont justes** : XᵀX = [[14,28],[28,56]] (v.p. 0 et 70), Xᵀy = (14,28) ; ridge λ = 1 → det 71, β̂ = (14/71 ; 28/71) = (0,197 ; 0,394), v.p. 1 et 71 ; min ‖β‖² en t = −0,4 → (0,2 ; 0,4) ; min ‖β‖₁ en t = −0,5 → (0 ; 0,5) ; séparable λ = 0,01 / 0,1 / 1 → β̂ = 3,4114 / 1,8472 / 0,7148, soit 3,41 / 1,85 / 0,71. Aucune correction apportée au spec.
+- **Constante de λ pour le prior de Laplace** : le spec ne la donne pas. La sheet écrit λ = 2σ²/τ, obtenu en multipliant RSS/(2σ²) + ‖β‖₁/τ par 2σ². À confirmer : c'est la convention qui garde le même facteur 2σ² que pour le cas gaussien.
+- **Conventions de λ entre p02-02 et p03-01** : p03-01 (habit 3) chiffre ½(θ−1)² + λθ² et obtient θ̂ = 1/(1+2λ) et max(0, 1−λ). p02-02 donne le seuillage doux sous ½(β−b)² + λ·pen(β), pen = ½β² ou |β|, d'où b/(1+λ) et signe(b)·max(0, |b|−λ). Les deux sont exacts mais les λ diffèrent d'un facteur 2 : à harmoniser si les deux fiches sont lues côte à côte.
+- **Ordre des figures** : les figures exigées 1 (plan/boules) et 3 (NLL séparable + λβ²) appartiennent toutes deux au pas 4 (« unicité » et « existence »), et la figure 2 (valeurs propres) au pas 5. La sheet les numérote donc dans l'ordre de lecture : Figure 1 = plan, Figure 2 = NLL séparable, Figure 3 = valeurs propres. Contenu identique au spec, seul l'indice d'affichage change.
+- **Liens en attente (9 WARN au validateur)** : `bridge-03`, `bridge-05`, `bridge-06` et `chain-p02-03` ne sont pas encore écrits. Les cibles sont posées, elles se résoudront à l'écriture de ces fiches.
