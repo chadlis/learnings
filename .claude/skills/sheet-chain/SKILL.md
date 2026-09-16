@@ -63,4 +63,8 @@ Commit : `feat(sheet): <id> <titre>` ; mettre le spec au statut `built`. Un spec
 
 ## Ce que ce skill ne fait pas
 
-Il n'invente pas de spec, il ne fusionne pas deux specs, il ne réécrit pas le gold standard, il ne touche pas aux sheets de `archive/`. Une question de contenu (chiffre douteux, pas manquant, contradiction avec une autre sheet) s'écrit dans le commit et dans `specs/<id>.md` sous `## Questions pour la revue`, elle ne se résout pas par une invention.
+Il n'invente pas de spec, il ne fusionne pas deux specs, il ne réécrit pas le gold standard, il ne touche pas aux sheets de `archive/`.
+
+**Ne pas invoquer le skill `frontend-design` (ou tout skill de design) pour une sheet** : le CSS et la mise en page viennent du gold standard, sans variation. Une sheet qui « a son propre style » est une sheet cassée — c'est l'uniformité qui rend la relecture rapide.
+
+Une question de contenu (chiffre douteux, pas manquant, contradiction avec une autre sheet) s'écrit dans le commit et dans `specs/<id>.md` sous `## Questions pour la revue`, elle ne se résout pas par une invention.
