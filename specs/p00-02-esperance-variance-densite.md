@@ -10,7 +10,7 @@ prereq: [p00-01]
 anki: [stats::esperance, stats::variance, stats::densite, stats::covariance]
 bridges: [b04]
 next: p00-03
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -27,7 +27,7 @@ Que valent E et Var d'une variable, comment se transforment-ils, quand s'additio
 Un dé équilibré : E = 3,5 ; E[X²] = 91/6 = 15,17 ; Var = 15,17 − 12,25 = 2,917 ; écart-type 1,708.
 Gain G = 2X + 1 : E = 8, Var = 4·2,917 = 11,67.
 Deux dés indépendants, S = X + Y : E = 7, Var = 5,833. Le même dé compté deux fois, 2X : E = 7 aussi, Var = 11,67 — pas 5,833.
-Densité : Exponentielle de taux 4/h a pour densité 4 en t = 0 (> 1) ; P(T = 15 min exactement) = 0 ; P(10 < T < 20 min) = e⁻²ᐟ³ − e⁻⁴ᐟ³ = 0,513 − 0,264 = 0,250.
+Densité : Exponentielle de taux 4/h a pour densité 4 en t = 0 (> 1) ; P(T = 15 min exactement) = 0 ; P(10 < T < 20 min) = e⁻²ᐟ³ − e⁻⁴ᐟ³ = 0,5134 − 0,2636 = 0,2498.
 Cov nulle sans indépendance : X uniforme sur {−1, 0, 1}, Y = X² : E[XY] = E[X³] = 0 = E[X]E[Y] ⇒ Cov = 0, mais Y est déterminé par X.
 
 ## Pas de la chaîne
@@ -72,6 +72,19 @@ Cov nulle sans indépendance : X uniforme sur {−1, 0, 1}, Y = X² : E[XY] = E[
 - Scorie du fil B (15/09) : densité **intégrée** au lieu d'**évaluée** — le pas 7 existe pour ça, et la figure 2 met la hauteur et l'aire côte à côte avec deux readouts distincts.
 - p01-04 a besoin de Var(D) = Var(A) + Var(B) − 2Cov : le pas 5 doit écrire explicitement le cas X − Y (signe moins devant 2Cov) en une ligne.
 - Le 1/n² de Var(X̄) (p01-01, pas 5) vient du pas 4 : le nommer.
+
+## Questions pour la revue
+- **Chiffre corrigé.** Le spec écrivait « 0,513 − 0,264 = 0,250 » : la soustraction posée donnait 0,249,
+  l'arrondi à 3 décimales du vrai résultat donnait 0,250. Valeur exacte vérifiée : e⁻²ᐟ³ − e⁻⁴ᐟ³ = 0,249820.
+  Passé à 4 décimales (0,5134 − 0,2636 = 0,2498) dans le spec et dans la sheet, pour qu'aucune ligne
+  affichée ne soit une soustraction fausse. Tous les autres chiffres du fil rouge sont confirmés exacts
+  (3,5 · 91/6 · 35/12 · 1,708 · 8 · 35/3 · 7 · 35/6 · 2,415 · 3,416 · Cov = 0 pour Y = X²).
+- **Figure 1, deux graphes au lieu d'un.** Le spec demandait la PMF et les barres (x − 3,5)²/6 sur la même
+  figure ; les deux séries n'ont pas la même unité ni le même ordre de grandeur (0,167 contre 1,04, et
+  jusqu'à 9,4 à a = 3). Rendues en deux graphes empilés partageant l'axe des x plutôt qu'en un seul avec
+  une échelle inventée. À valider.
+- **Figure 3, cas b < a.** Les sliders permettent b < a : l'aire affiche alors 0 (ce qui est exact pour
+  P(a < T < b)) mais les deux points se croisent à l'écran. Laissé tel quel — faut-il contraindre b > a ?
 
 ## Exclusions
 Pas de moments d'ordre supérieur, pas de fonction de répartition au-delà de « l'intégrale de la densité », pas de changement de variable.

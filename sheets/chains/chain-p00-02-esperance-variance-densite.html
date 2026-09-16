@@ -1,0 +1,511 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Espérance, variance, masse vs densité — chaîne</title>
+<meta name="sheet" content="series=chain;part=00;number=02;status=v1">
+<meta name="part" content="00 · Socle probabiliste">
+<meta name="subtitle" content="socle — les deux nombres qui résument une loi, et pourquoi une densité s'évalue mais ne se lit pas">
+<meta name="prereq" content="p00-01">
+<meta name="anki" content="stats::esperance,stats::variance,stats::densite,stats::covariance">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 00 · Socle probabiliste › chaîne 02</div>
+  <h1>Espérance, <span>variance</span>, masse vs <span>densité</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Une loi entière — six probabilités pour un dé, une courbe entière pour une attente — est trop d'information : on veut deux nombres, où elle est centrée et à quel point elle s'étale, puis savoir ce qu'ils deviennent quand on transforme ou qu'on additionne. <b>L'espérance est linéaire sans aucune condition ; la variance ne s'additionne que si la covariance est nulle.</b> Et dès qu'on passe au continu il n'y a plus de probabilité ponctuelle, seulement une densité : un taux qu'on évalue ou qu'on intègre, jamais qu'on lit comme une probabilité. Fil rouge : un dé équilibré, un gain <span class="m">G</span> = 2<span class="m">X</span> + 1, deux dés contre un dé doublé, et l'attente entre deux spams.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="chain-p00-01-lois-quand-laquelle.html#s1">p00-01 · v.a., loi, mécanisme</a></li>
+    <li><a href="chain-p00-01-lois-quand-laquelle.html#s3">p00-01 · PMF et essais iid</a></li>
+    <li><a href="chain-p00-01-lois-quand-laquelle.html#s5">p00-01 · Exponentielle(λ)</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::esperance</code><code>stats::variance</code><code>stats::densite</code><code>stats::covariance</code></div>
+  <h4>Suites</h4>
+  <ol>
+    <li><a href="../../map.html#p00-03">p00-03 · Conditionnement et Bayes</a></li>
+    <li><a href="../../map.html#p00-04">p00-04 · Moyenne, LGN, TCL</a></li>
+    <li><a href="../../map.html#b04">b04 · Variance d'une moyenne corrélée</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>Variable aléatoire et loi.</b> Un nombre qui dépend du tirage, noté en majuscule ; sa loi est le mécanisme qui le produit, pas la forme de sa courbe (<a href="chain-p00-01-lois-quand-laquelle.html#s1">p00-01, pas 1</a>).</li>
+      <li><b>PMF d'une loi discrète.</b> La liste des valeurs possibles avec leur probabilité, <span class="m">P</span>(<span class="m">X</span> = <span class="m">k</span>), qui somme à 1 (<a href="chain-p00-01-lois-quand-laquelle.html#s3">p00-01, pas 3</a>). Ici on part de là et on n'en garde que deux nombres.</li>
+      <li><b>Essais iid.</b> Indépendants et de même loi : c'est l'hypothèse qui fabrique la Binomiale (<a href="chain-p00-01-lois-quand-laquelle.html#s3">p00-01, pas 3</a>), et c'est elle qu'on va retrouver au pas 5 sous le nom de covariance nulle.</li>
+      <li><b>Exponentielle(λ).</b> <span class="m">P</span>(<span class="m">T</span> &gt; <span class="m">t</span>) = e<sup>−<span class="m">λt</span></sup>, <span class="m">E</span>[<span class="m">T</span>] = 1/<span class="m">λ</span> (<a href="chain-p00-01-lois-quand-laquelle.html#s5">p00-01, pas 5</a>). On ne la redérive pas : on regarde sa <i>densité</i>, qui est l'objet du pas 7.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span><span class="m">E</span> et Var <b>existent</b> : la somme Σ|<span class="m">x</span>|<span class="m">P</span>(<span class="m">X</span> = <span class="m">x</span>) et l'intégrale ∫|<span class="m">x</span>|<span class="m">f</span>(<span class="m">x</span>)d<span class="m">x</span> sont finies, et de même pour <span class="m">x</span>². Ce n'est pas automatique : certaines queues lourdes le mettent en défaut, et tout ce qui suit tombe avec (pas 8).</span>
+      <b>H2</b><span>« <b>Indépendant</b> » signifie <span class="m">P</span>(<span class="m">X</span> = <span class="m">x</span>, <span class="m">Y</span> = <span class="m">y</span>) = <span class="m">P</span>(<span class="m">X</span> = <span class="m">x</span>)<span class="m">P</span>(<span class="m">Y</span> = <span class="m">y</span>) pour tous <span class="m">x</span>, <span class="m">y</span>. On s'en sert comme d'une définition ; ce qu'elle veut dire en termes de conditionnement est en <a href="../../map.html#p00-03">p00-03</a>.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor</h3>
+    <p>Une loi entière ne se transporte pas : on ne la met pas dans un tableau de résultats, on ne la propage pas à travers une somme. On en veut deux nombres — la position et l'étalement.</p>
+    <p>Deux nombres ne suffisent que si on sait ce qu'ils deviennent quand la variable est transformée (un gain, un changement d'unité) ou additionnée (une somme, une moyenne). C'est toute la chaîne.</p>
+    <p class="say">« Une loi entière ne se manipule pas, donc on la résume par deux nombres, donc le seul travail utile est de savoir comment ces deux nombres traversent une transformation et une somme. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le fil rouge</div>
+    <table>
+      <tr><th>objet</th><th>ce que c'est</th><th>ce qu'on cherche</th></tr>
+      <tr><td><span class="m">X</span></td><td>un dé équilibré, faces 1 à 6</td><td><span class="m">E</span>, Var, écart-type</td></tr>
+      <tr><td><span class="m">G</span> = 2<span class="m">X</span> + 1</td><td>un gain affine du lancer</td><td>la transformation</td></tr>
+      <tr><td><span class="m">S</span> = <span class="m">X</span> + <span class="m">Y</span></td><td>deux dés <b>indépendants</b></td><td>la somme</td></tr>
+      <tr class="hl"><td>2<span class="m">X</span></td><td>le <b>même</b> dé compté deux fois</td><td>le piège de la somme</td></tr>
+      <tr><td><span class="m">T</span></td><td>l'attente entre deux spams, Exp(4/h)</td><td>le cas continu</td></tr>
+    </table>
+    <p><span class="m">S</span> et 2<span class="m">X</span> ont la même espérance et ne prennent pas les mêmes valeurs à la même fréquence. Le pas 5 dit exactement pourquoi.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Espérance = moyenne pondérée par les probabilités <span class="tag tronc">tronc</span></h3>
+    <p>La moyenne des valeurs, pondérée par leur probabilité — pas la valeur la plus probable, pas le milieu du support.</p>
+    <div class="eq"><span class="m">E</span>[<span class="m">X</span>] = Σ <span class="m">x</span> <span class="m">P</span>(<span class="m">X</span> = <span class="m">x</span>) &nbsp;&nbsp;&nbsp; <span class="m">E</span>[<span class="m">X</span>] = ∫ <span class="m">x f</span>(<span class="m">x</span>) d<span class="m">x</span></div>
+    <p>Une somme pondérée se réorganise terme à terme, donc l'espérance est <b>linéaire toujours</b> : les constantes sortent, les sommes se coupent en deux, et <b>aucune hypothèse d'indépendance n'intervient</b>.</p>
+    <div class="eq"><span class="m">E</span>[<span class="m">aX</span> + <span class="m">b</span>] = <span class="m">a E</span>[<span class="m">X</span>] + <span class="m">b</span> &nbsp;&nbsp;&nbsp; <span class="m">E</span>[<span class="m">X</span> + <span class="m">Y</span>] = <span class="m">E</span>[<span class="m">X</span>] + <span class="m">E</span>[<span class="m">Y</span>] &nbsp; (même si <span class="m">X</span> et <span class="m">Y</span> sont liés)</div>
+    <p class="say">« L'espérance est une somme pondérée, donc elle passe à travers les sommes et les constantes, donc elle est linéaire sans aucune hypothèse d'indépendance. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application</div>
+    <p>Dé équilibré : <span class="m">E</span>[<span class="m">X</span>] = (1 + 2 + 3 + 4 + 5 + 6)/6 = 21/6 = <b>3,5</b>. Ce n'est pas une face — une espérance n'a pas à être une valeur possible.</p>
+    <p>Gain : <span class="m">E</span>[<span class="m">G</span>] = <span class="m">E</span>[2<span class="m">X</span> + 1] = 2·3,5 + 1 = <b>8</b>.</p>
+    <p>Deux dés indépendants : <span class="m">E</span>[<span class="m">S</span>] = 3,5 + 3,5 = <b>7</b>. Le même dé compté deux fois : <span class="m">E</span>[2<span class="m">X</span>] = 2·3,5 = <b>7</b> aussi. Sur l'espérance, la dépendance ne se voit pas — c'est précisément ce qui rend le piège du pas 5 invisible si on s'arrête ici.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Variance = espérance de l'écart au carré <span class="tag tronc">tronc</span></h3>
+    <p>On mesure l'étalement par l'écart à l'espérance. En valeur absolue il ne se manipule pas ; au carré, si.</p>
+    <div class="eq">Var(<span class="m">X</span>) = <span class="m">E</span>[(<span class="m">X</span> − <span class="m">E</span>[<span class="m">X</span>])²] = <span class="m">E</span>[<span class="m">X</span>²] − <span class="m">E</span>[<span class="m">X</span>]²</div>
+    <p>La seconde écriture vient du développement du carré, par linéarité de <span class="m">E</span> : deux moments suffisent à calculer une variance.</p>
+    <p>Le carré a un prix : les <b>unités sont au carré</b> (des euros² si <span class="m">X</span> est en euros). Ce qu'on rapporte est donc l'écart-type <span class="m">σ</span> = √Var, dans l'unité de <span class="m">X</span>.</p>
+    <p class="say">« La variance est la moyenne des écarts au carré, donc en développant le carré il reste E de X deux moins E de X au carré, donc elle se calcule avec deux moments, donc l'écart-type est sa racine et vit dans l'unité de X. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le dé, face par face</div>
+    <p><span class="m">E</span>[<span class="m">X</span>²] = (1 + 4 + 9 + 16 + 25 + 36)/6 = 91/6 = <b>15,17</b>, donc Var = 15,17 − 3,5² = 15,17 − 12,25 = 35/12 = <b>2,917</b> et <span class="m">σ</span> = <b>1,708</b>.</p>
+    <table>
+      <tr><th>face <span class="m">x</span></th><th>1 et 6</th><th>2 et 5</th><th>3 et 4</th><th>somme</th></tr>
+      <tr><td>(<span class="m">x</span> − 3,5)²</td><td>6,25</td><td>2,25</td><td>0,25</td><td>—</td></tr>
+      <tr class="hl"><td>contribution ×1/6</td><td>2 × 1,042</td><td>2 × 0,375</td><td>2 × 0,042</td><td><b>2,917</b></td></tr>
+    </table>
+    <p>La variance est littéralement cette somme : chaque face apporte son écart au carré, pesé par sa probabilité. Les faces extrêmes en apportent 71 % à elles seules — le carré donne le pouvoir aux extrêmes, et c'est aussi ce qui la rend fragile (pas 8).</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Transformation affine : <span class="m">b</span> décale, <span class="m">a</span> étale au carré <span class="tag tronc">tronc</span></h3>
+    <div class="eq">Var(<span class="m">aX</span> + <span class="m">b</span>) = <span class="m">a</span>²Var(<span class="m">X</span>) &nbsp;&nbsp;&nbsp; <span class="m">σ</span>(<span class="m">aX</span> + <span class="m">b</span>) = |<span class="m">a</span>|·<span class="m">σ</span>(<span class="m">X</span>)</div>
+    <p>Ajouter <span class="m">b</span> déplace la variable <i>et</i> son espérance de la même quantité : les écarts à la moyenne sont inchangés, <span class="m">b</span> disparaît. Multiplier par <span class="m">a</span> multiplie chaque écart par <span class="m">a</span>, donc chaque écart au carré par <span class="m">a</span>².</p>
+    <p><b>C'est l'origine du 1/<span class="m">n</span>² de la moyenne.</b> <span class="m">X̄</span> = (1/<span class="m">n</span>)Σ<span class="m">X</span><sub><span class="m">i</span></sub> est une transformation affine de la somme avec <span class="m">a</span> = 1/<span class="m">n</span>, donc Var(<span class="m">X̄</span>) = (1/<span class="m">n</span>²)·Var(Σ<span class="m">X</span><sub><span class="m">i</span></sub>). Le 1/<span class="m">n</span>² vient d'ici et de nulle part ailleurs ; ce qui reste à trouver est Var(Σ<span class="m">X</span><sub><span class="m">i</span></sub>), et c'est le pas 5 (<a href="../../map.html#p00-04">p00-04</a>, <a href="chain-p01-01-objet-aleatoire.html">p01-01</a>).</p>
+    <p class="say">« Décaler ne change pas les écarts, donc b disparaît, donc multiplier par a multiplie les écarts par a et leur carré par a², donc la variance est multipliée par a² et l'écart-type par la valeur absolue de a. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le gain 2X + 1</div>
+    <p><span class="m">E</span>[<span class="m">G</span>] = 8 ; Var(<span class="m">G</span>) = 2²·2,917 = <b>11,67</b> ; <span class="m">σ</span>(<span class="m">G</span>) = 2·1,708 = <b>3,416</b>.</p>
+    <p>Le « + 1 » n'a strictement rien changé à la dispersion. Le « ×2 » a multiplié l'écart-type par 2 et la variance par 4.</p>
+    <p><b>Changement d'unité.</b> Passer d'heures en minutes, c'est <span class="m">a</span> = 60 : la variance est multipliée par 3600, l'écart-type par 60. Une variance ne se compare jamais entre deux unités ; un écart-type se compare, et un coefficient de variation <span class="m">σ</span>/<span class="m">E</span> se compare même entre unités.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — b décale, a étale au carré</div>
+    <div id="f1a" class="wide"></div>
+    <div id="f1b" class="wide"></div>
+    <div id="f1sliders"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">En haut la loi de <span class="m">aX</span> + <span class="m">b</span> : six valeurs de probabilité 1/6 chacune, avec <span class="m">E</span> en <b>trait rouge</b>. En bas la <b>contribution de chaque valeur à la variance</b>, (<span class="m">y</span> − <span class="m">E</span>)²·1/6 : la somme de ces six barres <i>est</i> la variance. Bouge <span class="m">b</span> seul : tout glisse, les barres du bas ne bougent pas d'un pixel. Bouge <span class="m">a</span> : l'écartement change et les barres du bas changent comme le carré — le readout <span class="m">a</span>² le confirme. À <span class="m">a</span> = 0 tout s'écrase sur un point, la variance tombe à zéro, et à <span class="m">a</span> = −1 la loi est retournée mais la variance est identique.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Additivité seulement à covariance nulle <span class="tag tronc">tronc</span></h3>
+    <p>Le carré d'une somme a un double produit ; la variance d'une somme a donc un terme croisé, la covariance.</p>
+    <div class="eq">Var(<span class="m">X</span> ± <span class="m">Y</span>) = Var(<span class="m">X</span>) + Var(<span class="m">Y</span>) ± 2 Cov(<span class="m">X</span>, <span class="m">Y</span>) &nbsp;&nbsp;&nbsp; Cov(<span class="m">X</span>, <span class="m">Y</span>) = <span class="m">E</span>[<span class="m">XY</span>] − <span class="m">E</span>[<span class="m">X</span>]<span class="m">E</span>[<span class="m">Y</span>]</div>
+    <p>Sous indépendance <span class="m">E</span>[<span class="m">XY</span>] = <span class="m">E</span>[<span class="m">X</span>]<span class="m">E</span>[<span class="m">Y</span>], donc Cov = 0, donc la variance s'additionne. Pour une <b>différence</b>, le signe du terme croisé s'inverse : Var(<span class="m">X</span> − <span class="m">Y</span>) = Var(<span class="m">X</span>) + Var(<span class="m">Y</span>) − 2Cov — c'est la formule des comparaisons appariées (<a href="chain-p01-04-comparer-modeles-multiplicite.html">p01-04</a>, <a href="../../map.html#b04">b04</a>).</p>
+    <p>Cas extrême, <span class="m">Y</span> = <span class="m">X</span> : Cov(<span class="m">X</span>, <span class="m">X</span>) = Var(<span class="m">X</span>), donc Var(2<span class="m">X</span>) = 4Var(<span class="m">X</span>), pas 2Var(<span class="m">X</span>).</p>
+    <p class="say">« Le carré d'une somme a un terme croisé, donc la variance d'une somme a une covariance, donc elle n'est additive que si la covariance est nulle, donc en particulier sous indépendance — et jamais quand on additionne une variable à elle-même. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — deux dés contre un dé doublé</div>
+    <table>
+      <tr><th></th><th><span class="m">S</span> = <span class="m">X</span> + <span class="m">Y</span> (indépendants)</th><th>2<span class="m">X</span> (le même dé)</th></tr>
+      <tr><td>espérance</td><td>7</td><td>7</td></tr>
+      <tr><td>covariance</td><td>0</td><td>Cov(<span class="m">X</span>, <span class="m">X</span>) = 2,917</td></tr>
+      <tr class="hl"><td>variance</td><td>2,917 + 2,917 = <b>5,833</b></td><td>2,917 + 2,917 + 2·2,917 = <b>11,67</b></td></tr>
+      <tr><td>écart-type</td><td>2,415</td><td>3,416</td></tr>
+      <tr><td>valeurs possibles</td><td>2 à 12, 7 le plus fréquent</td><td>2, 4, 6, 8, 10, 12 équiprobables</td></tr>
+    </table>
+    <p><b>Retour au 1/<span class="m">n</span>².</b> Sous iid, Var(Σ<span class="m">X</span><sub><span class="m">i</span></sub>) = <span class="m">nσ</span>², donc avec le <span class="m">a</span>² du pas 4 : Var(<span class="m">X̄</span>) = <span class="m">nσ</span>²/<span class="m">n</span>² = <span class="m">σ</span>²/<span class="m">n</span>. Le <span class="m">n</span> du haut vient de l'additivité, le <span class="m">n</span>² du bas vient de la transformation affine — et si les <span class="m">X</span><sub><span class="m">i</span></sub> sont corrélés positivement, seul le haut grossit.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — même moyenne, deux étalements</div>
+    <div id="f2sum" class="wide"></div>
+    <div id="f2dbl" class="wide"></div>
+    <p class="cap">Deux mécanismes, même espérance 7. Les deux histogrammes partent de 300 tirages ; ajoutes-en 500 de chaque côté : les moyennes mesurées convergent toutes deux vers 7, les <b>écarts-types mesurés</b> se séparent nettement — environ 2,42 en haut, 3,42 en bas. Le <b>trait épais bleu</b> est l'espérance théorique 7, le <b>trait rouge fin</b> la moyenne mesurée — elle vient s'y coller. En bas, seules les valeurs paires sortent : 2<span class="m">X</span> ne peut pas faire 7, alors que <span class="m">X</span> + <span class="m">Y</span> le fait une fois sur six. Deux lois différentes derrière la même espérance, et c'est la covariance de 2,917 qui fait toute la différence de variance.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Corrélation : la covariance sans unité</h3>
+    <p>La covariance a l'unité de <span class="m">X</span> fois celle de <span class="m">Y</span> ; on la normalise par les deux écarts-types pour la rendre lisible.</p>
+    <div class="eq"><span class="m">ρ</span> = Cov(<span class="m">X</span>, <span class="m">Y</span>) / (<span class="m">σ</span><sub><span class="m">X</span></sub> <span class="m">σ</span><sub><span class="m">Y</span></sub>) ∈ [−1, 1]</div>
+    <p><span class="m">ρ</span> = ±1 signifie <span class="m">Y</span> = <span class="m">aX</span> + <span class="m">b</span> exactement. Entre les deux, <span class="m">ρ</span> mesure <b>l'alignement linéaire, et rien d'autre</b>.</p>
+    <p>Indépendance ⇒ Cov = 0. La réciproque est <b>fausse</b> : une dépendance parfaite mais symétrique autour de 0 donne une covariance nulle. La bonne condition pour l'additivité du pas 5 est donc bien Cov = 0, pas l'indépendance — l'indépendance n'est qu'un cas suffisant.</p>
+    <p class="say">« La corrélation est la covariance normalisée par les deux écarts-types, donc elle ne mesure que l'alignement linéaire, donc une dépendance non linéaire peut donner une corrélation nulle, donc corrélation nulle ne veut pas dire indépendance. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le contre-exemple à retenir</div>
+    <p><span class="m">X</span> uniforme sur {−1, 0, 1} et <span class="m">Y</span> = <span class="m">X</span>². Connaître <span class="m">X</span> donne <span class="m">Y</span> <i>exactement</i> : dépendance totale.</p>
+    <div class="eq"><span class="m">E</span>[<span class="m">X</span>] = 0 &nbsp; <span class="m">E</span>[<span class="m">Y</span>] = 2/3 &nbsp; <span class="m">E</span>[<span class="m">XY</span>] = <span class="m">E</span>[<span class="m">X</span>³] = 0 &nbsp; ⇒ &nbsp; Cov = 0 − 0·(2/3) = <b>0</b></div>
+    <p>Les termes −1 et +1 se compensent : la covariance, qui est un produit signé, ne voit rien d'une dépendance en cloche.</p>
+    <p>Et l'additivité tient quand même : Var(<span class="m">X</span>) = 2/3, Var(<span class="m">Y</span>) = 2/9, et Var(<span class="m">X</span> + <span class="m">Y</span>) = 8/9 = 2/3 + 2/9 — sur des variables pourtant liées. La formule du pas 5 demande Cov = 0, et c'est tout ce qu'elle demande.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Masse vs densité : évaluer ou intégrer <span class="tag tronc">tronc</span></h3>
+    <p><b>Discret</b> : <span class="m">P</span>(<span class="m">X</span> = <span class="m">x</span>) est une probabilité, entre 0 et 1, et la somme vaut 1. <b>Continu</b> : <span class="m">P</span>(<span class="m">X</span> = <span class="m">x</span>) = 0 pour tout <span class="m">x</span> — un point n'a pas de largeur. Ce qui existe est une <b>densité</b> <span class="m">f</span>, un taux de probabilité par unité de <span class="m">x</span>.</p>
+    <div class="eq"><span class="m">P</span>(<span class="m">a</span> &lt; <span class="m">X</span> &lt; <span class="m">b</span>) = ∫<sub><span class="m">a</span></sub><sup><span class="m">b</span></sup> <span class="m">f</span>(<span class="m">x</span>) d<span class="m">x</span> &nbsp;&nbsp;&nbsp; <span class="m">f</span> ≥ 0, ∫<span class="m">f</span> = 1, et <span class="m">f</span>(<span class="m">x</span>) <b>peut dépasser 1</b></div>
+    <p>Deux gestes, deux objets. On <b>évalue</b> <span class="m">f</span> en un point quand on veut la <b>vraisemblance</b> d'une observation — une hauteur, sans borne supérieure. On <b>intègre</b> <span class="m">f</span> sur un intervalle quand on veut une <b>probabilité</b> — une aire, entre 0 et 1. Le test des unités tranche : <span class="m">f</span> a l'inverse de l'unité de <span class="m">x</span>, l'aire n'a pas d'unité.</p>
+    <p class="say">« En continu un point a probabilité nulle, donc l'information est un taux, donc une probabilité est une aire, donc une vraisemblance est une hauteur et n'a aucune raison d'être inférieure à 1. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — l'attente entre deux spams</div>
+    <p>Exponentielle de taux 4/h, <span class="m">t</span> en heures : <span class="m">f</span>(<span class="m">t</span>) = 4e<sup>−4<span class="m">t</span></sup>.</p>
+    <p><b>Évaluer</b> : <span class="m">f</span>(0) = <b>4</b> h<sup>−1</sup>. Quatre, pas 0,4 — et ce n'est pas une probabilité. <span class="m">f</span>(10 min) = 2,05 h<sup>−1</sup>, <span class="m">f</span>(20 min) = 1,05 h<sup>−1</sup>.</p>
+    <p><b>Intégrer</b> : <span class="m">P</span>(<span class="m">T</span> = 15 min) = <b>0</b> exactement. <span class="m">P</span>(10 min &lt; <span class="m">T</span> &lt; 20 min) = e<sup>−2/3</sup> − e<sup>−4/3</sup> = 0,5134 − 0,2636 = <b>0,2498</b>.</p>
+    <p><span class="m">E</span> et Var se lisent avec la même intégrale que le pas 2 : <span class="m">E</span>[<span class="m">T</span>] = 1/<span class="m">λ</span> = 15 min, <span class="m">σ</span> = 1/<span class="m">λ</span> = 15 min. Le continu ne change pas les pas 2 à 6 — il change seulement ce qu'on a le droit de lire sur l'axe vertical.</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — la hauteur et l'aire, côte à côte</div>
+    <div id="f3plot" class="wide"></div>
+    <div id="f3sliders"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">La densité de l'attente, Exp(4/h). Les deux readouts de gauche sont des <b>hauteurs</b> — <span class="m">f</span> évaluée en <span class="m">a</span> et en <span class="m">b</span>, en h<sup>−1</sup>, au-dessus de la ligne pointillée « 1 » sur toute la première partie du graphe. Les deux readouts de droite sont des <b>probabilités</b> — l'aire violette, et la probabilité d'un point, qui reste <b>0</b> quoi qu'on fasse. Referme <span class="m">a</span> sur <span class="m">b</span> : l'aire tend vers zéro pendant que les hauteurs, elles, ne bougent presque pas. C'est toute la différence entre évaluer et intégrer.</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Deux nombres, c'est peu : ils peuvent ne pas exister, et ils peuvent mentir sur ce qui les relie.</p>
+    <p class="say">« Le résumé en deux nombres suppose que les moments existent et que les termes ne sont pas liés, donc une queue trop lourde ou une dépendance oubliée le casse, donc devant un écart-type le premier réflexe est de demander d'où viennent les termes qu'on a additionnés. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>Queues lourdes : H1 tombe.</b> Une Cauchy n'a pas d'espérance (∫|<span class="m">x</span>|<span class="m">f</span> diverge) ; une Pareto d'indice &lt; 2 n'a pas de variance. Signal empirique : la moyenne ne se stabilise pas quand <span class="m">n</span> grandit, l'écart-type empirique <i>augmente</i> avec <span class="m">n</span>, et un seul point domine la somme. Quand H1 tombe, les pas 2 à 6 tombent avec, et la LGN et le TCL avec eux (<a href="../../map.html#p00-04">p00-04</a>).</li>
+      <li><b>Cov = 0 pris pour indépendance.</b> <span class="m">ρ</span> ne voit que le linéaire : <span class="m">Y</span> = <span class="m">X</span>² sur {−1, 0, 1} a une corrélation nulle et une dépendance totale. « Décorrélé » autorise à additionner les variances, pas à raisonner comme si les variables ne se parlaient pas.</li>
+      <li><b>Additivité appliquée à des termes dépendants.</b> Mesures répétées sur un même individu, plusieurs lignes d'un même utilisateur, folds qui partagent des données : Cov &gt; 0, donc Var(Σ) est <b>sous-estimée</b> si on l'ignore, donc l'erreur type est trop petite, l'intervalle trop étroit et la <span class="m">p</span>-value trop optimiste (<a href="chain-p01-01-objet-aleatoire.html">p01-01</a>, <a href="../../map.html#b04">b04</a>). Le <span class="m">n</span> qu'on croit avoir n'est pas le <span class="m">n</span> qu'on a.</li>
+      <li><b>Densité lue comme une probabilité.</b> « <span class="m">f</span>(<span class="m">x</span>) = 2,3, donc c'est probable » n'a pas de sens : seule l'aire en a. Et la scorie symétrique coûte autant — intégrer quand on voulait évaluer. Une vraisemblance est une <b>hauteur</b> : dans <span class="m">p</span>(<span class="m">x</span> ; <span class="m">θ</span>) on évalue la densité aux données observées, on n'intègre rien.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li><span class="m">E</span> = moyenne pondérée par les probabilités, <b>linéaire toujours</b> : ni <span class="m">E</span>[<span class="m">aX</span>+<span class="m">b</span>] ni <span class="m">E</span>[<span class="m">X</span>+<span class="m">Y</span>] ne demandent d'hypothèse.</li>
+    <li>Var = <span class="m">E</span>[<span class="m">X</span>²] − <span class="m">E</span>[<span class="m">X</span>]², unités au carré ; l'écart-type <span class="m">σ</span> = √Var est dans l'unité de <span class="m">X</span>.</li>
+    <li>Var(<span class="m">aX</span> + <span class="m">b</span>) = <span class="m">a</span>²Var(<span class="m">X</span>) : <span class="m">b</span> décale, <span class="m">a</span> étale au carré. C'est le 1/<span class="m">n</span>² de Var(<span class="m">X̄</span>).</li>
+    <li>Var(<span class="m">X</span> ± <span class="m">Y</span>) = Var(<span class="m">X</span>) + Var(<span class="m">Y</span>) ± 2Cov : additive <b>seulement</b> à covariance nulle (l'indépendance suffit). Var(2<span class="m">X</span>) = 4Var(<span class="m">X</span>).</li>
+    <li>Cov = 0 ⇏ indépendance ; <span class="m">ρ</span> ne voit que le linéaire.</li>
+    <li>Continu : densité = <b>taux</b>. On l'évalue pour une vraisemblance (une hauteur, qui peut dépasser 1), on l'intègre pour une probabilité (une aire). <span class="m">P</span>(<span class="m">X</span> = <span class="m">x</span>) = 0.</li>
+  </ol>
+</div>
+<div class="phrase">« L'espérance est linéaire sans condition ; la variance ne s'additionne que si la covariance est nulle, et une transformation affine la multiplie par <span class="m">a</span>². En continu il n'y a pas de probabilité ponctuelle, seulement une densité : je l'évalue quand je veux une vraisemblance, je l'intègre quand je veux une probabilité, et rien ne l'empêche de dépasser 1. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q"><span class="m">E</span>[<span class="m">X</span> + <span class="m">Y</span>] = <span class="m">E</span>[<span class="m">X</span>] + <span class="m">E</span>[<span class="m">Y</span>] : sous quelle hypothèse ?</div><div class="a hid">Aucune. C'est la linéarité de l'espérance, vraie même pour des variables totalement dépendantes.</div></li>
+    <li><div class="q">Var(<span class="m">X</span> + <span class="m">Y</span>) = Var(<span class="m">X</span>) + Var(<span class="m">Y</span>) : sous quelle hypothèse, et que vaut Var(2<span class="m">X</span>) ?</div><div class="a hid">Cov(X, Y) = 0 — l'indépendance suffit mais n'est pas nécessaire. Var(2X) = 4Var(X), parce que Cov(X, X) = Var(X).</div></li>
+    <li><div class="q">D'où vient le <span class="m">a</span>² dans Var(<span class="m">aX</span> + <span class="m">b</span>) ?</div><div class="a hid">b décale la variable et son espérance ensemble, donc disparaît des écarts ; a multiplie chaque écart par a, donc chaque écart au carré par a². C'est aussi l'origine du 1/n² de Var(X̄).</div></li>
+    <li><div class="q">Une densité peut-elle valoir 4 ?</div><div class="a hid">Oui : c'est un taux par unité de x, en h⁻¹ ici — Exp(4/h) vaut 4 en 0. Seule l'aire sous la courbe est une probabilité.</div></li>
+    <li><div class="q">Cov = 0 implique-t-il l'indépendance ?</div><div class="a hid">Non. X uniforme sur {−1, 0, 1} et Y = X² : Cov = 0 alors que Y est entièrement déterminé par X. La corrélation ne voit que le linéaire.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="../../map.html#b04"><b>b04 — Variance d'une moyenne corrélée</b><small>le pas 5 poussé jusqu'au bout : quand les termes d'une somme sont corrélés, Var(Σ) grossit du terme croisé et le <span class="m">n</span> effectif s'écroule — même mécanisme, dans les SE, la CV et les tests appariés</small></a>
+    <a href="../../map.html#p00-04"><b>p00-04 — Moyenne, LGN, TCL</b><small>Var(X̄) = σ²/n est exactement le pas 4 (le 1/n²) plus le pas 5 (l'additivité sous iid) ; le √n du dénominateur vient de la racine du pas 3</small></a>
+    <a href="chain-p02-01-bruit-vraisemblance-loss.html"><b>p02-01 — Du bruit à la loss</b><small>la vraisemblance y est une densité <i>évaluée</i> aux données observées : le pas 7 est ce qui autorise d'écrire une loss à partir d'une densité</small></a>
+    <a href="chain-p01-04-comparer-modeles-multiplicite.html"><b>p01-04 — Comparer deux modèles</b><small>Var(<span class="m">D</span>) = Var(<span class="m">A</span>) + Var(<span class="m">B</span>) − 2Cov : la ligne « différence » du pas 5, qui fait tout l'intérêt de l'appariement</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::esperance</code> (linéarité sans hypothèse, E ≠ valeur la plus probable) · <code>stats::variance</code> (E[X²] − E[X]², le a² affine, l'additivité conditionnelle) · <code>stats::covariance</code> (Cov = E[XY] − E[X]E[Y], ρ, le contre-exemple Y = X²) · <code>stats::densite</code> (évaluer vs intégrer, densité &gt; 1, P(X = x) = 0).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p00-02 · v1 du 16/09/2026 · Prérequis : <a href="chain-p00-01-lois-quand-laquelle.html">p00-01</a>. Suite : <a href="../../map.html#p00-03">p00-03 Conditionnement et Bayes</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').textContent.replace(/\s*(tronc|casse)\s*$/,'').trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outils communs ===== */
+const FACES=[1,2,3,4,5,6], EX=3.5, VX=35/12;
+/* ticks entiers « ronds » sur [a,b], au plus m */
+function xticks(a,b,m){const span=b-a;const raw=span/m;const e=Math.pow(10,Math.floor(Math.log10(Math.max(raw,1e-9))));
+  const step=[1,2,2.5,5,10].map(f=>f*e).find(s=>s>=raw)||e*10;const t=[];
+  for(let k=Math.ceil(a/step)*step;k<=b+1e-9;k+=step)t.push(+k.toPrecision(10));return t;}
+function bar(P,x,y,wpx){SL.el('rect',{x:P.sx(x)-wpx/2,y:P.sy(y),width:wpx,height:Math.max(0.6,P.sy(0)-P.sy(y)),class:'sl-bar'},P.dyn);}
+
+/* ===== Figure 1 : b décale, a étale au carré ===== */
+const hA=document.getElementById('f1a'),hB=document.getElementById('f1b'),o1=document.getElementById('f1out');
+const st1={a:1,b:0};
+function draw1(){
+  const a=st1.a,b=st1.b;hA.innerHTML='';hB.innerHTML='';
+  const vals=FACES.map(x=>a*x+b);
+  const E=a*EX+b, V=a*a*VX, sd=Math.sqrt(V);
+  const lo=Math.min.apply(null,vals), hi=Math.max.apply(null,vals);
+  const pad=Math.max(0.8,(hi-lo)*0.14);
+  const X=[lo-pad,hi+pad], xt=xticks(X[0],X[1],7);
+  /* largeur des barres : un peu plus de la moitié de l'écart entre deux valeurs */
+  const unit=Math.abs(a);
+  const PA=SL.plot(hA,{x:X,y:[0,a===0?1.3:0.26],w:600,h:180,xt:xt,yt:a===0?[0.5,1]:[1/6],xl:'valeur de aX + b',yl:'probabilité'});
+  const wpx=Math.max(3,Math.min(30,(PA.sx(unit)-PA.sx(0))*0.55));
+  if(a===0){bar(PA,b,1,26);}
+  else vals.forEach(v=>bar(PA,v,1/6,wpx));
+  PA.vline(E,'sl-mean');
+  /* l'étiquette se pose à côté du trait, jamais dessus : le trait couperait le signe moins */
+  const mid=(X[0]+X[1])/2, off=(X[1]-X[0])*0.018, gauche=E>mid;
+  PA.text(E+(gauche?-off:off),a===0?1.12:0.225,'E = '+SL.fmt(E,2),'',gauche?'end':'start');
+  const contrib=vals.map(v=>(v-E)*(v-E)/6);
+  const cmax=Math.max.apply(null,contrib);
+  const YB=Math.max(0.12,cmax*1.32);
+  const PB=SL.plot(hB,{x:X,y:[0,YB],w:600,h:180,xt:xt,yt:[YB/3,2*YB/3].map(v=>+v.toPrecision(2)),xl:'valeur de aX + b',yl:'(y − E)² × 1/6'});
+  vals.forEach((v,i)=>{if(contrib[i]>0)bar(PB,v,contrib[i],Math.max(2,wpx*0.35));PB.dot(v,0,'sl-c1 hollow',3);});
+  PB.vline(E,'sl-mean');
+  o1.innerHTML='<div>E[aX + b]<b>'+SL.fmt(E,2)+'</b></div>'
+    +'<div>Var = somme des barres<b>'+SL.fmt(V,3)+'</b></div>'
+    +'<div>écart-type<b>'+SL.fmt(sd,3)+'</b></div>'
+    +'<div class="'+(a===0?'zero':'pos')+'">Var / Var(X) = a²<b>'+SL.fmt(a*a,2)+'</b></div>';
+}
+const sl1=document.getElementById('f1sliders');
+SL.slider(sl1,{label:'a (étalement)',min:-3,max:3,step:0.25,value:1},v=>{st1.a=v;draw1();});
+SL.slider(sl1,{label:'b (décalage)',min:-5,max:5,step:0.5,value:0},v=>{st1.b=v;draw1();});
+
+/* ===== Figure 2 : X + Y contre 2X ===== */
+const d6=()=>1+Math.floor(Math.random()*6);
+const opts=(xl,th)=>({bins:[2,12,11],xt:[2,4,6,8,10,12],xl:xl,w:560,h:200,
+  marks:[{x:7,label:'E = 7',cls:'slope sl-c1'}],
+  empty:'Aucun tirage encore — clique « tirer 500 ».',
+  readout:(n,m,s)=>n+' tirages · moyenne '+SL.fmt(m,2)+' · écart-type mesuré '+SL.fmt(s,2)+'  (théorie : 7 et '+th+')'});
+const rSum=SL.repeat(document.getElementById('f2sum'),Object.assign(opts('X + Y — deux dés indépendants','2,42'),{draw:()=>d6()+d6()}));
+const rDbl=SL.repeat(document.getElementById('f2dbl'),Object.assign(opts('2X — le même dé compté deux fois','3,42'),{draw:()=>2*d6()}));
+/* on amorce les deux histogrammes : une figure vide au chargement ne montre rien */
+function amorce(r,f,n){for(let i=0;i<n;i++)r.stats.push(f());r.render();}
+amorce(rSum,()=>d6()+d6(),300);amorce(rDbl,()=>2*d6(),300);
+
+/* ===== Figure 3 : hauteur et aire ===== */
+const LAM=4; /* par heure */
+const dens=t=>LAM*Math.exp(-LAM*t), surv=t=>Math.exp(-LAM*t);
+const h3=document.getElementById('f3plot'),o3=document.getElementById('f3out');
+const st3={a:10,b:20}; /* en minutes */
+function draw3(){
+  const ta=st3.a/60, tb=st3.b/60;h3.innerHTML='';
+  const P=SL.plot(h3,{x:[0,1],y:[0,4.5],w:600,h:280,xt:[0,0.25,0.5,0.75,1],yt:[1,2,3,4],xl:'t (heures) — 0,25 h = 15 min',yl:'densité f(t), en h⁻¹'});
+  P.fn(dens,'sl-c1');
+  P.label(0.42,3.6,'f(t) = 4e⁻⁴ᵗ','sl-c1','start');
+  /* aire entre a et b */
+  if(tb>ta){let pts='';const n=120;
+    for(let i=0;i<=n;i++){const t=ta+(tb-ta)*i/n;pts+=P.sx(t).toFixed(1)+','+P.sy(dens(t)).toFixed(1)+' ';}
+    pts+=P.sx(tb).toFixed(1)+','+P.sy(0).toFixed(1)+' '+P.sx(ta).toFixed(1)+','+P.sy(0).toFixed(1);
+    SL.el('polygon',{points:pts.trim(),class:'sl-bar'},P.dyn);}
+  /* la ligne « hauteur 1 » : repère de ce qu'une densité n'a pas à respecter */
+  P.seg(0,1,1,1,'chord');P.text(0.99,1.14,'hauteur 1','','end');
+  P.seg(ta,0,ta,dens(ta),'');P.dot(ta,dens(ta),'sl-c3',5);
+  P.seg(tb,0,tb,dens(tb),'');P.dot(tb,dens(tb),'sl-c3',5);
+  const prob=Math.max(0,surv(ta)-surv(tb));
+  o3.innerHTML='<div>hauteur f(a)<b>'+SL.fmt(dens(ta),2)+' h⁻¹</b></div>'
+    +'<div>hauteur f(b)<b>'+SL.fmt(dens(tb),2)+' h⁻¹</b></div>'
+    +'<div class="pos">aire P(a &lt; T &lt; b)<b>'+SL.fmt(prob,4)+'</b></div>'
+    +'<div class="zero">P(T = a) exactement<b>0</b></div>';
+}
+const sl3=document.getElementById('f3sliders');
+SL.slider(sl3,{label:'a (minutes)',min:0,max:55,step:1,value:10,fmt:v=>SL.fmt(v,0)+' min'},v=>{st3.a=v;draw3();});
+SL.slider(sl3,{label:'b (minutes)',min:1,max:60,step:1,value:20,fmt:v=>SL.fmt(v,0)+' min'},v=>{st3.b=v;draw3();});
+
+draw1();draw3();
+})();
+</script>
+</body>
+</html>
