@@ -218,14 +218,13 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <div class="step" id="s2">
   <div class="rule">
     <h3>Le gradient, et où il pointe</h3>
-    <p>Sur une quadratique, ∇<span class="m">L</span>(<span class="m">β</span>) = <span class="m">Aβ</span> − <span class="m">b</span>. Au départ <span class="m">β</span><sub>0</sub> = (0 ; 0) il se réduit à −<span class="m">b</span>. La direction de plus forte descente est −∇<span class="m">L</span> normalisé.</p>
+    <p>Sur une quadratique, ∇<span class="m">L</span>(<span class="m">β</span>) = <span class="m">Aβ</span> − <span class="m">b</span>. Évalué en (0 ; 0) il se réduit à −<span class="m">b</span>, ce qui dit d'un coup d'œil où pointe la pente. La direction de plus forte descente est −∇<span class="m">L</span> normalisé.</p>
     <div class="eq">∇<span class="m">L</span>(0) = −(14 ; 28) &nbsp;·&nbsp; ‖∇<span class="m">L</span>‖ = √980 = 31,30 &nbsp;·&nbsp; <span class="m">u</span> = (14 ; 28)/31,30 = (0,447 ; 0,894)</div>
-    <p class="say">« Le gradient d'une quadratique vaut <span class="m">Aβ</span> − <span class="m">b</span>, donc en zéro il vaut −<span class="m">b</span> = (−14 ; −28), donc la descente part exactement dans la direction (1 ; 2)/√5, celle où vit tout le signal <span class="m">X</span><sup>⊤</sup><span class="m">y</span>. »</p>
+    <p class="say">« Le gradient d'une quadratique vaut <span class="m">Aβ</span> − <span class="m">b</span>, donc en zéro il vaut −<span class="m">b</span> = (−14 ; −28), donc la pente y pointe exactement dans la direction (1 ; 2)/√5, celle où vit tout le signal <span class="m">X</span><sup>⊤</sup><span class="m">y</span>. »</p>
   </div>
   <div class="card apply"><div class="lbl">Au tableau — marche 2</div>
-    <p>(0,447 ; 0,894) est <b>(1 ; 2)/√5</b> : √5 = 2,236, 1/2,236 = 0,447. La descente vise donc la droite <span class="m">β</span><sub>1</sub> + 2<span class="m">β</span><sub>2</sub> = 1 — la droite des solutions OLS de D4 — <b>perpendiculairement</b>.</p>
-    <p>Elle la viserait en (0,2 ; 0,4), le point de norme minimale de cette droite. On verra qu'elle s'arrête juste avant, à 70/71 de ce point.</p>
-    <div class="note">Cette direction n'est pas quelconque : (1 ; 2) est un <b>vecteur propre</b> de <span class="m">A</span>. Partir de l'origine, c'est partir pile sur un axe du bol — la marche 5 en tire la conséquence.</div>
+    <p>(0,447 ; 0,894) est <b>(1 ; 2)/√5</b> : √5 = 2,236, 1/2,236 = 0,447. Depuis l'origine, la descente viserait donc la droite <span class="m">β</span><sub>1</sub> + 2<span class="m">β</span><sub>2</sub> = 1 — la droite des solutions OLS de D4 — <b>perpendiculairement</b>, en (0,2 ; 0,4), le point de norme minimale de cette droite.</p>
+    <div class="note"><b>Et c'est un piège.</b> (1 ; 2) est un <b>vecteur propre</b> de <span class="m">A</span>, celui de <span class="m">λ</span> = 71 : partir de l'origine, c'est partir pile sur l'axe raide du bol, celui où la vallée n'existe pas. Ce déroulé part donc de <b><span class="m">β</span><sub>0</sub> = (1 ; 0)</b>, une solution OLS de D4 — un point sans privilège. Le gradient y vaut ∇<span class="m">L</span>(1 ; 0) = (15 − 14 ; 28 − 28) = <b>(1 ; 0)</b>. La marche 5 et la troisième limite disent ce que ce choix change.</div>
   </div>
 </div>
 
@@ -251,43 +250,48 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <div class="step" id="s4">
   <div class="rule">
     <h3>Trois pas à la main, <span class="m">η</span> = 0,02</h3>
-    <p>Un pas, c'est <span class="m">β</span> ← <span class="m">β</span> − <span class="m">η</span>(<span class="m">Aβ</span> − <span class="m">b</span>). Rien d'autre. Sur l'écart <span class="m">e</span> = <span class="m">β</span> − <span class="hat"><span class="m">β</span></span>, chaque coordonnée propre suit <span class="m">e</span><sub><span class="m">i</span></sub> ← (1 − <span class="m">ηλ</span><sub><span class="m">i</span></sub>)<span class="m">e</span><sub><span class="m">i</span></sub>.</p>
+    <p>Un pas, c'est <span class="m">β</span> ← <span class="m">β</span> − <span class="m">η</span>(<span class="m">Aβ</span> − <span class="m">b</span>). Rien d'autre. Sur l'écart <span class="m">e</span> = <span class="m">β</span> − <span class="hat"><span class="m">β</span></span>, chaque coordonnée propre suit <span class="m">e</span><sub><span class="m">i</span></sub> ← (1 − <span class="m">ηλ</span><sub><span class="m">i</span></sub>)<span class="m">e</span><sub><span class="m">i</span></sub>, indépendamment de l'autre.</p>
     <div class="eq">1 − 0,02 × 71 = <b>−0,42</b> &nbsp;(raide) &nbsp;·&nbsp; 1 − 0,02 × 1 = <b>0,98</b> &nbsp;(plate)</div>
-    <p class="say">« Le départ est l'origine et <span class="m">b</span> est colinéaire à (1 ; 2), donc chaque itéré reste sur cet axe propre, donc l'écart y est multiplié par 1 − 0,02 × 71 = −0,42 à chaque pas, donc la descente saute d'un côté puis de l'autre en se réduisant à 42 % à chaque fois. »</p>
+    <p class="say">« L'écart de départ se décompose sur les deux axes propres, donc chaque composante est multipliée par son propre facteur, donc la raide est ramenée à 42 % à chaque pas quand la plate n'en perd que 2 %, donc c'est la plate qui décide du temps que ça prend. »</p>
   </div>
   <div class="card apply"><div class="lbl">Au tableau — marche 4, chiffré</div>
-    <p><span class="m">β</span><sub>1</sub> = 0 − 0,02·(−14 ; −28) = <b>(0,28 ; 0,56)</b>.</p>
-    <p>∇<span class="m">L</span>(<span class="m">β</span><sub>1</sub>) = (15·0,28 + 28·0,56 − 14 ; 28·0,28 + 57·0,56 − 28) = (19,88 − 14 ; 39,76 − 28) = (5,88 ; 11,76), donc <span class="m">β</span><sub>2</sub> = (0,28 ; 0,56) − 0,02·(5,88 ; 11,76) = <b>(0,1624 ; 0,3248)</b>.</p>
-    <p>∇<span class="m">L</span>(<span class="m">β</span><sub>2</sub>) = (−2,4696 ; −4,9392), donc <span class="m">β</span><sub>3</sub> = <b>(0,2118 ; 0,4236)</b>.</p>
+    <p>Écart de départ <span class="m">e</span><sub>0</sub> = (1 ; 0) − <span class="hat"><span class="m">β</span></span> = (57/71 ; −28/71), de norme <b>0,8944</b>. Sa décomposition est le fait central de ce déroulé :</p>
+    <div class="eq">sur la vallée (−2 ; 1)/√5 : −2/√5 = <b>−0,8944</b> &nbsp;·&nbsp; sur le mur (1 ; 2)/√5 : 1/(71√5) = <b>0,0063</b></div>
+    <p>Le rapport vaut exactement <b>142</b> : presque tout l'écart est dans la direction que la descente traite le plus mal.</p>
+    <p><span class="m">β</span><sub>1</sub> = (1 ; 0) − 0,02·(1 ; 0) = <b>(0,98 ; 0)</b>.</p>
+    <p>∇<span class="m">L</span>(<span class="m">β</span><sub>1</sub>) = (15·0,98 − 14 ; 28·0,98 − 28) = (14,7 − 14 ; 27,44 − 28) = (0,7 ; −0,56), donc <span class="m">β</span><sub>2</sub> = (0,98 ; 0) − 0,02·(0,7 ; −0,56) = <b>(0,966 ; 0,0112)</b>.</p>
+    <p>∇<span class="m">L</span>(<span class="m">β</span><sub>2</sub>) = (14,49 + 0,3136 − 14 ; 27,048 + 0,6384 − 28) = (0,8036 ; −0,3136), donc <span class="m">β</span><sub>3</sub> = <b>(0,9499 ; 0,0175)</b>.</p>
     <table>
-      <tr><th><span class="m">k</span></th><th><span class="m">β</span><sub><span class="m">k</span></sub></th><th>écart à <span class="hat"><span class="m">β</span></span></th><th>côté</th></tr>
-      <tr><td>0</td><td>(0 ; 0)</td><td>0,4409</td><td>en deçà</td></tr>
-      <tr><td>1</td><td>(0,2800 ; 0,5600)</td><td>0,1852</td><td>au-delà</td></tr>
-      <tr><td>2</td><td>(0,1624 ; 0,3248)</td><td>0,0778</td><td>en deçà</td></tr>
-      <tr class="hl"><td>3</td><td>(0,2118 ; 0,4236)</td><td>0,0327</td><td>au-delà</td></tr>
+      <tr><th><span class="m">k</span></th><th><span class="m">β</span><sub><span class="m">k</span></sub></th><th>écart à <span class="hat"><span class="m">β</span></span></th><th>dont vallée</th></tr>
+      <tr><td>0</td><td>(1 ; 0)</td><td>0,8944</td><td>0,8944</td></tr>
+      <tr><td>1</td><td>(0,9800 ; 0)</td><td>0,8765</td><td>0,8765</td></tr>
+      <tr><td>2</td><td>(0,9660 ; 0,0112)</td><td>0,8590</td><td>0,8590</td></tr>
+      <tr class="hl"><td>3</td><td>(0,9499 ; 0,0175)</td><td>0,8418</td><td>0,8418</td></tr>
     </table>
-    <p>0,4409 × 0,42 = 0,1852, puis × 0,42 = 0,0778 : le facteur −0,42 se lit directement dans la colonne des écarts, et le changement de côté est son signe. Tous les itérés vérifient <span class="m">β</span><sub>2</sub> = 2<span class="m">β</span><sub>1</sub> : la coordonnée plate reste à zéro.</p>
+    <p>0,8944 × 0,98 = 0,8765, puis × 0,98 = 0,8590 : le facteur plat se lit directement dans la colonne des écarts. Trois pas ont grignoté <b>6 %</b>. La composante raide, elle, est déjà tombée de 0,0063 à 0,00047 — réglée, et invisible.</p>
   </div>
 </div>
 
 <div class="step" id="s5">
   <div class="rule">
-    <h3>Combien de pas — et ce que le départ cachait <span class="tag tronc">tronc</span></h3>
-    <p>Depuis l'origine, six pas suffisent : l'écart initial n'a <b>aucune</b> composante sur la vallée, seule la coordonnée raide travaille et elle est divisée par 2,4 à chaque pas. Ce départ est un cas particulier.</p>
-    <p>Dès qu'on démarre ailleurs, la coordonnée plate apparaît et se contracte de 0,98 par pas seulement. Pour la diviser par dix : <span class="up">ln</span> 0,1 / <span class="up">ln</span> 0,98 = 113,97, soit <b>114 pas</b>.</p>
-    <p class="say">« L'écart de départ est porté par le seul axe raide, donc le conditionnement ne se voit pas depuis l'origine ; ailleurs la coordonnée plate se contracte de 0,98 par pas, donc il en faut 114 pour la diviser par dix, donc sur ce bol la forme fermée est sans concurrence. »</p>
+    <h3>Combien de pas, et pourquoi la forme fermée gagne <span class="tag tronc">tronc</span></h3>
+    <p>La composante raide est réglée en une dizaine de pas : elle ne compte pas. Tout le temps part dans la vallée, qui ne se contracte que de 0,98 par pas.</p>
+    <p>Pour la diviser par dix : <span class="up">ln</span> 0,1 / <span class="up">ln</span> 0,98 = 113,97, soit <b>114 pas</b>. Par cent : 228. Et le système ∇<span class="m">L</span> = 0 est <b>linéaire</b> — une résolution 2×2 donne la réponse exacte, sans <span class="m">η</span> à régler.</p>
+    <p class="say">« La direction plate ne perd que 2 % par pas, donc il en faut 114 pour un facteur dix, donc le nombre d'itérations est fixé par le conditionnement et non par l'optimiseur ; et comme le gradient est linéaire en <span class="m">β</span>, annuler ∇<span class="m">L</span> est un système 2×2, donc ici on le résout au lieu de l'itérer. »</p>
   </div>
   <div class="card apply"><div class="lbl">Au tableau — marche 5</div>
     <p><b>La forme fermée.</b> Annuler le gradient, c'est résoudre [[15, 28], [28, 57]]<span class="m">β</span> = (14 ; 28), système 2×2 de déterminant 71 :</p>
     <div class="eq"><span class="hat"><span class="m">β</span></span><sub>1</sub> = (57·14 − 28·28)/71 = 14/71 = <b>0,197</b> &nbsp;·&nbsp; <span class="hat"><span class="m">β</span></span><sub>2</sub> = (15·28 − 28·14)/71 = 28/71 = <b>0,394</b></div>
     <p>C'est (0,2 ; 0,4) × 70/71 : le point de norme minimale de la droite OLS, rétréci d'un facteur 70/(70 + <span class="m">λ</span>).</p>
-    <p><b>Deux départs, deux histoires</b>, au même <span class="m">η</span> = 0,02 :</p>
+    <p><b>Le prix de l'itération</b>, à <span class="m">η</span> = 0,02 depuis (1 ; 0) :</p>
     <table>
-      <tr><th>départ</th><th>écart initial</th><th>dont plate</th><th>écart après 60 pas</th></tr>
-      <tr><td>(0 ; 0)</td><td>0,4409</td><td><b>0</b></td><td>10<sup>−22</sup></td></tr>
-      <tr class="hl"><td>(1 ; 0) <small>solution OLS</small></td><td>0,8944</td><td>0,8944</td><td><b>0,2661</b></td></tr>
+      <tr><th><span class="m">k</span></th><th>0,98<sup><span class="m">k</span></sup></th><th>écart restant</th><th>chemin parcouru</th></tr>
+      <tr><td>10</td><td>0,817</td><td>0,7308</td><td>18 %</td></tr>
+      <tr><td>30</td><td>0,545</td><td>0,4879</td><td>45 %</td></tr>
+      <tr><td>60</td><td>0,298</td><td>0,2661</td><td>70 %</td></tr>
+      <tr class="hl"><td>114</td><td>0,100</td><td>0,0894</td><td><b>90 %</b></td></tr>
     </table>
-    <p>0,98<sup>60</sup> = 0,2976 : après 60 itérations depuis (1 ; 0), il reste 30 % du chemin. Une résolution 2×2 l'aurait donné exactement, sans <span class="m">η</span> à régler.</p>
+    <p>Après 60 itérations il reste encore <b>30 %</b> du chemin. La résolution 2×2, elle, tient en une ligne et donne 0,197 et 0,394 exactement.</p>
   </div>
   <div class="fig" id="fig1">
     <div class="lbl">Figure 1 — le bol vu de dessus, et ce que le pas y fait</div>
@@ -295,7 +299,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <div class="sl-ctl" id="f1presets"></div>
     <div id="f1sliders"></div>
     <div class="readouts" id="f1out"></div>
-    <p class="cap">Lignes de niveau de <span class="m">L</span> : des ellipses <b>huit fois et demie plus longues que larges</b> (√71), d'axe long la vallée. Le point <span class="kp">bleu creux</span> est la forme fermée (0,197 ; 0,394), le trait <span class="ko">ambre</span> la droite des solutions OLS de D4, le point <span class="kv">violet</span> le départ et la ligne <span class="kr">rouge</span> les 60 itérations. Départ <b>(0 ; 0)</b> : la trajectoire est un segment sur l'axe raide, et le bol allongé ne se voit pas. Clique <b>départ (1 ; 0)</b> : la même descente rampe le long de la vallée et n'arrive pas. Monte <span class="m">η</span> : à 0,0282 = 2/71 le facteur raide passe sous −1 et la trajectoire quitte le cadre.</p>
+    <p class="cap">Lignes de niveau de <span class="m">L</span> : des ellipses <b>huit fois et demie plus longues que larges</b> (√71), d'axe long la vallée. Le point <span class="kp">bleu creux</span> est la forme fermée (0,197 ; 0,394), le trait <span class="ko">ambre</span> la droite des solutions OLS de D4, le point <span class="kv">violet</span> le départ <b>(1 ; 0)</b> et la ligne <span class="kr">rouge</span> les 60 itérations : elle rampe le long de la vallée et n'arrive pas — après 60 pas il reste 30 % du chemin. Clique <b>départ (0 ; 0)</b> pour voir le mirage : la trajectoire s'y réduit à un segment sur l'axe raide, converge en six pas, et le bol allongé ne se voit plus. Monte <span class="m">η</span> : à 0,0282 = 2/71 le facteur raide passe sous −1 et la trajectoire finit par quitter le cadre.</p>
   </div>
 </div>
 
@@ -327,9 +331,9 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   </div>
   <div class="card casse"><div class="lbl">Trois limites</div>
     <ul>
-      <li><b><span class="m">η</span> au-delà de 2/<span class="m">λ</span><sub>max</sub> diverge.</b> À <span class="m">η</span> = 0,03, le facteur raide vaut 1 − 0,03·71 = <b>−1,13</b>. Depuis l'origine, 60 pas mènent à (−301,5 ; −603,0) : la coordonnée plate continue pourtant de converger sagement. <b>Une direction sur deux suffit</b> à faire exploser la loss, et c'est toujours la plus raide qui fixe le plafond.</li>
+      <li><b><span class="m">η</span> au-delà de 2/<span class="m">λ</span><sub>max</sub> diverge.</b> À <span class="m">η</span> = 0,03, le facteur raide vaut 1 − 0,03·71 = <b>−1,13</b>. Depuis (1 ; 0) l'écart raide ne pèse que 0,0063 au départ : la divergence met une soixantaine de pas à se voir, puis <span class="m">β</span><sub>60</sub> = (4,64 ; 8,95) est <b>onze fois plus loin</b> de <span class="hat"><span class="m">β</span></span> que le point de départ — pendant que la coordonnée plate, elle, converge sagement. <b>Une direction sur deux suffit</b> à faire exploser la loss, et c'est toujours la plus raide qui fixe le plafond, même quand elle porte un millième de l'erreur.</li>
       <li><b><span class="m">κ</span> = 71 rend la vallée interminable.</b> Même avec le meilleur pas fixe, <span class="m">η</span> = 2/(1 + 71) = 0,0278, la contraction plate ne descend pas sous (<span class="m">κ</span> − 1)/(<span class="m">κ</span> + 1) = 70/72 = 0,9722 : il faut encore <b>82 pas</b> pour diviser l'écart par dix. Le nombre d'itérations est proportionnel à <span class="m">κ</span>, et <span class="m">κ</span> vient des données, pas de l'optimiseur.</li>
-      <li><b>Un départ chanceux masque tout.</b> Depuis (0 ; 0) la composante sur la vallée est <b>exactement nulle</b> et la descente converge en six pas : on mesurerait <span class="m">κ</span> = 1 sans le savoir. Le seul départ où ce bol paraît rond est celui qui tombe pile sur son axe raide — d'où les deux lignes du tableau de la marche 5.</li>
+      <li><b>Un départ chanceux masque tout.</b> Depuis (0 ; 0), <span class="m">b</span> étant colinéaire à (1 ; 2), la composante sur la vallée est <b>exactement nulle</b> : la descente reste sur l'axe raide et converge en six pas. On mesurerait <span class="m">κ</span> = 1 sans le savoir. C'est pour cela que ce déroulé part de (1 ; 0) et non de l'origine — et pour cela qu'un seul essai de <span class="m">η</span> depuis un seul point de départ ne mesure pas le conditionnement. Le bouton « départ (0 ; 0) » de la figure montre le mirage.</li>
     </ul>
   </div>
 </div>
@@ -343,9 +347,9 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <ol>
     <li><b>Le bol.</b> <span class="m">A</span> = <span class="m">X</span><sup>⊤</sup><span class="m">X</span> + <span class="m">I</span> = [[15, 28], [28, 57]], <span class="m">b</span> = (14 ; 28), ∇<span class="m">L</span> = <span class="m">Aβ</span> − <span class="m">b</span>. Trace 72, déterminant 71.</li>
     <li><b>Les deux courbures.</b> <span class="m">λ</span> = 71 sur (1 ; 2) — le mur — et <span class="m">λ</span> = 1 sur (−2 ; 1) — la vallée, la colinéarité relevée de 0 par <span class="m">λI</span>. <span class="m">κ</span> = 71, <span class="m">η</span><sub>max</sub> = 2/71 = 0,0282.</li>
-    <li><b>Trois pas à <span class="m">η</span> = 0,02</b> : (0,28 ; 0,56), (0,1624 ; 0,3248), (0,2118 ; 0,4236). Facteur raide −0,42 : l'écart change de côté et se réduit à 42 %.</li>
+    <li><b>Trois pas à <span class="m">η</span> = 0,02 depuis (1 ; 0)</b> : (0,98 ; 0), (0,966 ; 0,0112), (0,9499 ; 0,0175). L'écart 0,8944 est porté à 142 contre 1 par la vallée, et s'y contracte de 0,98 par pas.</li>
     <li><b>La forme fermée.</b> Une résolution 2×2 : <span class="hat"><span class="m">β</span></span> = (14/71 ; 28/71) = (0,197 ; 0,394), soit (0,2 ; 0,4) × 70/71.</li>
-    <li><b>Le coût de l'itération.</b> Facteur plat 0,98 ⇒ 114 pas pour diviser l'écart par dix ; 82 pas même au meilleur pas fixe 2/72. Depuis (1 ; 0), il reste 30 % du chemin après 60 pas.</li>
+    <li><b>Le coût de l'itération.</b> Facteur plat 0,98 ⇒ 114 pas pour diviser l'écart par dix ; 82 pas même au meilleur pas fixe 2/72. Après 60 pas il reste encore 30 % du chemin.</li>
     <li><b>Préconditionner.</b> <span class="m">η</span><sub><span class="m">i</span></sub> = 1/<span class="m">λ</span><sub><span class="m">i</span></sub> règle chaque coordonnée en un pas ; les deux à la fois, c'est <span class="m">A</span><sup>−1</sup>∇<span class="m">L</span>, c'est-à-dire Newton, et Adam l'approche par coordonnée.</li>
   </ol>
 </div>
@@ -356,9 +360,9 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <h2 style="--ac:var(--teal)">Chaîne verbalisée — le déroulé à voix haute</h2>
 <div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
   <ol class="verb">
-    <li><div class="q">Écris la loss ridge du jeu colinéaire de D4 et son gradient.</div><div class="a hid">L(β) = ½βᵀAβ − bᵀβ avec A = XᵀX + I = [[15, 28], [28, 57]] et b = Xᵀy = (14, 28). ∇L = Aβ − b, donc en (0, 0) : (−14, −28).</div></li>
+    <li><div class="q">Écris la loss ridge du jeu colinéaire de D4 et son gradient.</div><div class="a hid">L(β) = ½βᵀAβ − bᵀβ avec A = XᵀX + I = [[15, 28], [28, 57]] et b = Xᵀy = (14, 28). ∇L = Aβ − b : en (0, 0) il vaut −b = (−14, −28), et au départ retenu (1 ; 0) il vaut (1 ; 0).</div></li>
     <li><div class="q">Quelles sont les courbures de ce bol, et quel pas maximal en découle ?</div><div class="a hid">Trace 72, déterminant 71 ⇒ λ = 1 et 71. Le mur (1, 2) à 71, la vallée (−2, 1) à 1 — celle que λI a relevée de 0. κ = 71, η_max = 2/71 = 0,0282.</div></li>
-    <li><div class="q">Fais le premier pas à η = 0,02, et dis ce que devient l'écart.</div><div class="a hid">β₁ = 0 − 0,02·(−14, −28) = (0,28 ; 0,56). Facteur 1 − 0,02×71 = −0,42 : l'écart passe de 0,4409 à 0,1852 et change de côté. β₂ = (0,1624 ; 0,3248), β₃ = (0,2118 ; 0,4236).</div></li>
+    <li><div class="q">Fais le premier pas à η = 0,02, et dis ce que devient l'écart.</div><div class="a hid">β₁ = (1 ; 0) − 0,02·(1 ; 0) = (0,98 ; 0). L'écart 0,8944 est à 142 contre 1 sur la vallée, de facteur 1 − 0,02×1 = 0,98 : il passe à 0,8765. β₂ = (0,966 ; 0,0112), β₃ = (0,9499 ; 0,0175).</div></li>
     <li><div class="q">Combien d'itérations, et pourquoi préfère-t-on résoudre ?</div><div class="a hid">Facteur plat 0,98 ⇒ ln0,1/ln0,98 = 114 pas par facteur dix. La forme fermée est un système 2×2 de déterminant 71 : β̂ = (14/71 ; 28/71) = (0,197 ; 0,394), soit (0,2 ; 0,4) × 70/71.</div></li>
     <li><div class="q">Que ferait un pas par direction propre ?</div><div class="a hid">η = 1/λᵢ annule le facteur 1 − ηλᵢ : une itération par coordonnée. Les deux ensemble, c'est β − A⁻¹∇L = A⁻¹b = β̂ — Newton. Adam en fait une version diagonale dans la base canonique.</div></li>
   </ol>
@@ -425,7 +429,7 @@ P.label(-.62,1.04,'β₁ + 2β₂ = 1 · solutions OLS','sl-c5','start');
 P.label(1.55,-.42,'vallée · λ = 1','sl-c2','end');
 P.label(.33,.85,'mur · λ = 71','sl-c2','end');
 P.label(.30,.46,'β̂ = (0,197 ; 0,394)','sl-c1','start');
-const st={eta:.02,k:60,start:[0,0]};
+const st={eta:.02,k:60,start:[1,0]};
 const out=document.getElementById('f1out');
 function draw(){P.clear();
   const pts=[st.start.slice()];let b=st.start.slice();
@@ -452,7 +456,7 @@ const sl=document.getElementById('f1sliders');
 SL.slider(sl,{label:'pas η',min:.005,max:.03,step:.0005,value:.02,fmt:v=>SL.fmt(v,4)},v=>{st.eta=v;draw();});
 SL.slider(sl,{label:'itération k',min:0,max:60,step:1,value:60},v=>{st.k=v;draw();});
 const pre=document.getElementById('f1presets');
-[['départ (0 ; 0)',[0,0]],['départ (1 ; 0) · solution OLS',[1,0]],['départ (−1 ; 1) · solution OLS',[-1,1]]].forEach(([n,p])=>{
+[['départ (1 ; 0) · le déroulé',[1,0]],['départ (−1 ; 1) · autre solution OLS',[-1,1]],['départ (0 ; 0) · le mirage',[0,0]]].forEach(([n,p])=>{
   const bt=document.createElement('button');bt.className='tb';bt.textContent=n;
   bt.onclick=()=>{st.start=p.slice();draw();};pre.appendChild(bt);});
 draw();
