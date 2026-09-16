@@ -93,7 +93,9 @@ Pas de démonstration du TCL, pas de Berry-Esseen, pas de convergence presque s�
 - Numérotation des figures : l'ordre d'apparition impose 1 = dés (pas 3), 2 = moyenne vs somme
   cumulées (pas 5, la « figure 4 » du spec), 3 = exponentielle, 4 = Bernoulli rare (pas 6). Les
   quatre figures du spec sont toutes là, seul leur numéro suit la lecture.
-- Figure 3 (exponentielle) : le curseur commence à n = 2 et non n = 1. Avec les bins [0 ; 3 ; 60]
-  du spec, n = 1 tasse 5 % des tirages dans la dernière barre, ce qui fabrique un faux pic aussi
-  haut que le mode. À n = 2 il n'en reste que 2 %, et la légende le dit. À trancher si la
-  relecture préfère voir la loi brute quitte à garder le pic.
+- Figure 3 (exponentielle) : le curseur commence à n = 2 et non n = 1 — **validé 16/09**. Avec les
+  bins [0 ; 3 ; 60] du spec, n = 1 tasse 5 % des tirages dans la dernière barre, soit une barre de
+  débordement aussi haute que le mode : la figure donnerait à lire une loi à deux bosses, ce que
+  l'exponentielle n'est pas. À n = 2 il n'en reste que 2 %, et la légende le dit. La loi brute n'est
+  pas perdue pour autant : elle est en figure 3 de p00-02 et en figure 3 de p00-01. Cette figure-ci
+  porte sur l'effet de la **moyenne**, donc elle commence là où la moyenne commence.
