@@ -1,0 +1,465 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bootstrap, la distribution d'échantillonnage sans formule — chaîne</title>
+<meta name="sheet" content="series=chain;part=01;number=05;status=v1">
+<meta name="part" content="01 · L'objet aléatoire (fil A)">
+<meta name="subtitle" content="fil A — rééchantillonner l'échantillon pour imiter la procédure">
+<meta name="prereq" content="p01-01">
+<meta name="anki" content="stats::bootstrap,stats::inference">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ---- marques de cette chaîne (elles passent devant .sl-seg) ---- */
+.sl-seg.mk-obs{stroke:#B7791F;stroke-width:2.2;stroke-dasharray:4 3}
+.sl-seg.mk-ic{stroke:var(--green);stroke-width:2}
+.cap .kobs{color:#B7791F;font-weight:600}.cap .kic{color:var(--green);font-weight:600}.cap .kmean{color:var(--red);font-weight:600}.cap .kdup{color:#6B46C1;font-weight:600}
+/* ---- figure 2 : les cases d'un rééchantillon ---- */
+.bx{fill:var(--cardsoft);stroke:rgba(34,48,43,.4);stroke-width:1.3}
+.bx.dup{fill:rgba(107,70,193,.18);stroke:#6B46C1;stroke-width:2.2}
+.bx.gone{fill:none;stroke:rgba(34,48,43,.22);stroke-dasharray:4 3}
+.bx.mid{fill:rgba(240,209,120,.42);stroke:#B7791F;stroke-width:2.2}
+text.bv{font:13px var(--mono);fill:var(--cardink)}
+text.bv.gone{fill:rgba(34,48,43,.32)}
+text.bk{font:11.5px var(--sans);fill:#6B46C1}
+text.bk.gone{fill:rgba(34,48,43,.45)}
+text.bh{font:600 11px var(--sans);fill:var(--cardmuted);letter-spacing:.07em}
+text.bm{font:12.5px var(--sans);fill:#B7791F}
+line.brk{stroke:#B7791F;stroke-width:1.6}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 01 · L'objet aléatoire (fil A) › chaîne 05</div>
+  <h1>Le <span>bootstrap</span> — la distribution d'échantillonnage sans <span>formule</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Fil A. Médiane de dix latences, AUC, différence de F1 : aucune de ces quantités n'a de formule d'erreur-type. Une seule idée remplace la formule — <b>l'échantillon est la meilleure image de la population qu'on ait, donc rééchantillonner l'échantillon avec remise imite le tirage du test set</b>. Fil rouge : dix latences dont une à 410 ms, médiane observée 129,5 ms, rééchantillonnées mille fois.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="chain-p01-01-objet-aleatoire.html">p01-01 · L'objet aléatoire, SE</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::bootstrap</code><code>stats::inference</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-04-variance-moyenne-correlee.html">Variance d'une moyenne corrélée</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>La distribution d'échantillonnage.</b> L'histogramme qu'on obtiendrait en refaisant l'expérience — retirer un test set, recalculer la statistique — et qu'on n'observe jamais qu'en un point (<a href="chain-p01-01-objet-aleatoire.html#s3">p01-01, pas 3</a>).</li>
+      <li><b>Le SE est son écart-type.</b> Pas l'écart-type des données : la largeur de cet histogramme-là (<a href="chain-p01-01-objet-aleatoire.html#s5">p01-01, pas 5</a>).</li>
+      <li><b>Le plug-in.</b> Quand une formule contient l'inconnu, on y substitue ce qu'on a estimé (<a href="chain-p01-01-objet-aleatoire.html#s6">p01-01, pas 6</a>). Le bootstrap est ce même geste appliqué non plus à un paramètre, mais à la <b>loi entière</b>.</li>
+      <li><b>Un intervalle est une procédure.</b> Ses bornes sont aléatoires, la quantité visée ne l'est pas (<a href="chain-p01-02-ic-test-procedure.html">p01-02</a>).</li>
+      <li><b>Notation.</b> <span class="m">T</span> est la statistique, <span class="hat"><span class="m">T</span></span> = <span class="m">T</span>(échantillon) sa valeur observée, <span class="hat"><span class="m">T</span></span><sup>*</sup> sa valeur sur un rééchantillon. L'étoile marque le monde simulé.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>L'échantillon est un <b>tirage iid</b> de la population d'usage, et on le traite <b>comme si c'était la population</b>. Tout ce que le bootstrap saura de la population tient dans ces <span class="m">n</span> lignes.</span>
+      <b>H2</b><span>La statistique est <b>lisse</b> : moyenne, médiane, proportion, AUC, F1. Changer une ligne du jeu ne la déplace que d'un peu. Un maximum, un quantile 99,9 % ne remplissent pas cette condition.</span>
+      <b>H3</b><span><span class="m">B</span>, le nombre de rééchantillons, est <b>choisi</b> ; <span class="m">n</span> est <b>subi</b>. Monter <span class="m">B</span> ne règle que le bruit de simulation, jamais la largeur réelle.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor</h3>
+    <p>Dix mesures de latence, une médiane à annoncer. On voudrait tirer mille test sets dans la population, calculer mille médianes et lire la dispersion. On n'a <b>qu'un</b> échantillon.</p>
+    <p>Pour une proportion, p01-01 comblait le manque par une formule : √(<span class="m">π</span>(1−<span class="m">π</span>)/<span class="m">n</span>). Pour une médiane, une AUC, une différence de F1, cette formule n'existe pas — la statistique n'est pas une moyenne de quantités indépendantes.</p>
+    <p class="say">« La médiane n'est pas une moyenne de termes indépendants, donc aucune formule ne donne son erreur-type, donc il faut fabriquer sa distribution d'échantillonnage autrement. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le fil rouge</div>
+    <p>Dix latences (ms), triées : 98, 117, 120, 122, <b>128</b>, <b>131</b>, 135, 140, 150, <b>410</b>.</p>
+    <div class="eq">médiane = (128 + 131)/2 = <b>129,5 ms</b> &nbsp;&nbsp; moyenne = 155,1 ms</div>
+    <table>
+      <tr><th>statistique</th><th>valeur</th><th>formule de SE ?</th></tr>
+      <tr><td>moyenne</td><td>155,1 ms</td><td><span class="m">s</span>/√<span class="m">n</span> = 90,67/√10 = <b>28,7 ms</b></td></tr>
+      <tr class="hl"><td>médiane</td><td>129,5 ms</td><td><b>aucune</b></td></tr>
+    </table>
+    <p>La médiane est justement ce qu'on veut rapporter : la latence à 410 ms tire la moyenne de 25 ms vers le haut, la médiane l'ignore. Reste à lui donner une largeur.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>L'idée : substituer l'échantillon à la population <span class="tag tronc">tronc</span></h3>
+    <p>La population est inconnue. La meilleure image qu'on en ait est l'échantillon lui-même : <span class="m">n</span> valeurs, chacune de poids 1/<span class="m">n</span>. Le bootstrap y remplace la population par cette image, et <b>rejoue la procédure à l'identique</b> : tirer <span class="m">n</span> éléments, recalculer la statistique.</p>
+    <div class="eq">tirer <span class="m">n</span> éléments dans la population &nbsp;↝&nbsp; tirer <span class="m">n</span> éléments <b>dans l'échantillon, avec remise</b></div>
+    <p class="say">« La population est inconnue mais l'échantillon la représente, donc rééchantillonner l'échantillon avec remise imite le tirage dans la population, donc la dispersion des statistiques rééchantillonnées imite la distribution d'échantillonnage. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les deux mondes, ligne à ligne</div>
+    <table>
+      <tr><th></th><th>monde réel (inaccessible)</th><th>monde bootstrap</th></tr>
+      <tr><td>on tire dans</td><td>la population</td><td>les 10 latences observées</td></tr>
+      <tr><td>un tirage</td><td>10 lignes iid</td><td>10 indices avec remise</td></tr>
+      <tr><td>on calcule</td><td>la médiane</td><td>la <b>même</b> médiane</td></tr>
+      <tr><td>on répète</td><td>impossible</td><td><span class="m">B</span> = 1 000 fois</td></tr>
+      <tr class="hl"><td>on obtient</td><td>la distribution d'échantillonnage</td><td>son <b>image simulée</b></td></tr>
+    </table>
+    <p>Une seule ligne de la colonne de gauche est remplacée — celle du haut. Tout le reste, y compris le code qui calcule la statistique, est recopié tel quel. C'est ce qui rend la recette indépendante de la statistique.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Le geste : <span class="m">B</span> rééchantillons, un écart-type, deux quantiles</h3>
+    <p>Répéter <span class="m">B</span> fois : tirer <span class="m">n</span> indices avec remise, recalculer la statistique. On obtient <span class="m">B</span> valeurs <span class="hat"><span class="m">T</span></span><sup>*</sup><sub>1</sub>, …, <span class="hat"><span class="m">T</span></span><sup>*</sup><sub><span class="m">B</span></sub>, dont on lit l'écart-type et les quantiles.</p>
+    <div class="eq"><span class="hat"><span class="up">SE</span></span><sub>boot</sub> = écart-type des <span class="hat"><span class="m">T</span></span><sup>*</sup><sub><span class="m">b</span></sub> &nbsp;&nbsp;&nbsp; IC 95 % percentile = [<span class="m">q</span><sub>2,5 %</sub> ; <span class="m">q</span><sub>97,5 %</sub>]</div>
+    <p>Rien dans la recette ne dépend de la statistique : on change la fonction appelée, pas la formule. C'est le même code pour une médiane, une AUC ou un écart de F1.</p>
+    <p class="say">« Chaque rééchantillon rend une valeur de la statistique, donc <span class="m">B</span> rééchantillons en rendent <span class="m">B</span>, donc leur écart-type estime le SE et leurs quantiles 2,5 % et 97,5 % bornent l'intervalle. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — chiffres du fil rouge</div>
+    <p>Médiane, <span class="m">n</span> = 10. En énumérant les 10<sup>10</sup> rééchantillons possibles (donc sans aucune erreur de simulation) :</p>
+    <div class="eq"><span class="hat"><span class="up">SE</span></span><sub>boot</sub> = <b>8,86 ms</b> &nbsp;&nbsp; IC 95 % = [<b>119,5</b> ; <b>142,5</b>] ms &nbsp;&nbsp; IC 90 % = [120 ; 140] ms</div>
+    <p><b>Contrôle sur une statistique qui, elle, a une formule.</b> Sur la même colonne, pour la <i>moyenne</i> :</p>
+    <table>
+      <tr><th>SE de la moyenne</th><th>valeur</th></tr>
+      <tr><td>formule <span class="m">s</span>/√<span class="m">n</span></td><td>28,67 ms</td></tr>
+      <tr class="hl"><td>bootstrap</td><td><b>27,20 ms</b></td></tr>
+    </table>
+    <p>Les deux coïncident au facteur √((<span class="m">n</span>−1)/<span class="m">n</span>) = 0,9487 près : le bootstrap divise par <span class="m">n</span> là où <span class="m">s</span> divise par <span class="m">n</span>−1. Écart structurel, connu, qui s'efface quand <span class="m">n</span> grandit — pas une dérive de la méthode.</p>
+    <p><b><span class="m">B</span> n'est pas <span class="m">n</span>.</b> Passer de <span class="m">B</span> = 1 000 à 100 000 ne rétrécit pas l'intervalle : il stabilise ses bornes. Seul <span class="m">n</span> le rétrécit, en 1/√<span class="m">n</span> comme en p01-01.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — mille médianes tirées de dix latences</div>
+    <div id="f1host" class="wide"></div>
+    <p class="cap">Chaque tirage rééchantillonne vraiment les 10 latences avec remise et pose la médiane obtenue dans l'histogramme. Trait <span class="kobs">ambre pointillé</span> : la médiane observée, 129,5 ms. Traits <span class="kic">verts</span> : les quantiles 2,5 % et 97,5 % des tirages effectués — l'<b>intervalle percentile</b>, qui se stabilise vers [119,5 ; 142,5] ms. Trait <span class="kmean">rouge</span> : la moyenne des tirages, qui vient se poser <b>sur la médiane observée</b> et non sur la vraie médiane : le bootstrap donne une largeur, jamais un centre. Tire 50, puis 1 000 : l'écart-type affiché est le <b>SE bootstrap</b>, environ 8,9 ms, obtenu sans écrire une seule formule. L'histogramme est <b>discret</b> — une médiane de 10 valeurs ne peut prendre qu'un nombre fini de valeurs — et un rééchantillon sur 6 800 environ est dominé par la latence à 410 ms : il tombe alors hors du cadre, s'empile au bord droit, et fait sursauter le SE affiché.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Pourquoi avec remise <span class="tag tronc">tronc</span></h3>
+    <p>Sans remise, tirer <span class="m">n</span> éléments parmi <span class="m">n</span> redonne exactement le même échantillon : toutes les statistiques rééchantillonnées sont égales, la dispersion est nulle. La remise est ce qui fait bouger quelque chose.</p>
+    <p>Avec remise, une ligne donnée peut être absente, tirée une fois, ou doublée. La probabilité qu'elle soit absente d'un rééchantillon vaut</p>
+    <div class="eq">(1 − 1/<span class="m">n</span>)<sup><span class="m">n</span></sup> &nbsp;⟶&nbsp; e<sup>−1</sup> = 0,368</div>
+    <p class="say">« Tirer <span class="m">n</span> éléments sans remise parmi <span class="m">n</span> redonne le même échantillon, donc rien ne bouge, donc il faut la remise, donc chaque rééchantillon oublie environ 37 % des lignes et en double d'autres, et cette variation est précisément celle du tirage qu'on imite. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — 37 %, et où on le recroise</div>
+    <table>
+      <tr><th><span class="m">n</span></th><th>(1 − 1/<span class="m">n</span>)<sup><span class="m">n</span></sup></th><th>lignes absentes en moyenne</th></tr>
+      <tr class="hl"><td>10</td><td>0,3487</td><td>3,49 sur 10 · 6,5 lignes distinctes</td></tr>
+      <tr><td>100</td><td>0,3660</td><td>36,6 sur 100</td></tr>
+      <tr><td>1 000</td><td>0,3677</td><td>367,7 sur 1 000</td></tr>
+    </table>
+    <p>La limite e<sup>−1</sup> est atteinte dès <span class="m">n</span> ≈ 100 ; à <span class="m">n</span> = 10 on est encore à 34,9 %, et le raccourci « 37 % » y est déjà une approximation.</p>
+    <p><b>Le même 37 % que le OOB.</b> Dans le bagging, chaque arbre est entraîné sur un rééchantillon bootstrap des lignes ; les ≈ 37 % de lignes qu'il n'a pas vues forment son <i>out-of-bag</i> et servent de jeu de test gratuit (<a href="../../map.html#p07-02">p07-02</a>). Deux endroits, un seul calcul : (1 − 1/<span class="m">n</span>)<sup><span class="m">n</span></sup> → e<sup>−1</sup>.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — ce qui change d'un rééchantillon à l'autre</div>
+    <div class="wide"><svg viewBox="0 0 660 205" class="sl-plot" id="f2svg"></svg></div>
+    <div class="sl-ctl" id="f2ctl"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">En haut, les dix latences observées ; en bas, un rééchantillon avec remise, trié. Une case <b>pointillée pâle</b> est une ligne <b>absente</b> de ce tirage, une case <span class="kdup">violette</span> une ligne tirée deux fois ou plus, et les deux cases <span class="kobs">ambre</span> du bas sont celles dont la moyenne fait la médiane. Clique : l'échantillon de départ ne bouge jamais, seule la composition change — et avec elle la médiane. Le compteur « absentes en moyenne » converge vers <b>3,49</b>, soit 10 × 0,9<sup>10</sup>.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Comparer deux modèles : rééchantillonner les lignes</h3>
+    <p>Pour un écart entre A et B, on rééchantillonne <b>les lignes du test set</b>, jamais les deux colonnes de scores séparément. Une ligne tirée emporte ses deux prédictions : on recalcule les deux scores sur les mêmes lignes et on garde la différence.</p>
+    <p>L'appariement devient automatique. La corrélation entre les deux mesures, qui vient du test set partagé, est conservée sans qu'on ait à l'estimer ni à écrire une covariance.</p>
+    <p class="say">« Une ligne tirée emporte les deux prédictions, donc rééchantillonner les lignes conserve la corrélation des deux scores, donc l'écart-type des <span class="m">B</span> différences est bien le SE de la différence appariée, donc aucune formule de covariance n'est nécessaire. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le fil rouge de p01-04</div>
+    <p>1 000 lignes, A à 87,2 %, B à 88,1 %, <span class="m">b</span> = 30 lignes où A seul a juste, <span class="m">c</span> = 39 où B seul a juste. 4 000 rééchantillons de lignes :</p>
+    <table>
+      <tr><th>SE de l'écart <span class="m">D</span> = 0,009</th><th>valeur</th><th>IC 95 %</th></tr>
+      <tr class="hl"><td>bootstrap sur les lignes</td><td><b>0,0082</b></td><td>[−0,008 ; 0,025]</td></tr>
+      <tr><td>formule appariée √((<span class="m">b</span>+<span class="m">c</span>)/<span class="m">n</span> − <span class="m">D</span>²)/√<span class="m">n</span></td><td>0,0083</td><td>[−0,007 ; 0,025]</td></tr>
+      <tr><td>deux colonnes tirées séparément</td><td>0,0147</td><td>1,8× trop large</td></tr>
+    </table>
+    <p>Le bootstrap retrouve la formule appariée à 1 % près, et la conclusion de McNemar — l'intervalle couvre 0 — sans écrire (<span class="m">c</span>−<span class="m">b</span>)²/(<span class="m">b</span>+<span class="m">c</span>). Casser l'appariement gonfle le SE de 77 % : on jette exactement l'information qui sert à départager (<a href="chain-p01-04-comparer-modeles-multiplicite.html#s5">p01-04, pas 5</a> ; déroulé <a href="../walkthroughs/walkthrough-p01-02-comparer-deux-modeles.html">D2</a>).</p>
+    <p>L'intérêt réel arrive quand la métrique n'est pas une moyenne — F1, AUC, taux de préférence jugé par un LLM : là il n'y a pas de formule appariée du tout, et la recette ne change pas d'une ligne.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Le bootstrap copie une procédure ; il ne crée pas d'information. Ce que l'échantillon ignore de la population, l'image qu'on en tire l'ignore aussi.</p>
+    <p class="say">« Le bootstrap rejoue le tirage à partir de l'échantillon, donc il hérite de tout ce que l'échantillon ignore, donc il mesure une largeur et ne corrige jamais un centre. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>Lignes dépendantes.</b> Tirer les lignes une par une suppose H1. Vingt lignes d'un même utilisateur, les images d'une même vidéo, les points voisins d'une série : le tirage ligne à ligne casse les blocs, fabrique une variabilité que le vrai tirage n'a pas, et <b>sous-estime</b> le SE. Remède : tirer des groupes ou des blocs entiers — bootstrap par cluster, par bloc (<a href="../bridges/bridge-04-variance-moyenne-correlee.html">pont 04</a>).</li>
+      <li><b>Statistiques d'extrême.</b> H2 tombe. Un rééchantillon ne contient que des valeurs déjà vues, donc le maximum bootstrap ne dépasse <b>jamais</b> le maximum observé : sur nos dix latences il vaut 410 dans 65 % des cas et s'effondre sous 150 dans les autres. Sa distribution n'est pas l'image de la vraie, c'est un tas collé au bord. Même chose pour un quantile 99,9 %.</li>
+      <li><b><span class="m">n</span> minuscule.</b> Tout repose sur « l'échantillon représente la population ». À <span class="m">n</span> = 10 dont une valeur à 410 ms, l'image est grossière ; le bootstrap la recopie fidèlement, défauts compris. Le 8,86 ms est le SE du monde où la population vaut exactement ces dix valeurs.</li>
+      <li><b>Ce n'est pas plus de données.</b> Le bootstrap mesure une largeur ; il ne réduit ni le biais ni la variance réelle. Test set filtré ou décalé : un intervalle étroit autour de la mauvaise valeur. Test set déjà utilisé pour <i>choisir</i> le modèle : il tourne autour d'un score gonflé (<a href="chain-p01-04-comparer-modeles-multiplicite.html#s6">p01-04, pas 6</a>).</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Pas de formule de SE ⇒ <b>imiter la procédure</b> : rééchantillonner l'échantillon avec remise, <span class="m">n</span> éléments, <span class="m">B</span> fois.</li>
+    <li><span class="hat"><span class="up">SE</span></span><sub>boot</sub> = écart-type des <span class="m">B</span> valeurs ; IC percentile = quantiles 2,5 % et 97,5 %. Fil rouge : 8,86 ms, [119,5 ; 142,5].</li>
+    <li><b>Avec remise</b> = la variabilité : (1 − 1/<span class="m">n</span>)<sup><span class="m">n</span></sup> → e<sup>−1</sup>, ≈ 37 % de lignes absentes par tirage — le 37 % du OOB.</li>
+    <li>Comparer deux modèles : rééchantillonner <b>les lignes</b>, garder la différence. L'appariement est automatique.</li>
+    <li>Casse : dépendance, extrêmes, <span class="m">n</span> minuscule. Et <span class="m">B</span> ne remplace pas <span class="m">n</span> : le bootstrap mesure une largeur, il ne réduit pas un biais.</li>
+  </ol>
+</div>
+<div class="phrase">« Quand je n'ai pas de formule pour l'erreur-type, je rééchantillonne mon test set avec remise et je recalcule la métrique un millier de fois : la dispersion obtenue imite la distribution d'échantillonnage, son écart-type est le SE et ses quantiles 2,5 % et 97,5 % l'intervalle. Pour comparer deux modèles je rééchantillonne les lignes et je garde la différence, ce qui apparie automatiquement. Cela mesure une largeur : ni le biais, ni la dépendance entre lignes ne s'y corrigent. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Que veut-on, et qu'a-t-on ?</div><div class="a hid">La dispersion de la statistique sur des tirages répétés de la population ; on ne dispose que d'un seul échantillon, et d'aucune formule pour une médiane.</div></li>
+    <li><div class="q">Que fait le bootstrap, et pourquoi est-ce légitime ?</div><div class="a hid">Il rééchantillonne l'échantillon avec remise, n éléments, B fois, et recalcule la statistique. Légitime sous H1 : l'échantillon est la meilleure image de la population, donc y tirer imite tirer dans la population.</div></li>
+    <li><div class="q">Pourquoi avec remise ?</div><div class="a hid">Sans remise on retrouve le même échantillon et rien ne bouge. Avec remise, chaque tirage oublie (1 − 1/n)<sup>n</sup> → 37 % des lignes et en double d'autres : c'est la variabilité cherchée, et c'est le même 37 % que l'OOB du bagging.</div></li>
+    <li><div class="q">Comment comparer deux modèles ?</div><div class="a hid">Rééchantillonner les lignes, pas les colonnes : chaque ligne emporte ses deux prédictions, on recalcule les deux scores dessus et on garde la différence. Appariement automatique ; casser l'appariement élargit le SE de 77 % sur le fil rouge.</div></li>
+    <li><div class="q">Quand ne pas lui faire confiance ?</div><div class="a hid">Lignes dépendantes (tirer par blocs, sinon SE sous-estimé), statistiques d'extrême (rien au-delà des valeurs vues), n minuscule (il hérite d'un échantillon non représentatif). Et il ne corrige aucun biais.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="../bridges/bridge-04-variance-moyenne-correlee.html"><b>Variance d'une moyenne corrélée</b><small>la limite « lignes dépendantes » du pas 6 : dès que la corrélation apparaît, le tirage ligne à ligne ment, exactement comme la variance cesse de descendre en 1/n</small></a>
+    <a href="chain-p01-04-comparer-modeles-multiplicite.html#s5"><b>p01-04 — comparer deux modèles</b><small>le pas 5 y est annoncé : McNemar quand la métrique est une moyenne, bootstrap apparié quand elle ne l'est pas</small></a>
+    <a href="../walkthroughs/walkthrough-p01-02-comparer-deux-modeles.html"><b>D2 — comparer deux modèles</b><small>le bootstrap sur la différence, déroulé maillon par maillon sur le même fil rouge</small></a>
+    <a href="../../map.html#p07-02"><b>p07-02 — bagging et OOB</b><small>l'autre visage du 37 % : les lignes absentes d'un rééchantillon deviennent le jeu de test gratuit de chaque arbre</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::bootstrap</code> (la recette, le rôle de la remise, le 37 %, l'appariement par les lignes) · <code>stats::inference</code> (SE, intervalle percentile, ce qu'un intervalle ne corrige pas).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p01-05 · v1 du 16/09/2026 · Prérequis : p01-01. Suite : <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01 Du bruit à la loss (fil B)</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== le fil rouge : dix latences, triées une fois pour toutes ===== */
+const LAT=[98,117,120,122,128,131,135,140,150,410];
+const MEDOBS=129.5;
+const pick=()=>LAT[(Math.random()*LAT.length)|0];
+
+/* ===== Figure 1 : mille médianes bootstrap ===== */
+const resMed=()=>{const r=[];for(let i=0;i<10;i++)r.push(pick());r.sort((a,b)=>a-b);return (r[4]+r[5])/2;};
+function over(P){return SL.el('g',{},P.svg);}                               // calque au-dessus des barres, jamais effacé par P.clear
+function oline(g,P,xa,ya,xb,yb,cls){return SL.el('line',{x1:P.sx(xa),y1:P.sy(ya),x2:P.sx(xb),y2:P.sy(yb),class:'sl-seg '+cls},g);}
+const quant=(a,p)=>a[Math.min(a.length-1,Math.max(0,Math.ceil(p*a.length)-1))];
+let icLines=[];
+const R1=SL.repeat(document.getElementById('f1host'),{
+  draw:resMed,bins:[105,160,22],xt:[110,120,130,140,150],w:620,h:260,counts:[1,50,1000],
+  xl:'médiane du rééchantillon (ms)',yl:'fréquence',
+  marks:[],
+  readout:(k,m,s)=>{const a=R1.stats.slice().sort((p,q)=>p-q),lo=quant(a,.025),hi=quant(a,.975);drawIC(lo,hi);
+    return `${k} rééchantillons · SE bootstrap ${SL.fmt(s,2)} ms · IC percentile 95 % [${SL.fmt(lo,1)} ; ${SL.fmt(hi,1)}] ms`;},
+  empty:'Aucun rééchantillon : clique « tirer 50 ».'});
+const g1=over(R1.plot);
+oline(g1,R1.plot,MEDOBS,0,MEDOBS,1,'mk-obs');                               // dessinée en dernier : elle reste lisible par-dessus la moyenne rouge
+function drawIC(lo,hi){icLines.forEach(e=>e.remove());icLines=[oline(g1,R1.plot,lo,0,lo,1,'mk-ic'),oline(g1,R1.plot,hi,0,hi,1,'mk-ic')];}
+[...document.getElementById('f1host').querySelectorAll('.tb')].forEach(b=>{           // « effacer » doit aussi effacer l'intervalle
+  if(b.textContent==='effacer')b.addEventListener('click',()=>{icLines.forEach(e=>e.remove());icLines=[];});});
+for(let i=0;i<1000;i++)R1.stats.push(resMed());R1.render();
+
+/* ===== Figure 2 : un rééchantillon, case par case ===== */
+const F2=document.getElementById('f2svg'),out2=document.getElementById('f2out');
+const SX=i=>34+i*61,BW=54;
+let nRe=0,sumAbs=0;
+function tx(x,y,t,cls,anchor){const e=SL.el('text',{x:x,y:y,class:cls,'text-anchor':anchor||'middle'},F2);e.textContent=t;return e;}
+function draw2(){
+  while(F2.firstChild)F2.removeChild(F2.firstChild);
+  const cnt=new Array(10).fill(0),res=[];
+  for(let i=0;i<10;i++){const k=(Math.random()*10)|0;cnt[k]++;res.push(LAT[k]);}
+  res.sort((a,b)=>a-b);
+  const absent=cnt.filter(c=>c===0).length,dbl=cnt.filter(c=>c>1).length,med=(res[4]+res[5])/2;
+  nRe++;sumAbs+=absent;
+  tx(34,16,'LES 10 LATENCES OBSERVÉES (ms) — ELLES NE BOUGENT JAMAIS','bh','start');
+  LAT.forEach((v,i)=>{const c=cnt[i];
+    SL.el('rect',{x:SX(i),y:26,width:BW,height:38,rx:3,class:'bx'+(c===0?' gone':c>1?' dup':'')},F2);
+    tx(SX(i)+BW/2,50,String(v),'bv'+(c===0?' gone':''));
+    if(c===0)tx(SX(i)+BW/2,80,'absente','bk gone');else if(c>1)tx(SX(i)+BW/2,80,'× '+c,'bk');});
+  tx(34,112,'UN RÉÉCHANTILLON : 10 TIRAGES AVEC REMISE, TRIÉS','bh','start');
+  res.forEach((v,i)=>{SL.el('rect',{x:SX(i),y:122,width:BW,height:38,rx:3,class:'bx'+((i===4||i===5)?' mid':'')},F2);
+    tx(SX(i)+BW/2,146,String(v),'bv');});
+  const xa=SX(4),xb=SX(5)+BW;
+  SL.el('line',{x1:xa,y1:172,x2:xb,y2:172,class:'brk'},F2);
+  SL.el('line',{x1:xa,y1:167,x2:xa,y2:177,class:'brk'},F2);
+  SL.el('line',{x1:xb,y1:167,x2:xb,y2:177,class:'brk'},F2);
+  tx((xa+xb)/2,194,'médiane = '+SL.fmt(med,1)+' ms','bm');
+  out2.innerHTML=`<div>lignes absentes<b>${absent} / 10</b></div>`+
+    `<div>lignes tirées 2 fois ou plus<b>${dbl}</b></div>`+
+    `<div>médiane de ce rééchantillon<b>${SL.fmt(med,1)} ms</b></div>`+
+    `<div class="pos">absentes en moyenne sur ${nRe}<b>${SL.fmt(sumAbs/nRe,2)}</b></div>`;
+}
+const c2=document.getElementById('f2ctl');
+SL.h('button','tb',c2,'nouveau rééchantillon').onclick=draw2;
+SL.h('button','tb',c2,'50 d\'un coup').onclick=()=>{for(let i=0;i<50;i++)draw2();};
+SL.h('button','tb',c2,'remettre le compteur à zéro').onclick=()=>{nRe=0;sumAbs=0;draw2();};
+draw2();
+})();
+</script>
+</body>
+</html>

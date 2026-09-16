@@ -10,7 +10,7 @@ prereq: [p01-01]
 anki: [stats::bootstrap, stats::inference]
 bridges: [b04]
 next: p02-01
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -24,13 +24,13 @@ Médiane de 10 latences, AUC, différence de F1 : aucune formule de SE. Comment 
 - H2 : la statistique est « lisse » (moyenne, médiane, AUC, proportion) — pas un extrême (max, quantile 99,9 %).
 
 ## Exemple fil rouge
-Latences (ms) : 120, 135, 98, 410, 140, 128, 122, 150, 131, 117. Médiane = 129,5. B = 1 000 rééchantillons avec remise de taille 10 → écart-type des médianes ≈ 6 ms ; IC percentile 2,5–97,5 % ≈ [120 ; 140]. (Faire calculer par la figure ; les valeurs exactes sont celles de la simulation.)
+Latences (ms) : 120, 135, 98, 410, 140, 128, 122, 150, 131, 117. Médiane = 129,5. B = 1 000 rééchantillons avec remise de taille 10 → écart-type des médianes ≈ **8,86 ms** ; IC percentile 2,5–97,5 % = **[119,5 ; 142,5]** (l'intervalle [120 ; 140] est le 5–95 %). Valeurs obtenues par énumération exacte des 10^10 rééchantillons, pas par simulation. Contrôle sur la moyenne, qui a une formule : SE_boot = 27,20 ms contre s/√n = 28,67 ms, rapport √((n−1)/n).
 
 ## Pas de la chaîne
 1. **Le décor.** On voudrait tirer 1 000 échantillons de la population et regarder la dispersion des médianes. On n'a qu'un échantillon.
 2. **L'idée** [tronc] : l'échantillon est la meilleure image de la population qu'on ait ; tirer **dans l'échantillon, avec remise, n éléments** imite « tirer n éléments dans la population ». Au tableau : « La population est inconnue mais l'échantillon la représente, donc rééchantillonner l'échantillon avec remise imite le tirage dans la population, donc la dispersion des statistiques rééchantillonnées imite la distribution d'échantillonnage. »
 3. **Le geste.** B fois : tirer n indices avec remise → calculer la statistique. SE_boot = écart-type des B valeurs. IC percentile : quantiles 2,5 % et 97,5 %.
-4. **Pourquoi avec remise.** Sans remise on retrouve toujours le même échantillon. Avec remise, chaque rééchantillon oublie ≈ 37 % des lignes et en double d'autres — c'est la variabilité qu'on cherche (même 37 % que le OOB du bagging, p07-02).
+4. **Pourquoi avec remise.** Sans remise on retrouve toujours le même échantillon. Avec remise, chaque rééchantillon oublie ≈ 37 % des lignes et en double d'autres (à n = 10 : 34,9 % exactement, la limite e⁻¹ = 36,8 % n'étant atteinte que vers n ≈ 100) — c'est la variabilité qu'on cherche (même 37 % que le OOB du bagging, p07-02).
 5. **Apparié.** Pour comparer A et B : rééchantillonner les **lignes**, recalculer les deux scores sur les mêmes lignes, garder la différence. L'appariement est automatique.
 6. **Où ça casse** [casse].
 
@@ -66,3 +66,23 @@ Latences (ms) : 120, 135, 98, 410, 140, 128, 122, 150, 131, 117. Médiane = 129,
 
 ## Exclusions
 Pas de bootstrap paramétrique, pas de BCa. Pas de bootstrap sur les résidus.
+
+## Questions pour la revue
+Corrections apportées au spec lors de l'écriture de la sheet (vérifiées par énumération exacte
+des 10^10 rééchantillons possibles, script dans le scratchpad de la session) :
+
+- **SE bootstrap de la médiane : 8,86 ms, pas ≈ 6 ms.** La latence à 410 ms écarte la distribution
+  bien plus que le « 6 » annoncé. Corrigé dans « Exemple fil rouge ».
+- **IC percentile 95 % = [119,5 ; 142,5], pas [120 ; 140].** [120 ; 140] est exactement
+  l'intervalle **90 %** (q5 = 120, q95 = 140). Corrigé.
+- **« ≈ 37 % » est une limite, pas la valeur à n = 10** : (1 − 1/10)¹⁰ = 34,9 %, soit 3,49 lignes
+  absentes et 6,5 lignes distinctes. La sheet donne les deux et le tableau n = 10 / 100 / 1 000.
+- À trancher : avec B = 1 000, le SE affiché par la figure 1 **sursaute** (jusqu'à ~12 ms) quand
+  un rééchantillon tombe sur une médiane à 410 ms — environ 1 chance sur 6 800 par tirage, donc
+  ~14 % des chargements de page. C'est assumé dans la légende comme illustration de la limite
+  « statistiques d'extrême », mais si c'est jugé perturbant, il suffit de retirer le 410 du jeu
+  (médiane à n = 9 : 128) — au prix de la belle illustration « la médiane ignore l'outlier, la
+  moyenne non » du pas 1.
+- Le pas 5 emprunte le fil rouge chiffré de p01-04 (b = 30, c = 39, n = 1 000) plutôt que
+  d'inventer un second jeu : bootstrap apparié SE = 0,0082 contre formule appariée 0,0083, et
+  0,0147 en cassant l'appariement (+ 77 %). À confirmer que cet emprunt est souhaité.
