@@ -1,0 +1,586 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Flottants et log-sum-exp — chaîne</title>
+<meta name="sheet" content="series=chain;part=08;number=02;status=v1">
+<meta name="part" content="08 · Calcul, numérique, tenseurs">
+<meta name="subtitle" content="ce qui arrive vraiment quand on additionne, compare, exponentie — raisonner en float32, pas en mathématiques">
+<meta name="prereq" content="aucun">
+<meta name="anki" content="python::flottants,dl::log-sum-exp,dl::softmax-stabilite,python::dtypes">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 08 · Calcul, numérique, tenseurs › chaîne 02</div>
+  <h1>Flottants et <span>log-sum-exp</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Pourquoi 0,1 + 0,2 ≠ 0,3, pourquoi <span class="m">e</span><sup>1 000</sup> ne vaut ni 0 ni une erreur mais <b>inf</b>, et pourquoi tout code de softmax soustrait le max. Une seule cause : <b>la mantisse est finie, donc l'erreur est relative</b> — tout le reste en découle, la dérive des sommes, les <span class="m">nan</span> silencieux et l'astuce du log-sum-exp. Fil rouge : accumuler 0,1 un million de fois en float32, et calculer le softmax de (1 000 ; 0).</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li>Aucune fiche — notation scientifique <span class="m">x</span> = ±<span class="m">m</span> × 2<sup>e</sup></li>
+    <li><a href="chain-p08-01-jacobienne-chain-rule-backprop.html#s4">p08-01 · −log <span class="m">p</span> sur un neurone</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>python::flottants</code><code>dl::log-sum-exp</code><code>dl::softmax-stabilite</code><code>python::dtypes</code></div>
+  <h4>Ponts et suites</h4>
+  <ol>
+    <li><a href="chain-p08-01-jacobienne-chain-rule-backprop.html#s9">p08-01 · produits de jacobiennes</a></li>
+    <li><a href="../../map.html#p08-03">p08-03 · Cross-entropy, entropie, KL</a></li>
+    <li><a href="../../map.html#p08-04">p08-04 · Tenseurs, ruban, strides</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>La notation scientifique.</b> Un nombre s'écrit <span class="m">x</span> = ±<span class="m">m</span> × 2<sup>e</sup>, une <i>mantisse</i> <span class="m">m</span> ∈ [1, 2[ et un <i>exposant</i> entier <span class="m">e</span>. C'est la seule chose à savoir de la norme IEEE 754 pour cette chaîne.</li>
+      <li><b>Exponentielle et logarithme.</b> <span class="m">e</span><sup><span class="m">a</span>+<span class="m">b</span></sup> = <span class="m">e</span><sup><span class="m">a</span></sup><span class="m">e</span><sup><span class="m">b</span></sup> et log(<span class="m">ab</span>) = log <span class="m">a</span> + log <span class="m">b</span>. Le log-sum-exp du pas 6 n'est que cette identité, utilisée pour déplacer un facteur commun hors d'une somme.</li>
+      <li><b>Softmax et logits.</b> <span class="m">p</span><sub><span class="m">i</span></sub> = <span class="m">e</span><sup><span class="m">z</span><sub><span class="m">i</span></sub></sup> / Σ<sub><span class="m">j</span></sub> <span class="m">e</span><sup><span class="m">z</span><sub><span class="m">j</span></sub></sup> transforme des scores réels (<i>logits</i>) en probabilités. Ici on ne redérive rien : on regarde ce que cette formule devient en flottants.</li>
+      <li><b>Le terme −log <span class="m">p</span>.</b> Déjà rencontré comme facteur du gradient d'un neurone logistique (<a href="chain-p08-01-jacobienne-chain-rule-backprop.html#s4">p08-01, pas 4</a>). Le pas 7 montre qu'on ne le calcule <i>jamais</i> en formant <span class="m">p</span> d'abord.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>Un flottant a une <b>mantisse finie</b> : 24 bits en float32 (≈ 7 chiffres décimaux), 53 en float64 (≈ 16). L'erreur d'arrondi est donc <b>relative</b> : <span class="m">ε</span><sub>32</sub> = 2<sup>−23</sup> = 1,19 · 10<sup>−7</sup>, <span class="m">ε</span><sub>64</sub> = 2<sup>−52</sup> = 2,22 · 10<sup>−16</sup>.</span>
+      <b>H2</b><span>Les <b>valeurs spéciales existent et se propagent</b> : inf, −inf, nan. Elles ne lèvent aucune exception, elles voyagent. Et nan ≠ nan : un test d'égalité ne les détecte pas, <code>isnan</code> si.</span>
+      <b>H3</b><span>PyTorch calcule en <b>float32 par défaut</b> ; NumPy et Python en float64. Un même code ne donne pas le même résultat dans les deux — neuf ordres de grandeur d'écart sur l'epsilon. C'est le pas 8.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor : des fractions binaires, pas des réels</h3>
+    <p>Les nombres d'un programme forment un ensemble <b>fini</b> de fractions binaires. Une valeur est stockée comme mantisse tronquée à 24 bits fois une puissance de 2 :</p>
+    <div class="eq"><span class="m">x</span> = ±(1,<span class="m">b</span><sub>1</sub><span class="m">b</span><sub>2</sub>…<span class="m">b</span><sub>23</sub>)<sub>2</sub> × 2<sup>e</sup></div>
+    <p>0,1 n'a pas de développement binaire fini, exactement comme 1/3 n'en a pas en base 10. Il est <b>remplacé</b> par le flottant le plus proche à l'instant où on l'écrit. Tout ce qui suit est une conséquence de cette substitution.</p>
+    <p class="say">« La mantisse a un nombre fixe de bits, donc seules certaines fractions binaires existent, donc 0,1 est remplacé dès l'écriture par son voisin le plus proche, donc l'arithmétique porte sur ces voisins et pas sur les nombres écrits. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — ce que vaut vraiment 0,1</div>
+    <table>
+      <tr><th>écrit</th><th>réellement stocké</th></tr>
+      <tr><td>0,1 en float64</td><td>0,100000000000000005551115123…</td></tr>
+      <tr class="hl"><td>0,1 en float32</td><td>0,100000001490116119384765625</td></tr>
+    </table>
+    <p>D'où le classique : <code>0.1 + 0.2</code> vaut <b>0,30000000000000004</b> en float64, et <code>0.1 + 0.2 == 0.3</code> est <code>False</code>. Ce n'est pas un bug de Python : c'est la somme exacte de deux voisins qui ne sont pas 0,1 et 0,2, arrondie au voisin de 0,3 le plus proche… et qui tombe à côté.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>L'erreur est relative, pas absolue <span class="tag tronc">tronc</span></h3>
+    <p>La mantisse a un nombre fixe de bits <i>quelle que soit l'octave</i>. L'écart entre deux flottants consécutifs (l'<b>ulp</b>) est donc proportionnel à la taille du nombre :</p>
+    <div class="eq">ulp(<span class="m">x</span>) = 2<sup>⌊log<sub>2</sub> <span class="m">x</span>⌋</sup> × 2<sup>−23</sup> ≈ <span class="m">x</span> · <span class="m">ε</span><sub>32</sub></div>
+    <p>Un flottant représente <span class="m">x</span> à <span class="m">ε</span> près <b>en proportion</b>. Les grands nombres sont mesurés à la louche : au-delà de 2<sup>24</sup> = 16 777 216, float32 ne sait plus compter de 1 en 1.</p>
+    <p class="say">« La mantisse a un nombre fixe de bits, donc l'écart entre deux flottants consécutifs est proportionnel à leur taille, donc l'erreur est relative, donc les grands nombres sont mesurés à la louche. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — la résolution de float32</div>
+    <table>
+      <tr><th><span class="m">x</span></th><th>ulp(<span class="m">x</span>)</th><th>lecture</th></tr>
+      <tr><td>1</td><td>1,19 · 10<sup>−7</sup></td><td>7 chiffres utiles</td></tr>
+      <tr><td>1 000</td><td>6,10 · 10<sup>−5</sup></td><td>4 décimales</td></tr>
+      <tr><td>10<sup>6</sup></td><td>0,0625</td><td>1 décimale</td></tr>
+      <tr class="hl"><td>16 777 216 = 2<sup>24</sup></td><td>2</td><td>les impairs n'existent plus</td></tr>
+      <tr><td>10<sup>8</sup></td><td>8</td><td>on compte de 8 en 8</td></tr>
+    </table>
+    <p>Conséquence directe : en float32, <b>16 777 216 et 16 777 217 sont le même nombre</b>. Un compteur d'entiers stocké en float32 se met à sauter des valeurs passé 16 millions — sans le moindre avertissement.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — l'espacement des flottants, en log-log</div>
+    <div id="f1plot" class="wide"></div>
+    <div id="f1sliders"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">L'escalier bleu est l'écart réel entre deux flottants float32 consécutifs ; la droite ocre est l'approximation <span class="m">x</span> · <span class="m">ε</span><sub>32</sub>. En log-log, <b>une erreur relative constante est une droite de pente 1</b> : c'est toute l'hypothèse H1, dessinée. Fais glisser <span class="m">x</span> : le troisième readout ajoute 1 à <span class="m">x</span> en float32 puis retranche <span class="m">x</span> — il reste 1, ou bien rien du tout. À 2<sup>24</sup> (point rouge) l'ulp vaut 2 ; à 10<sup>8</sup> il vaut 8, et <b>10<sup>8</sup> + 1 = 10<sup>8</sup></b>.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Additionner un petit à un grand perd le petit</h3>
+    <p>Si le terme ajouté est plus petit que la moitié de l'ulp de l'accumulateur, la somme <b>ne bouge pas</b> : 10<sup>8</sup> + 1 = 10<sup>8</sup> en float32. Dans une somme séquentielle, l'accumulateur grandit à chaque tour, donc sa résolution se dégrade, donc chaque terme est arrondi plus grossièrement que le précédent. Le budget d'erreur vaut ≈ <span class="m">n</span> · <span class="m">ε</span> · max|somme partielle|.</p>
+    <p>Trois remèdes : sommer <b>par paires</b> (arbre binaire, erreur en log <span class="m">n</span> — c'est ce que fait <code>np.sum</code>), sommer dans un accumulateur <b>float64</b>, ou compenser à la Kahan.</p>
+    <p class="say">« L'accumulateur grandit, donc sa résolution baisse, donc chaque terme ajouté est de plus en plus arrondi, donc l'erreur totale croît en n fois epsilon fois l'échelle atteinte. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — un million de fois 0,1, en float32</div>
+    <table>
+      <tr><th>méthode</th><th>résultat</th><th>erreur relative</th></tr>
+      <tr class="hl"><td>boucle séquentielle float32</td><td><b>100 958,34</b></td><td>+0,96 %</td></tr>
+      <tr><td>somme par paires float32</td><td>100 000,0</td><td>0</td></tr>
+      <tr><td>boucle séquentielle float64</td><td>100 000,000001</td><td>1,3 · 10<sup>−11</sup></td></tr>
+    </table>
+    <p>Le budget théorique <span class="m">n</span>·<span class="m">ε</span>·max = 10<sup>6</sup> × 1,19·10<sup>−7</sup> × 10<sup>5</sup> = 11 920 est une <b>borne</b> ; on en observe 958, les arrondis se compensant partiellement. Passé un accumulateur de 0,1 × 2<sup>24</sup> = <b>1 677 722</b>, ajouter 0,1 ne changerait plus rien du tout : la somme se figerait.</p>
+    <p>Le même piège en deep learning : une loss moyennée sur un gros batch, un compteur de tokens, une norme de gradient accumulée — toujours en float64 ou par paires.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — la dérive d'une somme séquentielle</div>
+    <div id="f2plot" class="wide"></div>
+    <div class="sl-ctl" id="f2ctl"></div>
+    <div id="f2sliders"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Erreur relative de la somme séquentielle de 0,1 en float32, en fonction du nombre de termes (échelle log en <span class="m">x</span>). <b>L'axe horizontal est la somme exacte</b> <span class="m">n</span> · 0,1 : s'en écarter, c'est dériver. Le trait rouge épais est la part déjà accumulée, le trait gris ce qui reste à venir ; le bouton « accumuler » rejoue la course. Tant que l'accumulateur reste sous ≈ 10<sup>4</sup> l'erreur ne dépasse pas 0,07 % et change de signe ; au-delà elle part vite et ne revient plus : <b>+0,96 % quand l'accumulateur atteint 10<sup>5</sup></b>.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Jamais <code>==</code> sur des flottants</h3>
+    <p>Deux calculs mathématiquement égaux passent par des arrondis différents : l'égalité exacte est un accident, pas une propriété. On compare à une tolérance <b>relative</b>, c'est-à-dire proportionnelle à l'échelle des nombres comparés :</p>
+    <div class="eq">|<span class="m">a</span> − <span class="m">b</span>| ≤ <span class="m">τ</span> · max(1, |<span class="m">a</span>|, |<span class="m">b</span>|)</div>
+    <p>Pour l'argent, on ne tolère rien du tout : on compte en <b>centimes entiers</b>, ou en <code>Decimal</code>. Un centime perdu par arrondi est une erreur comptable, pas une imprécision.</p>
+    <p class="say">« Deux chemins de calcul arrondissent différemment, donc l'égalité exacte est un accident, donc on compare à une tolérance proportionnelle à l'échelle, donc l'argent se compte en entiers où il n'y a pas d'arrondi du tout. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — quatre égalités qui échouent</div>
+    <table>
+      <tr><th>écrit</th><th>obtenu en float64</th><th><code>==</code></th></tr>
+      <tr><td><code>0.1 + 0.2</code></td><td>0,30000000000000004</td><td>False</td></tr>
+      <tr class="hl"><td><code>4.35 * 100</code></td><td>434,99999999999994</td><td>False</td></tr>
+      <tr><td><code>0.29 * 100</code></td><td>28,999999999999996</td><td>False</td></tr>
+      <tr><td><code>2.00 - 1.10</code></td><td>0,8999999999999999</td><td>False</td></tr>
+    </table>
+    <p><b>Le piège comptable</b> : <code>int(4.35 * 100)</code> vaut <b>434</b>, pas 435. Un centime disparaît par troncature — et sur un million de lignes, c'est un écart de caisse.</p>
+    <p><b>Et le réflexe inverse est aussi faux</b> : <code>19.99 * 3 == 59.97</code> est <code>True</code> en float64. Un exemple qui marche ne prouve rien ; seul le raisonnement « mantisse finie ⇒ arrondi » est fiable, jamais un test ponctuel.</p>
+    <p>Tolérance fixe, le mauvais réflexe : <code>abs(a-b) &lt; 1e-6</code> est ridiculement lâche pour des nombres de l'ordre de 10<sup>−9</sup> et impossible à satisfaire pour des nombres de l'ordre de 10<sup>9</sup>, dont l'ulp float64 vaut déjà 2 · 10<sup>−7</sup>.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Débordement : inf d'abord, nan ensuite <span class="tag tronc">tronc</span></h3>
+    <p>Au-delà du plus grand flottant (3,40 · 10<sup>38</sup> en float32), un résultat devient <b>inf</b>. Pas 0, pas une exception, pas un message : inf. Les opérations sur inf produisent inf ou nan — inf − inf, inf/inf, 0 · inf donnent nan — et un nan <b>contamine</b> tout ce qu'il touche.</p>
+    <p>D'où la règle de diagnostic : une loss nan à l'itération 340 vient d'un inf à l'itération 339. On ne cherche pas le nan, on remonte au premier inf.</p>
+    <p class="say">« Dépasser le maximum donne inf, donc une division d'inf par inf donne nan, donc un nan en sortie est la trace d'un inf en amont, et on remonte le calcul pour le trouver. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le mur de l'exponentielle</div>
+    <p>Le plus grand float32 est 3,4028 · 10<sup>38</sup>, donc <span class="m">e</span><sup><span class="m">z</span></sup> déborde dès que <span class="m">z</span> &gt; log(3,4028 · 10<sup>38</sup>) = <b>88,7228</b>.</p>
+    <table>
+      <tr><th>calcul</th><th>float32</th></tr>
+      <tr><td><span class="m">e</span><sup>88,7</sup></td><td>3,326 · 10<sup>38</sup> — passe de justesse</td></tr>
+      <tr class="hl"><td><span class="m">e</span><sup>89</sup></td><td><b>inf</b> (la vraie valeur, 4,49 · 10<sup>38</sup>, existe pourtant en float64)</td></tr>
+      <tr><td>inf / inf</td><td><b>nan</b></td></tr>
+      <tr><td>nan == nan</td><td>False</td></tr>
+    </table>
+    <p><b>Softmax naïf de (1 000 ; 0)</b> : le numérateur <span class="m">e</span><sup>1 000</sup> = inf, le dénominateur inf + 1 = inf, donc <span class="m">p</span><sub>1</sub> = inf/inf = <b>nan</b> et <span class="m">p</span><sub>2</sub> = 1/inf = <b>0</b>. La sortie est (nan ; 0) : la classe manifestement gagnante reçoit nan, la perdante reçoit une vraie probabilité.</p>
+    <p>Le garde-fou qui ne coûte rien : <code>torch.isfinite(loss)</code> à chaque pas, et on sait à quelle itération le premier inf est né.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Log-sum-exp : soustraire le max <span class="tag tronc">tronc</span></h3>
+    <p>Avec <span class="m">m</span> = max<sub><span class="m">i</span></sub> <span class="m">z</span><sub><span class="m">i</span></sub>, mettre <span class="m">e</span><sup><span class="m">m</span></sup> en facteur dans la somme donne une identité <b>exacte</b>, vraie en mathématiques comme en flottants :</p>
+    <div class="eq">LSE(<span class="m">z</span>) = log Σ<sub><span class="m">i</span></sub> <span class="m">e</span><sup><span class="m">z</span><sub><span class="m">i</span></sub></sup> = <span class="m">m</span> + log Σ<sub><span class="m">i</span></sub> <span class="m">e</span><sup><span class="m">z</span><sub><span class="m">i</span></sub> − <span class="m">m</span></sup></div>
+    <p>Tous les exposants sont désormais ≤ 0, donc toutes les exponentielles sont dans ]0, 1] : <b>plus rien ne peut déborder</b>, et le plus grand terme vaut exactement 1, ce qui garantit que la somme est ≥ 1 et que son log est fini. Softmax stable : <span class="m">p</span><sub><span class="m">i</span></sub> = <span class="m">e</span><sup><span class="m">z</span><sub><span class="m">i</span></sub>−<span class="m">m</span></sup> / Σ<sub><span class="m">j</span></sub> <span class="m">e</span><sup><span class="m">z</span><sub><span class="m">j</span></sub>−<span class="m">m</span></sup>.</p>
+    <p class="say">« Multiplier numérateur et dénominateur par e puissance moins m ne change pas le quotient, donc on peut décaler tous les logits par leur max, donc plus aucune exponentielle ne dépasse 1, donc plus de inf. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — (1 000 ; 0), les deux versions</div>
+    <table>
+      <tr><th></th><th>naïf</th><th>max soustrait</th></tr>
+      <tr><td>exponentielles</td><td><span class="m">e</span><sup>1000</sup> = inf ; <span class="m">e</span><sup>0</sup> = 1</td><td><span class="m">e</span><sup>0</sup> = 1 ; <span class="m">e</span><sup>−1000</sup> = 0</td></tr>
+      <tr class="hl"><td>softmax</td><td>(<b>nan</b> ; 0)</td><td>(<b>1</b> ; 0)</td></tr>
+      <tr><td>LSE</td><td>log(inf) = inf</td><td>1 000 + log(1 + 0) = <b>1 000</b></td></tr>
+    </table>
+    <p>Le <span class="m">e</span><sup>−1000</sup> <i>underflow</i> à 0, et c'est sans conséquence : il aurait pesé 10<sup>−434</sup> dans un résultat de l'ordre de 1. L'underflow est bénin ici parce que l'erreur qu'il commet est <b>relative</b> au plus grand terme, qui vaut 1 — contrairement à l'overflow, qui détruit tout.</p>
+    <p>La soustraction du max n'est donc <b>pas une approximation</b> : c'est une réécriture algébrique exacte qui choisit l'ordre de grandeur où le calcul est faisable.</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — le mur de e<sup>z</sup>, et ce que le max soustrait y change</div>
+    <div id="f3plot" class="wide"></div>
+    <div id="f3sliders"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">En ordonnée, log<sub>10</sub> de <span class="m">e</span><sup><span class="m">z</span></sup> <b>calculé en float32</b>. La courbe bleue monte puis <b>s'arrête net</b> à <span class="m">z</span> = 88,72 : au-delà, la valeur n'est pas grande, elle est inf — le trait ocre est le plafond 3,40 · 10<sup>38</sup>. Pousse le curseur au-delà du mur : le readout « softmax naïf » vire au nan pendant que le readout « softmax stable » continue de donner 1. <b>Les deux calculent la même quantité mathématique</b> ; un seul survit.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Composer log et softmax est un piège</h3>
+    <p>Écrire <code>log(softmax(z))</code> forme d'abord une probabilité minuscule, qui <i>underflow</i> à 0, puis prend son log : −inf. Or la quantité cherchée est parfaitement représentable — c'est un nombre de l'ordre de la dizaine.</p>
+    <div class="eq">log_softmax(<span class="m">z</span>)<sub><span class="m">i</span></sub> = <span class="m">z</span><sub><span class="m">i</span></sub> − LSE(<span class="m">z</span>)</div>
+    <p>Cette forme ne construit <b>jamais</b> <span class="m">p</span> : une soustraction, pas un quotient d'exponentielles. C'est pourquoi <code>F.cross_entropy</code> prend des <b>logits</b> et fait le log-sum-exp elle-même — lui passer des probabilités, c'est lui retirer précisément ce qu'elle sait faire (<a href="../../map.html#p08-03">p08-03</a>).</p>
+    <p class="say">« log de softmax forme d'abord une probabilité minuscule, donc elle tombe à zéro par underflow, donc son log vaut moins l'infini, donc on écrit log_softmax = z moins LSE, qui ne forme jamais la probabilité. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — <span class="m">z</span> = (0 ; −120), classe cible = 2</div>
+    <table>
+      <tr><th>chemin</th><th>calcul</th><th>résultat float32</th></tr>
+      <tr class="hl"><td>log(softmax)</td><td><span class="m">p</span><sub>2</sub> = <span class="m">e</span><sup>−120</sup>/(1+<span class="m">e</span><sup>−120</sup>) = 7,7 · 10<sup>−53</sup> → 0, puis log 0</td><td><b>−inf</b></td></tr>
+      <tr><td><span class="m">z</span> − LSE</td><td>LSE = 0 + log(1 + <span class="m">e</span><sup>−120</sup>) = 0 ; −120 − 0</td><td><b>−120</b></td></tr>
+    </table>
+    <p>Le plus petit float32 normal vaut 1,18 · 10<sup>−38</sup> : 7,7 · 10<sup>−53</sup> est très en dessous, donc 0. La loss du premier chemin est +inf, et le gradient qui en sort est nan ; celle du second est 120, parfaitement utilisable.</p>
+    <p>Corollaire pratique : <b>pas de softmax dans le modèle</b>. Le réseau sort des logits, la loss fait le reste. Le softmax explicite n'apparaît qu'au moment d'afficher une probabilité à un humain.</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Les dtypes : float32 en PyTorch, float64 ailleurs</h3>
+    <p>Un tenseur créé depuis une liste Python est en <b>float32</b> ; depuis un tableau NumPy, il hérite du <b>float64</b>. Neuf ordres de grandeur séparent les deux epsilons : le même code ne donne pas le même résultat, et les mélanger promeut silencieusement ou lève une erreur de type.</p>
+    <p><b>bfloat16</b> : 8 bits de mantisse seulement, mais <i>le même exposant que float32</i>. On y entraîne des réseaux parce que le gradient est déjà bruité et tolère un arrondi grossier — pas parce que c'est précis. C'est un choix de <b>plage</b>, pas de précision : float16, lui, plafonne à 65 504 et déborde en entraînement.</p>
+    <p class="say">« Un tenseur créé depuis une liste Python est en float32, donc son epsilon vaut 10 puissance moins 7 et non 10 puissance moins 16, donc un même code ne donne pas le même résultat sous NumPy et sous PyTorch, donc on vérifie le dtype avant de s'étonner d'un écart. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les quatre dtypes à connaître</div>
+    <table>
+      <tr><th>dtype</th><th>mantisse</th><th><span class="m">ε</span></th><th>plus grand</th></tr>
+      <tr><td>float64</td><td>53 bits</td><td>2,2 · 10<sup>−16</sup></td><td>1,8 · 10<sup>308</sup></td></tr>
+      <tr class="hl"><td>float32</td><td>24 bits</td><td>1,2 · 10<sup>−7</sup></td><td>3,4 · 10<sup>38</sup></td></tr>
+      <tr><td>float16</td><td>11 bits</td><td>9,8 · 10<sup>−4</sup></td><td>65 504</td></tr>
+      <tr><td>bfloat16</td><td>8 bits</td><td>3,9 · 10<sup>−3</sup></td><td>3,4 · 10<sup>38</sup></td></tr>
+    </table>
+    <p>Lecture de la dernière ligne : bfloat16 tient environ <b>2 à 3 chiffres décimaux</b>. Deux logits de 8,42 et 8,45 y deviennent tous deux <b>8,4375</b> : ils se confondent. Le classement des classes peut donc changer d'un dtype à l'autre, à modèle identique.</p>
+    <p>Réflexe : <code>tenseur.dtype</code> avant de comparer deux résultats, et un accumulateur en float32 au moins pour tout ce qui se somme sur un batch.</p>
+  </div>
+</div>
+
+<div class="step" id="s9">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>La cause unique — mantisse finie — n'a pas de remède, seulement des déplacements. Chaque « solution » achète des ordres de grandeur, jamais l'exactitude.</p>
+    <p class="say">« Passer en float64 multiplie l'epsilon par 10 puissance moins 9, donc le problème recule de neuf ordres de grandeur, donc il ne disparaît pas, donc une somme assez longue ou une exponentielle assez grande le retrouve. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>float64 ne règle rien, il repousse.</b> <span class="m">ε</span><sub>64</sub> = 2,2 · 10<sup>−16</sup> contre 1,2 · 10<sup>−7</sup> : neuf ordres de grandeur gagnés, pas l'exactitude. Une somme séquentielle de 10<sup>9</sup> termes en float64 dérive exactement pour la même raison, avec le même budget <span class="m">n</span>·<span class="m">ε</span>·max. Et l'exponentielle y déborde à <span class="m">z</span> &gt; 709,78 au lieu de 88,72 — un mur plus loin, un mur quand même.</li>
+      <li><b>bfloat16 en inférence.</b> Résolution relative 4 · 10<sup>−3</sup> : des logits séparés de moins de 1 % se confondent (8,42 et 8,45 deviennent le même 8,4375). Les métriques de classement — top-<span class="m">k</span>, MRR, taux d'accord — peuvent changer d'un dtype à l'autre sans qu'aucun poids n'ait bougé. Un écart de top-1 entre deux runs se vérifie d'abord côté dtype.</li>
+      <li><b>Tolérance fixe.</b> <code>abs(a - b) &lt; 1e-6</code> est trop lâche autour de 10<sup>−9</sup> (tout passe) et inatteignable autour de 10<sup>9</sup> (rien ne passe, l'ulp float64 y vaut déjà 2 · 10<sup>−7</sup>). Il faut une tolérance <b>relative</b>, celle du pas 4 — et pour l'argent, pas de tolérance du tout : des entiers.</li>
+      <li><b>Le nan silencieux.</b> PyTorch ne lève aucune erreur : un inf naît, se propage, devient nan, et l'entraînement continue en produisant des poids nan pendant des heures. <code>torch.isfinite(loss)</code> à chaque pas coûte un test et donne l'itération exacte du premier débordement — le seul endroit où le bug est encore lisible.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Mantisse finie ⇒ erreur <b>relative</b> (<span class="m">ε</span><sub>32</sub> ≈ 10<sup>−7</sup>, <span class="m">ε</span><sub>64</sub> ≈ 10<sup>−16</sup>) ⇒ les grands nombres sont grossiers : 16 777 216 = 16 777 217 en float32.</li>
+    <li>Somme séquentielle : erreur ≈ <span class="m">n</span>·<span class="m">ε</span>·max. 10<sup>6</sup> fois 0,1 en float32 donne <b>100 958,34</b> ; par paires ou en float64, 100 000.</li>
+    <li>Jamais <code>==</code> : tolérance <b>relative</b> <span class="m">τ</span>·max(1, |<span class="m">a</span>|, |<span class="m">b</span>|) ; l'argent en centimes entiers (<code>int(4.35*100)</code> = 434).</li>
+    <li>Dépasser le maximum donne <b>inf</b>, pas 0 et pas une erreur ; inf/inf = nan ; un nan en aval est la trace d'un inf en amont.</li>
+    <li>LSE : <span class="m">m</span> + log Σ <span class="m">e</span><sup><span class="m">z</span>−<span class="m">m</span></sup>, identité <b>exacte</b> qui ramène toutes les exponentielles sous 1 ; softmax de (1 000 ; 0) = (1 ; 0) au lieu de (nan ; 0).</li>
+    <li><code>log_softmax</code> = <span class="m">z</span> − LSE(<span class="m">z</span>), jamais <code>log(softmax(z))</code> : d'où une cross-entropy qui prend des <b>logits</b>.</li>
+    <li>PyTorch float32 par défaut, NumPy float64 ; bfloat16 = même plage que float32, 2 à 3 chiffres — pour l'entraînement, parce que le gradient tolère le bruit.</li>
+  </ol>
+</div>
+<div class="phrase">« Un flottant a une mantisse finie, donc son erreur est relative et les grands nombres sont mesurés grossièrement ; une somme séquentielle dérive en n fois epsilon fois l'échelle atteinte. Dépasser le maximum donne inf, pas zéro, et inf sur inf donne nan : un nan est la trace d'un inf en amont. Le log-sum-exp soustrait le max, identité exacte qui ramène toutes les exponentielles sous 1 — c'est pourquoi la cross-entropy prend des logits et fait le log-softmax elle-même. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Pourquoi 0,1 + 0,2 ≠ 0,3 ?</div><div class="a hid">0,1 a un développement binaire infini ; la mantisse est finie, donc il est remplacé par son voisin dès l'écriture, et la somme de deux voisins arrondie tombe à côté de 0,3.</div></li>
+    <li><div class="q">Pourquoi la somme séquentielle de 0,1 dérive-t-elle, et de combien ?</div><div class="a hid">Chaque ajout est arrondi à l'échelle de l'accumulateur, qui grandit : budget ≈ n·ε·max. À 10<sup>6</sup> termes en float32 : 100 958,34 au lieu de 100 000, soit +0,96 %. Par paires ou en float64 : 100 000.</div></li>
+    <li><div class="q">Que donne <span class="m">e</span><sup>1 000</sup> en float32, puis <span class="m">e</span><sup>1 000</sup>/<span class="m">e</span><sup>1 000</sup> ?</div><div class="a hid">inf (le mur est à z = 88,72, au-delà de 3,40·10<sup>38</sup>), puis inf/inf = nan. Pas 0, pas une exception : inf, qui voyage.</div></li>
+    <li><div class="q">Pourquoi soustraire le max dans un softmax ?</div><div class="a hid">Mettre e<sup>m</sup> en facteur est une identité exacte ; tous les exposants deviennent ≤ 0, donc toutes les exp sont dans ]0,1], donc plus de débordement — et le plus grand terme vaut exactement 1.</div></li>
+    <li><div class="q">Pourquoi <code>F.cross_entropy</code> veut-elle des logits ?</div><div class="a hid">Elle calcule log_softmax = z − LSE(z) sans jamais former p. Passer par log(softmax(z)) sous-déborde à 0 puis donne −inf ; sur z = (0 ; −120), −inf au lieu de −120.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="chain-p08-01-jacobienne-chain-rule-backprop.html#s4"><b>p08-01, pas 4 — les trois facteurs du neurone</b><small>le −1/p qui compense p(1−p) y est une affaire de calcul ; ici c'est une affaire de flottants : on ne forme jamais p, donc on ne prend jamais son log</small></a>
+    <a href="chain-p08-01-jacobienne-chain-rule-backprop.html#s9"><b>p08-01, pas 9 — produits de jacobiennes</b><small>même mécanisme d'échelle : un produit long s'écroule ou diverge, et ce sont les mêmes inf et les mêmes nan qui apparaissent au bout</small></a>
+    <a href="../../map.html#p08-03"><b>p08-03 — Cross-entropy, entropie, KL</b><small>la suite directe du pas 7 : pourquoi la loss prend des logits, et ce que −log p mesure une fois qu'on sait le calculer</small></a>
+    <a href="../../map.html#p08-04"><b>p08-04 — Tenseurs, ruban, strides</b><small>l'autre moitié de « ce qu'est vraiment un tenseur » : ici le contenu d'une case, là sa place en mémoire</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>python::flottants</code> (mantisse finie, erreur relative, ulp, jamais <code>==</code>) · <code>dl::log-sum-exp</code> (m + log Σ e<sup>z−m</sup>, identité exacte) · <code>dl::softmax-stabilite</code> (inf → nan, softmax de (1 000 ; 0), log_softmax = z − LSE) · <code>python::dtypes</code> (float32 PyTorch vs float64 NumPy, bfloat16 = plage de float32).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p08-02 · v1 du 16/09/2026 · Prérequis : aucun (notation scientifique <span class="m">x</span> = ±<span class="m">m</span> × 2<sup>e</sup>). Suite : <a href="../../map.html#p08-03">p08-03 Cross-entropy, entropie, KL</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outils flottants partagés ===== */
+const _ab=new ArrayBuffer(4),_fv=new Float32Array(_ab),_uv=new Uint32Array(_ab);
+function ulp32(x){const a=Math.fround(Math.abs(x));if(!isFinite(a)||a===0)return NaN;_fv[0]=a;_uv[0]=_uv[0]+1;return _fv[0]-a;}
+const SUP={'-':'⁻','0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹'};
+function sup(n){return String(n).split('').map(c=>SUP[c]||c).join('');}
+function sci(v,d){
+  if(!isFinite(v))return isNaN(v)?'nan':(v>0?'inf':'−inf');
+  if(v===0)return '0';
+  const e=Math.floor(Math.log10(Math.abs(v)));
+  if(e>=-4&&e<=6)return SL.fmt(v,Math.max(0,Math.min(8,(d===undefined?3:d)-e)));
+  return SL.fmt(v/Math.pow(10,e),2)+' · 10'+sup(e);
+}
+
+/* ===== Figure 1 : l'espacement des flottants (ulp) ===== */
+const L2=Math.log10(2);
+const P1=SL.plot(document.getElementById('f1plot'),{x:[0,8],y:[-7.6,1.6],w:600,h:290,
+  xt:[0,2,4,6,8],yt:[-6,-4,-2,0],xl:'log₁₀ x',yl:'log₁₀ ulp(x)'});
+P1.fn(lx=>{const u=ulp32(Math.pow(10,lx));return isFinite(u)?Math.log10(u):NaN;},'sl-c1',480);
+P1.fn(lx=>lx-23*L2,'sl-c5',60);
+P1.label(0.4,-3.4,'ulp réel (escalier)','sl-c1');
+P1.label(2.8,-5.2,'x · ε₃₂','sl-c5');
+const out1=document.getElementById('f1out');
+const LX24=Math.log10(16777216);
+function draw1(lx){
+  P1.clear();
+  const x=Math.fround(Math.pow(10,lx)), u=ulp32(x), xp1=Math.fround(x+1);
+  P1.dot(LX24,L2,'sl-c3 hollow',6);
+  P1.text(LX24,L2+0.75,'2²⁴ · ulp = 2','sl-c3','middle');
+  P1.vline(lx,'');
+  P1.dot(lx,Math.log10(u),'sl-c1',6);
+  const fige=(xp1===x);
+  out1.innerHTML=
+    `<div class="pos">x en float32<b>${sci(x,3)}</b></div>`+
+    `<div class="pos">ulp(x)<b>${sci(u,3)}</b></div>`+
+    `<div class="${fige?'zero':'pos'}">(x + 1) − x en float32<b>${sci(xp1-x,3)}</b></div>`+
+    `<div class="${fige?'zero':'pos'}">le 1 ajouté est perdu ?<b>${fige?'oui':'non'}</b></div>`;
+}
+SL.slider(document.getElementById('f1sliders'),{label:'log₁₀ x',min:0,max:8,step:.02,value:8,fmt:v=>SL.fmt(v,2)},draw1);
+
+/* ===== Figure 2 : dérive d'une somme séquentielle ===== */
+const K=481,NMAX=1000000;
+const LN=new Array(K),NS=new Array(K),ERR=new Array(K),SEQ=new Array(K),TREE=new Array(K);
+for(let i=0;i<K;i++){LN[i]=6*i/(K-1);NS[i]=Math.max(1,Math.round(Math.pow(10,LN[i])));}
+(function(){
+  const c=Math.fround(0.1);let s=Math.fround(0);const lev=[];let j=0;
+  for(let i=1;i<=NMAX;i++){
+    s=Math.fround(s+c);
+    let v=c,k=0;
+    while(k<lev.length&&lev[k]!==null){v=Math.fround(lev[k]+v);lev[k]=null;k++;}
+    if(k===lev.length)lev.push(v);else lev[k]=v;
+    while(j<K&&NS[j]===i){
+      let t=Math.fround(0);
+      for(let q=0;q<lev.length;q++)if(lev[q]!==null)t=Math.fround(t+lev[q]);
+      const ex=i*0.1;
+      SEQ[j]=s;TREE[j]=t;ERR[j]=(s-ex)/ex*100;j++;
+    }
+  }
+})();
+const P2=SL.plot(document.getElementById('f2plot'),{x:[0,6],y:[-0.45,1.15],w:600,h:290,
+  xt:[0,1,2,3,4,5,6],yt:[-0.25,0,0.25,0.5,0.75,1],xl:'log₁₀ n  (n = termes ajoutés)',yl:'erreur relative (%)'});
+P2.label(0.12,-0.14,'somme exacte = l’axe horizontal','sl-c5');
+const out2=document.getElementById('f2out');
+function clampY(v){return Math.max(-0.45,Math.min(1.15,v));}
+function path2(a,b,cls){
+  let d='';
+  for(let i=a;i<=b;i++){d+=(d?' L':'M')+P2.sx(LN[i]).toFixed(1)+' '+P2.sy(clampY(ERR[i])).toFixed(1);}
+  return SL.el('path',{d,class:cls,fill:'none'},P2.dyn);
+}
+function draw2(lv){
+  P2.clear();
+  let m=Math.round((K-1)*lv/6);m=Math.max(1,Math.min(K-1,m));
+  path2(m,K-1,'sl-seg');
+  path2(0,m,'sl-fn sl-c3');
+  P2.vline(LN[m],'');
+  P2.dot(LN[m],clampY(ERR[m]),'sl-c3',6);
+  const n=NS[m],ex=n*0.1;
+  out2.innerHTML=
+    `<div class="pos">n<b>${SL.fmt(n,0)}</b></div>`+
+    `<div class="zero">somme séquentielle f32<b>${SL.fmt(SEQ[m],3)}</b></div>`+
+    `<div class="pos">somme par paires f32<b>${SL.fmt(TREE[m],3)}</b></div>`+
+    `<div class="${Math.abs(ERR[m])>0.1?'zero':'pos'}">erreur relative<b>${SL.fmt(ERR[m],3)} %</b></div>`;
+}
+const s2=SL.slider(document.getElementById('f2sliders'),{label:'log₁₀ n',min:1,max:6,step:.02,value:6,fmt:v=>SL.fmt(v,2)},draw2);
+(function(){
+  const ctl=document.getElementById('f2ctl');
+  const b=SL.h('button','tb',ctl,'accumuler');
+  let timer=null;
+  b.onclick=()=>{
+    if(timer){clearInterval(timer);timer=null;}
+    if(SL.reduced){s2.set(6);return;}
+    let v=1;s2.set(1);
+    timer=setInterval(()=>{v+=0.1;if(v>=6){v=6;clearInterval(timer);timer=null;}s2.set(v);},45);
+  };
+  const r=SL.h('button','tb',ctl,'tout voir');
+  r.onclick=()=>{if(timer){clearInterval(timer);timer=null;}s2.set(6);};
+})();
+
+/* ===== Figure 3 : le mur de exp, softmax naïf vs stable ===== */
+const CEIL=Math.log10(3.4028234663852886e38), ZWALL=88.72283905206835;
+const P3=SL.plot(document.getElementById('f3plot'),{x:[0,120],y:[0,46],w:600,h:290,
+  xt:[0,20,40,60,80,100,120],yt:[10,20,30,40],xl:'z',yl:'log₁₀ de eᶻ calculé en float32'});
+P3.fn(z=>{const v=Math.fround(Math.exp(z));return isFinite(v)?Math.log10(v):NaN;},'sl-c1',400);
+P3.fn(()=>CEIL,'sl-c5',8);
+P3.label(3,36.2,'plafond float32 = 3,40 · 10³⁸','sl-c5');
+P3.label(96,20,'au-delà : inf','sl-c3');
+const out3=document.getElementById('f3out');
+function draw3(z){
+  P3.clear();
+  P3.vline(ZWALL,'chord');
+  P3.text(ZWALL-2,44.4,'z = 88,72','sl-c3','end');
+  P3.vline(z,'');
+  const ez=Math.fround(Math.exp(z));
+  const fini=isFinite(ez);
+  P3.dot(z,fini?Math.log10(ez):44,fini?'sl-c1':'sl-c3',6);
+  const den=Math.fround(ez+1), naif=Math.fround(ez/den);
+  const stable=Math.fround(1/Math.fround(1+Math.fround(Math.exp(-z))));
+  const lseN=Math.log(Math.fround(ez+1)), lseS=z+Math.log1p(Math.exp(-z));
+  out3.innerHTML=
+    `<div class="${fini?'pos':'zero'}">eᶻ en float32<b>${sci(ez,3)}</b></div>`+
+    `<div class="${isNaN(naif)?'zero':'pos'}">softmax naïf de (z ; 0)<b>${isNaN(naif)?'nan':SL.fmt(naif,4)}</b></div>`+
+    `<div class="pos">softmax stable<b>${SL.fmt(stable,4)}</b></div>`+
+    `<div class="${isFinite(lseN)?'pos':'zero'}">LSE naïf / stable<b>${isFinite(lseN)?SL.fmt(lseN,2):'inf'} / ${SL.fmt(lseS,2)}</b></div>`;
+}
+SL.slider(document.getElementById('f3sliders'),{label:'logit z',min:0,max:120,step:.5,value:60,fmt:v=>SL.fmt(v,1)},draw3);
+})();
+</script>
+</body>
+</html>

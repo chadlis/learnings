@@ -10,7 +10,7 @@ prereq: []
 anki: [python::flottants, dl::log-sum-exp, dl::softmax-stabilite, python::dtypes]
 bridges: []
 next: p08-03
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -30,7 +30,7 @@ Aucune sheet. Notation scientifique : x = ±m × 2ᵉ.
 - exp(88,7) = 3,3·10³⁸ (limite float32) ; exp(89) = **inf** ; inf/inf = **nan**. Softmax naïf de (1 000 ; 0) : (nan ; 0). Avec le max soustrait : exp(0)/(exp(0) + exp(−1 000)) = 1 exactement.
 - Log-sum-exp de (1 000 ; 0) : 1 000 + log(1 + e⁻¹⁰⁰⁰) = 1 000.
 - Comparaison : `0.1 + 0.2 == 0.3` est False ; `abs(a − b) < 1e-9·max(1, |a|, |b|)` est le test.
-- Argent : 19,99 × 3 en flottant ≠ 59,97 exactement ; on compte en centimes entiers.
+- Argent : 4,35 × 100 = 434,99999999999994 en flottant, donc `int(4.35*100)` vaut **434** et pas 435 ; on compte en centimes entiers. (19,99 × 3 vaut *exactement* 59,97 en float64 : un exemple qui marche ne prouve rien.)
 
 ## Pas de la chaîne
 1. **Le décor.** Les nombres d'un programme ne sont pas des réels : ce sont des fractions binaires à mantisse finie. Tout ce qui suit découle de « mantisse finie ».
@@ -78,3 +78,21 @@ Aucune sheet. Notation scientifique : x = ±m × 2ᵉ.
 
 ## Exclusions
 Pas d'IEEE 754 au-delà de mantisse/exposant, pas de dénormalisés, pas de Kahan détaillé, pas de mixed precision (loss scaling) au-delà d'une mention.
+
+## Questions pour la revue
+- **Chiffre corrigé** (fil rouge, ligne « Argent »). `19.99 * 3 == 59.97` est **`True`** en
+  float64 — vérifié par script (`struct`/stdlib, sans numpy) : les deux arrondis se compensent
+  exactement. La ligne a été remplacée par un contre-exemple vérifié, `4.35 * 100` =
+  434,99999999999994, dont `int(...)` vaut 434 : un centime perdu. La sheet garde l'ancien
+  exemple, mais retourné en garde-fou (« un exemple qui marche ne prouve rien »), au pas 4.
+- **Légende de la figure « accumuler »** : le spec dit « la dérive commence quand l'accumulateur
+  dépasse ~10⁵ ». Mesuré : l'erreur relative reste sous 0,07 % tant que l'accumulateur est sous
+  ≈ 10⁴ (elle change même de signe), passe 0,1 % vers un accumulateur de 1,3 · 10⁴, et atteint
+  +0,96 % à 10⁵. La légende de la sheet dit « sous ≈ 10⁴ », pas 10⁵. À confirmer.
+- **« somme par paires = 100 000,0 »** : exact avec un arbre binaire équilibré (c'est ce que la
+  figure simule). L'algorithme réel de NumPy (blocs de 128, 8 accumulateurs) donne
+  100 000,0078125 — erreur relative 8 · 10⁻⁸, du niveau de ε₃₂. Faut-il le préciser dans la sheet ?
+- **bfloat16** : le spec écrit « 8 bits de mantisse (≈ 3 chiffres) ». 8 · log₁₀ 2 = 2,41 : la sheet
+  écrit « 2 à 3 chiffres décimaux ». Vérifié : 8,42 et 8,45 deviennent tous deux 8,4375.
+- **Numérotation des figures** : l'ordre de lecture impose ulp (pas 2) avant accumulation (pas 3),
+  donc les figures 1 et 3 du spec sont interverties dans la sheet. Contenu identique.
