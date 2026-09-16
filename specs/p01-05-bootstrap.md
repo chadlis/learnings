@@ -10,7 +10,7 @@ prereq: [p01-01]
 anki: [stats::bootstrap, stats::inference]
 bridges: [b04]
 next: p02-01
-status: built
+status: reviewed
 ---
 
 ## Question de la chaîne
@@ -71,11 +71,11 @@ Pas de bootstrap paramétrique, pas de BCa. Pas de bootstrap sur les résidus.
 Corrections apportées au spec lors de l'écriture de la sheet (vérifiées par énumération exacte
 des 10^10 rééchantillons possibles, script dans le scratchpad de la session) :
 
-- **SE bootstrap de la médiane : 8,86 ms, pas ≈ 6 ms.** La latence à 410 ms écarte la distribution
+- **SE bootstrap de la médiane : 8,86 ms, pas ≈ 6 ms.** — validé 16/09 La latence à 410 ms écarte la distribution
   bien plus que le « 6 » annoncé. Corrigé dans « Exemple fil rouge ».
-- **IC percentile 95 % = [119,5 ; 142,5], pas [120 ; 140].** [120 ; 140] est exactement
+- **IC percentile 95 % = [119,5 ; 142,5], pas [120 ; 140].** — validé 16/09 [120 ; 140] est exactement
   l'intervalle **90 %** (q5 = 120, q95 = 140). Corrigé.
-- **« ≈ 37 % » est une limite, pas la valeur à n = 10** : (1 − 1/10)¹⁰ = 34,9 %, soit 3,49 lignes
+- **« ≈ 37 % » est une limite, pas la valeur à n = 10** — validé 16/09 : (1 − 1/10)¹⁰ = 34,9 %, soit 3,49 lignes
   absentes et 6,5 lignes distinctes. La sheet donne les deux et le tableau n = 10 / 100 / 1 000.
 - À trancher : avec B = 1 000, le SE affiché par la figure 1 **sursaute** (jusqu'à ~12 ms) quand
   un rééchantillon tombe sur une médiane à 410 ms — environ 1 chance sur 6 800 par tirage, donc

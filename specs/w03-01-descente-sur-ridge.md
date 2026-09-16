@@ -10,7 +10,7 @@ prereq: [p03-02, p02-02]
 anki: [ml::optimisation]
 bridges: [b01, b06]
 next: p04-01
-status: built
+status: reviewed
 ---
 
 ## Question du déroulé
@@ -38,13 +38,13 @@ Pas de Newton au-delà de la marche 6.
 Trois écarts relevés en vérifiant chaque produit matriciel par script avant écriture
 (`A`, `b`, valeurs propres, itérés, forme fermée : tout le reste du spec est exact).
 
-1. **β₃ était faux** (marche 4). Le spec donnait `(0,2287 ; 0,4575)`. Le calcul est
+1. **β₃ était faux** — validé 16/09 (marche 4). Le spec donnait `(0,2287 ; 0,4575)`. Le calcul est
    ∇L(β₂) = A·(0,1624 ; 0,3248) − b = (−2,4696 ; −4,9392), donc
    β₃ = β₂ + 0,02·(2,4696 ; 4,9392) = **(0,2118 ; 0,4236)**. Corrigé dans le spec et
    dans la sheet. Contrôle indépendant : l'écart à β̂ doit être multiplié par
    (1 − 0,02·71) = −0,42 à chaque pas, et 0,0778 × (−0,42) = −0,0327 = l'écart de β₃.
 
-2. **« ≈ 115 pas » → 114** (marche 5). ln 0,1 / ln 0,98 = 113,974, et 0,98¹¹⁴ = 0,0999.
+2. **« ≈ 115 pas » → 114** — validé 16/09 (marche 5). ln 0,1 / ln 0,98 = 113,974, et 0,98¹¹⁴ = 0,0999.
 
 3. **Le départ (0 ; 0) annule la direction plate — tranché le 16/09 : θ₀ = (1 ; 0).** — validé 16/09
    b = (14 ; 28) est colinéaire à (1 ; 2), vecteur propre de A pour λ = 71, donc β̂ l'est aussi :

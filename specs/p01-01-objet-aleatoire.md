@@ -10,7 +10,7 @@ prereq: [p00-02, p00-04]
 anki: [stats::estimation, stats::inference, stats::binomiale, stats::tcl]
 bridges: [b03, b04]
 next: p01-02
-status: built
+status: reviewed
 ---
 
 ## Question de la chaîne
@@ -85,31 +85,34 @@ Wilson : nom, principe en une ligne, chiffres 28/30 — pas la formule. Pas de C
 
 Corrections faites d'office en écrivant la sheet (à valider) :
 
-1. **Critère du TCL, résumé (3) et phrase d'entretien.** Le spec disait « forme normale
+1. **Critère du TCL, résumé (3) et phrase d'entretien.** — validé 16/09 Le spec disait « forme normale
    si n·π ≥ 10 » / « dès que n·π dépasse 10 » — c'est exactement l'erreur que le pas 7
    corrige (ce n'est pas la prévalence, c'est min(k, n − k)). Remplacé ici et dans la
    sheet par **min(succès, échecs) ≥ 10**. Avec n·π seul, 28/30 passerait le test
    (28 ≥ 10) alors que c'est le contre-exemple de la chaîne.
-2. **Bornes de la figure 2.** Le spec demandait « mêmes bornes » que la figure 1
+2. **Bornes de la figure 2.** — validé 16/09 Le spec demandait « mêmes bornes » que la figure 1
    ([0,83 ; 0,91]) ; à n = 100 le SE vaut 0,0336 et 20 % des tirages tomberaient hors
    cadre, empilés dans les bacs de bord. Bornes élargies à **[0,76 ; 0,98], 66 bacs**,
    identiques aux trois valeurs de n (c'est le point : l'axe ne bouge pas, la cloche se
    resserre). Effet secondaire : à n = 100 les valeurs k/100 ne tombent qu'un bac sur
    trois, l'histogramme est un peigne régulier sous une enveloppe en cloche.
-3. **Bacs de la figure 3.** [0,7 ; 1,0 ; 15] donnait un peigne irrégulier (pas de
+3. **Bacs de la figure 3.** — validé 16/09 [0,7 ; 1,0 ; 15] donnait un peigne irrégulier (pas de
    support 1/30 ≈ 0,0333 contre des bacs de 0,02) et surtout coupait l'axe à 1,0, donc
    la borne haute de Wald (1,023) était hors du SVG — l'essentiel de la figure.
    Remplacé par **[0,70 ; 1,033 ; 10]** : un bac = une valeur possible de k/30, chaque
    barre s'arrête exactement sur sa valeur, l'axe va jusqu'à 1,033 et le dépassement de
    Wald est visible à droite du trait « borne 1 ».
-4. **Chiffres vérifiés** (script Python, avant écriture) : Var = 1,131·10⁻⁴ et
+4. **Chiffres vérifiés** — validé 16/09 (script Python, avant écriture) : Var = 1,131·10⁻⁴ et
    SE = 0,010635 en π = 0,87 ✓ ; SE = 0,010565 en plug-in ✓ ; SE(rappel) = 0,045542 ✓ ;
    Wilson 28/30 = [0,78676 ; 0,98152] → [0,787 ; 0,982] ✓. Une précision : Wald 28/30
    vaut [0,8441 ; **1,0226**] avec r = 28/30 exact (→ 1,023 comme l'annonce le spec),
    mais [0,8435 ; 1,0225] (→ 1,022) si on part du 0,933 arrondi écrit dans le spec. La
    sheet calcule tout à partir de 28/30 et affiche 1,023.
-5. **Ajout non demandé** : une puce « Notation » dans le bloc des prérequis (chapeau de
+5. **Ajout non demandé** — validé 16/09 : une puce « Notation » dans le bloc des prérequis (chapeau de
    l'estimateur, p(x ; π) et non p(x | π)) — c'est la seule façon d'adresser la scorie
    du 15/09 sans la raconter. À retirer si le bloc prérequis doit rester strictement
    du rappel de contenu.
-- **Wilson sur 872/1 000 corrigé après coup** : la sheet annonçait [0,851 ; 0,892], le calcul donne [0,84986 ; 0,89129] soit **[0,850 ; 0,891]** (z = 1,96, la borne basse de Wilson est sous celle de Wald, pas confondue avec elle). Corrigé dans la sheet. Repéré en écrivant w01-04, qui rejoue les mêmes chiffres.
+- **Wilson sur 872/1 000 corrigé après coup** — validé 16/09 : la sheet annonçait [0,851 ; 0,892], le calcul donne [0,84986 ; 0,89129] soit **[0,850 ; 0,891]** (z = 1,96, la borne basse de Wilson est sous celle de Wald, pas confondue avec elle). Corrigé dans la sheet. Repéré en écrivant w01-04, qui rejoue les mêmes chiffres.
+
+**Arbitrage de revue, 16/09.** La puce « Notation » des prérequis est **conservée** : c'est la bonne façon d'adresser les scories (chapeau de l'estimateur, `p(x ; π)` en fréquentiste) — une règle posée une fois en tête, pas une correction répétée dans les pas. Les bornes des figures 2 ([0,76 ; 0,98], 66 bacs) et 3 ([0,70 ; 1,033 ; 10 bacs, alignés sur 1/30]) sont **validées telles quelles** : elles gardent l'axe fixe d'une valeur de n à l'autre et laissent voir la borne de Wald à 1,023, qui est l'objet même de la figure.
+

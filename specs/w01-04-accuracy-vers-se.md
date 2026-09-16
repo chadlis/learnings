@@ -10,7 +10,7 @@ prereq: [p01-01]
 anki: [stats::estimation]
 bridges: []
 next: p02-01
-status: built
+status: reviewed
 ---
 
 ## Question du déroulé
@@ -38,9 +38,9 @@ Rien d'autre. Quatre maillons, pas cinq.
 
 ## Questions pour la revue
 
-- **Tous les chiffres du spec sont vérifiés et justes** (script Python) : SE = √(0,87·0,13/1 000) = 0,010635 → 0,0106 ; plug-in en 0,872 = 0,010565 → 0,01056 ; SE rappel = 0,045542 → 0,0455 ; Wald 0,933 ± 1,96·0,0455 = [0,8441 ; 1,0226] → [0,844 ; 1,023] ; Wilson (z = 1,96) = [0,7868 ; 0,9815] → [0,787 ; 0,982]. Aucune correction nécessaire.
-- **Nuance d'affichage, pas d'erreur** : la formule « √(0,933·0,067/30) » prise au pied de la lettre vaut 0,04565 (→ 0,0457). C'est 28/30 *exact* qui donne 0,0455. La sheet écrit la formule avec les arrondis (comme p01-01) et le résultat exact. À trancher un jour pour tout le fil A : arrondir les opérandes ou les garder exacts.
-- **Hors périmètre, mais repéré** : `chain-p01-01` annonce Wilson [0,851 ; 0,892] pour 872/1 000 ; le calcul donne [0,8499 ; 0,8913], soit [0,850 ; 0,891]. Ce déroulé ne reprend pas ce chiffre, donc rien n'a été touché.
-- **« Ce qui a cassé pour Salah », second point** : « quand il la surapprend (≈ novembre 2026), il sert de référence pour en générer une autre, pas de sonde » n'est pas adressable par le contenu d'une marche. Traité par une phrase dans `#links` qui dit que la valeur de la page est le temps qu'elle met à sortir, et qu'une fois acquise elle devient le patron d'une autre sonde. Si ce n'est pas le bon endroit, le dire.
-- **Lien de suite manquant** : `next: p02-01` pointe vers `../chains/chain-p02-01-bruit-vraisemblance-loss.html`, pas encore écrite → 3 WARN de lien interne au validateur, attendus.
-- **`bridges: []`** : la barre latérale n'a donc pas de section « Ponts » ; `#links` sert de renvoi vers p01-01 (amont) et p02-01 (aval).
+- **Tous les chiffres du spec sont vérifiés et justes** — validé 16/09 (script Python) : SE = √(0,87·0,13/1 000) = 0,010635 → 0,0106 ; plug-in en 0,872 = 0,010565 → 0,01056 ; SE rappel = 0,045542 → 0,0455 ; Wald 0,933 ± 1,96·0,0455 = [0,8441 ; 1,0226] → [0,844 ; 1,023] ; Wilson (z = 1,96) = [0,7868 ; 0,9815] → [0,787 ; 0,982]. Aucune correction nécessaire.
+- **Nuance d'affichage, pas d'erreur** — validé 16/09 : la formule « √(0,933·0,067/30) » prise au pied de la lettre vaut 0,04565 (→ 0,0457). C'est 28/30 *exact* qui donne 0,0455. La sheet écrit la formule avec les arrondis (comme p01-01) et le résultat exact. À trancher un jour pour tout le fil A : arrondir les opérandes ou les garder exacts.
+- **Hors périmètre, mais repéré** — validé 16/09 : `chain-p01-01` annonce Wilson [0,851 ; 0,892] pour 872/1 000 ; le calcul donne [0,8499 ; 0,8913], soit [0,850 ; 0,891]. Ce déroulé ne reprend pas ce chiffre, donc rien n'a été touché.
+- **« Ce qui a cassé pour Salah », second point** — validé 16/09 : « quand il la surapprend (≈ novembre 2026), il sert de référence pour en générer une autre, pas de sonde » n'est pas adressable par le contenu d'une marche. Traité par une phrase dans `#links` qui dit que la valeur de la page est le temps qu'elle met à sortir, et qu'une fois acquise elle devient le patron d'une autre sonde. Si ce n'est pas le bon endroit, le dire.
+- **Lien de suite manquant** — validé 16/09 : `next: p02-01` pointe vers `../chains/chain-p02-01-bruit-vraisemblance-loss.html`, pas encore écrite → 3 WARN de lien interne au validateur, attendus.
+- **`bridges: []`** — validé 16/09 : la barre latérale n'a donc pas de section « Ponts » ; `#links` sert de renvoi vers p01-01 (amont) et p02-01 (aval).

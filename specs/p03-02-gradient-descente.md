@@ -10,7 +10,7 @@ prereq: [p04-01, p04-02, p08-01]
 anki: [analyse::gradient-jacobienne, ml::optimisation, ml::learning-rate, algebre::eigen]
 bridges: [b01, b06]
 next: p04-01
-status: built
+status: reviewed
 ---
 
 ## Question de la chaîne
@@ -77,8 +77,8 @@ Pourquoi −∇L ? Pourquoi un pas trop grand diverge ? Quand résout-on en une 
 Pas de momentum/Adam au-delà du nom (Phase 2). Pas de line search, pas de Newton au-delà d'une mention en pas 5. Pas de non-convexité détaillée.
 
 ## Questions pour la revue
-- **Chiffre corrigé (bloc « Exemple fil rouge »)** : le spec annonçait « ~150 itérations pour un facteur e⁻¹ » sur la direction λ_min = 1 à η = 2/71. Vérifié par script : la contraction vaut 1 − 2/71 = 0,9718, donc −1/ln(0,9718) = **35,0 itérations** (≈ κ/2), et 161 itérations pour un facteur 100. Corrigé ci-dessus et dans la sheet. La formulation « le nombre de pas croît comme κ » reste exacte, c'est la constante qui était fausse.
-- **Numérotation des figures** : dans la sheet elles suivent l'ordre de lecture (fig. 1 = `descent` au pas 3, fig. 2 = log-loss au pas 4, fig. 3 = ellipses au pas 6). Le spec les numérotait 1 / 2 / 3 dans l'ordre descent / ellipses / log-loss. Rien n'est perdu, mais si la carte ou un déroulé cite « figure 2 de p03-02 », c'est la convexité, pas le zigzag.
-- **Figure 3, ce qu'on voit réellement** : à pas fixe le zigzag s'éteint géométriquement (facteur −0,8 par pas) et laisse la place à une reptation horizontale ; le zigzag permanent des dessins classiques suppose une recherche linéaire exacte à chaque pas, exclue par H2. La figure et sa légende disent donc « zigzag puis reptation ». À valider : est-ce le bon compromis, ou faut-il ajouter le cas « pas optimal à chaque itération » ?
-- **Pas 7 et B1–B3** : SGD / momentum / Adam sont nommés et rattachés au pas auquel ils répondent, sans une seule formule (exclusion respectée). Le lien vers micrograd / makemore n'est pas écrit en clair dans la sheet, faute d'un nœud de carte où pointer ; il l'est ici.
+- **Chiffre corrigé (bloc « Exemple fil rouge »)** — validé 16/09 : le spec annonçait « ~150 itérations pour un facteur e⁻¹ » sur la direction λ_min = 1 à η = 2/71. Vérifié par script : la contraction vaut 1 − 2/71 = 0,9718, donc −1/ln(0,9718) = **35,0 itérations** (≈ κ/2), et 161 itérations pour un facteur 100. Corrigé ci-dessus et dans la sheet. La formulation « le nombre de pas croît comme κ » reste exacte, c'est la constante qui était fausse.
+- **Numérotation des figures** — validé 16/09 : dans la sheet elles suivent l'ordre de lecture (fig. 1 = `descent` au pas 3, fig. 2 = log-loss au pas 4, fig. 3 = ellipses au pas 6). Le spec les numérotait 1 / 2 / 3 dans l'ordre descent / ellipses / log-loss. Rien n'est perdu, mais si la carte ou un déroulé cite « figure 2 de p03-02 », c'est la convexité, pas le zigzag.
+- **Figure 3, ce qu'on voit réellement** — validé 16/09 : à pas fixe le zigzag s'éteint géométriquement (facteur −0,8 par pas) et laisse la place à une reptation horizontale ; le zigzag permanent des dessins classiques suppose une recherche linéaire exacte à chaque pas, exclue par H2. La figure et sa légende disent donc « zigzag puis reptation ». À valider : est-ce le bon compromis, ou faut-il ajouter le cas « pas optimal à chaque itération » ?
+- **Pas 7 et B1–B3** — validé 16/09 : SGD / momentum / Adam sont nommés et rattachés au pas auquel ils répondent, sans une seule formule (exclusion respectée). Le lien vers micrograd / makemore n'est pas écrit en clair dans la sheet, faute d'un nœud de carte où pointer ; il l'est ici.
 

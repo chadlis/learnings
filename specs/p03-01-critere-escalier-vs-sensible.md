@@ -10,7 +10,7 @@ prereq: [p00-04, p02-01, p03-02]
 anki: [ml::arbres, ml::logistique, stats::regularisation, dl::cross-entropy, ml::svm]
 bridges: [b01, b06]
 next: p03-02
-status: built
+status: reviewed
 ---
 Pilote, écrit dans le chat le 16/09/2026 : `sheets/chains/chain-p03-01-critere-escalier-vs-sensible.html`. **C'est le gold standard du format `chain`** — Claude Code le lit avant chaque production. Ce spec n'est pas à exécuter.
 
@@ -24,7 +24,7 @@ Ce qui a cassé pour Salah (séance du 16/09) : argument produit une fois (Q8.1)
 
 ## Questions pour la revue
 
-- **Ordre des règles CSS du gold standard** — corrigé le 16/09, validé 16/09 : `@media(max-width:900px){… .side{position:static …}}` est déclaré *avant* `.side{position:sticky …}`. À spécificité égale, la dernière règle gagne : la barre latérale reste `sticky` sur téléphone au lieu de repasser dans le flux. Sans conséquence sur le débordement horizontal (la grille `.wrap`, elle, se replie bien sur une colonne), mais la barre devient une boîte scrollable haute de 100vh. Les deux lignes ont été échangées dans le gold standard, dans `template.html` et, par propagation, dans les douze sheets du standard « tableau noir » : la barre repasse en `static` sous 900 px. Le runner `tools/test_walkthroughs.mjs` le vérifie désormais (sticky à 1280 px, static à 390 px, zéro débordement).
+- **Ordre des règles CSS du gold standard** — validé 16/09 — corrigé le 16/09, validé 16/09 : `@media(max-width:900px){… .side{position:static …}}` est déclaré *avant* `.side{position:sticky …}`. À spécificité égale, la dernière règle gagne : la barre latérale reste `sticky` sur téléphone au lieu de repasser dans le flux. Sans conséquence sur le débordement horizontal (la grille `.wrap`, elle, se replie bien sur une colonne), mais la barre devient une boîte scrollable haute de 100vh. Les deux lignes ont été échangées dans le gold standard, dans `template.html` et, par propagation, dans les douze sheets du standard « tableau noir » : la barre repasse en `static` sous 900 px. Le runner `tools/test_walkthroughs.mjs` le vérifie désormais (sticky à 1280 px, static à 390 px, zéro débordement).
 
 - **Convention de régularisation, fixée le 16/09** — validé 16/09. L'objectif est `L(θ) + λ·pen(θ)`,
   loss **sans ½**. Avec `L(θ) = (θ − 1)²` : L2 → θ̂ = 1/(1 + λ), L1 → θ̂ = max(0, 1 − λ/2), zéro exact

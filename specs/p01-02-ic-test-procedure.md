@@ -10,7 +10,7 @@ prereq: [p01-01]
 anki: [stats::inference, stats::ic, stats::pvalue, stats::h0]
 bridges: [b03]
 next: p01-03
-status: built
+status: reviewed
 ---
 
 ## Question de la chaîne
@@ -75,19 +75,19 @@ Le logiciel affiche β̂₁ = 1,4, SE = 0,62, p = 0,024, IC95 = [0,18 ; 2,62]. Q
 Pas de Student ici (p01-03). Pas de puissance/β-risk au-delà d'une mention. Pas de correction de Bonferroni (p01-04).
 
 ## Questions pour la revue
-- **IC arrondi corrigé.** Le spec annonçait `[0,19 ; 2,61]` en tête et dans « Où ça
+- **IC arrondi corrigé.** — validé 16/09 Le spec annonçait `[0,19 ; 2,61]` en tête et dans « Où ça
   casse », incompatible avec son propre calcul : 1,4 ± 1,96·0,62 = [0,1848 ; 2,6152],
   soit **[0,18 ; 2,62]** à deux décimales (et [0,185 ; 2,615] à trois). Corrigé
   partout dans le spec et dans la sheet, qui affiche les deux arrondis.
-- **Couverture simulée.** Vérifié par simulation (20 000 répétitions de 50 tirages,
+- **Couverture simulée.** — validé 16/09 Vérifié par simulation (20 000 répétitions de 50 tirages,
   β₁ = 1, SE = 0,62 connu) : couverture moyenne 47,51/50 = 95,0 %, écart-type du
   compte 1,54. Le « 47/50 » du spec est un tirage plausible mais **48 est le mode**
   (P(48) ≈ 0,26, P(47) ≈ 0,22). La figure 2 affiche le compte réel de chaque tirage
   et la légende dit « autour de 47 ou 48 » plutôt qu'une valeur fixe.
-- **Les autres chiffres du fil rouge sont exacts** : z = 1,4/0,62 = 2,2581 → 2,26 ;
+- **Les autres chiffres du fil rouge sont exacts** — validé 16/09 : z = 1,4/0,62 = 2,2581 → 2,26 ;
   1 − Φ(2,26) = 0,0119 ; p = 0,0239 → 0,024. Seuil de bascule β̂₁ = 1,96·0,62 = 1,215
   (p = 0,050 exactement), 1 − 0,95²⁰ = 0,6415.
-- **À trancher à la revue** : la sheet mentionne le mot « Student » une fois, dans H1,
+- **À trancher à la revue** — validé 16/09 : la sheet mentionne le mot « Student » une fois, dans H1,
   pour dire que la forme normale est supposée ici et justifiée en p01-03 (le spec le
   fait aussi). Si l'exclusion « pas de Student ici » doit être stricte, retirer la
   demi-phrase de H1.

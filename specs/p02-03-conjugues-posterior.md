@@ -10,7 +10,7 @@ prereq: [p02-01, p02-02, p00-03]
 anki: [stats::beta, stats::bayes, stats::map, stats::mle-map]
 bridges: [b03]
 next: p03-01
-status: built
+status: reviewed
 ---
 
 ## Question de la chaîne
@@ -72,7 +72,7 @@ n = 300, k = 300 : Beta(302, 2), moyenne 0,993 : le prior est noyé.
 Pas d'algorithme MCMC (Metropolis) ni de VI (ELBO) : cinq lignes de « pourquoi », c'est tout. Pas de Dirichlet.
 
 ## Questions pour la revue
-- **Chiffre corrigé.** La figure 2 disait « la somme suit la vraisemblance dès n ≈ 30 ».
+- **Chiffre corrigé.** — validé 16/09 La figure 2 disait « la somme suit la vraisemblance dès n ≈ 30 ».
   Vérifié : cela dépend de la quantité qu'on regarde. Avec prior Beta(2, 2) et k = n, en
   p₀ = 0,9, la part du prior dans le log-posterior vaut encore **16,3 % à n = 30** (66 % à
   n = 3, 1,9 % à n = 300) ; elle ne passe sous 10 % qu'à n = 53 et sous 5 % qu'à n = 112,
@@ -81,23 +81,23 @@ Pas d'algorithme MCMC (Metropolis) ni de VI (ELBO) : cinq lignes de « pourquoi 
   La sheet donne les deux (tableau du pas 5 et readouts de la figure 2) ; le spec a été
   corrigé. À trancher : veut-on garder une formulation courte du type « dès quelques
   dizaines d'observations », ou assumer les deux lectures comme ici ?
-- **p₀ = 0,9 est un choix.** La part du prior dépend du point où on évalue les deux termes :
+- **p₀ = 0,9 est un choix.** — validé 16/09 La part du prior dépend du point où on évalue les deux termes :
   en p₀ = 0,8 elle n'est déjà plus que de 5,7 % à n = 3. La figure 2 fixe p₀ = 0,9 et le dit
   dans la légende, mais l'argument « somme de n termes contre une constante » est, lui,
   indépendant de p₀ — c'est ce qu'il faut retenir, pas les pourcentages.
-- **Tous les autres chiffres du spec sont vérifiés** (script de contrôle en Python) : Beta(1,1)
+- **Tous les autres chiffres du spec sont vérifiés** — validé 16/09 (script de contrôle en Python) : Beta(1,1)
   → Beta(4,1) moyenne 4/5 = 0,8 et mode 1 ; Beta(2,2) → Beta(5,2) moyenne 5/7 = 0,714 et
   mode 4/5 = 0,8 ; Laplace (k+1)/(n+2) = 0,8 = moyenne sous Beta(1,1) = mode sous
   Beta(2,2) ; n = 300, k = 300 sous Beta(2,2) → Beta(302,2), moyenne 302/304 = 0,993.
-- **Intervalles crédibles.** Le spec ne les chiffrait pas ; la sheet en ajoute deux, calculés par
+- **Intervalles crédibles.** — validé 16/09 Le spec ne les chiffrait pas ; la sheet en ajoute deux, calculés par
   quadrature sur grille (même algorithme en Python et en JS, accord à 10⁻³) : Beta(4,1) →
   [0,473 ; 0,987], Beta(5,2) → [0,418 ; 0,937]. À confirmer si l'on veut du 90 % ou du 95 %
   comme convention du dépôt — p01-02 utilise peut-être l'autre.
-- **Deux écarts assumés au texte du spec.** (a) Le pas 5 du spec écrit « Σᵢ log p(xᵢ | p) » ;
+- **Deux écarts assumés au texte du spec.** — validé 16/09 (a) Le pas 5 du spec écrit « Σᵢ log p(xᵢ | p) » ;
   la sheet écrit « Σᵢ log p(xᵢ ; p) », point-virgule, parce que ce terme-là est la
   vraisemblance fréquentiste — la barre est réservée au posterior π(p | D). Le prérequis
   nomme explicitement la distinction. (b) La phrase d'entretien du spec contient « parce
   que la log-vraisemblance croît en n » ; la sheet dit « puisque », le standard réservant
   « donc » et bannissant « parce que » dans les formulations au tableau.
-- **Lien `b03`.** `sheets/bridges/bridge-03-biais-variance-partout.html` n'existe pas encore :
+- **Lien `b03`.** — validé 16/09 `sheets/bridges/bridge-03-biais-variance-partout.html` n'existe pas encore :
   le lien est posé (WARN attendu du validateur), il se résoudra quand le pont sera écrit.
