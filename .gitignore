@@ -4,3 +4,6 @@ node_modules/
 # Boîte aux lettres des fiches à intégrer : le contenu est transitoire.
 inbox/*
 !inbox/README.md
+
+# Captures du validateur : régénérées par tools/validate_sheet.py --render.
+sheets/_render/

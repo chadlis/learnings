@@ -1,15 +1,136 @@
-<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fiches — formation ML/LLM</title>
-<style>:root{--board:#20312C;--chalk:#EDE8DA;--muted:#C9C4B6;--faint:#8F9A93;--yellow:#F0D178;--mint:#B9E2C4;--sky:#A7CCEB;--teal:#9FE0D2;--violet:#C8B6F5;--coral:#F3A28F;--amber:#F0D178;--line:rgba(237,232,218,.18);--card:#F5F1E6;--cardink:#22302B}
-*{box-sizing:border-box;margin:0;padding:0}body{background:var(--board);color:var(--chalk);font-family:"Avenir Next",Avenir,"Segoe UI",Roboto,sans-serif;padding:32px clamp(14px,4vw,48px) 60px;max-width:820px;margin:0 auto}
+<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fiches — formation ML/LLM</title><style>:root{--board:#20312C;--chalk:#EDE8DA;--muted:#C9C4B6;--faint:#8F9A93;--yellow:#F0D178;--mint:#B9E2C4;--sky:#A7CCEB;--teal:#9FE0D2;--violet:#C8B6F5;--coral:#F3A28F;--amber:#F0D178;--line:rgba(237,232,218,.18);--card:#F5F1E6;--cardink:#22302B}
+*{box-sizing:border-box;margin:0;padding:0}body{background:var(--board);color:var(--chalk);font-family:"Avenir Next",Avenir,"Segoe UI",Roboto,sans-serif;padding:32px clamp(14px,4vw,48px) 60px;max-width:860px;margin:0 auto}
 h1{font-family:Georgia,serif;font-weight:400;font-size:clamp(30px,5vw,44px);text-shadow:0 0 1px rgba(237,232,218,.55);line-height:1.1}h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:7px}
-p.sub{color:var(--muted);margin:16px 0 26px;max-width:60ch;line-height:1.55}
+p.sub{color:var(--muted);margin:16px 0 26px;max-width:62ch;line-height:1.55}a{color:inherit}
 h2{font-family:Georgia,serif;font-weight:400;font-size:19px;margin:30px 0 10px;color:var(--chalk)}h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
 h3{font:600 11.5px "Avenir Next",Avenir,"Segoe UI",sans-serif;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:36px 0 4px}
 .it{display:grid;grid-template-columns:44px 1fr auto;gap:12px;align-items:center;background:var(--card);color:var(--cardink);text-decoration:none;padding:12px 16px;border-radius:3px;margin-bottom:8px;box-shadow:0 10px 20px -14px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--yellow))}
-.it:hover{transform:translateY(-1px)}.it .k{font-family:Georgia,serif;font-size:20px;color:#4E5A55}.it .t{font-size:15.5px;font-weight:500}.it .t small{display:block;font-weight:400;font-size:12.5px;color:#4E5A55;margin-top:2px}.it .n{font-size:12.5px;color:#4E5A55;text-align:right}
-footer{margin-top:36px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}</style>
-<!--pwa--><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/svg+xml" href="icon.svg"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="theme-color" content="#20312C"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Fiches"><script>if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(){});});}</script><!--/pwa--></head>
-<body><h1>Formation ML/LLM — <span>fiches</span></h1><p class="sub">La timeline pour savoir où tu es ; puis les fiches rangées comme les decks Anki « swe » : chaque bloc couvre les cartes du deck correspondant. Ouvre, réponds à voix haute, note-toi.</p>
-<h3>Pilotage</h3><div style="--ac:var(--sky)"><a class="it" href="timeline.html"><span class="k">⏱</span><span class="t">Timeline de la formation — 51 semaines</span><span class="n">v4 du 11/09</span></a></div>
-<h3>Par deck Anki</h3><div style="--ac:var(--teal)"><h2>🧮 01 · maths-stats</h2><a class="it" href="sheets/topics/sheet-t01-probabilites-lois.html"><span class="k">01</span><span class="t">Probabilités &amp; lois</span><span class="n">14 q.</span></a><a class="it" href="sheets/topics/sheet-t02-inference-frequentiste.html"><span class="k">02</span><span class="t">Inférence fréquentiste</span><span class="n">28 q.</span></a><a class="it" href="sheets/topics/sheet-t03-vraisemblance-mle-map.html"><span class="k">03</span><span class="t">Vraisemblance, MLE, MAP, régularisation</span><span class="n">17 q.</span></a><a class="it" href="sheets/topics/sheet-t04-algebre-calcul-pca.html"><span class="k">04</span><span class="t">Algèbre linéaire, calcul &amp; PCA</span><span class="n">23 q.</span></a><a class="it" href="sheets/walkthroughs/walkthrough-d01-intervalle-procedure.html"><span class="k">D1</span><span class="t">L’intervalle porte sur la procédure<small>cas 1 du fil A — déroulé suivi, pas d’auto-test</small></span><span class="n">6 marches · 8 fig.</span></a><a class="it" href="sheets/walkthroughs/walkthrough-d02-comparer-deux-modeles.html"><span class="k">D2</span><span class="t">Comparer deux modèles sur le même tirage<small>cas 2 du fil A — déroulé suivi, pas d’auto-test</small></span><span class="n">6 marches · 7 fig.</span></a><a class="it" href="sheets/walkthroughs/walkthrough-d03-biais-du-max.html"><span class="k">D3</span><span class="t">Le biais du max<small>cas 3 du fil A — déroulé suivi, pas d’auto-test</small></span><span class="n">5 marches · 11 fig.</span></a><a class="it" href="sheets/walkthroughs/walkthrough-d04-une-chaine-trois-exemples.html"><span class="k">D4</span><span class="t">Une chaîne, trois exemples<small>fil B, de la vraisemblance à la pénalité — déroulé suivi, pas d’auto-test</small></span><span class="n">12 marches · 2 fig.</span></a></div><div style="--ac:var(--violet)"><h2>📊 02 · ml classique</h2><a class="it" href="sheets/topics/sheet-t05-regression-lineaire-logistique.html"><span class="k">05</span><span class="t">Régression linéaire &amp; logistique</span><span class="n">18 q.</span></a><a class="it" href="sheets/topics/sheet-t06-evaluation-metriques.html"><span class="k">06</span><span class="t">Évaluation, métriques, biais-variance</span><span class="n">23 q.</span></a><a class="it" href="sheets/topics/sheet-t07-arbres-ensembles-clustering.html"><span class="k">07</span><span class="t">Arbres, ensembles, clustering</span><span class="n">17 q.</span></a></div><div style="--ac:var(--sky)"><h2>🧪 03 · deep learning &nbsp;·&nbsp; 🐍 07 · python</h2><a class="it" href="sheets/topics/sheet-t08-tenseurs-numerique.html"><span class="k">08</span><span class="t">Tenseurs &amp; numérique — numpy, PyTorch, flottants<small>numpy, PyTorch, flottants, numérique DL — les deux decks réunis</small></span><span class="n">24 q.</span></a></div><div style="--ac:var(--coral)"><h2>🤖 04 · llm engineering &nbsp;·&nbsp; 🏛️ 05 · system design</h2><a class="it" href="sheets/topics/sheet-t10-backend-architecture-estimation.html"><span class="k">10</span><span class="t">Backend, architecture &amp; estimation système<small>RAG/IVF et estimation, plus l'architecture backend (deck web)</small></span><span class="n">16 q.</span></a></div><div style="--ac:var(--mint)"><h2>🧑🏻‍💻 06 · coding patterns</h2><a class="it" href="sheets/topics/sheet-t09-coding-patterns.html"><span class="k">09</span><span class="t">Coding patterns — signal → pattern, preuves, complexité</span><span class="n">31 q.</span></a></div><div style="--ac:var(--amber)"><h2>🌐 08 · web</h2><a class="it" href="sheets/topics/sheet-t11-http-web-securite.html"><span class="k">11</span><span class="t">HTTP, web, JS/TS &amp; sécurité</span><span class="n">20 q.</span></a></div>
-<footer>Un fichier HTML autonome par entrée, ouvrable hors ligne. Convention : <code>/timeline.html</code> · <code>/sheets/weekly/sheet-wNN-&lt;sujet&gt;.html</code> · <code>/sheets/topics/sheet-tNN-&lt;sujet&gt;.html</code> · <code>/sheets/walkthroughs/walkthrough-dNN-&lt;sujet&gt;.html</code> · <code>/sheets/archive/</code>. La version vit dans le titre, pas dans le nom. Index généré par <code>tools/build_index.py</code> — ne pas éditer à la main.</footer></body></html>
+a.it:hover{transform:translateY(-1px)}.it .k{font-family:Georgia,serif;font-size:20px;color:#4E5A55}.it .t{font-size:15.5px;font-weight:500}.it .t small{display:block;font-weight:400;font-size:12.5px;color:#4E5A55;margin-top:2px}.it .n{font-size:12.5px;color:#4E5A55;text-align:right}
+.it.todo{opacity:.45;background:transparent;color:var(--muted);border-left-style:dashed;box-shadow:none}.it.todo .k,.it.todo .t small,.it.todo .n{color:var(--faint)}
+.nav{display:flex;gap:14px;margin:8px 0 0;font-size:14px}.nav a{color:var(--muted)}
+footer{margin-top:36px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.map{overflow-x:auto;margin-top:18px}.map svg{min-width:1600px;width:100%;height:auto}body.wide{max-width:1500px}
+.map text{font:12px "Avenir Next",Avenir,"Segoe UI",sans-serif;fill:var(--chalk)}.map .todo text{fill:var(--faint)}.map .part{font:600 11px sans-serif;letter-spacing:.08em;fill:var(--faint)}
+.map rect{fill:#1A2925;stroke:var(--ac,var(--yellow));stroke-width:1.5}.map .todo rect{stroke-dasharray:4 3;opacity:.6}.map .edge{fill:none;stroke:rgba(237,232,218,.35);stroke-width:1.2;marker-end:url(#ah)}.map .bridge rect{stroke:var(--amber)}
+</style><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/svg+xml" href="icone-fiches.svg"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="theme-color" content="#20312C"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Fiches"><script>if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(){});});}</script></head><body>
+<h1>Formation ML/LLM — <span>fiches</span></h1>
+<p class="sub">Rangées par dépendance, pas par deck : chaque chaîne suppose les précédentes. Une chaîne = hypothèses → mécanisme → où ça casse → résumé ; un déroulé = la même chaîne sur des exemples chiffrés ; un pont = un mécanisme vu dans plusieurs domaines. Anki teste l'atome ; ici on relit l'enchaînement.</p>
+<div class="nav"><a href="map.html">Carte des prérequis</a> · <a href="timeline.html">Timeline</a></div>
+<div style="--ac:var(--teal)"><h2>0 · Socle probabiliste</h2>
+<div class="it todo"><span class="k">01</span><span class="t">Lois usuelles — quelle situation déclenche quelle loi<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">02</span><span class="t">Espérance, variance, masse vs densité<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">03</span><span class="t">Conditionnement et Bayes — base rate en effectifs<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">04</span><span class="t">Moyenne, LGN, TCL<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+</div>
+<div style="--ac:var(--sky)"><h2>1 · L&#x27;objet aléatoire (fil A)</h2>
+<div class="it todo"><span class="k">01</span><span class="t">L&#x27;objet aléatoire — échantillon, estimateur, distribution d&#x27;échantillonnage, SE<small>chaîne · fil A — « qu&#x27;est-ce qui varierait si je refaisais l&#x27;expérience ? »</small></span><span class="n">spec prêt</span></div>
+<div class="it todo"><span class="k">02</span><span class="t">IC et test — centre, largeur, p-value, et sur quoi porte le 95 %<small>chaîne · fil A, cas 1 — l&#x27;intervalle porte sur la procédure</small></span><span class="n">spec prêt</span></div>
+<div class="it todo"><span class="k">03</span><span class="t">Inférence en régression — σ̂², t, Student, n − p<small>chaîne · fil A ↔ fil B — d&#x27;où viennent le SE d&#x27;une pente et la loi de t</small></span><span class="n">spec prêt</span></div>
+<div class="it todo"><span class="k">04</span><span class="t">Comparer deux modèles, et pourquoi le max ment<small>chaîne · fil A, cas 2 et 3 — appariement, McNemar, multiplicité, train/val/test</small></span><span class="n">spec prêt</span></div>
+<div class="it todo"><span class="k">05</span><span class="t">Bootstrap — la distribution d&#x27;échantillonnage quand il n&#x27;y a pas de formule<small>chaîne · fil A — rééchantillonner l&#x27;échantillon pour imiter la procédure</small></span><span class="n">spec prêt</span></div>
+<a class="it" href="sheets/walkthroughs/walkthrough-p01-01-intervalle-procedure.html"><span class="k">D01</span><span class="t">L&#x27;intervalle porte sur la procédure (D1)<small>déroulé · fil A, cas 1 — déroulé existant</small></span><span class="n">v1</span></a>
+<a class="it" href="sheets/walkthroughs/walkthrough-p01-02-comparer-deux-modeles.html"><span class="k">D02</span><span class="t">Comparer deux modèles sur le même tirage (D2)<small>déroulé · fil A, cas 2 — déroulé existant</small></span><span class="n">v1</span></a>
+<a class="it" href="sheets/walkthroughs/walkthrough-p01-03-biais-du-max.html"><span class="k">D03</span><span class="t">Le biais du max (D3)<small>déroulé · fil A, cas 3 — déroulé existant, 4 marches</small></span><span class="n">v1</span></a>
+<div class="it todo"><span class="k">D04</span><span class="t">De l&#x27;accuracy au SE en quatre maillons — la sonde<small>déroulé · fil A — le déroulé de 3 minutes qui sert de sonde de fatigue</small></span><span class="n">spec prêt</span></div>
+</div>
+<div style="--ac:var(--violet)"><h2>2 · Le bruit décide (fil B)</h2>
+<div class="it todo"><span class="k">01</span><span class="t">Du bruit à la loss — le geste en six pas<small>chaîne · fil B — hypothèse de bruit → densité → produit → log → négatif → jeter</small></span><span class="n">spec prêt</span></div>
+<div class="it todo"><span class="k">02</span><span class="t">Du prior à la pénalité — ce que la régularisation fournit<small>chaîne · fil B — MAP, λ = σ²/τ², +λI translate, L1 tranche ailleurs</small></span><span class="n">spec prêt</span></div>
+<div class="it todo"><span class="k">03</span><span class="t">Le posterior entier — conjugués, lissage, et pourquoi MCMC/VI existent<small>chaîne · fil B — Beta-Binomiale, pseudo-comptes, prior noyé quand n grandit</small></span><span class="n">spec prêt</span></div>
+<a class="it" href="sheets/walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html"><span class="k">D01</span><span class="t">Une chaîne, trois exemples (D4)<small>déroulé · fil B, de la vraisemblance à la pénalité — déroulé existant</small></span><span class="n">v1</span></a>
+</div>
+<div style="--ac:var(--yellow)"><h2>3 · Critère et descente (fil C, optim)</h2>
+<a class="it" href="sheets/chains/chain-p03-01-critere-escalier-vs-sensible.html"><span class="k">01</span><span class="t">Critère en escalier vs critère sensible<small>chaîne · fil C — un seul argument, quatre habits : split, loss, pénalité, marge</small></span><span class="n">v1</span></a>
+<div class="it todo"><span class="k">02</span><span class="t">Gradient et descente — pente, pas, convexité, conditionnement<small>chaîne · la porte d&#x27;entrée de la Phase 2 : ce que voit un optimiseur</small></span><span class="n">spec prêt</span></div>
+<div class="it todo"><span class="k">D01</span><span class="t">Descente sur un bol allongé — ridge à deux paramètres<small>déroulé · p03-02 appliqué aux chiffres de D4 : κ = 71, forme fermée vs 150 itérations</small></span><span class="n">spec prêt</span></div>
+</div>
+<div style="--ac:var(--mint)"><h2>4 · Matrice = action</h2>
+<div class="it todo"><span class="k">01</span><span class="t">Une matrice est une action — colonnes, noyau, affine<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">02</span><span class="t">Valeurs propres et itération — ce qui survit à Aᵏ<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">03</span><span class="t">Spectral, SVD, conditionnement<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">04</span><span class="t">PCA — diagonaliser la covariance<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+</div>
+<div style="--ac:var(--sky)"><h2>5 · Modèles linéaires</h2>
+<div class="it todo"><span class="k">01</span><span class="t">Régression linéaire — le modèle et OLS<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">02</span><span class="t">Régression logistique — logit, odds ratio, effet marginal<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">03</span><span class="t">Régularisation vue en biais-variance — le chemin de λ<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+</div>
+<div style="--ac:var(--coral)"><h2>6 · Évaluer</h2>
+<div class="it todo"><span class="k">01</span><span class="t">Biais, variance, bruit — la décomposition<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">02</span><span class="t">Estimer l&#x27;erreur — CV, LOOCV, leakage<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">03</span><span class="t">Seuil, matrice de confusion, ROC, PR<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">04</span><span class="t">Scores, calibration, déséquilibre<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+</div>
+<div style="--ac:var(--violet)"><h2>7 · Arbres, ensembles, k-means</h2>
+<div class="it todo"><span class="k">01</span><span class="t">Arbres — impureté, split, profondeur<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">02</span><span class="t">Bagging et random forest — la variance seule<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">03</span><span class="t">Gradient boosting — une descente dans l&#x27;espace des fonctions<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">04</span><span class="t">k-means — descente alternée sur l&#x27;inertie<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+</div>
+<div style="--ac:var(--teal)"><h2>8 · Calcul, numérique, tenseurs</h2>
+<div class="it todo"><span class="k">01</span><span class="t">Jacobienne, chain rule, backprop<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">02</span><span class="t">Flottants et log-sum-exp — raisonner en float32<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">03</span><span class="t">Cross-entropy, entropie, KL<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">04</span><span class="t">Tenseurs — ruban, strides, view vs copie, broadcasting<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+</div>
+<div style="--ac:var(--mint)"><h2>9 · Coding</h2>
+<div class="it todo"><span class="k">C00</span><span class="t">TAP — invariant, variant, conclusion, complexité<small>coding · signal → pattern → invariant → complexité</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">C01</span><span class="t">Fenêtre glissante<small>coding · signal → pattern → invariant → complexité</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">C02</span><span class="t">Deux pointeurs<small>coding · signal → pattern → invariant → complexité</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">C03</span><span class="t">Binary search<small>coding · signal → pattern → invariant → complexité</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">C04</span><span class="t">Listes chaînées<small>coding · signal → pattern → invariant → complexité</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">C05</span><span class="t">Arbres<small>coding · signal → pattern → invariant → complexité</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">C06</span><span class="t">Graphes<small>coding · signal → pattern → invariant → complexité</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">C07</span><span class="t">Heap<small>coding · signal → pattern → invariant → complexité</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">C08</span><span class="t">Intervals<small>coding · signal → pattern → invariant → complexité</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">C09</span><span class="t">DP 1D<small>coding · signal → pattern → invariant → complexité</small></span><span class="n">à venir</span></div>
+</div>
+<div style="--ac:var(--amber)"><h2>Ponts</h2>
+<div class="it todo"><span class="k">P01</span><span class="t">Une seule descente<small>pont · pont — un mécanisme, plusieurs domaines</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">P02</span><span class="t">Le témoin atteignable<small>pont · pont — un mécanisme, plusieurs domaines</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">P03</span><span class="t">Biais et variance partout<small>pont · pont — un mécanisme, plusieurs domaines</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">P04</span><span class="t">La variance d&#x27;une moyenne corrélée<small>pont · pont — un mécanisme, plusieurs domaines</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">P05</span><span class="t">Escalier vs sensible<small>pont · pont — un mécanisme, plusieurs domaines</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">P06</span><span class="t">Convexité et forme fermée<small>pont · pont — un mécanisme, plusieurs domaines</small></span><span class="n">à venir</span></div>
+</div>
+<div style="--ac:var(--faint)"><h2>Phase 2 · micrograd</h2>
+<div class="it todo"><span class="k">·</span><span class="t">partie vide<small>la sheet du bloc arrive avec la revue du vendredi</small></span><span class="n">Phase à venir</span></div>
+</div>
+<div style="--ac:var(--faint)"><h2>Phase 2 · makemore</h2>
+<div class="it todo"><span class="k">·</span><span class="t">partie vide<small>la sheet du bloc arrive avec la revue du vendredi</small></span><span class="n">Phase à venir</span></div>
+</div>
+<div style="--ac:var(--faint)"><h2>Phase 2 · transformer</h2>
+<div class="it todo"><span class="k">·</span><span class="t">partie vide<small>la sheet du bloc arrive avec la revue du vendredi</small></span><span class="n">Phase à venir</span></div>
+</div>
+<div style="--ac:var(--faint)"><h2>Phase 2 · tokenizer</h2>
+<div class="it todo"><span class="k">·</span><span class="t">partie vide<small>la sheet du bloc arrive avec la revue du vendredi</small></span><span class="n">Phase à venir</span></div>
+</div>
+<div style="--ac:var(--faint)"><h2>Phase 2 · mech interp</h2>
+<div class="it todo"><span class="k">·</span><span class="t">partie vide<small>la sheet du bloc arrive avec la revue du vendredi</small></span><span class="n">Phase à venir</span></div>
+</div>
+<div style="--ac:var(--faint)"><h2>Phase 3 · evals</h2>
+<div class="it todo"><span class="k">·</span><span class="t">partie vide<small>la sheet du bloc arrive avec la revue du vendredi</small></span><span class="n">Phase à venir</span></div>
+</div>
+<div style="--ac:var(--faint)"><h2>Phase 3 · fine-tuning</h2>
+<div class="it todo"><span class="k">·</span><span class="t">partie vide<small>la sheet du bloc arrive avec la revue du vendredi</small></span><span class="n">Phase à venir</span></div>
+</div>
+<div style="--ac:var(--faint)"><h2>Phase 3 · inference</h2>
+<div class="it todo"><span class="k">·</span><span class="t">partie vide<small>la sheet du bloc arrive avec la revue du vendredi</small></span><span class="n">Phase à venir</span></div>
+</div>
+<div style="--ac:var(--faint)"><h2>Phase 4 · system design</h2>
+<div class="it todo"><span class="k">·</span><span class="t">partie vide<small>la sheet du bloc arrive avec la revue du vendredi</small></span><span class="n">Phase à venir</span></div>
+</div>
+<h3>Archive — fiches thématiques Q/A (11/09/2026), remplacées par Anki</h3><div style="--ac:var(--faint)">
+<a class="it" href="sheets/archive/sheet-t01-probabilites-lois.html" style="opacity:.7"><span class="k">A</span><span class="t">Probabilités &amp; lois — fiche thématique</span><span class="n">archive</span></a>
+<a class="it" href="sheets/archive/sheet-t02-inference-frequentiste.html" style="opacity:.7"><span class="k">A</span><span class="t">Inférence fréquentiste — fiche thématique</span><span class="n">archive</span></a>
+<a class="it" href="sheets/archive/sheet-t03-vraisemblance-mle-map.html" style="opacity:.7"><span class="k">A</span><span class="t">Vraisemblance, MLE, MAP, régularisation — fiche thématique</span><span class="n">archive</span></a>
+<a class="it" href="sheets/archive/sheet-t04-algebre-calcul-pca.html" style="opacity:.7"><span class="k">A</span><span class="t">Algèbre linéaire, calcul &amp; PCA — fiche thématique</span><span class="n">archive</span></a>
+<a class="it" href="sheets/archive/sheet-t05-regression-lineaire-logistique.html" style="opacity:.7"><span class="k">A</span><span class="t">Régression linéaire &amp; logistique — fiche thématique</span><span class="n">archive</span></a>
+<a class="it" href="sheets/archive/sheet-t06-evaluation-metriques.html" style="opacity:.7"><span class="k">A</span><span class="t">Évaluation, métriques, biais-variance — fiche thématique</span><span class="n">archive</span></a>
+<a class="it" href="sheets/archive/sheet-t07-arbres-ensembles-clustering.html" style="opacity:.7"><span class="k">A</span><span class="t">Arbres, ensembles, clustering — fiche thématique</span><span class="n">archive</span></a>
+<a class="it" href="sheets/archive/sheet-t08-tenseurs-numerique.html" style="opacity:.7"><span class="k">A</span><span class="t">Tenseurs &amp; numérique — numpy, PyTorch, flottants — fiche thématique</span><span class="n">archive</span></a>
+<a class="it" href="sheets/archive/sheet-t09-coding-patterns.html" style="opacity:.7"><span class="k">A</span><span class="t">Coding patterns — signal → pattern, preuves, complexité — fiche thématique</span><span class="n">archive</span></a>
+<a class="it" href="sheets/archive/sheet-t10-backend-architecture-estimation.html" style="opacity:.7"><span class="k">A</span><span class="t">Backend, architecture &amp; estimation système — fiche thématique</span><span class="n">archive</span></a>
+<a class="it" href="sheets/archive/sheet-t11-http-web-securite.html" style="opacity:.7"><span class="k">A</span><span class="t">HTTP, web, JS/TS &amp; sécurité — fiche thématique</span><span class="n">archive</span></a>
+</div>
+<footer>Un HTML par entrée, <code>assets/sheetlib.js</code> partagé, ouvrable hors ligne. Convention : <code>sheets/chains/chain-pPP-NN-&lt;slug&gt;.html</code> · <code>sheets/walkthroughs/walkthrough-pPP-NN-…</code> · <code>sheets/bridges/bridge-NN-…</code> · <code>sheets/coding/coding-NN-…</code> · <code>sheets/archive/</code>. Index et carte générés par <code>tools/build_index.py</code> le 16/09/2026 — ne pas éditer à la main.</footer></body></html>

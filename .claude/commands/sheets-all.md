@@ -1,0 +1,1 @@
+Exécute la Phase 2 du prompt général (`CLAUDE-CODE-PROMPT.md`) : toutes les parties, dans l'ordre `01 02 03 08 06 05 07 04 00 09 B`, un sous-agent à contexte frais par spec `ready`, validateur après chaque retour, un commit par sheet, `tools/build_index.py` + push après chaque partie. Aucune question. Termine par le rapport de la Phase 3.

@@ -10,7 +10,7 @@ const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
 
 const BASE = (process.argv[2] || 'http://127.0.0.1:8777').replace(/\/$/, '');
-const SHEET = process.argv[3] || 'sheets/topics/sheet-t01-probabilites-lois.html';
+const SHEET = process.argv[3] || 'sheets/archive/sheet-t01-probabilites-lois.html';
 const URL = BASE + '/' + SHEET;
 const KEY = 'sheet:' + SHEET.split('/').pop() + ':ratings';
 

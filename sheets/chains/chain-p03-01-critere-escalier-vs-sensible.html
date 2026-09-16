@@ -1,0 +1,539 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Critère en escalier vs critère sensible — chaîne</title>
+<meta name="sheet" content="series=chain;part=03;number=01;status=v1">
+<meta name="part" content="03 · Critère et descente">
+<meta name="subtitle" content="fil C — un seul argument, quatre habits : split, loss, pénalité, marge">
+<meta name="prereq" content="p00-04,p02-01,p03-02">
+<meta name="anki" content="ml::arbres,ml::logistique,stats::regularisation,dl::cross-entropy,ml::svm">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 03 · Critère et descente › chaîne 01</div>
+  <h1>Critère en <span>escalier</span> vs critère <span>sensible</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Fil C. Un seul argument — <b>un critère ne fait bouger que là où sa pente n'est pas nulle</b> — rejoué sous quatre habits : le critère de split d'un arbre, la loss d'un classifieur, la pénalité d'une régularisation, la marge d'une SVM. Exemple minimal calculé à la main, puis le même geste transféré trois fois.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="../../map.html#p00-04">p00-04 · Espérance, moyenne pondérée</a></li>
+    <li><a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01 · Du bruit à la loss (fil B)</a></li>
+    <li><a href="chain-p03-02-gradient-descente.html">p03-02 · Gradient et descente</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>ml::arbres</code><code>ml::logistique</code><code>stats::regularisation</code><code>dl::cross-entropy</code><code>ml::svm</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-01-une-seule-descente.html">Une seule descente</a></li>
+    <li><a href="../bridges/bridge-06-convexite-forme-fermee.html">Convexité et forme fermée</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>Proportion et moyenne pondérée.</b> Un nœud à <span class="m">n</span> observations dont <span class="m">n</span><sub>+</sub> positives a pour proportion <span class="m">p</span> = <span class="m">n</span><sub>+</sub>/<span class="m">n</span>. Si on le coupe en deux enfants de poids <span class="m">w</span> et 1−<span class="m">w</span>, la proportion du parent est la moyenne pondérée des proportions des enfants : <span class="m">p</span> = <span class="m">w p</span><sub>L</sub> + (1−<span class="m">w</span>)<span class="m">p</span><sub>R</sub>.</li>
+      <li><b>Concavité.</b> <span class="m">φ</span> est strictement concave si sa corde est strictement sous sa courbe : <span class="m">φ</span>(<span class="m">w a</span> + (1−<span class="m">w</span>)<span class="m">b</span>) &gt; <span class="m">w φ</span>(<span class="m">a</span>) + (1−<span class="m">w</span>)<span class="m">φ</span>(<span class="m">b</span>) dès que <span class="m">a</span> ≠ <span class="m">b</span> (inégalité de Jensen, cas strict). Convexe : l'inégalité inverse.</li>
+      <li><b>Gradient = signal.</b> En descente de gradient, un paramètre bouge de −<span class="m">η</span>·∂<span class="m">L</span>/∂<span class="m">θ</span> ; là où la dérivée est nulle, il ne bouge pas (<a href="chain-p03-02-gradient-descente.html">p03-02</a>).</li>
+      <li><b>La loss est la trace du bruit</b> (fil B, <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4</a>) : log-loss ← Bernoulli, MSE ← gaussienne. Ici on ne redérive pas les losses, on compare leur pente.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>Un critère sert à <b>départager des candidats</b> (splits, valeurs de β, valeurs de θ). Il n'est utile que s'il attribue des valeurs différentes à des candidats différents.</span>
+      <b>H2</b><span>L'apprentissage est <b>local et itératif</b> : un split est choisi parmi des candidats voisins, un paramètre bouge par petits pas. Ce qui compte est donc la <b>variation</b> du critère sous une petite amélioration, pas sa valeur absolue.</span>
+      <b>H3</b><span>Classification binaire, classes codées <span class="m">y</span> ∈ {0,1} pour les proportions et <span class="m">y</span> ∈ {−1,+1} pour les marges. Aucune hypothèse sur la distribution des <span class="m">x</span>.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor</h3>
+    <p>Un nœud parent de 800 observations, moitié positives. Deux splits candidats, aucune contrainte de profondeur. La question de CART : lequel des deux est le meilleur ?</p>
+    <p class="say">« Le critère doit ranger S1 et S2. S'il leur donne la même valeur, il ne sert à rien. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application</div>
+    <p>Parent : 400 <b>+</b> / 400 <b>−</b>, <span class="m">p</span> = 0,5.</p>
+    <table>
+      <tr><th>split</th><th>enfant gauche</th><th>enfant droit</th></tr>
+      <tr><td><b>S1</b></td><td>300 + / 100 − &nbsp;(<span class="m">p</span><sub>L</sub> = 0,75, <span class="m">n</span> = 400)</td><td>100 + / 300 − &nbsp;(<span class="m">p</span><sub>R</sub> = 0,25, <span class="m">n</span> = 400)</td></tr>
+      <tr><td><b>S2</b></td><td>200 + / 400 − &nbsp;(<span class="m">p</span><sub>L</sub> = 1/3, <span class="m">n</span> = 600)</td><td>200 + / 0 − &nbsp;(<span class="m">p</span><sub>R</sub> = 1, <span class="m">n</span> = 200)</td></tr>
+    </table>
+    <p>S2 produit une feuille <b>pure</b>. Intuitivement il sépare mieux. On va voir quel critère le voit.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Le critère naïf : l'accuracy</h3>
+    <p>Chaque enfant prédit sa classe majoritaire ; son erreur est la proportion minoritaire. Le critère d'un nœud est donc</p>
+    <div class="eq"><span class="m">e</span>(<span class="m">p</span>) = min(<span class="m">p</span>, 1−<span class="m">p</span>)</div>
+    <p>et le gain d'un split est <span class="m">e</span>(<span class="m">p</span>) − [<span class="m">w e</span>(<span class="m">p</span><sub>L</sub>) + (1−<span class="m">w</span>)<span class="m">e</span>(<span class="m">p</span><sub>R</sub>)].</p>
+    <p class="say">« L'erreur d'un nœud est sa proportion minoritaire, donc le gain compare l'erreur du parent à l'erreur pondérée des enfants. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application</div>
+    <p>Parent : 400 erreurs sur 800, <span class="m">e</span> = 0,5.</p>
+    <table>
+      <tr><th>split</th><th>erreurs gauche</th><th>erreurs droite</th><th>total</th><th>gain</th></tr>
+      <tr><td>S1</td><td>100</td><td>100</td><td>200</td><td>0,25</td></tr>
+      <tr><td>S2</td><td>200</td><td>0</td><td>200</td><td>0,25</td></tr>
+    </table>
+    <p><b>Égalité.</b> Une feuille pure et deux feuilles à 75 % valent exactement pareil pour l'accuracy. Le critère ne départage pas.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Pourquoi l'accuracy est muette <span class="tag tronc">tronc</span></h3>
+    <p><span class="m">e</span>(<span class="m">p</span>) = min(<span class="m">p</span>, 1−<span class="m">p</span>) est une <b>tente</b> : affine de chaque côté de ½ (pente +1 puis −1), un seul angle au sommet. Sur un segment linéaire, la corde est <i>sur</i> la courbe : la moyenne pondérée des erreurs des enfants est exactement l'erreur du parent.</p>
+    <p>Conséquence : le gain n'est strictement positif que si un enfant <b>traverse ½</b>, c'est-à-dire change de classe majoritaire. Tout split qui purifie sans faire basculer une majorité a un gain <b>exactement nul</b>. C'est un critère en escalier : il ne voit que les basculements.</p>
+    <p class="say">« L'erreur est linéaire de chaque côté de ½, donc la corde entre deux enfants du même côté passe par le parent, donc le gain est nul tant qu'aucune majorité ne bascule, donc l'accuracy ne voit pas une purification. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — un split qui purifie sans basculer</div>
+    <p>Parent 7 + / 3 −. Split : (4 + / 2 −) et (3 + / 1 −). Les deux enfants restent majoritairement <b>+</b>.</p>
+    <p>Erreurs : parent 3 ; enfants 2 + 1 = 3. <b>Gain = 0.</b> Pourtant l'enfant droit est à 75 % contre 70 % au parent : le split a fait quelque chose, le critère dit « rien ».</p>
+    <p>Sur S1 et S2 : les enfants de S1 sont à 0,75 et 0,25, de part et d'autre de ½ ; ceux de S2 à 1/3 et 1. Dans les deux cas <i>une</i> majorité bascule et le gain vaut 0,25 — l'accuracy compte les basculements, pas l'ampleur.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — la corde et la courbe</div>
+    <div id="f1plot" class="wide"></div>
+    <div class="sl-ctl" id="f1presets"></div>
+    <div id="f1sliders"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Chaque critère est une fonction de la proportion <span class="m">p</span>. Le point plein est le parent, les deux points vides sont les enfants, le pointillé rouge est la corde entre eux, et le <b>segment vert</b> est le gain : la hauteur entre la courbe et la corde, lue en <span class="m">p</span>. Déplace <span class="m">p</span><sub>L</sub>, <span class="m">p</span><sub>R</sub>, <span class="m">w</span> : tant que les deux enfants restent du même côté de ½, le gain en accuracy reste à zéro alors que Gini et entropie bougent.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Le critère sensible : un dôme <span class="tag tronc">tronc</span></h3>
+    <p>Gini et entropie sont des <b>dômes</b>, strictement concaves sur ]0,1[ :</p>
+    <div class="eq"><span class="m">G</span>(<span class="m">p</span>) = 2<span class="m">p</span>(1−<span class="m">p</span>) &nbsp;&nbsp; <span class="m">H</span>(<span class="m">p</span>) = −<span class="m">p</span> log <span class="m">p</span> − (1−<span class="m">p</span>) log(1−<span class="m">p</span>)</div>
+    <p>Lecture de Gini en <b>deux tirages</b> : tirer un individu du nœud, lui attribuer une étiquette tirée au hasard selon les proportions ; Gini = probabilité de se tromper = <span class="m">p</span>(1−<span class="m">p</span>) + (1−<span class="m">p</span>)<span class="m">p</span>. Entropie = surprise moyenne, −log de la probabilité de ce qu'on observe, en espérance.</p>
+    <p>Jensen strict : <span class="m">φ</span>(<span class="m">w p</span><sub>L</sub> + (1−<span class="m">w</span>)<span class="m">p</span><sub>R</sub>) &gt; <span class="m">w φ</span>(<span class="m">p</span><sub>L</sub>) + (1−<span class="m">w</span>)<span class="m">φ</span>(<span class="m">p</span><sub>R</sub>) dès que <span class="m">p</span><sub>L</sub> ≠ <span class="m">p</span><sub>R</sub>. Le membre de gauche est l'impureté du parent, le membre de droite celle des enfants : le gain est strictement positif pour <b>tout</b> split qui change les proportions, et il croît avec l'écartement des enfants.</p>
+    <p class="say">« Gini et l'entropie sont strictement concaves, donc la corde entre deux enfants distincts passe sous la courbe, donc l'impureté pondérée des enfants est strictement sous celle du parent, donc tout split qui sépare est vu, et plus il sépare plus il est vu. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application</div>
+    <p>Gini, parent : 2·0,5·0,5 = <b>0,5</b>.</p>
+    <table>
+      <tr><th>split</th><th>gauche</th><th>droite</th><th>pondéré</th><th>gain</th></tr>
+      <tr><td>S1</td><td>2·0,75·0,25 = 0,375</td><td>0,375</td><td>0,375</td><td>0,125</td></tr>
+      <tr class="hl"><td>S2</td><td>2·(1/3)(2/3) = 0,444</td><td>0</td><td>0,75·0,444 + 0,25·0 = 0,333</td><td><b>0,167</b></td></tr>
+    </table>
+    <p>Entropie (bits), parent 1 : S1 → 0,811, gain 0,189 ; S2 → 0,75·0,918 = 0,689, gain <b>0,311</b>. Les deux critères préfèrent S2, celui qui produit la feuille pure.</p>
+    <p>Split 7/3 sans basculement : Gini 0,42 → 0,417, gain 0,003 &gt; 0. Petit, mais <b>non nul</b> : l'arbre peut le ranger.</p>
+  </div>
+</div>
+
+
+<div class="step" id="s4b">
+  <div class="rule">
+    <h3>Pourquoi c'est légitime : un surrogate</h3>
+    <p>On n'optimise pas l'impureté pour elle-même. Elle mesure le <b>progrès intermédiaire</b> vers une feuille pure, et chaque dôme est une loss connue lue au niveau du nœud : l'entropie d'un nœud est la <b>log-loss</b> moyenne de la prédiction « proportions du nœud », Gini est son <b>score de Brier</b>. Les deux sont indépendantes d'un seuil de décision — l'accuracy ne l'est pas.</p>
+    <p class="say">« L'impureté est une loss de probabilité évaluée sur le nœud, donc elle mesure un progrès même quand la décision ne change pas, donc on la prend comme critère de split, et on garde le taux d'erreur pour évaluer et pour élaguer. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application</div>
+    <p>Nœud à <span class="m">p</span> = 0,75 prédisant (0,75 ; 0,25) : log-loss moyenne = −0,75 log 0,75 − 0,25 log 0,25 = <span class="m">H</span>(0,75) ; Brier moyen = 0,75·(1−0,75)² + 0,25·(0−0,25)² = 0,1875 = <span class="m">G</span>(0,75)/2.</p>
+    <p>Élagage et évaluation : le taux d'erreur (ou la métrique métier) convient, parce qu'on <i>mesure</i>, on n'apprend plus.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Le même argument, écrit en pente</h3>
+    <p>Reformulé pour qu'il se transporte : la variation d'un critère sous une petite amélioration est sa <b>dérivée</b>. Une fonction en marches a une dérivée nulle presque partout — aucun signal entre deux marches. Une fonction strictement concave (ou convexe) et dérivable a une dérivée qui change continûment : chaque amélioration, même petite, déplace le critère.</p>
+    <p>Pour un split, l'objet qui bouge est <span class="m">p</span> ; pour un classifieur, c'est <span class="m">β</span> ; pour une pénalité, c'est <span class="m">θ</span> ; pour une SVM, c'est la marge. Quatre habits, une règle.</p>
+    <p class="say">« Un critère n'informe l'apprentissage que par sa pente, donc un critère en marches est muet presque partout, donc on optimise un critère strictement concave ou convexe même si la quantité qu'on rapporte à la fin est l'accuracy. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Le geste à transférer</div>
+    <table>
+      <tr><th>habit</th><th>ce qui bouge</th><th>critère en escalier</th><th>critère sensible</th></tr>
+      <tr><td>split d'arbre</td><td><span class="m">p</span></td><td>accuracy</td><td>Gini, entropie</td></tr>
+      <tr><td>loss de classification</td><td><span class="m">β</span></td><td>0/1 loss</td><td>log-loss</td></tr>
+      <tr><td>pénalité</td><td><span class="m">θ</span></td><td>L2 <i>près de 0</i></td><td>L1</td></tr>
+      <tr><td>SVM</td><td>marge</td><td>hinge <i>au-delà de 1</i></td><td>hinge <i>en deçà de 1</i></td></tr>
+    </table>
+    <p>Lis la colonne « escalier » comme « là où la pente est nulle ». Pour L2 et la hinge, ce n'est pas partout : c'est une <b>zone</b>, et c'est exactement cette zone qui explique leur comportement.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Habit 2 — la loss d'un classifieur</h3>
+    <p>Marge <span class="m">m</span> = <span class="m">y</span>·<span class="m">z</span> avec <span class="m">z</span> = <span class="m">β</span><sup>⊤</sup><span class="m">x</span> et <span class="m">y</span> ∈ {−1,+1} : positive si bien classé, négative sinon.</p>
+    <div class="eq">0/1 : 𝟙[<span class="m">m</span> &lt; 0] &nbsp;&nbsp;&nbsp; log-loss : log(1 + e<sup>−<span class="m">m</span></sup>) &nbsp;&nbsp;&nbsp; hinge : max(0, 1 − <span class="m">m</span>)</div>
+    <p>La 0/1 loss compte les erreurs — c'est l'accuracy du côté des paramètres. Sa dérivée en <span class="m">β</span> est nulle partout sauf sur la frontière : la descente de gradient ne reçoit rien. La log-loss a pour dérivée −<span class="m">σ</span>(−<span class="m">m</span>), jamais nulle, décroissante en |<span class="m">m</span>| : un point mal classé pousse fort, un point bien classé pousse encore un peu.</p>
+    <p class="say">« La 0/1 loss est en marches en β, donc son gradient est nul presque partout, donc rien n'apprend ; la log-loss est convexe et dérivable, donc chaque point envoie un gradient proportionnel à son degré d'erreur. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application</div>
+    <p>Un point avec <span class="m">m</span> = −2 (franchement mal classé) : 0/1 loss = 1, pente 0. Log-loss = log(1+e²) = 2,13, pente −<span class="m">σ</span>(2) = −0,88. Le point tire fort.</p>
+    <p><span class="m">m</span> = +2 (bien classé) : 0/1 = 0, pente 0. Log-loss = 0,13, pente −<span class="m">σ</span>(−2) = −0,12. Il tire encore, faiblement — c'est ce qui fait fuir <span class="m">β</span> vers l'infini sous séparation parfaite (D4, exemple 2).</p>
+    <p><b>Deux étages.</b> Par la chain rule, ∂loss/∂<span class="m">z</span> = ∂loss/∂<span class="m">p</span> × ∂<span class="m">p</span>/∂<span class="m">z</span>, et ∂<span class="m">p</span>/∂<span class="m">z</span> = <span class="m">p</span>(1−<span class="m">p</span>) écrase tout près de 0 et de 1. Log-loss, <span class="m">y</span> = 1 : (−1/<span class="m">p</span>) × <span class="m">p</span>(1−<span class="m">p</span>) = −(1−<span class="m">p</span>) : le −1/<span class="m">p</span> du log <b>compense</b> l'écrasement, gradient <span class="m">p</span> − <span class="m">y</span>, maximal quand l'erreur est maximale. MSE : 2(<span class="m">p</span>−<span class="m">y</span>) × <span class="m">p</span>(1−<span class="m">p</span>) : rien ne compense, le gradient meurt là où l'erreur est maximale (D4).</p>
+    <p><b>Signe.</b> Le paramètre bouge de −<span class="m">η</span> × pente. Pente négative en <span class="m">m</span> ⇒ la marge <i>augmente</i> : on descend la loss en montant la marge.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — losses en fonction de la marge, et leur pente</div>
+    <div id="f2plot" class="wide"></div>
+    <div id="f2sliders"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Déplace la marge <span class="m">m</span> d'un point. Les traits épais sont les pentes locales : nulles pour la 0/1 loss partout, nulle pour la hinge au-delà de <span class="m">m</span> = 1, jamais nulle pour la log-loss. Là où la pente est nulle, ce point n'influence plus <span class="m">β</span>.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Habit 3 — la pénalité</h3>
+    <p>Minimiser <span class="m">L</span>(<span class="m">θ</span>) + <span class="m">λ</span>·pen(<span class="m">θ</span>). La force de rappel vers 0 est la dérivée de la pénalité :</p>
+    <div class="eq">L2 : d(<span class="m">θ</span>²)/d<span class="m">θ</span> = 2<span class="m">θ</span> → 0 quand <span class="m">θ</span> → 0 &nbsp;&nbsp;&nbsp; L1 : d|<span class="m">θ</span>|/d<span class="m">θ</span> = ±1, constante</div>
+    <p>L2 est sensible partout <i>sauf</i> près de 0, où sa pente s'évanouit : le poids ralentit sans jamais arriver. L1 garde une pente constante jusqu'à 0 : le poids arrive. Et il y <b>reste</b> : en 0, |<span class="m">θ</span>| a un <b>coude</b>, la pénalité tire vers 0 depuis les deux côtés avec la force <span class="m">λ</span> — un <b>mur des deux côtés</b>. Le poids ne repart que si la loss pousse plus fort que <span class="m">λ</span> : |<span class="m">L</span>′(0)| &gt; <span class="m">λ</span>. C'est la même règle lue à l'envers : là où la pente de la loss est trop faible, c'est le mur qui gagne.</p>
+    <p class="say">« La pénalité tire avec sa dérivée, donc L2 tire de moins en moins près de zéro et le poids n'y arrive jamais, donc L1 tire à force constante et le poids atteint exactement zéro dès que la loss ne pousse plus plus fort que λ. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — un seul paramètre</div>
+    <p>Loss <span class="m">L</span>(<span class="m">θ</span>) = ½(<span class="m">θ</span> − 1)² : les données veulent <span class="m">θ</span> = 1.</p>
+    <div class="eq">L2 : <span class="hat"><span class="m">θ</span></span> = 1/(1 + 2<span class="m">λ</span>) &nbsp;&nbsp;&nbsp; L1 : <span class="hat"><span class="m">θ</span></span> = max(0, 1 − <span class="m">λ</span>)</div>
+    <table>
+      <tr><th><span class="m">λ</span></th><th>L2</th><th>L1</th></tr>
+      <tr><td>0,25</td><td>0,667</td><td>0,75</td></tr>
+      <tr><td>0,5</td><td>0,5</td><td>0,5</td></tr>
+      <tr class="hl"><td>1</td><td>0,333</td><td><b>0</b></td></tr>
+      <tr><td>4</td><td>0,111</td><td>0</td></tr>
+    </table>
+    <p>L2 tend vers 0 sans l'atteindre ; L1 y est <b>exactement</b> dès <span class="m">λ</span> ≥ 1. Sur <span class="m">p</span> paramètres, c'est la sélection de variables du Lasso.</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — où s'arrête le poids</div>
+    <div id="f3plot" class="wide"></div>
+    <div id="f3sliders"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Les deux critères pénalisés en fonction de <span class="m">θ</span>, avec leur minimum. Monte <span class="m">λ</span> : le minimum L2 glisse vers 0 en ralentissant, le minimum L1 arrive en 0 et s'y colle — c'est l'angle de |<span class="m">θ</span>| qui le retient.</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Habit 4 — la marge (demi-chaîne SVM)</h3>
+    <p>SVM linéaire : minimiser ½‖<span class="m">w</span>‖² + <span class="m">C</span> Σ<sub><span class="m">i</span></sub> max(0, 1 − <span class="m">y</span><sub><span class="m">i</span></sub>(<span class="m">w</span><sup>⊤</sup><span class="m">x</span><sub><span class="m">i</span></sub> + <span class="m">b</span>)). La marge géométrique vaut 2/‖<span class="m">w</span>‖ : minimiser ‖<span class="m">w</span>‖ l'élargit.</p>
+    <p>La hinge a une pente nulle pour <span class="m">m</span> ≥ 1 : un point bien classé <i>au-delà de la marge</i> n'envoie aucun gradient. Seuls les points avec <span class="m">m</span> ≤ 1 — sur la marge ou du mauvais côté — portent la solution : les <b>vecteurs de support</b>. La solution s'écrit <span class="m">w</span> = Σ <span class="m">α</span><sub><span class="m">i</span></sub><span class="m">y</span><sub><span class="m">i</span></sub><span class="m">x</span><sub><span class="m">i</span></sub> avec <span class="m">α</span><sub><span class="m">i</span></sub> = 0 hors support.</p>
+    <p><b>Kernel trick.</b> Prédiction et entraînement ne touchent les <span class="m">x</span> que par des produits scalaires <span class="m">x</span><sub><span class="m">i</span></sub><sup>⊤</sup><span class="m">x</span> ; on remplace chacun par <span class="m">K</span>(<span class="m">x</span><sub><span class="m">i</span></sub>, <span class="m">x</span>) = ⟨<span class="m">φ</span>(<span class="m">x</span><sub><span class="m">i</span></sub>), <span class="m">φ</span>(<span class="m">x</span>)⟩ sans jamais calculer <span class="m">φ</span>. RBF : frontière non linéaire en O(n<sub>support</sub>) par prédiction.</p>
+    <p class="say">« La hinge est nulle au-delà de la marge, donc les points bien classés ne portent aucun gradient, donc la frontière ne dépend que des vecteurs de support ; et comme tout passe par des produits scalaires, un noyau les remplace et rend la frontière non linéaire. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">SVM vs logistique — quand</div>
+    <table>
+      <tr><th></th><th>logistique</th><th>SVM</th></tr>
+      <tr><td>loss</td><td>log-loss, pente jamais nulle</td><td>hinge, nulle au-delà de la marge</td></tr>
+      <tr><td>qui décide de la frontière</td><td>tous les points, pondérés</td><td>les vecteurs de support seuls</td></tr>
+      <tr><td>probabilités</td><td>natives (à calibrer quand même)</td><td>non ; Platt après coup</td></tr>
+      <tr><td>non-linéaire</td><td>features explicites</td><td>noyau, sans expliciter <span class="m">φ</span></td></tr>
+      <tr><td>préférer quand</td><td>on veut des probas ; n grand</td><td>n petit/moyen, frontière courbe, marge claire</td></tr>
+    </table>
+    <p>Frontières souvent proches ; la différence est dans ce qui les porte. La question d'entretien est rarement « SVM ou logistique », c'est « pourquoi la hinge est-elle creuse ».</p>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — la marge et ceux qui la portent</div>
+    <div class="wide"><svg viewBox="0 0 460 300" class="sl-plot" id="f4svg"></svg></div>
+    <p class="cap">Deux classes, l'hyperplan et ses deux marges. Les points <b>cerclés</b> sont les vecteurs de support (<span class="m">m</span> ≤ 1) ; retire un point hors support, la frontière ne bouge pas ; retire un vecteur de support, elle se recalcule.</p>
+    <div class="sl-ctl" id="f4ctl"></div>
+  </div>
+</div>
+
+<div class="step" id="s9">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>« Sensible » n'est pas « meilleur partout ».</p>
+    <p class="say">« Un critère sensible transmet tout, donc il transmet aussi le bruit ; c'est pour cela qu'on borne parfois sa pente — Huber, hinge — et qu'on rapporte à la fin une métrique en marches. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>La log-loss n'est pas bornée.</b> Une erreur confiante (<span class="m">m</span> = −10) coûte 10 et tire à pente presque 1 : un label bruité déplace la frontière. La hinge et Huber bornent l'influence d'un point. Sensible partout ⇒ sensible aux outliers.</li>
+      <li><b>Séparation parfaite.</b> Pente jamais nulle ⇒ ‖<span class="m">β</span>‖ → ∞ (D4, ex. 2). La pénalité rend le minimum existant. Pas un défaut du critère, une conséquence de sa sensibilité.</li>
+      <li><b>Gini vs entropie : même concavité, même ordre des splits</b> dans presque tous les cas. Le choix entre les deux est un détail d'implémentation ; le choix accuracy vs concave est structurel.</li>
+      <li><b>Le critère optimisé n'est pas la métrique rapportée.</b> On entraîne sur la log-loss et on rapporte une accuracy, un F1, un rappel à un seuil : des fonctions en marches, parfaites pour <i>évaluer</i>, muettes pour <i>apprendre</i>. Ne pas confondre les deux rôles.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Un critère n'informe l'apprentissage que par sa <b>pente</b>. Pente nulle = pas de signal.</li>
+    <li>Accuracy et 0/1 loss sont <b>en marches</b> : gain nul sans basculement de majorité, gradient nul presque partout.</li>
+    <li>Gini, entropie, log-loss sont des <b>dômes</b> (strictement concaves / convexes) : tout écart se voit (Jensen strict). Légitimes comme surrogates : entropie = log-loss du nœud, Gini = Brier.</li>
+    <li>La pente de <b>L2</b> s'évanouit en 0 (jamais de zéro exact) ; celle de <b>L1</b> est constante (zéros exacts).</li>
+    <li>La <b>hinge</b> est plate au-delà de la marge : seuls les vecteurs de support portent la SVM ; le noyau remplace les produits scalaires.</li>
+    <li>Sensible = transmet aussi le bruit : Huber, hinge bornent ; on évalue avec des métriques en marches, on n'apprend pas avec.</li>
+  </ol>
+</div>
+<div class="phrase">« Un critère n'apprend que là où sa pente n'est pas nulle. L'accuracy et la 0/1 loss sont en marches, donc muettes presque partout ; Gini, l'entropie et la log-loss sont strictement concaves ou convexes, donc chaque amélioration se voit. Le même fait explique les zéros exacts du Lasso et les vecteurs de support de la SVM. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Pourquoi CART ne choisit-il pas ses splits à l'accuracy ?</div><div class="a hid">Erreur = min(p, 1−p), linéaire par morceaux : gain exactement nul tant qu'aucun enfant ne traverse ½.</div></li>
+    <li><div class="q">Pourquoi Gini et l'entropie voient-elles tout split, et pourquoi c'est légitime ?</div><div class="a hid">Dômes : corde sous la courbe (Jensen strict), impureté pondérée des enfants &lt; parent dès que p<sub>L</sub> ≠ p<sub>R</sub>. Légitime : surrogate — entropie = log-loss du nœud, Gini = Brier ; on élague au taux d'erreur.</div></li>
+    <li><div class="q">Même argument côté loss : pourquoi la log-loss et pas la 0/1 loss ?</div><div class="a hid">La 0/1 loss a un gradient nul presque partout en β ; la log-loss a pour pente −σ(−m), jamais nulle, proportionnelle à l'erreur.</div></li>
+    <li><div class="q">Même argument côté pénalité : pourquoi L1 met des zéros exacts ?</div><div class="a hid">Pente de θ² → 0 près de 0 (le poids n'arrive jamais) ; pente de |θ| = ±1 constante (le poids arrive) ; coude en 0 = mur des deux côtés de force λ (il reste tant que |L′(0)| ≤ λ).</div></li>
+    <li><div class="q">Même argument côté SVM : qui porte la frontière ?</div><div class="a hid">Hinge plate pour m ≥ 1 ⇒ gradient nul pour les points bien classés ⇒ seuls les vecteurs de support (m ≤ 1) comptent.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="../bridges/bridge-01-une-seule-descente.html"><b>Une seule descente</b><small>le gradient d'une loss sur β, d'une loss sur une fonction (boosting), sur des centroïdes (Lloyd) : même pas, même signal</small></a>
+    <a href="../bridges/bridge-06-convexite-forme-fermee.html"><b>Convexité et forme fermée</b><small>quand une pente s'annule en un point unique on résout, sinon on itère</small></a>
+    <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html"><b>D4 — fil B</b><small>d'où viennent la log-loss et la MSE ; l'exemple 2 (séparation parfaite) est le pas 6 vu de l'autre côté</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p>Cartes du 16/09 : <i>Gini vs taux d'erreur</i>, <i>accuracy comme loss</i>, cloze <i>Gini/entropie</i> (deux tirages, pont log-loss), <i>MSE vs log-loss</i> (Brier), <i>L1 — le coude</i>, <i>Wilson</i>.</p>
+  <p><code>ml::arbres</code> (critère de split CART, Gini vs accuracy) · <code>ml::logistique</code> (pas de forme fermée, gradient de la BCE) · <code>stats::regularisation</code> (L1 zéros exacts, L2 ressort) · <code>dl::cross-entropy</code> (gradient p − y) · <code>ml::svm</code> (hinge, vecteurs de support, noyau — à créer).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p03-01 · v1 du 16/09/2026 · gold standard du format <code>chain</code>. Prérequis : p00-04, p02-01, p03-02. Suite : <a href="chain-p03-02-gradient-descente.html">p03-02 Gradient et descente</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== Figure 1 : corde et courbe ===== */
+const H=p=>(p<=0||p>=1)?0:-(p*Math.log2(p)+(1-p)*Math.log2(1-p));
+const G=p=>2*p*(1-p), E=p=>Math.min(p,1-p);
+const crit=[{f:E,cls:'sl-c3',name:'accuracy (erreur)'},{f:G,cls:'sl-c1',name:'Gini'},{f:H,cls:'sl-c2',name:'entropie (bits)'}];
+const P1=SL.plot(document.getElementById('f1plot'),{x:[0,1],y:[0,1.05],w:600,h:300,xt:[0,.25,.5,.75,1],yt:[.5,1],xl:'p (proportion de +)',yl:'critère'});
+crit.forEach(c=>{P1.fn(c.f,c.cls);});P1.label(.14,.72,'entropie','sl-c2','middle');P1.label(.88,.36,'Gini','sl-c1','middle');P1.label(.14,.08,'accuracy','sl-c3','middle');
+const st={pl:.75,pr:.25,w:.5};
+const out1=document.getElementById('f1out');
+function draw1(){P1.clear();const p=st.w*st.pl+(1-st.w)*st.pr;out1.innerHTML='';
+  crit.forEach(c=>{const yl=c.f(st.pl),yr=c.f(st.pr),ch=st.w*yl+(1-st.w)*yr,gain=c.f(p)-ch;
+    P1.seg(st.pl,yl,st.pr,yr,'chord');P1.dot(st.pl,yl,c.cls+' hollow',4);P1.dot(st.pr,yr,c.cls+' hollow',4);
+    P1.seg(p,ch,p,c.f(p),'gain');P1.dot(p,c.f(p),c.cls,5);
+    const d=document.createElement('div');d.className=gain<1e-9?'zero':'pos';d.innerHTML=`gain ${c.name}<b>${SL.fmt(gain,3)}</b>`;out1.appendChild(d);});
+  P1.vline(p,'');P1.text(p,1.02,'parent p = '+SL.fmt(p,2),'','middle');}
+const sl1=document.getElementById('f1sliders');
+const sPL=SL.slider(sl1,{label:'p gauche',min:0,max:1,step:.01,value:.75},v=>{st.pl=v;draw1();});
+const sPR=SL.slider(sl1,{label:'p droite',min:0,max:1,step:.01,value:.25},v=>{st.pr=v;draw1();});
+const sW=SL.slider(sl1,{label:'poids gauche w',min:.05,max:.95,step:.05,value:.5},v=>{st.w=v;draw1();});
+const pre=document.getElementById('f1presets');
+[['S1 · 300/100 | 100/300',.75,.25,.5],['S2 · 200/400 | 200/0',1/3,1,.75],['7/3 sans basculement',4/6,.75,.6]].forEach(([n,a,b,w])=>{const bt=document.createElement('button');bt.className='tb';bt.textContent=n;bt.onclick=()=>{sPL.set(a);sPR.set(b);sW.set(w);};pre.appendChild(bt);});
+draw1();
+
+/* ===== Figure 2 : losses vs marge ===== */
+const sig=z=>1/(1+Math.exp(-z));
+const L01=m=>m<0?1:0, Llog=m=>Math.log(1+Math.exp(-m)), Lh=m=>Math.max(0,1-m);
+const dL01=m=>0, dLlog=m=>-sig(-m), dLh=m=>m<1?-1:0;
+const P2=SL.plot(document.getElementById('f2plot'),{x:[-3,3],y:[0,3.2],w:600,h:300,xt:[-3,-2,-1,0,1,2,3],yt:[1,2,3],xl:'marge m = y·z',yl:'loss'});
+P2.fn(L01,'sl-c3',400);P2.fn(Llog,'sl-c1');P2.fn(Lh,'sl-c5');
+P2.label(-2.5,1.12,'0/1','sl-c3');P2.label(-2.2,2.15,'log-loss','sl-c1');P2.label(-1.4,2.55,'hinge','sl-c5');
+const out2=document.getElementById('f2out');
+function draw2(m){P2.clear();P2.vline(m,'');out2.innerHTML='';
+  [[L01,dL01,'sl-c3','0/1'],[Llog,dLlog,'sl-c1','log-loss'],[Lh,dLh,'sl-c5','hinge']].forEach(([f,df,cls,n])=>{const y=f(m),s=df(m);const dx=.5;P2.seg(m-dx,y-s*dx,m+dx,y+s*dx,'slope '+cls);P2.dot(m,y,cls,5);
+    const d=document.createElement('div');d.className=Math.abs(s)<1e-9?'zero':'pos';d.innerHTML=`${n} : loss ${SL.fmt(y,2)}<b>pente ${SL.fmt(s,2)}</b>`;out2.appendChild(d);});}
+SL.slider(document.getElementById('f2sliders'),{label:'marge m',min:-3,max:3,step:.05,value:-2},draw2);
+
+/* ===== Figure 3 : pénalités ===== */
+const P3=SL.plot(document.getElementById('f3plot'),{x:[-.6,1.6],y:[0,1.6],w:600,h:280,xt:[-.5,0,.5,1,1.5],yt:[.5,1,1.5],xl:'θ',yl:''});
+const out3=document.getElementById('f3out');let path3=[];
+function draw3(lam){path3.forEach(p=>p.remove());path3=[];P3.clear();
+  const f2=t=>.5*(t-1)**2+lam*t*t, f1=t=>.5*(t-1)**2+lam*Math.abs(t);
+  path3.push(P3.fn(f2,'sl-c1'));path3.push(P3.fn(f1,'sl-c2'));
+  const t2=1/(1+2*lam), t1=Math.max(0,1-lam);
+  P3.vline(t2,'');P3.dot(t2,f2(t2),'sl-c1',6);P3.vline(t1,'');P3.dot(t1,f1(t1),'sl-c2',6);
+  P3.text(1.55,f2(1.55)+.05,'L2','sl-c1','end');P3.text(1.55,f1(1.55)-.12,'L1','sl-c2','end');
+  out3.innerHTML=`<div class="pos">minimum L2<b>θ̂ = ${SL.fmt(t2,3)}</b></div><div class="${t1===0?'zero':'pos'}">minimum L1<b>θ̂ = ${SL.fmt(t1,3)}</b></div>`;}
+SL.slider(document.getElementById('f3sliders'),{label:'λ',min:0,max:1.5,step:.05,value:.5},draw3);
+
+/* ===== Figure 4 : SVM, marge et supports ===== */
+const svg4=document.getElementById('f4svg');const W4=460,H4=300;
+const pts=[{x:1.2,y:2.6,y0:1},{x:1.8,y:1.6,y0:1},{x:2.7,y:2.2,y0:1},{x:1.3,y:1.1,y0:1},{x:3.4,y:3.1,y0:1},{x:3.0,y:1.2,y0:-1},{x:3.9,y:1.8,y0:-1},{x:4.6,y:1.1,y0:-1},{x:4.2,y:.5,y0:-1},{x:5.1,y:2.2,y0:-1}];
+const S4x=x=>40+x*72,S4y=y=>H4-30-y*72;
+function svmFit(P){ // SVM à marge dure, exacte : la frontière optimale est portée par 2 ou 3 points, on énumère les candidats
+  const pos=P.filter(p=>p.y0>0),neg=P.filter(p=>p.y0<0);let best=null;
+  const feas=(w,b)=>P.every(p=>p.y0*(w[0]*p.x+w[1]*p.y+b)>=1-1e-7);
+  const consider=(w,b)=>{if(!feas(w,b))return;const n=Math.hypot(w[0],w[1]);if(!best||n<best.n)best={w,b,n};};
+  pos.forEach(a=>neg.forEach(bp=>{const d=[a.x-bp.x,a.y-bp.y],k=2/(d[0]*d[0]+d[1]*d[1]);const w=[d[0]*k,d[1]*k];const c=[(a.x+bp.x)/2,(a.y+bp.y)/2];consider(w,-(w[0]*c[0]+w[1]*c[1]));}));
+  const triples=(same,other,s)=>{for(let i=0;i<same.length;i++)for(let j=i+1;j<same.length;j++)other.forEach(bp=>{const a1=same[i],a2=same[j];const d=[a2.x-a1.x,a2.y-a1.y];const L=Math.hypot(d[0],d[1]);if(L<1e-9)return;const nh=[-d[1]/L,d[0]/L];const u=nh[0]*(bp.x-a1.x)+nh[1]*(bp.y-a1.y);if(Math.abs(u)<1e-9)return;const k=-2*s/u;const w=[k*nh[0],k*nh[1]];const b=-k*(nh[0]*a1.x+nh[1]*a1.y+u/2);consider(w,b);});};
+  triples(pos,neg,1);triples(neg,pos,-1);
+  return best||{w:[1,0],b:0};}
+let active=pts.map(()=>true);
+function draw4(){while(svg4.firstChild)svg4.removeChild(svg4.firstChild);const P=pts.filter((p,i)=>active[i]);const {w,b}=svmFit(P);
+  const line=(c,cls)=>{ // w·x + b = c
+    const xs=[0,6];const ys=xs.map(x=>(c-b-w[0]*x)/w[1]);SL.el('line',{x1:S4x(xs[0]),y1:S4y(ys[0]),x2:S4x(xs[1]),y2:S4y(ys[1]),class:cls},svg4);};
+  line(0,'sl-axis');line(1,'sl-seg chord');line(-1,'sl-seg chord');
+  pts.forEach((p,i)=>{if(!active[i])return;const m=p.y0*(w[0]*p.x+w[1]*p.y+b);const c=SL.el('circle',{cx:S4x(p.x),cy:S4y(p.y),r:6,class:'sl-dot '+(p.y0>0?'sl-c1':'sl-c3')},svg4);if(m<=1+1e-4){SL.el('circle',{cx:S4x(p.x),cy:S4y(p.y),r:11,class:'sl-seg gain',fill:'none'},svg4);}});
+  SL.el('text',{x:W4-10,y:H4-8,class:'sl-lbl','text-anchor':'end'},svg4).textContent='marge = 2/‖w‖ = '+SL.fmt(2/Math.hypot(w[0],w[1]),2);}
+const ctl4=document.getElementById('f4ctl');const b4=document.createElement('button');b4.className='tb';b4.textContent='retirer un point hors support';const b5=document.createElement('button');b5.className='tb';b5.textContent='retirer un vecteur de support';const b6=document.createElement('button');b6.className='tb';b6.textContent='remettre tout';
+function removeWhere(cond){const P=pts.filter((p,i)=>active[i]);const {w,b}=svmFit(P);for(let i=0;i<pts.length;i++){if(!active[i])continue;const p=pts[i];const m=p.y0*(w[0]*p.x+w[1]*p.y+b);if(cond(m)){active[i]=false;break;}}draw4();}
+b4.onclick=()=>removeWhere(m=>m>1+1e-4);b5.onclick=()=>removeWhere(m=>m<=1+1e-4);b6.onclick=()=>{active=pts.map(()=>true);draw4();};
+ctl4.append(b4,b5,b6);draw4();
+})();
+</script>
+</body>
+</html>
