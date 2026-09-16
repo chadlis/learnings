@@ -1,0 +1,628 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Une matrice est une action — chaîne</title>
+<meta name="sheet" content="series=chain;part=04;number=01;status=v1">
+<meta name="part" content="04 · Matrice = action">
+<meta name="subtitle" content="lire Ax comme un geste sur le plan, pas comme un tableau de nombres">
+<meta name="prereq" content="aucun">
+<meta name="anki" content="algebre::matrice-action,algebre::noyau,algebre::affine,algebre::temoin">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ---- marques propres à cette chaîne (matrices, plan 2D) ---- */
+.mat{display:inline-grid;grid-template-columns:auto auto;gap:1px 14px;font-family:var(--math);border-left:1.6px solid currentColor;border-right:1.6px solid currentColor;padding:3px 7px;margin:0 2px;vertical-align:middle;text-align:right;line-height:1.3}
+.mat.col{grid-template-columns:auto}
+.mat b{font-weight:400;font-style:normal}
+.note{font-size:14px;color:var(--cardmuted);border-top:1px solid var(--cardline);margin-top:10px;padding-top:8px}
+.note b{color:var(--cardink)}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tw table{min-width:320px}
+.sl-plane{display:block;width:100%;max-width:470px;height:auto;margin:0 auto}
+.sl-plane .sl-gridl{stroke:rgba(34,48,43,.1);fill:none}
+#f2plot .sl-world{display:none}
+.sl-plane .sl-unit{fill:none;stroke:rgba(34,48,43,.5);stroke-width:1.3;stroke-dasharray:4 3}
+.sl-plane .tgrid{stroke:rgba(34,48,43,.38);stroke-width:1;fill:none}
+.sl-plane .img{fill:rgba(107,70,193,.2);stroke:#6B46C1;stroke-width:1.8;stroke-linejoin:round}
+.sl-plane .sl-seg.vec{stroke-width:2.6}
+.sl-plane .sl-dot.ring{fill:none!important;stroke:var(--red);stroke-width:2.4}
+.sl-plane .sl-seg.sl-c1{stroke:var(--pen)}
+.sl-plane .sl-seg.sl-c2{stroke:#6B46C1}
+.sl-plane .sl-seg.sl-c3{stroke:var(--red)}
+.sl-plane .sl-seg.sl-c5{stroke:#B7791F}
+.sl-plane .sl-fix{stroke-width:1.6;fill:none;stroke-dasharray:7 5}
+.sl-plane .ax{stroke:rgba(34,48,43,.5);stroke-width:1.2;stroke-dasharray:none}
+.sl-plane text{font-family:var(--sans);font-size:12.5px}
+.sl-plane text.plain{fill:var(--cardmuted)}
+.sl-plane text.strong{font-weight:600}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 04 · Matrice = action › chaîne 01</div>
+  <h1>Une <span>matrice</span> est une <span>action</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Que fait une matrice quand on la multiplie par un vecteur ? Une seule lecture tient toute la chaîne : <b>Ax est une combinaison des colonnes de A</b>, donc les colonnes sont les images de la base, donc tout le reste suit. Deux machines servent de fil rouge : <span class="m">A</span> = <span class="mat"><b>2</b><b>1</b><b>0</b><b>3</b></span>, qui déforme le plan sans rien perdre, et <span class="m">B</span> = <span class="mat"><b>1</b><b>2</b><b>2</b><b>4</b></span>, dont les deux colonnes sont colinéaires — <span class="m">B</span> écrase le plan sur une droite, et ce qui est écrasé ne revient pas.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li>Aucune fiche — <a href="../../map.html">la carte</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>algebre::matrice-action</code><code>algebre::noyau</code><code>algebre::affine</code><code>algebre::temoin</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../../map.html#b02">b02 · Le témoin atteignable</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>Vecteur.</b> Une flèche partant de l'origine, ou la liste de ses coordonnées : <span class="m">v</span> = (<span class="m">v</span><sub>1</sub>, <span class="m">v</span><sub>2</sub>). Les deux lectures servent, la flèche pour voir, la liste pour calculer.</li>
+      <li><b>Somme et multiple.</b> <span class="m">u</span> + <span class="m">v</span> coordonnée par coordonnée, <span class="m">λv</span> allonge la flèche sans la tourner (elle se retourne si <span class="m">λ</span> &lt; 0).</li>
+      <li><b>Produit scalaire et norme.</b> ⟨<span class="m">u</span>, <span class="m">v</span>⟩ = Σ <span class="m">u</span><sub><span class="m">i</span></sub><span class="m">v</span><sub><span class="m">i</span></sub> et ‖<span class="m">v</span>‖ = √⟨<span class="m">v</span>, <span class="m">v</span>⟩. Ils n'interviennent qu'au pas 8, pour parler de distance à une image.</li>
+      <li><b>Aucune fiche préalable.</b> Cette chaîne ouvre la partie 4 ; elle est le prérequis des suivantes, pas leur conséquence (<a href="../../map.html#p04-02">la carte</a>).</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>On lit une matrice <b>par colonnes</b> : <span class="m">Ax</span> = Σ <span class="m">x</span><sub><span class="m">j</span></sub> · (colonne <span class="m">j</span>). C'est le seul réflexe de la chaîne ; la lecture par lignes est reléguée au pas 9.</span>
+      <b>H2</b><span>Dimension <b>2</b>, pour voir. Rien de ce qui suit ne dépend de la dimension : les mêmes phrases valent pour une matrice 768 × 768.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor : quatre nombres, ou une machine</h3>
+    <p>Une matrice 2 × 2, c'est quatre nombres dans un cadre. C'est aussi une <b>machine</b> : elle prend un vecteur et en rend un autre. Tant qu'on lit le tableau, il n'y a rien à comprendre ; dès qu'on regarde ce qu'il fait au plan, tout se déduit.</p>
+    <p>Deux machines tiennent toute la chaîne — l'une déforme, l'autre écrase.</p>
+    <p class="say">« Quatre nombres ne disent rien, donc on regarde ce qu'ils font à un vecteur, donc une matrice se lit comme un geste sur le plan. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les deux machines du fil rouge</div>
+    <div class="tw"><table>
+      <tr><th>matrice</th><th>colonne 1</th><th>colonne 2</th><th>ce qu'elle fait</th></tr>
+      <tr><td><span class="m">A</span> = <span class="mat"><b>2</b><b>1</b><b>0</b><b>3</b></span></td><td>(2 ; 0)</td><td>(1 ; 3)</td><td>étire et cisaille</td></tr>
+      <tr class="hl"><td><span class="m">B</span> = <span class="mat"><b>1</b><b>2</b><b>2</b><b>4</b></span></td><td>(1 ; 2)</td><td>(2 ; 4)</td><td><b>écrase</b> sur une droite</td></tr>
+    </table></div>
+    <p>Les colonnes de <span class="m">B</span> sont colinéaires : (2 ; 4) = 2 · (1 ; 2). Ce seul fait produit tout ce que <span class="m">B</span> fait de particulier — pas 4, 5 et 6.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3><span class="m">Ax</span> = combinaison des colonnes <span class="tag tronc">tronc</span></h3>
+    <p>Écrire <span class="m">Ax</span>, c'est <b>pondérer les colonnes</b> de <span class="m">A</span> par les coordonnées de <span class="m">x</span>. Rien d'autre.</p>
+    <div class="eq"><span class="m">A x</span> = <span class="m">x</span><sub>1</sub> · col<sub>1</sub> + <span class="m">x</span><sub>2</sub> · col<sub>2</sub></div>
+    <p>En particulier <span class="m">e</span><sub>1</sub> = (1 ; 0) sélectionne col<sub>1</sub>, et <span class="m">e</span><sub>2</sub> = (0 ; 1) sélectionne col<sub>2</sub> : <b>les colonnes sont les images de la base</b>. Comme tout vecteur s'écrit <span class="m">x</span><sub>1</sub><span class="m">e</span><sub>1</sub> + <span class="m">x</span><sub>2</sub><span class="m">e</span><sub>2</sub>, connaître les deux colonnes, c'est connaître l'action sur le plan entier.</p>
+    <p class="say">« Le produit matrice-vecteur pondère les colonnes par les coordonnées, donc l'image de la base est la liste des colonnes, donc connaître les colonnes c'est connaître l'action entière. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — quatre vecteurs passés dans <span class="m">A</span></div>
+    <div class="tw"><table>
+      <tr><th><span class="m">x</span></th><th>combinaison</th><th><span class="m">A x</span></th></tr>
+      <tr><td>(1 ; 0)</td><td>1 · col<sub>1</sub></td><td>(2 ; 0)</td></tr>
+      <tr><td>(0 ; 1)</td><td>1 · col<sub>2</sub></td><td>(1 ; 3)</td></tr>
+      <tr class="hl"><td>(1 ; 1)</td><td>col<sub>1</sub> + col<sub>2</sub></td><td>(3 ; 3)</td></tr>
+      <tr><td>(1 ; −1)</td><td>col<sub>1</sub> − col<sub>2</sub></td><td>(1 ; −3)</td></tr>
+    </table></div>
+    <p>Aucune des trois dernières lignes n'a demandé de calcul nouveau : (3 ; 3) est (2 ; 0) + (1 ; 3), et (1 ; −3) est (2 ; 0) − (1 ; 3). Deux colonnes retenues, toutes les sorties disponibles.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Linéarité : la grille reste une grille</h3>
+    <p><span class="m">A</span>(<span class="m">u</span> + <span class="m">v</span>) = <span class="m">Au</span> + <span class="m">Av</span> et <span class="m">A</span>(<span class="m">λu</span>) = <span class="m">λAu</span>. Visuellement : les droites restent des droites, les parallèles restent parallèles, l'espacement reste régulier, et <b>l'origine ne bouge pas</b>.</p>
+    <p>Le carré unité devient donc le parallélogramme porté par les deux colonnes, et son aire porte un nom :</p>
+    <div class="eq">det <span class="mat"><b><span class="m">a</span></b><b><span class="m">b</span></b><b><span class="m">c</span></b><b><span class="m">d</span></b></span> = <span class="m">ad</span> − <span class="m">bc</span> &nbsp;;&nbsp; aire = |det|</div>
+    <p>det = 0 signifie donc exactement : l'aire s'écrase, les deux colonnes sont alignées.</p>
+    <p class="say">« L'image d'une somme est la somme des images, donc la grille reste une grille et l'origine reste fixe, donc le carré unité devient le parallélogramme des colonnes, donc son aire vaut la valeur absolue du déterminant. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le carré unité sous <span class="m">A</span>, puis sous <span class="m">B</span></div>
+    <p><b>Sous <span class="m">A</span></b> : les quatre sommets (0 ; 0), (1 ; 0), (1 ; 1), (0 ; 1) deviennent (0 ; 0), (2 ; 0), (3 ; 3), (1 ; 3). det <span class="m">A</span> = 2 · 3 − 1 · 0 = <b>6</b>, et l'aire du parallélogramme vaut 6 : le plan est dilaté six fois, rien n'est perdu.</p>
+    <p><b>Sous <span class="m">B</span></b> : les mêmes sommets deviennent (0 ; 0), (1 ; 2), (3 ; 6), (2 ; 4) — <b>tous alignés</b> sur la droite dirigée par (1 ; 2). det <span class="m">B</span> = 1 · 4 − 2 · 2 = <b>0</b>, aire nulle : le carré est devenu un segment.</p>
+    <div class="note"><b>Le signe du déterminant.</b> Négatif, il dit que l'orientation est retournée (le plan a été replié comme un miroir) ; l'aire, elle, est la valeur absolue. On n'en fera rien de plus ici.</div>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — la grille bouge, l'origine reste</div>
+    <div class="sl-ctl" id="f1presets"></div>
+    <div id="f1plot" class="wide"></div>
+    <div id="f1sliders"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Les quatre curseurs sont les quatre coefficients ; la grille fine et régulière, comme le carré <b>pointillé</b>, est celle de départ : elle ne bouge jamais, seule la grille grasse est transformée. Les deux points colorés sont les <b>colonnes</b>, c'est-à-dire les images de <span class="m">e</span><sub>1</sub> et <span class="m">e</span><sub>2</sub> — et le troisième, l'image de (1 ; 1), reste toujours leur somme. Presse <b>B</b> : les deux colonnes s'alignent, le parallélogramme s'aplatit sur un segment, det et aire tombent à 0. Presse <b>rotation</b> ou <b>cisaillement</b> : det = 1, la forme change, l'aire ne change pas.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Image et rang : où atterrit le plan</h3>
+    <p>L'<b>image</b> de <span class="m">A</span> est l'ensemble de toutes les sorties possibles. Comme chaque sortie est une combinaison des colonnes, l'image est exactement l'espace <b>engendré par les colonnes</b>.</p>
+    <div class="eq">Im <span class="m">A</span> = {<span class="m">Ax</span>} = vect(col<sub>1</sub>, col<sub>2</sub>) &nbsp;;&nbsp; rang = dim Im</div>
+    <p>Le rang est le nombre de colonnes réellement indépendantes — pas le nombre de colonnes écrites.</p>
+    <p class="say">« Toute sortie est une combinaison des colonnes, donc l'image est l'espace qu'elles engendrent, donc le rang est le nombre de colonnes indépendantes, donc deux colonnes alignées ne donnent qu'une droite. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — <span class="m">A</span> couvre le plan, <span class="m">B</span> une droite</div>
+    <p><b><span class="m">A</span></b> : (2 ; 0) et (1 ; 3) ne sont pas colinéaires (det = 6 ≠ 0), donc rang <b>2</b> : l'image est le plan entier, toute cible est atteignable.</p>
+    <p><b><span class="m">B</span></b> : col<sub>2</sub> = 2 · col<sub>1</sub>, donc rang <b>1</b> : l'image est la droite {<span class="m">t</span> · (1 ; 2)}. Deux colonnes écrites, une seule direction disponible.</p>
+    <p>Test d'appartenance à cette droite : (<span class="m">y</span><sub>1</sub> ; <span class="m">y</span><sub>2</sub>) y est si et seulement si 2<span class="m">y</span><sub>1</sub> − <span class="m">y</span><sub>2</sub> = 0.</p>
+    <div class="tw"><table>
+      <tr><th>cible</th><th>2<span class="m">y</span><sub>1</sub> − <span class="m">y</span><sub>2</sub></th><th>dans Im <span class="m">B</span> ?</th></tr>
+      <tr><td>(1 ; 2)</td><td>0</td><td>oui</td></tr>
+      <tr class="hl"><td>(1 ; 1)</td><td>1</td><td><b>non</b></td></tr>
+      <tr><td>(3 ; 6)</td><td>0</td><td>oui</td></tr>
+    </table></div>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Le noyau : ce qui est envoyé sur zéro <span class="tag tronc">tronc</span></h3>
+    <p>Ker <span class="m">A</span> = {<span class="m">x</span> : <span class="m">Ax</span> = 0}. Il contient toujours 0. La question est de savoir s'il contient <b>autre chose</b>.</p>
+    <p>Si <span class="m">k</span> ≠ 0 est dans le noyau, alors <span class="m">A</span>(<span class="m">x</span> + <span class="m">k</span>) = <span class="m">Ax</span> + <span class="m">Ak</span> = <span class="m">Ax</span> : deux entrées distinctes, une seule sortie. L'information est perdue, et aucune matrice ne peut la rendre — <span class="m">A</span> n'est pas inversible.</p>
+    <div class="eq">rang <span class="m">A</span> + dim Ker <span class="m">A</span> = <span class="m">n</span> &nbsp;&nbsp;(théorème du rang)</div>
+    <p class="say">« Un vecteur du noyau est écrasé sur zéro, donc l'ajouter à une entrée ne change pas la sortie, donc deux entrées se confondent, donc on ne peut pas revenir en arrière. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le noyau de <span class="m">B</span> est une droite</div>
+    <p><span class="m">B</span>(2 ; −1) = (1 · 2 + 2 · (−1) ; 2 · 2 + 4 · (−1)) = <b>(0 ; 0)</b>. Le vecteur (2 ; −1) est donc dans Ker <span class="m">B</span>, et avec lui toute la droite {<span class="m">t</span> · (2 ; −1)}.</p>
+    <p>Conséquence immédiate, sans nouveau calcul : trois entrées, une sortie.</p>
+    <div class="tw"><table>
+      <tr><th><span class="m">x</span></th><th>écriture</th><th><span class="m">B x</span></th></tr>
+      <tr class="hl"><td>(1 ; 0)</td><td><span class="m">x</span><sub>0</sub></td><td>(1 ; 2)</td></tr>
+      <tr><td>(3 ; −1)</td><td><span class="m">x</span><sub>0</sub> + (2 ; −1)</td><td>(1 ; 2)</td></tr>
+      <tr><td>(−1 ; 1)</td><td><span class="m">x</span><sub>0</sub> − (2 ; −1)</td><td>(1 ; 2)</td></tr>
+    </table></div>
+    <p>Compte : rang 1 + dim Ker 1 = 2. Pour <span class="m">A</span>, det = 6 ≠ 0 donne Ker <span class="m">A</span> = {0}, donc rang 2 + 0 = 2 — et l'inverse existe.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — tout un segment d'entrées, une seule sortie</div>
+    <div class="sl-ctl" id="f2ctl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div id="f2sliders"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">La grille affichée est celle d'<b>arrivée</b> : <span class="m">B</span> l'a écrasée sur la droite bleue, son <b>image</b> — le bouton la déplie pour comparer. Le curseur <b>t</b> fait glisser l'entrée <b>x</b> (cercle creux, rouge) le long de la droite rouge, la direction du <b>noyau</b> : <span class="m">Bx</span> (point plein, bleu) ne bouge pas d'un pixel — c'est cela, perdre de l'information. Le curseur <b>s</b> sort x de cette droite : alors la sortie bouge, d'un facteur affiché à droite. À <b>s</b> = −1, x tombe sur le noyau lui-même et la sortie est (0 ; 0).</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Résoudre <span class="m">Ax</span> = <span class="m">b</span> : zéro, une, ou une infinité</h3>
+    <p>Deux questions, dans cet ordre. La cible est-elle dans l'image ? Le noyau est-il trivial ?</p>
+    <div class="eq">{<span class="m">x</span> : <span class="m">Ax</span> = <span class="m">b</span>} = <span class="m">x</span><sub>0</sub> + Ker <span class="m">A</span></div>
+    <p>Si <span class="m">b</span> ∉ Im : aucune solution — et c'est là que les moindres carrés remplacent <span class="m">b</span> par sa <b>projection</b> sur l'image. Si <span class="m">b</span> ∈ Im et Ker = {0} : une seule. Si <span class="m">b</span> ∈ Im et Ker ≠ {0} : une solution particulière <b>plus tout le noyau</b> — la droite de solutions équivalentes que la <a href="chain-p02-02-prior-penalite.html">pénalité vient trancher</a>.</p>
+    <p class="say">« Les solutions forment une solution particulière plus le noyau, donc leur nombre est 0, 1 ou une infinité selon que b est atteignable et que le noyau est trivial. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — trois systèmes, trois verdicts</div>
+    <div class="tw"><table>
+      <tr><th>système</th><th>image ?</th><th>noyau</th><th>solutions</th></tr>
+      <tr><td><span class="m">A x</span> = (1 ; 1)</td><td>oui (Im = plan)</td><td>{0}</td><td><b>1</b> : (1/3 ; 1/3)</td></tr>
+      <tr class="hl"><td><span class="m">B x</span> = (1 ; 1)</td><td><b>non</b></td><td>droite</td><td><b>0</b></td></tr>
+      <tr><td><span class="m">B x</span> = (1 ; 2)</td><td>oui</td><td>droite</td><td><b>∞</b> : (1 ; 0) + <span class="m">t</span>(2 ; −1)</td></tr>
+    </table></div>
+    <p>Vérification de la première : 3<span class="m">x</span><sub>2</sub> = 1 donne <span class="m">x</span><sub>2</sub> = 1/3, puis 2<span class="m">x</span><sub>1</sub> + 1/3 = 1 donne <span class="m">x</span><sub>1</sub> = 1/3. Vérification de la troisième : <span class="m">B</span>(1 ; 0) = (1 ; 2), et ajouter <span class="m">t</span>(2 ; −1) ne change rien puisque c'est le noyau.</p>
+    <p>Les deux dernières lignes se ressemblent et n'ont rien à voir : la deuxième échoue à cause de l'<b>image</b>, la troisième hésite à cause du <b>noyau</b>. C'est la droite de solutions du <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">déroulé D4</a> sous colinéarité.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Affine ≠ linéaire : le biais décale</h3>
+    <p><span class="m">f</span>(<span class="m">x</span>) = <span class="m">Wx</span> + <span class="m">b</span> n'est pas linéaire dès que <span class="m">b</span> ≠ 0, et le test tient en une ligne : <span class="m">f</span>(0) = <span class="m">b</span> ≠ 0. Une application linéaire fixe l'origine, une affine la déplace.</p>
+    <div class="eq"><span class="m">f</span>(<span class="m">u</span> + <span class="m">v</span>) − <span class="m">f</span>(<span class="m">u</span>) − <span class="m">f</span>(<span class="m">v</span>) = −<span class="m">b</span> &nbsp;;&nbsp; <span class="m">f</span>(2<span class="m">x</span>) − 2<span class="m">f</span>(<span class="m">x</span>) = −<span class="m">b</span></div>
+    <p>C'est une action linéaire <b>suivie d'un décalage</b>. Dans un neurone, <span class="m">W</span> tourne et étire la frontière, <span class="m">b</span> la translate ; sans biais, toute frontière est forcée de passer par l'origine.</p>
+    <p class="say">« Le biais déplace l'image de zéro, donc f(0) vaut b et non 0, donc f est affine et non linéaire, donc une couche sans biais force toutes ses frontières à passer par l'origine. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — <span class="m">W</span> = <span class="m">A</span>, <span class="m">b</span> = (1 ; 1), <span class="m">x</span> = (1 ; 1)</div>
+    <div class="tw"><table>
+      <tr><th>quantité</th><th>valeur</th></tr>
+      <tr class="hl"><td><span class="m">f</span>(0)</td><td>(1 ; 1) — l'origine a bougé</td></tr>
+      <tr><td><span class="m">f</span>(<span class="m">x</span>)</td><td>(3 ; 3) + (1 ; 1) = (4 ; 4)</td></tr>
+      <tr><td>2 <span class="m">f</span>(<span class="m">x</span>)</td><td>(8 ; 8)</td></tr>
+      <tr><td><span class="m">f</span>(2<span class="m">x</span>)</td><td>(6 ; 6) + (1 ; 1) = (7 ; 7)</td></tr>
+      <tr><td>écart</td><td>(7 ; 7) − (8 ; 8) = <b>(−1 ; −1)</b> = −<span class="m">b</span></td></tr>
+    </table></div>
+    <p>L'écart ne dépend pas de <span class="m">x</span> : il vaut −<span class="m">b</span>, toujours. De même <span class="m">f</span>(<span class="m">e</span><sub>1</sub> + <span class="m">e</span><sub>2</sub>) = (4 ; 4) tandis que <span class="m">f</span>(<span class="m">e</span><sub>1</sub>) + <span class="m">f</span>(<span class="m">e</span><sub>2</sub>) = (5 ; 5) — le biais a été compté deux fois.</p>
+    <div class="note"><b>Le tour du vecteur augmenté.</b> On retrouve une vraie linéarité en ajoutant une coordonnée constante à 1 : <span class="m">b</span> devient une colonne de plus. Le décalage n'a pas disparu, il a changé de place.</div>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — l'origine n'est plus fixe</div>
+    <div class="sl-ctl" id="f3ctl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div id="f3sliders"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Même grille qu'à la figure 1, plus un décalage. Les deux curseurs sont les coordonnées de <b>b</b> : la grille entière glisse, et l'<b>origine</b> (cercle creux) s'éloigne de son image <b>f(0) = b</b> (point rouge). Les readouts comparent <span class="m">f</span>(2<span class="m">x</span>) et 2<span class="m">f</span>(<span class="m">x</span>) : leur écart vaut −<b>b</b>, quel que soit <span class="m">W</span>. Remets les deux curseurs à 0 : l'écart s'annule et la linéarité revient — c'est le seul cas où elle tient.</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Le témoin atteignable</h3>
+    <p>Pour montrer qu'un minimum <b>ne peut pas monter</b> quand on élargit l'espace des candidats, il suffit d'exhiber un point du nouvel espace qui reproduit l'ancien optimum. Le nouveau minimum est alors au plus l'ancien.</p>
+    <div class="eq">min<sub>nouveau</sub> ≤ valeur au témoin = min<sub>ancien</sub></div>
+    <p>Ajouter une variable, c'est ajouter une <b>colonne</b> à <span class="m">X</span> : l'image grandit et contient l'ancienne, donc la projection de <span class="m">y</span> ne peut que s'en rapprocher. Le témoin est la version algébrique de ce dessin.</p>
+    <p class="say">« L'ancien optimum est atteignable dans le nouvel espace, donc le nouveau minimum est au plus l'ancien, donc élargir ne peut que faire baisser le RSS. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — <span class="m">R</span><sup>2</sup> ne baisse jamais, sur cinq points</div>
+    <p><span class="m">x</span> = (1, 2, 3, 4, 5), <span class="m">y</span> = (2, 3, 5, 4, 6), et une variable ajoutée <span class="m">z</span> = (1, 0, 1, 0, 1) choisie sans rapport avec <span class="m">y</span>.</p>
+    <div class="tw"><table>
+      <tr><th>modèle</th><th>ajustement</th><th>RSS</th><th><span class="m">R</span><sup>2</sup></th></tr>
+      <tr><td>1 + <span class="m">x</span></td><td>1,3 + 0,9 <span class="m">x</span></td><td>19/10 = 1,9</td><td>0,81</td></tr>
+      <tr class="hl"><td>1 + <span class="m">x</span> + <span class="m">z</span></td><td>0,8 + 0,9 <span class="m">x</span> + (5/6) <span class="m">z</span></td><td>16/15 ≈ 1,067</td><td>67/75 ≈ 0,893</td></tr>
+      <tr><td><b>témoin</b> : <span class="m">β</span><sub><span class="m">z</span></sub> = 0</td><td>1,3 + 0,9 <span class="m">x</span></td><td><b>19/10</b> = 1,9</td><td>0,81</td></tr>
+    </table></div>
+    <p>TSS = 10 dans les deux cas. La troisième ligne est le témoin : elle vit dans le grand espace et y vaut exactement l'ancien RSS, donc le minimum du grand espace lui est inférieur ou égal. Le calcul confirme (1,067 &lt; 1,9), mais il n'était pas nécessaire : <b>l'argument précède le chiffre</b>.</p>
+    <p>Même geste pour le biais du max, pour un tuning évalué sur son propre test, pour l'OOB face au test — c'est le pont <a href="../../map.html#b02">b02</a>.</p>
+  </div>
+</div>
+
+<div class="step" id="s9">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>La lecture par colonnes est une intuition, pas un théorème de calcul numérique. Trois endroits où elle se retourne contre soi, et un où l'implémentation triche.</p>
+    <p class="say">« Le déterminant est un test exact sur le papier et fragile en machine, donc un zéro numérique ne se lit pas sur det, donc le vrai diagnostic est le conditionnement. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>Lire par lignes.</b> <span class="m">Ax</span> ligne par ligne, c'est deux produits scalaires : correct pour <i>calculer</i>, muet pour <i>voir</i>. Aucune ligne ne dit où part la base. Pour l'intuition, toujours les colonnes ; pour le calcul à la main, les lignes.</li>
+      <li><b>det = 0 en flottant.</b> En machine, un déterminant vaut 10<sup>−15</sup> et non 0 — et un det minuscule peut venir d'une simple mise à l'échelle. Le bon diagnostic n'est pas det mais le <b>conditionnement</b> (<a href="../../map.html#p04-03">p04-03</a>) : de combien une petite erreur sur <span class="m">b</span> se propage sur <span class="m">x</span>.</li>
+      <li><b>Confondre « pas de solution » et « solution non unique ».</b> La première vient de l'<b>image</b> (la cible n'est pas atteignable), la seconde du <b>noyau</b> (plusieurs entrées, même sortie). Les deux arrivent en même temps sur une matrice de rang 1 et n'ont pas le même remède : projeter d'un côté, choisir de l'autre.</li>
+      <li><b>Un réseau sans biais.</b> Toutes les frontières passent alors par l'origine : le modèle ne peut pas décaler son seuil. Standardiser les entrées recentre les données autour de 0 et <i>masque</i> le symptôme sans rendre au modèle le degré de liberté qui lui manque.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li><span class="m">Ax</span> = <b>combinaison des colonnes</b> ; les colonnes sont les images de la base, donc elles suffisent à décrire l'action.</li>
+    <li>Linéaire ⇒ la grille reste une grille, l'origine reste fixe ; |det| = aire du parallélogramme ; det = 0 écrase.</li>
+    <li><b>Image</b> = espace engendré par les colonnes ; <b>rang</b> = sa dimension, c'est-à-dire le nombre de colonnes indépendantes.</li>
+    <li><b>Noyau</b> = les entrées envoyées sur 0. Non trivial ⇒ deux entrées se confondent ⇒ information perdue ⇒ non inversible. rang + dim Ker = <span class="m">n</span>.</li>
+    <li><span class="m">Ax</span> = <span class="m">b</span> : 0 solution (image), 1 (noyau trivial), ou une infinité = <span class="m">x</span><sub>0</sub> + Ker. Dans le dernier cas, c'est la pénalité qui choisit.</li>
+    <li><span class="m">Wx</span> + <span class="m">b</span> est <b>affine</b> : <span class="m">f</span>(0) = <span class="m">b</span>, l'écart de linéarité vaut −<span class="m">b</span>. Sans biais, toute frontière passe par l'origine.</li>
+    <li><b>Témoin atteignable</b> : élargir l'espace ne fait jamais monter un minimum — l'ancien optimum y est encore disponible.</li>
+  </ol>
+</div>
+<div class="phrase">« Je lis une matrice par ses colonnes : ce sont les images de la base, et tout le reste suit par linéarité. Si les colonnes sont liées, le noyau n'est pas trivial, deux entrées se confondent et la matrice n'est pas inversible ; résoudre <span class="m">Ax</span> = <span class="m">b</span> donne alors soit rien, soit une solution plus tout le noyau — et c'est là qu'une pénalité choisit. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Que fait <span class="m">A</span> à (1 ; 0) et (0 ; 1) ?</div><div class="a hid">Elle les envoie sur ses deux colonnes — et tout le reste suit par linéarité.</div></li>
+    <li><div class="q">Que signifie det <span class="m">A</span> = 0, géométriquement et algébriquement ?</div><div class="a hid">Le carré unité s'écrase (aire nulle) ; les colonnes sont liées ; le noyau n'est pas trivial.</div></li>
+    <li><div class="q">Pourquoi une matrice à noyau non trivial n'est-elle pas inversible ?</div><div class="a hid"><span class="m">x</span> et <span class="m">x</span> + <span class="m">k</span> ont la même image : on ne peut pas remonter de la sortie à l'entrée.</div></li>
+    <li><div class="q">Combien de solutions à <span class="m">Ax</span> = <span class="m">b</span> ?</div><div class="a hid">0 si <span class="m">b</span> est hors de l'image ; 1 si le noyau est trivial ; une infinité sinon — <span class="m">x</span><sub>0</sub> + Ker.</div></li>
+    <li><div class="q"><span class="m">Wx</span> + <span class="m">b</span> est-il linéaire ?</div><div class="a hid">Non : <span class="m">f</span>(0) = <span class="m">b</span> ≠ 0. C'est affine — une action linéaire puis un décalage.</div></li>
+    <li><div class="q">Pourquoi <span class="m">R</span><sup>2</sup> ne baisse-t-il jamais quand on ajoute une variable ?</div><div class="a hid">Le témoin <span class="m">β</span> = 0 est atteignable dans le grand espace et redonne l'ancien RSS.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="../../map.html#b02"><b>b02 · Le témoin atteignable</b><small>Le pas 8 en entier : majorer un minimum en exhibant un point du nouvel espace qui reproduit l'ancien. Même argument pour le biais du max, pour un tuning évalué sur son test, pour l'OOB.</small></a>
+    <a href="chain-p02-02-prior-penalite.html"><b>p02-02 · Du prior à la pénalité</b><small>La droite de solutions du pas 6 : quand le noyau n'est pas trivial, c'est la pénalité qui choisit un point dessus — <span class="m">λ</span>I rend le problème inversible.</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>algebre::matrice-action</code> (colonnes, image de la base) · <code>algebre::noyau</code> (noyau, rang, inversibilité) · <code>algebre::affine</code> (biais, <span class="m">f</span>(0) = <span class="m">b</span>) · <code>algebre::temoin</code> (le témoin atteignable).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p04-01 · v1 du 16/09/2026 · Prérequis : aucun. Suite : <a href="../../map.html#p04-02">p04-02 Valeurs propres et itération</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outillage commun aux trois plans ===== */
+/* Le transform SVG du groupe monde n'est pas rendu quand la matrice est singulière :
+   on compose donc SL.plane (grille de départ, carré unité, axes) avec une grille
+   d'arrivée recalculée à la main — det = 0 doit rester visible. */
+const V=(x,y)=>`(${SL.fmt(x,2)} ; ${SL.fmt(y,2)})`;
+const UNIT=[[0,0],[1,0],[1,1],[0,1]];
+function planeFig(id,o){
+  const W=440,H=440,S=33,CX=W/2,CY=H/2;
+  const pl=SL.plane(document.getElementById(id),{w:W,h:H,scale:S,vectors:[],fixed:o.fixed||[]});
+  const ov=SL.el('g',{},pl.svg);
+  const px=x=>CX+S*x, py=y=>CY-S*y;
+  const cx=v=>Math.max(48,Math.min(W-48,v)), cy=v=>Math.max(15,Math.min(H-8,v));
+  const F={svg:pl.svg,px,py,
+    clear(){while(ov.firstChild)ov.removeChild(ov.firstChild);},
+    quad(p,cls){return SL.el('path',{d:p.map((q,i)=>(i?'L':'M')+px(q[0]).toFixed(1)+' '+py(q[1]).toFixed(1)).join(' ')+' Z',class:cls},ov);},
+    dot(x,y,cls,r){return SL.el('circle',{cx:px(x),cy:py(y),r:r||5.5,class:'sl-dot '+(cls||'')},ov);},
+    seg(xa,ya,xb,yb,cls){return SL.el('line',{x1:px(xa),y1:py(ya),x2:px(xb),y2:py(yb),class:'sl-seg '+(cls||'')},ov);},
+    txt(x,y,s,cls,dx,dy,an){
+      let X=px(x)+(dx||0),Y=py(y)+(dy||0),a=an||'start';
+      if(a==='start'&&X>W-86){a='end';}else if(a==='end'&&X<86){a='start';}
+      X=a==='middle'?cx(X):Math.max(8,Math.min(W-8,X));Y=cy(Y);
+      const e=SL.el('text',{x:X,y:Y,class:cls||'','text-anchor':a},ov);e.textContent=s;return e;},
+    grid(M,t){
+      const a=(x,y)=>[M[0]*x+M[1]*y+(t?t[0]:0), M[2]*x+M[3]*y+(t?t[1]:0)];
+      const L=(p,q)=>`M${px(p[0]).toFixed(1)} ${py(p[1]).toFixed(1)}L${px(q[0]).toFixed(1)} ${py(q[1]).toFixed(1)}`;
+      let d='';
+      for(let i=-5;i<=5;i++){d+=L(a(i,-5),a(i,5))+L(a(-5,i),a(5,i));}
+      SL.el('path',{d,class:'tgrid'},ov);
+      F.quad(UNIT.map(u=>a(u[0],u[1])),'img');
+      return a;}};
+  return F;
+}
+function vlabel(F,x,y,s,cls,fx,fy,push,ddy){
+  const n=Math.hypot(x,y),ux=n>1e-6?x/n:fx,uy=n>1e-6?y/n:fy,k=push||0.6;
+  const an=ux>0.35?'start':(ux<-0.35?'end':'middle');
+  F.txt(x+ux*k,y+uy*k,s,cls,an==='start'?3:(an==='end'?-3:0),4+(ddy||0),an);
+}
+function readouts(host,items){host.innerHTML=items.map(i=>`<div class="${i.c||''}">${i.k}<b>${i.v}</b></div>`).join('');}
+function tween(from,to,cb){
+  if(SL.reduced){cb(to.slice());return;}
+  const t0=performance.now();
+  const step=n=>{let u=Math.min(1,(n-t0)/650);u=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;
+    cb(from.map((x,i)=>x+(to[i]-x)*u));if(u<1)requestAnimationFrame(step);};
+  requestAnimationFrame(step);
+}
+
+/* ===== Figure 1 — la grille bouge, l'origine reste ===== */
+(function(){
+  const F=planeFig('f1plot',{fixed:[[1,0,'ax'],[0,1,'ax']]});
+  const out=document.getElementById('f1out'), sh=document.getElementById('f1sliders');
+  const PR=[['identité',[1,0,0,1]],['A',[2,1,0,3]],['B',[1,2,2,4]],['rotation 45°',[0.7071,-0.7071,0.7071,0.7071]],['cisaillement',[1,1,0,1]]];
+  const btns=PR.map(p=>{const b=SL.h('button','tb',document.getElementById('f1presets'),p[0]);b.onclick=()=>go(p[1]);return b;});
+  let ready=false;
+  const S=[];
+  ['a₁₁','a₁₂','a₂₁','a₂₂'].forEach((lb,i)=>{S.push(SL.slider(sh,{label:lb,min:-4,max:4,step:'any',value:[2,1,0,3][i]},()=>draw()));});
+  function draw(){
+    if(!ready)return;
+    const M=S.map(s=>s.get()),a=M[0],b=M[1],c=M[2],d=M[3],det=a*d-b*c,z=Math.abs(det)<1e-9;
+    F.clear();
+    F.grid(M);
+    F.seg(0,0,a,c,'vec sl-c1'); F.seg(0,0,b,d,'vec sl-c2'); F.seg(0,0,a+b,c+d,'vec sl-c5');
+    F.dot(a,c,'sl-c1'); F.dot(b,d,'sl-c2'); F.dot(a+b,c+d,'sl-c5');
+    F.txt(1,0,'e₁','plain',7,16); F.txt(0,1,'e₂','plain',-26,-4);
+    vlabel(F,a,c,'col₁','sl-c1 strong',1,0); vlabel(F,b,d,'col₂','sl-c2 strong',0,1,1,-14);
+    vlabel(F,a+b,c+d,'col₁+col₂','sl-c5 strong',0.707,0.707);
+    const rang=(Math.abs(a)+Math.abs(b)+Math.abs(c)+Math.abs(d)<1e-9)?0:(z?1:2);
+    readouts(out,[
+      {k:'det',v:SL.fmt(det,3),c:z?'zero':'pos'},
+      {k:'aire du carré unité',v:SL.fmt(Math.abs(det),3),c:z?'zero':'pos'},
+      {k:'rang',v:String(rang),c:rang<2?'zero':'pos'},
+      {k:'col₁ = image de e₁',v:V(a,c)},
+      {k:'col₂ = image de e₂',v:V(b,d)},
+      {k:'image de (1 ; 1)',v:V(a+b,c+d)}]);
+    btns.forEach((bt,i)=>bt.setAttribute('aria-pressed',String(PR[i][1].every((v,j)=>Math.abs(v-M[j])<5e-3))));
+  }
+  function go(t){tween(S.map(s=>s.get()),t,v=>S.forEach((s,i)=>s.set(v[i])));}
+  ready=true;draw();
+})();
+
+/* ===== Figure 2 — le noyau ===== */
+(function(){
+  const B=[1,2,2,4];
+  const F=planeFig('f2plot',{fixed:[[1,0,'ax'],[0,1,'ax'],[1,2,'sl-c1']]});
+  const out=document.getElementById('f2out'), sh=document.getElementById('f2sliders'), ctl=document.getElementById('f2ctl');
+  let M=B.slice(), squash=true;
+  const b1=SL.h('button','tb',ctl,'grille de départ'), b2=SL.h('button','tb',ctl,'grille après B');
+  b1.onclick=()=>go(false); b2.onclick=()=>go(true);
+  function go(s){squash=s;b1.setAttribute('aria-pressed',String(!s));b2.setAttribute('aria-pressed',String(s));
+    tween(M,s?B:[1,0,0,1],v=>{M=v;draw();});}
+  let ready=false;
+  const st=SL.slider(sh,{label:'t · (2 ; −1)',min:-2,max:2,step:'any',value:0},()=>draw());
+  const ss=SL.slider(sh,{label:'s · (1 ; 0)',min:-2,max:1.5,step:'any',value:0},()=>draw());
+  function draw(){
+    if(!ready)return;
+    const t=st.get(),s=ss.get();
+    const x=[1+2*t+s,-t], Bx=[B[0]*x[0]+B[1]*x[1],B[2]*x[0]+B[3]*x[1]], f=1+s;
+    F.clear();
+    F.grid(M);
+    F.seg(x[0]-6,x[1]+3,x[0]+6,x[1]-3,'chord');
+    const g=x[0]>0?-1:1;
+    F.txt(x[0]+g*4.4,x[1]-g*2.2,'x + Ker B','sl-c3 strong',g*4,23,g<0?'end':'start');
+    F.txt(-1.8,-3.6,'Im B','sl-c1 strong',12,4);
+    F.dot(Bx[0],Bx[1],'sl-c1',6.5); F.txt(Bx[0],Bx[1],'B x','sl-c1 strong',12,-11);
+    F.dot(x[0],x[1],'ring sl-c3',8); F.txt(x[0],x[1],'x','sl-c3 strong',-14,20,'end');
+    readouts(out,[
+      {k:'entrée x',v:V(x[0],x[1])},
+      {k:'sortie B x',v:V(Bx[0],Bx[1])},
+      {k:'B x = (1+s) · (1 ; 2)',v:SL.fmt(f,3),c:Math.abs(f)<1e-9?'zero':'pos'},
+      {k:'déplacement t · (2 ; −1)',v:V(2*t,-t)}]);
+  }
+  ready=true;go(true);draw();
+})();
+
+/* ===== Figure 3 — affine ===== */
+(function(){
+  const F=planeFig('f3plot',{fixed:[[1,0,'ax'],[0,1,'ax']]});
+  const out=document.getElementById('f3out'), sh=document.getElementById('f3sliders'), ctl=document.getElementById('f3ctl');
+  let M=[2,1,0,3];
+  const bI=SL.h('button','tb',ctl,'W = identité'), bA=SL.h('button','tb',ctl,'W = A');
+  bI.onclick=()=>set([1,0,0,1]); bA.onclick=()=>set([2,1,0,3]);
+  function set(t){tween(M,t,v=>{M=v;draw();});}
+  let ready=false;
+  const s1=SL.slider(sh,{label:'b₁',min:-3,max:3,step:'any',value:1},()=>draw());
+  const s2=SL.slider(sh,{label:'b₂',min:-3,max:3,step:'any',value:1},()=>draw());
+  function draw(){
+    if(!ready)return;
+    const b=[s1.get(),s2.get()];
+    const f=v=>[M[0]*v[0]+M[1]*v[1]+b[0], M[2]*v[0]+M[3]*v[1]+b[1]];
+    const fx=f([1,1]),f2x=f([2,2]),ec=[f2x[0]-2*fx[0],f2x[1]-2*fx[1]];
+    const lin=Math.abs(b[0])+Math.abs(b[1])<1e-9;
+    F.clear();
+    F.grid(M,b);
+    F.seg(0,0,b[0],b[1],'chord');
+    F.dot(0,0,'hollow sl-c2',6.5); F.txt(0,0,'0','sl-c2 strong',-18,17);
+    F.dot(b[0],b[1],'sl-c3',6.5); F.txt(b[0],b[1],'f(0) = b','sl-c3 strong',11,-10);
+    readouts(out,[
+      {k:'f(0)',v:V(b[0],b[1]),c:lin?'pos':'zero'},
+      {k:'f(x), x = (1 ; 1)',v:V(fx[0],fx[1])},
+      {k:'2 f(x)',v:V(2*fx[0],2*fx[1])},
+      {k:'f(2x)',v:V(f2x[0],f2x[1])},
+      {k:'f(2x) − 2 f(x) = −b',v:V(ec[0],ec[1]),c:lin?'pos':'zero'}]);
+    bI.setAttribute('aria-pressed',String(Math.abs(M[0]-1)<5e-3&&Math.abs(M[1])<5e-3));
+    bA.setAttribute('aria-pressed',String(Math.abs(M[0]-2)<5e-3));
+  }
+  ready=true;draw();
+})();
+})();
+</script>
+</body>
+</html>

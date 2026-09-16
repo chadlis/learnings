@@ -10,7 +10,7 @@ prereq: []
 anki: [algebre::matrice-action, algebre::noyau, algebre::affine, algebre::temoin]
 bridges: [b02]
 next: p04-02
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -77,3 +77,8 @@ Témoin : R² = 1 − RSS/TSS ; ajouter une variable ne peut pas faire monter RS
 
 ## Exclusions
 Pas de déterminant au-delà de l'aire, pas de Gauss, pas d'espaces abstraits, pas de projection orthogonale détaillée (nommée au pas 6).
+
+## Questions pour la revue
+- **Tous les chiffres du fil rouge ont été revérifiés** (déterminants, produits, noyau, solutions, écart affine) en `Fraction` exacte : rien à corriger, det A = 6, B(2, −1) = (0, 0), f(2x) − 2f(x) = −b = (−1, −1), et le carré unité sous B s'aplatit sur le segment (0,0) → (3,6).
+- **Le pas 8 a fallu chiffrer.** Le spec donne l'argument du témoin mais pas de nombres ; la sheet ajoute un jeu de cinq points (x = 1…5, y = 2, 3, 5, 4, 6, z = 1, 0, 1, 0, 1) qui donne RSS 19/10 → 16/15 et R² 0,81 → 67/75, le témoin β_z = 0 redonnant exactement 19/10. Jeu inventé pour l'occasion : à valider ou à remplacer.
+- **`SL.plane` ne survit pas à det = 0.** Chrome n'affiche pas un groupe dont la matrice de transformation est singulière : la grille disparaît au moment précis où l'écrasement doit se voir. Les trois figures composent donc `SL.plane` (grille de départ, carré unité, axes) avec une grille d'arrivée recalculée en coordonnées écran. `assets/sheetlib.js` n'a pas été touché — faut-il y corriger `SL.plane` avant p04-02 et p04-04, qui en auront besoin ?
