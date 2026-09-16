@@ -268,16 +268,17 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <p>Pour l'argent, on ne tolère rien du tout : on compte en <b>centimes entiers</b>, ou en <code>Decimal</code>. Un centime perdu par arrondi est une erreur comptable, pas une imprécision.</p>
     <p class="say">« Deux chemins de calcul arrondissent différemment, donc l'égalité exacte est un accident, donc on compare à une tolérance proportionnelle à l'échelle, donc l'argent se compte en entiers où il n'y a pas d'arrondi du tout. »</p>
   </div>
-  <div class="card apply"><div class="lbl">Application — quatre égalités qui échouent</div>
+  <div class="card apply"><div class="lbl">Application — cinq égalités qui échouent</div>
     <table>
       <tr><th>écrit</th><th>obtenu en float64</th><th><code>==</code></th></tr>
+      <tr><td><code>1.1 * 3</code></td><td>3,3000000000000003</td><td>False</td></tr>
       <tr><td><code>0.1 + 0.2</code></td><td>0,30000000000000004</td><td>False</td></tr>
       <tr class="hl"><td><code>4.35 * 100</code></td><td>434,99999999999994</td><td>False</td></tr>
       <tr><td><code>0.29 * 100</code></td><td>28,999999999999996</td><td>False</td></tr>
       <tr><td><code>2.00 - 1.10</code></td><td>0,8999999999999999</td><td>False</td></tr>
     </table>
     <p><b>Le piège comptable</b> : <code>int(4.35 * 100)</code> vaut <b>434</b>, pas 435. Un centime disparaît par troncature — et sur un million de lignes, c'est un écart de caisse.</p>
-    <p><b>Et le réflexe inverse est aussi faux</b> : <code>19.99 * 3 == 59.97</code> est <code>True</code> en float64. Un exemple qui marche ne prouve rien ; seul le raisonnement « mantisse finie ⇒ arrondi » est fiable, jamais un test ponctuel.</p>
+    <p><b>Le cas classique</b> : <code>1.1 * 3</code> donne <b>3,3000000000000003</b>, donc <code>1.1 * 3 == 3.3</code> est <code>False</code>. Ni 1,1 ni 3,3 n'ont d'écriture binaire finie ; le produit des deux arrondis n'a aucune raison de tomber sur l'arrondi du produit. C'est la même mécanique que la ligne comptable : <b>l'argent se compte en centimes entiers</b>, où il n'y a pas d'arrondi du tout.</p>
     <p>Tolérance fixe, le mauvais réflexe : <code>abs(a-b) &lt; 1e-6</code> est ridiculement lâche pour des nombres de l'ordre de 10<sup>−9</sup> et impossible à satisfaire pour des nombres de l'ordre de 10<sup>9</sup>, dont l'ulp float64 vaut déjà 2 · 10<sup>−7</sup>.</p>
   </div>
 </div>
