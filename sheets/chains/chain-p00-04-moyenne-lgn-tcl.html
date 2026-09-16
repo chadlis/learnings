@@ -1,0 +1,518 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Moyenne, loi des grands nombres, théorème central limite — chaîne</title>
+<meta name="sheet" content="series=chain;part=00;number=04;status=v1">
+<meta name="part" content="00 · Socle probabiliste">
+<meta name="subtitle" content="socle — pourquoi une moyenne se resserre en 1/√n et prend une forme de cloche">
+<meta name="prereq" content="p00-01,p00-02">
+<meta name="anki" content="stats::tcl,stats::lgn,stats::se,stats::normale">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ---- marques propres à cette chaîne ---- */
+.sl-seg.mk-mu{stroke:var(--pen);stroke-width:4}
+.sl-fn.mk-band{stroke:var(--green);stroke-width:1.6;stroke-dasharray:5 4;fill:none}
+.sl-fn.mk-mul{stroke:var(--pen);stroke-width:2;fill:none}
+.sl-fn.mk-path{stroke:var(--red);stroke-width:1.3;fill:none}
+text.mk-mu{fill:var(--pen)}text.mk-band{fill:var(--green)}
+.sl-plot text.mk-mu,.sl-plot text.mk-band{font-family:var(--math);font-size:13px}
+.cap .kmu{color:var(--pen);font-weight:600}.cap .kband{color:var(--green);font-weight:600}
+.cap .kpath{color:var(--red);font-weight:600}.cap .kbar{color:#6B46C1;font-weight:600}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 00 · Socle probabiliste › chaîne 04</div>
+  <h1>Moyenne, <span>loi des grands nombres</span>, <span>théorème central limite</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">On moyenne <span class="m">n</span> mesures. Quatre questions, dans cet ordre : <b>où est le centre, quelle est la largeur, quelle est la forme, et à partir de quel <span class="m">n</span></b>. Les réponses sont μ, σ/√<span class="m">n</span>, la normale, et « ça dépend de la loi ». Fil rouge : la moyenne de <span class="m">n</span> dés (μ = 3,5 ; σ = 1,708), puis deux lois qui mettent bien plus longtemps à donner une cloche — l'exponentielle et une Bernoulli rare.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="chain-p00-02-esperance-variance-densite.html#s2">p00-02 · E est linéaire</a></li>
+    <li><a href="chain-p00-02-esperance-variance-densite.html#s4">p00-02 · Var(aX) = a²Var(X)</a></li>
+    <li><a href="chain-p00-02-esperance-variance-densite.html#s5">p00-02 · additivité des variances</a></li>
+    <li><a href="chain-p00-01-lois-quand-laquelle.html#s6">p00-01 · Normale, 68/95/99,7</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::tcl</code><code>stats::lgn</code><code>stats::se</code><code>stats::normale</code></div>
+  <h4>Ponts et suites</h4>
+  <ol>
+    <li><a href="../../map.html#b03">b03 · Biais et variance partout</a></li>
+    <li><a href="../../map.html#b04">b04 · Variance d'une moyenne corrélée</a></li>
+    <li><a href="chain-p01-01-objet-aleatoire.html">p01-01 · L'objet aléatoire</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>L'espérance est linéaire, toujours.</b> <span class="m">E</span>[<span class="m">aX</span> + <span class="m">b</span>] = <span class="m">aE</span>[<span class="m">X</span>] + <span class="m">b</span> et <span class="m">E</span>[<span class="m">X</span> + <span class="m">Y</span>] = <span class="m">E</span>[<span class="m">X</span>] + <span class="m">E</span>[<span class="m">Y</span>] <i>même si</i> <span class="m">X</span> et <span class="m">Y</span> sont liés (<a href="chain-p00-02-esperance-variance-densite.html#s2">p00-02, pas 2</a>).</li>
+      <li><b>Un facteur passe au carré dans la variance.</b> Var(<span class="m">aX</span> + <span class="m">b</span>) = <span class="m">a</span>²Var(<span class="m">X</span>) : c'est de là, et de nulle part ailleurs, que viendra le 1/<span class="m">n</span>² (<a href="chain-p00-02-esperance-variance-densite.html#s4">p00-02, pas 4</a>).</li>
+      <li><b>Les variances ne s'additionnent que si la covariance est nulle.</b> Var(Σ<span class="m">X</span><sub><span class="m">i</span></sub>) = Σ Var(<span class="m">X</span><sub><span class="m">i</span></sub>) sous indépendance, et pas autrement (<a href="chain-p00-02-esperance-variance-densite.html#s5">p00-02, pas 5</a>).</li>
+      <li><b>La normale et ses trois bandes.</b> ±1σ : 68,3 % ; ±2σ : 95,4 % ; ±3σ : 99,7 % — deux paramètres, position et échelle (<a href="chain-p00-01-lois-quand-laquelle.html#s6">p00-01, pas 6</a>).</li>
+      <li><b>Le dé du fil rouge.</b> μ = 3,5, Var = 35/12 = 2,917, σ = 1,708 — calculé face par face en <a href="chain-p00-02-esperance-variance-densite.html#s3">p00-02, pas 3</a>.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span><span class="m">X</span><sub>1</sub>, …, <span class="m">X</span><sub><span class="m">n</span></sub> sont <b>iid</b> — indépendantes et de même loi — d'espérance μ et de variance σ² <b>finie</b>. Chacun des trois mots porte un pas : « même loi » donne μ et σ, « indépendantes » donne l'additivité, « variance finie » donne le TCL.</span>
+      <b>H2</b><span><span class="m">n</span> est le <b>nombre de termes moyennés</b>, pas le nombre d'événements intéressants qu'ils contiennent. Un <span class="m">n</span> de 100 avec deux succès dedans n'est pas un <span class="m">n</span> de 100 pour le TCL — c'est la casse du pas 8.</span>
+      <b>H3</b><span>On décrit la loi de <span class="m">X̄</span> <b>avant</b> de voir les données : μ et σ sont les vrais paramètres, pas des estimations. Les remplacer par leurs estimations est un pas supplémentaire, traité en <a href="chain-p01-01-objet-aleatoire.html#s6">p01-01</a>.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor : une moyenne est une variable aléatoire</h3>
+    <p><span class="m">X̄</span> = (<span class="m">X</span><sub>1</sub> + … + <span class="m">X</span><sub><span class="m">n</span></sub>)/<span class="m">n</span> est calculée <i>à partir</i> du tirage : refaire l'expérience change sa valeur. Ce n'est donc pas un nombre, c'est une variable aléatoire — et comme toute variable aléatoire elle a un <b>centre</b>, une <b>largeur</b> et une <b>forme</b>.</p>
+    <p>Toute la chaîne consiste à nommer ces trois choses, dans cet ordre. C'est la « colonne aléatoire » de <a href="chain-p01-01-objet-aleatoire.html#s2">p01-01</a>, vue ici sans contexte d'estimation.</p>
+    <p class="say">« La moyenne est calculée sur des variables aléatoires, donc elle change quand on refait l'expérience, donc c'est elle-même une variable aléatoire, donc elle a un centre, une largeur et une forme à calculer. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — trois fois quatre dés</div>
+    <p>Le même protocole, « jeter 4 dés et faire la moyenne », rejoué trois fois :</p>
+    <table>
+      <tr><th>tirage</th><th>faces</th><th><span class="m">X̄</span></th></tr>
+      <tr><td>1</td><td>2, 5, 1, 5</td><td>3,25</td></tr>
+      <tr><td>2</td><td>6, 3, 4, 5</td><td>4,5</td></tr>
+      <tr><td>3</td><td>1, 4, 3, 3</td><td>2,75</td></tr>
+    </table>
+    <p>Trois valeurs différentes pour un protocole identique : c'est exactement ce qui fait de <span class="m">X̄</span> une variable aléatoire. La question n'est pas « combien vaut <span class="m">X̄</span> » mais <b>« quelle est la loi de <span class="m">X̄</span> »</b>.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Centre : <span class="m">E</span>[<span class="m">X̄</span>] = μ</h3>
+    <p>Rien d'autre que la linéarité de l'espérance, appliquée deux fois : elle traverse la somme, puis la constante 1/<span class="m">n</span> sort.</p>
+    <div class="eq"><span class="m">E</span>[<span class="m">X̄</span>] = (1/<span class="m">n</span>) <span class="m">E</span>[Σ <span class="m">X</span><sub><span class="m">i</span></sub>] = (1/<span class="m">n</span>) Σ <span class="m">E</span>[<span class="m">X</span><sub><span class="m">i</span></sub>] = (1/<span class="m">n</span>) · <span class="m">n</span>μ = μ</div>
+    <p><b>Aucune hypothèse d'indépendance n'est utilisée</b> : même sur des mesures fortement corrélées, la moyenne reste centrée sur μ. C'est le pas le plus robuste de la chaîne, et c'est pour ça que la dépendance ne se voit jamais dans le centre — seulement dans la largeur.</p>
+    <p class="say">« L'espérance est linéaire, donc celle de la somme est n fois μ, donc celle de la moyenne est μ, et cela quelles que soient les dépendances entre les termes. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application</div>
+    <p>Dé : μ = 3,5, donc <span class="m">E</span>[<span class="m">X̄</span>] = <b>3,5</b> pour <span class="m">n</span> = 1, 4, 100 ou 10 000. Le centre ne dépend pas de <span class="m">n</span>.</p>
+    <p><b>Test de la dépendance.</b> Jeter un seul dé et recopier sa face quatre fois : <span class="m">X̄</span> = <span class="m">X</span>, donc <span class="m">E</span>[<span class="m">X̄</span>] = 3,5 — le centre est intact alors que les quatre « mesures » sont maximalement dépendantes. Sa largeur, elle, vaut 1,708 au lieu de 0,854 : toute l'information sur la dépendance est passée dans la variance (<a href="chain-p00-02-esperance-variance-densite.html#s5">p00-02, pas 5</a>).</p>
+    <p>Corollaire de vocabulaire : <span class="m">X̄</span> est un estimateur <b>sans biais</b> de μ. Le biais est un écart de centre, et il n'y en a pas ici.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Largeur : Var(<span class="m">X̄</span>) = σ²/<span class="m">n</span> <span class="tag tronc">tronc</span></h3>
+    <p>Deux règles de p00-02, dans cet ordre, et rien d'autre. Les <span class="m">n</span> termes sont indépendants, donc leurs variances s'<b>ajoutent</b> ; puis on divise par <span class="m">n</span>, et un facteur passe <b>au carré</b>.</p>
+    <div class="eq">Var(Σ <span class="m">X</span><sub><span class="m">i</span></sub>) = <span class="m">n</span>σ² &nbsp;&nbsp; Var(<span class="m">X̄</span>) = <span class="m">n</span>σ²/<span class="m">n</span>² = σ²/<span class="m">n</span> &nbsp;&nbsp; SE = σ/√<span class="m">n</span></div>
+    <p>Le <span class="m">n</span> du haut vient de l'additivité, le <span class="m">n</span>² du bas de la division : il ne reste qu'un <span class="m">n</span>. Cet écart-type de la moyenne porte un nom à lui, l'<b>erreur standard</b> (SE), pour rappeler qu'il décrit la dispersion d'une quantité calculée et non celle des mesures elles-mêmes.</p>
+    <p class="say">« Les n termes sont indépendants, donc leurs variances s'ajoutent en n σ², donc diviser par n divise la variance par n au carré, donc la largeur de la moyenne est σ sur racine de n. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le dé</div>
+    <p>σ² = 35/12 = 2,917, σ = 1,708. Var(<span class="m">X̄</span>) = 2,917/<span class="m">n</span> :</p>
+    <table>
+      <tr><th><span class="m">n</span></th><th>Var(<span class="m">X̄</span>) = 2,917/<span class="m">n</span></th><th>SE = 1,708/√<span class="m">n</span></th></tr>
+      <tr><td>1</td><td>2,917</td><td>1,708</td></tr>
+      <tr><td>4</td><td>0,729</td><td>0,854</td></tr>
+      <tr><td>25</td><td>0,117</td><td>0,342</td></tr>
+      <tr class="hl"><td>100</td><td>0,029</td><td><b>0,171</b></td></tr>
+      <tr><td>400</td><td>0,007</td><td>0,085</td></tr>
+    </table>
+    <p>De 1 à 4 dés la largeur est divisée par 2 ; de 4 à 400, par 10. À chaque fois, <span class="m">n</span> a été multiplié par le carré du facteur gagné.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — la même cloche, de plus en plus étroite</div>
+    <div id="f1sliders"></div>
+    <div id="f1host" class="wide"></div>
+    <p class="cap">Chaque tirage lance <span class="m">n</span> dés et pose leur moyenne dans l'histogramme — la hauteur d'une barre est la part des tirages tombés dedans. L'axe garde les <b>mêmes bornes 1 à 6 à toutes les valeurs de <span class="m">n</span></b>, et c'est ce qui rend le resserrement lisible. Le trait épais <span class="kmu">bleu</span> est μ = 3,5, le trait fin <span class="kpath">rouge</span> la moyenne des tirages : elle vient se poser dans le bleu et n'en bouge plus quand <span class="m">n</span> change — seule la largeur bouge. Compare dans le bandeau le <b>SE théorique</b> σ/√<span class="m">n</span> et l'<b>écart-type mesuré</b> — ce sont deux noms de la même largeur. Regarde aussi la <b>forme</b> : à <span class="m">n</span> = 1 six barres plates, à <span class="m">n</span> = 2 un triangle, à <span class="m">n</span> = 4 déjà une cloche.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Le 1/√<span class="m">n</span> est lent, et c'est structurel</h3>
+    <p>La racine change tout le rapport coût/précision. Gagner un facteur <span class="m">k</span> sur la largeur demande un facteur <span class="m">k</span>² sur la taille de l'échantillon.</p>
+    <div class="eq">SE(<span class="m">k</span>²<span class="m">n</span>) = SE(<span class="m">n</span>)/<span class="m">k</span> &nbsp;&nbsp; ÷2 sur la largeur ⇒ ×4 sur <span class="m">n</span> &nbsp;&nbsp; ÷10 ⇒ ×100</div>
+    <p>C'est le prix de toute précision statistique : intervalle de confiance, A/B test, évaluation d'un modèle. Et c'est aussi la forme mathématique des rendements décroissants de « plus de données » — sans hypothèse supplémentaire, on n'y échappe pas.</p>
+    <p class="say">« Le SE est proportionnel à un sur racine de n, donc diviser la largeur par k exige de multiplier n par k au carré, donc chaque décimale de précision coûte cent fois plus de données que la précédente. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — combien de dés pour quelle précision</div>
+    <table>
+      <tr><th>SE visé</th><th><span class="m">n</span> = (1,708/SE)²</th><th><span class="m">n</span> requis</th></tr>
+      <tr><td>0,5</td><td>11,67</td><td>12</td></tr>
+      <tr><td>0,1</td><td>291,7</td><td>292</td></tr>
+      <tr class="hl"><td>0,05</td><td>1 166,7</td><td><b>1 167</b></td></tr>
+      <tr><td>0,01</td><td>29 166,7</td><td>29 167</td></tr>
+    </table>
+    <p>Passer de 0,1 à 0,05 — un simple facteur 2 — coûte 875 dés de plus. Passer de 0,05 à 0,01 en coûte 28 000.</p>
+    <p><b>Lecture à l'envers, la seule utile en entretien</b> : devant un SE, la question n'est pas « est-il petit » mais « quel <span class="m">n</span> faudrait-il pour le diviser par deux ». La réponse est toujours : quatre fois celui-ci.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>LGN : <span class="m">X̄</span> → μ parce que sa variance → 0 <span class="tag tronc">tronc</span></h3>
+    <p>L'inégalité de Chebyshev transforme la largeur en probabilité : un écart fixé ε devient de plus en plus improbable à mesure que la variance tombe.</p>
+    <div class="eq"><span class="m">P</span>(|<span class="m">X̄</span> − μ| &gt; ε) ≤ Var(<span class="m">X̄</span>)/ε² = σ²/(<span class="m">n</span>ε²) &nbsp;→&nbsp; 0</div>
+    <p><b>La somme, elle, s'écarte.</b> σ(<span class="m">S</span><sub><span class="m">n</span></sub>) = σ√<span class="m">n</span> <i>croît</i> : l'écart de la somme à <span class="m">n</span>μ grandit sans fin. « Les tirages finissent par se compenser » est donc faux — rien ne se compense, c'est la <b>division par <span class="m">n</span></b> qui écrase un écart qui, lui, continue de grandir.</p>
+    <p class="say">« La variance de la moyenne tend vers zéro, donc la probabilité d'un écart fixé tend vers zéro, donc la moyenne converge vers μ — et cela par la division par n, non par une compensation entre les tirages. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — la borne et la vérité</div>
+    <p><span class="m">n</span> = 100 dés, ε = 0,5 :</p>
+    <div class="eq"><span class="m">P</span>(|<span class="m">X̄</span> − 3,5| &gt; 0,5) ≤ 2,917/(100 × 0,25) = <b>0,117</b></div>
+    <table>
+      <tr><th>source</th><th><span class="m">P</span>(|<span class="m">X̄</span> − 3,5| &gt; 0,5)</th></tr>
+      <tr><td>Chebyshev (borne, aucune hypothèse de forme)</td><td>≤ 0,117</td></tr>
+      <tr class="hl"><td>TCL (forme normale supposée)</td><td><b>0,0034</b></td></tr>
+      <tr><td>valeur exacte (loi de la somme de 100 dés)</td><td>0,0030</td></tr>
+    </table>
+    <p>Chebyshev surestime de plus d'un facteur 30 : c'est le prix de ne rien supposer sur la forme. Sa valeur n'est pas numérique, elle est logique — elle <b>démontre</b> la convergence, sans invoquer le TCL.</p>
+    <p><b>Moyenne vs somme, sur 1 000 dés.</b> SE de la moyenne = 0,054 ; écart-type de la somme = 1,708 × √1 000 = <b>54,0</b>. Un facteur 1 000 entre les deux — et c'est le même tirage.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — un seul chemin, deux lectures opposées</div>
+    <div id="fchA" class="wide"></div>
+    <div id="fchB" class="wide"></div>
+    <div class="sl-ctl" id="fchCtl"></div>
+    <div class="readouts" id="fchOut"></div>
+    <p class="cap">Les deux courbes <span class="kpath">rouges</span> lisent <b>le même tirage de 1 000 dés</b>, l'une divisée par <span class="m">n</span>, l'autre non. En haut la moyenne cumulée, avec la bande <span class="kband">±2σ/√<span class="m">n</span></span> qui se referme sur <span class="kmu">μ = 3,5</span> : le chemin y est piégé. En bas la somme cumulée moins 3,5<span class="m">n</span>, avec la bande <span class="kband">±2σ√<span class="m">n</span></span> qui s'ouvre : le même chemin s'éloigne de zéro, souvent de plusieurs dizaines. Clique « nouveau chemin » plusieurs fois — en haut ça converge à tous les coups, en bas ça ne revient jamais se poser durablement sur zéro. <b>Rien ne se compense</b> : c'est la division par <span class="m">n</span>, et elle seule, qui fabrique la convergence.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>TCL : la forme devient normale <span class="tag tronc">tronc</span></h3>
+    <p>La moyenne standardisée converge en loi vers une normale standard, <b>quelle que soit la loi</b> des <span class="m">X</span><sub><span class="m">i</span></sub>, pourvu que σ² soit finie.</p>
+    <div class="eq">(<span class="m">X̄</span> − μ)/(σ/√<span class="m">n</span>) → <span class="up">N</span>(0, 1) &nbsp;&nbsp; autrement dit &nbsp; <span class="m">X̄</span> ≈ <span class="up">N</span>(μ, σ²/<span class="m">n</span>)</div>
+    <p>Chaque terme pèse 1/<span class="m">n</span> et n'influence aucun autre : la somme « oublie » la loi de départ, il ne lui reste que ses deux premiers moments. Le TCL ne dit rien du centre ni de la largeur — ils sont déjà connus (pas 2 et 3) : il ne donne que la <b>forme</b>.</p>
+    <p><b>La vitesse, elle, dépend de la loi.</b> Rapide pour une loi symétrique, lente pour une loi asymétrique, très lente quand un événement est rare — c'est le nombre d'événements dans l'échantillon qui compte, pas <span class="m">n</span>.</p>
+    <p class="say">« Chaque terme contribue peu et indépendamment des autres, donc la forme de la somme ne dépend plus de la forme des termes, donc elle devient normale — d'autant plus vite que la loi de départ est symétrique et sans queue. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — un calcul, puis les trois vitesses</div>
+    <p><span class="m">n</span> = 100 dés : <span class="m">X̄</span> ≈ <span class="up">N</span>(3,5 ; 0,171²). D'où</p>
+    <div class="eq"><span class="m">P</span>(<span class="m">X̄</span> &gt; 3,8) = <span class="m">P</span>(<span class="m">Z</span> &gt; (3,8 − 3,5)/0,171) = <span class="m">P</span>(<span class="m">Z</span> &gt; 1,76) = <b>0,039</b></div>
+    <p>La valeur exacte est 0,037 : l'approximation se trompe de 2 points pour mille, sur une loi discrète à six valeurs et seulement 100 termes.</p>
+    <table>
+      <tr><th>loi moyennée</th><th>forme</th><th><span class="m">n</span> pour une cloche</th></tr>
+      <tr><td>dé (symétrique, bornée)</td><td>plate</td><td><b>4</b></td></tr>
+      <tr><td>Exponentielle(1) (asymétrique)</td><td>queue à droite</td><td>≈ <b>100</b></td></tr>
+      <tr class="hl"><td>Bernoulli(0,02) (rare)</td><td>deux atomes</td><td><b><span class="m">np</span> ≥ 10</b>, donc <span class="m">n</span> ≥ 500</td></tr>
+    </table>
+    <p>« <span class="m">n</span> ≥ 30 » n'apparaît nulle part dans ce tableau : c'est un ordre de grandeur valable pour la première ligne, faux pour la troisième.</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — une loi asymétrique met longtemps</div>
+    <div id="fexSliders"></div>
+    <div id="fexHost" class="wide"></div>
+    <p class="cap">Même dispositif que la figure 1, mais on moyenne des <a href="chain-p00-01-lois-quand-laquelle.html#s5">Exponentielle(1)</a> (μ = 1, σ = 1) au lieu de dés. À <span class="m">n</span> = 2 la loi monte d'un coup depuis zéro puis traîne longtemps à droite ; à <span class="m">n</span> = 10 la cloche <b>penche encore</b> nettement ; il faut <span class="m">n</span> ≈ 100 pour qu'elle paraisse symétrique. Le trait épais <span class="kmu">bleu</span> est μ = 1, le trait fin <span class="kpath">rouge</span> la moyenne des tirages. Ce n'est pas la largeur qui règle la vitesse — le SE vaut toujours σ/√<span class="m">n</span>, il est écrit dans le bandeau — c'est l'<b>asymétrie</b> de la loi de départ, et elle ne s'efface qu'en 1/√<span class="m">n</span> elle aussi. <i>La dernière barre ramasse tout ce qui dépasse 3 : à <span class="m">n</span> = 2 c'est encore 2 % des tirages, à <span class="m">n</span> = 10 plus rien.</i></p>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — un événement rare : ce qui compte est le nombre de succès</div>
+    <div id="fbeSliders"></div>
+    <div id="fbeHost" class="wide"></div>
+    <p class="cap">On moyenne maintenant des <a href="chain-p00-01-lois-quand-laquelle.html#s2">Bernoulli(0,02)</a> — la moyenne est donc une proportion observée, centrée sur <span class="kmu">0,02</span>. À <span class="m">n</span> = 20 il n'y a que trois barres — zéro succès, un succès, et tout le reste tassé contre le bord droit ; à <span class="m">n</span> = 100 (<span class="m">np</span> = 2) un <b>peigne asymétrique collé à zéro</b>, où 13 % des tirages ne contiennent <i>aucun</i> succès. Il faut <span class="m">n</span> = 500, c'est-à-dire <span class="m">np</span> = 10, pour voir une cloche. Compare avec la figure 1 : même <span class="m">n</span> = 100, cloche d'un côté, peigne de l'autre. <b>Le TCL ne compte pas les lignes, il compte les succès.</b></p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Standardiser : la brique de tout intervalle</h3>
+    <p>Une fois la forme connue, on ramène <span class="m">X̄</span> à une échelle universelle en soustrayant le centre et en divisant par la largeur.</p>
+    <div class="eq"><span class="m">Z</span> = (<span class="m">X̄</span> − μ)/(σ/√<span class="m">n</span>) ≈ <span class="up">N</span>(0, 1) &nbsp;&nbsp; <span class="m">P</span>(|<span class="m">Z</span>| &lt; 1,96) = 0,95</div>
+    <p>Réécrite en <span class="m">X̄</span>, cette ligne est l'intervalle de confiance : <span class="m">X̄</span> ± 1,96 σ/√<span class="m">n</span>. Deux amendements l'attendent et ne sont pas ici : σ est inconnu et se remplace par son estimation (<a href="chain-p01-01-objet-aleatoire.html#s6">p01-01</a>), et à petit <span class="m">n</span> ce remplacement élargit l'intervalle — c'est Student (<a href="../../map.html#p01-03">p01-03</a>).</p>
+    <p class="say">« La moyenne est approximativement normale de centre μ et de largeur σ sur racine de n, donc sa version standardisée est une normale standard, donc 95 % de sa masse est dans plus ou moins 1,96, donc l'intervalle est X barre plus ou moins 1,96 σ sur racine de n. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application</div>
+    <p>100 dés, σ connu : la procédure « jeter 100 dés, moyenner » produit 95 % du temps une valeur dans</p>
+    <div class="eq">3,5 ± 1,96 × 0,171 = [3,165 ; 3,835]</div>
+    <p>Retour au pas 6 : <span class="m">P</span>(<span class="m">X̄</span> &gt; 3,8) = 0,039, donc 3,8 est <i>presque</i> la borne haute — cohérent, 1,76 est proche de 1,96.</p>
+    <p><b>Ce que la standardisation permet vraiment</b> : comparer des écarts issus de lois et d'unités différentes. « 2,4 écarts-types » se lit pareil pour un temps de réponse, une accuracy ou un taux de clic. C'est le vocabulaire commun des pas 7 des parties suivantes.</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Trois des quatre limites viennent de H1, une seule du folklore. À chaque fois, savoir <b>laquelle des trois conditions</b> est tombée suffit à prédire ce qui casse.</p>
+    <p class="say">« Le σ sur racine de n suppose l'indépendance et une variance finie, donc corrélation et queues lourdes le rendent faux, donc quand il tient encore c'est sa forme normale qui peut manquer, et l'ordre de grandeur n supérieur à trente n'est jamais ce qui l'autorise. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>Dépendance — la largeur ne tend plus vers zéro.</b> Avec une corrélation commune ρ entre les termes, Var(<span class="m">X̄</span>) = ρσ² + (1 − ρ)σ²/<span class="m">n</span> : le second terme s'efface, le premier <b>reste</b>. Avec ρ = 0,05 sur le dé, le SE plafonne à 0,382 quel que soit <span class="m">n</span> — contre 0,017 à <span class="m">n</span> = 10 000 sous indépendance, soit 22 fois trop optimiste. Plusieurs lignes d'un même utilisateur, points successifs d'une série temporelle : c'est le cas courant, pas le cas rare. Le pont <a href="../../map.html#b04">b04</a> dérive la formule.</li>
+      <li><b>Variance infinie — ni LGN utile, ni TCL.</b> Cauchy, Pareto d'indice ≤ 2 : σ² n'existe pas, σ/√<span class="m">n</span> n'a pas de sens. La moyenne de <span class="m">n</span> Cauchy suit <i>exactement</i> la même loi qu'une seule : moyenner n'apporte strictement rien. Signe clinique : une moyenne empirique qui ne se stabilise pas et saute à chaque gros tirage.</li>
+      <li><b>Événements rares — <span class="m">n</span> n'est pas la bonne échelle.</b> Le TCL demande que chaque terme pèse peu ; avec <span class="m">p</span> = 0,02, un échantillon de 100 lignes contient deux succès et la loi reste un peigne (figure 4). La règle est <span class="m">np</span> ≥ 10 <i>et</i> <span class="m">n</span>(1 − <span class="m">p</span>) ≥ 10 : c'est le <b>nombre de succès</b>, pas la prévalence ni la taille d'échantillon, qui décide. C'est la même chose que le 28/30 de <a href="chain-p01-01-objet-aleatoire.html#s8">p01-01</a>, vu ici depuis le TCL.</li>
+      <li><b>« <span class="m">n</span> ≥ 30 » n'est pas un théorème.</b> C'est un ordre de grandeur pour des lois symétriques à queue courte. Faux vers le bas pour une exponentielle (≈ 100), très faux pour une Bernoulli rare (≥ 500). La question utile n'est jamais « <span class="m">n</span> est-il assez grand » mais « <b>à quelle vitesse cette loi-là oublie-t-elle sa forme</b> ».</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li><span class="m">X̄</span> est une variable aléatoire ; <span class="m">E</span>[<span class="m">X̄</span>] = μ <b>sans aucune condition</b>, dépendance comprise.</li>
+    <li>Var(<span class="m">X̄</span>) = σ²/<span class="m">n</span> <b>sous indépendance</b> ; SE = σ/√<span class="m">n</span> ; ÷2 sur la largeur = ×4 sur <span class="m">n</span>.</li>
+    <li>LGN : <span class="m">X̄</span> → μ parce que sa variance → 0 (Chebyshev), <b>pas par compensation</b> — la somme, elle, s'écarte en σ√<span class="m">n</span>.</li>
+    <li>TCL : forme normale <b>quelle que soit la loi</b>, à variance finie. Il donne la forme, pas le centre ni la largeur.</li>
+    <li>Vitesse selon la loi : dé <span class="m">n</span> = 4, exponentielle ≈ 100, Bernoulli rare <span class="m">np</span> ≥ 10.</li>
+    <li><span class="m">Z</span> = (<span class="m">X̄</span> − μ)/(σ/√<span class="m">n</span>), ±1,96 pour 95 % : la brique de l'IC.</li>
+    <li>Casse : dépendance (ρσ² résiduel), variance infinie, événements rares, « <span class="m">n</span> ≥ 30 » pris pour une loi.</li>
+  </ol>
+</div>
+<div class="phrase">« La moyenne de <span class="m">n</span> observations indépendantes est centrée sur μ, de largeur σ sur racine de <span class="m">n</span>, et sa forme devient normale quelle que soit la loi de départ dès que chaque terme pèse peu — vite pour une loi symétrique, lentement pour une loi asymétrique, et pas avant dix succès pour un événement rare. Elle converge parce que sa variance tend vers zéro, pas parce que les tirages se compensent. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">D'où vient le σ²/<span class="m">n</span> ?</div><div class="a hid">Additivité des variances sous indépendance → <span class="m">n</span>σ² ; division par <span class="m">n</span> → facteur 1/<span class="m">n</span>² ; il reste σ²/<span class="m">n</span>.</div></li>
+    <li><div class="q">Pourquoi <span class="m">X̄</span> converge-t-elle, et que fait la somme pendant ce temps ?</div><div class="a hid">Var(<span class="m">X̄</span>) → 0, donc Chebyshev écrase la probabilité d'un écart fixé. La somme a un écart-type σ√<span class="m">n</span> qui croît : rien ne se compense, c'est la division par <span class="m">n</span> qui converge.</div></li>
+    <li><div class="q">Que dit le TCL exactement, et sous quelles conditions ?</div><div class="a hid">(<span class="m">X̄</span> − μ)/(σ/√<span class="m">n</span>) tend en loi vers <span class="up">N</span>(0, 1) : indépendance, même loi, variance finie. Il donne la forme seulement — centre et largeur sont déjà connus.</div></li>
+    <li><div class="q">À partir de quel <span class="m">n</span> ?</div><div class="a hid">Dépend de la loi : 4 pour un dé, ≈ 100 pour une exponentielle, <span class="m">np</span> ≥ 10 pour une Bernoulli rare (donc <span class="m">n</span> ≥ 500 à <span class="m">p</span> = 0,02). « <span class="m">n</span> ≥ 30 » est un ordre de grandeur, pas un théorème.</div></li>
+    <li><div class="q">Que devient σ²/<span class="m">n</span> si les termes sont corrélés ?</div><div class="a hid">ρσ² + (1 − ρ)σ²/<span class="m">n</span> : le terme en 1/<span class="m">n</span> s'efface, le ρσ² reste. La largeur plafonne au lieu de tendre vers zéro ; le centre, lui, reste μ.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts et voisines</div>
+  <div class="bridges">
+    <a href="../../map.html#b04"><b>b04 — Variance d'une moyenne corrélée</b><small>la première limite du pas 8 dérivée jusqu'au bout : d'où sort ρσ² + (1 − ρ)σ²/n, et pourquoi c'est la même formule qui explique le nombre effectif d'observations, les comparaisons appariées et le bagging d'arbres corrélés</small></a>
+    <a href="../../map.html#b03"><b>b03 — Biais et variance partout</b><small>le pas 2 donne le biais nul, le pas 3 la variance : le même couple centre / largeur se rejoue sur un estimateur, sur une prédiction et sur une erreur de test</small></a>
+    <a href="chain-p01-01-objet-aleatoire.html"><b>p01-01 — L'objet aléatoire</b><small>la suite immédiate : X̄ devient un estimateur, σ/√n devient le SE d'une proportion, et le np ≥ 10 du pas 8 réapparaît sur un rappel de 28/30</small></a>
+    <a href="chain-p00-02-esperance-variance-densite.html#s5"><b>p00-02 — Additivité et covariance</b><small>la source du n du haut ; c'est exactement le terme croisé qu'on y annule sous indépendance qui revient en ρσ² quand elle tombe</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::lgn</code> (X̄ → μ par Chebyshev, la somme diverge, « se compenser » n'existe pas) · <code>stats::se</code> (σ/√n, ÷2 = ×4, l'erreur standard décrit une quantité calculée) · <code>stats::tcl</code> (énoncé standardisé, variance finie, vitesses : 4 / 100 / np ≥ 10) · <code>stats::normale</code> (±1,96 pour 95 %, la standardisation comme échelle commune).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p00-04 · v1 du 16/09/2026 · dernière chaîne de la partie 00. Prérequis : <a href="chain-p00-01-lois-quand-laquelle.html">p00-01</a>, <a href="chain-p00-02-esperance-variance-densite.html">p00-02</a>. Suite : <a href="chain-p01-01-objet-aleatoire.html">p01-01 L'objet aléatoire</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outils communs ===== */
+const SIG=Math.sqrt(35/12);                                   // σ d'un dé : 1,708
+const die=()=>1+Math.floor(Math.random()*6);
+const expo=()=>-Math.log(1-Math.random());                    // Exponentielle(1), inverse de la CDF
+const bern=p=>Math.random()<p?1:0;
+const mean=(n,g)=>{let s=0;for(let i=0;i<n;i++)s+=g();return s/n;};
+const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+
+/* ===== Figure 1 : moyenne de n dés, axe fixe 1–6 ===== */
+const N1=[1,2,4,10,30,100],L1=['1','2','4','10','30','100'];let n1=4;
+const R1=SL.repeat(document.getElementById('f1host'),{
+  draw:()=>mean(n1,die),bins:[1,6,50],xt:[1,2,3,3.5,4,5,6],w:600,h:250,counts:[1,50,500],
+  xl:'moyenne de n dés',yl:' ',
+  marks:[{x:3.5,label:'',cls:'mk-mu'}],
+  readout:(k,m,s)=>`${k} tirages · n = ${L1[N1.indexOf(n1)]} · SE théorique ${SL.fmt(SIG/Math.sqrt(n1),3)} · écart-type mesuré ${SL.fmt(s,3)}`,
+  empty:'Aucun tirage : clique « tirer 50 ».'});
+SL.slider(document.getElementById('f1sliders'),{label:'n (dés moyennés)',min:0,max:5,step:1,value:2,fmt:v=>L1[v]},v=>{
+  n1=N1[v];R1.stats.length=0;for(let i=0;i<400;i++)R1.stats.push(mean(n1,die));R1.render();});
+
+/* ===== Figure 2 : un chemin, deux lectures ===== */
+const NMIN=4,NMAX=1000;
+const PA=SL.plot(document.getElementById('fchA'),{x:[NMIN,NMAX],y:[1,6],w:600,h:210,
+  xt:[200,400,600,800,1000],yt:[2,3,3.5,4,5],xl:'n (dés cumulés)',yl:'moyenne cumulée'});
+PA.fn(n=>3.5+2*SIG/Math.sqrt(n),'mk-band',300);PA.fn(n=>3.5-2*SIG/Math.sqrt(n),'mk-band',300);
+PA.fn(()=>3.5,'mk-mul',2);
+PA.label(300,4.55,'± 2σ/√n','mk-band','middle');
+const PB=SL.plot(document.getElementById('fchB'),{x:[NMIN,NMAX],y:[-130,130],w:600,h:210,
+  xt:[200,400,600,800,1000],yt:[-100,-50,50,100],xl:'n (dés cumulés)',yl:'somme cumulée − 3,5 n'});
+PB.fn(n=>2*SIG*Math.sqrt(n),'mk-band',300);PB.fn(n=>-2*SIG*Math.sqrt(n),'mk-band',300);
+PB.label(560,113,'± 2σ√n','mk-band','middle');
+function poly(P,pts,cls){let d='';pts.forEach((p,i)=>{d+=(i?' L':'M')+P.sx(p[0]).toFixed(1)+' '+P.sy(p[1]).toFixed(1);});
+  return SL.el('path',{d,class:'sl-fn '+cls,fill:'none'},P.dyn);}
+const outCh=document.getElementById('fchOut');
+function chemin(){PA.clear();PB.clear();let s=0;const A=[],B=[];
+  for(let i=1;i<=NMAX;i++){s+=die();if(i>=NMIN){A.push([i,clamp(s/i,1,6)]);B.push([i,clamp(s-3.5*i,-130,130)]);}}
+  poly(PA,A,'mk-path');poly(PB,B,'mk-path');
+  outCh.innerHTML=`<div class="pos">moyenne après 1 000 dés<b>${SL.fmt(s/NMAX,3)}</b></div>`+
+    `<div class="pos">écart de la moyenne à 3,5<b>${SL.fmt(Math.abs(s/NMAX-3.5),3)}</b></div>`+
+    `<div class="zero">somme − 3,5 n<b>${SL.fmt(s-3.5*NMAX,1)}</b></div>`;}
+SL.h('button','tb',document.getElementById('fchCtl'),'nouveau chemin').onclick=chemin;chemin();
+
+/* ===== Figure 3 : moyenne de n Exponentielle(1) ===== */
+const NE=[2,5,10,30,100],LE=['2','5','10','30','100'];let ne=10;
+const RE=SL.repeat(document.getElementById('fexHost'),{
+  draw:()=>mean(ne,expo),bins:[0,3,60],xt:[0,0.5,1,1.5,2,2.5,3],w:600,h:250,counts:[1,50,500],
+  xl:'moyenne de n Exponentielle(1)',yl:' ',
+  marks:[{x:1,label:'',cls:'mk-mu'}],
+  readout:(k,m,s)=>`${k} tirages · n = ${LE[NE.indexOf(ne)]} · SE théorique ${SL.fmt(1/Math.sqrt(ne),3)} · écart-type mesuré ${SL.fmt(s,3)}`,
+  empty:'Aucun tirage : clique « tirer 50 ».'});
+SL.slider(document.getElementById('fexSliders'),{label:'n (moyennés)',min:0,max:4,step:1,value:2,fmt:v=>LE[v]},v=>{
+  ne=NE[v];RE.stats.length=0;for(let i=0;i<400;i++)RE.stats.push(mean(ne,expo));RE.render();});
+
+/* ===== Figure 4 : moyenne de n Bernoulli(0,02) ===== */
+const NB=[20,100,500,5000],LB=['20','100','500','5 000'],PB0=.02;let nb=100;
+const RB=SL.repeat(document.getElementById('fbeHost'),{
+  draw:()=>mean(nb,()=>bern(PB0)),bins:[0,.08,40],xt:[0,.02,.04,.06,.08],w:600,h:250,counts:[1,50,500],
+  xl:'proportion observée sur n tirages',yl:' ',
+  marks:[{x:.02,label:'',cls:'mk-mu'}],
+  readout:(k,m,s)=>`${k} tirages · n = ${LB[NB.indexOf(nb)]} · np = ${SL.fmt(nb*PB0,1)} · SE théorique ${SL.fmt(Math.sqrt(PB0*(1-PB0)/nb),4)} · écart-type mesuré ${SL.fmt(s,4)}`,
+  empty:'Aucun tirage : clique « tirer 50 ».'});
+SL.slider(document.getElementById('fbeSliders'),{label:'n (tirages)',min:0,max:3,step:1,value:1,fmt:v=>LB[v]},v=>{
+  nb=NB[v];RB.stats.length=0;for(let i=0;i<400;i++)RB.stats.push(mean(nb,()=>bern(PB0)));RB.render();});
+})();
+</script>
+</body>
+</html>

@@ -10,7 +10,7 @@ prereq: [p00-01, p00-02]
 anki: [stats::tcl, stats::lgn, stats::se, stats::normale]
 bridges: [b03, b04]
 next: p01-01
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -78,3 +78,22 @@ Bernoulli rare p = 0,02, n = 100 : np = 2 ⇒ peigne asymétrique, pas de cloche
 
 ## Exclusions
 Pas de démonstration du TCL, pas de Berry-Esseen, pas de convergence presque sûre vs en probabilité, pas de Bessel.
+
+## Questions pour la revue
+- Tous les chiffres du fil rouge ont été revérifiés avant écriture (fractions + loi exacte de la
+  somme de n dés par convolution) : σ = 1,70783 ; SE 1,708 / 0,854 / 0,342 / 0,171 ; z = 1,757 et
+  P(X̄ > 3,8) = 0,0395 ; Chebyshev 2,917/(100·0,25) = 0,1167 ; TCL 0,00341. **Aucune correction
+  nécessaire.** La sheet ajoute la valeur *exacte* à côté des deux bornes : P(|X̄ − 3,5| > 0,5)
+  = 0,00301 et P(X̄ > 3,8) = 0,0370 — ça montre que Chebyshev surestime d'un facteur 39 et que
+  le TCL se trompe de 2 pour mille dès n = 100.
+- Chiffres ajoutés par la sheet, non présents dans le spec, à valider : le tableau « combien de
+  dés pour quel SE » (12 / 292 / 1 167 / 29 167), σ(S₁₀₀₀) = 54,0, l'IC [3,165 ; 3,835] à n = 100,
+  et le plafond du SE sous dépendance ρ = 0,05 : √(0,05·2,917) = 0,382 contre 0,017 à n = 10 000
+  sous indépendance (facteur 22).
+- Numérotation des figures : l'ordre d'apparition impose 1 = dés (pas 3), 2 = moyenne vs somme
+  cumulées (pas 5, la « figure 4 » du spec), 3 = exponentielle, 4 = Bernoulli rare (pas 6). Les
+  quatre figures du spec sont toutes là, seul leur numéro suit la lecture.
+- Figure 3 (exponentielle) : le curseur commence à n = 2 et non n = 1. Avec les bins [0 ; 3 ; 60]
+  du spec, n = 1 tasse 5 % des tirages dans la dernière barre, ce qui fabrique un faux pic aussi
+  haut que le mode. À n = 2 il n'en reste que 2 %, et la légende le dit. À trancher si la
+  relecture préfère voir la loi brute quitte à garder le pic.
