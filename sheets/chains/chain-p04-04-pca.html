@@ -1,0 +1,770 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>PCA, diagonaliser la covariance — chaîne</title>
+<meta name="sheet" content="series=chain;part=04;number=04;status=v1">
+<meta name="part" content="04 · Matrice = action">
+<meta name="subtitle" content="les directions de variance maximale, et les trois pièges qui rendent le résultat faux sans lever d'erreur">
+<meta name="prereq" content="p04-03,p00-02">
+<meta name="anki" content="ml::pca,algebre::spectral,ml::standardisation">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ---- marques propres à cette chaîne (nuages 2D, axes principaux, scree) ---- */
+.mat{display:inline-grid;grid-template-columns:auto auto;gap:1px 14px;font-family:var(--math);border-left:1.6px solid currentColor;border-right:1.6px solid currentColor;padding:3px 7px;margin:0 2px;vertical-align:middle;text-align:right;line-height:1.3}
+.mat.col{grid-template-columns:auto}
+.mat b{font-weight:400;font-style:normal}
+.note{font-size:14px;color:var(--cardmuted);border-top:1px solid var(--cardline);margin-top:10px;padding-top:8px}
+.note b{color:var(--cardink)}
+.tw{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.tw table{min-width:340px}
+.sl-plane{display:block;width:100%;max-width:470px;height:auto;margin:0 auto}
+.sl-plane .sl-gridl{stroke:rgba(34,48,43,.1);fill:none}
+.sl-plane .sl-unit{fill:none;stroke:rgba(34,48,43,.4);stroke-width:1.2;stroke-dasharray:4 3}
+.sl-plane text{font-family:var(--sans);font-size:12.5px}
+.sl-plane text.plain{fill:var(--cardmuted)}
+.sl-plane text.strong{font-weight:600}
+.sl-plane .ax{stroke:rgba(34,48,43,.5);stroke-width:1.2;stroke-dasharray:none}
+/* segments colorés : deux classes, pour passer devant la règle .sl-seg de base */
+.sl-seg.sl-c1{stroke:var(--pen)}.sl-seg.sl-c2{stroke:#6B46C1}.sl-seg.sl-c3{stroke:var(--red)}.sl-seg.sl-c4{stroke:#1F5FA8}.sl-seg.sl-c5{stroke:#B7791F}
+.sl-seg.axv{stroke-width:2.8}
+.sl-seg.eig{stroke-width:1.7;stroke-dasharray:7 5}
+.sl-seg.proj{stroke:rgba(184,50,42,.4);stroke-width:1;stroke-dasharray:3 3}
+.sl-seg.lead{stroke:rgba(34,48,43,.5);stroke-width:1.4;stroke-dasharray:5 4}
+.sl-dot.pt{fill:#6B46C1;stroke:none;opacity:.62}
+.sl-dot.foot{fill:var(--red);stroke:none;opacity:.8}
+.sl-dot.ring{fill:none!important;stroke:var(--red);stroke-width:2.4}
+.sl-dot.ghost{fill:rgba(34,48,43,.22);stroke:none}
+.pale{opacity:.4}
+.sl-plot text.inbar{fill:var(--card);font-weight:600}
+.sl-plot .lvl{stroke:rgba(34,48,43,.45);stroke-width:1.3;stroke-dasharray:5 4;fill:none}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 04 · Matrice = action › chaîne 04</div>
+  <h1>PCA : <span>diagonaliser</span> la <span>covariance</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Que cherche la PCA, pourquoi c'est un problème de valeurs propres, et pourquoi elle rend un résultat faux <b>sans lever d'erreur</b> si on ne centre pas, si on ne standardise pas, ou si on l'ajuste sur le test. Le geste tient en une ligne — <b>maximiser <span class="m">a</span><sup>⊤</sup><span class="m">Ca</span> sous ‖<span class="m">a</span>‖ = 1, donc prendre le vecteur propre dominant</b> — et tout le reste est de la plomberie de préparation. Fil rouge : trois points alignés, (1, 2), (2, 3), (3, 4), qui tiennent sur une seule dimension.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="chain-p04-03-spectral-svd-conditionnement.html#s2">p04-03 · théorème spectral</a></li>
+    <li><a href="chain-p04-03-spectral-svd-conditionnement.html#s4">p04-03 · SVD</a></li>
+    <li><a href="chain-p00-02-esperance-variance-densite.html#s5">p00-02 · variance, covariance</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>ml::pca</code><code>algebre::spectral</code><code>ml::standardisation</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="chain-p04-03-spectral-svd-conditionnement.html#s7">p04-03 · ne pas former X<sup>⊤</sup>X</a></li>
+    <li><a href="../../map.html#p06-02">p06-02 · fuite et validation croisée</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>Théorème spectral.</b> Si <span class="m">C</span> = <span class="m">C</span><sup>⊤</sup>, alors <span class="m">C</span> = <span class="m">Q</span>Λ<span class="m">Q</span><sup>⊤</sup> avec <span class="m">Q</span> orthogonale et Λ réelle (<a href="chain-p04-03-spectral-svd-conditionnement.html#s2">p04-03, pas 2</a>). Toute covariance est symétrique : ses axes propres sont donc orthogonaux, gratuitement.</li>
+      <li><b>Forme quadratique dans la base propre.</b> <span class="m">x</span><sup>⊤</sup><span class="m">Cx</span> = Σ<span class="m">λ</span><sub>i</sub><span class="m">a</span><sub>i</sub>² où <span class="m">a</span><sub>i</sub> = ⟨<span class="m">q</span><sub>i</sub>, <span class="m">x</span>⟩ (<a href="chain-p04-03-spectral-svd-conditionnement.html#s3">p04-03, pas 3</a>). C'est le pas 3 de cette chaîne, tout entier.</li>
+      <li><b>SVD.</b> Toute matrice <span class="m">X</span> s'écrit <span class="m">U</span>Σ<span class="m">V</span><sup>⊤</sup>, et <span class="m">X</span><sup>⊤</sup><span class="m">X</span> = <span class="m">V</span>Σ²<span class="m">V</span><sup>⊤</sup> (<a href="chain-p04-03-spectral-svd-conditionnement.html#s5">p04-03, pas 5</a>). Former <span class="m">X</span><sup>⊤</sup><span class="m">X</span> élève le conditionnement au carré (<a href="chain-p04-03-spectral-svd-conditionnement.html#s7">p04-03, pas 7</a>).</li>
+      <li><b>Variance, covariance.</b> Var(<span class="m">X</span>) = <span class="up">E</span>[(<span class="m">X</span> − <span class="m">μ</span>)²] — définie <b>autour de la moyenne</b> — et Var(<span class="m">aX</span> + <span class="m">bY</span>) = <span class="m">a</span>²Var(<span class="m">X</span>) + <span class="m">b</span>²Var(<span class="m">Y</span>) + 2<span class="m">ab</span> Cov(<span class="m">X</span>, <span class="m">Y</span>) (<a href="chain-p00-02-esperance-variance-densite.html#s5">p00-02, pas 5</a>). C'est déjà <span class="m">a</span><sup>⊤</sup><span class="m">Ca</span> en dimension 2.</li>
+      <li><b>Une variance porte les unités au carré.</b> Var(<span class="m">aX</span>) = <span class="m">a</span>²Var(<span class="m">X</span>) (<a href="chain-p00-02-esperance-variance-densite.html#s4">p00-02, pas 4</a>) : passer des mètres aux centimètres multiplie une variance par 10 000. Le pas 6 vit là-dessus.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>La structure intéressante est <b>linéaire</b> et se lit dans la <b>variance</b>. Deux hypothèses, fortes toutes les deux, et aucune n'est vérifiable depuis les données seules. Le pas 9 les reprend comme limites.</span>
+      <b>H2</b><span><span class="m">X</span> est <span class="m">n</span> × <span class="m">p</span>, <b>une ligne par observation</b>, et <span class="m">C</span> = <span class="m">X</span><sub>c</sub><sup>⊤</sup><span class="m">X</span><sub>c</sub>/(<span class="m">n</span> − 1) est calculée sur les données <b>centrées</b> <span class="m">X</span><sub>c</sub>. Toute la chaîne suppose ce centrage ; le pas 5 montre ce qui arrive quand il manque.</span>
+      <b>H3</b><span>Les <span class="m">λ</span> sont rangés <b>décroissants</b>, <span class="m">λ</span><sub>1</sub> ≥ <span class="m">λ</span><sub>2</sub> ≥ … ≥ 0. Une covariance est semi-définie positive, donc aucun <span class="m">λ</span> n'est négatif — mais un <span class="m">λ</span> nul est possible, et c'est exactement le fil rouge.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor : <span class="m">p</span> colonnes corrélées</h3>
+    <p><span class="m">p</span> features corrélées ; on veut <span class="m">k</span> &lt; <span class="m">p</span> directions qui gardent l'essentiel. Rien dans les données ne dit ce qu'est « l'essentiel » : c'est nous qui le décrétons, et la PCA décrète que c'est la <b>variance</b> (H1).</p>
+    <div class="eq"><span class="m">X</span> (<span class="m">n</span> × <span class="m">p</span>) &nbsp;⟶&nbsp; <span class="m">Z</span> (<span class="m">n</span> × <span class="m">k</span>) &nbsp;,&nbsp; <span class="m">k</span> &lt; <span class="m">p</span> &nbsp;,&nbsp; <span class="m">Z</span> = <span class="m">X</span><sub>c</sub><span class="m">V</span><sub>k</sub></div>
+    <p class="say">« On veut remplacer <span class="m">p</span> colonnes corrélées par <span class="m">k</span> colonnes, donc il faut un critère qui dise ce qu'on garde, donc on pose que l'essentiel est la variance — une décision, pas un théorème. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le fil rouge</div>
+    <p>Trois points, deux colonnes : (1, 2), (2, 3), (3, 4). Moyenne (2 ; 3), donc centrés :</p>
+    <div class="eq"><span class="m">X</span><sub>c</sub> = <span class="mat col"><b>(−1 ; −1)</b><b>(0 ; 0)</b><b>(1 ; 1)</b></span></div>
+    <p>Les trois points sont <b>sur une droite</b>. Deux colonnes, mais une seule dimension d'information : <span class="m">k</span> = 1 suffit, sans rien perdre. La chaîne va le retrouver comme une valeur propre nulle.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>La variance projetée est une forme quadratique <span class="tag tronc">tronc</span></h3>
+    <p>Projeter <span class="m">x</span> sur une direction unitaire <span class="m">a</span> donne le scalaire <span class="m">a</span><sup>⊤</sup><span class="m">x</span>. Sur le nuage centré, la variance de ce scalaire ne dépend que de <span class="m">C</span> :</p>
+    <div class="eq">Var(<span class="m">a</span><sup>⊤</sup><span class="m">x</span>) = <span class="m">a</span><sup>⊤</sup><span class="m">Ca</span> &nbsp;,&nbsp; ‖<span class="m">a</span>‖ = 1 &nbsp;,&nbsp; <span class="m">C</span> = <span class="m">X</span><sub>c</sub><sup>⊤</sup><span class="m">X</span><sub>c</sub>/(<span class="m">n</span> − 1)</div>
+    <p>La contrainte ‖<span class="m">a</span>‖ = 1 n'est pas décorative : sans elle on gonfle la variance en allongeant <span class="m">a</span>, et le maximum est infini.</p>
+    <p class="say">« La projection est linéaire, donc sa variance est <span class="m">a</span><sup>⊤</sup><span class="m">Ca</span>, donc chercher la direction de variance maximale c'est maximiser une forme quadratique sur la sphère unité. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — <span class="m">C</span> = [[1, 1], [1, 4]]</div>
+    <p>La covariance du pas 2 de <a href="chain-p04-03-spectral-svd-conditionnement.html#s2">p04-03</a>. On lit <span class="m">a</span><sup>⊤</sup><span class="m">Ca</span> pour quatre directions :</p>
+    <div class="tw"><table>
+      <tr><th>direction <span class="m">a</span></th><th>angle</th><th><span class="m">a</span><sup>⊤</sup><span class="m">Ca</span></th></tr>
+      <tr><td>(1 ; 0)</td><td>0°</td><td>1</td></tr>
+      <tr><td>(1 ; 1)/√2</td><td>45°</td><td>3,5</td></tr>
+      <tr><td>(0 ; 1)</td><td>90°</td><td>4</td></tr>
+      <tr class="hl"><td>(0,290 ; 0,957)</td><td>73,2°</td><td>4,303</td></tr>
+    </table></div>
+    <p>La direction de l'axe <span class="m">x</span><sub>2</sub> donne 4, mais une direction penchée de 73,2° fait mieux : 4,303. Le pas 3 dit pourquoi celle-là, et pourquoi on ne fera pas mieux.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — tourner la direction, lire la variance</div>
+    <div class="sl-ctl" id="f1clouds"></div>
+    <div id="f1plot" class="wide"></div>
+    <div class="sl-ctl" id="f1presets"></div>
+    <div id="f1sliders"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap"><b>Tourne le curseur d'angle</b> et regarde la tuile Var(<span class="m">a</span><sup>⊤</sup><span class="m">x</span>) : elle passe par un maximum exactement quand la droite rouge tombe sur la droite tiretée PC1, et par un minimum sur PC2. Les traits fins rouges sont les projections des points sur <span class="m">a</span> : leur dispersion <i>est</i> la variance lue. Le carré pointillé donne l'unité. Passe au <b>nuage plat</b> : la deuxième valeur propre vaut 0, le nuage s'effondre sur une droite, et il existe une direction où tous les points se projettent au même endroit — variance nulle.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Le maximum est un vecteur propre <span class="tag tronc">tronc</span></h3>
+    <p>Écris <span class="m">a</span> dans la base propre de <span class="m">C</span> : <span class="m">a</span><sub>i</sub> = ⟨<span class="m">q</span><sub>i</sub>, <span class="m">a</span>⟩, avec Σ<span class="m">a</span><sub>i</sub>² = ‖<span class="m">a</span>‖² = 1. Alors</p>
+    <div class="eq"><span class="m">a</span><sup>⊤</sup><span class="m">Ca</span> = Σ<sub>i</sub> <span class="m">λ</span><sub>i</sub> <span class="m">a</span><sub>i</sub>² &nbsp;,&nbsp; Σ<sub>i</sub> <span class="m">a</span><sub>i</sub>² = 1</div>
+    <p>C'est une moyenne pondérée des <span class="m">λ</span> : elle est maximale quand tout le poids part sur le plus grand. PC1 = <span class="m">q</span><sub>1</sub>, variance portée = <span class="m">λ</span><sub>1</sub> ; PC2 = <span class="m">q</span><sub>2</sub>, le meilleur de ce qui reste orthogonal, et ainsi de suite. L'orthogonalité est offerte par le spectral, pas imposée à la main.</p>
+    <p class="say">« Dans la base propre la forme quadratique est une moyenne pondérée des <span class="m">λ</span>, donc le maximum sous norme unité est atteint sur la plus grande valeur propre, donc la première composante est le vecteur propre dominant. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les axes de <span class="m">C</span> = [[1, 1], [1, 4]]</div>
+    <p>Trace 5, déterminant 3, donc <span class="m">λ</span>² − 5<span class="m">λ</span> + 3 = 0 :</p>
+    <div class="eq"><span class="m">λ</span> = (5 ± √13)/2 &nbsp;⇒&nbsp; <span class="m">λ</span><sub>1</sub> = 4,303 &nbsp;·&nbsp; <span class="m">λ</span><sub>2</sub> = 0,697</div>
+    <div class="tw"><table>
+      <tr><th>axe</th><th>direction</th><th>angle</th><th>variance portée</th></tr>
+      <tr class="hl"><td>PC1</td><td>(0,290 ; 0,957)</td><td>73,2°</td><td>4,303</td></tr>
+      <tr><td>PC2</td><td>(−0,957 ; 0,290)</td><td>163,2°</td><td>0,697</td></tr>
+    </table></div>
+    <p>Contrôles gratuits : 4,303 + 0,697 = 5 = trace ✓ · 4,303 × 0,697 = 3 = det ✓ · PC1 · PC2 = 0 ✓.</p>
+    <p class="note"><b>Fil rouge.</b> <span class="m">C</span> = [[1, 1], [1, 1]] : trace 2, det 0, donc <span class="m">λ</span> = 2 et <b>0</b>. PC1 = (1 ; 1)/√2, PC2 = (1 ; −1)/√2 et personne ne bouge dans cette seconde direction.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Ce que disent les <span class="m">λ</span> : part expliquée et erreur de troncature</h3>
+    <p>La trace de <span class="m">C</span> est la somme des variances des colonnes, donc la <b>variance totale</b> ; chaque <span class="m">λ</span> en est la part portée par son axe. Tronquer aux <span class="m">k</span> premières composantes puis revenir dans l'espace de départ coûte exactement ce qu'on a laissé (SVD tronquée, <a href="chain-p04-03-spectral-svd-conditionnement.html#s8">p04-03, pas 8</a>).</p>
+    <div class="eq">Σ<span class="m">λ</span><sub>i</sub> = <span class="up">tr</span> <span class="m">C</span> &nbsp;·&nbsp; part(<span class="m">i</span>) = <span class="m">λ</span><sub>i</sub>/<span class="up">tr</span> <span class="m">C</span> &nbsp;·&nbsp; erreur(<span class="m">k</span>) = Σ<sub><span class="m">i</span> &gt; <span class="m">k</span></sub> <span class="m">λ</span><sub>i</sub></div>
+    <p>Choisir <span class="m">k</span> : le coude du scree plot, ou un seuil de cumul (90 %). Aucun des deux n'est un critère statistique — ce sont des conventions.</p>
+    <p class="say">« La trace est la variance totale, donc chaque <span class="m">λ</span> est la part de variance portée par son axe, donc tronquer aux <span class="m">k</span> premiers coûte exactement la somme des <span class="m">λ</span> laissés derrière. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — trois spectres</div>
+    <div class="tw"><table>
+      <tr><th>nuage</th><th><span class="m">λ</span></th><th>part de PC1</th><th><span class="m">k</span> à 90 %</th></tr>
+      <tr><td><span class="m">C</span> = [[1, 1], [1, 4]]</td><td>4,303 · 0,697</td><td>86,1 %</td><td>2</td></tr>
+      <tr class="hl"><td>fil rouge</td><td>2 · 0</td><td>100 %</td><td>1</td></tr>
+      <tr><td>5D synthétique</td><td>4,2 · 2,6 · 1,4 · 0,6 · 0,2</td><td>46,7 %</td><td>3</td></tr>
+    </table></div>
+    <p><b>Fil rouge, erreur de reconstruction.</b> <span class="m">k</span> = 1 : on projette (−1 ; −1) sur (1 ; 1)/√2, coordonnée −√2, on revient : (−1 ; −1). Exactement le point de départ. Erreur = <span class="m">λ</span><sub>2</sub> = 0.</p>
+    <p class="note">Le 5D coupe à <span class="m">k</span> = 3 (cumul 91,1 %) alors que son coude est à <span class="m">k</span> = 2 (75,6 %) : <b>les deux règles ne donnent pas le même <span class="m">k</span></b>, et aucune n'a raison contre l'autre.</p>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — scree plot : choisir <span class="m">k</span></div>
+    <div class="sl-ctl" id="f4presets"></div>
+    <div id="f4plot" class="wide"></div>
+    <div id="f4sliders"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">Barres : la part <span class="m">λ</span><sub>i</sub>/tr <span class="m">C</span> de chaque axe. Ligne bleue : le cumul. Ligne tiretée : le seuil 90 %. <b>Déplace <span class="m">k</span></b> et lis les deux tuiles du bas : la variance gardée monte, l'erreur de reconstruction Σ<sub>i &gt; k</sub> <span class="m">λ</span><sub>i</sub> descend, et elle tombe à zéro dès <span class="m">k</span> = 1 sur le fil rouge — un axe suffit parce que le second <span class="m">λ</span> est nul. Compare le 5D (coude à 2, seuil à 3) : <b>deux règles, deux réponses</b>.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Piège 1 : centrer <span class="tag casse">casse</span></h3>
+    <p>Sans centrage on ne diagonalise plus <span class="m">C</span> mais la matrice des moments autour de <b>0</b>, et l'écart entre les deux est une matrice de rang 1 qui pointe vers la moyenne :</p>
+    <div class="eq">Σ<sub>i</sub> <span class="m">x</span><sub>i</sub><span class="m">x</span><sub>i</sub><sup>⊤</sup> = Σ<sub>i</sub> (<span class="m">x</span><sub>i</sub> − <span class="m">μ</span>)(<span class="m">x</span><sub>i</sub> − <span class="m">μ</span>)<sup>⊤</sup> + <span class="m">n μμ</span><sup>⊤</sup></div>
+    <p>Plus le nuage est loin de l'origine, plus <span class="m">nμμ</span><sup>⊤</sup> écrase la dispersion : la première direction bascule vers le <b>centre</b> du nuage. Aucune exception n'est levée, le code tourne, le résultat est faux.</p>
+    <p class="say">« La covariance est définie autour de la moyenne, donc sans centrer on diagonalise cette covariance plus <span class="m">nμμ</span><sup>⊤</sup>, donc la première direction pointe vers le centre du nuage et non le long de sa dispersion. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le fil rouge, non centré</div>
+    <p><span class="m">X</span><sup>⊤</sup><span class="m">X</span>/2 sur les points bruts (1, 2), (2, 3), (3, 4) :</p>
+    <div class="eq"><span class="mat"><b>7</b><b>10</b><b>10</b><b>14,5</b></span> &nbsp;⇒&nbsp; <span class="m">λ</span> = 21,43 et 0,070</div>
+    <div class="tw"><table>
+      <tr><th></th><th>première direction</th><th>angle</th></tr>
+      <tr class="hl"><td>centré (vrai)</td><td>(0,707 ; 0,707)</td><td>45,0°</td></tr>
+      <tr><td>non centré</td><td>(0,570 ; 0,822)</td><td>55,3°</td></tr>
+      <tr><td>direction de <span class="m">μ</span> = (2 ; 3)</td><td>(0,555 ; 0,832)</td><td>56,3°</td></tr>
+    </table></div>
+    <p>Les trois points sont exactement sur la droite à 45° : c'est la seule bonne réponse. Non centrée, la PCA rend 55,3° — à 1° près la direction de la moyenne. Elle a mesuré <b>où est le nuage</b>, pas comment il s'étale.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — centrer, ou pointer vers le centre</div>
+    <div class="sl-ctl" id="f2ctl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div id="f2sliders"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap"><b>Éloigne le nuage de l'origine</b> avec le curseur : la droite bleue (axe de <span class="m">C</span>, calculée sur les données centrées) garde son angle de 73,2° quoi qu'il arrive, tandis que la droite rouge (axe de <span class="m">X</span><sup>⊤</sup><span class="m">X</span>, sans centrage) se couche vers la direction du décalage. Clique <b>centrer les données</b> : le nuage revient à l'origine, <span class="m">μ</span> = 0, le terme <span class="m">nμμ</span><sup>⊤</sup> disparaît et les deux droites se confondent — l'écart d'angle tombe à 0 et le curseur n'a plus aucun effet sur elles. C'est ça, l'invariance qu'on achète en centrant.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Piège 2 : les unités <span class="tag casse">casse</span></h3>
+    <p>Une variance porte les unités au carré (<a href="chain-p00-02-esperance-variance-densite.html#s4">p00-02, pas 4</a>) : multiplier une colonne par 100 multiplie sa variance par 10 000. Une feature en centaines domine donc une feature en unités <b>sans être plus informative</b>.</p>
+    <div class="eq">Var(<span class="m">c x</span>) = <span class="m">c</span>² Var(<span class="m">x</span>) &nbsp;⇒&nbsp; standardiser = diagonaliser la <b>corrélation</b>, pas la covariance</div>
+    <p>Standardiser quand les unités diffèrent. Ne pas standardiser quand elles sont comparables et que les écarts de variance <i>sont</i> l'information — pixels, log-retours. C'est un choix à justifier, jamais un réglage par défaut.</p>
+    <p class="say">« La variance porte les unités au carré, donc changer d'unité multiplie une variance par le carré du facteur, donc la composante dominante suit l'unité et non l'information — sauf à diagonaliser la corrélation. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — quatre points, deux unités</div>
+    <p><span class="m">x</span><sub>1</sub> ∈ {1, 2, 3, 4} et <span class="m">x</span><sub>2</sub> ∈ {100, 300, 200, 400}, corrélation 0,8.</p>
+    <div class="eq"><span class="m">C</span> = <span class="mat"><b>1,667</b><b>133,3</b><b>133,3</b><b>16 666,7</b></span></div>
+    <div class="tw"><table>
+      <tr><th></th><th><span class="m">λ</span><sub>1</sub> · <span class="m">λ</span><sub>2</sub></th><th>PC1</th><th>part de PC1</th></tr>
+      <tr><td>brut</td><td>16 667,7 · 0,600</td><td>(0,008 ; 1,000)</td><td>99,996 %</td></tr>
+      <tr class="hl"><td>standardisé</td><td>1,8 · 0,2</td><td>(0,707 ; 0,707)</td><td>90 %</td></tr>
+    </table></div>
+    <p>Brut, PC1 <i>est</i> l'axe <span class="m">x</span><sub>2</sub> à 0,46° près et <span class="m">x</span><sub>1</sub> n'existe plus. Standardisé, la matrice diagonalisée est [[1 ; 0,8], [0,8 ; 1]] : <span class="m">λ</span> = 1 ± 0,8, et PC1 retombe sur la diagonale. <b>Les deux réponses sont exactes</b> — elles répondent à deux questions différentes.</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — l'unité fabrique la composante</div>
+    <div class="sl-ctl" id="f3presets"></div>
+    <div id="f3plot" class="wide"></div>
+    <div id="f3sliders"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Le même nuage de 60 points, dont on change l'<b>unité</b> de <span class="m">x</span><sub>2</sub> — les données ne changent pas, seule l'échelle de lecture change. Les deux axes sont à la même échelle de pixels : dès ×10 le nuage est une aiguille et PC1 (trait rouge) se couche sur <span class="m">x</span><sub>2</sub>. Le preset <b>×100</b> reproduit les chiffres de l'application au chiffre près. Clique <b>standardiser</b> : <span class="m">λ</span> = 1,8 et 0,2 et PC1 revient sur la diagonale, <b>quelle que soit la position du curseur</b> — c'est le sens de l'opération.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Piège 3 : ajuster sur le train seulement <span class="tag casse">casse</span></h3>
+    <p>Moyenne, écart-type et directions sont des <b>quantités estimées</b>, au même titre que des coefficients. Elles s'estiment sur le train ; le test est seulement <b>transformé</b> avec elles.</p>
+    <div class="eq"><span class="hat"><span class="m">μ</span></span>, <span class="hat"><span class="m">σ</span></span>, <span class="m">V</span> ← train &nbsp;·&nbsp; <span class="m">Z</span><sub>test</sub> = ((<span class="m">X</span><sub>test</sub> − <span class="hat"><span class="m">μ</span></span>) ⊘ <span class="hat"><span class="m">σ</span></span>) <span class="m">V</span><sub>k</sub></div>
+    <p>Ajuster sur la réunion train + test, c'est laisser le test entrer dans le modèle : le score mesuré devient optimiste. Dans une validation croisée, tout le pipeline — centrage, standardisation, PCA — se réajuste <b>à l'intérieur de chaque pli</b> (<a href="../../map.html#p06-02">p06-02</a>).</p>
+    <p class="say">« La moyenne, l'écart-type et les directions sont estimés sur des données, donc les estimer sur le test fait entrer le test dans le modèle, donc le score mesuré est optimiste — c'est une fuite, pas un détail d'implémentation. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le même point, deux transformations</div>
+    <p>Train = (1, 100), (2, 300), (3, 200) ; test = (4, 400). Sur le train : <span class="hat"><span class="m">μ</span></span> = (2 ; 200), <span class="hat"><span class="m">σ</span></span> = (1 ; 100).</p>
+    <div class="tw"><table>
+      <tr><th>statistiques ajustées sur…</th><th><span class="hat"><span class="m">μ</span></span></th><th><span class="hat"><span class="m">σ</span></span></th><th>image de (4, 400)</th></tr>
+      <tr class="hl"><td>le train seul</td><td>(2 ; 200)</td><td>(1 ; 100)</td><td>(2,00 ; 2,00)</td></tr>
+      <tr><td>train + test (fuite)</td><td>(2,5 ; 250)</td><td>(1,29 ; 129,1)</td><td>(1,16 ; 1,16)</td></tr>
+    </table></div>
+    <p>Le point de test est un <b>extrême</b> : ajusté correctement il tombe à 2 écarts-types, avec la fuite il n'est plus qu'à 1,16. Le modèle a vu le test lui rétrécir sa propre queue de distribution — et le score de test en hérite.</p>
+    <p class="note">L'axe bouge aussi : PC1 vaut 89,71° ajustée sur le train seul, 89,54° ajustée sur tout. <b>Petit écart, mais du test dedans</b> : la fuite n'a pas besoin d'être grosse pour invalider un score.</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>PCA = SVD des données centrées <span class="tag tronc">tronc</span></h3>
+    <p>On ne forme pas <span class="m">C</span> pour la diagonaliser : on décompose <span class="m">X</span><sub>c</sub> directement.</p>
+    <div class="eq"><span class="m">X</span><sub>c</sub> = <span class="m">U</span>Σ<span class="m">V</span><sup>⊤</sup> &nbsp;⇒&nbsp; <span class="m">C</span> = <span class="m">X</span><sub>c</sub><sup>⊤</sup><span class="m">X</span><sub>c</sub>/(<span class="m">n</span> − 1) = <span class="m">V</span>Σ²<span class="m">V</span><sup>⊤</sup>/(<span class="m">n</span> − 1)</div>
+    <p>Composantes = colonnes de <span class="m">V</span> · <span class="m">λ</span><sub>i</sub> = <span class="m">σ</span><sub>i</sub>²/(<span class="m">n</span> − 1) · scores = <span class="m">U</span>Σ. Former <span class="m">X</span><sub>c</sub><sup>⊤</sup><span class="m">X</span><sub>c</sub> élèverait le conditionnement au carré et perdrait deux fois plus de chiffres (<a href="chain-p04-03-spectral-svd-conditionnement.html#s7">p04-03, pas 7</a>) : ici la matrice est celle qu'on veut décomposer, le motif est donc le même.</p>
+    <p class="say">« <span class="m">X</span><sub>c</sub> se factorise en <span class="m">U</span>Σ<span class="m">V</span><sup>⊤</sup>, donc <span class="m">X</span><sub>c</sub><sup>⊤</sup><span class="m">X</span><sub>c</sub> vaut <span class="m">V</span>Σ²<span class="m">V</span><sup>⊤</sup>, donc les composantes sont les colonnes de <span class="m">V</span> et les <span class="m">λ</span> valent <span class="m">σ</span>²/(<span class="m">n</span> − 1), donc on lit la PCA sur la SVD sans jamais former la covariance. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le fil rouge par la SVD</div>
+    <p><span class="m">X</span><sub>c</sub><sup>⊤</sup><span class="m">X</span><sub>c</sub> = [[2, 2], [2, 2]], valeurs propres 4 et 0, donc</p>
+    <div class="eq"><span class="m">σ</span> = 2 et 0 &nbsp;⇒&nbsp; <span class="m">λ</span> = <span class="m">σ</span>²/(<span class="m">n</span> − 1) = 4/2 = 2 et 0 ✓</div>
+    <div class="tw"><table>
+      <tr><th>objet</th><th>valeur</th></tr>
+      <tr class="hl"><td><span class="m">V</span> (composantes)</td><td>(0,707 ; 0,707) et (0,707 ; −0,707)</td></tr>
+      <tr><td>scores <span class="m">U</span>Σ sur PC1</td><td>−1,414 · 0 · 1,414</td></tr>
+      <tr><td><span class="m">u</span><sub>1</sub> = <span class="m">X</span><sub>c</sub><span class="m">v</span><sub>1</sub>/<span class="m">σ</span><sub>1</sub></td><td>(−0,707 ; 0 ; 0,707)</td></tr>
+    </table></div>
+    <p>Les mêmes <span class="m">λ</span> qu'au pas 3, obtenus sans écrire <span class="m">C</span>. Et <span class="m">σ</span><sub>2</sub> = 0 dit directement le rang : une seule direction porte le nuage.</p>
+  </div>
+</div>
+
+<div class="step" id="s9">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Les trois pièges précédents sont des fautes de préparation, réparables. Ce qui suit est dans la méthode elle-même : les deux hypothèses H1 — linéarité et variance — ne sont pas toujours vraies, et rien dans la sortie ne le signale.</p>
+    <p class="say">« La PCA ne voit que des ellipses et ne classe que par variance, donc une structure courbe ou une direction utile mais peu dispersée lui sont invisibles, donc son silence n'est jamais une preuve qu'il n'y avait rien. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">4 limites</div>
+    <ul>
+      <li><b>Structure non linéaire.</b> Un cercle, un S, une spirale : la covariance ne décrit que des ellipses, donc PCA renvoie deux axes de variance égale et ne dit rien de la courbe. Kernel PCA, UMAP.</li>
+      <li><b>Variance ≠ information.</b> La plus grande variance peut être du bruit de capteur ou une variable parasite ; et la PCA ne regarde jamais <span class="m">y</span>, donc elle peut jeter précisément la direction qui prédit. Pour réduire <i>en vue de prédire</i> : PLS.</li>
+      <li><b>Outliers.</b> La covariance est quadratique en l'écart : un seul point aberrant loin du nuage fabrique à lui seul une direction de grande variance et tire PC1 vers lui. Même mécanisme que la moyenne contre la médiane.</li>
+      <li><b>Interprétation.</b> Une composante est un mélange de <b>toutes</b> les features, avec des signes arbitraires (<span class="m">q</span> et −<span class="m">q</span> sont le même axe). « PC1 = la taille » est une lecture après coup, jamais un fait produit par la méthode.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>PCA = directions de <b>variance maximale</b> ; Var(<span class="m">a</span><sup>⊤</sup><span class="m">x</span>) = <span class="m">a</span><sup>⊤</sup><span class="m">Ca</span> sous ‖<span class="m">a</span>‖ = 1.</li>
+    <li>Maximiser une forme quadratique sur la sphère ⇒ <b>vecteur propre dominant</b> ; <span class="m">λ</span><sub>i</sub> = variance portée, <span class="m">λ</span><sub>i</sub>/tr <span class="m">C</span> = part expliquée, Σ<sub>i &gt; k</sub> <span class="m">λ</span><sub>i</sub> = erreur de troncature.</li>
+    <li><b>Centrer</b>, sinon on diagonalise <span class="m">C</span> + <span class="m">nμμ</span><sup>⊤</sup> et la direction pointe vers le centre du nuage.</li>
+    <li><b>Standardiser</b> si les unités diffèrent (c'est diagonaliser la corrélation) ; sinon la variance fabrique la composante. Choix à justifier, pas défaut.</li>
+    <li><b>fit</b> sur le train, <b>transform</b> sur le test — moyenne, écart-type et <span class="m">V</span> compris, et à l'intérieur de chaque pli.</li>
+    <li>Calcul : <b>SVD des données centrées</b>, composantes = <span class="m">V</span>, <span class="m">λ</span> = <span class="m">σ</span>²/(<span class="m">n</span> − 1) ; ne pas former <span class="m">C</span>. Silencieuse sur le non-linéaire, sur <span class="m">y</span> et sur les outliers.</li>
+  </ol>
+</div>
+<div class="phrase">« La PCA maximise la variance projetée, qui est une forme quadratique de la covariance ; son maximum sur la sphère unité est le vecteur propre dominant, et les suivants sont orthogonaux. Elle est fausse sans erreur si on ne centre pas, parce que la covariance est définie autour de la moyenne ; si on ne standardise pas des unités hétérogènes, parce que la variance porte les unités au carré ; et si on l'ajuste sur le test, parce que c'est une fuite. On la calcule par SVD des données centrées. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Que maximise la PCA, et sous quelle forme ?</div><div class="a hid">Var(a<sup>⊤</sup>x) = a<sup>⊤</sup>Ca, sous ‖a‖ = 1 — une forme quadratique sur la sphère unité.</div></li>
+    <li><div class="q">Pourquoi la solution est-elle un vecteur propre ?</div><div class="a hid">Dans la base propre, a<sup>⊤</sup>Ca = Σλ<sub>i</sub>a<sub>i</sub>² avec Σa<sub>i</sub>² = 1 : une moyenne pondérée des λ, maximale quand tout le poids va sur λ<sub>max</sub>.</div></li>
+    <li><div class="q">Que se passe-t-il si on ne centre pas ?</div><div class="a hid">On diagonalise C + nμμ<sup>⊤</sup> : la première direction pointe vers le centre du nuage. Sur le fil rouge, 55,3° au lieu de 45° — la direction de μ, pas celle de la droite.</div></li>
+    <li><div class="q">Quand standardiser, quand ne pas le faire ?</div><div class="a hid">Unités hétérogènes : oui — c'est diagonaliser la corrélation. Unités comparables où les écarts de variance sont l'information (pixels) : non.</div></li>
+    <li><div class="q">PCA et SVD : quel lien, et pourquoi préférer la SVD ?</div><div class="a hid">X<sub>c</sub> = UΣV<sup>⊤</sup>, composantes = V, λ = σ²/(n − 1), scores = UΣ. Former X<sub>c</sub><sup>⊤</sup>X<sub>c</sub> élève κ au carré.</div></li>
+    <li><div class="q">Que fait-on du jeu de test ?</div><div class="a hid">On le <i>transforme</i> avec la moyenne, l'écart-type et le V du train — jamais on ne les réestime dessus, et tout le pipeline se réajuste dans chaque pli de CV.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="chain-p04-03-spectral-svd-conditionnement.html#s3"><b>p04-03, pas 3 — formes quadratiques</b><small>même objet : x<sup>⊤</sup>Ax = Σλ<sub>i</sub>a<sub>i</sub>². Là-bas le signe des λ donne bol / vallée / selle ; ici la taille des λ donne l'axe principal. Une seule identité, deux lectures.</small></a>
+    <a href="chain-p04-03-spectral-svd-conditionnement.html#s7"><b>p04-03, pas 7 — ne pas former X<sup>⊤</sup>X</b><small>le pas 8 le rejoue pour la PCA : les composantes se lisent sur V, jamais sur les vecteurs propres d'un produit formé à la main.</small></a>
+    <a href="chain-p04-02-valeurs-propres-iteration.html#s5"><b>p04-02, pas 5 — seule la plus grande survit</b><small>la puissance itérée converge vers q<sub>1</sub> : c'est l'algorithme qui trouve PC1 quand p est grand, et la même domination de λ<sub>1</sub>.</small></a>
+    <a href="../../map.html#p06-02"><b>p06-02 — fuite et validation croisée</b><small>le pas 7 est un cas particulier : toute quantité estimée sur les données doit rester à l'intérieur du pli.</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>ml::pca</code> (ce que maximise la PCA, part de variance expliquée, choix de k, PCA ≠ sélection de features) · <code>algebre::spectral</code> (QΛQ<sup>⊤</sup>, forme quadratique dans la base propre) · <code>ml::standardisation</code> (quand standardiser, fit sur le train, corrélation vs covariance).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p04-04 · v1 du 16/09/2026 · dernière chaîne de la partie 04. Prérequis : p04-03, p00-02. Suite : <a href="../../map.html#p05-01">p05-01 Régression linéaire — le modèle et OLS</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outillage commun (repris de p04-01 … p04-03) =====
+   Rappel du piège : SL.plane pose la matrice en transform="matrix(…)" sur son groupe
+   monde, et Chromium ne peint RIEN quand cette matrice est singulière. Ici le fil rouge
+   EST le cas singulier (λ₂ = 0), donc SL.plane ne sert qu'au décor fixe — grille fine,
+   carré unité — et jamais rien n'est appliqué : tout le nuage, les axes et les
+   projections sont dessinés à la main en coordonnées écran. Un nuage plat doit se voir
+   s'effondrer sur une droite, pas disparaître. */
+function readouts(host,items){host.innerHTML=items.map(i=>`<div class="${i.c||''}">${i.k}<b>${i.v}</b></div>`).join('');}
+const DEG=x=>SL.fmt(((x%180)+180)%180,1)+'°';
+
+function planeFig(id,o){
+  const W=o.W||460,H=o.H||460,S=o.S||40,CX=W/2,CY=H/2;
+  const pl=SL.plane(document.getElementById(id),{w:W,h:H,scale:S,vectors:[],fixed:[]});
+  const ov=SL.el('g',{},pl.svg);
+  const px=x=>CX+S*x, py=y=>CY-S*y;
+  return {svg:pl.svg,px,py,S,W,H,R:Math.min(CX,CY)/S,
+    clear(){while(ov.firstChild)ov.removeChild(ov.firstChild);},
+    dot(x,y,cls,r){return SL.el('circle',{cx:px(x),cy:py(y),r:r===undefined?5.5:r,class:'sl-dot '+(cls||'')},ov);},
+    seg(xa,ya,xb,yb,cls){return SL.el('line',{x1:px(xa),y1:py(ya),x2:px(xb),y2:py(yb),class:'sl-seg '+(cls||'')},ov);},
+    txt(x,y,s,cls,dx,dy,an){
+      let X=px(x)+(dx||0),Y=py(y)+(dy||0),a=an||'start';
+      if(a==='start'&&X>W-92)a='end'; else if(a==='end'&&X<92)a='start';
+      X=Math.max(8,Math.min(W-8,X));Y=Math.max(15,Math.min(H-8,Y));
+      const e=SL.el('text',{x:X,y:Y,class:cls||'','text-anchor':a},ov);e.textContent=s;return e;}};
+}
+
+/* ----- algèbre 2×2, matrices à plat : [a, b, c, d] pour [[a, b], [c, d]] ----- */
+function mm(A,B){return [A[0]*B[0]+A[1]*B[2],A[0]*B[1]+A[1]*B[3],A[2]*B[0]+A[3]*B[2],A[2]*B[1]+A[3]*B[3]];}
+function mv(M,x){return [M[0]*x[0]+M[1]*x[1],M[2]*x[0]+M[3]*x[1]];}
+/* décomposition spectrale d'une 2×2 symétrique : λ₁ ≥ λ₂, q₁ ⟂ q₂, q₁ orienté vers la droite */
+function eigsym(C){
+  const tr=C[0]+C[3], dt=C[0]*C[3]-C[1]*C[2];
+  const s=Math.sqrt(Math.max(0,tr*tr-4*dt));
+  const l1=(tr+s)/2, l2=Math.max(0,(tr-s)/2);
+  let v=Math.abs(C[1])>1e-12?[C[1],l1-C[0]]:(C[0]>=C[3]?[1,0]:[0,1]);
+  let n=Math.hypot(v[0],v[1]); if(n<1e-12){v=[1,0];n=1;}
+  v=[v[0]/n,v[1]/n];
+  if(v[0]<-1e-12||(Math.abs(v[0])<=1e-12&&v[1]<0))v=[-v[0],-v[1]];
+  return {l1,l2,tr,q1:v,q2:[-v[1],v[0]]};
+}
+/* racine carrée symétrique d'une 2×2 semi-définie positive : √C = (C + √det·I)/(√λ₁ + √λ₂) */
+function msqrt(C){
+  const E=eigsym(C), r1=Math.sqrt(E.l1), r2=Math.sqrt(E.l2), k=r1+r2;
+  if(k<1e-12)return [0,0,0,0];
+  return [(C[0]+r1*r2)/k,C[1]/k,C[2]/k,(C[3]+r1*r2)/k];
+}
+function minv(M){const d=M[0]*M[3]-M[1]*M[2];return [M[3]/d,-M[1]/d,-M[2]/d,M[0]/d];}
+/* covariance empirique (dénominateur n − 1) d'une liste de points, centrée ou non */
+function covOf(P,center){
+  const n=P.length; let mx=0,my=0;
+  if(center!==false){P.forEach(p=>{mx+=p[0];my+=p[1];});mx/=n;my/=n;}
+  let a=0,b=0,d=0;
+  P.forEach(p=>{const u=p[0]-mx,v=p[1]-my;a+=u*u;b+=u*v;d+=v*v;});
+  return [a/(n-1),b/(n-1),b/(n-1),d/(n-1)];
+}
+/* nuage pseudo-aléatoire de covariance empirique EXACTEMENT C : on blanchit l'échantillon
+   tiré, puis on lui applique √C. Les readouts collent donc à l'algèbre au dernier chiffre. */
+function lcg(seed){let s=seed>>>0;return()=>{s=(Math.imul(s,1664525)+1013904223)>>>0;return (s>>>8)/16777216;};}
+function makeCloud(C,n,seed){
+  const r=lcg(seed), Z=[];
+  for(let i=0;i<n;i++){
+    let u=r();if(u<1e-9)u=1e-9;
+    const v=r(), g=Math.sqrt(-2*Math.log(u));
+    Z.push([g*Math.cos(2*Math.PI*v),g*Math.sin(2*Math.PI*v)]);
+  }
+  let mx=0,my=0;Z.forEach(p=>{mx+=p[0];my+=p[1];});mx/=n;my/=n;
+  Z.forEach(p=>{p[0]-=mx;p[1]-=my;});
+  const A=mm(msqrt(C),minv(msqrt(covOf(Z,false))));
+  return Z.map(p=>mv(A,p));
+}
+
+/* ===== Figure 1 — tourner la direction, lire la variance ===== */
+(function(){
+  const F=planeFig('f1plot',{W:460,H:460,S:42});
+  const CL=[
+    {n:'C = [[1, 1], [1, 4]] — 60 points',pts:makeCloud([1,1,1,4],60,7),r:3.6},
+    {n:'nuage plat — 60 points alignés',pts:makeCloud([1,1,1,1],60,7),r:3.6},
+    {n:'le fil rouge — 3 points',pts:[[-1,-1],[0,0],[1,1]],r:6}];
+  let cur=0;
+  const cbtns=CL.map((c,i)=>{const b=SL.h('button','tb',document.getElementById('f1clouds'),c.n);
+    b.onclick=()=>{cur=i;draw();};return b;});
+  let ready=false;
+  const sA=SL.slider(document.getElementById('f1sliders'),
+    {label:'angle de a',min:0,max:180,step:'any',value:30,fmt:v=>SL.fmt(v,1)+'°'},()=>draw());
+  const PR=[['sur PC1',()=>angOf(E().q1)],['sur PC2',()=>angOf(E().q2)],['axe x₁',()=>0],['axe x₂',()=>90]];
+  const pbtns=PR.map(p=>{const b=SL.h('button','tb',document.getElementById('f1presets'),p[0]);
+    b.onclick=()=>sA.set(p[1]());return b;});
+  const angOf=v=>((Math.atan2(v[1],v[0])*180/Math.PI)%180+180)%180;
+  const E=()=>eigsym(covOf(CL[cur].pts));
+  const out=document.getElementById('f1out');
+  function draw(){
+    if(!ready)return;
+    const cl=CL[cur], P=cl.pts, C=covOf(P), e=eigsym(C);
+    const th=sA.get()*Math.PI/180, a=[Math.cos(th),Math.sin(th)], L=5.3;
+    F.clear();
+    F.seg(-L,0,L,0,'ax');F.seg(0,-L,0,L,'ax');
+    /* les deux axes propres, tiretés : ils ne bougent pas avec le curseur */
+    [[e.q1,'PC1','sl-c4'],[e.q2,'PC2','sl-c4 pale']].forEach(([q,nm,cls])=>{
+      F.seg(-L*q[0],-L*q[1],L*q[0],L*q[1],'eig '+cls);
+      F.txt(4.4*q[0],4.4*q[1],nm,cls.indexOf('pale')>=0?'sl-c4 pale strong':'sl-c4 strong',0,-5,q[0]>0.2?'start':(q[0]<-0.2?'end':'middle'));});
+    /* la direction a, puis les projections point par point */
+    F.seg(-L*a[0],-L*a[1],L*a[0],L*a[1],'axv sl-c3');
+    let s2=0;
+    P.forEach(p=>{const t=p[0]*a[0]+p[1]*a[1];s2+=t*t;
+      F.seg(p[0],p[1],t*a[0],t*a[1],'proj');});
+    P.forEach(p=>F.dot(p[0],p[1],'pt',cl.r));
+    P.forEach(p=>{const t=p[0]*a[0]+p[1]*a[1];F.dot(t*a[0],t*a[1],'foot',2.8);});
+    const vr=s2/(P.length-1);
+    F.txt(4.9*a[0],4.9*a[1],'a','sl-c3 strong',0,-6,a[0]>0.2?'start':'middle');
+    readouts(out,[
+      {k:'angle de a',v:SL.fmt(sA.get(),1)+'°'},
+      {k:'Var(aᵀx) = aᵀCa',v:SL.fmt(vr,3),c:Math.abs(vr-e.l1)<1e-6?'pos':(Math.abs(vr-e.l2)<1e-6?'zero':'')},
+      {k:'part de la variance totale',v:SL.fmt(100*vr/e.tr,1)+' %'},
+      {k:'λ₁ — le maximum, sur PC1',v:SL.fmt(e.l1,3)+' à '+DEG(angOf(e.q1))},
+      {k:'λ₂ — le minimum, sur PC2',v:SL.fmt(e.l2,3)+' à '+DEG(angOf(e.q2)),c:e.l2<1e-9?'zero':''},
+      {k:'ce qu\'il reste au maximum',v:SL.fmt(e.l1-vr,3)}]);
+    cbtns.forEach((b,i)=>b.setAttribute('aria-pressed',String(i===cur)));
+  }
+  ready=true;draw();
+})();
+
+/* ===== Figure 2 — centrer, ou pointer vers le centre ===== */
+(function(){
+  const F=planeFig('f2plot',{W:460,H:460,S:32});
+  const base=makeCloud([1,1,1,4],60,11);
+  const Cc=covOf(base), Ec=eigsym(Cc);
+  let centre=false, ready=false;
+  const bC=SL.h('button','tb',document.getElementById('f2ctl'),'centrer les données');
+  bC.onclick=()=>{centre=!centre;draw();};
+  const sD=SL.slider(document.getElementById('f2sliders'),
+    {label:'décalage d',min:0,max:2.2,step:'any',value:1.6,fmt:v=>'d = '+SL.fmt(v,2)},()=>draw());
+  const out=document.getElementById('f2out');
+  const angOf=v=>((Math.atan2(v[1],v[0])*180/Math.PI)%180+180)%180;
+  function draw(){
+    if(!ready)return;
+    const d=sD.get(), mu=[d,d], L=7.1;
+    const raw=base.map(p=>[p[0]+d,p[1]+d]);
+    const data=centre?base:raw;                 // ce qu'on donne à la PCA
+    const Mb=eigsym(covOf(data,false));          // XᵀX/(n−1) : pas de centrage interne
+    const ctr=centre?[0,0]:mu;                   // où passe l'axe de C
+    F.clear();
+    F.seg(-L,0,L,0,'ax');F.seg(0,-L,0,L,'ax');
+    if(centre){                                  // le nuage brut reste visible, en pâle
+      raw.forEach(p=>F.dot(p[0],p[1],'ghost',2.6));
+      if(d>0.12){F.seg(mu[0],mu[1],0,0,'lead');F.txt(mu[0],mu[1],'on retranche μ','plain',6,-8);}
+    }
+    data.forEach(p=>F.dot(p[0],p[1],'pt',3.2));
+    /* axe dominant de XᵀX : passe toujours par l'origine ; tireté une fois les deux
+       droites confondues, pour qu'on voie encore la bleue dessous */
+    F.seg(-L*Mb.q1[0],-L*Mb.q1[1],L*Mb.q1[0],L*Mb.q1[1],'axv sl-c3'+(centre?' eig':''));
+    /* axe de C (centré) : passe par la moyenne du nuage affiché */
+    F.seg(ctr[0]-L*Ec.q1[0],ctr[1]-L*Ec.q1[1],ctr[0]+L*Ec.q1[0],ctr[1]+L*Ec.q1[1],'axv sl-c4');
+    F.dot(ctr[0],ctr[1],'ring',6);
+    F.txt(ctr[0],ctr[1],'μ','plain',9,15);
+    /* les deux étiquettes partent dans des sens opposés : jamais de collision */
+    F.txt(-6.3*Mb.q1[0],-6.3*Mb.q1[1],'axe de XᵀX','sl-c3 strong',0,16,'middle');
+    F.txt(ctr[0]+5.0*Ec.q1[0],ctr[1]+5.0*Ec.q1[1],'axe de C','sl-c4 strong',7,0,'start');
+    const ab=angOf(Mb.q1), ac=angOf(Ec.q1), ecart=Math.abs(ab-ac);
+    readouts(out,[
+      {k:'état',v:centre?'centré':'brut',c:centre?'pos':'zero'},
+      {k:'‖μ‖ — éloignement',v:SL.fmt(centre?0:Math.hypot(mu[0],mu[1]),3)},
+      {k:'axe de XᵀX (rouge)',v:DEG(ab),c:ecart<1e-6?'pos':'zero'},
+      {k:'axe de C (bleu)',v:DEG(ac),c:'pos'},
+      {k:'écart d\'angle',v:SL.fmt(ecart,2)+'°',c:ecart<1e-6?'pos':'zero'},
+      {k:'λ₁ brut vs λ₁ centré',v:SL.fmt(Mb.l1,2)+' vs '+SL.fmt(Ec.l1,2)}]);
+    bC.setAttribute('aria-pressed',String(centre));
+    bC.textContent=centre?'revenir aux données brutes':'centrer les données';
+  }
+  ready=true;draw();
+})();
+
+/* ===== Figure 3 — l'unité fabrique la composante ===== */
+(function(){
+  const host=document.getElementById('f3plot');
+  const base=makeCloud([5/3,4/3,4/3,5/3],60,23);   // sd = √(5/3) sur les deux axes, ρ = 0,8
+  let std=false, ready=false;
+  const bS=SL.h('button','tb',document.getElementById('f3presets'),'standardiser');
+  const PR=[['×1',0],['×10',1],['×100 — le fil rouge',2],['×1 000',3]];
+  const pbtns=PR.map(p=>{const b=SL.h('button','tb',document.getElementById('f3presets'),p[0]);
+    b.onclick=()=>sS.set(p[1]);return b;});
+  const sS=SL.slider(document.getElementById('f3sliders'),
+    {label:'unité de x₂',min:0,max:3,step:'any',value:2,fmt:v=>'×'+SL.fmt(Math.pow(10,v))},()=>draw());
+  bS.onclick=()=>{std=!std;draw();};
+  const out=document.getElementById('f3out');
+  function ticks(R){
+    const raw=R/2.2, e=Math.pow(10,Math.floor(Math.log10(raw)));
+    const m=[1,2,2.5,5,10].find(k=>raw<=k*e)||10, st=m*e, t=[];
+    for(let k=-4;k<=4;k++){const v=k*st;if(Math.abs(v)<=R*1.001)t.push(v);}
+    return t;
+  }
+  function draw(){
+    if(!ready)return;
+    const s=Math.pow(10,sS.get());
+    const raw=base.map(p=>[p[0],p[1]*s]);
+    const C0=covOf(raw), sd1=Math.sqrt(C0[0]), sd2=Math.sqrt(C0[3]);
+    const data=std?raw.map(p=>[p[0]/sd1,p[1]/sd2]):raw;
+    const C=covOf(data), e=eigsym(C);
+    let R=0;data.forEach(p=>{R=Math.max(R,Math.abs(p[0]),Math.abs(p[1]));});R*=1.18;
+    const tk=ticks(R);
+    host.innerHTML='';
+    /* cadre carré en pixels (402 × 402) : les deux axes ont la MÊME échelle, donc
+       l'angle de PC1 se lit tel quel — c'est tout l'objet de la figure. */
+    const P=SL.plot(host,{x:[-R,R],y:[-R,R],w:460,h:452,xt:tk,yt:tk,xl:'x₁',yl:'x₂'});
+    data.forEach(p=>P.dot(p[0],p[1],'pt',3.2));
+    const k1=R/Math.max(Math.abs(e.q1[0]),Math.abs(e.q1[1])), k2=R/Math.max(Math.abs(e.q2[0]),Math.abs(e.q2[1]));
+    P.seg(-k2*e.q2[0],-k2*e.q2[1],k2*e.q2[0],k2*e.q2[1],'eig sl-c4');
+    P.seg(-k1*e.q1[0],-k1*e.q1[1],k1*e.q1[0],k1*e.q1[1],'axv sl-c3');
+    P.text(0.62*k1*e.q1[0]+0.07*R,0.62*k1*e.q1[1],'PC1','sl-c3','start');
+    const ang=((Math.atan2(e.q1[1],e.q1[0])*180/Math.PI)%180+180)%180;
+    readouts(out,[
+      {k:'unité de x₂',v:'×'+SL.fmt(s)},
+      {k:'état',v:std?'standardisé':'brut',c:std?'pos':'zero'},
+      {k:'écarts-types',v:SL.fmt(Math.sqrt(C[0]),3)+' · '+SL.fmt(Math.sqrt(C[3]),3)},
+      {k:'λ₁ · λ₂',v:SL.fmt(e.l1,e.l1>=1000?0:3)+' · '+SL.fmt(e.l2,3)},
+      {k:'PC1',v:'('+SL.fmt(e.q1[0],3)+' ; '+SL.fmt(e.q1[1],3)+') à '+DEG(ang)},
+      {k:'part de PC1',v:SL.fmt(100*e.l1/e.tr,3)+' %',c:100*e.l1/e.tr>99?'zero':'pos'}]);
+    bS.setAttribute('aria-pressed',String(std));
+    bS.textContent=std?'revenir aux données brutes':'standardiser';
+    pbtns.forEach((b,i)=>b.setAttribute('aria-pressed',String(Math.abs(PR[i][1]-sS.get())<1e-9)));
+  }
+  ready=true;draw();
+})();
+
+/* ===== Figure 4 — scree plot : choisir k ===== */
+(function(){
+  const E2=eigsym([1,1,1,4]);
+  const SETS=[
+    {n:'C = [[1, 1], [1, 4]] — p = 2',lam:[E2.l1,E2.l2]},
+    {n:'le fil rouge — λ₂ = 0',lam:[2,0]},
+    {n:'nuage 5D synthétique',lam:[4.2,2.6,1.4,0.6,0.2]}];
+  const P=SL.plot(document.getElementById('f4plot'),
+    {x:[0.3,5.7],y:[0,1.08],w:600,h:300,xt:[1,2,3,4,5],yt:[0.25,0.5,0.75,1],xl:'composante i',yl:'part de variance'});
+  const out=document.getElementById('f4out'), sh=document.getElementById('f4sliders');
+  let cur=0, sK=null;
+  const btns=SETS.map((s,i)=>{const b=SL.h('button','tb',document.getElementById('f4presets'),s.n);
+    b.onclick=()=>{cur=i;build();};return b;});
+  function build(){
+    sh.innerHTML='';
+    const p=SETS[cur].lam.length;
+    sK=null;                                   // le slider tire son callback à la création
+    const s=SL.slider(sh,{label:'k gardé',min:1,max:p,step:1,value:1,fmt:v=>SL.fmt(v,0)+' / '+p},()=>{if(sK)draw();});
+    sK=s;draw();
+  }
+  function draw(){
+    const lam=SETS[cur].lam, tot=lam.reduce((a,b)=>a+b,0), k=Math.round(sK.get());
+    P.clear();
+    /* le seuil 90 % et le repère k d'abord : les étiquettes passeront par-dessus */
+    P.seg(0.3,0.9,5.7,0.9,'lvl');P.text(5.6,0.93,'90 %','','end');
+    P.vline(k,'chord');
+    let cum=0;const pts=[];
+    lam.forEach((l,i)=>{const sh2=l/tot;cum+=sh2;pts.push([i+1,cum]);
+      const x0=P.sx(i+1-0.3), x1=P.sx(i+1+0.3), y=P.sy(sh2), y0=P.sy(0);
+      if(sh2>1e-9)SL.el('rect',{x:x0,y:y,width:x1-x0,height:y0-y,class:'sl-bar'},P.dyn);
+      /* une barre presque pleine n'a plus de place au-dessus : l'étiquette rentre dedans */
+      P.text(i+1,sh2>0.85?sh2-0.075:sh2+0.035,SL.fmt(100*sh2,1)+' %',sh2>0.85?'inbar':'','middle');});
+    pts.forEach((q,i)=>{if(i)P.seg(pts[i-1][0],pts[i-1][1],q[0],q[1],'sl-c1');});
+    pts.forEach(q=>P.dot(q[0],q[1],'sl-c1',5));
+    const gard=pts[k-1][1], err=lam.slice(k).reduce((a,b)=>a+b,0);
+    const k90=lam.findIndex((_,i)=>pts[i][1]>=0.9-1e-12)+1;
+    readouts(out,[
+      {k:'k gardé',v:k+' sur '+lam.length},
+      {k:'variance gardée',v:SL.fmt(100*gard,2)+' %',c:gard>=0.9?'pos':'zero'},
+      {k:'erreur Σ λ (i > k)',v:SL.fmt(err,3),c:err<1e-9?'pos':'zero'},
+      {k:'variance totale = tr C',v:SL.fmt(tot,3)},
+      {k:'k minimal à 90 %',v:String(k90)},
+      {k:'λ gardés',v:lam.slice(0,k).map(l=>SL.fmt(l,2)).join(' · ')}]);
+    btns.forEach((b,i)=>b.setAttribute('aria-pressed',String(i===cur)));
+  }
+  build();
+})();
+})();
+</script>
+</body>
+</html>
