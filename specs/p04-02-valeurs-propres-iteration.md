@@ -10,7 +10,7 @@ prereq: [p04-01]
 anki: [algebre::eigen, algebre::power-iteration, algebre::markov, algebre::diagonalisation]
 bridges: [b06]
 next: p04-03
-status: built
+status: reviewed
 ---
 
 ## Question de la chaîne
@@ -106,3 +106,5 @@ Pas de Jordan au-delà d'une phrase de casse, pas de valeurs propres complexes a
   b06 retenu ici : « une forme quadratique est convexe quand ses valeurs propres sont
   ≥ 0, et la forme fermée existe quand aucune n'est nulle ». À reprendre si le pont
   b06 est écrit autrement.
+
+**Arbitrage de revue 3, 16/09 — validé 16/09.** Preset Markov normalisé par la somme : **validé** (les deux rendus sont indiscernables, et la somme est la bonne lecture pour des distributions). Directions propres en overlay plutôt que par `fixed` : **validé**, c'est la conséquence du bug `SL.plane` corrigé depuis dans la lib — le contournement reste en place, la sheet n'est pas à refaire. Nuance sur la suite (0,8376 à k = 4) et cadrage du pont b06 : **validés**. Statut `reviewed`.

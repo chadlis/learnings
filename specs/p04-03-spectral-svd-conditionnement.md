@@ -10,7 +10,7 @@ prereq: [p04-02]
 anki: [algebre::spectral, algebre::svd, algebre::conditionnement, algebre::valeurs-singulieres]
 bridges: [b06]
 next: p04-04
-status: built
+status: reviewed
 ---
 
 ## Question de la chaîne
@@ -111,3 +111,5 @@ Note de mise en œuvre : comme en p04-01 et p04-02, `SL.plane` ne sert qu'au dé
 départ et toute la scène d'arrivée est redessinée en coordonnées écran — sans quoi
 le preset singulier B (σ₂ = 0) disparaîtrait au lieu de s'effondrer sur une droite.
 `assets/sheetlib.js` n'a pas été touché.
+
+**Arbitrage de revue 3, 16/09 — validé 16/09.** Les deux chiffres d'itérations **cohabitent** : 163 pas à η = 1/κ pour un facteur 100 sur la loss ici, 114 à η = 0,02 pour un facteur 10 sur l'écart dans w03-01 — ce ne sont pas les mêmes conventions, et la légende le dit, ce qui suffit. Recoupement de la figure 4 avec la figure 3 de p04-02 : **validé**, le recentrage sur κ(matrice empilée) contre κ(Gram) justifie la reprise. Presets de la figure 2 limités à det ≥ 0 : **validé**. Statut `reviewed`.
