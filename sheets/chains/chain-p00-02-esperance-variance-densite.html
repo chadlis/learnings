@@ -501,8 +501,12 @@ function draw3(){
     +'<div class="zero">P(T = a) exactement<b>0</b></div>';
 }
 const sl3=document.getElementById('f3sliders');
-SL.slider(sl3,{label:'a (minutes)',min:0,max:55,step:1,value:10,fmt:v=>SL.fmt(v,0)+' min'},v=>{st3.a=v;draw3();});
-SL.slider(sl3,{label:'b (minutes)',min:1,max:60,step:1,value:20,fmt:v=>SL.fmt(v,0)+' min'},v=>{st3.b=v;draw3();});
+/* a et b se poussent l'un l'autre : b > a toujours, donc jamais d'aire nulle à regarder */
+let sA,sB;
+sA=SL.slider(sl3,{label:'a (minutes)',min:0,max:55,step:1,value:10,fmt:v=>SL.fmt(v,0)+' min'},
+  v=>{st3.a=v;if(sB&&st3.b<=v){sB.set(Math.min(60,v+1));return;}draw3();});
+sB=SL.slider(sl3,{label:'b (minutes)',min:1,max:60,step:1,value:20,fmt:v=>SL.fmt(v,0)+' min'},
+  v=>{st3.b=v;if(sA&&st3.a>=v){sA.set(Math.max(0,v-1));return;}draw3();});
 
 draw1();draw3();
 })();

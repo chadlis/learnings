@@ -497,7 +497,7 @@ function draw2(){
     +'<div>'+(!ok?'n trop petit pour ce λ : il n\'y a pas assez d\'occasions, la binomiale n\'existe pas':(dmax<=0.01?'la binomiale a rejoint la poisson':'monte n pour faire tomber l\'écart'))+'</div>';
 }
 SL.slider(document.getElementById('f2sliders'),{label:'λ (par heure)',min:0.5,max:15,step:0.5,value:4},v=>{st2.lam=v;draw2();});
-SL.slider(document.getElementById('f2sliders'),{label:'n (occasions)',min:10,max:2000,step:10,value:1000,fmt:v=>SL.fmt(v,0)},v=>{st2.n=v;draw2();});
+SL.slider(document.getElementById('f2sliders'),{label:'n (occasions)',min:20,max:2000,step:10,value:1000,fmt:v=>SL.fmt(v,0)},v=>{st2.n=v;draw2();});
 
 /* ===== Figure 3 : exponentielle et absence de mémoire ===== */
 const h3=document.getElementById('f3plot'),o3=document.getElementById('f3out');
