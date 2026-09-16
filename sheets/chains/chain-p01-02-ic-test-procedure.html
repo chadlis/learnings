@@ -1,0 +1,478 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Intervalle de confiance et test — chaîne</title>
+<meta name="sheet" content="series=chain;part=01;number=02;status=v1">
+<meta name="part" content="01 · L'objet aléatoire (fil A)">
+<meta name="subtitle" content="fil A, cas 1 — l'intervalle porte sur la procédure, pas sur la vérité">
+<meta name="prereq" content="p01-01">
+<meta name="anki" content="stats::inference,stats::ic,stats::pvalue,stats::h0">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ---- marques de cette chaîne (classes seulement, jamais de fill inline) ---- */
+.sl-area{fill:var(--red);opacity:.20;stroke:none}
+.sl-seg.mk-hat{stroke:#B7791F;stroke-width:2.2;stroke-dasharray:4 3}
+.sl-seg.mk-h0{stroke:var(--pen);stroke-width:2}
+.sl-seg.mk-se{stroke:#6B46C1;stroke-width:2.4}
+.sl-seg.mk-true{stroke:var(--pen);stroke-width:2.4}
+.sl-seg.ic-ok{stroke:var(--green);stroke-width:2}
+.sl-seg.ic-miss{stroke:var(--red);stroke-width:2.4}
+.sl-seg.ic-mine{stroke-width:4.5}
+.sl-dot.mk-hat{fill:#B7791F}
+text.mk-hat{fill:#B7791F}text.mk-h0{fill:var(--pen)}text.mk-se{fill:#6B46C1}text.mk-true{fill:var(--pen)}text.mk-p{fill:var(--red)}
+.sl-plot text.mk-hat,.sl-plot text.mk-h0,.sl-plot text.mk-se,.sl-plot text.mk-true,.sl-plot text.mk-p{font-family:var(--math);font-size:13.5px}
+.cap .khat{color:#B7791F;font-weight:600}.cap .kse{color:#6B46C1;font-weight:600}.cap .ktrue{color:var(--pen);font-weight:600}
+.cap .kok{color:var(--green);font-weight:600}.cap .kmiss{color:var(--red);font-weight:600}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 01 · L'objet aléatoire › chaîne 02</div>
+  <h1>IC et test — <span>centre</span>, <span>largeur</span>, p-value</h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Fil A, cas 1. Le logiciel affiche quatre nombres — <span class="m">β̂</span><sub>1</sub> = 1,4, SE = 0,62, <span class="m">p</span> = 0,024, IC95 = [0,18 ; 2,62] — et tous les quatre décrivent le <b>même objet aléatoire</b> : la distribution de l'estimateur. Aucun ne décrit <span class="m">β</span><sub>1</sub>, qui est fixe. H₀ fixe le <b>centre</b> de cette distribution, le SE en fixe la <b>largeur</b> ; la p-value est une aire lue sous le centre imposé par H₀, l'intervalle est une largeur posée autour de l'estimateur. Et le 95 % ne qualifie ni l'un ni l'autre : il qualifie la <b>procédure</b>.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="chain-p01-01-objet-aleatoire.html">p01-01 · L'objet aléatoire, le SE</a></li>
+    <li><a href="../../map.html#p00-01">p00-01 · La normale, μ ± 1,96σ</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::inference</code><code>stats::ic</code><code>stats::pvalue</code><code>stats::h0</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-03-biais-variance-partout.html">Biais et variance partout</a></li>
+    <li><a href="../walkthroughs/walkthrough-p01-01-intervalle-procedure.html">D1 · le même cas, déroulé</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>Les trois colonnes.</b> Fixe (le paramètre), aléatoire (l'échantillon, et l'estimateur qui en descend), procédure (la recette qui transforme l'un en l'autre). Tout le tri de cette chaîne se fait dans ce tableau (<a href="chain-p01-01-objet-aleatoire.html#s2">p01-01, pas 2</a>).</li>
+      <li><b>Distribution d'échantillonnage et SE.</b> Refaire l'expérience donnerait un autre estimateur ; l'ensemble de ces valeurs a un centre et une largeur, et le SE <i>est</i> cette largeur — une propriété de la procédure, pas du chiffre en main (<a href="chain-p01-01-objet-aleatoire.html#s9">p01-01, pas 9</a>).</li>
+      <li><b>La normale et son 1,96.</b> Si <span class="m">Z</span> ~ <span class="up">N</span>(0, 1), alors <span class="up">P</span>(|<span class="m">Z</span>| ≤ 1,96) = 0,95 ; par transformation affine, <span class="up">N</span>(<span class="m">μ</span>, <span class="m">σ</span>²) met 95 % de sa masse dans <span class="m">μ</span> ± 1,96<span class="m">σ</span> (<a href="../../map.html#p00-01">p00-01</a>).</li>
+      <li><b>Notation.</b> <span class="m">β̂</span><sub>1</sub> porte son chapeau : il est calculé sur les données. <span class="m">β</span><sub>1</sub> n'en porte pas : c'est le paramètre. En fréquentiste on écrit <span class="m">p</span>(<span class="m">x</span> ; <span class="m">β</span><sub>1</sub>) et non <span class="m">p</span>(<span class="m">x</span> | <span class="m">β</span><sub>1</sub>) — on ne conditionne pas sur une constante.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>La distribution de <span class="m">β̂</span><sub>1</sub> est <b>normale</b> : <span class="m">β̂</span><sub>1</sub> ~ <span class="up">N</span>(<span class="m">β</span><sub>1</sub>, SE²). Acquis ici, avec <span class="m">n</span> grand ; d'où vient cette forme, et pourquoi elle devient un Student quand <span class="m">n</span> est petit, est la chaîne suivante.</span>
+      <b>H2</b><span>Le SE est <b>connu</b> — ou estimé par plug-in, ce qui ne change aucun raisonnement de cette page, seulement le quantile 1,96.</span>
+      <b>H3</b><span>Une <b>seule</b> hypothèse testée sur un <b>seul</b> échantillon. Dès qu'il y en a vingt, la lecture d'une p-value change de nature : c'est la multiplicité, chaîne p01-04.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor : deux objets, pas un</h3>
+    <p>Une régression, une sortie de logiciel, quatre nombres. Avant toute interprétation, séparer les <b>deux objets</b> que la ligne mélange.</p>
+    <p><span class="m">β</span><sub>1</sub> : la pente vraie. Fixe, inconnue, sans distribution. <span class="m">β̂</span><sub>1</sub> : la pente estimée. Aléatoire, connue, de distribution <span class="up">N</span>(<span class="m">β</span><sub>1</sub>, SE²). Le premier est dans la colonne <b>fixe</b>, le second dans la colonne <b>aléatoire</b>.</p>
+    <p class="say">« <span class="m">β</span><sub>1</sub> est fixe et l'échantillon est tiré, donc <span class="m">β̂</span><sub>1</sub> est la seule quantité aléatoire de la sortie, donc les quatre nombres imprimés décrivent tous la distribution de <span class="m">β̂</span><sub>1</sub>, jamais <span class="m">β</span><sub>1</sub> lui-même. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le fil rouge</div>
+    <table>
+      <tr><th>nombre</th><th>ce qu'il est</th><th>colonne</th></tr>
+      <tr><td><span class="m">β̂</span><sub>1</sub> = 1,4</td><td>un tirage de la distribution</td><td>aléatoire</td></tr>
+      <tr><td>SE = 0,62</td><td>la <b>largeur</b> de cette distribution</td><td>procédure</td></tr>
+      <tr><td><span class="m">p</span> = 0,024</td><td>une aire dans cette distribution, recentrée par&nbsp;H₀</td><td>procédure</td></tr>
+      <tr><td>IC95&nbsp;= [0,18&nbsp;;&nbsp;2,62]</td><td>un intervalle produit par une recette</td><td>procédure</td></tr>
+      <tr class="hl"><td><span class="m">β</span><sub>1</sub></td><td>la pente vraie</td><td><b>fixe, jamais imprimée</b></td></tr>
+    </table>
+    <p>Le SE vaut 0,62 : sur des échantillons répétés, les <span class="m">β̂</span><sub>1</sub> se dispersent de ± 0,62 autour de <span class="m">β</span><sub>1</sub>. C'est la seule chose que l'on sache avant d'avoir posé une hypothèse.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>H₀ porte sur le paramètre <span class="tag tronc">tronc</span></h3>
+    <p>L'hypothèse nulle est une phrase sur la colonne <b>fixe</b> : H₀ : <span class="m">β</span><sub>1</sub> = 0. Jamais « <span class="m">β̂</span><sub>1</sub> = 0 », qui serait une phrase sur un nombre qu'on a sous les yeux et qui vaut 1,4.</p>
+    <p>Ce que H₀ change, et la seule chose qu'elle change, est le <b>centre</b> de la distribution de l'estimateur :</p>
+    <div class="eq">sans H₀ : <span class="m">β̂</span><sub>1</sub> ~ <span class="up">N</span>(<span class="m">β</span><sub>1</sub>, SE²) &nbsp;&nbsp;→&nbsp;&nbsp; sous H₀ : <span class="m">β̂</span><sub>1</sub> ~ <span class="up">N</span>(0, SE²)</div>
+    <p>La largeur, elle, ne bouge pas : elle vient de la procédure d'échantillonnage, pas de l'hypothèse. <b>H₀ fixe le centre, le SE fixe la largeur</b> — deux boutons distincts.</p>
+    <p class="say">« H₀ fixe le paramètre, donc elle fixe le centre de la distribution de l'estimateur, donc on peut calculer où tomberait <span class="m">β̂</span><sub>1</sub> si H₀ était vraie. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application</div>
+    <p>Sous H₀ : <span class="m">β̂</span><sub>1</sub> ~ <span class="up">N</span>(0 ; 0,62²). On mesure la distance de l'observation au centre imposé, en unités de largeur :</p>
+    <div class="eq"><span class="m">z</span> = (<span class="m">β̂</span><sub>1</sub> − 0) / SE = 1,4 / 0,62 = <b>2,26</b></div>
+    <p>Lecture : l'estimateur observé est tombé à <b>2,26 largeurs</b> du centre que H₀ impose. Le <span class="m">z</span> ne dit encore rien de rare ou pas — il compte des SE, c'est tout.</p>
+    <p>Rien dans ce calcul ne suppose que H₀ soit vraie ou fausse : on calcule ce que serait le décor <i>si</i> elle l'était.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>La p-value est une aire, sous H₀</h3>
+    <p>Une fois le décor posé, la p-value est une probabilité lue dans <span class="up">N</span>(0, SE²) : celle d'obtenir un estimateur <b>au moins aussi loin de 0</b> que celui observé.</p>
+    <div class="eq"><span class="m">p</span> = <span class="up">P</span>( |<span class="m">β̂</span><sub>1</sub>| ≥ 1,4 ; <span class="m">β</span><sub>1</sub> = 0 ) = 2·(1 − <span class="m">Φ</span>(2,26))</div>
+    <p>Trois mots à tenir ensemble : c'est une probabilité <b>sur <span class="m">β̂</span><sub>1</sub></b> (le seul objet aléatoire), <b>conditionnelle à H₀</b> (le centre est imposé), et <b>bilatérale</b> (les deux queues, tant que la question est « la pente est-elle nulle » et non « est-elle positive »).</p>
+    <p class="say">« Sous H₀ la distribution de <span class="m">β̂</span><sub>1</sub> est entièrement connue, donc on peut y mesurer l'aire au-delà de la valeur observée, donc cette aire est la p-value — une probabilité sur l'estimateur, jamais sur l'hypothèse. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application</div>
+    <p>1 − <span class="m">Φ</span>(2,26) = 0,0119, donc <span class="m">p</span> = 2 × 0,0119 = <b>0,024</b>.</p>
+    <table>
+      <tr><th><span class="m">β̂</span><sub>1</sub> observé</th><th><span class="m">z</span> = <span class="m">β̂</span><sub>1</sub>/0,62</th><th><span class="m">p</span> bilatérale</th></tr>
+      <tr><td>0,62</td><td>1,00</td><td>0,317</td></tr>
+      <tr><td>1,215</td><td>1,96</td><td><b>0,050</b></td></tr>
+      <tr class="hl"><td>1,4</td><td>2,26</td><td><b>0,024</b></td></tr>
+      <tr><td>2,0</td><td>3,23</td><td>0,001</td></tr>
+    </table>
+    <p>La colonne de droite est une <b>aire</b>, pas un degré de croyance : elle répond à « si le centre était 0, à quelle fréquence serais-je tombé aussi loin ? ».</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — l'aire au-delà de l'observation</div>
+    <div id="f1plot" class="wide"></div>
+    <div id="f1sliders"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">La cloche est <span class="up">N</span>(0 ; 0,62²) : <b>le décor imposé par H₀</b>. Son centre est en 0 : H₀ le dit. Sa largeur est le <span class="kse">SE</span>, que H₀ ne touche pas. Déplace <span class="m">β̂</span><sub>1</sub> : les deux traits <span class="khat">ambre</span> bougent, l'aire rouge — la p-value — se réduit, et <b>la cloche ne bouge jamais</b>. C'est là que se lit la distinction : le curseur agit sur l'observation, pas sur l'hypothèse. La barre violette <span class="kse">± SE</span> est la largeur, seule quantité que le curseur ne change pas.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>L'IC est centré sur l'estimateur <span class="tag tronc">tronc</span></h3>
+    <p>L'intervalle change de point d'appui. Il n'utilise de la distribution que sa <b>largeur</b> ; son centre, il le prend là où il peut — sur le seul nombre disponible.</p>
+    <div class="eq">IC95 = <span class="m">β̂</span><sub>1</sub> ± 1,96 · SE</div>
+    <p>Le centre de la distribution est <span class="m">β</span><sub>1</sub>, inconnu : impossible de dessiner l'intervalle autour de lui. On retourne la relation « <span class="m">β̂</span><sub>1</sub> est à moins de 1,96 SE de <span class="m">β</span><sub>1</sub> dans 95 % des tirages » en « <span class="m">β</span><sub>1</sub> est à moins de 1,96 SE de <span class="m">β̂</span><sub>1</sub> » — la même distance, lue depuis l'autre bout.</p>
+    <p><b>L'IC n'est pas centré sur H₀.</b> H₀ n'entre pas dans sa formule : on peut construire l'intervalle sans avoir posé d'hypothèse.</p>
+    <p class="say">« On ne connaît pas <span class="m">β</span><sub>1</sub>, donc on ne peut pas centrer sur lui, donc on centre sur ce qu'on a, <span class="m">β̂</span><sub>1</sub>, avec la largeur que donne SE. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application</div>
+    <div class="eq">1,96 × 0,62 = 1,215<br>1,4 ± 1,215 = <b>[0,185&nbsp;;&nbsp;2,615]</b></div>
+    <p>Arrondi à deux décimales : <b>[0,18 ; 2,62]</b>.</p>
+    <table>
+      <tr><th></th><th>centre</th><th>largeur</th></tr>
+      <tr><td>distribution sous H₀</td><td>0 <i>(imposé)</i></td><td>SE = 0,62</td></tr>
+      <tr><td>distribution réelle</td><td><span class="m">β</span><sub>1</sub> <i>(inconnu)</i></td><td>SE = 0,62</td></tr>
+      <tr class="hl"><td>intervalle de confiance</td><td><b>1,4</b> <i>(observé)</i></td><td>± 1,96 × 0,62</td></tr>
+    </table>
+    <p>Trois lignes, une seule largeur, trois centres différents. Confondre la première et la troisième produit l'erreur classique : lire [0,18 ; 2,62] comme un intervalle autour de zéro, ou construire un intervalle autour de 0 et s'étonner que 1,4 en sorte.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Sur quoi porte le 95 % <span class="tag tronc">tronc</span></h3>
+    <p>Le 95 % ne qualifie ni <span class="m">β</span><sub>1</sub> ni l'intervalle en main. Il qualifie la <b>procédure</b> : « tirer un échantillon → calculer <span class="m">β̂</span><sub>1</sub> ± 1,96·SE ».</p>
+    <div class="eq"><span class="up">P</span>( <span class="m">β̂</span><sub>1</sub> − 1,96 SE ≤ <span class="m">β</span><sub>1</sub> ≤ <span class="m">β̂</span><sub>1</sub> + 1,96 SE ) = 0,95 &nbsp;&nbsp; — aléa : <span class="m">β̂</span><sub>1</sub>, et lui seul</div>
+    <p>Dans cette probabilité, ce qui varie ce sont les <b>bornes</b>, pas <span class="m">β</span><sub>1</sub> qui reste planté au même endroit. Une fois l'échantillon tiré, les bornes valent 0,18 et 2,62 : plus rien n'est aléatoire, et l'intervalle en main contient <span class="m">β</span><sub>1</sub> ou ne le contient pas. On ignore lequel des deux, et aucune probabilité ne décrit cette ignorance en fréquentiste.</p>
+    <p class="say">« <span class="m">β</span><sub>1</sub> est fixe, donc il n'a pas de probabilité d'être dans un intervalle, donc le 95 % ne peut porter que sur les intervalles, donc sur la procédure qui les produit sur des tirages répétés. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — la traduction mot à mot</div>
+    <p><i>« La procédure “tirer un échantillon, calculer la pente, poser ± 1,96 × 0,62 autour d'elle” produit des intervalles qui contiennent <span class="m">β</span><sub>1</sub> dans 95 % des tirages. Celui qu'elle m'a donné cette fois-ci est [0,18 ; 2,62]. »</i></p>
+    <p>Test de cohérence : les deux phrases suivantes sont <b>fausses</b>, et on voit pourquoi sur la figure — 95 % des <span class="m">β̂</span><sub>1</sub> tombent dans [0,18 ; 2,62] (non : chaque échantillon déplace l'intervalle avec lui) ; il y a 95 % de chances que <span class="m">β</span><sub>1</sub> soit dans [0,18 ; 2,62] (non : les deux nombres sont tombés, <span class="m">β</span><sub>1</sub> n'a jamais été tiré).</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — 50 échantillons, 50 intervalles</div>
+    <div class="sl-ctl" id="f2ctl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Ici on triche : on fixe la vérité à <span class="ktrue"><span class="m">β</span><sub>1</sub> = 1,0</span> (trait bleu) pour pouvoir compter. Chaque ligne horizontale est un échantillon : son <span class="m">β̂</span><sub>1</sub> est tiré dans <span class="up">N</span>(1 ; 0,62²), et l'intervalle <span class="m">β̂</span><sub>1</sub> ± 1,96·SE est posé autour. <span class="kok">Vert</span> si la ligne coupe le trait bleu, <span class="kmiss">rouge</span> sinon. Rejoue : le compte oscille autour de 47 ou 48 sur 50, jamais exactement. <b>La ligne du bas, plus épaisse, est celle que tu as en main</b> : elle est verte ou rouge, et dans la vraie vie tu ne vois ni sa couleur ni le trait bleu. Le 95 % est la proportion de vert sur la colonne entière, pas une propriété de ta ligne.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Dualité : un seul calcul, deux lectures</h3>
+    <p>Test et intervalle comparent la même distance au même seuil. La distance est |<span class="m">β̂</span><sub>1</sub> − 0|, le seuil est 1,96·SE.</p>
+    <div class="eq">0 ∉ IC95 &nbsp;⟺&nbsp; |<span class="m">β̂</span><sub>1</sub>| &gt; 1,96·SE &nbsp;⟺&nbsp; |<span class="m">z</span>| &gt; 1,96 &nbsp;⟺&nbsp; <span class="m">p</span> &lt; 0,05</div>
+    <p>Généralisation : l'IC95 est exactement l'ensemble des valeurs <span class="m">b</span> que le test au seuil 5 % ne rejetterait pas si l'on posait H₀ : <span class="m">β</span><sub>1</sub> = <span class="m">b</span>. L'intervalle est le test, balayé sur toutes les hypothèses possibles.</p>
+    <p class="say">« L'IC contient 0 exactement quand la distance de <span class="m">β̂</span><sub>1</sub> à 0 est sous 1,96·SE, donc le test rejette exactement quand elle la dépasse, donc les deux sorties du logiciel sont le même calcul lu dans les deux sens. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application</div>
+    <p>Distance : |1,4 − 0| = 1,4. Seuil : 1,96 × 0,62 = 1,215. Donc 1,4 &gt; 1,215 : on rejette, 0 est hors de l'intervalle, <span class="m">p</span> = 0,024 &lt; 0,05. Les trois lectures s'accordent, forcément.</p>
+    <p>Le point de bascule est <span class="m">β̂</span><sub>1</sub> = 1,215 : là, la borne basse de l'IC vaut exactement 0 et <span class="m">p</span> vaut exactement 0,050.</p>
+    <p><b>Ce que l'IC dit en plus.</b> Le test rend un bit — rejet ou non. L'intervalle rend l'échelle : [0,18 ; 2,62] annonce que la pente pourrait tout aussi bien valoir 0,2 que 2,6, soit un facteur 14 sur l'effet. Une même p-value peut venir d'un intervalle serré autour de 1,4 ou de celui-ci, très large : la décision est la même, la conclusion métier ne l'est pas.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Les quatre erreurs classiques sont quatre façons de déplacer un nombre d'une colonne à l'autre : rendre <span class="m">β</span><sub>1</sub> aléatoire, rendre l'intervalle fixe, oublier combien de tests ont été faits, confondre la largeur avec l'importance.</p>
+    <p class="say">« La p-value est une probabilité sur les données sous H₀, donc la retourner en probabilité sur H₀ demande un prior, donc sans prior elle ne dit rien de la chance que <span class="m">β</span><sub>1</sub> soit nul, et un intervalle ne dit rien de l'endroit où tombent les autres estimateurs. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>« 97 % de chances que <span class="m">β</span><sub>1</sub> ≠ 0 ».</b> Le complément d'une p-value n'est pas une probabilité d'hypothèse. <span class="m">p</span> = <span class="up">P</span>(données au moins aussi extrêmes ; H₀) ; ce que la phrase veut dire est <span class="up">P</span>(H₀ | données), et passer de l'une à l'autre demande la formule de Bayes, donc un <b>prior</b> sur <span class="m">β</span><sub>1</sub> — c'est le fil B, et c'est un autre cadre, pas une reformulation.</li>
+      <li><b>« 95 % des échantillons donnent <span class="m">β̂</span><sub>1</sub> dans [0,18 ; 2,62] ».</b> L'intervalle n'est pas une plage de tirage : il se déplace avec chaque échantillon, comme les 50 lignes de la figure 2. La quantité qui vaut 95 % est la <b>proportion d'intervalles contenant <span class="m">β</span><sub>1</sub></b>, jamais la proportion d'estimateurs tombant dans l'un d'eux.</li>
+      <li><b>Multiplicité.</b> Sous H₀ partout, une p-value est uniforme sur [0, 1] : sur 20 hypothèses testées, on attend <b>1</b> résultat à <span class="m">p</span> &lt; 0,05, et la chance d'en voir au moins un est 1 − 0,95²⁰ = <b>0,64</b>. La p-value affichée suppose H3 — un seul test. Combien en a-t-on fait est une information qui ne figure pas dans la sortie (chaîne p01-04).</li>
+      <li><b>Significatif n'est pas important.</b> Le SE décroît en 1/√<span class="m">n</span> : avec <span class="m">n</span> énorme, <span class="m">β̂</span><sub>1</sub> = 0,001 et SE = 0,0002 donnent <span class="m">z</span> = 5 et une p-value de 6·10⁻⁷, pour un effet nul en pratique. L'IC, lui, l'annonce : [0,0006 ; 0,0014]. <b>Lire l'intervalle avant la p-value</b> — il porte l'échelle, elle ne porte qu'une décision.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>H₀ porte sur le <b>paramètre</b> (<span class="m">β</span><sub>1</sub> = 0), jamais sur l'estimateur. Elle fixe le <b>centre</b> de la distribution de <span class="m">β̂</span><sub>1</sub> ; le SE en fixe la <b>largeur</b>.</li>
+    <li><span class="m">p</span> = <span class="up">P</span>(au moins aussi extrême ; H₀) : une aire sous <span class="up">N</span>(0, SE²), donc une probabilité sur <span class="m">β̂</span><sub>1</sub>. Ici 2·(1 − <span class="m">Φ</span>(2,26)) = 0,024.</li>
+    <li>IC = <span class="m">β̂</span><sub>1</sub> ± 1,96·SE : centré sur l'<b>estimateur</b> — le centre vrai est inconnu — largeur donnée par le SE. Ici [0,185 ; 2,615].</li>
+    <li>Le 95 % porte sur la <b>procédure</b> : la proportion d'intervalles couvrant <span class="m">β</span><sub>1</sub> sur des tirages répétés. L'intervalle en main le contient ou non.</li>
+    <li>Dualité : 0 ∉ IC95 ⟺ |<span class="m">z</span>| &gt; 1,96 ⟺ <span class="m">p</span> &lt; 0,05. Même distance, même seuil.</li>
+    <li>Ni « probabilité que <span class="m">β</span><sub>1</sub> ≠ 0 » (il faudrait un prior), ni « 95 % des <span class="m">β̂</span> tombent dans cet IC » (l'intervalle bouge avec l'échantillon).</li>
+    <li>Une p-value suppose un seul test ; un effet significatif peut être minuscule. L'intervalle porte l'échelle.</li>
+  </ol>
+</div>
+<div class="phrase">« L'hypothèse nulle porte sur la pente vraie ; sous cette hypothèse l'estimateur est centré en zéro avec la largeur SE, et la p-value est la probabilité d'observer au moins aussi loin de zéro. L'intervalle, lui, est centré sur l'estimateur, et le 95 % décrit la procédure : sur des tirages répétés, 95 % des intervalles qu'elle produit contiennent la vraie pente. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Sur quoi porte H₀, et qu'est-ce qu'elle change ?</div><div class="a hid">Sur β<sub>1</sub>, le paramètre fixe — jamais sur β̂<sub>1</sub>. Elle change le centre de la distribution de l'estimateur : N(0, SE²). La largeur, non.</div></li>
+    <li><div class="q">Que vaut la p-value ici, et que dit-elle exactement ?</div><div class="a hid">0,024 = P(|β̂<sub>1</sub>| ≥ 1,4 ; β<sub>1</sub> = 0). Une aire sous N(0 ; 0,62²), bilatérale : une probabilité sur l'estimateur, conditionnelle à H₀.</div></li>
+    <li><div class="q">Sur quoi l'intervalle est-il centré, et pour quelle raison ?</div><div class="a hid">Sur β̂<sub>1</sub> = 1,4 : β<sub>1</sub> est inconnu, on ne peut pas centrer dessus. Seule la largeur vient de la distribution : ± 1,96 × 0,62 = ± 1,215.</div></li>
+    <li><div class="q">Sur quoi porte le 95 % ?</div><div class="a hid">Sur la procédure « tirer → calculer β̂<sub>1</sub> ± 1,96 SE » : 95 % des intervalles qu'elle produit contiennent β<sub>1</sub>. Celui en main le contient ou non.</div></li>
+    <li><div class="q">Pourquoi « 97 % de chances que β<sub>1</sub> ≠ 0 » est-il faux ?</div><div class="a hid">β<sub>1</sub> n'est pas aléatoire, il n'a pas de probabilité. Et p = P(données ; H₀), pas P(H₀ | données) : retourner le conditionnement demande un prior.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="../bridges/bridge-03-biais-variance-partout.html"><b>Biais et variance partout</b><small>le couple centre / largeur de cette chaîne est le même que biais / variance : H₀ déplace le centre, le SE tient la largeur, et aucun des deux ne renseigne sur l'autre</small></a>
+    <a href="../walkthroughs/walkthrough-p01-01-intervalle-procedure.html"><b>D1 — l'intervalle, déroulé complet</b><small>le même cas tenu en marches, avec la simulation de couverture faite à la main : cette chaîne en est la version courte</small></a>
+    <a href="chain-p01-01-objet-aleatoire.html"><b>p01-01 — l'objet aléatoire</b><small>d'où vient le SE de 0,62 : la largeur de la distribution d'échantillonnage, propriété de la procédure</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::h0</code> (H₀ porte sur le paramètre, elle fixe le centre) · <code>stats::pvalue</code> (P(données ; H₀), aire bilatérale, jamais P(H₀ | données)) · <code>stats::ic</code> (centré sur l'estimateur, largeur 1,96·SE, dualité avec le test) · <code>stats::inference</code> (le 95 % porte sur la procédure).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p01-02 · v1 du 16/09/2026 · Prérequis : p01-01. Suite : <a href="chain-p01-03-inference-regression.html">p01-03 Inférence en régression</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outils communs ===== */
+const SE=0.62, Z=1.96;
+const erf=x=>{const s=x<0?-1:1;x=Math.abs(x);const t=1/(1+0.3275911*x);   // Abramowitz-Stegun 7.1.26, erreur < 2·10⁻⁷
+  return s*(1-((((1.061405429*t-1.453152027)*t+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x));};
+const Phi=z=>0.5*(1+erf(z/Math.SQRT2));
+const dens=(x,s)=>Math.exp(-0.5*(x/s)*(x/s))/(s*Math.sqrt(2*Math.PI));
+const gauss=(mu,s)=>{let u=0,v=0;while(u===0)u=Math.random();while(v===0)v=Math.random();
+  return mu+s*Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);};
+
+/* ===== Figure 1 : l'aire sous H0 ===== */
+const X0=-2.9,X1=2.9,Y1=0.78;
+const P1=SL.plot(document.getElementById('f1plot'),{x:[X0,X1],y:[0,Y1],w:620,h:310,
+  xt:[-2,-1,0,1,2],yt:[0.2,0.4,0.6],xl:'valeurs possibles de β̂₁ sous H₀',yl:'densité'});
+P1.fn(x=>dens(x,SE),'sl-c1');
+P1.label(0,0.735,'décor imposé par H₀ : centre en 0','mk-h0','middle');
+const out1=document.getElementById('f1out');
+function area(a,b){ // polygone sous la courbe entre a et b
+  let d='M'+P1.sx(a).toFixed(1)+' '+P1.sy(0).toFixed(1);
+  const n=80;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;d+=' L'+P1.sx(x).toFixed(1)+' '+P1.sy(dens(x,SE)).toFixed(1);}
+  d+=' L'+P1.sx(b).toFixed(1)+' '+P1.sy(0).toFixed(1)+' Z';
+  SL.el('path',{d,class:'sl-area'},P1.dyn);}
+function draw1(b){
+  P1.clear();
+  area(b,X1);area(X0,-b);
+  P1.seg(-SE,dens(SE,SE),SE,dens(SE,SE),'mk-se');
+  P1.seg(-SE,dens(SE,SE)-0.022,-SE,dens(SE,SE)+0.022,'mk-se');
+  P1.seg(SE,dens(SE,SE)-0.022,SE,dens(SE,SE)+0.022,'mk-se');
+  P1.text(0,dens(SE,SE)+0.045,'± SE = ± 0,62','mk-se','middle');
+  P1.seg(b,0,b,0.70,'mk-hat');P1.seg(-b,0,-b,0.70,'mk-hat');
+  P1.dot(b,dens(b,SE),'mk-hat',4.5);P1.dot(-b,dens(b,SE),'mk-hat',4.5);
+  P1.text(Math.min(b+0.55,2.0),0.035,'aire = p-value','mk-p','middle');
+  const z=b/SE,p=2*(1-Phi(z));
+  out1.innerHTML=
+    `<div class="pos">β̂₁ observé<b>${SL.fmt(b,2)}</b></div>`+
+    `<div class="pos">z = β̂₁ / SE<b>${SL.fmt(z,2)}</b></div>`+
+    `<div class="${p<0.05?'zero':'pos'}">p bilatérale<b>${p<0.001?'< 0,001':SL.fmt(p,3)}</b></div>`+
+    `<div class="${p<0.05?'zero':'pos'}">au seuil 5 %<b>${p<0.05?'rejet de H₀':'pas de rejet'}</b></div>`;}
+SL.slider(document.getElementById('f1sliders'),{label:'β̂₁ observé',min:0.1,max:2.6,step:0.02,value:1.4},draw1);
+
+/* ===== Figure 2 : 50 intervalles, une vérité ===== */
+const BT=1.0,NIC=50;
+const P2=SL.plot(document.getElementById('f2plot'),{x:[-1.9,3.9],y:[0,56],w:620,h:360,
+  xt:[-1,0,1,2,3],yt:[],xl:'β̂₁ ± 1,96 · SE',yl:'50 échantillons simulés'});
+const out2=document.getElementById('f2out');
+function draw2(){
+  P2.clear();
+  P2.seg(BT,0,BT,53.4,'mk-true');
+  P2.text(BT,54.6,'β₁ = 1,0 (vrai, fixe)','mk-true','middle');
+  let ok=0;
+  for(let i=0;i<NIC;i++){
+    const bh=gauss(BT,SE),lo=bh-Z*SE,hi=bh+Z*SE,hit=(lo<=BT&&BT<=hi);
+    if(hit)ok++;
+    const y=i+3,cls=(hit?'ic-ok':'ic-miss')+(i===0?' ic-mine':'');
+    P2.seg(lo,y,hi,y,cls);
+    P2.dot(bh,y,'mk-hat',i===0?3.2:2);}
+  out2.innerHTML=
+    `<div class="pos">couverture simulée<b>${ok} / 50</b></div>`+
+    `<div class="pos">soit<b>${SL.fmt(100*ok/NIC,0)} %</b></div>`+
+    `<div class="zero">intervalles ratés<b>${NIC-ok}</b></div>`+
+    `<div class="pos">attendu par la procédure<b>95 %</b></div>`;}
+(function(){const c=document.getElementById('f2ctl');
+  const b=document.createElement('button');b.className='tb';b.textContent='tirer 50 échantillons';b.onclick=draw2;c.appendChild(b);})();
+draw2();
+})();
+</script>
+</body>
+</html>
