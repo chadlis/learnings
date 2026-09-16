@@ -92,10 +92,13 @@ faux, rien n'a été corrigé ci-dessus. Restent quatre points de décision.
    p01-01) donne plutôt 0,8925 — la dissymétrie de la binomiale et la granularité de
    1/1000 rabotent une demi-dizaine de millièmes de point. Le 0,893 du spec est conservé
    dans le texte ; la figure affiche sa propre moyenne mesurée.
-3. **Convention de signe, chaîne contre déroulé D2.** Le spec pose D = p̂_B − p̂_A
-   (positif ici, +0,009) ; D2 pose Dᵢ = Xᵢ − Yᵢ, donc d = p_A − p_B (négatif). Les noms
-   b et c (A seul juste / B seul juste) coïncident, eux. La chaîne suit le spec.
-   À trancher : harmoniser D2, ou nommer explicitement les deux conventions.
+3. **Convention de signe, chaîne contre déroulé D2.** — validé 16/09
+   Le spec pose D = p̂_B − p̂_A (positif ici, +0,009) ; D2 pose Dᵢ = Xᵢ − Yᵢ, donc
+   d = p_A − p_B (négatif). Les noms b et c (A seul juste / B seul juste) coïncident, eux.
+   **Tranché : les deux conventions coexistent et sont nommées.** Le pas 2 de la chaîne
+   porte la phrase « D2 note la différence dans l'autre sens (A − B) ; ici D = B − A,
+   positif = B meilleur » ; D2 reste inchangé — une fiche publiée ne se renomme pas pour
+   des raisons de symétrie.
 4. **Pas 5, bootstrap apparié sans chiffre.** Le spec ne fixe aucun IC bootstrap pour le
    fil rouge n = 1 000. La sheet décrit la recette et renvoie à p01-05 et à D2 plutôt que
    d'inventer un intervalle — à compléter quand p01-05 sera écrite.
