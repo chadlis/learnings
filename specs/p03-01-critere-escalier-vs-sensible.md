@@ -21,3 +21,8 @@ Bilan du 16/09 intégré au pilote : vocabulaire tente / dôme, lecture de Gini 
 À re-solliciter (revue du 18/09) : la réponse d'entretien Gini vs accuracy à voix haute (= maillon 1 de la chaîne verbalisée) ; nommer Wilson sans aide (p01-01) ; le signe du gradient en descente (pas 7, « Signe »).
 
 Ce qui a cassé pour Salah (séance du 16/09) : argument produit une fois (Q8.1) jamais transféré ; Q11.1 Gini vs accuracy ; Q4.3 cross-entropy — d'où la table « le geste à transférer » et la chaîne verbalisée à cinq maillons.
+
+## Questions pour la revue
+
+- **Ordre des règles CSS du gold standard** : `@media(max-width:900px){… .side{position:static …}}` est déclaré *avant* `.side{position:sticky …}`. À spécificité égale, la dernière règle gagne : la barre latérale reste `sticky` sur téléphone au lieu de repasser dans le flux. Sans conséquence sur le débordement horizontal (la grille `.wrap`, elle, se replie bien sur une colonne), mais la barre devient une boîte scrollable haute de 100vh. Le correctif tient en un échange de deux lignes ; non appliqué ici parce que le gold standard ne se réécrit pas sans décision — et toutes les sheets produites en recopient le CSS tel quel, donc elles héritent du même comportement.
+
