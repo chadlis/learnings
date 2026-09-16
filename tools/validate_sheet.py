@@ -35,6 +35,11 @@ if re.search(r'<(script|link)[^>]+(cdn|mathjax)', t, re.I): fail('CDN / MathJax 
 if 'localStorage' in t: fail('localStorage interdit (session seulement)')
 if '../../assets/sheetlib.js' not in t: fail('sheetlib.js non chargé')
 
+# ---- un seul <style> : un second bloc recopié du template ravale le :root du premier
+#      et la page sort sans couleurs — invisible au rendu automatique, seul l'œil le voit.
+nstyle = len(re.findall(r'<style\b', t))
+if nstyle != 1: fail(f'{nstyle} balises <style> (il en faut exactement 1 — un doublon avale le bloc :root)')
+
 # ---- structure de la chaîne
 need = {'#prereq': 'id="prereq"', '#hyp': 'id="hyp"', '.chain': 'class="chain"', '#resume': 'id="resume"',
         '#verbal': 'id="verbal"', '#links': 'id="links"', '.phrase': 'class="phrase"'}
