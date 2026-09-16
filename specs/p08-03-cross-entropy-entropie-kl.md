@@ -10,7 +10,7 @@ prereq: [p02-01, p08-02]
 anki: [dl::cross-entropy, stats::entropie, stats::kl, dl::perplexite]
 bridges: [b05]
 next: p08-04
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -81,3 +81,19 @@ Pourquoi la loss d'un modèle de langage vaut log V au départ, que mesure exp(l
 
 ## Exclusions
 Pas d'information mutuelle, pas de théorie du codage (Kraft, Huffman) au-delà d'une phrase, pas de label smoothing détaillé, pas de température au-delà de la figure 4.
+
+## Questions pour la revue
+- **Chiffres du fil rouge : tous vérifiés par script, aucun faux.** q = (0,8438 ; 0,1142 ; 0,0420) ;
+  CE chat 0,1698 ; CE oiseau 3,1698 ; gradient chat (−0,1562 ; 0,1142 ; 0,0420) ; ln 27 = 3,2958 ;
+  e^2,5 = 12,182 ; H(p) = 1,5 bit ; log₂ 3 = 1,58496 ; KL(p‖q_unif) = 0,08496 ; CE(p ; 0,7/0,2/0,1)
+  = 1,66825 et KL = 0,16825 ; CE = H + KL exact dans les deux cas. Rien n'a été corrigé.
+- **Figure 3, borne du curseur.** Le spec dit `V ∈ [2, 50 000]` mais demande une marque à 50 257.
+  Le curseur va donc jusqu'à 50 257, pour que le repère GPT-2 soit atteignable. À confirmer.
+- **Figure 4, ce qui est tracé.** Le spec demande « softmax et CE » dans la figure. La CE quand la
+  vérité est oiseau atteint 15 nats à s = 5 et écraserait tout le reste sur le même axe : la figure
+  trace les trois coordonnées du softmax et met les trois CE (chat, oiseau, moyenne sous vérité
+  uniforme) dans les readouts. À confirmer.
+- **Deux chiffres ajoutés, non demandés par le spec, vérifiés par script.** Double softmax de
+  (2 ; 0 ; −1) : q' = (0,518 ; 0,250 ; 0,232), loss chat 0,658 au lieu de 0,170 (pas 8) ; label
+  smoothing ε = 0,1 sur V = 3 : p = (0,933 ; 0,033 ; 0,033), surprise maximale 3,40 nats, plancher
+  H(p) = 0,291 nat (pas 9).
