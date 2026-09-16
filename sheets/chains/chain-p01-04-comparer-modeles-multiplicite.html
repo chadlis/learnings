@@ -297,7 +297,8 @@ text.mk-seuil{fill:var(--red)}
       <li>Sur le fil rouge, l'IC retrouve la conclusion de McNemar sans jamais écrire (<span class="m">c</span>−<span class="m">b</span>)²/(<span class="m">b</span>+<span class="m">c</span>).</li>
     </ul>
     <p><b>Ce qu'il ne voit pas.</b> Le bootstrap rééchantillonne le tirage qu'on a. Si ce tirage a déjà servi à <i>choisir</i> B parmi plusieurs candidats, il tourne autour d'une valeur déjà gonflée et produit un intervalle centré au mauvais endroit. C'est exactement le pas suivant.</p>
-    <p>Développé dans <a href="chain-p01-05-bootstrap.html">p01-05</a> ; version pas à pas dans le déroulé <a href="../walkthroughs/walkthrough-p01-02-comparer-deux-modeles.html">D2</a>.</p>
+    <p><b>À quoi ressemble la sortie.</b> <a href="chain-p01-05-bootstrap.html">p01-05</a> mène la recette jusqu'au bout sur son propre fil rouge — la <b>médiane</b> de dix latences, une statistique sans formule de SE : 1 000 rééchantillons donnent <b>SE = 8,86 ms</b> et l'IC percentile <b>[119,5 ; 142,5] ms</b>. Même geste, autre quantité : ce n'est pas la différence appariée à <span class="m">n</span> = 1 000 de cette chaîne-ci, c'est l'exemple qui montre l'histogramme des rééchantillons et la lecture des quantiles.</p>
+    <p>Mécanisme complet dans <a href="chain-p01-05-bootstrap.html">p01-05</a> ; version pas à pas sur deux modèles dans le déroulé <a href="../walkthroughs/walkthrough-p01-02-comparer-deux-modeles.html">D2</a>.</p>
   </div>
 </div>
 

@@ -10,7 +10,7 @@ prereq: [p01-01, p01-02]
 anki: [stats::inference, stats::comparaison, stats::multiplicite, ml::validation]
 bridges: [b02, b03]
 next: p01-05
-status: built
+status: reviewed
 ---
 
 ## Question de la chaîne
@@ -84,10 +84,10 @@ Pas de Bonferroni/FDR au-delà d'une phrase. Pas de tests sur AUC (DeLong). Pas 
 Tous les chiffres de l'exemple fil rouge ont été revérifiés par script : aucun n'était
 faux, rien n'a été corrigé ci-dessus. Restent quatre points de décision.
 
-1. **Figure 1, bornes du slider.** Le spec demande b + c ∈ [10, 200]. Avec c − b = 9
+1. **Figure 1, bornes du slider.** — validé 16/09 Le spec demande b + c ∈ [10, 200]. Avec c − b = 9
    bloqué, b + c doit être **impair** pour que b et c restent entiers : le slider court
    donc de 11 à 199 par pas de 2. Le franchissement du seuil de 5 % est à b + c ≈ 21.
-2. **Figure 2, 0,893 contre la simulation.** L'approximation normale donne
+2. **Figure 2, 0,893 contre la simulation.** — validé 16/09 L'approximation normale donne
    0,87 + 2,16 · 0,0106 = 0,8930. La simulation exacte (sommes de Bernoulli, comme dans
    p01-01) donne plutôt 0,8925 — la dissymétrie de la binomiale et la granularité de
    1/1000 rabotent une demi-dizaine de millièmes de point. Le 0,893 du spec est conservé
@@ -99,6 +99,10 @@ faux, rien n'a été corrigé ci-dessus. Restent quatre points de décision.
    porte la phrase « D2 note la différence dans l'autre sens (A − B) ; ici D = B − A,
    positif = B meilleur » ; D2 reste inchangé — une fiche publiée ne se renomme pas pour
    des raisons de symétrie.
-4. **Pas 5, bootstrap apparié sans chiffre.** Le spec ne fixe aucun IC bootstrap pour le
-   fil rouge n = 1 000. La sheet décrit la recette et renvoie à p01-05 et à D2 plutôt que
-   d'inventer un intervalle — à compléter quand p01-05 sera écrite.
+4. **Pas 5, bootstrap apparié sans chiffre.** — validé 16/09
+   Le spec ne fixe aucun IC bootstrap pour le fil rouge n = 1 000, et la sheet ne l'invente
+   pas. **Complété le 16/09, p01-05 étant écrite** : le pas 5 cite ses chiffres — médiane de
+   dix latences, 1 000 rééchantillons, SE = 8,86 ms, IC percentile [119,5 ; 142,5] ms — en
+   précisant que c'est l'exemple *médiane* et non la différence appariée à n = 1 000.
+   Le fil rouge de cette chaîne reste sans IC bootstrap chiffré : il faudrait un spec pour
+   l'y mettre.
