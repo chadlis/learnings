@@ -10,7 +10,7 @@ prereq: []
 anki: [stats::lois, stats::binomiale, stats::poisson, stats::exponentielle, stats::normale]
 bridges: []
 next: p00-02
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -75,3 +75,8 @@ Temps de réponse d'un agent : moyenne 12 min, écart-type 3 min, si c'est une s
 
 ## Exclusions
 Pas de fonction génératrice, pas de Gamma/Beta au-delà du nom, pas de binomiale négative au-delà du nom, pas de démonstration de la limite Binomiale → Poisson (la figure 2 la montre).
+
+## Questions pour la revue
+- Tous les chiffres du fil rouge ont été revérifiés par script (bibliothèque standard, `math`) : ils sont exacts, aucune correction apportée au spec. Détail : 1 − 0,7¹⁰ = 0,97175 (0,972) ; C(10,3)·0,3³·0,7⁷ = 0,26683 (0,267) ; e⁻⁴ = 0,018316 ; P(4) = 0,195367 ; P(≥ 7) = 0,110674 ; Binomiale(1 000 ; 0,004) P(4) = 0,195759 (0,196, écart 3,9·10⁻⁴) ; ln 2/4 h = 10,397 min ; aires ±1/2/3 σ = 68,269 / 95,450 / 99,730 %.
+- Figure 2 : les bornes demandées par le spec (λ jusqu'à 15, n à partir de 10) se recouvrent sur une zone impossible — λ/n > 1 n'est pas une probabilité. La figure ne tronque pas silencieusement : elle affiche la Poisson seule et un readout « n trop petit pour ce λ ». À arbitrer : garder ce garde-fou, ou resserrer le slider n à [20, 2 000] dans le spec.
+- Le spec donne `prereq: []`, mais `validate_sheet.py` exige une méta `prereq` non vide ; la sheet porte `content="aucun"`. Convention à figer si d'autres chaînes sans prérequis arrivent.
