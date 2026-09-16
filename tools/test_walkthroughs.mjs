@@ -48,7 +48,9 @@ for (const path of WALKTHROUGHS) {
   for (let i = 0; i < Math.max(tabs.length, 1); i++) {
     if (tabs.length) { await tabs[i].click(); await page.waitForTimeout(80); }
 
-    for (const fig of await page.$$('figure')) {
+    // Deux formats cohabitent : les déroulés « papier » (<figure>) et le
+    // standard « tableau noir » de la refonte (div.fig).
+    for (const fig of await page.$$('figure, div.fig')) {
       if (!(await fig.isVisible())) continue;
       seen++;
       // Les boutons des figures sont créés en JS : on les cherche après coup.
@@ -64,17 +66,31 @@ for (const path of WALKTHROUGHS) {
     }
   }
 
-  // Le rail latéral tient le desktop et s'efface sous 1100px (media query).
-  const railWide = await page.$eval('nav.echelle', (n) => getComputedStyle(n).display);
+  // Le rail latéral tient le desktop et se replie sur téléphone. Les deux
+  // formats s'y prennent autrement : le rail « papier » passe à display:none
+  // sous 1100px, la barre « tableau noir » quitte le sticky sous 900px. On
+  // mesure la propriété qui porte le repli, selon le rail trouvé.
+  const sel = (await page.$('nav.echelle')) ? 'nav.echelle'
+            : (await page.$('aside.side')) ? 'aside.side' : null;
+  // « papier » : le rail passe à display:none. « tableau noir » : il reste
+  // affiché mais la grille à deux colonnes se replie sur une seule — c'est
+  // cette bascule-là qu'on mesure, pas la position du rail.
+  const read = (s) => page.$eval(s, (n) => (
+    n.matches('nav.echelle') ? getComputedStyle(n).display
+      : getComputedStyle(n.closest('.wrap')).gridTemplateColumns.split(' ').length + ' col.'
+  ));
+  const railWide = sel ? await read(sel) : 'absent';
   await page.setViewportSize({ width: 390, height: 844 });
   await page.waitForTimeout(150);
-  const railNarrow = await page.$eval('nav.echelle', (n) => getComputedStyle(n).display);
+  const railNarrow = sel ? await read(sel) : 'absent';
   const overflow = await page.evaluate(
     () => document.documentElement.scrollWidth - document.documentElement.clientWidth
   );
+  const railOk = sel === 'nav.echelle' ? (railWide !== 'none' && railNarrow === 'none')
+               : sel === 'aside.side' ? (railWide === '2 col.' && railNarrow === '1 col.')
+               : false;
 
-  const ok = !errors.length && !silent.length && seen > 0
-    && railWide !== 'none' && railNarrow === 'none' && overflow <= 0;
+  const ok = !errors.length && !silent.length && seen > 0 && railOk && overflow <= 0;
   if (!ok) failures++;
   console.log(`${ok ? '✓' : '✗'} ${path.split('/').pop()} — ${seen} figures`
     + `${tabs.length ? ` sur ${tabs.length} onglets` : ''}, `

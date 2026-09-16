@@ -1,0 +1,560 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Du bruit à la loss — chaîne</title>
+<meta name="sheet" content="series=chain;part=02;number=01;status=v1">
+<meta name="part" content="02 · Le bruit décide (fil B)">
+<meta name="subtitle" content="fil B — hypothèse de bruit → densité → produit → log → négatif → jeter">
+<meta name="prereq" content="p00-02,p00-03">
+<meta name="anki" content="stats::vraisemblance,stats::mle,ml::regression-lineaire,ml::logistique,dl::cross-entropy">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ---- marques de cette chaîne (classes seulement, jamais de fill inline) ---- */
+.sl-fn.dash{stroke-dasharray:6 4}
+.sl-seg.mk-r{stroke:rgba(34,48,43,.75);stroke-width:1.6;stroke-dasharray:3 3}
+.sl-seg.mk-asym{stroke:var(--green);stroke-width:1.6;stroke-dasharray:4 4}
+text.mk-asym{fill:var(--green)}
+.sl-plot text.sl-c1,.sl-plot text.sl-c2,.sl-plot text.sl-c3,.sl-plot text.sl-c5{font-size:12.5px}
+.cap .kg{color:var(--pen);font-weight:600}.cap .kl{color:var(--red);font-weight:600}.cap .km{color:#B7791F;font-weight:600}
+.fig .pan{font:600 11px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cardmuted);margin:8px 0 0}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 02 · Le bruit décide (fil B) › chaîne 01</div>
+  <h1>Du <span>bruit</span> à la <span>loss</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Fil B. D'où viennent la MSE, la log-loss, la MAE, la cross-entropy ? <b>D'une seule hypothèse — la loi du bruit — et d'un geste mécanique en six pas</b> : densité, produit, log, négatif, jeter, nommer. Trois exemples minuscules le traversent : une régression sur trois points, une classification sur quatre, un softmax à trois classes. Le déroulé <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4</a> rejoue ces mêmes exemples calcul par calcul ; ici ce sont les règles.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="../../map.html#p00-02">p00-02 · Espérance, variance, densité</a></li>
+    <li><a href="../../map.html#p00-03">p00-03 · Conditionnement et Bayes</a></li>
+    <li><a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4 · les mêmes exemples, calculés</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::vraisemblance</code><code>stats::mle</code><code>ml::regression-lineaire</code><code>ml::logistique</code><code>dl::cross-entropy</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-05-escalier-vs-sensible.html">Escalier vs sensible</a></li>
+    <li><a href="../bridges/bridge-06-convexite-forme-fermee.html">Convexité et forme fermée</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>Masse contre densité</b> (<a href="../../map.html#p00-02">p00-02</a>). Pour un <span class="m">y</span> continu, <span class="m">p</span>(<span class="m">y</span>) est une <b>densité</b> : on l'<b>évalue</b> en un point, on ne l'intègre pas. Elle peut dépasser 1 et ce n'est pas une probabilité. Pour un <span class="m">y</span> discret, c'est une masse, et là c'en est une.</li>
+      <li><b>Indépendance ⇒ produit</b> (<a href="../../map.html#p00-03">p00-03</a>). Si les observations sont indépendantes sachant <span class="m">x</span> et <span class="m">θ</span>, la probabilité de les voir toutes est le produit de leurs probabilités individuelles. C'est la seule justification du produit du pas 4.</li>
+      <li><b>Le log ne déplace pas l'argmax.</b> <span class="m">log</span> est strictement croissante, donc <span class="up">argmax</span> <span class="m">L</span> = <span class="up">argmax</span> <span class="m">log L</span> ; et <span class="m">log</span>(<span class="m">ab</span>) = <span class="m">log a</span> + <span class="m">log b</span> transforme le produit en somme.</li>
+      <li><b>Les calculs de cette chaîne sont faits ailleurs.</b> Le déroulé <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4</a> refait les six pas ligne à ligne sur les trois mêmes exemples. Ici on garde les règles et les points d'arrêt.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>On modélise <b><span class="m">y</span> sachant <span class="m">x</span></b>, jamais <span class="m">x</span>. La loi des features ne sert à rien ici et n'est jamais écrite.</span>
+      <b>H2</b><span>Les observations sont <b>indépendantes</b> conditionnellement à <span class="m">x</span> et <span class="m">θ</span>. C'est cette hypothèse, et elle seule, qui autorise le produit du pas 4.</span>
+      <b>H3</b><span><span class="m">θ</span> est un <b>paramètre fixe</b>, pas une variable aléatoire : cadre fréquentiste. On écrit donc <span class="m">p</span>(<span class="m">y</span> | <span class="m">x</span> ; <span class="m">θ</span>), point-virgule devant <span class="m">θ</span> — une barre supposerait une loi sur <span class="m">θ</span>, et il n'y en a pas. Le prior arrive en <a href="chain-p02-02-prior-penalite.html">p02-02</a>.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor</h3>
+    <p>Un modèle <span class="m">f</span>(<span class="m">x</span> ; <span class="m">θ</span>), des données (<span class="m">x</span><sub><span class="m">i</span></sub>, <span class="m">y</span><sub><span class="m">i</span></sub>), et l'envie d'un <span class="m">θ</span>. Pour départager les candidats il faut un critère — et ce critère ne se décrète pas : il va se <b>déduire</b>.</p>
+    <p>La seule chose qu'on posera dans toute la chaîne est la <b>loi du bruit</b>. Tout ce qui suit est du calcul, sans un seul choix supplémentaire.</p>
+    <p class="say">« Il faut un critère pour ranger les candidats <span class="m">θ</span>, donc la question est d'où il sort, donc on ne va pas le choisir mais le déduire d'une seule hypothèse. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Les trois exemples fil rouge</div>
+    <table>
+      <tr><th>exemple</th><th>données</th><th>modèle</th></tr>
+      <tr><td><b>régression</b></td><td><span class="m">x</span> = (1, 2, 3), <span class="m">y</span> = (1, 2, 3)</td><td><span class="m">f</span>(<span class="m">x</span> ; <span class="m">β</span>) = <span class="m">βx</span></td></tr>
+      <tr><td><b>classification</b></td><td><span class="m">x</span> = (−2, −1, 1, 2), <span class="m">y</span> = (0, 0, 1, 1)</td><td><span class="m">p</span> = <span class="m">σ</span>(<span class="m">βx</span>)</td></tr>
+      <tr><td><b>trois classes</b></td><td>un exemple, logits <span class="m">z</span> = (2, 0, −1)</td><td>softmax(<span class="m">z</span>)</td></tr>
+      <tr><td><b>la pièce</b></td><td>trois tirages, trois succès (PPP)</td><td>un seul <span class="m">p</span></td></tr>
+    </table>
+    <p>Minuscules exprès : chaque pas de la chaîne sera chiffré à la main, et deux d'entre eux casseront.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>L'hypothèse de bruit <span class="tag tronc">tronc</span></h3>
+    <p>Le modèle ne passe pas par les points : ce qui reste est le bruit, et on lui donne une loi. Deux écritures, la même chose :</p>
+    <div class="eq"><span class="m">y</span><sub><span class="m">i</span></sub> = <span class="m">f</span>(<span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>) + <span class="m">ε</span><sub><span class="m">i</span></sub>, &nbsp; <span class="m">ε</span><sub><span class="m">i</span></sub> ~ Loi &nbsp;&nbsp;|&nbsp;&nbsp; <span class="m">y</span><sub><span class="m">i</span></sub> ~ Loi(<span class="m">f</span>(<span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>))</div>
+    <p>La seconde est la bonne quand l'additivité n'a pas de sens : un <span class="m">y</span> à valeurs 0/1 ou une classe ne s'écrit pas « prédiction + erreur ».</p>
+    <p class="say">« La loss n'est pas choisie, elle sera déduite, donc tout ce qu'on suppose est ici : la loi du bruit. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — une loi par exemple</div>
+    <table>
+      <tr><th>exemple</th><th>hypothèse de bruit</th></tr>
+      <tr><td>régression</td><td><span class="m">ε</span><sub><span class="m">i</span></sub> ~ <span class="up">N</span>(0, <span class="m">σ</span>²), i.i.d.</td></tr>
+      <tr><td>même régression, queues lourdes</td><td><span class="m">ε</span><sub><span class="m">i</span></sub> ~ Laplace(0, <span class="m">b</span>)</td></tr>
+      <tr><td>classification</td><td><span class="m">y</span><sub><span class="m">i</span></sub> ~ Bernoulli(<span class="m">p</span><sub><span class="m">i</span></sub>), <span class="m">p</span><sub><span class="m">i</span></sub> = <span class="m">σ</span>(<span class="m">βx</span><sub><span class="m">i</span></sub>)</td></tr>
+      <tr><td>trois classes</td><td><span class="m">y</span><sub><span class="m">i</span></sub> ~ Catégorielle(softmax(<span class="m">z</span><sub><span class="m">i</span></sub>))</td></tr>
+    </table>
+    <p>Quatre lignes, quatre losses différentes à l'arrivée. Rien d'autre ne changera dans la chaîne.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Densité d'une observation</h3>
+    <p>On injecte le résidu <span class="m">ε</span><sub><span class="m">i</span></sub> = <span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">f</span>(<span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>) dans la densité du bruit. Chaque observation reçoit un nombre, <b>évalué</b> en un point et non intégré :</p>
+    <div class="eq">gaussien : <span class="m">p</span>(<span class="m">y</span><sub><span class="m">i</span></sub> | <span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>) = (1 / (<span class="m">σ</span>√(2<span class="m">π</span>))) · exp( −(<span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">f</span>)² / (<b>2</b><span class="m">σ</span>²) )</div>
+    <div class="eq">Bernoulli : <span class="m">p</span><sub><span class="m">i</span></sub><sup><span class="m">y</span><sub><span class="m">i</span></sub></sup>(1 − <span class="m">p</span><sub><span class="m">i</span></sub>)<sup>1−<span class="m">y</span><sub><span class="m">i</span></sub></sup> &nbsp;&nbsp;|&nbsp;&nbsp; catégoriel : <span class="m">p</span><sub><span class="m">y</span><sub><span class="m">i</span></sub></sub> = softmax(<span class="m">z</span><sub><span class="m">i</span></sub>)<sub><span class="m">y</span><sub><span class="m">i</span></sub></sub></div>
+    <p>Le <b>2</b> sous <span class="m">σ</span>² fait partie de la gaussienne, il ne s'invente pas au pas suivant. Et c'est ici que le point-virgule se place : <span class="m">θ</span> est fixe, il paramètre la densité.</p>
+    <p class="say">« La densité du bruit est connue, donc on y injecte le résidu <span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">f</span>(<span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>), donc chaque observation reçoit un nombre — une densité évaluée en un point, jamais une aire. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application</div>
+    <p><b>Régression</b>, <span class="m">σ</span> = 1. En <span class="m">β</span> = 1 les trois résidus sont nuls : chaque densité vaut 1/√(2<span class="m">π</span>) = <b>0,399</b>. En <span class="m">β</span> = 0 les résidus sont (1, 2, 3) : 0,242 · 0,054 · 0,0044.</p>
+    <p><b>Trois classes</b>, <span class="m">z</span> = (2, 0, −1) : e² = 7,389 ; e⁰ = 1 ; e⁻¹ = 0,368 ; somme 8,757. Softmax = (<b>0,844</b> ; 0,114 ; 0,042). La densité de l'observation « chat » est 0,844 ; si la vraie classe était « oiseau », ce serait 0,042.</p>
+    <p><b>La pièce</b> : trois succès, chacun de probabilité <span class="m">p</span>. Trois nombres, tous égaux à <span class="m">p</span>.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — la densité du bruit, et son −log</div>
+    <p class="pan">en haut : la densité · en bas : son −log, c'est-à-dire la loss</p>
+    <div id="f1dens" class="wide"></div>
+    <div id="f1nll" class="wide"></div>
+    <div id="f1sliders"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Déplace le résidu <span class="m">r</span> = <span class="m">y</span> − <span class="m">f</span>(<span class="m">x</span> ; <span class="m">θ</span>). En haut, deux hypothèses de bruit : la <span class="kg">gaussienne</span> et la <span class="kl">Laplace</span>. En bas, en pointillé, le <b>−log</b> de chacune : c'est déjà la loss, à une constante près. Le −log de la gaussienne est un <b>carré</b> (0,919 + <span class="m">r</span>²/2), celui de Laplace une <b>valeur absolue</b> (0,693 + |<span class="m">r</span>|). Passe <span class="m">r</span> de 1 à 4 : la part qui dépend de <span class="m">r</span> passe de 0,5 à 8 côté gaussien (×16) et de 1 à 4 côté Laplace (×4) — la forme de la loss est la forme de l'exposant de la densité.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Produit</h3>
+    <p>Les observations sont indépendantes sachant <span class="m">x</span> et <span class="m">θ</span> (H2), donc la probabilité de les voir <i>toutes</i> est le produit :</p>
+    <div class="eq"><span class="m">L</span>(<span class="m">θ</span>) = <span class="m">Π</span><sub><span class="m">i</span></sub> <span class="m">p</span>(<span class="m">y</span><sub><span class="m">i</span></sub> | <span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>)</div>
+    <p>Données fixées, <span class="m">θ</span> qui varie : ce n'est plus une densité sur <span class="m">y</span>, c'est une fonction de <span class="m">θ</span>. C'est ce retournement que le mot <b>vraisemblance</b> désigne — et ce n'est pas une loi sur <span class="m">θ</span> : son intégrale ne vaut pas 1.</p>
+    <p class="say">« Les observations sont indépendantes sachant <span class="m">x</span>, donc leur probabilité jointe est le produit des densités, donc <span class="m">L</span>(<span class="m">θ</span>) est une fonction de <span class="m">θ</span> à données fixées — une vraisemblance, pas une loi sur <span class="m">θ</span>. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application</div>
+    <p><b>Régression</b>, <span class="m">σ</span> = 1 : <span class="m">L</span>(<span class="m">β</span>) = (2<span class="m">π</span>)<sup>−3/2</sup> · exp(−RSS(<span class="m">β</span>)/2) avec RSS(<span class="m">β</span>) = <span class="m">Σ</span>(<span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">βx</span><sub><span class="m">i</span></sub>)². En <span class="m">β</span> = 1 : <span class="m">L</span> = 0,0635. En <span class="m">β</span> = 0 : 0,0635 · e<sup>−7</sup> = 5,79·10<sup>−5</sup>.</p>
+    <p><b>La pièce</b> : <span class="m">L</span>(<span class="m">p</span>) = <span class="m">p</span> · <span class="m">p</span> · <span class="m">p</span> = <span class="m">p</span>³.</p>
+    <p><b>Vérification qu'aucune loi ne se cache là</b> : ∫<sub>0</sub><sup>1</sup> <span class="m">p</span>³ d<span class="m">p</span> = 1/4 ≠ 1. La vraisemblance n'est pas normalisée en <span class="m">θ</span>, et rien ne la normalisera avant le prior de <a href="chain-p02-02-prior-penalite.html">p02-02</a>.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Log</h3>
+    <p><span class="m">log</span> est croissante, donc elle ne déplace pas l'argmax ; et elle change le produit en somme, dérivable terme à terme et calculable sans sous-débordement.</p>
+    <div class="eq"><span class="m">ℓ</span>(<span class="m">θ</span>) = <span class="m">Σ</span><sub><span class="m">i</span></sub> <span class="m">log p</span>(<span class="m">y</span><sub><span class="m">i</span></sub> | <span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>)</div>
+    <div class="eq">gaussien : <span class="m">ℓ</span>(<span class="m">θ</span>) = −<b><span class="m">n</span></b> <span class="m">log</span>(<span class="m">σ</span>√(2<span class="m">π</span>)) − <span class="m">Σ</span><sub><span class="m">i</span></sub>(<span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">f</span>)² / (2<span class="m">σ</span>²)</div>
+    <p>Le <b><span class="m">n</span></b> devant la constante n'est pas décoratif : une constante par observation, parce qu'il y a <span class="m">n</span> termes dans la somme.</p>
+    <p class="say">« Le log est croissant, donc il ne déplace pas l'argmax, donc le produit devient une somme de <span class="m">n</span> termes — dont <span class="m">n</span> constantes, une par observation. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application</div>
+    <p><b>Régression</b>, <span class="m">n</span> = 3, <span class="m">σ</span> = 1 : RSS(<span class="m">β</span>) = 14 − 28<span class="m">β</span> + 14<span class="m">β</span>² = 14(1 − <span class="m">β</span>)², donc</p>
+    <div class="eq"><span class="m">ℓ</span>(<span class="m">β</span>) = −3 <span class="m">log</span>(√(2<span class="m">π</span>)) − 7(1 − <span class="m">β</span>)² = −2,757 − 7(1 − <span class="m">β</span>)²</div>
+    <p><span class="m">ℓ</span>(1) = −2,757 ; <span class="m">ℓ</span>(0) = −9,757. <b>La pièce</b> : <span class="m">log L</span>(<span class="m">p</span>) = 3 <span class="m">log p</span>, valant 0 en <span class="m">p</span> = 1 et −2,079 en <span class="m">p</span> = 0,5 — même sommet que <span class="m">p</span>³.</p>
+    <p><b>Le sous-débordement, en un chiffre</b> : mille densités à 0,01 donnent un produit de 10<sup>−2000</sup>, qui vaut exactement 0 en flottant 64 bits ; la somme des logs vaut −4 605 et se calcule sans effort. (Le même réflexe, plus fin, fait écrire <span class="m">log</span>(1 + e<sup>−<span class="m">z</span></sup>) plutôt que <span class="m">log σ</span>(<span class="m">z</span>) — les flottants sont un sujet à part, <a href="../../map.html#p08-02">p08-02</a>.)</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — le log garde le sommet</div>
+    <div id="f2plot" class="wide"></div>
+    <div id="f2sliders"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">La pièce à trois succès : <span class="kg"><span class="m">L</span>(<span class="m">p</span>) = <span class="m">p</span>³</span> et son <span class="km">logarithme</span>, en pointillé. Déplace <span class="m">p</span> : les deux courbes n'ont pas la même forme du tout, et pourtant elles montent toutes les deux jusqu'au bord droit et culminent au <b>même</b> point, <span class="hat"><span class="m">p</span></span> = 1. C'est tout ce qu'on demande au log. Au passage la figure montre aussi ce que vaut le maximum de vraisemblance brut : il ne croit que ce qu'il a vu, et déclare l'échec impossible.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Négatif</h3>
+    <p>Maximiser <span class="m">ℓ</span> revient à minimiser son opposé. On pose</p>
+    <div class="eq">NLL(<span class="m">θ</span>) = −<span class="m">ℓ</span>(<span class="m">θ</span>) &nbsp;&nbsp;&nbsp; <span class="up">argmax</span><sub><span class="m">θ</span></sub> <span class="m">ℓ</span>(<span class="m">θ</span>) = <span class="up">argmin</span><sub><span class="m">θ</span></sub> NLL(<span class="m">θ</span>)</div>
+    <p>Rien d'autre n'a changé : mêmes termes, même argument, un signe. C'est ce signe, et lui seul, qui fabrique une <b>loss</b> à partir d'une vraisemblance.</p>
+    <p class="say">« Maximiser <span class="m">ℓ</span> revient à minimiser −<span class="m">ℓ</span>, donc on pose NLL = −<span class="m">ℓ</span>, donc une loss n'est rien d'autre qu'une log-vraisemblance retournée. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application</div>
+    <div class="eq">gaussien : NLL(<span class="m">β</span>) = <span class="m">n</span> <span class="m">log</span>(<span class="m">σ</span>√(2<span class="m">π</span>)) + RSS(<span class="m">β</span>) / (2<span class="m">σ</span>²)</div>
+    <p>Sur la régression, <span class="m">σ</span> = 1 : NLL(<span class="m">β</span>) = 2,757 + 7(1 − <span class="m">β</span>)². Minimale en <span class="m">β</span> = 1, valeur 2,757.</p>
+    <div class="eq">Bernoulli : NLL(<span class="m">β</span>) = −<span class="m">Σ</span><sub><span class="m">i</span></sub> [ <span class="m">y</span><sub><span class="m">i</span></sub> <span class="m">log p</span><sub><span class="m">i</span></sub> + (1 − <span class="m">y</span><sub><span class="m">i</span></sub>) <span class="m">log</span>(1 − <span class="m">p</span><sub><span class="m">i</span></sub>) ]</div>
+    <p>Sur la classification, en regroupant les quatre points : NLL(<span class="m">β</span>) = 2 <span class="m">log</span>(1 + e<sup>−<span class="m">β</span></sup>) + 2 <span class="m">log</span>(1 + e<sup>−2<span class="m">β</span></sup>). NLL(0) = 4 <span class="m">log</span> 2 = 2,773 ; NLL(2) = 0,290.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Jeter — puis s'arrêter <span class="tag tronc">tronc</span></h3>
+    <p>L'<span class="up">argmin</span> ne bouge ni sous une constante additive ni sous un facteur multiplicatif positif. On jette donc tout ce qui ne dépend pas de <span class="m">θ</span>.</p>
+    <p>Ce qui reste <b>porte un nom</b>, et c'est le <b>point d'arrêt</b> de la chaîne : il n'y a rien à simplifier après, rien à continuer. Reconnaître le nom fait partie du geste au même titre que le calcul.</p>
+    <p class="say">« La constante ne dépend pas de <span class="m">θ</span>, donc elle ne déplace pas l'argmin, donc on la jette, donc ce qui reste est la loss, et sa forme est la forme de l'exposant de la densité. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les quatre arrivées</div>
+    <table>
+      <tr><th>bruit</th><th>ce qu'on jette</th><th>ce qui reste</th><th>son nom</th></tr>
+      <tr class="hl"><td><span class="up">N</span>(0, <span class="m">σ</span>²)</td><td><span class="m">n</span> <span class="m">log</span>(<span class="m">σ</span>√(2<span class="m">π</span>)) et 1/(2<span class="m">σ</span>²)</td><td><span class="m">Σ</span> <span class="m">r</span><sub><span class="m">i</span></sub>²</td><td><b>MSE</b></td></tr>
+      <tr><td>Laplace(0, <span class="m">b</span>)</td><td><span class="m">n</span> <span class="m">log</span>(2<span class="m">b</span>) et 1/<span class="m">b</span></td><td><span class="m">Σ</span> |<span class="m">r</span><sub><span class="m">i</span></sub>|</td><td><b>MAE</b></td></tr>
+      <tr><td>Bernoulli(<span class="m">p</span>)</td><td><b>rien</b></td><td>−<span class="m">Σ</span>[<span class="m">y</span> <span class="m">log p</span> + (1−<span class="m">y</span>) <span class="m">log</span>(1−<span class="m">p</span>)]</td><td><b>log-loss</b></td></tr>
+      <tr><td>Catégorielle</td><td><b>rien</b></td><td>−<span class="m">Σ</span> <span class="m">log p</span><sub><span class="m">y</span><sub><span class="m">i</span></sub></sub></td><td><b>cross-entropy</b></td></tr>
+    </table>
+    <p><b>Régression</b> : <span class="up">argmin</span> [2,757 + 7(1−<span class="m">β</span>)²] = <span class="up">argmin</span> 14(1−<span class="m">β</span>)² = <span class="up">argmin</span> RSS, donc <span class="hat"><span class="m">β</span></span> = 1. La MSE n'a pas été choisie, elle est tombée.</p>
+    <p><b>Bernoulli et catégorielle : rien à jeter.</b> Pas de paramètre de dispersion séparé — la variance <span class="m">p</span>(1 − <span class="m">p</span>) est fixée par la moyenne. La NLL <i>est</i> la loss, telle quelle. Sur les trois classes : cross-entropy = −<span class="m">log</span> 0,844 = <b>0,170</b> si la vraie classe est chat, −<span class="m">log</span> 0,042 = <b>3,17</b> si c'est oiseau. Le nom est là, on s'arrête.</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — ce que coûte une erreur confiante</div>
+    <div id="f3plot" class="wide"></div>
+    <div id="f3sliders"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Un seul exemple, une probabilité prédite <span class="m">p</span> pour la classe 1. La <span class="kg">log-loss quand <span class="m">y</span> = 1</span> est −<span class="m">log p</span>, la <span class="kl">log-loss quand <span class="m">y</span> = 0</span> est −<span class="m">log</span>(1 − <span class="m">p</span>) ; en pointillé, la <span class="km">MSE</span> (1 − <span class="m">p</span>)² pour comparaison. Glisse <span class="m">p</span> vers 0 avec <span class="m">y</span> = 1 : la log-loss part vers l'infini (4,61 en <span class="m">p</span> = 0,01) pendant que la MSE plafonne à 0,98. <b>La log-loss n'est pas bornée, la MSE l'est</b> : se tromper avec certitude coûte sans limite d'un côté, et à peine plus que « je ne sais pas » de l'autre. Même lecture à trois classes : la cross-entropy est ce même −<span class="m">log</span> lu sur la probabilité de la <i>vraie</i> classe.</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Ce que chaque loss estime</h3>
+    <p>Changer d'hypothèse de bruit ne change pas seulement la robustesse : ça change la <b>quantité estimée</b>.</p>
+    <div class="eq">MSE → moyenne conditionnelle &nbsp;·&nbsp; MAE → médiane conditionnelle &nbsp;·&nbsp; log-loss et cross-entropy → probabilité conditionnelle</div>
+    <p>« Laquelle veux-tu prédire ? » est donc une question qui précède toute considération de robustesse, et qui se pose dès le pas 2.</p>
+    <p class="say">« Le minimiseur de <span class="m">Σ</span>(<span class="m">y</span> − <span class="m">c</span>)² est la moyenne et celui de <span class="m">Σ</span>|<span class="m">y</span> − <span class="m">c</span>| est la médiane, donc changer le bruit change la quantité estimée, donc MSE et MAE ne sont pas deux précisions du même nombre mais deux nombres. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — un modèle constant, cinq valeurs</div>
+    <p><span class="m">y</span> = (1, 2, 3, 4, 20). Moyenne <b>6</b>, médiane <b>3</b>.</p>
+    <table>
+      <tr><th><span class="m">c</span></th><th><span class="m">Σ</span>(<span class="m">y</span> − <span class="m">c</span>)²</th><th><span class="m">Σ</span>|<span class="m">y</span> − <span class="m">c</span>|</th></tr>
+      <tr><td>3 (médiane)</td><td>295</td><td><b>21</b></td></tr>
+      <tr><td>6 (moyenne)</td><td><b>250</b></td><td>28</td></tr>
+    </table>
+    <p>Chacune gagne chez elle. Le seul point à 20 déplace la moyenne de 3 à 6 et <b>ne déplace pas</b> la médiane : sous gaussienne un résidu de 10 coûte 100 fois un résidu de 1, sous Laplace il coûte 10 fois. L'influence d'un point est non bornée d'un côté, bornée de l'autre.</p>
+    <p>Sur une cible asymétrique — revenus, durées, temps de réponse — moyenne et médiane ne coïncident pas, et le choix de la loss est un choix de cible.</p>
+  </div>
+</div>
+
+<div class="step" id="s9">
+  <div class="rule">
+    <h3>Le geste, en arrière</h3>
+    <p>Personne ne dit « je suppose un bruit de Laplace »&nbsp;: on choisit la MAE, et l'hypothèse est reconstituée après coup. Savoir faire le trajet dans ce sens est ce qui distingue une réponse d'un slogan.</p>
+    <p>Devant une loss inconnue : quel <b>exposant</b>, donc quelle <b>densité</b>, donc quel <b>bruit</b>, donc quelle <b>cible</b>&nbsp;?</p>
+    <p class="say">« La loss est le −log d'une densité, donc son exposant est celui de la densité, donc un carré trahit une gaussienne et une valeur absolue une Laplace, donc la bonne phrase est <i>la MAE suppose des queues exponentielles et estime la médiane</i>. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — la lecture à l'envers</div>
+    <table>
+      <tr><th>ce qu'on lit</th><th>exposant</th><th>bruit supposé</th><th>cible</th></tr>
+      <tr><td><span class="m">Σ</span>(<span class="m">y</span> − <span class="m">f</span>)²</td><td>carré</td><td>gaussien</td><td>moyenne</td></tr>
+      <tr><td><span class="m">Σ</span>|<span class="m">y</span> − <span class="m">f</span>|</td><td>valeur absolue</td><td>Laplace</td><td>médiane</td></tr>
+      <tr><td>−<span class="m">Σ</span>[<span class="m">y</span> <span class="m">log p</span> + …]</td><td><span class="m">log</span> d'une puissance</td><td>Bernoulli</td><td>probabilité</td></tr>
+      <tr class="hl"><td>−<span class="m">log p</span><sub><span class="m">y</span></sub></td><td><span class="m">log</span> d'une puissance</td><td>catégorielle</td><td>probabilité</td></tr>
+    </table>
+    <p><b>Le lien cross-entropy ↔ MLE, en quatre pas</b>, quand la mémoire lâche : (1) une loi paramétrée pour <span class="m">y</span> sachant <span class="m">x</span> — ici une catégorielle de paramètre softmax(<span class="m">z</span>) ; (2) la probabilité d'une observation — <span class="m">p</span><sub><span class="m">y</span></sub>, la coordonnée de la vraie classe ; (3) le produit sur les observations ; (4) <span class="up">argmax</span>, donc <span class="up">argmin</span> du −<span class="m">log</span>. On arrive sur −<span class="m">Σ log p</span><sub><span class="m">y</span><sub><span class="m">i</span></sub></sub> : la cross-entropy <b>est</b> le maximum de vraisemblance d'une catégorielle, pas une loss inventée à part.</p>
+  </div>
+</div>
+
+<div class="step" id="s10">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Le geste est mécanique, mais ses deux appuis — l'indépendance et la vraisemblance seule — lâchent dans des cas précis, et toujours pour la même raison : la vraisemblance ne détermine parfois rien du tout.</p>
+    <p class="say">« Le produit suppose l'indépendance et le maximum de vraisemblance ne croit que ce qu'il a vu, donc la vraisemblance seule peut ne rien déterminer — trop de solutions, ou aucune — donc il faudra lui ajouter quelque chose, et ce sera le prior. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>Le produit est interdit dès qu'il y a dépendance.</b> Séries temporelles, mesures répétées sur un même sujet, phrases d'un même document : la jointe ne se factorise pas et le produit compte plusieurs fois la même information. La vraisemblance obtenue est trop piquée, donc toute barre d'erreur qui en sort est trop étroite.</li>
+      <li><b>Le maximum de vraisemblance ne croit que ce qu'il a vu.</b> Pièce PPP : <span class="m">L</span>(<span class="m">p</span>) = <span class="m">p</span>³, maximale en <span class="hat"><span class="m">p</span></span> = 1 — « un échec est impossible » après trois tirages (figure 2). Même mécanisme en langue : un mot jamais vu reçoit la probabilité 0, donc toute phrase qui le contient devient impossible. Remède : ajouter une croyance — prior, ou lissage (3+1)/(3+2) = 0,8 — c'est <a href="chain-p02-02-prior-penalite.html">p02-02</a>.</li>
+      <li><b>Parfois il n'y a pas de minimum du tout.</b> Séparation parfaite : la NLL décroît vers 0 sans jamais l'atteindre, donc <span class="hat"><span class="m">β</span></span> n'existe pas et ‖<span class="m">β</span>‖ → ∞ (figure 4). Le solveur s'arrête sur son nombre d'itérations avec un coefficient énorme, ce qui ressemble à un résultat sans en être un.</li>
+      <li><b><span class="m">σ</span> a disparu au pas 7</b>, et c'était légitime : il ne déplace pas l'<span class="up">argmin</span> en <span class="m">β</span>. Mais une barre d'erreur sur <span class="hat"><span class="m">β</span></span>, elle, en a besoin — il faut le récupérer, <span class="hat"><span class="m">σ</span></span>² = RSS/<span class="m">n</span>. Jeter pour optimiser ne veut pas dire jeter pour conclure : c'est le retour du fil A, <a href="chain-p01-03-inference-regression.html">p01-03</a>.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — une loss qui n'a pas de minimum</div>
+    <div id="f4plot" class="wide"></div>
+    <div id="f4sliders"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">L'exemple de classification, <span class="m">x</span> = (−2, −1, 1, 2) et <span class="m">y</span> = (0, 0, 1, 1) : toute pente <span class="m">β</span> &gt; 0 classe les quatre points correctement. Monte <span class="m">β</span> : la NLL descend vers 0 sans jamais l'atteindre et sa pente reste strictement négative — pour tout <span class="m">β</span>, doubler <span class="m">β</span> fait mieux. Il n'y a <b>pas</b> d'argmin, et ce n'est pas un défaut du calcul : les données disent « n'importe quelle pente pourvu qu'elle soit infinie ». La pénalité de <a href="chain-p02-02-prior-penalite.html">p02-02</a> ne rendra pas la solution meilleure, elle la fera <i>exister</i>.</p>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Une seule hypothèse dans toute la chaîne : <b>la loi du bruit</b> (plus l'indépendance, qui autorise le produit).</li>
+    <li>Six pas mécaniques : <b>densité → produit → log → négatif → jeter → nommer</b>. Le nom est le point d'arrêt.</li>
+    <li>Gaussien → <b>MSE</b> (<span class="m">σ</span>² jeté) ; Laplace → <b>MAE</b> ; Bernoulli → <b>log-loss</b> (rien à jeter) ; catégoriel → <b>cross-entropy</b> = −<span class="m">log p</span><sub><span class="m">y</span></sub>.</li>
+    <li>La forme de la loss est la forme de <b>l'exposant de la densité</b> : carré ⇒ gaussienne, valeur absolue ⇒ Laplace.</li>
+    <li>Chaque loss estime une cible différente : <b>moyenne</b>, <b>médiane</b>, <b>probabilité</b>. Le geste se lit aussi à l'envers, de la loss vers le bruit.</li>
+    <li>Ça casse par : dépendance (produit interdit), <span class="hat"><span class="m">p</span></span> = 1 du maximum de vraisemblance, séparation parfaite (pas de minimum), <span class="m">σ</span> jeté dont une barre d'erreur a pourtant besoin.</li>
+  </ol>
+</div>
+<div class="phrase">« Je ne choisis pas la MSE, elle tombe d'un bruit gaussien : je pose la loi du bruit, j'écris la densité de chaque observation, le produit par indépendance, le log, le signe moins, je jette les constantes, et il reste la somme des carrés. Le même geste avec Bernoulli donne la log-loss, avec une catégorielle la cross-entropy, avec Laplace la MAE — et chacune estime une cible différente. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Quelle est la seule hypothèse de la chaîne ?</div><div class="a hid">La loi du bruit — et l'indépendance conditionnelle, qui autorise le produit. Tout le reste est du calcul.</div></li>
+    <li><div class="q">Déroule les six pas sur un bruit gaussien.</div><div class="a hid">Densité exp(−r²/2σ²)/(σ√2π) → produit → log (−n log(σ√2π) − RSS/2σ²) → négatif → jeter la constante et le facteur 1/(2σ²) → MSE.</div></li>
+    <li><div class="q">Que jette-t-on avec Bernoulli ?</div><div class="a hid">Rien : pas de paramètre de dispersion séparé, la variance p(1−p) est fixée par la moyenne. La log-loss est la NLL telle quelle, et c'est le point d'arrêt.</div></li>
+    <li><div class="q">La cross-entropy à trois classes, c'est quoi ?</div><div class="a hid">La NLL d'une catégorielle : −log de la probabilité softmax de la vraie classe. Sur z = (2, 0, −1) : −log 0,844 = 0,170 pour chat, −log 0,042 = 3,17 pour oiseau.</div></li>
+    <li><div class="q">Que casse la séparation parfaite ?</div><div class="a hid">La NLL décroît vers 0 sans l'atteindre : pas de minimum, ‖β‖ → ∞. Le maximum de vraisemblance n'existe pas.</div></li>
+    <li><div class="q">Que suppose la MAE, et qu'estime-t-elle ?</div><div class="a hid">Un bruit de Laplace — queues exponentielles. Elle estime la médiane conditionnelle, pas la moyenne : une autre quantité, pas la même en plus prudent.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html"><b>D4 — une chaîne, trois exemples</b><small>le même geste, mais calculé : les trois exemples de cette chaîne repris ligne à ligne, jusqu'à la pénalité. Cette chaîne donne les règles, D4 donne les calculs</small></a>
+    <a href="../bridges/bridge-05-escalier-vs-sensible.html"><b>Escalier vs sensible</b><small>une loss n'informe que par sa pente ; la log-loss tombée de Bernoulli en a une partout, la 0/1 loss nulle part</small></a>
+    <a href="../bridges/bridge-06-convexite-forme-fermee.html"><b>Convexité et forme fermée</b><small>la NLL gaussienne est quadratique donc résolue en forme fermée ; la NLL Bernoulli est convexe mais s'itère</small></a>
+    <a href="chain-p03-01-critere-escalier-vs-sensible.html"><b>p03-01 — critère en escalier vs critère sensible</b><small>cette chaîne y est prérequis : une fois les losses déduites, on y compare leurs pentes au lieu de les redériver</small></a>
+    <a href="chain-p02-02-prior-penalite.html"><b>p02-02 — du prior à la pénalité</b><small>la suite immédiate : ce que la vraisemblance seule ne détermine pas, et ce que λ‖β‖² fournit</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::vraisemblance</code> (fonction de <span class="m">θ</span> à données fixées, pas une loi sur <span class="m">θ</span>) · <code>stats::mle</code> (les six pas, <span class="hat"><span class="m">p</span></span> = 1 sur PPP) · <code>ml::regression-lineaire</code> (MSE ← gaussienne, <span class="hat"><span class="m">σ</span></span>² = RSS/<span class="m">n</span>) · <code>ml::logistique</code> (log-loss ← Bernoulli, séparation parfaite) · <code>dl::cross-entropy</code> (−<span class="m">log p</span><sub><span class="m">y</span></sub>, NLL d'une catégorielle).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p02-01 · v1 du 16/09/2026 · Prérequis : p00-02, p00-03. Suite : <a href="chain-p02-02-prior-penalite.html">p02-02 Du prior à la pénalité</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+const S2PI=Math.sqrt(2*Math.PI), LS2PI=Math.log(S2PI), LN2=Math.LN2;
+const sig=z=>1/(1+Math.exp(-z));
+const l1pe=z=>z>0?z+Math.log1p(Math.exp(-z)):Math.log1p(Math.exp(z)); /* log(1 + e^z), stable */
+function ro(host,items){host.innerHTML='';items.forEach(([t,v,cls])=>{const d=document.createElement('div');if(cls)d.className=cls;d.innerHTML=t+'<b>'+v+'</b>';host.appendChild(d);});}
+
+/* ===== Figure 1 : densité du bruit et son −log ===== */
+const dG=r=>Math.exp(-r*r/2)/S2PI, dL=r=>.5*Math.exp(-Math.abs(r));
+const nG=r=>LS2PI+r*r/2,          nL=r=>LN2+Math.abs(r);
+const PA=SL.plot(document.getElementById('f1dens'),{x:[-4,4],y:[0,.56],w:600,h:210,xt:[-4,-2,0,2,4],yt:[.2,.4],xl:'résidu r = y − f(x ; θ)',yl:'densité du bruit'});
+PA.fn(dG,'sl-c1');PA.fn(dL,'sl-c3');
+PA.label(-3.9,.34,'gaussienne','sl-c1');PA.label(3.9,.20,'Laplace','sl-c3','end');
+const PB=SL.plot(document.getElementById('f1nll'),{x:[-4,4],y:[0,6],w:600,h:210,xt:[-4,-2,0,2,4],yt:[2,4,6],xl:'résidu r',yl:'−log densité = la loss'});
+PB.fn(nG,'sl-c1 dash');PB.fn(nL,'sl-c3 dash');
+PB.label(-3.9,2.1,'−log N : un carré','sl-c1');PB.label(3.9,1.0,'−log Laplace : |r|','sl-c3','end');
+function draw1(r){
+  PA.clear();PB.clear();
+  PA.vline(r,'mk-r');PB.vline(r,'mk-r');
+  PA.dot(r,dG(r),'sl-c1',5);PA.dot(r,dL(r),'sl-c3',5);
+  PB.dot(r,Math.min(nG(r),6),'sl-c1',5);PB.dot(r,nL(r),'sl-c3',5);
+  ro(document.getElementById('f1out'),[
+    ['gaussienne · densité',SL.fmt(dG(r),4)],
+    ['gaussienne · −log = la loss',SL.fmt(nG(r),3)],
+    ['Laplace · densité',SL.fmt(dL(r),4)],
+    ['Laplace · −log = la loss',SL.fmt(nL(r),3)]]);
+}
+SL.slider(document.getElementById('f1sliders'),{label:'résidu r',min:-4,max:4,step:.05,value:2},draw1);
+
+/* ===== Figure 2 : le log garde le sommet ===== */
+const P2=SL.plot(document.getElementById('f2plot'),{x:[0,1],y:[-3,1.1],w:600,h:260,xt:[0,.25,.5,.75,1],yt:[-3,-2,-1,0,1],xl:'p (probabilité de succès)',yl:'L(p) et log L(p)'});
+P2.fn(p=>p*p*p,'sl-c1');P2.fn(p=>p>0?3*Math.log(p):NaN,'sl-c5 dash');
+P2.label(.40,.72,'L(p) = p³','sl-c1');P2.label(.55,-2.55,'log L(p) = 3 log p','sl-c5');
+function draw2(p){
+  P2.clear();
+  P2.vline(p,'mk-r');P2.dot(p,p*p*p,'sl-c1',5);P2.dot(p,Math.max(3*Math.log(p),-3),'sl-c5',5);
+  P2.seg(1,-3,1,1.1,'gain');P2.text(.98,1.02,'p̂ = 1','','end');
+  ro(document.getElementById('f2out'),[
+    ['L(p) = p³',SL.fmt(p*p*p,4)],
+    ['log L(p)',SL.fmt(3*Math.log(p),3)],
+    ['argmax des deux','p̂ = 1','pos']]);
+}
+SL.slider(document.getElementById('f2sliders'),{label:'p',min:.02,max:1,step:.01,value:.75},draw2);
+
+/* ===== Figure 3 : log-loss vs MSE ===== */
+const P3=SL.plot(document.getElementById('f3plot'),{x:[0,1],y:[0,5],w:600,h:270,xt:[0,.25,.5,.75,1],yt:[1,2,3,4,5],xl:'p = probabilité prédite pour la classe 1',yl:'coût'});
+P3.fn(p=>p>0?-Math.log(p):NaN,'sl-c1');
+P3.fn(p=>p<1?-Math.log(1-p):NaN,'sl-c3');
+P3.fn(p=>(1-p)*(1-p),'sl-c5 dash');
+P3.label(.14,3.7,'−log p  (y = 1)','sl-c1');P3.label(.86,3.7,'−log(1 − p)  (y = 0)','sl-c3','end');
+P3.label(.30,2.5,'MSE : (1 − p)², bornée par 1','sl-c5');
+function draw3(p){
+  P3.clear();
+  P3.vline(p,'mk-r');
+  P3.dot(p,Math.min(-Math.log(p),5),'sl-c1',5);
+  P3.dot(p,Math.min(-Math.log(1-p),5),'sl-c3',5);
+  P3.dot(p,(1-p)*(1-p),'sl-c5',5);
+  ro(document.getElementById('f3out'),[
+    ['log-loss si y = 1',SL.fmt(-Math.log(p),3)],
+    ['log-loss si y = 0',SL.fmt(-Math.log(1-p),3)],
+    ['MSE si y = 1',SL.fmt((1-p)*(1-p),3)]]);
+}
+SL.slider(document.getElementById('f3sliders'),{label:'p',min:.01,max:.99,step:.01,value:.1},draw3);
+
+/* ===== Figure 4 : séparation parfaite, pas de minimum ===== */
+const nllB=b=>2*l1pe(-b)+2*l1pe(-2*b);
+const dnllB=b=>-2*sig(-b)-4*sig(-2*b);
+const P4=SL.plot(document.getElementById('f4plot'),{x:[0,10],y:[0,3],w:600,h:260,xt:[0,2,4,6,8,10],yt:[1,2,3],xl:'β (toute pente β > 0 sépare parfaitement)',yl:'NLL(β)'});
+P4.fn(nllB,'sl-c1',320);
+P4.label(3.3,1.75,'décroît vers 0, jamais atteint','sl-c1');
+function draw4(b){
+  P4.clear();
+  P4.seg(0,0,10,0,'mk-asym');P4.text(9.7,.22,'asymptote : NLL → 0','mk-asym','end');
+  P4.vline(b,'mk-r');P4.dot(b,Math.min(nllB(b),3),'sl-c1',6);
+  ro(document.getElementById('f4out'),[
+    ['NLL(β)',SL.fmt(nllB(b),4)],
+    ['pente dNLL/dβ',SL.fmt(dnllB(b),4)],
+    ['σ(β) pour x = 1',SL.fmt(sig(b),4)],
+    ['un minimum\u202f?','non','zero']]);
+}
+SL.slider(document.getElementById('f4sliders'),{label:'β',min:0,max:10,step:.05,value:1},draw4);
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,524 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Du prior à la pénalité — chaîne</title>
+<meta name="sheet" content="series=chain;part=02;number=02;status=v1">
+<meta name="part" content="02 · Le bruit décide (fil B)">
+<meta name="subtitle" content="fil B — MAP, λ = σ²/τ², +λI translate, L1 tranche ailleurs">
+<meta name="prereq" content="p02-01,p04-02,p00-03">
+<meta name="anki" content="stats::map,stats::regularisation,ml::ridge,ml::lasso,algebre::eigen">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ---- additions locales p02-02 ---- */
+.sl-fn.dash{stroke-dasharray:6 4}
+.sl-fn.thick{stroke-width:3.4}
+.fig .pan{font:600 11px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cardmuted);margin:8px 0 0}
+.fig .sq .sl-plot{max-width:460px;min-width:320px}
+.sl-plot text.sl-c1,.sl-plot text.sl-c2,.sl-plot text.sl-c3,.sl-plot text.sl-c5{font-size:12.5px}
+.cap .kl2{color:var(--pen);font-weight:600}.cap .kl1{color:#6B46C1;font-weight:600}.cap .kd{color:var(--red);font-weight:600}
+.card .note{background:var(--cardsoft);border-radius:3px;padding:8px 12px;margin:8px 0;font-size:14.5px}
+.cap .km{color:#B7791F;font-weight:600}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 02 · Le bruit décide (fil B) › chaîne 02</div>
+  <h1>Du <span>prior</span> à la <span>pénalité</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Fil B, seconde moitié. D'où sort <span class="m">λ</span>‖<span class="m">β</span>‖² ? Que fournit-il que les données ne fournissaient pas ? Et pourquoi L1 met-il des zéros exacts ? <b>La pénalité est la trace du prior, exactement comme la loss est la trace du bruit</b> — même geste, appliqué à <span class="m">β</span> au lieu de <span class="m">y</span>. Exemple fil rouge : la régression colinéaire de <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4</a>, trois points, deux features, une droite entière de solutions.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01 · Du bruit à la loss</a></li>
+    <li><a href="../../map.html#p04-02">p04-02 · Valeurs propres et itération</a></li>
+    <li><a href="../../map.html#p00-03">p00-03 · Conditionnement et Bayes</a></li>
+    <li><a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4 · les mêmes exemples, calculés</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::map</code><code>stats::regularisation</code><code>ml::ridge</code><code>ml::lasso</code><code>algebre::eigen</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-03-biais-variance-partout.html">Biais et variance partout</a></li>
+    <li><a href="../bridges/bridge-05-escalier-vs-sensible.html">Escalier vs sensible</a></li>
+    <li><a href="../bridges/bridge-06-convexite-forme-fermee.html">Convexité et forme fermée</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>Le geste en six pas</b> (<a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>) : densité → produit → log → négatif → jeter → nommer. Il produit la NLL. Ici on ne le redéroule pas : on le <b>rejoue sur un deuxième objet</b>, le prior, et on additionne.</li>
+      <li><b>Bayes</b> (<a href="../../map.html#p00-03">p00-03</a>) : <span class="m">p</span>(<span class="m">β</span> | <span class="m">D</span>) = <span class="m">p</span>(<span class="m">D</span> | <span class="m">β</span>) <span class="m">p</span>(<span class="m">β</span>) / <span class="m">p</span>(<span class="m">D</span>), donc <span class="m">p</span>(<span class="m">β</span> | <span class="m">D</span>) ∝ <span class="m">L</span>(<span class="m">β</span>) <span class="m">p</span>(<span class="m">β</span>) à données fixées : le dénominateur ne dépend pas de <span class="m">β</span> et ne déplace aucun argmax.</li>
+      <li><b>Valeurs propres</b> (<a href="../../map.html#p04-02">p04-02</a>) : si <span class="m">Av</span> = <span class="m">μv</span> alors (<span class="m">A</span> + <span class="m">λI</span>)<span class="m">v</span> = (<span class="m">μ</span> + <span class="m">λ</span>)<span class="m">v</span>. Mêmes vecteurs propres, spectre décalé. Une matrice symétrique est inversible si et seulement si aucune valeur propre n'est nulle.</li>
+      <li><b>Les calculs sont faits ailleurs.</b> Le déroulé <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4</a> refait les marches 8 à 11 ligne à ligne sur ce même jeu colinéaire. Ici on garde les règles, les chiffres d'arrivée et les points d'arrêt.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>Une loi sur <span class="m">β</span> <b>avant</b> les données — le prior. C'est la <b>deuxième et dernière</b> hypothèse de tout le fil B, après la loi du bruit. <span class="up">N</span>(0, <span class="m">τ</span>²) ou Laplace(0, <span class="m">τ</span>), coordonnées indépendantes.</span>
+      <b>H2</b><span>Le bruit est celui de <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a> : <span class="m">σ</span>² est <b>connu</b>, ou bien jeté avec les constantes. Rien de neuf de ce côté.</span>
+      <b>H3</b><span>On cherche l'<b>argmax du posterior</b> (MAP), un seul point — pas le posterior entier, qui est l'objet de <a href="chain-p02-03-conjugues-posterior.html">p02-03</a>. Un maximum n'est pas une distribution.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor</h3>
+    <p>La vraisemblance ne détermine pas toujours un <span class="hat"><span class="m">β</span></span>, et elle échoue de deux façons opposées : <b>trop</b> de solutions, ou <b>aucune</b>. Colinéarité parfaite : une droite entière de <span class="m">β</span> donne exactement le même RSS. Séparation parfaite : la NLL décroît vers 0 sans jamais l'atteindre.</p>
+    <p>Dans les deux cas il manque un critère. Comme la loss au pas 1 de <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, il ne va pas se décréter : il va se déduire.</p>
+    <p class="say">« La vraisemblance seule laisse une droite entière de solutions ou n'en laisse aucune, donc il manque un critère, donc on ne va pas l'inventer mais le déduire d'une seconde hypothèse. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les deux jeux fil rouge</div>
+    <p><b>Colinéaire</b> : <span class="m">x</span><sub>1</sub> = (1, 2, 3), <span class="m">x</span><sub>2</sub> = (2, 4, 6) = 2<span class="m">x</span><sub>1</sub>, <span class="m">y</span> = (1, 2, 3), modèle <span class="m">f</span> = <span class="m">β</span><sub>1</sub><span class="m">x</span><sub>1</sub> + <span class="m">β</span><sub>2</sub><span class="m">x</span><sub>2</sub>.</p>
+    <div class="eq"><span class="m">X</span><sup>⊤</sup><span class="m">X</span> = [[14, 28], [28, 56]] &nbsp;·&nbsp; valeurs propres <b>0</b> et <b>70</b> &nbsp;·&nbsp; <span class="m">X</span><sup>⊤</sup><span class="m">y</span> = (14, 28)</div>
+    <p>Rang 1 : toute la droite <span class="m">s</span> = <span class="m">β</span><sub>1</sub> + 2<span class="m">β</span><sub>2</sub> = 1 a RSS = 0.</p>
+    <table>
+      <tr><th><span class="m">β</span><sub>1</sub></th><th><span class="m">β</span><sub>2</sub></th><th><span class="m">s</span></th><th>RSS</th><th>‖<span class="m">β</span>‖²</th></tr>
+      <tr><td>1</td><td>0</td><td>1</td><td>0</td><td>1</td></tr>
+      <tr><td>3</td><td>−1</td><td>1</td><td>0</td><td>10</td></tr>
+      <tr><td>−1</td><td>1</td><td>1</td><td>0</td><td>2</td></tr>
+      <tr class="hl"><td>0,2</td><td>0,4</td><td>1</td><td>0</td><td><b>0,2</b></td></tr>
+    </table>
+    <p>La solution n'est pas instable, elle est <b>non identifiable</b>. Même mécanisme dès que <span class="m">p</span> &gt; <span class="m">n</span> : le rang de <span class="m">X</span><sup>⊤</sup><span class="m">X</span> vaut au plus <span class="m">n</span> &lt; <span class="m">p</span>, donc au moins une valeur propre est nulle, donc une infinité de solutions. Une seule brique à retenir : <b>valeur propre nulle ⇒ pas d'unicité</b>.</p>
+    <p><b>Séparable</b> : <span class="m">x</span> = (−2, −1, 1, 2), <span class="m">y</span> = (0, 0, 1, 1), <span class="m">p</span> = <span class="m">σ</span>(<span class="m">βx</span>). NLL(<span class="m">β</span>) = 2 <span class="m">log</span>(1 + e<sup>−<span class="m">β</span></sup>) + 2 <span class="m">log</span>(1 + e<sup>−2<span class="m">β</span></sup>), strictement décroissante : <span class="hat"><span class="m">β</span></span> n'existe pas.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Le prior sur <span class="m">β</span> <span class="tag tronc">tronc</span></h3>
+    <p>On pose une loi sur <span class="m">β</span> avant de voir les données. Bayes retourne alors la vraisemblance en une loi sur le paramètre :</p>
+    <div class="eq"><span class="m">p</span>(<span class="m">β</span> | <span class="m">D</span>) ∝ <span class="m">L</span>(<span class="m">β</span>) · <span class="m">p</span>(<span class="m">β</span>)</div>
+    <p><b>La barre change de statut.</b> En fréquentiste on écrivait <span class="m">p</span>(<span class="m">y</span> | <span class="m">x</span> ; <span class="m">θ</span>), point-virgule, parce que <span class="m">θ</span> était fixe. Ici <span class="m">β</span> est une variable aléatoire : <span class="m">p</span>(<span class="m">β</span> | <span class="m">D</span>) est un vrai conditionnement, et c'est le posterior.</p>
+    <p class="say">« Le prior est une hypothèse sur le monde, donc il est discutable et remplaçable, donc il n'est pas un artifice. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — deux priors, deux croyances</div>
+    <table>
+      <tr><th>prior</th><th>densité</th><th>ce qu'il dit</th></tr>
+      <tr class="hl"><td><span class="up">N</span>(0, <span class="m">τ</span>²)</td><td>∝ exp(−<span class="m">β</span>²/(2<span class="m">τ</span>²))</td><td>les coefficients sont <b>modérés</b>, centrés sur zéro, aucun n'est exactement nul</td></tr>
+      <tr><td>Laplace(0, <span class="m">τ</span>)</td><td>∝ exp(−|<span class="m">β</span>|/<span class="m">τ</span>)</td><td>la <b>plupart</b> sont proches de zéro, quelques-uns sont francs</td></tr>
+    </table>
+    <p><span class="m">τ</span> est la largeur de la croyance : <span class="m">τ</span> grand = « je ne sais pas grand-chose » ; <span class="m">τ</span> petit = « je suis sûr qu'ils sont petits ». Le prior ne parle jamais des données, seulement du monde d'où elles viennent.</p>
+    <div class="note">Sur le jeu colinéaire, ce prior seul ne sait rien : il donne le même poids à (1 ; 0) et à (0 ; 1). C'est <i>combiné</i> au RSS qu'il tranche.</div>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>−<span class="m">log</span> prior → pénalité</h3>
+    <p>Maximiser le posterior, c'est minimiser son −<span class="m">log</span>. Le produit devient une somme : la NLL, plus le −<span class="m">log</span> du prior. Le geste des pas 4–6 de <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, appliqué à <span class="m">β</span> au lieu de <span class="m">y</span>.</p>
+    <div class="eq">−<span class="m">log p</span>(<span class="m">β</span>) = ‖<span class="m">β</span>‖² / (2<span class="m">τ</span>²) + cste</div>
+    <div class="eq"><span class="up">argmin</span><sub><span class="m">β</span></sub> [ RSS/(2<span class="m">σ</span>²) + ‖<span class="m">β</span>‖²/(2<span class="m">τ</span>²) ] = <span class="up">argmin</span><sub><span class="m">β</span></sub> [ RSS + <span class="m">λ</span>‖<span class="m">β</span>‖² ], &nbsp; <b><span class="m">λ</span> = <span class="m">σ</span>²/<span class="m">τ</span>²</b></div>
+    <p>C'est <b>Ridge</b>, et il n'a pas été choisi : il est tombé. Le facteur 2<span class="m">σ</span>², constant, ne déplace pas l'argmin.</p>
+    <p class="say">« Le MAP minimise la NLL plus le moins log du prior, donc un prior gaussien ajoute un terme quadratique, donc c'est L2 avec λ = σ²/τ². »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — <span class="m">λ</span> a un sens</div>
+    <p><span class="m">λ</span> = <span class="m">σ</span>²/<span class="m">τ</span>² est un <b>rapport de variances</b> : bruit des données sur largeur de la croyance.</p>
+    <table>
+      <tr><th><span class="m">σ</span>²</th><th><span class="m">τ</span>²</th><th><span class="m">λ</span></th><th>lecture</th></tr>
+      <tr><td>1</td><td>100</td><td>0,01</td><td>prior large, données propres : on écoute les données</td></tr>
+      <tr><td>1</td><td>1</td><td>1</td><td>à égalité</td></tr>
+      <tr class="hl"><td>4</td><td>0,25</td><td><b>16</b></td><td>bruit fort ou prior étroit : on croit le prior</td></tr>
+    </table>
+    <p><b>Prior de Laplace</b>, même geste : −<span class="m">log p</span>(<span class="m">β</span>) = ‖<span class="m">β</span>‖<sub>1</sub>/<span class="m">τ</span> + cste, et en multipliant par 2<span class="m">σ</span>² on obtient <span class="up">argmin</span> [ RSS + <span class="m">λ</span>‖<span class="m">β</span>‖<sub>1</sub> ] avec <span class="m">λ</span> = 2<span class="m">σ</span>²/<span class="m">τ</span>. C'est le <b>Lasso</b>. Rien d'autre n'a changé que la densité du prior.</p>
+    <p><span class="m">λ</span> → 0 redonne le maximum de vraisemblance ; <span class="m">λ</span> → ∞ écrase <span class="hat"><span class="m">β</span></span> vers 0, c'est-à-dire vers le prior seul.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Ce que la pénalité fournit <span class="tag tronc">tronc</span></h3>
+    <p>Le RSS est <b>constant</b> sur la droite des solutions ; <span class="m">λ</span>‖<span class="m">β</span>‖² ne l'est pas. Un seul point survit : la pénalité fournit l'<b>unicité</b>.</p>
+    <p>Sous séparation, la NLL descend vers 0 sans l'atteindre pendant que <span class="m">λβ</span>² monte vers +∞ : la somme redescend puis remonte, donc elle a un minimum. La pénalité fournit l'<b>existence</b>.</p>
+    <p>Dans les deux cas elle tranche là où les données ne tranchent pas. Le gain en test vient ensuite, par la variance ; ce n'est pas le mécanisme.</p>
+    <p class="say">« Là où les données ne tranchent pas, la pénalité tranche, donc elle rend la solution unique ou existante, donc l'amélioration en test est une conséquence et non le mécanisme. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le point choisi, et le minimum créé</div>
+    <p><b>Unicité.</b> Paramétrons la droite : (<span class="m">β</span><sub>1</sub>, <span class="m">β</span><sub>2</sub>) = (1 + 2<span class="m">t</span>, −<span class="m">t</span>). Alors</p>
+    <div class="eq">‖<span class="m">β</span>‖² = (1 + 2<span class="m">t</span>)² + <span class="m">t</span>² = 5<span class="m">t</span>² + 4<span class="m">t</span> + 1</div>
+    <p>Parabole, <b>un</b> minimum, en <span class="m">t</span> = −0,4 → <span class="hat"><span class="m">β</span></span> = (<b>0,2</b> ; <b>0,4</b>), de norme ‖<span class="m">β</span>‖² = 0,2 et ‖<span class="m">β</span>‖<sub>2</sub> = 0,447. Les trois autres lignes du tableau du pas 1 valent 1, 10 et 2 : elles perdent toutes.</p>
+    <p><b>Existence.</b> Sur le jeu séparable, <span class="up">argmin</span> [NLL(<span class="m">β</span>) + <span class="m">λβ</span>²] existe dès que <span class="m">λ</span> &gt; 0 :</p>
+    <table>
+      <tr><th><span class="m">λ</span></th><th>0,01</th><th>0,1</th><th>1</th></tr>
+      <tr class="hl"><td><span class="hat"><span class="m">β</span></span></td><td><b>3,41</b></td><td><b>1,85</b></td><td><b>0,71</b></td></tr>
+    </table>
+    <p>Même <span class="m">λ</span> = 10<sup>−6</sup> suffit : il ne change rien près de l'origine, il bloque seulement la fuite à l'infini. <b>La pénalité ne rend pas la solution meilleure, elle la fait exister.</b></p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — la boule qui gonfle jusqu'à la droite</div>
+    <div id="f1plot" class="wide sq"></div>
+    <div class="sl-ctl" id="f1presets"></div>
+    <div id="f1sliders"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Le plan (<span class="m">β</span><sub>1</sub>, <span class="m">β</span><sub>2</sub>). La <span class="kd">droite rouge</span> est l'ensemble des solutions à RSS = 0 : les données n'ont rien d'autre à dire. Gonfle le rayon : le <span class="kl2">cercle L2</span> touche la droite le premier à <span class="m">r</span> = 0,447, en (0,2 ; 0,4) — <b>deux</b> coordonnées non nulles ; le <span class="kl1">losange L1</span> touche à <span class="m">r</span> = 0,5, par un <b>sommet posé sur l'axe</b>, en (0 ; 0,5) — une coordonnée <b>exactement</b> nulle. Le premier contact est le point de la droite de plus petite norme : c'est lui que la pénalité choisit.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — la pénalité fait exister le minimum</div>
+    <div id="f2plot" class="wide"></div>
+    <div class="sl-ctl" id="f2presets"></div>
+    <div id="f2sliders"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Le jeu séparable. La <span class="kd">NLL seule</span> descend vers 0 sans jamais l'atteindre : aucun minimum, <span class="hat"><span class="m">β</span></span> fuit. Ajoute la <span class="km">pénalité <span class="m">λβ</span>²</span> : la <span class="kl2">somme</span> remonte, et le minimum apparaît. Mets <span class="m">λ</span> à 0 puis remonte-le d'un cran : c'est le passage de « pas de solution » à « une solution ». Baisse ensuite <span class="m">λ</span> : <span class="hat"><span class="m">β</span></span> part vers la droite — 3,41 à <span class="m">λ</span> = 0,01, et rien ne l'arrête à <span class="m">λ</span> = 0.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>+<span class="m">λI</span> translate, n'annule pas <span class="tag tronc">tronc</span></h3>
+    <p>Côté matrice, Ridge remplace <span class="m">X</span><sup>⊤</sup><span class="m">X</span> par <span class="m">X</span><sup>⊤</sup><span class="m">X</span> + <span class="m">λI</span>. Les vecteurs propres ne bougent pas, le spectre se décale en bloc :</p>
+    <div class="eq">(<span class="m">X</span><sup>⊤</sup><span class="m">X</span> + <span class="m">λI</span>)<span class="m">v</span> = <span class="m">X</span><sup>⊤</sup><span class="m">Xv</span> + <span class="m">λv</span> = (<span class="m">μ</span> + <span class="m">λ</span>)<span class="m">v</span></div>
+    <p>La valeur propre 0 devient <span class="m">λ</span>, 70 devient 70 + <span class="m">λ</span>. Toutes strictement positives ⇒ la matrice est inversible ⇒ la forme fermée existe à nouveau.</p>
+    <p><b>Rien n'est annulé.</b> La direction propre plate n'est pas supprimée : elle est <b>relevée</b>, juste assez pour qu'un minimum unique s'y trouve. Ce sont les <i>coefficients</i> que L1 annule, au pas suivant — autre objet, autre mécanisme.</p>
+    <p class="say">« Ajouter λI ajoute λ à chaque valeur propre, donc la valeur propre nulle devient λ, donc la matrice devient inversible, donc la forme fermée existe à nouveau. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — la forme fermée retrouvée</div>
+    <div class="eq"><span class="hat"><span class="m">β</span></span> = (<span class="m">X</span><sup>⊤</sup><span class="m">X</span> + <span class="m">λI</span>)<sup>−1</sup> <span class="m">X</span><sup>⊤</sup><span class="m">y</span></div>
+    <p><span class="m">λ</span> = 1 : la matrice vaut [[15, 28], [28, 57]], déterminant 855 − 784 = <b>71</b> = 1 × 71, le produit des deux valeurs propres.</p>
+    <div class="eq"><span class="hat"><span class="m">β</span></span><sub>1</sub> = (57·14 − 28·28)/71 = 14/71 = <b>0,197</b> &nbsp;·&nbsp; <span class="hat"><span class="m">β</span></span><sub>2</sub> = (15·28 − 28·14)/71 = 28/71 = <b>0,394</b></div>
+    <table>
+      <tr><th><span class="m">λ</span></th><th>petite v.p.</th><th>grande v.p.</th><th>conditionnement</th><th><span class="hat"><span class="m">β</span></span></th></tr>
+      <tr><td>0</td><td>0</td><td>70</td><td>∞ — non inversible</td><td>toute la droite</td></tr>
+      <tr><td>0,01</td><td>0,01</td><td>70,01</td><td>7 001</td><td>(0,200 ; 0,400)</td></tr>
+      <tr class="hl"><td>1</td><td>1</td><td>71</td><td><b>71</b></td><td>(0,197 ; 0,394)</td></tr>
+      <tr><td>10</td><td>10</td><td>80</td><td>8</td><td>(0,175 ; 0,350)</td></tr>
+    </table>
+    <p>En forme fermée : <span class="hat"><span class="m">β</span></span> = (1/5)·(70/(70 + <span class="m">λ</span>))·(1, 2). Le rapport <span class="hat"><span class="m">β</span></span><sub>2</sub>/<span class="hat"><span class="m">β</span></span><sub>1</sub> reste <b>exactement 2</b> quel que soit <span class="m">λ</span> : le signal <span class="m">X</span><sup>⊤</sup><span class="m">y</span> = 14·(1, 2) vit entièrement dans la direction propre non nulle, et Ridge ne fait qu'y <b>rétrécir</b>. Quand <span class="m">λ</span> → 0, on retrouve (0,2 ; 0,4) : le point de norme minimale de la figure 1.</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — le spectre se décale, il ne s'efface pas</div>
+    <p class="pan">en haut : la grande valeur propre · en bas : la petite, sur son propre axe</p>
+    <div id="f3top" class="wide"></div>
+    <div id="f3bot" class="wide"></div>
+    <div id="f3sliders"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Les deux valeurs propres de <span class="m">X</span><sup>⊤</sup><span class="m">X</span> + <span class="m">λI</span> en fonction de <span class="m">λ</span>. Deux droites de <b>pente 1</b>, l'une partant de 70, l'autre de 0 — d'où les deux axes séparés, sans quoi la seconde serait collée au bord. Fais glisser <span class="m">λ</span> : la petite valeur propre <b>vaut exactement <span class="m">λ</span></b>. Elle quitte 0 dès le premier cran et ne le rejoint plus : <b>translation, pas annulation</b>. Le déterminant <span class="m">λ</span>(70 + <span class="m">λ</span>) et le conditionnement (70 + <span class="m">λ</span>)/<span class="m">λ</span> suivent : à <span class="m">λ</span> = 0 le premier est nul et le second infini, c'est la même phrase dite trois fois.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>L1 tranche ailleurs</h3>
+    <p>Prior de Laplace ⇒ pénalité ‖<span class="m">β</span>‖<sub>1</sub> ⇒ Lasso. Même rôle qu'au pas 4 — trancher sur la droite plate — mais le point choisi <b>change</b>.</p>
+    <p><b>Géométrie.</b> Gonfler la pénalité jusqu'au premier contact avec la droite, c'est gonfler sa boule. La boule L2 est ronde : elle touche n'importe où, et presque jamais sur un axe. La boule L1 est un losange dont les <b>sommets sont posés sur les axes</b> : une droite générique la rencontre d'abord par un sommet, donc avec une coordonnée exactement nulle.</p>
+    <p>Lu en pente plutôt qu'en géométrie, c'est le même fait : pente de |<span class="m">β</span>| constante jusqu'à 0, pente de <span class="m">β</span>² qui s'évanouit — <a href="chain-p03-01-critere-escalier-vs-sensible.html">p03-01</a>, habit 3.</p>
+    <p class="say">« La boule L1 a ses sommets sur les axes, donc le premier contact avec la droite des solutions tombe sur un sommet, donc une coordonnée est exactement nulle, donc L1 sélectionne là où L2 répartit. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le même jeu, l'autre point</div>
+    <p>Sur la droite (1 + 2<span class="m">t</span>, −<span class="m">t</span>) : ‖<span class="m">β</span>‖<sub>1</sub> = |1 + 2<span class="m">t</span>| + |<span class="m">t</span>|, qui vaut 1 + <span class="m">t</span> sur [−0,5 ; 0] — décroissante jusqu'au bord. Minimum en <span class="m">t</span> = −0,5 → <span class="hat"><span class="m">β</span></span> = (<b>0</b> ; 0,5), valeur 0,5.</p>
+    <table>
+      <tr><th>prior</th><th>pénalité</th><th>point choisi</th><th>lecture</th></tr>
+      <tr><td>gaussien</td><td>‖<span class="m">β</span>‖²</td><td>(0,2 ; 0,4)</td><td>répartit entre les deux features colinéaires</td></tr>
+      <tr class="hl"><td>Laplace</td><td>‖<span class="m">β</span>‖<sub>1</sub></td><td>(<b>0</b> ; 0,5)</td><td>en éteint une, garde l'autre</td></tr>
+    </table>
+    <p><b>Le zéro exact, en forme fermée.</b> Design orthonormal, critère ½(<span class="m">β</span> − <span class="m">b</span>)² + <span class="m">λ</span>·pen(<span class="m">β</span>) avec <span class="m">b</span> l'estimation non pénalisée :</p>
+    <div class="eq">L2 (pen = ½<span class="m">β</span>²) : <span class="hat"><span class="m">β</span></span> = <span class="m">b</span>/(1 + <span class="m">λ</span>) &nbsp;&nbsp;·&nbsp;&nbsp; L1 (pen = |<span class="m">β</span>|) : <span class="hat"><span class="m">β</span></span> = signe(<span class="m">b</span>)·max(0, |<span class="m">b</span>| − <span class="m">λ</span>)</div>
+    <p><span class="m">b</span> = 0,8 : à <span class="m">λ</span> = 0,5, L2 donne 0,533 et L1 donne 0,300 ; à <span class="m">λ</span> = 1, L2 donne 0,400 et L1 donne <b>0</b>, exactement. Le <b>seuillage doux</b> : L1 soustrait <span class="m">λ</span> puis s'arrête à zéro, L2 divise et n'y arrive jamais.</p>
+    <p>Elastic Net additionne les deux pénalités pour garder les zéros tout en stabilisant les groupes de features corrélées ; le chemin complet de <span class="m">λ</span> est l'objet de <a href="../../map.html#p05-03">p05-03</a>.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Le <span class="m">λ</span> réel, celui qu'on règle</h3>
+    <p>On ne connaît ni <span class="m">σ</span>² ni <span class="m">τ</span>² : <span class="m">λ</span> ne se <b>calcule</b> pas, il se <b>choisit</b>, par validation croisée sur une grille logarithmique.</p>
+    <p>Deux statuts à ne pas confondre. L'équivalence des formules — pénalité L2 = −<span class="m">log</span> d'un prior gaussien — est un <b>fait</b>, vrai ligne à ligne. L'interprétation bayésienne est une <b>lecture</b> : elle explique la <i>forme</i> de la pénalité, pas la valeur de <span class="m">λ</span>.</p>
+    <p class="say">« σ² et τ² ne sont pas observables, donc λ ne se calcule pas et se choisit par validation croisée, donc la lecture bayésienne donne la forme de la pénalité et la CV en fixe la force. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les trois gestes obligatoires</div>
+    <ul>
+      <li><b>Standardiser d'abord.</b> ‖<span class="m">β</span>‖² dépend des unités : passer une longueur de mètres en millimètres divise son coefficient par 1 000 et le rend invisible à la pénalité. Centrer-réduire <b>sur le train seul</b>, à l'intérieur de la CV.</li>
+      <li><b>Ne pas pénaliser l'intercept.</b> Il n'a aucune raison d'être proche de zéro : le tirer vers 0 déplace la prédiction moyenne.</li>
+      <li><b>Grille logarithmique</b> (10<sup>−4</sup> … 10<sup>4</sup>), et le <span class="m">λ</span> retenu doit tomber à l'<i>intérieur</i> de la grille : s'il est au bord, la grille est trop courte.</li>
+    </ul>
+    <p>Sur le jeu colinéaire, la CV n'a rien à départager en erreur — le RSS vaut 0 pour toute la droite. Elle choisira un <span class="m">λ</span> petit, et ce <span class="m">λ</span> petit suffit à rendre <span class="hat"><span class="m">β</span></span> unique : <span class="m">λ</span> = 0,01 → (0,200 ; 0,400).</p>
+    <div class="note">Quand <span class="m">n</span> est petit, un seul point — l'argmax du posterior — ne dit plus grand-chose : la largeur du posterior porte l'information. C'est <a href="chain-p02-03-conjugues-posterior.html">p02-03</a>.</div>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>La pénalité <i>est</i> le prior. Tout ce qui casse vient de là : un prior faux, ou un prior qu'on croit poser alors qu'on en pose un autre.</p>
+    <p class="say">« La pénalité est le moins log du prior, donc choisir une pénalité c'est déclarer une croyance, donc la question n'est pas de savoir si l'on régularise mais ce que l'on croit du monde. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>Prior faux.</b> L2 sur une vérité vraiment sparse répartit du poids sur des features inutiles au lieu de les éteindre ; L1 sur des effets diffus et corrélés en éteint à tort et n'en garde qu'une par groupe. Le critère ajouté doit correspondre à ce qu'on croit du monde : effets diffus ⇒ L2, vérité sparse ⇒ L1.</li>
+      <li><b>Échelle.</b> ‖<span class="m">β</span>‖² compare des coefficients qui n'ont pas les mêmes unités. Sans standardisation, <span class="m">λ</span> pénalise surtout les features à petite échelle — dont les coefficients sont grands — et le prior effectivement posé n'est pas celui qu'on croyait.</li>
+      <li><b>Intercept.</b> Le pénaliser revient à poser un prior centré sur 0 pour la valeur moyenne de <span class="m">y</span>, ce que personne ne croit. On le laisse libre.</li>
+      <li><b>« On régularise pour éviter l'overfitting ».</b> Phrase tentante et fausse au niveau du mécanisme : la pénalité fournit l'<b>existence</b> et l'<b>unicité</b>, en tranchant là où le RSS est plat. La baisse de variance et le gain en test sont une <b>conséquence</b> (<a href="../../map.html#p06-01">p06-01</a>). Dire la conséquence sans le mécanisme est ce qui coûte en entretien.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Tout le fil B tient sur <b>deux hypothèses</b> : la loi du bruit (<a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>) et le prior sur <span class="m">β</span> (ici). Le reste est du calcul.</li>
+    <li>MAP = NLL + (−<span class="m">log</span> prior). Gaussien → <span class="m">λ</span>‖<span class="m">β</span>‖² avec <b><span class="m">λ</span> = <span class="m">σ</span>²/<span class="m">τ</span>²</b> ; Laplace → <span class="m">λ</span>‖<span class="m">β</span>‖<sub>1</sub>.</li>
+    <li>La pénalité fournit l'<b>existence</b> et l'<b>unicité</b> : elle tranche là où les données ne tranchent pas. Le gain en test est une conséquence.</li>
+    <li>+<span class="m">λI</span> <b>translate</b> le spectre de <span class="m">λ</span> : 0 → <span class="m">λ</span>, 70 → 70 + <span class="m">λ</span>. Rien n'est annulé, tout devient inversible.</li>
+    <li>L1 tranche sur un <b>sommet</b> de sa boule, posé sur un axe : zéros exacts, (0 ; 0,5). L2 tranche au plus près : (0,2 ; 0,4), jamais zéro.</li>
+    <li><span class="m">λ</span> par validation croisée ; standardiser avant ; ne pas pénaliser l'intercept.</li>
+  </ol>
+</div>
+<div class="phrase">« La pénalité L2 est le moins log d'un prior gaussien sur les coefficients, avec λ égal au rapport variance du bruit sur variance du prior. Ce qu'elle fournit, c'est l'existence et l'unicité : sous colinéarité elle choisit le point de norme minimale, et +λI translate chaque valeur propre de λ sans rien annuler. Un prior de Laplace donne L1, qui tranche sur un coin de sa boule et met des coefficients exactement à zéro. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">D'où sort <span class="m">λ</span>‖<span class="m">β</span>‖² ?</div><div class="a hid">Du −log d'un prior N(0, τ²) sur β. Le MAP minimise NLL + (−log prior) ; le terme quadratique tombe, avec λ = σ²/τ².</div></li>
+    <li><div class="q">Que fournit la pénalité sous colinéarité ?</div><div class="a hid">L'unicité. Le RSS est constant sur la droite des solutions, la norme ne l'est pas : elle choisit (0,2 ; 0,4), le point de plus petite norme.</div></li>
+    <li><div class="q">Que fait +<span class="m">λI</span> aux valeurs propres ?</div><div class="a hid">Il les translate de λ, mêmes vecteurs propres : 0 → λ, 70 → 70 + λ. Toutes positives ⇒ inversible ⇒ forme fermée. Rien n'est annulé.</div></li>
+    <li><div class="q">Pourquoi L1 met-il des zéros exacts ?</div><div class="a hid">Sa boule a ses sommets sur les axes, et le premier contact tombe sur un sommet : (0 ; 0,5). En pente : |β| garde une pente constante jusqu'à 0, β² l'évanouit.</div></li>
+    <li><div class="q">Que fournit la pénalité sous séparation parfaite ?</div><div class="a hid">L'existence. La NLL seule n'a pas de minimum ; λβ² → ∞ fait remonter la somme. λ = 0,01 → β̂ = 3,41.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html"><b>D4 — fil B, calculé</b><small>marches 8 à 11 : le prior, son −log, la pénalité, le β̂ pénalisé chiffré sur ce même jeu colinéaire</small></a>
+    <a href="chain-p03-01-critere-escalier-vs-sensible.html"><b>p03-01 — critère en escalier vs sensible</b><small>la même pénalité lue par sa pente : pourquoi L2 n'atteint jamais 0 et L1 s'y colle (habit 3)</small></a>
+    <a href="../bridges/bridge-06-convexite-forme-fermee.html"><b>Convexité et forme fermée</b><small>+λI rend le critère strictement convexe : un seul point annule la pente, donc une forme fermée</small></a>
+    <a href="../bridges/bridge-03-biais-variance-partout.html"><b>Biais et variance partout</b><small>ce que λ coûte en biais et gagne en variance — la conséquence, une fois le mécanisme posé</small></a>
+    <a href="../bridges/bridge-05-escalier-vs-sensible.html"><b>Escalier vs sensible</b><small>pente nulle = pas de signal : le même argument que le sommet de la boule L1</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::map</code> (MAP = NLL + −log prior) · <code>stats::regularisation</code> (λ = σ²/τ², L1 zéros exacts) · <code>ml::ridge</code> (forme fermée, +λI) · <code>ml::lasso</code> (seuillage doux, sommet de la boule) · <code>algebre::eigen</code> (spectre translaté, conditionnement).</p>
+  <p>Deux cartes déjà solides à <b>réutiliser</b> plutôt qu'à redémontrer : <i>Ridge = prior gaussien, Lasso = prior de Laplace</i>, et <i>le gradient de L1 est constant</i>. Une carte à créer : <i>+λI translate le spectre</i> — c'est le point qui s'inverse le plus facilement en « annule ».</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p02-02 · v1 du 16/09/2026 · fil B, 2/3. Prérequis : <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, <a href="../../map.html#p04-02">p04-02</a>, <a href="../../map.html#p00-03">p00-03</a>. Suite : <a href="chain-p02-03-conjugues-posterior.html">p02-03 Le posterior entier</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').textContent.replace(/tronc|casse/g,'').trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== Figure 1 : la droite des solutions et les deux boules ===== */
+const R2=1/Math.sqrt(5), R1=0.5, TOL=0.003;
+const P1=SL.plot(document.getElementById('f1plot'),{x:[-1,2],y:[-1,2],w:560,h:552,xt:[-1,0,1,2],yt:[-1,0,1,2],xl:'β₁',yl:'β₂'});
+P1.fn(x=>(1-x)/2,'sl-c3');
+P1.label(-0.95,1.25,'droite RSS = 0 : β₁ + 2β₂ = 1','sl-c3','start');
+P1.label(0.30,0.46,'(0,2 ; 0,4)','sl-c1','start');
+P1.label(0.06,0.68,'(0 ; 0,5)','sl-c2','start');
+const out1=document.getElementById('f1out');
+function ring(r,n){let d='';for(let i=0;i<=n;i++){const a=2*Math.PI*i/n;d+=(i?' L':'M')+P1.sx(r*Math.cos(a)).toFixed(1)+' '+P1.sy(r*Math.sin(a)).toFixed(1);}return d+' Z';}
+function draw1(r){P1.clear();
+  SL.el('path',{d:ring(r,120),class:'sl-fn sl-c1',fill:'none'},P1.dyn);
+  SL.el('path',{d:ring(r,4).replace('M','M'),class:'sl-fn sl-c2',fill:'none'},P1.dyn);
+  const t2=r>=R2-TOL, t1=r>=R1-TOL;
+  P1.dot(.2,.4,'sl-c1'+(t2?'':' hollow'),5.5);
+  P1.dot(0,.5,'sl-c2'+(t1?'':' hollow'),5.5);
+  out1.innerHTML=`<div class="pos">rayon r<b>${SL.fmt(r,3)}</b></div>`
+   +`<div class="${t2?'pos':'zero'}">cercle L2 · contact à r = 0,447<b>${t2?'(0,2 ; 0,4)':'pas encore'}</b></div>`
+   +`<div class="${t1?'pos':'zero'}">losange L1 · contact à r = 0,5<b>${t1?'(0 ; 0,5)':'pas encore'}</b></div>`;}
+const sR=SL.slider(document.getElementById('f1sliders'),{label:'rayon de la boule',min:0,max:1.4,step:0.001,value:0.447,fmt:v=>SL.fmt(v,3)},draw1);
+const pre1=document.getElementById('f1presets');
+[['contact L2 · r = 0,447',0.447],['contact L1 · r = 0,5',0.5],['r = 1',1]].forEach(([n,v])=>{const b=document.createElement('button');b.className='tb';b.textContent=n;b.onclick=()=>sR.set(v);pre1.appendChild(b);});
+
+/* ===== Figure 2 : la pénalité fait exister le minimum ===== */
+const nll=b=>2*Math.log1p(Math.exp(-b))+2*Math.log1p(Math.exp(-2*b));
+function argmin(lam){if(lam<=0)return null;let a=0,b=60;const gr=(Math.sqrt(5)-1)/2;const f=x=>nll(x)+lam*x*x;
+  let c=b-gr*(b-a),d=a+gr*(b-a);
+  for(let i=0;i<140;i++){if(f(c)<f(d))b=d;else a=c;c=b-gr*(b-a);d=a+gr*(b-a);}
+  return (a+b)/2;}
+const P2=SL.plot(document.getElementById('f2plot'),{x:[0,5],y:[0,3.2],w:600,h:300,xt:[0,1,2,3,4,5],yt:[1,2,3],xl:'β',yl:''});
+P2.fn(nll,'sl-c3 dash');
+const out2=document.getElementById('f2out');let p2=[];
+function draw2(lam){p2.forEach(p=>p.remove());p2=[];P2.clear();
+  p2.push(P2.fn(b=>lam*b*b,'sl-c5 dash'));
+  p2.push(P2.fn(b=>nll(b)+lam*b*b,'sl-c1 thick'));
+  const bh=argmin(lam);
+  if(bh!==null&&bh<5){const v=nll(bh)+lam*bh*bh;P2.seg(bh,0,bh,v-0.12,'');P2.dot(bh,v,'sl-c1',6);P2.text(bh,v+0.30,'β̂ = '+SL.fmt(bh,2),'sl-c1','middle');}
+  out2.innerHTML=`<div class="${bh===null?'zero':'pos'}">β̂ = argmin<b>${bh===null?'+∞':SL.fmt(bh,2)}</b></div>`
+   +`<div class="pos">NLL en β̂<b>${bh===null?'→ 0':SL.fmt(nll(bh),3)}</b></div>`
+   +`<div class="pos">pénalité λβ̂²<b>${bh===null?'0':SL.fmt(lam*bh*bh,3)}</b></div>`;}
+const sL2=SL.slider(document.getElementById('f2sliders'),{label:'λ',min:0,max:1,step:0.01,value:0.1,fmt:v=>SL.fmt(v,2)},draw2);
+const pre2=document.getElementById('f2presets');
+[['λ = 0 · pas de minimum',0],['λ = 0,01',0.01],['λ = 0,1',0.1],['λ = 1',1]].forEach(([n,v])=>{const b=document.createElement('button');b.className='tb';b.textContent=n;b.onclick=()=>sL2.set(v);pre2.appendChild(b);});
+
+/* ===== Figure 3 : le spectre translaté ===== */
+const P3a=SL.plot(document.getElementById('f3top'),{x:[0,5],y:[69.5,75.5],w:600,h:175,xt:[0,1,2,3,4,5],yt:[70,72,74],xl:'λ',yl:'grande valeur propre'});
+P3a.fn(l=>70+l,'sl-c1');P3a.label(3.35,74.5,'μ = 70 + λ','sl-c1','start');
+const P3b=SL.plot(document.getElementById('f3bot'),{x:[0,5],y:[0,5.2],w:600,h:175,xt:[0,1,2,3,4,5],yt:[1,2,3,4,5],xl:'λ',yl:'petite valeur propre'});
+P3b.fn(l=>l,'sl-c2');P3b.label(3.15,4.5,'μ = 0 + λ = λ','sl-c2','start');
+const out3=document.getElementById('f3out');
+function draw3(lam){P3a.clear();P3b.clear();
+  P3a.seg(lam,69.5,lam,70+lam,'');P3a.dot(lam,70+lam,'sl-c1',5.5);
+  P3b.seg(lam,0,lam,lam,'');P3b.dot(lam,lam,'sl-c2',5.5);
+  const s=70/(70+lam), b1=s/5, b2=2*s/5, det=lam*(70+lam), k=lam>0?(70+lam)/lam:Infinity;
+  out3.innerHTML=`<div class="${lam>0?'pos':'zero'}">petite valeur propre<b>${SL.fmt(lam,2)}</b></div>`
+   +`<div class="pos">grande valeur propre<b>${SL.fmt(70+lam,2)}</b></div>`
+   +`<div class="${lam>0?'pos':'zero'}">déterminant<b>${SL.fmt(det,2)}</b></div>`
+   +`<div class="${lam>0?'pos':'zero'}">conditionnement<b>${lam>0?SL.fmt(k,k>=100?0:1):'∞'}</b></div>`
+   +`<div class="${lam>0?'pos':'zero'}">β̂ ridge<b>${lam>0?SL.fmt(b1,3)+' ; '+SL.fmt(b2,3):'non unique'}</b></div>`;}
+SL.slider(document.getElementById('f3sliders'),{label:'λ',min:0,max:5,step:0.05,value:1,fmt:v=>SL.fmt(v,2)},draw3);
+})();
+</script>
+</body>
+</html>

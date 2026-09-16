@@ -7,7 +7,7 @@ const require = createRequire(import.meta.url);
 const { chromium } = require(process.env.PLAYWRIGHT_PATH || 'playwright');
 
 const BASE = (process.argv[2] || 'http://127.0.0.1:8777').replace(/\/$/, '');
-const SHEET = '/' + (process.argv[3] || 'sheets/topics/sheet-t06-evaluation-metriques.html');
+const SHEET = '/' + (process.argv[3] || 'sheets/archive/sheet-t06-evaluation-metriques.html');
 
 const fail = (m) => { console.error('✗ ' + m); process.exitCode = 1; };
 const ok = (m) => console.log('✓ ' + m);

@@ -1,0 +1,462 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Descente sur un bol allongé — déroulé</title>
+<meta name="sheet" content="series=walkthrough;part=03;number=01;status=v1">
+<meta name="part" content="03 · Critère et descente">
+<meta name="subtitle" content="p03-02 appliqué aux chiffres de D4 : κ = 71, forme fermée contre 114 itérations">
+<meta name="prereq" content="p03-02,p02-02">
+<meta name="anki" content="ml::optimisation">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ---- marques de ce déroulé ---- */
+.sl-lev{fill:none;stroke:rgba(34,48,43,.3);stroke-width:1.1}
+.sl-seg.traj{stroke:var(--red);stroke-width:1.6}
+.sl-seg.ols{stroke:#B7791F;stroke-width:1.6;stroke-dasharray:6 4}
+.card .note{background:var(--cardsoft);border-radius:3px;padding:8px 12px;margin:8px 0;font-size:14.5px}
+.sl-plot text.sl-c1,.sl-plot text.sl-c2,.sl-plot text.sl-c5{font-family:var(--math);font-size:13px}
+.cap .kr{color:var(--red);font-weight:600}.cap .kv{color:#6B46C1;font-weight:600}
+.cap .kp{color:var(--pen);font-weight:600}.cap .ko{color:#B7791F;font-weight:600}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 03 · Critère et descente › déroulé 01</div>
+  <h1>Descente sur un bol <span>allongé</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Un seul exemple, suivi du début à la fin : le jeu colinéaire de <a href="walkthrough-p02-01-une-chaine-trois-exemples.html">D4</a> passé en ridge à <span class="m">λ</span> = 1. Chaque marche pose une règle de <a href="../chains/chain-p03-02-gradient-descente.html">p03-02</a> à gauche et la chiffre à droite sur la même matrice <span class="m">A</span> = [[15, 28], [28, 57]]. <b>Deux valeurs propres, 1 et 71, décident de tout</b> : de la direction du premier pas, du pas maximal 2/71, du nombre d'itérations, et de la raison pour laquelle on préfère ici résoudre d'un coup.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>Les marches</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="../chains/chain-p03-02-gradient-descente.html">p03-02 · Gradient et descente</a></li>
+    <li><a href="../chains/chain-p02-02-prior-penalite.html">p02-02 · Du prior à la pénalité</a></li>
+    <li><a href="walkthrough-p02-01-une-chaine-trois-exemples.html">D4 · Une chaîne, trois exemples</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>ml::optimisation</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-01-une-seule-descente.html">Une seule descente</a></li>
+    <li><a href="../bridges/bridge-06-convexite-forme-fermee.html">Convexité et forme fermée</a></li>
+  </ol>
+  <h4>Suite</h4>
+  <ol>
+    <li><a href="../../map.html#p04-01">p04-01 · Produit scalaire</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que ce déroulé suppose acquis</div>
+    <ul>
+      <li><b>La chaîne qu'on applique</b> (<a href="../chains/chain-p03-02-gradient-descente.html">p03-02</a>) : direction −∇<span class="m">L</span>, pas <span class="m">η</span> &lt; 2/courbure, convexité, conditionnement <span class="m">κ</span>. Rien n'est redémontré ici : chaque marche pose la règle et la chiffre.</li>
+      <li><b>D'où viennent <span class="m">A</span> et <span class="m">b</span></b> (<a href="../chains/chain-p02-02-prior-penalite.html">p02-02</a>, exemple 1 de <a href="walkthrough-p02-01-une-chaine-trois-exemples.html">D4</a>) : jeu colinéaire, <span class="m">X</span><sup>⊤</sup><span class="m">X</span> de valeurs propres 0 et 70, le +<span class="m">λI</span> du MAP gaussien qui translate le spectre.</li>
+      <li><b>Quadratique et gradient.</b> Pour <span class="m">L</span>(<span class="m">β</span>) = ½<span class="m">β</span><sup>⊤</sup><span class="m">Aβ</span> − <span class="m">b</span><sup>⊤</sup><span class="m">β</span> avec <span class="m">A</span> symétrique, ∇<span class="m">L</span> = <span class="m">Aβ</span> − <span class="m">b</span>. C'est la seule dérivation utilisée.</li>
+      <li><b>Base propre d'une symétrique.</b> <span class="m">Av</span><sub><span class="m">i</span></sub> = <span class="m">λ</span><sub><span class="m">i</span></sub><span class="m">v</span><sub><span class="m">i</span></sub>, vecteurs orthogonaux : un système couplé de deux équations y devient deux équations indépendantes.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses du déroulé</div>
+    <div class="hyp">
+      <b>H1</b><span>La loss est <b>exactement quadratique</b> : les chiffres sont exacts, pas approchés. C'est le ridge, pas une linéarisation locale.</span>
+      <b>H2</b><span>Le pas <span class="m">η</span> est <b>fixe</b> : aucune recherche linéaire, aucune mémoire de direction, gradient exact à chaque itération.</span>
+      <b>H3</b><span><span class="m">λ</span> = 1, <b>fixé une fois pour toutes</b>. Tous les nombres du déroulé en dépendent : c'est lui qui pose la valeur propre plate à 1 plutôt qu'à 0.</span>
+      <b>H4</b><span>Le départ est <span class="m">β</span><sub>0</sub> = (0 ; 0) sauf mention contraire. La marche 5 montre que <b>ce choix n'est pas neutre</b>.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">Les six marches, sur le même bol</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor</h3>
+    <p>Trois observations, deux features dont la seconde vaut le double de la première. Sans pénalité, <span class="m">X</span><sup>⊤</sup><span class="m">X</span> a une valeur propre nulle et la solution n'est pas unique. Ridge à <span class="m">λ</span> = 1 ajoute <span class="m">I</span>, et la loss devient une quadratique à minimum unique :</p>
+    <div class="eq"><span class="m">L</span>(<span class="m">β</span>) = ½<span class="m">β</span><sup>⊤</sup><span class="m">Aβ</span> − <span class="m">b</span><sup>⊤</sup><span class="m">β</span> &nbsp;·&nbsp; <span class="m">A</span> = <span class="m">X</span><sup>⊤</sup><span class="m">X</span> + <span class="m">I</span> &nbsp;·&nbsp; <span class="m">b</span> = <span class="m">X</span><sup>⊤</sup><span class="m">y</span></div>
+    <p class="say">« Le jeu est colinéaire et <span class="m">X</span><sup>⊤</sup><span class="m">X</span> a une valeur propre nulle, donc le +<span class="m">λI</span> du prior gaussien la relève à 1, donc la loss pénalisée est une quadratique définie positive dont on peut descendre le bol. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Au tableau — marche 1</div>
+    <p>Données de D4 : <span class="m">x</span><sub>1</sub> = (1, 2, 3), <span class="m">x</span><sub>2</sub> = (2, 4, 6) = 2<span class="m">x</span><sub>1</sub>, <span class="m">y</span> = (1, 2, 3).</p>
+    <div class="eq"><span class="m">X</span><sup>⊤</sup><span class="m">X</span> = [[14, 28], [28, 56]] &nbsp;→&nbsp; <span class="m">A</span> = [[<b>15</b>, 28], [28, <b>57</b>]] &nbsp;·&nbsp; <span class="m">b</span> = <span class="m">X</span><sup>⊤</sup><span class="m">y</span> = (14 ; 28)</div>
+    <p>Vérification à la main : 1² + 2² + 3² = 14, 1·2 + 2·4 + 3·6 = 28, 2² + 4² + 6² = 56 ; et <span class="m">X</span><sup>⊤</sup><span class="m">y</span> = (14 ; 28) parce que <span class="m">y</span> = <span class="m">x</span><sub>1</sub>.</p>
+    <p>Un seul objet à descendre pour tout le déroulé : <b><span class="m">A</span> = [[15, 28], [28, 57]]</b>, <b><span class="m">b</span> = (14 ; 28)</b>. Le minimum vaudra <span class="m">L</span> = −6,901.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Le gradient, et où il pointe</h3>
+    <p>Sur une quadratique, ∇<span class="m">L</span>(<span class="m">β</span>) = <span class="m">Aβ</span> − <span class="m">b</span>. Au départ <span class="m">β</span><sub>0</sub> = (0 ; 0) il se réduit à −<span class="m">b</span>. La direction de plus forte descente est −∇<span class="m">L</span> normalisé.</p>
+    <div class="eq">∇<span class="m">L</span>(0) = −(14 ; 28) &nbsp;·&nbsp; ‖∇<span class="m">L</span>‖ = √980 = 31,30 &nbsp;·&nbsp; <span class="m">u</span> = (14 ; 28)/31,30 = (0,447 ; 0,894)</div>
+    <p class="say">« Le gradient d'une quadratique vaut <span class="m">Aβ</span> − <span class="m">b</span>, donc en zéro il vaut −<span class="m">b</span> = (−14 ; −28), donc la descente part exactement dans la direction (1 ; 2)/√5, celle où vit tout le signal <span class="m">X</span><sup>⊤</sup><span class="m">y</span>. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Au tableau — marche 2</div>
+    <p>(0,447 ; 0,894) est <b>(1 ; 2)/√5</b> : √5 = 2,236, 1/2,236 = 0,447. La descente vise donc la droite <span class="m">β</span><sub>1</sub> + 2<span class="m">β</span><sub>2</sub> = 1 — la droite des solutions OLS de D4 — <b>perpendiculairement</b>.</p>
+    <p>Elle la viserait en (0,2 ; 0,4), le point de norme minimale de cette droite. On verra qu'elle s'arrête juste avant, à 70/71 de ce point.</p>
+    <div class="note">Cette direction n'est pas quelconque : (1 ; 2) est un <b>vecteur propre</b> de <span class="m">A</span>. Partir de l'origine, c'est partir pile sur un axe du bol — la marche 5 en tire la conséquence.</div>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Les deux courbures <span class="tag tronc">tronc</span></h3>
+    <p>La courbure de <span class="m">L</span> dans une direction est la valeur propre de <span class="m">A</span> associée. Pour une 2×2, trace et déterminant suffisent : <span class="m">λ</span><sub>1</sub> + <span class="m">λ</span><sub>2</sub> = 72 et <span class="m">λ</span><sub>1</sub><span class="m">λ</span><sub>2</sub> = 71.</p>
+    <div class="eq"><span class="m">λ</span>² − 72<span class="m">λ</span> + 71 = 0 &nbsp;⇒&nbsp; <span class="m">λ</span> = <b>1</b> et <b>71</b> &nbsp;·&nbsp; <span class="m">κ</span> = 71 &nbsp;·&nbsp; <span class="m">η</span><sub>max</sub> = 2/<span class="m">λ</span><sub>max</sub> = 2/71</div>
+    <p class="say">« La trace vaut 72 et le déterminant 71, donc les valeurs propres sont racines de <span class="m">λ</span>² − 72<span class="m">λ</span> + 71, donc elles valent 1 et 71, donc le conditionnement vaut 71 et le pas admissible s'arrête à 2/71 = 0,028. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Au tableau — marche 3</div>
+    <p>Déterminant : 15·57 − 28·28 = 855 − 784 = <b>71</b>. Trace : 15 + 57 = <b>72</b>. Les deux vecteurs propres se vérifient en une multiplication :</p>
+    <table>
+      <tr><th>direction</th><th><span class="m">Av</span></th><th><span class="m">λ</span></th><th>nom</th></tr>
+      <tr class="hl"><td>(1 ; 2)</td><td>(15 + 56 ; 28 + 114) = (71 ; 142)</td><td><b>71</b></td><td>le mur</td></tr>
+      <tr><td>(−2 ; 1)</td><td>(−30 + 28 ; −56 + 57) = (−2 ; 1)</td><td><b>1</b></td><td>la vallée</td></tr>
+    </table>
+    <p>La vallée est la direction de colinéarité : sa courbure valait <b>0</b> avant pénalisation, c'est <span class="m">λI</span> qui l'a portée à 1 (<a href="../chains/chain-p02-02-prior-penalite.html">p02-02</a>). Le bol est 71 fois plus raide en travers qu'en long.</p>
+    <p><span class="m">η</span><sub>max</sub> = 2/71 = <b>0,0282</b>. Au-delà, la coordonnée raide est multipliée par un facteur de module &gt; 1 à chaque pas.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Trois pas à la main, <span class="m">η</span> = 0,02</h3>
+    <p>Un pas, c'est <span class="m">β</span> ← <span class="m">β</span> − <span class="m">η</span>(<span class="m">Aβ</span> − <span class="m">b</span>). Rien d'autre. Sur l'écart <span class="m">e</span> = <span class="m">β</span> − <span class="hat"><span class="m">β</span></span>, chaque coordonnée propre suit <span class="m">e</span><sub><span class="m">i</span></sub> ← (1 − <span class="m">ηλ</span><sub><span class="m">i</span></sub>)<span class="m">e</span><sub><span class="m">i</span></sub>.</p>
+    <div class="eq">1 − 0,02 × 71 = <b>−0,42</b> &nbsp;(raide) &nbsp;·&nbsp; 1 − 0,02 × 1 = <b>0,98</b> &nbsp;(plate)</div>
+    <p class="say">« Le départ est l'origine et <span class="m">b</span> est colinéaire à (1 ; 2), donc chaque itéré reste sur cet axe propre, donc l'écart y est multiplié par 1 − 0,02 × 71 = −0,42 à chaque pas, donc la descente saute d'un côté puis de l'autre en se réduisant à 42 % à chaque fois. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Au tableau — marche 4, chiffré</div>
+    <p><span class="m">β</span><sub>1</sub> = 0 − 0,02·(−14 ; −28) = <b>(0,28 ; 0,56)</b>.</p>
+    <p>∇<span class="m">L</span>(<span class="m">β</span><sub>1</sub>) = (15·0,28 + 28·0,56 − 14 ; 28·0,28 + 57·0,56 − 28) = (19,88 − 14 ; 39,76 − 28) = (5,88 ; 11,76), donc <span class="m">β</span><sub>2</sub> = (0,28 ; 0,56) − 0,02·(5,88 ; 11,76) = <b>(0,1624 ; 0,3248)</b>.</p>
+    <p>∇<span class="m">L</span>(<span class="m">β</span><sub>2</sub>) = (−2,4696 ; −4,9392), donc <span class="m">β</span><sub>3</sub> = <b>(0,2118 ; 0,4236)</b>.</p>
+    <table>
+      <tr><th><span class="m">k</span></th><th><span class="m">β</span><sub><span class="m">k</span></sub></th><th>écart à <span class="hat"><span class="m">β</span></span></th><th>côté</th></tr>
+      <tr><td>0</td><td>(0 ; 0)</td><td>0,4409</td><td>en deçà</td></tr>
+      <tr><td>1</td><td>(0,2800 ; 0,5600)</td><td>0,1852</td><td>au-delà</td></tr>
+      <tr><td>2</td><td>(0,1624 ; 0,3248)</td><td>0,0778</td><td>en deçà</td></tr>
+      <tr class="hl"><td>3</td><td>(0,2118 ; 0,4236)</td><td>0,0327</td><td>au-delà</td></tr>
+    </table>
+    <p>0,4409 × 0,42 = 0,1852, puis × 0,42 = 0,0778 : le facteur −0,42 se lit directement dans la colonne des écarts, et le changement de côté est son signe. Tous les itérés vérifient <span class="m">β</span><sub>2</sub> = 2<span class="m">β</span><sub>1</sub> : la coordonnée plate reste à zéro.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Combien de pas — et ce que le départ cachait <span class="tag tronc">tronc</span></h3>
+    <p>Depuis l'origine, six pas suffisent : l'écart initial n'a <b>aucune</b> composante sur la vallée, seule la coordonnée raide travaille et elle est divisée par 2,4 à chaque pas. Ce départ est un cas particulier.</p>
+    <p>Dès qu'on démarre ailleurs, la coordonnée plate apparaît et se contracte de 0,98 par pas seulement. Pour la diviser par dix : <span class="up">ln</span> 0,1 / <span class="up">ln</span> 0,98 = 113,97, soit <b>114 pas</b>.</p>
+    <p class="say">« L'écart de départ est porté par le seul axe raide, donc le conditionnement ne se voit pas depuis l'origine ; ailleurs la coordonnée plate se contracte de 0,98 par pas, donc il en faut 114 pour la diviser par dix, donc sur ce bol la forme fermée est sans concurrence. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Au tableau — marche 5</div>
+    <p><b>La forme fermée.</b> Annuler le gradient, c'est résoudre [[15, 28], [28, 57]]<span class="m">β</span> = (14 ; 28), système 2×2 de déterminant 71 :</p>
+    <div class="eq"><span class="hat"><span class="m">β</span></span><sub>1</sub> = (57·14 − 28·28)/71 = 14/71 = <b>0,197</b> &nbsp;·&nbsp; <span class="hat"><span class="m">β</span></span><sub>2</sub> = (15·28 − 28·14)/71 = 28/71 = <b>0,394</b></div>
+    <p>C'est (0,2 ; 0,4) × 70/71 : le point de norme minimale de la droite OLS, rétréci d'un facteur 70/(70 + <span class="m">λ</span>).</p>
+    <p><b>Deux départs, deux histoires</b>, au même <span class="m">η</span> = 0,02 :</p>
+    <table>
+      <tr><th>départ</th><th>écart initial</th><th>dont plate</th><th>écart après 60 pas</th></tr>
+      <tr><td>(0 ; 0)</td><td>0,4409</td><td><b>0</b></td><td>10<sup>−22</sup></td></tr>
+      <tr class="hl"><td>(1 ; 0) <small>solution OLS</small></td><td>0,8944</td><td>0,8944</td><td><b>0,2661</b></td></tr>
+    </table>
+    <p>0,98<sup>60</sup> = 0,2976 : après 60 itérations depuis (1 ; 0), il reste 30 % du chemin. Une résolution 2×2 l'aurait donné exactement, sans <span class="m">η</span> à régler.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — le bol vu de dessus, et ce que le pas y fait</div>
+    <div id="f1plot" class="wide"></div>
+    <div class="sl-ctl" id="f1presets"></div>
+    <div id="f1sliders"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Lignes de niveau de <span class="m">L</span> : des ellipses <b>huit fois et demie plus longues que larges</b> (√71), d'axe long la vallée. Le point <span class="kp">bleu creux</span> est la forme fermée (0,197 ; 0,394), le trait <span class="ko">ambre</span> la droite des solutions OLS de D4, le point <span class="kv">violet</span> le départ et la ligne <span class="kr">rouge</span> les 60 itérations. Départ <b>(0 ; 0)</b> : la trajectoire est un segment sur l'axe raide, et le bol allongé ne se voit pas. Clique <b>départ (1 ; 0)</b> : la même descente rampe le long de la vallée et n'arrive pas. Monte <span class="m">η</span> : à 0,0282 = 2/71 le facteur raide passe sous −1 et la trajectoire quitte le cadre.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Un pas par direction : préconditionner</h3>
+    <p>Le pas unique est un compromis entre deux courbures. Dans la base propre, les deux coordonnées sont <b>indépendantes</b> : rien n'oblige à leur donner le même <span class="m">η</span>. Avec <span class="m">η</span><sub><span class="m">i</span></sub> = 1/<span class="m">λ</span><sub><span class="m">i</span></sub>, le facteur 1 − <span class="m">η</span><sub><span class="m">i</span></sub><span class="m">λ</span><sub><span class="m">i</span></sub> vaut zéro : la coordonnée est réglée en <b>une</b> itération.</p>
+    <div class="eq"><span class="m">β</span><sub>1</sub> = <span class="m">β</span><sub>0</sub> − <span class="m">A</span><sup>−1</sup>∇<span class="m">L</span>(<span class="m">β</span><sub>0</sub>) = <span class="m">A</span><sup>−1</sup><span class="m">b</span> = <span class="hat"><span class="m">β</span></span></div>
+    <p class="say">« Dans la base propre les deux coordonnées sont indépendantes, donc un pas de 1/<span class="m">λ</span><sub><span class="m">i</span></sub> annule chacune d'un coup, donc multiplier le gradient par <span class="m">A</span><sup>−1</sup> fait les deux à la fois et retombe sur la forme fermée en une itération. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Au tableau — marche 6</div>
+    <table>
+      <tr><th><span class="m">η</span></th><th>facteur raide</th><th>facteur plat</th><th>lecture</th></tr>
+      <tr><td>1/71 = 0,0141</td><td><b>0</b></td><td>0,9859</td><td>le mur réglé, la vallée figée</td></tr>
+      <tr><td>1/1 = 1</td><td>−70</td><td><b>0</b></td><td>la vallée réglée, le mur explose</td></tr>
+      <tr class="hl"><td colspan="3">les deux à la fois : <span class="m">A</span><sup>−1</sup> à la place de <span class="m">η</span></td><td><b>un seul pas</b></td></tr>
+    </table>
+    <div class="eq"><span class="m">A</span><sup>−1</sup> = (1/71)·[[57, −28], [−28, 15]] &nbsp;⇒&nbsp; <span class="m">A</span><sup>−1</sup><span class="m">b</span> = (1/71)·(798 − 784 ; −392 + 420) = (14/71 ; 28/71)</div>
+    <p>C'est <b>Newton</b> sur une quadratique : <span class="m">A</span> est la hessienne, et un pas de Newton depuis n'importe quel point tombe sur <span class="hat"><span class="m">β</span></span>. Le prix est <span class="m">A</span> entière — <span class="up">O</span>(<span class="m">p</span>³) et <span class="m">p</span>² coefficients.</p>
+    <div class="note"><b>Adam</b> fait la même chose au rabais : un pas par coordonnée, dans la base canonique et non dans la base propre, estimé par la taille récente des gradients. Aucune matrice n'est formée. Standardiser les features poursuit le même but encore plus en amont, en rapprochant les valeurs propres de <span class="m">A</span>.</div>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Deux valeurs propres, deux façons de se faire piéger : par le haut, la divergence ; par le bas, l'attente. Et une troisième, plus sournoise, quand le point de départ cache les deux.</p>
+    <p class="say">« Une seule direction suffit à faire diverger, donc le pas est borné par la plus raide ; la plus plate n'est alors contractée au mieux que de 70/72, donc le nombre d'itérations suit le conditionnement, donc un seul essai de learning rate depuis un seul point de départ ne prouve rien. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Trois limites</div>
+    <ul>
+      <li><b><span class="m">η</span> au-delà de 2/<span class="m">λ</span><sub>max</sub> diverge.</b> À <span class="m">η</span> = 0,03, le facteur raide vaut 1 − 0,03·71 = <b>−1,13</b>. Depuis l'origine, 60 pas mènent à (−301,5 ; −603,0) : la coordonnée plate continue pourtant de converger sagement. <b>Une direction sur deux suffit</b> à faire exploser la loss, et c'est toujours la plus raide qui fixe le plafond.</li>
+      <li><b><span class="m">κ</span> = 71 rend la vallée interminable.</b> Même avec le meilleur pas fixe, <span class="m">η</span> = 2/(1 + 71) = 0,0278, la contraction plate ne descend pas sous (<span class="m">κ</span> − 1)/(<span class="m">κ</span> + 1) = 70/72 = 0,9722 : il faut encore <b>82 pas</b> pour diviser l'écart par dix. Le nombre d'itérations est proportionnel à <span class="m">κ</span>, et <span class="m">κ</span> vient des données, pas de l'optimiseur.</li>
+      <li><b>Un départ chanceux masque tout.</b> Depuis (0 ; 0) la composante sur la vallée est <b>exactement nulle</b> et la descente converge en six pas : on mesurerait <span class="m">κ</span> = 1 sans le savoir. Le seul départ où ce bol paraît rond est celui qui tombe pile sur son axe raide — d'où les deux lignes du tableau de la marche 5.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li><b>Le bol.</b> <span class="m">A</span> = <span class="m">X</span><sup>⊤</sup><span class="m">X</span> + <span class="m">I</span> = [[15, 28], [28, 57]], <span class="m">b</span> = (14 ; 28), ∇<span class="m">L</span> = <span class="m">Aβ</span> − <span class="m">b</span>. Trace 72, déterminant 71.</li>
+    <li><b>Les deux courbures.</b> <span class="m">λ</span> = 71 sur (1 ; 2) — le mur — et <span class="m">λ</span> = 1 sur (−2 ; 1) — la vallée, la colinéarité relevée de 0 par <span class="m">λI</span>. <span class="m">κ</span> = 71, <span class="m">η</span><sub>max</sub> = 2/71 = 0,0282.</li>
+    <li><b>Trois pas à <span class="m">η</span> = 0,02</b> : (0,28 ; 0,56), (0,1624 ; 0,3248), (0,2118 ; 0,4236). Facteur raide −0,42 : l'écart change de côté et se réduit à 42 %.</li>
+    <li><b>La forme fermée.</b> Une résolution 2×2 : <span class="hat"><span class="m">β</span></span> = (14/71 ; 28/71) = (0,197 ; 0,394), soit (0,2 ; 0,4) × 70/71.</li>
+    <li><b>Le coût de l'itération.</b> Facteur plat 0,98 ⇒ 114 pas pour diviser l'écart par dix ; 82 pas même au meilleur pas fixe 2/72. Depuis (1 ; 0), il reste 30 % du chemin après 60 pas.</li>
+    <li><b>Préconditionner.</b> <span class="m">η</span><sub><span class="m">i</span></sub> = 1/<span class="m">λ</span><sub><span class="m">i</span></sub> règle chaque coordonnée en un pas ; les deux à la fois, c'est <span class="m">A</span><sup>−1</sup>∇<span class="m">L</span>, c'est-à-dire Newton, et Adam l'approche par coordonnée.</li>
+  </ol>
+</div>
+<div class="phrase">« Sur le ridge colinéaire, <span class="m">A</span> a pour valeurs propres 1 et 71 : le pas est plafonné à 2/71 par la direction raide, et la direction plate ne se contracte alors que de 0,98 par itération — 114 pas pour un facteur dix. Le système ∇<span class="m">L</span> = 0 étant linéaire, je le résous en une fois et j'obtiens (0,197 ; 0,394). Quand je ne peux pas résoudre, je donne un pas par direction : c'est le conditionnement que Newton annule et qu'Adam approche. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — le déroulé à voix haute</h2>
+<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Écris la loss ridge du jeu colinéaire de D4 et son gradient.</div><div class="a hid">L(β) = ½βᵀAβ − bᵀβ avec A = XᵀX + I = [[15, 28], [28, 57]] et b = Xᵀy = (14, 28). ∇L = Aβ − b, donc en (0, 0) : (−14, −28).</div></li>
+    <li><div class="q">Quelles sont les courbures de ce bol, et quel pas maximal en découle ?</div><div class="a hid">Trace 72, déterminant 71 ⇒ λ = 1 et 71. Le mur (1, 2) à 71, la vallée (−2, 1) à 1 — celle que λI a relevée de 0. κ = 71, η_max = 2/71 = 0,0282.</div></li>
+    <li><div class="q">Fais le premier pas à η = 0,02, et dis ce que devient l'écart.</div><div class="a hid">β₁ = 0 − 0,02·(−14, −28) = (0,28 ; 0,56). Facteur 1 − 0,02×71 = −0,42 : l'écart passe de 0,4409 à 0,1852 et change de côté. β₂ = (0,1624 ; 0,3248), β₃ = (0,2118 ; 0,4236).</div></li>
+    <li><div class="q">Combien d'itérations, et pourquoi préfère-t-on résoudre ?</div><div class="a hid">Facteur plat 0,98 ⇒ ln0,1/ln0,98 = 114 pas par facteur dix. La forme fermée est un système 2×2 de déterminant 71 : β̂ = (14/71 ; 28/71) = (0,197 ; 0,394), soit (0,2 ; 0,4) × 70/71.</div></li>
+    <li><div class="q">Que ferait un pas par direction propre ?</div><div class="a hid">η = 1/λᵢ annule le facteur 1 − ηλᵢ : une itération par coordonnée. Les deux ensemble, c'est β − A⁻¹∇L = A⁻¹b = β̂ — Newton. Adam en fait une version diagonale dans la base canonique.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">D'où ça vient, où ça va</div>
+  <div class="bridges">
+    <a href="../chains/chain-p03-02-gradient-descente.html"><b>p03-02 — Le gradient et le pas</b><small>la chaîne appliquée ici marche par marche : direction, seuil 2/courbure, convexité, conditionnement. Ce déroulé n'en est que la version chiffrée sur un bol unique</small></a>
+    <a href="../chains/chain-p02-02-prior-penalite.html"><b>p02-02 — Du prior à la pénalité</b><small>d'où viennent le +λI et la valeur propre plate à 1 : le prior gaussien translate le spectre au lieu de l'annuler</small></a>
+    <a href="walkthrough-p02-01-une-chaine-trois-exemples.html"><b>D4 — Une chaîne, trois exemples</b><small>le jeu colinéaire, la droite des solutions OLS et le point (0,2 ; 0,4) de norme minimale que le ridge rétrécit de 70/71</small></a>
+    <a href="../bridges/bridge-01-une-seule-descente.html"><b>Une seule descente</b><small>le même pas −η∇L, sur des paramètres, sur une fonction ou sur des centroïdes</small></a>
+    <a href="../bridges/bridge-06-convexite-forme-fermee.html"><b>Convexité et forme fermée</b><small>ce bol est le cas d'école du pont : gradient linéaire, minimum unique, résolution directe</small></a>
+    <a href="../../map.html#p04-01"><b>p04-01 — Produit scalaire</b><small>la suite : Cauchy-Schwarz derrière la direction de plus forte pente, et les bases orthonormées derrière la base propre</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>ml::optimisation</code> (pas maximal 2/courbure, conditionnement, préconditionnement, forme fermée contre itération).</p>
+  <p>Une carte qui résiste après ce déroulé est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Déroulé p03-01 · v1 du 16/09/2026 · Prérequis : <a href="../chains/chain-p03-02-gradient-descente.html">p03-02</a>, <a href="../chains/chain-p02-02-prior-penalite.html">p02-02</a>. Suite : <a href="../../map.html#p04-01">p04-01 Produit scalaire</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper : la révélation marche par marche */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== Figure 1 : le bol du ridge vu de dessus ===== */
+const A=[[15,28],[28,57]], B=[14,28], BS=[14/71,28/71];
+const S5=Math.sqrt(5), VS=[1/S5,2/S5], VF=[2/S5,-1/S5];   // VS : raide λ=71 ; VF : plate λ=1
+const grad=b=>[A[0][0]*b[0]+A[0][1]*b[1]-B[0], A[1][0]*b[0]+A[1][1]*b[1]-B[1]];
+const XR=[-1,1.6], YR=[-.5,1.1];
+const inFrame=p=>isFinite(p[0])&&isFinite(p[1])&&p[0]>=XR[0]&&p[0]<=XR[1]&&p[1]>=YR[0]&&p[1]<=YR[1];
+const P=SL.plot(document.getElementById('f1plot'),{x:XR,y:YR,w:600,h:384,
+  xt:[-1,-.5,0,.5,1,1.5],yt:[-.5,0,.5,1],xl:'β₁',yl:'β₂'});
+/* lignes de niveau : L − L* = c, demi-axes √(2c/λ) dans chaque direction propre */
+[.05,.15,.35,.6,.85].forEach(c=>{const af=Math.sqrt(2*c),as=Math.sqrt(2*c/71);let d='';
+  for(let i=0;i<=140;i++){const t=2*Math.PI*i/140, u=af*Math.cos(t), v=as*Math.sin(t);
+    d+=(d?' L':'M')+P.sx(BS[0]+u*VF[0]+v*VS[0]).toFixed(1)+' '+P.sy(BS[1]+u*VF[1]+v*VS[1]).toFixed(1);}
+  SL.el('path',{d:d+' Z',class:'sl-lev'},P.layer);});
+/* droite des solutions OLS : β₁ + 2β₂ = 1 */
+SL.el('line',{x1:P.sx(-1),y1:P.sy(1),x2:P.sx(1.6),y2:P.sy(-.3),class:'sl-seg ols'},P.layer);
+P.label(-.62,1.04,'β₁ + 2β₂ = 1 · solutions OLS','sl-c5','start');
+P.label(1.55,-.42,'vallée · λ = 1','sl-c2','end');
+P.label(.33,.85,'mur · λ = 71','sl-c2','end');
+P.label(.30,.46,'β̂ = (0,197 ; 0,394)','sl-c1','start');
+const st={eta:.02,k:60,start:[0,0]};
+const out=document.getElementById('f1out');
+function draw(){P.clear();
+  const pts=[st.start.slice()];let b=st.start.slice();
+  for(let i=0;i<60;i++){const g=grad(b);b=[b[0]-st.eta*g[0],b[1]-st.eta*g[1]];
+    if(!isFinite(b[0])||Math.abs(b[0])>1e9){break;}pts.push(b.slice());}
+  let sortie=null;
+  for(let i=1;i<pts.length;i++){if(inFrame(pts[i-1])&&inFrame(pts[i]))P.seg(pts[i-1][0],pts[i-1][1],pts[i][0],pts[i][1],'traj');
+    if(sortie===null&&!inFrame(pts[i]))sortie=i;}
+  if(sortie===null&&pts.length<61)sortie=pts.length;
+  pts.forEach((p,i)=>{if(i>0&&inFrame(p))P.dot(p[0],p[1],'sl-c3',2.4);});
+  P.dot(BS[0],BS[1],'sl-c1 hollow',6);
+  if(inFrame(pts[0]))P.dot(pts[0][0],pts[0][1],'sl-c2',5);
+  const kk=Math.min(st.k,pts.length-1), pk=pts[kk];
+  if(inFrame(pk))P.dot(pk[0],pk[1],'sl-c3',6);
+  const d=Math.hypot(pk[0]-BS[0],pk[1]-BS[1]);
+  const e0=[st.start[0]-BS[0],st.start[1]-BS[1]], d0=Math.hypot(e0[0],e0[1]);
+  const fr=1-st.eta*71, fp=1-st.eta;
+  const grand=Math.abs(fr)>1;
+  out.innerHTML=`<div class="${grand?'zero':'pos'}">facteur raide 1 − 71η<b>${SL.fmt(fr,3)}</b></div>`
+    +`<div class="${fp>.95?'zero':'pos'}">facteur plat 1 − η<b>${SL.fmt(fp,3)}</b></div>`
+    +`<div class="${d<.01*d0?'pos':'zero'}">distance à β̂ après ${kk} pas<b>${(d<1e4&&d>1e-4)||d===0?SL.fmt(d,4):d.toExponential(1).replace('.',',')}</b></div>`
+    +`<div class="${sortie===null?'pos':'zero'}">sortie du cadre<b>${sortie===null?'jamais':'pas n° '+sortie}</b></div>`;}
+const sl=document.getElementById('f1sliders');
+SL.slider(sl,{label:'pas η',min:.005,max:.03,step:.0005,value:.02,fmt:v=>SL.fmt(v,4)},v=>{st.eta=v;draw();});
+SL.slider(sl,{label:'itération k',min:0,max:60,step:1,value:60},v=>{st.k=v;draw();});
+const pre=document.getElementById('f1presets');
+[['départ (0 ; 0)',[0,0]],['départ (1 ; 0) · solution OLS',[1,0]],['départ (−1 ; 1) · solution OLS',[-1,1]]].forEach(([n,p])=>{
+  const bt=document.createElement('button');bt.className='tb';bt.textContent=n;
+  bt.onclick=()=>{st.start=p.slice();draw();};pre.appendChild(bt);});
+draw();
+})();
+</script>
+</body>
+</html>

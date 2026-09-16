@@ -5,3 +5,8 @@ tools/
 .githooks/
 inbox/
 CLAUDE.md
+specs/
+.claude/
+sheets/_render/
+CLAUDE-CODE-PROMPT.md
+README-LIVRAISON.md
