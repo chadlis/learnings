@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Comparer deux modèles, et pourquoi le max ment — chaîne</title>
+<meta name="sheet" content="series=chain;part=01;number=04;status=v1">
+<meta name="part" content="01 · L'objet aléatoire (fil A)">
+<meta name="subtitle" content="fil A, cas 2 et 3 — appariement, McNemar, multiplicité, train/val/test">
+<meta name="prereq" content="p01-01,p01-02">
+<meta name="anki" content="stats::inference,stats::comparaison,stats::multiplicite,ml::validation">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ---- marques propres à cette chaîne ---- */
+.sl-seg.mk-true{stroke:var(--pen);stroke-width:2.2}
+text.mk-true{fill:var(--pen)}
+text.sl-mean{fill:var(--red);stroke:none}
+.sl-plot text.mk-true,.sl-plot text.sl-mean{font-family:var(--math);font-size:13px}
+.sl-fn.mk-seuil{stroke:var(--red);stroke-dasharray:5 4;stroke-width:1.8}
+text.mk-seuil{fill:var(--red)}
+.fig .sub-lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin:10px 0 2px}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 01 · L'objet aléatoire › chaîne 04</div>
+  <h1>Comparer deux <span>modèles</span>, et pourquoi le <span>max</span> ment</h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Fil A, cas 2 et 3. A fait 87,2 %, B fait 88,1 % sur le même test set de 1 000 lignes : B est-il meilleur ? Puis la même question quand B est <b>le meilleur de 40 configurations essayées sur ce test set</b>. Deux idées, une seule racine : <b>le test set est la colonne aléatoire</b> — partagé, il corrèle les deux mesures et il faut apparier ; réutilisé pour choisir, il cesse de mesurer.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="chain-p01-01-objet-aleatoire.html#s2">p01-01 · Les trois colonnes</a></li>
+    <li><a href="chain-p01-01-objet-aleatoire.html#s5">p01-01 · Le SE d'une proportion</a></li>
+    <li><a href="chain-p01-02-ic-test-procedure.html#s2">p01-02 · H₀ et p-value</a></li>
+    <li><a href="../../map.html#p00-02">p00-02 · Variance d'une différence</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::inference</code><code>stats::comparaison</code><code>stats::multiplicite</code><code>ml::validation</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-02-temoin-atteignable.html">Le témoin atteignable</a></li>
+    <li><a href="../bridges/bridge-03-biais-variance-partout.html">Biais et variance partout</a></li>
+  </ol>
+  <h4>Déroulés</h4>
+  <ol>
+    <li><a href="../walkthroughs/walkthrough-p01-02-comparer-deux-modeles.html">D2 · Comparer deux modèles</a></li>
+    <li><a href="../walkthroughs/walkthrough-p01-03-biais-du-max.html">D3 · Le biais du max</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>L'objet aléatoire est le tirage.</b> Trois colonnes : le paramètre vrai (fixe, inconnu), l'estimateur (aléatoire, fonction du tirage), le tirage lui-même (<a href="chain-p01-01-objet-aleatoire.html#s2">p01-01, pas 2</a>). Ici le tirage est le <b>test set</b> ; les deux modèles sont figés.</li>
+      <li><b>SE d'une proportion.</b> <span class="up">SE</span>(<span class="hat"><span class="m">p</span></span>) = √(<span class="m">π</span>(1−<span class="m">π</span>)/<span class="m">n</span>), estimé par plug-in (<a href="chain-p01-01-objet-aleatoire.html#s5">p01-01, pas 5</a>). Pour <span class="m">π</span> = 0,87 et <span class="m">n</span> = 1 000 : 0,0106, soit 1,06 point.</li>
+      <li><b>H₀ porte sur le paramètre, la p-value est une aire sous H₀</b> (<a href="chain-p01-02-ic-test-procedure.html#s2">p01-02, pas 2</a> et <a href="chain-p01-02-ic-test-procedure.html#s3">pas 3</a>). On ne « prouve » jamais H₀ ; on la rejette ou on ne la rejette pas.</li>
+      <li><b>Variance d'une différence.</b> <span class="up">Var</span>(<span class="m">X</span> − <span class="m">Y</span>) = <span class="up">Var</span>(<span class="m">X</span>) + <span class="up">Var</span>(<span class="m">Y</span>) − 2<span class="up">Cov</span>(<span class="m">X</span>, <span class="m">Y</span>) (<a href="../../map.html#p00-02">p00-02</a>). Le terme −2Cov est tout le cas 2.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>A et B sont évalués sur le <b>même</b> tirage. Leurs erreurs sont donc corrélées : les lignes faciles sont faciles pour les deux, les lignes ambiguës piègent les deux.</span>
+      <b>H2</b><span>Les lignes du test set sont <b>indépendantes</b> et tirées de la même population. Une ligne = une unité d'information.</span>
+      <b>H3</b><span><i>Cas 3 seulement, hypothèse de travail.</i> Les 40 configurations ont la <b>même</b> accuracy vraie ; seule la chance du tirage les sépare. C'est un <b>témoin</b> : on regarde ce que la procédure affiche quand il n'y a rien à trouver.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor : une seule colonne bouge</h3>
+    <p>Un test set de 1 000 lignes, deux modèles <b>figés</b>. Poids appris, seuils fixés, rien de stochastique à la prédiction : sur une ligne donnée, chaque modèle rend toujours la même réponse.</p>
+    <p>La colonne aléatoire n'est donc pas « les prédictions » : c'est le <b>test set</b>. Les deux accuracies affichées descendent du même tirage, et c'est de là que vient tout le reste.</p>
+    <p class="say">« Ce qui varierait si je refaisais l'expérience, c'est le test set ; les deux modèles, eux, ne tirent rien. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le fil rouge</div>
+    <table>
+      <tr><th>modèle</th><th>justes / 1 000</th><th><span class="hat"><span class="m">p</span></span></th></tr>
+      <tr><td><b>A</b></td><td>872</td><td>0,872</td></tr>
+      <tr><td><b>B</b></td><td>881</td><td>0,881</td></tr>
+      <tr class="hl"><td>écart</td><td>+9 lignes</td><td><b>+0,009</b></td></tr>
+    </table>
+    <p>Question posée : « B est-il meilleur ? » — donc sur un <b>seul</b> objet, la différence <span class="m">π</span><sub>B</sub> − <span class="m">π</span><sub>A</sub>, pas sur deux.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>La différence est l'objet <span class="tag tronc">tronc</span></h3>
+    <p>H₀ : <span class="m">π</span><sub>A</sub> = <span class="m">π</span><sub>B</sub>, testée par <span class="m">D</span> = <span class="hat"><span class="m">p</span></span><sub>B</sub> − <span class="hat"><span class="m">p</span></span><sub>A</sub>. Sa variance n'est pas la somme des deux :</p>
+    <div class="eq"><span class="up">Var</span>(<span class="m">D</span>) = <span class="up">Var</span>(<span class="hat"><span class="m">p</span></span><sub>A</sub>) + <span class="up">Var</span>(<span class="hat"><span class="m">p</span></span><sub>B</sub>) − 2<span class="up">Cov</span>(<span class="hat"><span class="m">p</span></span><sub>A</sub>, <span class="hat"><span class="m">p</span></span><sub>B</sub>)</div>
+    <p>Le test <b>non apparié</b> jette le dernier terme. Sous H1 la covariance est positive : le jeter gonfle la variance, élargit l'intervalle et coûte de la puissance.</p>
+    <p class="say">« Les deux modèles sont évalués sur les mêmes lignes, donc leurs erreurs sont corrélées positivement, donc la variance de la différence est plus petite que la somme des variances, donc le test non apparié manque de puissance. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — ce que donne le test non apparié</div>
+    <div class="eq"><span class="up">SE</span> = √(0,872·0,128/1000 + 0,881·0,119/1000)<br>&nbsp;&nbsp;&nbsp;= √(1,116·10<sup>−4</sup> + 1,048·10<sup>−4</sup>) = <b>0,0147</b></div>
+    <p><span class="m">z</span> = 0,009 / 0,0147 = <b>0,61</b> ; <span class="m">p</span> ≈ <b>0,54</b>. Verdict : rien du tout.</p>
+    <p>Le calcul est <i>valide</i>, il n'est pas <i>faux</i> : il répond juste à une expérience qu'on n'a pas faite (deux test sets distincts). Il a payé pour une indépendance qu'on ne consomme pas.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Apparier : seuls les désaccords portent l'information</h3>
+    <p>Descendre à la ligne. Sur la ligne <span class="m">i</span>, <span class="m">D</span><sub><span class="m">i</span></sub> = <span class="m">Y</span><sub><span class="m">i</span></sub> − <span class="m">X</span><sub><span class="m">i</span></sub> ∈ {−1, 0, +1} (B moins A). Les deux modèles d'accord — justes ensemble ou faux ensemble — donnent <span class="m">D</span><sub><span class="m">i</span></sub> = 0 : ni au numérateur, ni à la variance.</p>
+    <p>Restent les désaccords : <span class="m">b</span> lignes où A seul a juste, <span class="m">c</span> lignes où B seul a juste. Sous H₀ les deux sortes sont équiprobables, d'où</p>
+    <div class="eq">McNemar : <span class="m">χ</span>² = (<span class="m">c</span> − <span class="m">b</span>)² / (<span class="m">b</span> + <span class="m">c</span>), &nbsp; 1 degré de liberté</div>
+    <p><span class="m">n</span> a disparu de la formule. Ce n'est pas un oubli, c'est l'énoncé.</p>
+    <p class="say">« Une ligne où les deux modèles sont d'accord donne <span class="m">D</span><sub><span class="m">i</span></sub> = 0, donc elle ne pèse ni sur l'écart ni sur sa variance, donc l'effectif informatif n'est pas 1 000 mais le nombre de désaccords, donc McNemar teste seulement si les désaccords sont équilibrés. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — la table 2 × 2 du fil rouge</div>
+    <table>
+      <tr><th></th><th>B juste</th><th>B faux</th><th>total A</th></tr>
+      <tr><td><b>A juste</b></td><td>842</td><td><span class="m">b</span> = 30</td><td>872</td></tr>
+      <tr><td><b>A faux</b></td><td><span class="m">c</span> = 39</td><td>89</td><td>128</td></tr>
+      <tr><td><b>total B</b></td><td>881</td><td>119</td><td>1 000</td></tr>
+    </table>
+    <p><span class="m">c</span> − <span class="m">b</span> = 9, cohérent avec les +9 lignes du pas 1. Désaccords : <span class="m">b</span> + <span class="m">c</span> = <b>69</b>.</p>
+    <div class="eq"><span class="m">χ</span>² = 81 / 69 = <b>1,17</b> &nbsp;→&nbsp; <span class="m">p</span> ≈ <b>0,28</b></div>
+    <p>Les 931 lignes d'accord ne sont nulle part dans ce calcul. L'écart de 9 se lit sur 69 tirages à pile ou face, pas sur 1 000.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Lecture : ce qui décide est le dénominateur</h3>
+    <p>L'écart brut est au numérateur, le nombre de désaccords au dénominateur. À écart égal, <b>moins</b> de désaccords fait monter le <span class="m">χ</span>² : deux modèles qui divergent partout sont plus durs à départager que deux modèles quasi identiques qui penchent toujours du même côté.</p>
+    <p>C'est l'inverse de l'intuition « plus de données, plus de puissance » : ici la donnée utile, ce sont les désaccords, et ils se comptent après coup.</p>
+    <p class="say">« L'écart est au numérateur et les désaccords au dénominateur, donc à écart égal moins de désaccords fait monter le <span class="m">χ</span>², donc deux modèles proches se départagent plus facilement, donc annoncer <span class="m">n</span> = 1 000 ne dit rien de la précision de la comparaison. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — mêmes totaux, deux verdicts</div>
+    <p>Dans les deux cas : A = 872, B = 881, écart +9 lignes.</p>
+    <table>
+      <tr><th>table</th><th><span class="m">b</span></th><th><span class="m">c</span></th><th><span class="m">b</span>+<span class="m">c</span></th><th><span class="m">χ</span>²</th><th><span class="m">p</span></th></tr>
+      <tr><td>désaccords larges</td><td>30</td><td>39</td><td>69</td><td>1,17</td><td>0,28</td></tr>
+      <tr class="hl"><td>désaccords serrés</td><td>5</td><td>14</td><td>19</td><td><b>4,26</b></td><td><b>0,039</b></td></tr>
+    </table>
+    <p>Même différence observée, verdict opposé. Le seuil <span class="m">p</span> = 0,05 est franchi vers <span class="m">b</span> + <span class="m">c</span> ≈ 21 : au-delà, 9 lignes d'écart se noient dans le bruit des désaccords.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — même écart, plus de désaccords, moins de puissance</div>
+    <div id="f1plot" class="wide"></div>
+    <div class="sl-ctl" id="f1presets"></div>
+    <div id="f1sliders"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">L'écart <span class="m">c</span> − <span class="m">b</span> reste <b>bloqué à 9 lignes</b> ; seul le nombre de désaccords <span class="m">b</span> + <span class="m">c</span> bouge (valeurs impaires, pour que <span class="m">b</span> et <span class="m">c</span> restent entiers). Fais glisser : la p-value de McNemar monte, et le point passe du bon côté de la ligne rouge des 5 % vers 21 désaccords. Les deux boutons posent les deux tables du pas 4.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Bootstrap apparié : la même idée sans formule</h3>
+    <p>McNemar tient au fait que <span class="m">D</span> est une moyenne. Pour une métrique qui n'en est pas une — F1, AUC, taux de préférence jugé par un LLM — il n'y a pas de formule fermée. On simule alors « refaire l'expérience » : tirer 1 000 <b>lignes avec remise</b>, recalculer la différence, recommencer, lire la dispersion.</p>
+    <p>Une ligne tirée emporte <b>les deux</b> prédictions. Rééchantillonner les deux colonnes séparément effacerait la covariance et ramènerait au SE non apparié.</p>
+    <p class="say">« Le bootstrap rejoue le tirage du test set, donc il faut retirer des lignes entières pour garder la corrélation des deux mesures, donc l'intervalle obtenu est bien celui de la différence appariée, donc on se passe de la formule là où la métrique n'est pas une moyenne. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — la recette, et sa cécité</div>
+    <ul>
+      <li>Répéter 2 000 fois : tirer 1 000 indices avec remise, recalculer <span class="m">D</span> sur ces lignes.</li>
+      <li>IC à 95 % = quantiles 2,5 % et 97,5 % des 2 000 valeurs de <span class="m">D</span>.</li>
+      <li>Sur le fil rouge, l'IC retrouve la conclusion de McNemar sans jamais écrire (<span class="m">c</span>−<span class="m">b</span>)²/(<span class="m">b</span>+<span class="m">c</span>).</li>
+    </ul>
+    <p><b>Ce qu'il ne voit pas.</b> Le bootstrap rééchantillonne le tirage qu'on a. Si ce tirage a déjà servi à <i>choisir</i> B parmi plusieurs candidats, il tourne autour d'une valeur déjà gonflée et produit un intervalle centré au mauvais endroit. C'est exactement le pas suivant.</p>
+    <p>Développé dans <a href="chain-p01-05-bootstrap.html">p01-05</a> ; version pas à pas dans le déroulé <a href="../walkthroughs/walkthrough-p01-02-comparer-deux-modeles.html">D2</a>.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Le max ment <span class="tag tronc">tronc</span></h3>
+    <p>Changement d'expérience : B n'est plus donné, c'est <b>le meilleur de 40 configurations</b> essayées sur ce test set. Sous H3 les 40 valent pareil ; le classement est alors entièrement fabriqué par le bruit du tirage.</p>
+    <p>Le score rapporté n'est plus un score, c'est un <b>maximum de 40 variables bruitées</b>. Un max ne peut que monter, et son espérance dépasse la valeur commune de</p>
+    <div class="eq">biais ≈ <span class="up">SE</span> · <span class="up">E</span>[max de <span class="m">k</span> normales centrées réduites]</div>
+    <p>Le calcul de cette espérance passe par P(max ≤ <span class="m">t</span>) = Φ(<span class="m">t</span>/SE)<sup><span class="m">k</span></sup> : elle est dérivée dans <a href="../walkthroughs/walkthrough-p01-03-biais-du-max.html">D3</a>, ici on la prend telle quelle. Même mécanisme que le <a href="../bridges/bridge-02-temoin-atteignable.html">témoin atteignable</a> : prendre le meilleur d'un ensemble ne peut que faire monter le chiffre affiché.</p>
+    <p class="say">« La règle de sélection garde le plus haut des 40 scores, donc le chiffre rapporté est un maximum de variables bruitées, donc il contient la chance qui l'a fait gagner, donc un test set qui a servi à choisir ne mesure plus. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — 40 configs, toutes à 0,87</div>
+    <p><span class="m">n</span> = 1 000, <span class="m">π</span> = 0,87 pour les 40 : <span class="up">SE</span> = √(0,87·0,13/1000) = <b>0,0106</b>.</p>
+    <div class="eq"><span class="up">E</span>[max de 40] ≈ 0,87 + 2,16 · 0,0106 = <b>0,893</b></div>
+    <p>Le gagnant affiche <b>2,3 points</b> de plus qu'il ne vaut, sans qu'aucune des 40 mesures ne soit biaisée : chacune est sans biais, c'est leur max qui ne l'est pas.</p>
+    <p><b>La même chose côté tests.</b> 40 comparaisons indépendantes au seuil de 5 % : P(au moins un faux positif) = 1 − 0,95<sup>40</sup> = <b>0,87</b>. Corriger le seuil (Bonferroni, FDR) répond à cette question-là ; cela ne répare pas le score du gagnant, qui est l'affaire du pas 7.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — une config, puis la meilleure de 40</div>
+    <p class="sub-lbl">Une seule config, annoncée d'avance</p>
+    <div id="f2a" class="wide"></div>
+    <p class="sub-lbl">La meilleure de 40 configs qui valent toutes 0,87</p>
+    <div id="f2b" class="wide"></div>
+    <p class="cap">Chaque tirage est un test set de 1 000 lignes, simulé par 1 000 pile ou face à 0,87 — aucune approximation normale. Trait <b>bleu</b> : la valeur vraie, la même pour tout le monde. Trait <b>rouge</b> : la moyenne des tirages effectués. En haut, une config nommée <b>avant</b> d'ouvrir le fichier : les deux traits se superposent. En bas, la même vérité, mais on garde le plus haut des 40 scores : la <b>forme entière glisse d'environ 2 écarts-types à droite</b>. Tire dans les deux, compare les décalages affichés sous chaque histogramme. Rien n'a été truqué : seul le geste « garder le meilleur » a changé.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Remède : train, validation, test</h3>
+    <p>Le biais naît du jeu qui a servi à <b>choisir</b>. Il suffit donc que le jeu qui sert à <b>mesurer</b> ne soit pas celui-là : on règle et on compare sur la validation, on ouvre le test une seule fois, à la fin, pour le chiffre rapporté.</p>
+    <p>Le score de validation du gagnant reste gonflé — c'est le prix du choix, et on ne le publie pas. Le score de test, lui, est un tirage neuf, indépendant de la sélection : son bruit est centré.</p>
+    <p class="say">« Le biais du max vient du jeu qui a servi à choisir, donc on le paie sur la validation, donc le test reste un tirage que la sélection n'a jamais vu, donc le chiffre rapporté redevient sans biais. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le même sweep, bien rangé</div>
+    <table>
+      <tr><th>jeu</th><th>rôle</th><th>combien de fois</th><th>chiffre</th></tr>
+      <tr><td>train</td><td>ajuster les poids</td><td>autant qu'on veut</td><td>aucun</td></tr>
+      <tr><td>validation</td><td>choisir parmi les 40</td><td>autant qu'on veut</td><td>0,893 — gonflé, non publié</td></tr>
+      <tr class="hl"><td>test</td><td>mesurer le retenu</td><td><b>une fois</b></td><td>≈ 0,870 ± 2 <span class="up">SE</span></td></tr>
+    </table>
+    <p><b>Ce que la k-fold ne répare pas.</b> Moyenner sur 5 folds divise le SE par √5 (0,0106 → 0,0048) et réduit le biais du max d'autant (2,3 → 1,0 point). Réduit, pas supprimé : mesurer mieux ne défait pas « choisir sur ce qu'on a mesuré ».</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — ce que coûte un choix, en points d'accuracy</div>
+    <div id="f3plot" class="wide"></div>
+    <div id="f3sliders"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Biais attendu du score du gagnant, <span class="up">SE</span> · <span class="up">E</span>[max de <span class="m">k</span>], sous H3. Monte <span class="m">k</span> : la courbe grimpe vite puis s'aplatit — passer de 40 à 200 configs coûte moins cher que passer de 1 à 10. Baisse <span class="m">n</span> : la courbe entière se dilate, car le biais est <b>proportionnel au SE</b>. Petit jeu de validation et beaucoup de configs est le pire mélange — et c'est la situation ordinaire d'un sweep d'hyperparamètres.</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Deux hypothèses portent toute la chaîne — même tirage (H1), lignes indépendantes (H2) — et elles tombent séparément.</p>
+    <p class="say">« Apparier suppose le même tirage et McNemar suppose des lignes indépendantes, donc chacune de ces deux hypothèses a sa propre façon de tomber, donc on nomme laquelle a lâché avant de discuter le chiffre. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>Pas le même test set.</b> H1 tombe, il n'y a plus de paires : retour au test non apparié du pas 2. Moins puissant, mais <i>valide</i> — c'est de la puissance perdue, pas une erreur.</li>
+      <li><b>Lignes dépendantes.</b> H2 tombe : plusieurs lignes du même utilisateur, frames d'une même vidéo, reformulations d'une même question. L'effectif informatif est inférieur au nombre de désaccords comptés, donc <span class="m">b</span> + <span class="m">c</span> est surévalué et McNemar devient trop optimiste. Remède : apparier au niveau du groupe (bootstrap par cluster).</li>
+      <li><b>Différence dans le bruit.</b> <span class="m">z</span> = 0,61 ne dit pas « A = B », il dit « on ne sait pas » : l'IC de la différence contient 0 mais aussi des écarts qui compteraient en production. La réponse est plus de lignes, pas une conclusion d'égalité.</li>
+      <li><b>Validation trop petite.</b> Le biais du max se reporte alors sur la validation avec un SE large (figure 3) : le classement des 40 devient du bruit, et le remède du pas 7 protège le chiffre rapporté sans protéger le <i>choix</i>. Mesurer proprement et choisir correctement sont deux problèmes distincts.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Objet aléatoire : le <b>test set commun</b>. Les deux mesures en descendent ensemble, leurs bruits sont corrélés, donc on apparie — le terme −2Cov n'est pas un raffinement.</li>
+    <li><b>McNemar</b> : les lignes d'accord donnent <span class="m">D</span><sub><span class="m">i</span></sub> = 0 et sortent du calcul ; <span class="m">χ</span>² = (<span class="m">c</span> − <span class="m">b</span>)²/(<span class="m">b</span> + <span class="m">c</span>), sans <span class="m">n</span>.</li>
+    <li>Même écart, <b>moins de désaccords ⇒ plus significatif</b> : 81/69 → <span class="m">p</span> = 0,28 ; 81/19 → <span class="m">p</span> = 0,039.</li>
+    <li>Le <b>max de <span class="m">k</span> scores bruités</b> est décalé vers le haut d'environ SE · E[max de <span class="m">k</span>] : 40 configs, SE = 1,06 point ⇒ +2,3 points offerts par la chance.</li>
+    <li><b>Train / validation / test</b> : on choisit sur la validation, on mesure sur le test, ouvert une seule fois. Un test set qui a servi à choisir ne mesure plus.</li>
+  </ol>
+</div>
+<div class="phrase">« Les deux modèles sont évalués sur le même tirage, donc j'apparie : seuls les désaccords comptent, McNemar ou bootstrap sur la différence. Et si B est le meilleur de quarante essais sur ce test set, son score est un maximum de variables bruitées, biaisé vers le haut d'environ deux erreurs-types : il faut une validation pour choisir et un test ouvert une seule fois pour mesurer. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Quel est l'objet aléatoire quand on compare A et B ?</div><div class="a hid">Le test set commun — les modèles sont figés. Les deux accuracies descendent du même tirage, donc leurs erreurs sont corrélées.</div></li>
+    <li><div class="q">Pourquoi l'appariement gagne-t-il de la puissance ?</div><div class="a hid">Var(D) = Var<sub>A</sub> + Var<sub>B</sub> − 2Cov : ignorer la covariance gonfle la variance. Et les lignes d'accord donnent D<sub>i</sub> = 0, elles ne pèsent nulle part.</div></li>
+    <li><div class="q">Que teste McNemar, avec quelle statistique ?</div><div class="a hid">H₀ : les deux sortes de désaccords sont équiprobables (b = c). χ² = (c − b)²/(b + c), 1 ddl ; n n'y figure pas.</div></li>
+    <li><div class="q">Pourquoi le meilleur de 40 configs surestime-t-il sa valeur ?</div><div class="a hid">Son score est un max de 40 variables bruitées, décalé de ≈ SE·E[max de 40] ≈ 2,16 SE. Chaque mesure est sans biais, leur max ne l'est pas.</div></li>
+    <li><div class="q">Quel protocole répare, et que ne répare-t-il pas ?</div><div class="a hid">Train / validation / test : on choisit sur la validation, on mesure sur le test ouvert une fois. Il protège le chiffre rapporté, pas la qualité du choix si la validation est petite.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="../bridges/bridge-02-temoin-atteignable.html"><b>Le témoin atteignable</b><small>le pas 6 en est un cas : choisir le meilleur d'un ensemble ne peut que faire monter le chiffre affiché — comme R² qui ne décroît jamais quand on ajoute une variable, ou un minimum majoré par un témoin</small></a>
+    <a href="../bridges/bridge-03-biais-variance-partout.html"><b>Biais et variance partout</b><small>ici les deux se séparent nettement : la k-fold réduit la variance de chaque mesure et laisse le biais de sélection intact — mesurer mieux n'est pas choisir mieux</small></a>
+    <a href="../walkthroughs/walkthrough-p01-02-comparer-deux-modeles.html"><b>D2 — comparer deux modèles</b><small>le cas 2 déroulé maillon par maillon : Var(D<sub>i</sub>) = π − d², SE sous H₀ contre SE estimée, bootstrap apparié</small></a>
+    <a href="../walkthroughs/walkthrough-p01-03-biais-du-max.html"><b>D3 — le biais du max</b><small>le cas 3 déroulé : le max de deux dés, puis P(max ≤ t) = Φ(t/SE)<sup>k</sup>, la course des 40 et « E sur quoi ? »</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::comparaison</code> (apparié vs non apparié, McNemar, l'effectif qui compte) · <code>stats::multiplicite</code> (biais du max, 1 − 0,95<sup>k</sup>, sélection sur le test) · <code>ml::validation</code> (train/validation/test, ce que la k-fold ne répare pas) · <code>stats::inference</code> (H₀ sur la différence, p-value).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p01-04 · v1 du 16/09/2026 · Prérequis : p01-01, p01-02. Suite : <a href="chain-p01-05-bootstrap.html">p01-05 Bootstrap</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ---- outils numériques ---- */
+const erf=x=>{const s=x<0?-1:1;x=Math.abs(x);const t=1/(1+.3275911*x);
+  const y=1-((((1.061405429*t-1.453152027)*t+1.421413741)*t-.284496736)*t+.254829592)*t*Math.exp(-x*x);return s*y;};
+const Phi=z=>.5*(1+erf(z/Math.SQRT2));
+const pchi1=c=>2*(1-Phi(Math.sqrt(Math.max(0,c))));                                   // loi du χ² à 1 ddl = carré d'une normale
+const binom=(n,p)=>{let k=0;for(let i=0;i<n;i++)if(Math.random()<p)k++;return k;};      // vraie somme de Bernoulli, jamais d'approximation normale
+function over(P){return SL.el('g',{},P.svg);}                                          // calque au-dessus des barres, jamais effacé
+function oline(g,P,xa,ya,xb,yb,cls){return SL.el('line',{x1:P.sx(xa),y1:P.sy(ya),x2:P.sx(xb),y2:P.sy(yb),class:'sl-seg '+cls},g);}
+function otext(g,P,x,y,t,cls,anchor){const e=SL.el('text',{x:P.sx(x),y:P.sy(y),class:'sl-lbl '+(cls||''),'text-anchor':anchor||'start'},g);e.textContent=t;return e;}
+function legend(g,P,x0,y0,len,items){items.forEach((it,i)=>{const y=y0-i*.09;oline(g,P,x0,y,x0+len,y,it.cls);otext(g,P,x0+len*1.4,y-.022,it.t,it.cls,'start');});}
+
+/* ===== Figure 1 : p-value de McNemar à écart constant ===== */
+const DIF=9;                                                                            // c − b, bloqué
+const pMc=s=>pchi1(DIF*DIF/s);
+const P1=SL.plot(document.getElementById('f1plot'),{x:[11,199],y:[0,.6],w:600,h:290,
+  xt:[11,19,69,120,199],yt:[.05,.2,.4,.6],xl:'b + c (nombre de désaccords)',yl:'p-value de McNemar'});
+P1.fn(pMc,'sl-c1');P1.fn(()=>.05,'mk-seuil');
+P1.label(150,.085,'seuil 5 %','mk-seuil','start');
+const out1=document.getElementById('f1out');
+function draw1(s){s=Math.round(s);if((s-DIF)%2)s+=1;
+  const b=(s-DIF)/2,c=(s+DIF)/2,chi=DIF*DIF/s,p=pMc(s);
+  P1.clear();P1.vline(s,'');P1.dot(s,p,'sl-c1',6);
+  P1.text(s,p+(p<.13?.105:.05),'p = '+SL.fmt(p,3),'sl-c1','middle');
+  out1.innerHTML=`<div><span>A seul juste · b</span><b>${b}</b></div>`
+    +`<div><span>B seul juste · c</span><b>${c}</b></div>`
+    +`<div><span>χ² = 81 / ${s}</span><b>${SL.fmt(chi,2)}</b></div>`
+    +`<div class="${p<.05?'pos':'zero'}"><span>p-value</span><b>${SL.fmt(p,3)}</b></div>`;}
+const sS=SL.slider(document.getElementById('f1sliders'),{label:'désaccords b + c',min:11,max:199,step:2,value:69},draw1);
+[['table serrée · b = 5, c = 14',19],['fil rouge · b = 30, c = 39',69]].forEach(([n,v])=>{
+  const bt=document.createElement('button');bt.className='tb';bt.textContent=n;bt.onclick=()=>sS.set(v);
+  document.getElementById('f1presets').appendChild(bt);});
+
+/* ===== Figure 2 : une config, puis le max de 40 ===== */
+const N2=1000,PI2=.87,K2=40;
+const drawOne=()=>binom(N2,PI2)/N2;
+const drawMax=()=>{let m=0;for(let i=0;i<K2;i++){const v=binom(N2,PI2);if(v>m)m=v;}return m/N2;};
+const commonRepeat=(host,draw,lab,lx)=>{
+  const R=SL.repeat(host,{
+    draw,bins:[.85,.92,35],xt:[.85,.87,.89,.91],w:600,h:230,counts:[1,50,500],
+    xl:'accuracy affichée',yl:'fréquence',
+    marks:[{x:PI2,label:'',cls:'mk-true'}],
+    readout:(n,m,s)=>`${lab} · ${n} tirages · moyenne ${SL.fmt(m,4)} · décalage ${m>=PI2?'+':''}${SL.fmt((m-PI2)*100,2)} pt`,
+    empty:'Aucun tirage encore — clique « tirer ».'});
+  legend(over(R.plot),R.plot,lx[0],lx[1],.0035,[{t:'π = 0,87',cls:'mk-true'},{t:'moyenne',cls:'sl-mean'}]);
+  return R;};
+const RA=commonRepeat(document.getElementById('f2a'),drawOne,'une config',[.8925,.93]);
+const RB=commonRepeat(document.getElementById('f2b'),drawMax,'meilleure de 40',[.8535,.80]);
+for(let i=0;i<400;i++)RA.stats.push(drawOne());RA.render();
+for(let i=0;i<300;i++)RB.stats.push(drawMax());RB.render();
+
+/* ===== Figure 3 : biais du max en fonction de k et de n ===== */
+const KT=[1,2,5,10,20,40,100,200],AT=[0,.56,1.16,1.54,1.87,2.16,2.51,2.75];            // E[max de k N(0,1)], tabulé (dérivation : D3)
+function aK(k){k=Math.max(1,Math.min(200,k));
+  for(let i=0;i<KT.length-1;i++)if(k<=KT[i+1]){
+    const u=(Math.log(k)-Math.log(KT[i]))/(Math.log(KT[i+1])-Math.log(KT[i]));
+    return AT[i]+u*(AT[i+1]-AT[i]);}
+  return AT[AT.length-1];}
+const seOf=n=>Math.sqrt(PI2*(1-PI2)/n);
+const P3=SL.plot(document.getElementById('f3plot'),{x:[1,200],y:[0,4.5],w:600,h:280,
+  xt:[1,40,100,200],yt:[1,2,3,4],xl:'k configurations essayées',yl:'biais du gagnant (points)'});
+const out3=document.getElementById('f3out');let path3=null,n3=1000,k3=40;
+function draw3(){
+  if(path3)path3.remove();
+  path3=P3.fn(k=>aK(k)*seOf(n3)*100,'sl-c1');
+  const se=seOf(n3),a=aK(k3),bi=a*se*100;
+  P3.clear();P3.vline(k3,'');P3.dot(k3,bi,'sl-c1',6);
+  P3.text(k3,bi+.28,SL.fmt(bi,2)+' pt','sl-c1',k3>165?'end':(k3<28?'start':'middle'));
+  out3.innerHTML=`<div><span>SE d'une config</span><b>${SL.fmt(se*100,2)} pt</b></div>`
+    +`<div><span>E[max de k] / SE</span><b>${SL.fmt(a,2)}</b></div>`
+    +`<div class="zero"><span>biais du gagnant</span><b>${SL.fmt(bi,2)} pt</b></div>`
+    +`<div><span>score affiché</span><b>${SL.fmt(PI2*100+bi,2)} %</b></div>`;}
+const sl3=document.getElementById('f3sliders');
+SL.slider(sl3,{label:'k configs',min:1,max:200,step:1,value:40},v=>{k3=v;draw3();});
+SL.slider(sl3,{label:'n du jeu',min:500,max:5000,step:100,value:1000,fmt:v=>SL.fmt(v,0)},v=>{n3=v;draw3();});
+})();
+</script>
+</body>
+</html>

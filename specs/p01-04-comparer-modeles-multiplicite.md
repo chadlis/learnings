@@ -10,7 +10,7 @@ prereq: [p01-01, p01-02]
 anki: [stats::inference, stats::comparaison, stats::multiplicite, ml::validation]
 bridges: [b02, b03]
 next: p01-05
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -78,3 +78,24 @@ n = 1 000. A : 872 justes ; B : 881 justes ; différence 0,009.
 
 ## Exclusions
 Pas de Bonferroni/FDR au-delà d'une phrase. Pas de tests sur AUC (DeLong). Pas de dérivation de Φᵏ (D3).
+
+## Questions pour la revue
+
+Tous les chiffres de l'exemple fil rouge ont été revérifiés par script : aucun n'était
+faux, rien n'a été corrigé ci-dessus. Restent quatre points de décision.
+
+1. **Figure 1, bornes du slider.** Le spec demande b + c ∈ [10, 200]. Avec c − b = 9
+   bloqué, b + c doit être **impair** pour que b et c restent entiers : le slider court
+   donc de 11 à 199 par pas de 2. Le franchissement du seuil de 5 % est à b + c ≈ 21.
+2. **Figure 2, 0,893 contre la simulation.** L'approximation normale donne
+   0,87 + 2,16 · 0,0106 = 0,8930. La simulation exacte (sommes de Bernoulli, comme dans
+   p01-01) donne plutôt 0,8925 — la dissymétrie de la binomiale et la granularité de
+   1/1000 rabotent une demi-dizaine de millièmes de point. Le 0,893 du spec est conservé
+   dans le texte ; la figure affiche sa propre moyenne mesurée.
+3. **Convention de signe, chaîne contre déroulé D2.** Le spec pose D = p̂_B − p̂_A
+   (positif ici, +0,009) ; D2 pose Dᵢ = Xᵢ − Yᵢ, donc d = p_A − p_B (négatif). Les noms
+   b et c (A seul juste / B seul juste) coïncident, eux. La chaîne suit le spec.
+   À trancher : harmoniser D2, ou nommer explicitement les deux conventions.
+4. **Pas 5, bootstrap apparié sans chiffre.** Le spec ne fixe aucun IC bootstrap pour le
+   fil rouge n = 1 000. La sheet décrit la recette et renvoie à p01-05 et à D2 plutôt que
+   d'inventer un intervalle — à compléter quand p01-05 sera écrite.
