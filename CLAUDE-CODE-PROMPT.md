@@ -16,6 +16,7 @@ Le site est refondu : les anciennes fiches Q/A (`sheets/topics/sheet-tNN-*.html`
 Règles absolues :
 - Tu ne rédiges **jamais** une sheet sans spec au statut `ready`. Un spec `stub` n'est pas une invitation à inventer : tu le sautes et tu le listes dans le rapport final.
 - **Le statut d'un spec ne se change jamais de `stub` à `ready` par Claude Code ; seul Salah le fait en déposant un spec complet.**
+- **Claude Code n'écrit jamais le corps d'un spec** (question, hypothèses, fil rouge, pas, figures). Il ne modifie un spec que pour : corriger un chiffre vérifié par script, ajouter « ## Questions pour la revue », changer le statut `ready` → `built` ou → `reviewed` sur instruction.
 - Standard = skill `.claude/skills/sheet-chain/` + gold standard `sheets/chains/chain-p03-01-critere-escalier-vs-sensible.html`. Tu ne modifies ni l'un ni l'autre, ni `assets/sheetlib.js`, ni `sheets/archive/`.
 - Une sheet = un commit. `python3 tools/validate_sheet.py <chemin> --render` à 0 FAIL avant commit, captures regardées.
 - Zéro CDN, zéro police externe, zéro MathJax, zéro localStorage.
