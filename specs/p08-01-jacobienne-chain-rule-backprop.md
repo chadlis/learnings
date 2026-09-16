@@ -10,7 +10,7 @@ prereq: [p04-01, p03-02]
 anki: [analyse::gradient-jacobienne, analyse::chain-rule, dl::backprop, dl::vjp]
 bridges: [b01]
 next: p08-02
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -79,3 +79,27 @@ Coût : trois couches de largeur m = 1 000 sur une entrée n = 1 000, loss scala
 
 ## Exclusions
 Pas d'autodiff par traçage/graphe dynamique au-delà de « micrograd le fait », pas de hessienne, pas de détails d'implémentation PyTorch (autograd.Function).
+
+## Questions pour la revue
+- **Chiffres du fil rouge : tous vérifiés par script, aucun faux.** z = 1 ; p = 0,7310586 ;
+  L = 0,3132617 ; −1/p = −1,3678794 ; p(1−p) = 0,1966119 ; produit = −0,2689414 = p − 1
+  (égalité exacte) ; ∂L/∂w = −0,5378828, confirmé par différence finie. Une seule précision
+  ajoutée : le coût « depuis l'entrée » est 1,001 · 10⁹ (m²n + mn) et le rapport exact
+  **500,5**, pas 500 — la sheet écrit 500,5 dans le tableau et garde « facteur 500 » dans le
+  chapeau. Rien à corriger dans le spec.
+- **Figure 3, échelle.** Sur [−6, 6], −1/p va de −404 à −1 pendant que p(1−p) va de 0,0025 à
+  0,25 : les trois courbes ne tiennent pas sur un axe linéaire commun. Choix fait : tracer
+  **log₁₀ des valeurs absolues**, ce qui rend le produit visible comme une **somme de
+  hauteurs** (la courbe rouge est exactement la somme des deux autres) ; les readouts
+  gardent les valeurs signées. À valider.
+- **Placement de la figure 3.** Elle est accrochée au pas 9 (« Où ça casse ») et non au pas 4,
+  pour que l'ordre des figures dans la page suive leur numérotation ; le pas 4 y renvoie. La
+  légende porte les deux lectures : compensation (pas 4) et évanouissement (pas 9).
+- **Pas 8, chiffres non fournis par le spec.** Calculés : 1 JVP = mn + m² + m = 2,001 · 10⁶,
+  et il en faut n = 1 000 ⇒ 2,001 · 10⁹, soit **1 000,5 fois** le VJP unique. À valider comme
+  façon de chiffrer « coût proportionnel au nombre d'entrées ».
+- **Pas 7, exemple hors fil rouge.** Le spec ne donne pas de graphe où un nœud sert deux fois.
+  Construit : e = a·b puis L = e + a, avec a = 2 et b = 0,5 (les nombres du fil rouge), donc
+  ∂L/∂a = b + 1 = **1,5**, vérifié en différence finie ; avec `=` au lieu de `+=` on lit 0,5 ou 1.
+- **Liens.** p04-01, p08-02 et b01 n'existent pas encore : liens vers `map.html#<id>`, comme
+  le prescrit le skill. p03-01 et p03-02 pointent vers leurs ancres exactes (`#s6`, `#s2`).
