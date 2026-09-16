@@ -10,7 +10,7 @@ prereq: [p01-01, p01-02, p05-01]
 anki: [stats::inference, stats::estimation, ml::regression-lineaire, stats::bessel]
 bridges: [b03, b04]
 next: p01-04
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -27,6 +27,8 @@ Le logiciel affiche pour la pente t = 17,67 et « Student à 198 degrés de libe
 
 ## Exemple fil rouge
 ISLR Advertising, `sales ~ TV`, n = 200, p = 2 paramètres : β̂₁ = 0,0475, SE = 0,0027, t = 17,67, ddl = 198. σ̂ = RSE = 3,26.
+Valeurs non arrondies (vérifiées) : β̂₁ = 0,047537, SE = 0,0026906, β̂₀ = 7,0325, Sxx = Σ(xᵢ − x̄)² = 1 466 829,
+RSS = 2 102,6, σ̂² = 10,62, t₀,₉₇₅(198) = 1,9720, IC95 = [0,0422 ; 0,0528].
 
 ## Pas de la chaîne
 1. **Le décor.** Le nuage est un tirage : mêmes x, autres ε ⇒ autre nuage ⇒ autre β̂₁. Colonne aléatoire : ε (donc y, donc β̂₁).
@@ -72,3 +74,24 @@ ISLR Advertising, `sales ~ TV`, n = 200, p = 2 paramètres : β̂₁ = 0,0475, S
 
 ## Exclusions
 Pas de test F, pas de régression multiple au-delà de « p paramètres », pas de SE de White, pas de leverage.
+
+## Questions pour la revue
+Tous les chiffres du spec ont été revérifiés par script (Student par bêta incomplète + bissection,
+simulations en pur Python) : **aucun n'est faux**. Restent cinq points à trancher.
+
+1. **t = 17,67 est un chiffre non reproductible depuis les valeurs imprimées.** 0,047537/0,0026906 = 17,668 ;
+   mais 0,0475/0,0027 = 17,59. Les deux viennent d'ISLR, l'un arrondi, l'autre pas. La sheet le dit
+   explicitement au pas 6 (« piège d'arrondi »). Les valeurs non arrondies ont été ajoutées au fil rouge
+   ci-dessus — à garder ou à retirer ?
+2. **Figure 1, readout.** Le spec annonce « écart-type ≈ SE théorique 0,0027 ». Avec x = grille régulière
+   0–300 (Sxx = 1 515 075) le SE théorique vaut 0,00265 ; ce sont les vrais budgets TV (Sxx = 1 466 829)
+   qui donnent 0,00269. La figure affiche donc le SE **calculé** au lieu d'un chiffre en dur.
+3. **Renumérotation des figures.** Dans la sheet : fig1 = `repeat` (pas 2), fig2 = étalement des x (pas 4),
+   fig3 = Student (pas 5) — c'est-à-dire les figures 2 et 3 du spec permutées, pour que les numéros
+   suivent l'ordre de lecture.
+4. **« Deux nuages côte à côte » rendu en un seul nuage réglable.** Deux `SL.plot` côte à côte débordent
+   (min-width 440 px chacun, colonne principale ~890 px) et deux jeux d'axes rendent la comparaison
+   moins directe. La figure 2 est donc un nuage unique dont l'étalement se règle au curseur, avec trois
+   présélections (± 20 · ± 60 · ± 145) et un faisceau de sept ajustements sur des bruits figés. À valider.
+5. **SE robustes.** Le spec dit « nommer seulement », les exclusions disent « pas de SE de White ». La sheet
+   écrit « erreurs standard robustes à l'hétéroscédasticité », sans le nom de White et sans formule.
