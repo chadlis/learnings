@@ -10,7 +10,7 @@ prereq: [c00]
 anki: [coding::dp, coding::kadane, coding::recurrence]
 bridges: []
 next: 
-status: ready
+status: built
 ---
 ## Signal
 Une réponse optimale sur un **préfixe** qui se déduit des réponses sur des préfixes plus courts ; des **choix** (prendre / laisser, couper / continuer) ; le mot « nombre de façons », « maximum sur un sous-tableau », « escalier », « pièces ». Contre-signal : le sous-problème dépend de tout le futur (pas de récurrence sur un préfixe) ; état à deux dimensions (DP 2D, hors périmètre).
@@ -43,7 +43,7 @@ nums = [2, 7, 9, 3, 1] : (i, v, dp[i]) = (0, 2, 2) · (1, 7, 7) · (2, 9, 11) ·
 - **Reconstruire les choix** : garder dp entier et remonter depuis la fin.
 
 ## Figures exigées
-- **Figure 1 — `SL.trace`** : arr = [2, 7, 9, 3, 1], 5 images, `ptr` = {i}, `mark` = les maisons volées dans la solution courante, `note` = « max(11, 2 + 9) = 11 », `inv`. Légende : dp[i] ne lit que dp[i−1] et dp[i−2] ; le reste peut être oublié.
+- **Figure 1 — `SL.trace`** : arr = [2, 7, 9, 3, 1], 5 images, `ptr` = {i}, `mark` = les maisons volées dans la solution courante, `note` = « max(7, 2 + 9) = 11 », `inv`. Légende : dp[i] ne lit que dp[i−1] et dp[i−2] ; le reste peut être oublié.
 - **Figure 2 — `SL.trace`** : Kadane sur [−2, 1, −3, 4, −1, 2, 1, −5, 4], 9 images, `note` = « cur = max(4, −2 + 4) = 4 : on repart », `win` = le sous-tableau courant, `inv` = « cur = meilleure somme finissant en i ». Légende : repartir quand le passé pèse.
 
 ## Où ça casse
@@ -71,3 +71,21 @@ Un dp[i] mal défini (« la réponse jusqu'à i » sans dire si i est inclus, ou
 
 ## Ce qui a cassé pour Salah
 - Famille t09 : « sous-problème indexé par position, récurrence, ordre de remplissage, roulement O(1), Kadane comme DP » ; la scorie à surveiller est la **définition** de dp[i] laissée vague — chaque variante la dit ici.
+
+## Questions pour la revue
+- **Chiffre corrigé (figure 1).** Le spec écrivait `note` = « max(11, 2 + 9) = 11 ». Numériquement
+  vrai, mais ne correspond à aucun tour : au tour i = 2 la récurrence est
+  max(dp[1], dp[0] + 9) = **max(7, 2 + 9) = 11** (11 est le *résultat*, pas l'opérande gauche) ;
+  au tour i = 3 c'est max(11, 7 + 3) = 11. Corrigé en « max(7, 2 + 9) = 11 ». Tous les autres
+  chiffres du spec ont été revérifiés par script et sont justes : dp = [2, 7, 11, 11, 12],
+  réponse 12 = 2 + 9 + 1 (maisons 0, 2, 4, confirmé par force brute sur chaque préfixe) ;
+  Kadane = 6 sur [−2, 1, −3, 4, −1, 2, 1, −5, 4], sous-tableau [4, −1, 2, 1] ;
+  « cur = max(4, −2 + 4) = 4 » est bien le tour i = 3.
+- **Ajouts chiffrés non demandés par le spec**, tous vérifiés, à valider ou à couper :
+  pièces [1, 3, 4] pour 6 → dp = 2 (3 + 3) contre 3 au glouton (4 + 1 + 1) ; LIS de
+  [10, 9, 2, 5, 3, 7, 101, 18] → 4, sous-suite [2, 5, 7, 101] ; récursion naïve de House Robber
+  à n = 30 → 4 356 617 appels contre 30 tours ; Kadane à `best = 0` faux sur **9,9 %** des
+  tirages aléatoires ; Kadane sans max final (`cur` au lieu de `best`) faux sur **51,1 %**.
+- **Contre-signal du pas 1** : j'ai choisi le sous-tableau **circulaire** comme contre-exemple
+  chiffré ([5, −3, 5] → 10 en circulaire contre 7 en linéaire). Le spec ne le nommait pas ;
+  il dit seulement « le sous-problème dépend de tout le futur ». À arbitrer.

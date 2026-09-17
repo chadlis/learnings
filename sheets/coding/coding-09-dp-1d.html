@@ -1,0 +1,472 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>DP 1D — un sous-problème par position — coding</title>
+<meta name="sheet" content="series=coding;part=09;number=09;status=v1">
+<meta name="part" content="09 · Coding">
+<meta name="subtitle" content="coding — la relation de récurrence est l'invariant ; l'ordre de remplissage et le roulement O(1) en sont les conséquences">
+<meta name="prereq" content="c00">
+<meta name="anki" content="coding::dp,coding::kadane,coding::recurrence">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- série `coding` : squelette annoté et ruban de SL.trace (inerte hors coding) ---- */
+.skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.skel b{color:var(--pen);font-weight:600}
+.step .card.full,.step .card.casse{grid-column:1 / -1}
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .wide table{min-width:520px}
+.card .wide th:nth-child(2),.card .wide td:nth-child(2),
+.card .wide th:nth-child(3),.card .wide td:nth-child(3){text-align:left}
+.readouts .c1 b{color:var(--pen)}.readouts .c3 b{color:var(--red)}
+.sl-trace{--cw:58px;--cgap:8px;margin:4px 0 2px}
+.sl-cells{display:flex;gap:var(--cgap)}
+.sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
+.sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
+.sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
+.sl-cell.win{border-color:var(--green);border-width:2.5px}
+.sl-ptrs{position:relative;height:20px;margin-top:5px}
+.sl-ptr{position:absolute;top:0;left:calc(var(--i) * (var(--cw) + var(--cgap)));width:var(--cw);text-align:center;font:600 12px var(--sans);color:var(--pen)}
+.sl-note{font-size:14px;color:var(--cardink);margin-top:10px}
+.sl-inv{font:12.5px/1.55 var(--mono);color:var(--cardmuted);margin-top:6px;border-left:2px solid #B7791F;padding-left:10px}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ---- marques propres à cette chaîne ---- */
+/* Les deux définitions de dp[i] et les quatre variantes se lisent en colonnes, jamais en
+   table : à trois ou quatre colonnes une table se fait rogner dans la carte de gauche
+   (405 px). Un bloc par entrée, titre en capitales, corps en dessous — ça tient partout. */
+.defs{display:grid;gap:8px;margin:10px 0 2px}
+.defs div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:14px;border-left:3px solid var(--cardline)}
+.defs div>b:first-child{display:block;font:600 11px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:2px}
+.defs div.pre{border-left-color:var(--pen)}
+.defs div.fin{border-left-color:var(--red)}
+.defs div.va{border-left-color:var(--green)}
+.defsleg{font-size:14px;color:var(--cardmuted);margin-top:6px}
+/* Le ruban de SL.trace fait 9 cases pour Kadane : 586 px, à l'aise dans une figure pleine
+   largeur, à faire défiler sous 640 px. `.wide` porte déjà l'overflow ; les pointeurs sont
+   en position absolue dans .sl-trace, donc le conteneur défilant doit les englober. */
+.fig .wide .sl-trace{min-width:600px}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 09 · Coding › coding 09</div>
+  <h1>DP 1D — un sous-problème par <span>position</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Une question qui porte sur un <b>préfixe</b> — le meilleur butin sur les <span class="m">i</span> premières maisons, le nombre de façons de monter <span class="m">i</span> marches — et dont la réponse se déduit des réponses sur des préfixes plus courts. Le pattern tient en un geste et trois conséquences : <b>définir dp[<span class="m">i</span>] exactement</b>, puis écrire la récurrence, poser les cas de base, remplir dans l'ordre des dépendances. Ce qui compte n'est pas la récurrence, c'est la <b>définition</b> : « sur le préfixe » et « se terminant en <span class="m">i</span> » ne se lisent pas au même endroit, et confondre les deux rend un nombre plausible et faux. Fil rouge : House Robber (LC 198) sur <code>[2, 7, 9, 3, 1]</code>, dp = <b>[2, 7, 11, 11, 12]</b>, réponse <b>12</b> (maisons 0, 2 et 4). Coût O(<span class="m">n</span>) en temps, <b>O(1)</b> en espace par roulement. Jamais la solution complète : le squelette, la trace, les phrases.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="coding-00-tap-invariant-variant.html#s2">c00 · l'invariant</a> — conteneur, tranche, « exactement »</li>
+    <li><a href="coding-00-tap-invariant-variant.html#s3">c00 · le variant</a> — l'entier ≥ 0 qui décroît</li>
+    <li><a href="coding-00-tap-invariant-variant.html#s5">c00 · la complexité</a> — composée, jamais devinée</li>
+    <li><a href="coding-01-fenetre-glissante.html#s3">c01 · l'invariant exact</a> — la même exigence de précision, sur une tranche</li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>coding::dp</code><code>coding::kadane</code><code>coding::recurrence</code></div>
+  <h4>Où le pattern voisine</h4>
+  <ol>
+    <li><a href="coding-00-tap-invariant-variant.html">c00 · Le TAP</a></li>
+    <li><a href="coding-01-fenetre-glissante.html">c01 · Fenêtre glissante</a></li>
+    <li><a href="coding-03-binary-search.html">c03 · Binary search</a></li>
+    <li><a href="coding-08-intervals.html">c08 · Intervals</a></li>
+    <li><a href="../../map.html">La carte, colonne 9</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette sheet suppose acquis</div>
+    <ul>
+      <li><b>Le rituel TAP.</b> Invariant, variant, conclusion, complexité — <a href="coding-00-tap-invariant-variant.html#s1">c00, pas 1</a>. Ici il se dit d'un coup : <b>la récurrence <i>est</i> l'invariant</b>, écrit en langage d'indices plutôt qu'en français.</li>
+      <li><b>Invariant = conteneur + tranche + « exactement ».</b> <a href="coding-00-tap-invariant-variant.html#s2">c00, pas 2</a>. Le conteneur est <code>dp[<span class="m">i</span>]</code>, la tranche est le préfixe, et le mot <b>exactement</b> est celui qui décide de tout — c'est le pas 2 de cette sheet en entier.</li>
+      <li><b>Variant = entier ≥ 0 strictement décroissant.</b> <a href="coding-00-tap-invariant-variant.html#s3">c00, pas 3</a>. C'est <span class="m">n</span> − <span class="m">i</span>, le nombre de positions non encore remplies. Trivial ici, et c'est normal : la difficulté de la DP est entièrement dans l'invariant.</li>
+      <li><b>Complexité composée.</b> <a href="coding-00-tap-invariant-variant.html#s5">c00, pas 5</a>. Le coût d'une DP se lit <b>nombre d'états × coût d'une transition</b> : <span class="m">n</span> × O(1) pour House Robber, <span class="m">n</span> × O(<span class="m">n</span>) pour la plus longue sous-suite croissante.</li>
+      <li><b>L'exigence de précision sur l'invariant.</b> <a href="coding-01-fenetre-glissante.html#s3">c01, pas 3</a>. Même discipline, autre objet : là une tranche <code>[l:r+1)</code>, ici une définition de sous-problème. Dans les deux cas le flou ne plante pas, il fausse.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>L'état tient en <b>un seul indice</b>. Une position sur un axe, un montant, un nombre de marches. Dès qu'il faut deux indices — deux chaînes à aligner, une capacité <i>et</i> une position — c'est de la <b>DP 2D</b> : même rituel, autre sheet.</span>
+      <b>H2</b><span><b>Sous-structure optimale.</b> La réponse optimale sur un préfixe se compose de réponses optimales sur des préfixes plus courts. C'est une hypothèse, pas un théorème : elle se vérifie en énonçant le <b>choix</b> fait en <span class="m">i</span> et ce qu'il interdit.</span>
+      <b>H3</b><span>Les sous-problèmes se <b>chevauchent</b>. C'est ce qui fait de la mémorisation un gain : sans chevauchement, la récursion nue coûte déjà le prix juste et la table ne sert à rien.</span>
+      <b>H4</b><span>On veut la <b>valeur</b>, pas les choix. Le roulement en O(1) suppose exactement ça : reconstruire les maisons volées demande de garder la table entière — pas 4.</span>
+      <b>H5</b><span>On énonce le <b>squelette</b> et les phrases. Le corps se remplit devant l'interlocuteur : une sheet de coding ne contient jamais la solution complète.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le signal, et le contre-signal <span class="tag tronc">tronc</span></h3>
+    <p>Une question dont la réponse sur les <span class="m">i</span> premiers éléments se déduit des réponses sur <b>moins</b> d'éléments, et un <b>choix</b> à chaque position : prendre ou laisser, couper ou continuer, poser une pièce ou une autre. Les mots qui le trahissent : « nombre de façons », « maximum sur un sous-tableau », « escalier », « pièces », « sans deux adjacents ».</p>
+    <div class="eq">réponse sur un préfixe + un choix par position &nbsp;⇒&nbsp; <b>un sous-problème par position</b>, et une récurrence</div>
+    <p>Le contre-signal est double. Si le sous-problème dépend de <b>tout le futur</b> — un tableau <b>circulaire</b>, une contrainte globale — le préfixe ne porte plus l'information et la récurrence n'existe pas. Si l'état demande <b>deux indices</b>, c'est de la DP 2D.</p>
+    <p class="say">« La réponse sur les i premiers se déduit des réponses sur moins d'éléments, donc il existe un sous-problème par position, donc la question devient une récurrence à remplir dans l'ordre, donc un seul passage suffit. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le fil rouge, et ce que le contre-signal coûte</div>
+    <p><b>Le fil rouge.</b> House Robber, LC 198 : <code>nums = [2, 7, 9, 3, 1]</code>, on maximise la somme <b>sans prendre deux maisons adjacentes</b>. Réponse <b>12</b> = 2 + 9 + 1, maisons <b>0, 2, 4</b>. Vérifié par force brute sur <b>chaque préfixe</b> : 2 · 7 · 11 · 11 · 12, exactement la table dp.</p>
+    <p><b>Pourquoi cet exemple et pas un autre.</b> C'est l'exemple canonique de LC 198, et il contient le seul tour qui prouve quelque chose : au tour <span class="m">i</span> = 3 la table <b>stagne</b> (11 → 11). Un exemple où dp croît à chaque tour laisserait croire qu'on additionne ; ici on voit qu'on <b>choisit</b>.</p>
+    <p><b>Le contre-signal, chiffré.</b> Sur <code>[5, −3, 5]</code>, le meilleur sous-tableau <b>linéaire</b> vaut <b>7</b> (tout le tableau) ; le meilleur sous-tableau <b>circulaire</b> vaut <b>10</b>, en recollant les deux 5 par les bords. Un dp sur les préfixes ne verra jamais 10 : la solution n'est pas un préfixe d'un suffixe. Le remède se dit en une phrase — <b>total − (somme minimale d'un sous-tableau)</b> — et il rend au problème son axe.</p>
+    <p><b>Ce que la sheet n'aborde pas.</b> La DP 2D (distance d'édition, sac à dos, grilles), la DP sur arbres, la DP à bitmask. On les <b>nomme</b> si la question tombe ; ici, un seul indice et un seul passage.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Définir le sous-problème <i>exactement</i> : le geste qui décide de tout <span class="tag tronc">tronc</span></h3>
+    <p>Deux définitions circulent sous le même nom, et elles ne se lisent pas au même endroit. <b>Sur le préfixe</b> : dp[<span class="m">i</span>] = la réponse sur <code>nums[0:i+1]</code>, l'élément <span class="m">i</span> pouvant être laissé. <b>Se terminant en <span class="m">i</span></b> : dp[<span class="m">i</span>] = la réponse parmi les solutions qui <b>utilisent</b> <span class="m">i</span>.</p>
+    <div class="eq">dp sur le préfixe &nbsp;⇒&nbsp; réponse = <b>dp[<span class="m">n</span>−1]</b> &nbsp;·&nbsp; dp « se terminant en <span class="m">i</span> » &nbsp;⇒&nbsp; réponse = <b>max<sub><span class="m">i</span></sub> dp[<span class="m">i</span>]</b></div>
+    <p>La seconde est souvent la seule qui donne une récurrence simple — c'est le cas de Kadane et de la sous-suite croissante. Elle se paie d'un <b>max final</b>, et c'est exactement ce max qu'on oublie.</p>
+    <p class="say">« Une solution se termine quelque part, donc fixer cette fin donne un sous-problème par position, donc la récurrence devient simple, donc la réponse n'est plus la dernière case mais le maximum sur toutes les cases. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les deux définitions sur le fil rouge, chiffrées</div>
+    <div class="defs">
+      <div class="pre"><b>dp sur le préfixe — celle de House Robber</b>dp[<span class="m">i</span>] = butin max sur <code>nums[0:i+1]</code> · <b>[2, 7, 11, 11, 12]</b> · réponse lue en <b>dp[4] = 12</b></div>
+      <div class="fin"><b>dp « se terminant en <span class="m">i</span> » — la même entrée</b>dp[<span class="m">i</span>] = butin max <b>en volant i</b> · <b>[2, 7, 11, 10, 12]</b> · réponse = max = <b>12</b>, atteint en <span class="m">i</span> = 4 <i>par coïncidence</i></div>
+    </div>
+    <p class="defsleg">Deux tables différentes, même réponse <b>ici</b> : c'est ce qui rend la confusion durable.</p>
+    <p><b>Le contre-exemple minimal.</b> Sur <code>[5, 1, 1, 0]</code>, la table « se terminant en <span class="m">i</span> » vaut <b>[5, 1, 6, 5]</b> : le maximum est <b>6</b> (voler 0 et 2), mais la <b>dernière case</b> vaut <b>5</b>. Lire dp[<span class="m">n</span>−1] au lieu du max rend <b>5</b> au lieu de <b>6</b> — un nombre plausible, sans la moindre exception.</p>
+    <p><b>Le test qui tranche, à se poser à voix haute.</b> « Est-ce que dp[<span class="m">i</span>] a le droit de <b>ne pas utiliser</b> l'élément <span class="m">i</span> ? » Oui ⇒ définition préfixe, la réponse est la dernière case. Non ⇒ définition « se terminant en <span class="m">i</span> », la réponse est un max. Il n'y a pas de troisième cas, et la question se pose <b>avant</b> d'écrire la récurrence.</p>
+    <p><b>Et « jusqu'à <span class="m">i</span> » ?</b> C'est la formule à bannir : elle ne dit ni si <span class="m">i</span> est inclus, ni s'il est utilisé. Deux lecteurs en tirent deux tables, deux cas de base, deux décalages d'indice — et le code tourne dans les deux cas.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>La récurrence est l'invariant ; cas de base, ordre de remplissage <span class="tag tronc">tronc</span></h3>
+    <p>Une fois dp[<span class="m">i</span>] défini, la récurrence s'obtient en énonçant le <b>choix</b> fait en <span class="m">i</span> et ce qu'il <b>interdit</b>. Voler la maison <span class="m">i</span> interdit la maison <span class="m">i</span> − 1, donc le reste du butin se lit en dp[<span class="m">i</span> − 2] :</p>
+    <div class="eq">dp[<span class="m">i</span>] = max( dp[<span class="m">i</span>−1] , dp[<span class="m">i</span>−2] + nums[<span class="m">i</span>] ) &nbsp;·&nbsp; dp[0] = nums[0] &nbsp;·&nbsp; dp[1] = max(nums[0], nums[1])</div>
+    <p>L'<b>ordre de remplissage</b> n'est pas une convention : dp[<span class="m">i</span>] lit dp[<span class="m">i</span>−1] et dp[<span class="m">i</span>−2], donc <span class="m">i</span> croissant. <b>Variant</b> : <span class="m">n</span> − <span class="m">i</span>. <b>Conclusion</b> : à <span class="m">i</span> = <span class="m">n</span> − 1, la tranche vaut le tableau entier.</p>
+    <p class="say">« Voler i interdit i − 1, donc le butin en volant i vaut dp[i−2] + nums[i], donc dp[i] est le max de ce butin et de dp[i−1], donc remplir dans l'ordre croissant tient l'invariant à chaque case et dp[n−1] est le butin maximal sur tout le tableau. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le squelette, puis l'invariant récité sur les cinq tours</div>
+    <div class="skel"><b>a, b = 0, 0</b>        # a = dp[i−2]
+                   # b = dp[i−1]
+<b>pour</b> v <b>dans</b> nums :
+    # dp[i] = max(laisser i, prendre i)
+    a, b = b, <b>max</b>(b, a + v)
+<b>retour</b> b</div>
+    <p><b>Quatre lignes de code, et deux portent l'idée</b> : <code>max(b, a + v)</code> est la récurrence, <code>a, b = b, …</code> est l'ordre de remplissage. Les cas de base ne sont pas écrits : <code>(0, 0)</code> les <b>produit</b> — au premier tour on obtient max(0, 0 + 2) = 2 = dp[0], au deuxième max(2, 0 + 7) = 7 = dp[1].</p>
+    <ul>
+      <li><b><span class="m">i</span> = 0, v = 2.</b> max(0, 0 + 2) = <b>2</b>. Butin max sur <code>[2]</code>. ✔</li>
+      <li><b><span class="m">i</span> = 1, v = 7.</b> max(2, 0 + 7) = <b>7</b> — on <b>abandonne</b> la maison 0. Butin max sur <code>[2, 7]</code>. ✔</li>
+      <li><b><span class="m">i</span> = 2, v = 9.</b> max(7, 2 + 9) = <b>11</b> — on vole, et la maison 0 revient dans la solution : {0, 2}.</li>
+      <li><b><span class="m">i</span> = 3, v = 3.</b> max(11, 7 + 3) = <b>11</b> — la table <b>stagne</b> : voler 3 rapporterait 10, moins que les 11 déjà acquis. La solution reste {0, 2}.</li>
+      <li><b><span class="m">i</span> = 4, v = 1.</b> max(11, 11 + 1) = <b>12</b> — on vole 1, qui ne coûte rien : la maison 3 n'était pas prise. Solution {0, 2, 4}.</li>
+      <li><b>Conclusion.</b> Variant nul <b>donc</b> la tranche vaut <code>nums</code> tout entier <b>donc</b> b = dp[4] = <b>12</b> est le butin maximal.</li>
+    </ul>
+    <p><b>Vérifié à l'exécution.</b> La table confrontée à l'énumération de <b>tous</b> les sous-ensembles sans deux adjacents, sur <b>20 000</b> tirages (longueurs 1 à 10, valeurs 0 à 20) : <b>0 désaccord</b>. Et sur chacun des cinq préfixes du fil rouge, la force brute rend le même optimum <i>et</i> le même jeu de maisons.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — les cinq tours de LC 198, la récurrence à chaque image</div>
+    <div id="f1trace" class="wide"></div>
+    <p class="cap"><code>nums = [2, 7, 9, 3, 1]</code>. Le fond <b>ambré</b> est un jeu de maisons <b>optimal pour le préfixe courant</b> — celui que la table représente, recalculé par force brute à chaque image. Fais « pas › » et regarde deux choses. D'abord ce que la récurrence <b>lit</b> : jamais plus que dp[<span class="m">i</span>−1] et dp[<span class="m">i</span>−2], jamais le tableau entier — c'est ce qui autorisera le roulement du pas 4. Ensuite l'image <b>4</b>, la seule qui prouve quelque chose : dp <b>stagne</b> à 11, donc la maison 3 est <b>refusée</b> ; le fond ambré ne bouge pas. Une table qui croît à chaque tour, ce serait une somme ; une table qui stagne, c'est un <b>choix</b>. Et note l'image <b>2</b> : la maison 0 <b>sort</b> de la solution, puis <b>revient</b> à l'image 3 — dp[<span class="m">i</span>] retient une valeur, pas un jeu de maisons, et c'est pour cela que reconstruire les choix demande de garder la table.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Le roulement : ne garder que ce que la récurrence lit</h3>
+    <p>La table entière n'a jamais été nécessaire : elle est un <b>artefact</b> de la façon dont on a écrit la récurrence. Si dp[<span class="m">i</span>] ne lit que <span class="m">k</span> termes précédents, <span class="m">k</span> variables suffisent — deux ici. La table ne redevient obligatoire que pour <b>reconstruire les choix</b>.</p>
+    <div class="eq">temps = états × transition = <span class="m">n</span> × O(1) = <b>O(<span class="m">n</span>)</b> &nbsp;·&nbsp; espace <b>O(1)</b> si la récurrence lit <span class="m">k</span> termes fixes, <b>O(<span class="m">n</span>)</b> si on reconstruit</div>
+    <p>Et l'autre moitié du gain se voit en face : la récursion nue recalcule les mêmes sous-problèmes en boucle. C'est le <b>chevauchement</b> (H3) que la table encaisse, pas la récurrence.</p>
+    <p class="say">« La récurrence ne lit que deux termes, donc deux variables portent tout l'état, donc l'espace tombe à O(1) — et si on me demande les maisons volées et pas seulement le butin, je garde la table et je remonte depuis la fin. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — mesuré, pas estimé</div>
+    <p><b>Ce que la mémorisation achète.</b> House Robber écrit en récursion nue, appels comptés : <b>287</b> appels à <span class="m">n</span> = 10, <b>35 421</b> à <span class="m">n</span> = 20, <b>392 835</b> à <span class="m">n</span> = 25, <b>4 356 617</b> à <span class="m">n</span> = 30 — contre <b>30 tours</b> en DP. Le rapport n'est pas un facteur, c'est un <b>changement de classe</b> : O(φ<sup><span class="m">n</span></sup>) contre O(<span class="m">n</span>).</p>
+    <p><b>Ce que le roulement achète.</b> <span class="m">n</span> = 10<sup>6</sup>, même entrée : roulement <b>0,08 s</b> et <b>deux entiers</b> ; table complète <b>0,12 s</b> et <b>8,0 Mo</b> de liste. Même réponse aux deux. Le gain en temps est marginal, le gain en espace est le seul qui se dit — et c'est celui qu'on demande en entretien.</p>
+    <p><b>Reconstruire les choix, quand on les veut.</b> On garde dp, on part de <span class="m">i</span> = <span class="m">n</span> − 1 et on remonte : si dp[<span class="m">i</span>] = dp[<span class="m">i</span>−1], la maison <span class="m">i</span> n'a pas été volée, on recule d'un cran ; sinon elle l'a été, on recule de <b>deux</b>. Sur le fil rouge : 12 ≠ 11 <b>donc</b> on prend 4 ; 11 = 11 <b>donc</b> on saute 3 ; 11 ≠ 7 <b>donc</b> on prend 2 ; puis 0. Jeu <b>{0, 2, 4}</b>, celui de la force brute.</p>
+    <p><b>La phrase qui rapporte des points.</b> « Je pars du tableau dp — c'est lui qui rend l'invariant lisible — puis je remarque que la récurrence ne lit que deux cases, donc je roule. » Annoncer O(1) d'emblée fait sauter l'étape où l'invariant se démontre.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Les variantes : même geste, une autre récurrence</h3>
+    <p>La charpente ne bouge pas — définir dp, écrire la récurrence, poser les cas de base, remplir dans l'ordre. Ce qui change est la <b>définition</b>, et elle commande tout le reste : où se lit la réponse, dans quel ordre on remplit, ce qu'on peut oublier.</p>
+    <div class="eq">Kadane : dp[<span class="m">i</span>] = max( nums[<span class="m">i</span>] , dp[<span class="m">i</span>−1] + nums[<span class="m">i</span>] ) &nbsp;·&nbsp; réponse = <b>max<sub><span class="m">i</span></sub> dp[<span class="m">i</span>]</b></div>
+    <p>Kadane <i>est</i> une DP, et c'est la seule façon de ne plus l'apprendre par cœur : dp[<span class="m">i</span>] est la meilleure somme <b>finissant en <span class="m">i</span></b>, le <code>max</code> intérieur décide de <b>repartir</b>, et le max extérieur est la réponse.</p>
+    <p class="say">« dp[i] est la meilleure somme finissant en i, donc soit on prolonge le sous-tableau précédent, soit on repart de i seul, donc on repart dès que dp[i−1] est négatif, donc la réponse est le maximum de la table et non sa dernière case. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — quatre variantes, chacune avec sa définition et ses chiffres</div>
+    <div class="defs">
+      <div class="fin"><b>Kadane — somme max d'un sous-tableau, LC 53</b>dp[<span class="m">i</span>] = meilleure somme <b>finissant en <span class="m">i</span></b> · <code>cur = max(x, cur + x)</code>, <code>best = max(best, cur)</code> · sur <code>[−2, 1, −3, 4, −1, 2, 1, −5, 4]</code> : <b>6</b>, sur <code>[4, −1, 2, 1]</code> · on repart aux indices <b>1</b> et <b>3</b> · O(<span class="m">n</span>) / O(1)</div>
+      <div class="pre"><b>Escalier — nombre de façons, LC 70</b>dp[<span class="m">i</span>] = nombre de façons d'atteindre la marche <span class="m">i</span> (<b>préfixe</b>) · dp[<span class="m">i</span>] = dp[<span class="m">i</span>−1] + dp[<span class="m">i</span>−2] · <span class="m">n</span> = 1…10 : <b>1, 2, 3, 5, 8, 13, 21, 34, 55, 89</b> — c'est <b>F(<span class="m">n</span>+1)</b>, un comptage et non un optimum · O(<span class="m">n</span>) / O(1)</div>
+      <div class="va"><b>Pièces, minimum — LC 322</b>dp[<span class="m">m</span>] = nombre minimal de pièces pour le <b>montant</b> <span class="m">m</span> · dp[<span class="m">m</span>] = 1 + min(dp[<span class="m">m</span> − <span class="m">c</span>]) · l'indice n'est plus une position mais un montant, donc l'ordre de remplissage est <b>croissant en montant</b> · pièces <code>[1, 3, 4]</code>, montant 6 : dp = <b>[0, 1, 2, 1, 1, 2, 2]</b>, réponse <b>2</b> (3 + 3) · O(<span class="m">m</span> × |<span class="m">c</span>|)</div>
+      <div class="fin"><b>Plus longue sous-suite croissante — LC 300</b>dp[<span class="m">i</span>] = longueur max d'une sous-suite croissante <b>finissant en <span class="m">i</span></b> · dp[<span class="m">i</span>] = 1 + max(dp[<span class="m">j</span>] : <span class="m">j</span> &lt; <span class="m">i</span>, a[<span class="m">j</span>] &lt; a[<span class="m">i</span>]) · sur <code>[10, 9, 2, 5, 3, 7, 101, 18]</code> : dp = <b>[1, 1, 1, 2, 2, 3, 4, 4]</b>, réponse <b>4</b> sur <code>[2, 5, 7, 101]</code> · <b>O(<span class="m">n</span>²)</b> : la transition coûte O(<span class="m">n</span>)</div>
+    </div>
+    <p class="defsleg"><b>Deux tables « finissant en <span class="m">i</span> » sur quatre</b> — donc deux max finaux à ne pas oublier. Et la LIS en O(<span class="m">n</span> log <span class="m">n</span>) n'est plus une DP : c'est un tableau de queues maintenu trié, dans lequel on fait une <a href="coding-03-binary-search.html#s7">recherche dichotomique</a>.</p>
+    <p><b>Le glouton ne remplace pas la DP.</b> Sur les pièces <code>[1, 3, 4]</code> et le montant 6, le glouton prend la plus grosse pièce d'abord : 4 + 1 + 1 = <b>3</b> pièces. La DP en trouve <b>2</b> : 3 + 3. Le glouton rend un nombre valide, jamais une erreur — c'est le même mode de panne qu'au pas 6.</p>
+    <p><b>L'impossible se marque, il ne se devine pas.</b> Pièces <code>[2]</code>, montant 3 : dp = <b>[0, +∞, 1, +∞]</b>, donc <b>−1</b>. Sans le <b>+∞</b>, un <code>min</code> sur une liste vide lève un <code>ValueError</code> — et un 0 par défaut, lui, ne lève rien et prétend que 3 se paie sans pièce.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — Kadane, ou pourquoi « repartir » est un <code>max</code> et pas une astuce</div>
+    <div id="f2trace" class="wide"></div>
+    <p class="cap"><code>nums = [−2, 1, −3, 4, −1, 2, 1, −5, 4]</code>. Le cadre <b>vert</b> est le sous-tableau courant — celui dont <code>cur</code> est la somme ; le fond <b>ambré</b> est le meilleur sous-tableau enregistré jusqu'ici. Fais « pas › » et regarde le cadre vert : il ne fait que deux choses, <b>s'allonger d'une case</b> ou <b>repartir à un</b>. Les deux images qui comptent sont la <b>2</b> et la <b>4</b>, les seules où il repart : à chaque fois <code>cur</code> était <b>négatif</b>, donc le traîner coûterait plus qu'il ne rapporte — c'est tout le contenu de <code>max(x, cur + x)</code>. Puis regarde la <b>fin</b> : à la dernière image <code>cur</code> vaut <b>5</b> et <code>best</code> vaut <b>6</b>. La table « finissant en <span class="m">i</span> » ne met pas sa réponse dans la dernière case, et retourner <code>cur</code> rendrait ici 5 au lieu de 6 — sans erreur, sans ralentissement, sans avertissement.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>La DP casse par le haut, sur la <b>définition</b>. Un dp[<span class="m">i</span>] flou — « la réponse jusqu'à <span class="m">i</span> » — se traduit malgré tout en une récurrence, des cas de base et une boucle qui tourne. Rien ne plante, rien ne ralentit : il sort un nombre du bon ordre de grandeur, et il est faux.</p>
+    <div class="eq">définition floue &nbsp;⇒&nbsp; récurrence fausse ou réponse lue au mauvais endroit &nbsp;⇒&nbsp; nombre plausible, <b>zéro exception</b></div>
+    <p>C'est le mode de panne le plus coûteux de toute la série : un test sur l'exemple de l'énoncé passe souvent, et l'erreur n'apparaît que sur une entrée qu'on n'a pas pensé à construire.</p>
+    <p class="say">« Le code tourne et rend un nombre, donc rien ne signale l'erreur, donc le seul garde-fou est d'énoncer dp[i] avec le mot “exactement” et de dire où se lit la réponse, donc je fais les deux à voix haute avant d'écrire la boucle. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Les trois pannes silencieuses, à sortir de mémoire</div>
+    <p><b>Le max final oublié.</b> Kadane sur le fil rouge de la figure 2 : retourner <code>cur</code> au lieu de <code>best</code> rend <b>5</b> au lieu de <b>6</b>. Sur <b>20 000</b> tirages aléatoires (longueurs 1 à 9, valeurs −9 à 9), <code>cur</code> et <code>best</code> diffèrent dans <b>51,1 %</b> des cas : ce n'est pas un cas limite, c'est plus d'une entrée sur deux.</p>
+    <p><b>La dernière case lue au lieu du max.</b> House Robber avec une table « <b>se terminant en <span class="m">i</span></b> » sur <code>[5, 1, 1, 0]</code> : dp = <b>[5, 1, 6, 5]</b>. Le maximum vaut <b>6</b>, la dernière case <b>5</b>. Même famille que la précédente, même absence d'erreur — et sur le fil rouge <code>[2, 7, 9, 3, 1]</code> les deux lectures donnent 12, donc l'exemple de l'énoncé ne l'aurait pas attrapé.</p>
+    <p><b>L'ordre de remplissage inversé.</b> Pièces <code>[1, 3, 4]</code>, montant 6, montants parcourus en <b>décroissant</b> : dp = <b>[0, 1, +∞, 1, 1, +∞, +∞]</b>. La fonction répond <b>« impossible »</b> pour 6, dont la vraie réponse est 2 — et « impossible » est une réponse que l'énoncé prévoit, donc elle ne choque personne. La règle : <b>remplir dans l'ordre des dépendances</b>, et dp[<span class="m">m</span>] dépend de dp[<span class="m">m</span> − <span class="m">c</span>], qui est <b>plus petit</b>.</p>
+    <p><b>La phrase qui tue.</b> « Je dis dp[<span class="m">i</span>] en entier, avec “exactement”, et je dis <b>où se lit la réponse</b> — dernière case ou maximum. Si je ne peux pas dire les deux, je n'écris pas encore la récurrence. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Pièges Python — quatre lignes qui ont l'air justes</div>
+    <ul>
+      <li><b>Le roulement écrit en deux affectations.</b> <code>a = b</code> puis <code>b = max(b, a + v)</code> : <code>a</code> est écrasé <b>avant</b> d'être lu, donc on additionne deux voisines. Sur le fil rouge, <b>22</b> au lieu de <b>12</b> — vérifié. Et 22 &gt; 12 : le bug rend un butin <i>meilleur</i>, ce qui n'éveille aucun soupçon. Remède : <code>a, b = b, max(b, a + v)</code>, <b>une seule</b> affectation, le membre de droite entièrement évalué d'abord.</li>
+      <li><b>Les cas de base bricolés.</b> Deux écoles, et une seule à choisir : soit <code>dp[0]</code> et <code>dp[1]</code> écrits à la main — et alors <code>nums</code> de longueur 1 lève un <code>IndexError</code> — soit le roulement initialisé à <code>(0, 0)</code>, qui <b>produit</b> les deux premiers tours (max(0, 0 + 2) = 2, puis max(2, 0 + 7) = 7) et traite la longueur 1 sans cas particulier. Vérifié : les deux donnent <b>[2, 7, 11, 11, 12]</b>.</li>
+      <li><b><code>best = 0</code> pour Kadane.</b> Faux dès que tout est négatif : <code>[−3, −1, −2]</code> rend <b>0</b> au lieu de <b>−1</b>, un sous-tableau vide n'étant pas un sous-tableau. Sur <b>20 000</b> tirages, l'initialisation à 0 est fausse dans <b>9,9 %</b> des cas. Remède : <code>cur = best = nums[0]</code>, puis la boucle à partir de l'indice 1.</li>
+      <li><b>Le <code>+∞</code> des pièces.</b> <code>float('inf')</code> pour les montants inatteignables, et la conversion en <code>−1</code> <b>à la sortie</b> — pas pendant. Initialiser à 0 fait croire que tout montant se paie sans pièce ; un <code>min()</code> sur un générateur vide lève un <code>ValueError</code> ; et <code>dp[m − c] + 1</code> sur <code>inf</code> vaut <code>inf</code>, ce qui est exactement le comportement voulu.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li><b>Signal</b> : une réponse sur un <b>préfixe</b> déduite des préfixes plus courts, et un <b>choix</b> par position. Contre-signal : le sous-problème dépend de tout le futur (circulaire), ou l'état demande deux indices (DP 2D).</li>
+    <li><b>Le geste</b> : définir dp[<span class="m">i</span>] <b>exactement</b>. « Sur le préfixe [0:<span class="m">i</span>+1] » ⇒ réponse = dp[<span class="m">n</span>−1] · « se terminant en <span class="m">i</span> » ⇒ réponse = <b>max<sub><span class="m">i</span></sub> dp[<span class="m">i</span>]</b>. Le test : dp[<span class="m">i</span>] a-t-il le droit de <b>ne pas utiliser</b> <span class="m">i</span> ?</li>
+    <li><b>La récurrence est l'invariant</b> : on énonce le choix fait en <span class="m">i</span> et ce qu'il interdit. House Robber : dp[<span class="m">i</span>] = max(dp[<span class="m">i</span>−1], dp[<span class="m">i</span>−2] + nums[<span class="m">i</span>]). <b>Variant</b> : <span class="m">n</span> − <span class="m">i</span>.</li>
+    <li><b>Cas de base et ordre de remplissage</b> : on remplit dans l'ordre des <b>dépendances</b>. Pour les pièces c'est le montant croissant — à l'envers, dp[6] sort « impossible » au lieu de 2.</li>
+    <li><b>Roulement</b> : la récurrence ne lit que deux termes ⇒ deux variables, espace <b>O(1)</b>, temps O(<span class="m">n</span>). La table complète ne sert qu'à <b>reconstruire les choix</b> ({0, 2, 4} sur le fil rouge).</li>
+    <li><b>Variantes</b> : Kadane = dp « finissant en <span class="m">i</span> » + <b>max final</b> (6 sur le fil rouge) · escalier = Fibonacci (89 pour 10 marches) · pièces = min + <b>+∞</b> + ordre croissant · LIS = O(<span class="m">n</span>²), et sa version O(<span class="m">n</span> log <span class="m">n</span>) est une dichotomie.</li>
+    <li><b>Où ça casse</b> : la définition floue. Kadane sans max final rend <b>5</b> au lieu de 6 (et diffère dans <b>51,1 %</b> des tirages) ; la table « finissant en <span class="m">i</span> » lue en dernière case rend <b>5</b> au lieu de 6 sur <code>[5, 1, 1, 0]</code> — sans aucune erreur.</li>
+  </ol>
+</div>
+<div class="phrase">« Je définis dp[<span class="m">i</span>] exactement — sur le préfixe ou se terminant en <span class="m">i</span> — j'écris la récurrence, qui est mon invariant, je pose les cas de base et je remplis dans l'ordre des dépendances. Si la récurrence ne lit que deux termes, je roule en O(1). Kadane, c'est dp “se terminant en <span class="m">i</span>” avec un max final : on repart quand le passé pèse. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Comment définis-tu dp[<span class="m">i</span>], et pourquoi la précision compte-t-elle ?</div><div class="a hid">Deux définitions et pas une : dp[i] = la réponse sur le préfixe nums[0:i+1], où i a le droit de ne pas être utilisé ; ou dp[i] = la réponse parmi les solutions qui utilisent i, « se terminant en i ». La première se lit en dp[n−1], la seconde exige un max sur tous les i. Le test qui tranche : est-ce que dp[i] a le droit de ne pas utiliser l'élément i ? « La réponse jusqu'à i » ne dit ni l'un ni l'autre, et le code tourne quand même — c'est de là que vient la faute.</div></li>
+    <li><div class="q">La récurrence de House Robber, et son invariant ?</div><div class="a hid">dp[i] = max(dp[i−1], dp[i−2] + nums[i]) : voler i interdit i−1, donc ce qui reste se lit deux cases plus tôt. L'invariant est la récurrence elle-même : après le tour i, b = dp[i] = le butin maximal sur nums[0:i+1] exactement, et a = dp[i−1]. Cas de base dp[0] = nums[0], dp[1] = max(nums[0], nums[1]) — ou le roulement à (0, 0), qui les produit. Variant n − i. Conclusion : à i = n−1, b est le butin maximal sur tout le tableau. Sur [2, 7, 9, 3, 1] : 2, 7, 11, 11, 12.</div></li>
+    <li><div class="q">Quand roule-t-on en O(1), et quand ne le peut-on pas ?</div><div class="a hid">Dès que la récurrence ne lit qu'un nombre fixe de termes précédents : deux ici, donc deux variables, a, b = b, max(b, a + v) en une seule affectation. Temps O(n) — n états × transition O(1) — et espace O(1). On ne le peut pas si on veut reconstruire les choix : il faut alors garder la table et remonter depuis la fin, en comparant dp[i] à dp[i−1]. Sur le fil rouge ça rend {0, 2, 4}. Mesuré à n = 10⁶ : 8,0 Mo de table contre deux entiers, pour la même réponse.</div></li>
+    <li><div class="q">Kadane : que vaut dp[<span class="m">i</span>], et d'où vient la réponse ?</div><div class="a hid">dp[i] est la meilleure somme d'un sous-tableau finissant en i : soit on prolonge le précédent, soit on repart de i tout seul, donc cur = max(x, cur + x). On repart exactement quand cur est négatif — le passé pèse plus qu'il ne rapporte. La réponse n'est pas dp[n−1] mais le maximum de la table, d'où best = max(best, cur) à chaque tour. Sur [−2, 1, −3, 4, −1, 2, 1, −5, 4] : 6, sur [4, −1, 2, 1] ; à la fin cur vaut 5 et best vaut 6.</div></li>
+    <li><div class="q">Qu'est-ce qui casse sans lever d'erreur ?</div><div class="a hid">Tout ce qui touche à la définition. Kadane sans le max final rend 5 au lieu de 6 sur le fil rouge, et diffère dans 51,1 % des tirages aléatoires. Une table « se terminant en i » lue en dernière case rend 5 au lieu de 6 sur [5, 1, 1, 0]. Les pièces remplies en montant décroissant rendent « impossible » pour un montant qui coûte 2 pièces. Et le roulement écrit en deux affectations rend 22 au lieu de 12 — un butin plus grand que le vrai, donc invisible. Dans les quatre cas : un nombre plausible, aucune exception, aucun ralentissement.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Où ce mécanisme se rejoue</div>
+  <div class="bridges">
+    <a href="coding-00-tap-invariant-variant.html#s2"><b>c00 · L'invariant</b><small>le cas où l'invariant <i>est</i> le code : « dp[i] = la réponse sur nums[0:i+1] exactement » n'est pas un commentaire au-dessus de la boucle, c'est la définition dont la récurrence se déduit</small></a>
+    <a href="coding-00-tap-invariant-variant.html#s5"><b>c00 · La complexité composée</b><small>le cas produit : états × transition. n × O(1) pour House Robber, n × O(n) pour la LIS — le même tableau, deux classes de coût, et c'est la transition qui décide</small></a>
+    <a href="coding-08-intervals.html#s2"><b>c08 · Le dernier fusionné</b><small>le balayage à mémoire bornée : là ce qu'on retient d'une position est une <i>borne</i>, ici c'est la <i>valeur d'un sous-problème</i>. Même économie — oublier le passé — et dans les deux cas c'est une propriété démontrée qui l'autorise</small></a>
+    <a href="coding-01-fenetre-glissante.html#s3"><b>c01 · L'invariant exact</b><small>l'autre sheet où le mot « exactement » fait tout le travail : une tranche [l:r+1) mal bornée et une définition de dp floue cassent de la même façon, en rendant un nombre au lieu d'une erreur</small></a>
+    <a href="coding-03-binary-search.html#s7"><b>c03 · Chercher sur la réponse</b><small>la LIS en O(n log n) sort de la DP : on maintient un tableau de queues trié et on y fait une dichotomie. C'est le pont qui explique pourquoi le O(n²) reste la bonne première réponse en entretien</small></a>
+    <a href="../../map.html#c10"><b>c10 · Préfixes et deque monotone</b><small>la suite : quand la récurrence ne suffit plus et qu'il faut une structure pour tenir les candidats — sommes préfixes et dictionnaire, ou deque décroissante</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>coding::dp</code> (les deux définitions de dp[<span class="m">i</span>] et le test qui tranche, la récurrence de LC 198, cas de base et ordre de remplissage, le roulement à deux variables, la reconstruction des choix) · <code>coding::kadane</code> (<code>cur = max(x, cur + x)</code>, pourquoi on repart, le max final, <code>best = nums[0]</code> et jamais 0) · <code>coding::recurrence</code> (écrire la récurrence en énonçant le choix et ce qu'il interdit ; remplir dans l'ordre des dépendances ; escalier, pièces, LIS et leurs définitions respectives).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>coding c09 · v1 du 17/09/2026 · Prérequis : <a href="coding-00-tap-invariant-variant.html">c00 · Le TAP</a>. Suite : <a href="../../map.html#c10">c10 · Préfixes et deque monotone</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== Figure 1 : House Robber, LC 198, nums = [2, 7, 9, 3, 1] =====
+   Cinq images, une par tour. `mark` n'est PAS déduit de la table — dp[i] ne retient qu'une
+   valeur — mais recalculé par force brute sur chaque préfixe : c'est justement ce que la
+   légende fait remarquer (la maison 0 sort à l'image 2, revient à l'image 3).
+   dp = [2, 7, 11, 11, 12] ; après le tour i, b = dp[i] et a = dp[i−1]. */
+SL.trace(document.getElementById('f1trace'),{arr:[2, 7, 9, 3, 1],ms:1300,frames:[
+  {"ptr": {"▲ i": 0}, "mark": [0], "note": "i = 0, v = 2 · max(0, 0 + 2) = 2. Le roulement produit le cas de base, sans le coder.", "inv": "b = dp[0] = butin max sur nums[0:1] = 2  ·  a = 0"},
+  {"ptr": {"▲ i": 1}, "mark": [1], "note": "i = 1, v = 7 · max(2, 0 + 7) = 7 : on abandonne la maison 0.", "inv": "b = dp[1] = butin max sur nums[0:2] = 7  ·  a = dp[0] = 2"},
+  {"ptr": {"▲ i": 2}, "mark": [0, 2], "note": "i = 2, v = 9 · max(7, 2 + 9) = 11 : on vole, et la maison 0 revient dans la solution.", "inv": "b = dp[2] = butin max sur nums[0:3] = 11  ·  a = dp[1] = 7"},
+  {"ptr": {"▲ i": 3}, "mark": [0, 2], "note": "i = 3, v = 3 · max(11, 7 + 3) = 11 : la table stagne, la maison 3 est refusée.", "inv": "b = dp[3] = butin max sur nums[0:4] = 11  ·  a = dp[2] = 11"},
+  {"ptr": {"▲ i": 4}, "mark": [0, 2, 4], "note": "i = 4, v = 1 · max(11, 11 + 1) = 12 : on vole 1, puisque la maison 3 n'était pas prise.", "inv": "b = dp[4] = butin max sur nums[0:5] = 12  ·  a = dp[3] = 11"}
+]});
+
+/* ===== Figure 2 : Kadane, LC 53, nums = [−2, 1, −3, 4, −1, 2, 1, −5, 4] =====
+   Neuf images, une par tour. `win` = le sous-tableau courant (celui dont cur est la somme),
+   il repart aux images 2 et 4 ; `mark` = le meilleur sous-tableau enregistré.
+   cur = −2, 1, −2, 4, 3, 5, 6, 1, 5 ; best = −2, 1, 1, 4, 4, 5, 6, 6, 6. */
+SL.trace(document.getElementById('f2trace'),{arr:["−2", "1", "−3", "4", "−1", "2", "1", "−5", "4"],ms:1200,frames:[
+  {"ptr": {"▲ i": 0}, "win": [0, 1], "mark": [0], "note": "i = 0, v = −2 · cur = best = −2. La table démarre sur nums[0], jamais sur 0.", "inv": "cur = dp[0] = meilleure somme finissant en 0 = −2  ·  best = −2"},
+  {"ptr": {"▲ i": 1}, "win": [1, 2], "mark": [1], "note": "i = 1, v = 1 · cur = max(1, −2 + 1) = 1 : ON REPART, le passé était négatif.", "inv": "cur = dp[1] = meilleure somme finissant en 1 = 1  ·  best = 1"},
+  {"ptr": {"▲ i": 2}, "win": [1, 3], "mark": [1], "note": "i = 2, v = −3 · cur = max(−3, 1 − 3) = −2 : on prolonge, et cur passe sous zéro.", "inv": "cur = dp[2] = meilleure somme finissant en 2 = −2  ·  best = 1"},
+  {"ptr": {"▲ i": 3}, "win": [3, 4], "mark": [3], "note": "i = 3, v = 4 · cur = max(4, −2 + 4) = 4 : ON REPART. Traîner −2 coûterait plus que de repartir.", "inv": "cur = dp[3] = meilleure somme finissant en 3 = 4  ·  best = 4"},
+  {"ptr": {"▲ i": 4}, "win": [3, 5], "mark": [3], "note": "i = 4, v = −1 · cur = max(−1, 4 − 1) = 3 : on prolonge, cur reste positif.", "inv": "cur = dp[4] = meilleure somme finissant en 4 = 3  ·  best = 4"},
+  {"ptr": {"▲ i": 5}, "win": [3, 6], "mark": [3, 4, 5], "note": "i = 5, v = 2 · cur = max(2, 3 + 2) = 5 : record, best = 5.", "inv": "cur = dp[5] = meilleure somme finissant en 5 = 5  ·  best = 5"},
+  {"ptr": {"▲ i": 6}, "win": [3, 7], "mark": [3, 4, 5, 6], "note": "i = 6, v = 1 · cur = max(1, 5 + 1) = 6 : record, best = 6 sur [4, −1, 2, 1].", "inv": "cur = dp[6] = meilleure somme finissant en 6 = 6  ·  best = 6"},
+  {"ptr": {"▲ i": 7}, "win": [3, 8], "mark": [3, 4, 5, 6], "note": "i = 7, v = −5 · cur = max(−5, 6 − 5) = 1 : on prolonge, best ne bouge plus.", "inv": "cur = dp[7] = meilleure somme finissant en 7 = 1  ·  best = 6"},
+  {"ptr": {"▲ i": 8}, "win": [3, 9], "mark": [3, 4, 5, 6], "note": "i = 8, v = 4 · cur = max(4, 1 + 4) = 5. Fin : cur = 5, best = 6 — la réponse n'est pas la dernière case.", "inv": "cur = dp[8] = meilleure somme finissant en 8 = 5  ·  best = max sur tous les i = 6"}
+]});
+})();
+</script>
+</body>
+</html>
