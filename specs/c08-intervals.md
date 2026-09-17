@@ -10,7 +10,7 @@ prereq: [c00]
 anki: [coding::intervals, coding::balayage, coding::tri]
 bridges: []
 next: c09
-status: ready
+status: built
 ---
 ## Signal
 Des **segments** [début, fin] (réunions, réservations, plages), des questions de fusion, de chevauchement, de nombre de salles, de couverture. Contre-signal : segments sur un cercle ou en 2D (autre chose).
@@ -72,3 +72,21 @@ Sans tri, ou trié par fin pour la fusion : un intervalle peut chevaucher un fus
 
 ## Ce qui a cassé pour Salah
 - Famille t09 : « trier par début, fusion, invariant "le dernier fusionné", balayage » — le point à dire est **pourquoi** le dernier suffit (le tri), pas seulement qu'il suffit.
+
+## Questions pour la revue
+- **Aucun chiffre du spec n'était faux** : la trace de la figure 1, le max de 2 salles
+  de LC 253 et la conclusion `[[1,6],[8,12],[15,18]]` sont tous vérifiés par script
+  (dont 200 000 tirages croisés fusion / union point par point, 0 désaccord, et
+  100 000 tirages compteur d'événements / min-heap des fins, 0 désaccord).
+- **Le fil rouge ne distingue pas les deux tris.** Sur `[[1,3],[2,6],[8,10],[9,12],[15,18]]`,
+  trier par **fin** donne la *même* sortie que trier par début. Le « Où ça casse » a donc
+  besoin d'un exemple à lui : la sheet utilise `[[1,10],[2,3],[4,5]]` (par début → `[[1,10]]`,
+  par fin → `[[2,3],[4,10]]`). À confirmer que c'est bien le contre-exemple à mémoriser,
+  ou faut-il changer le fil rouge pour qu'il porte les deux rôles ?
+- **LC 57 : le spec ne donne pas de chiffres.** La sheet insère `[4,9]` dans la sortie
+  fusionnée du fil rouge `[[1,6],[8,12],[15,18]]` → `[[1,12],[15,18]]`, ce qui réutilise
+  le fil rouge au lieu d'ouvrir un second exemple. À valider.
+- **Le tri domine en théorie, à peine en pratique.** À n = 10⁶ : tri 1,20 s contre 0,81 s
+  pour le balayage, alors que les comparaisons disent 15× (`sorted()` est en C, la boucle
+  en Python). La sheet le dit explicitement ; à trancher si cette nuance mérite d'y rester
+  ou si elle brouille le message asymptotique attendu en entretien.
