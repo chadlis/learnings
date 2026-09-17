@@ -10,7 +10,7 @@ prereq: [p02-02, p06-01, p06-02, p03-01]
 anki: [ml::ridge, ml::lasso, ml::regularisation, ml::biais-variance]
 bridges: [b03, b05]
 next: p06-01
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -82,3 +82,35 @@ Cas orthonormé (XᵀX = I, une coordonnée) : β̂_OLS ~ N(β, σ²) ; ridge β
 
 ## Exclusions
 Pas de best subset / forward stepwise au-delà d'une phrase, pas de dérivation générale de la variance de ridge (le cas orthonormé suffit), pas de group lasso.
+
+## Questions pour la revue
+
+Construction de la sheet du 17/09. Tous les chiffres du bloc « Exemple fil rouge »
+ont été revérifiés par script (minimisation numérique du MSE sur 300 001 points,
+argmin du critère L1 sur 400 001 points) : **aucun n'est faux**. MSE(0) = 0,500 ;
+MSE(0,25) = 0,360 ; MSE(0,5) = 0,333 (minimum, atteint exactement en σ²/β²) ;
+MSE(1) = 0,375 ; dérivée du MSE en λ = 0 égale à −2σ² ; seuillage doux
+max(0, |β̂| − λ/2) conforme à la convention du dépôt. Rien n'a été corrigé.
+
+Trois points restent à trancher :
+
+1. **Figure 2, composition du jeu.** Le spec demande « 6 colonnes (2 fortes,
+   2 faibles, 2 nulles, 2 corrélées) » — quatre rôles pour six colonnes. J'ai lu
+   « les deux fortes *sont* les deux corrélées », seule lecture qui tienne en six
+   colonnes et qui serve la légende (« les deux corrélées se partagent ou se
+   disputent »). Jeu effectivement construit : n = 50, x₁ et x₂ corrélées à 0,94
+   et de vrai β = 1,5 chacune, x₃ = 0,5, x₄ = −0,4, x₅ = x₆ = 0, σ = 1,5. Si la
+   lecture voulue était 8 colonnes, la figure est à refaire.
+
+2. **ISLR Credit remplacé.** Le spec donne l'exemple Credit en *qualitatif*
+   (« les coefficients de income, limit, rating se compensent »). Une sheet ne
+   pouvant pas embarquer le jeu Credit, j'ai construit un jeu synthétique qui
+   produit exactement le phénomène décrit — OLS donne 0,735 et 2,663 pour deux
+   vrais coefficients égaux à 1,5, somme bien estimée (3,40 pour 3,00),
+   répartition du bruit pur — et tous les chiffres de la sheet en sortent.
+   Credit n'est plus mentionné.
+
+3. **Grille de λ de la figure 3.** Le spec prescrit 10⁻³ à 10³ ; la figure
+   calcule sur 10⁻¹ à 10³ et n'affiche que 10⁻¹ à 10^1,6. En deçà de 10⁻¹ la
+   courbe est plate (l'OLS est atteint) et en deçà du minimum la règle 1 SE ne
+   change pas. Le texte du pas 7 prescrit toujours 10⁻³ à 10³.

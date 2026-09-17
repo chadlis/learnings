@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Régularisation vue en biais-variance, le chemin de λ — chaîne</title>
+<meta name="sheet" content="series=chain;part=05;number=03;status=v1">
+<meta name="part" content="05 · Modèles linéaires">
+<meta name="subtitle" content="rétrécir les coefficients échange un biais contre de la variance ; λ se lit sur une courbe en U">
+<meta name="prereq" content="p02-02,p06-01,p06-02,p03-01">
+<meta name="anki" content="ml::ridge,ml::lasso,ml::regularisation,ml::biais-variance">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 05 · Modèles linéaires › chaîne 03</div>
+  <h1>Régularisation vue en <span>biais-variance</span> — le chemin de <span>λ</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Le fil B dit <i>d'où vient</i> <span class="m">λ</span>‖<span class="m">β</span>‖² (un prior) et <i>ce qu'il fournit</i> (existence, unicité). Cette chaîne dit ce qu'il <b>coûte et rapporte en erreur de prédiction</b> : rétrécir les coefficients achète de la variance au prix d'un biais, et l'échange est gagnant sur une plage de <span class="m">λ</span> qui n'est jamais vide. Fil rouge : le cas orthonormé à une coordonnée, calculé à la main, puis un jeu de 50 lignes et 6 colonnes dont deux corrélées à 0,94.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="chain-p02-02-prior-penalite.html#s4">p02-02 · Prior et pénalité</a></li>
+    <li><a href="chain-p06-01-biais-variance.html#s3">p06-01 · Biais-variance</a></li>
+    <li><a href="chain-p06-02-cv-leakage.html#s6">p06-02 · CV et fuites</a></li>
+    <li><a href="chain-p03-01-critere-escalier-vs-sensible.html#s8">p03-01 · Escalier vs sensible</a></li>
+    <li><a href="chain-p05-01-regression-modele-ols.html">p05-01 · Régression linéaire, OLS</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>ml::ridge</code><code>ml::lasso</code><code>ml::regularisation</code><code>ml::biais-variance</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-03-biais-variance-partout.html">Biais-variance partout</a></li>
+    <li><a href="../bridges/bridge-05-escalier-vs-sensible.html">Escalier vs sensible</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>D'où vient la pénalité.</b> Ridge = prior gaussien <span class="m">N</span>(0, <span class="m">τ</span>²), lasso = prior de Laplace ; <span class="m">λ</span> = <span class="m">σ</span>²/<span class="m">τ</span>². Ajouter <span class="m">λ</span><span class="up">I</span> translate le spectre de <span class="m">X</span><sup>⊤</sup><span class="m">X</span> sans rien annuler, donc rend le minimum existant et unique même si <span class="m">p</span> &gt; <span class="m">n</span> (<a href="chain-p02-02-prior-penalite.html#s4">p02-02, pas 4 et 5</a>). Ici on ne redérive rien de cela : on en mesure le <b>prix</b>.</li>
+      <li><b>Erreur = biais² + variance + <span class="m">σ</span>².</b> L'erreur de prédiction en un point se découpe en trois termes dont un seul, <span class="m">σ</span>², est irréductible (<a href="chain-p06-01-biais-variance.html#s3">p06-01, pas 3</a>). Le biais vient de la rigidité, la variance de la sensibilité au tirage du dataset.</li>
+      <li><b>Choisir sur des données non vues.</b> <span class="m">k</span>-fold, et tout ce qui est appris sur les données — standardisation comprise — se refait <b>dans chaque pli</b> (<a href="chain-p06-02-cv-leakage.html#s6">p06-02, pas 6</a>).</li>
+      <li><b>L1 met des zéros exacts.</b> La pente de |<span class="m">θ</span>| est constante jusqu'à 0, celle de <span class="m">θ</span>² s'évanouit : le coude de |<span class="m">θ</span>| est un mur des deux côtés, de force <span class="m">λ</span> (<a href="chain-p03-01-critere-escalier-vs-sensible.html#s8">p03-01, pas 8</a>).</li>
+      <li><b>Convention.</b> L'objectif s'écrit ‖<span class="m">y</span> − <span class="m">X</span><span class="m">β</span>‖² + <span class="m">λ</span>·pen(<span class="m">β</span>), loss <b>sans</b> facteur ½. Un ½ déplacerait tous les seuils en <span class="m">λ</span> d'un facteur 2 sans changer le mécanisme.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>Modèle <b>linéaire</b> (<a href="chain-p05-01-regression-modele-ols.html">p05-01</a>) à <span class="m">p</span> colonnes, éventuellement <span class="m">p</span> &gt; <span class="m">n</span> ou fortement colinéaires. C'est le cas où l'OLS est légal mais inutilisable.</span>
+      <b>H2</b><span>Colonnes <b>standardisées</b> (moyenne 0, écart-type 1). Sans cela <span class="m">λ</span> pénalise les <i>unités</i> : une colonne en centimes et la même en euros ne reçoivent pas le même rétrécissement.</span>
+      <b>H3</b><span>Intercept <b>non pénalisé</b> — en pratique on centre <span class="m">y</span> et on l'estime à part. Le pénaliser biaiserait le niveau moyen sans aucune raison.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor : sans biais et inutilisable</h3>
+    <p>Sans pénalité, <span class="hat"><span class="m">β</span></span><sub>OLS</sub> est <b>sans biais</b> : en moyenne sur les tirages du dataset, il vise juste. Rien dans cette propriété ne borne l'écart d'un tirage <i>particulier</i>.</p>
+    <p>Sa variance vaut <span class="m">σ</span>²(<span class="m">X</span><sup>⊤</sup><span class="m">X</span>)<sup>−1</sup> : elle explose dès qu'une direction de <span class="m">X</span> est plate — colinéarité, <span class="m">p</span> proche de <span class="m">n</span>.</p>
+    <p class="say">« L'OLS est sans biais, donc il vise juste en moyenne sur les tirages, donc rien ne borne l'écart d'un tirage donné, donc deux colonnes corrélées reçoivent des coefficients déséquilibrés dont seule la somme est bien estimée. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le jeu fil rouge</div>
+    <p><span class="m">n</span> = 50, <span class="m">p</span> = 6, colonnes standardisées, <span class="m">y</span> centré. Vrais coefficients <span class="m">β</span> = (1,5 ; 1,5 ; 0,5 ; −0,4 ; 0 ; 0), bruit <span class="m">σ</span> = 1,5. Les colonnes <span class="m">x</span><sub>1</sub> et <span class="m">x</span><sub>2</sub> sont <b>corrélées à 0,94</b> et portent le même signal.</p>
+    <table>
+      <tr><th>colonne</th><th>vrai <span class="m">β</span></th><th>OLS <span class="hat"><span class="m">β</span></span></th><th>écart-type</th></tr>
+      <tr class="hl"><td><span class="m">x</span><sub>1</sub> &nbsp;corrélée</td><td>1,5</td><td><b>0,735</b></td><td>0,63</td></tr>
+      <tr class="hl"><td><span class="m">x</span><sub>2</sub> &nbsp;corrélée</td><td>1,5</td><td><b>2,663</b></td><td>0,63</td></tr>
+      <tr><td><span class="m">x</span><sub>3</sub></td><td>0,5</td><td>0,300</td><td>0,22</td></tr>
+      <tr><td><span class="m">x</span><sub>4</sub></td><td>−0,4</td><td>−0,653</td><td>0,22</td></tr>
+      <tr><td><span class="m">x</span><sub>5</sub></td><td>0</td><td>−0,257</td><td>0,23</td></tr>
+      <tr><td><span class="m">x</span><sub>6</sub></td><td>0</td><td>0,137</td><td>0,22</td></tr>
+    </table>
+    <p>Aucun biais, et pourtant : 0,735 contre 2,663 pour deux vrais coefficients <b>égaux</b>. Ce qui est bien estimé, c'est la <b>somme</b> — 3,40 pour une vraie somme de 3,00 ; la répartition entre les deux, elle, est du bruit pur (écart-type trois fois plus grand que sur les colonnes indépendantes).</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Ridge rétrécit, direction par direction <span class="tag tronc">tronc</span></h3>
+    <p>Minimiser ‖<span class="m">y</span> − <span class="m">X</span><span class="m">β</span>‖² + <span class="m">λ</span>‖<span class="m">β</span>‖² donne <span class="hat"><span class="m">β</span></span><sub><span class="m">λ</span></sub> = (<span class="m">X</span><sup>⊤</sup><span class="m">X</span> + <span class="m">λ</span><span class="up">I</span>)<sup>−1</sup><span class="m">X</span><sup>⊤</sup><span class="m">y</span>.</p>
+    <p>Dans le cas <b>orthonormé</b> (<span class="m">X</span><sup>⊤</sup><span class="m">X</span> = <span class="up">I</span>), une seule coordonnée :</p>
+    <div class="eq"><span class="hat"><span class="m">β</span></span><sub><span class="m">λ</span></sub> = <span class="hat"><span class="m">β</span></span><sub>OLS</sub> / (1 + <span class="m">λ</span>)</div>
+    <p>En général, dans la base propre de <span class="m">X</span><sup>⊤</sup><span class="m">X</span>, la direction de valeur propre <span class="m">λ</span><sub><span class="m">i</span></sub> est multipliée par <span class="m">λ</span><sub><span class="m">i</span></sub>/(<span class="m">λ</span><sub><span class="m">i</span></sub> + <span class="m">λ</span>) : rétrécissement <b>fort</b> là où les données informent peu (petit <span class="m">λ</span><sub><span class="m">i</span></sub>), faible là où elles informent beaucoup (<a href="chain-p04-02-valeurs-propres-iteration.html#s7">p04-02</a>, <a href="chain-p04-03-spectral-svd-conditionnement.html#s6">p04-03</a>).</p>
+    <p class="say">« La ridge divise chaque direction propre par sa valeur propre plus λ, donc elle rétrécit surtout les directions où les données sont plates, donc elle tue la variance là où elle est la plus grande. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — où le rétrécissement tombe</div>
+    <p>Valeurs propres de <span class="m">X</span><sup>⊤</sup><span class="m">X</span> sur le jeu fil rouge : 104,6 · 72,6 · 47,7 · 39,6 · 32,7 · <b>2,84</b>. La dernière direction est la <b>différence</b> <span class="m">x</span><sub>1</sub> − <span class="m">x</span><sub>2</sub> : les données n'y disent presque rien. Conditionnement 36,9.</p>
+    <table>
+      <tr><th>direction propre</th><th><span class="m">λ</span><sub><span class="m">i</span></sub></th><th>facteur à <span class="m">λ</span> = 10</th></tr>
+      <tr><td>1 (la plus informée)</td><td>104,6</td><td>0,913</td></tr>
+      <tr><td>2</td><td>72,6</td><td>0,879</td></tr>
+      <tr><td>3</td><td>47,7</td><td>0,827</td></tr>
+      <tr><td>4</td><td>39,6</td><td>0,798</td></tr>
+      <tr><td>5</td><td>32,7</td><td>0,766</td></tr>
+      <tr class="hl"><td>6 &nbsp;≈ <span class="m">x</span><sub>1</sub> − <span class="m">x</span><sub>2</sub></td><td><b>2,84</b></td><td><b>0,221</b></td></tr>
+    </table>
+    <p>La ridge laisse les directions informatives à 80–91 % et coupe la direction plate à 22 %. Résultat : <span class="hat"><span class="m">β</span></span><sub>10</sub> = (1,307 ; 1,720 ; 0,283 ; −0,501 ; −0,151 ; 0,052). La somme passe de 3,40 à 3,03 (à peine touchée), l'écart entre <span class="m">x</span><sub>1</sub> et <span class="m">x</span><sub>2</sub> de 1,93 à 0,41. Elle rabote exactement ce qui était du bruit.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Le prix : un biais, et un U <span class="tag tronc">tronc</span></h3>
+    <p>Cas orthonormé, <span class="hat"><span class="m">β</span></span><sub>OLS</sub> ~ <span class="up">N</span>(<span class="m">β</span>, <span class="m">σ</span>²). Alors <span class="up">E</span>[<span class="hat"><span class="m">β</span></span><sub><span class="m">λ</span></sub>] = <span class="m">β</span>/(1 + <span class="m">λ</span>) ≠ <span class="m">β</span> : la ridge est <b>biaisée</b>, et le biais croît avec <span class="m">λ</span>. La variance, elle, est divisée par (1 + <span class="m">λ</span>)².</p>
+    <div class="eq">MSE(<span class="m">λ</span>) = (<span class="m">λ</span>/(1+<span class="m">λ</span>))² <span class="m">β</span>² &nbsp;+&nbsp; <span class="m">σ</span>²/(1+<span class="m">λ</span>)² &nbsp;&nbsp;→&nbsp;&nbsp; minimum en <span class="m">λ</span>* = <span class="m">σ</span>²/<span class="m">β</span>²</div>
+    <p>Un terme monte de 0 à <span class="m">β</span>², l'autre descend de <span class="m">σ</span>² à 0 : la somme est en <b>U</b>. Et <span class="m">λ</span>* = <span class="m">σ</span>²/<span class="m">β</span>² est exactement le <span class="m">σ</span>²/<span class="m">τ</span>² du fil B, avec <span class="m">τ</span>² = <span class="m">β</span>² — le prior qui connaît l'ordre de grandeur de <span class="m">β</span> (<a href="chain-p02-02-prior-penalite.html#s7">p02-02, pas 7</a>).</p>
+    <p class="say">« Rétrécir tire vers zéro, donc introduit un biais qui croît avec λ, et divise la variance, qui décroît avec λ, donc l'erreur totale a un minimum strictement positif en λ dès que la variance n'est pas nulle. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — <span class="m">β</span> = 1, <span class="m">σ</span>² = 0,5</div>
+    <table>
+      <tr><th><span class="m">λ</span></th><th>biais²</th><th>variance</th><th>MSE</th></tr>
+      <tr><td>0 &nbsp;(OLS)</td><td>0</td><td>0,500</td><td>0,500</td></tr>
+      <tr><td>0,25</td><td>0,040</td><td>0,320</td><td>0,360</td></tr>
+      <tr class="hl"><td>0,5 &nbsp;= <span class="m">σ</span>²/<span class="m">β</span>²</td><td>0,111</td><td>0,222</td><td><b>0,333</b></td></tr>
+      <tr><td>1</td><td>0,250</td><td>0,125</td><td>0,375</td></tr>
+      <tr><td>2</td><td>0,444</td><td>0,056</td><td>0,500</td></tr>
+    </table>
+    <p>À <span class="m">λ</span>* = 0,5 l'erreur tombe de 0,500 à 0,333, soit <b>−33 %</b>, en acceptant un biais de −1/3 sur un coefficient qui vaut 1. À <span class="m">λ</span> = 2 on a tout rendu : le biais a rattrapé le gain.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — le U, et où son fond se déplace</div>
+    <div id="f1plot" class="wide"></div>
+    <div id="f1sliders"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Cas orthonormé, <span class="m">β</span> = 1. Le <b>biais²</b> monte, la <b>variance</b> descend, leur somme (le <b>MSE</b>) est en U ; le trait vertical marque le fond, à <span class="m">λ</span>* = <span class="m">σ</span>²/<span class="m">β</span>². Bouge <span class="m">λ</span> : la courbe part sous l'horizontale « OLS » (l'erreur sans pénalité) puis repasse au-dessus. Bouge <span class="m">σ</span>² : <b>plus de bruit, plus de pénalité</b> — le fond glisse vers la droite, et il n'atteint jamais <span class="m">λ</span> = 0.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Il existe toujours un <span class="m">λ</span> &gt; 0 qui bat l'OLS</h3>
+    <p>Ce n'est pas un accident de l'exemple. Dérivons le MSE en <span class="m">λ</span> = 0 :</p>
+    <div class="eq">d MSE/d<span class="m">λ</span> = 2<span class="m">β</span>²<span class="m">λ</span>/(1+<span class="m">λ</span>)³ − 2<span class="m">σ</span>²/(1+<span class="m">λ</span>)³ &nbsp;&nbsp;⇒&nbsp;&nbsp; en <span class="m">λ</span> = 0 : <b>−2<span class="m">σ</span>²</b> &lt; 0</div>
+    <p>La pente est strictement négative dès que <span class="m">σ</span>² &gt; 0 : partir de l'OLS et mettre un peu de pénalité fait <b>toujours</b> baisser l'erreur. C'est le théorème de <b>Hoerl-Kennard</b> (1970), vrai en dimension quelconque.</p>
+    <p>L'objection « mais l'OLS est optimal » confond deux énoncés : Gauss-Markov dit qu'il est de variance minimale <b>parmi les estimateurs sans biais</b> (<a href="chain-p05-01-regression-modele-ols.html">p05-01</a>). On n'a jamais demandé ça.</p>
+    <p class="say">« La dérivée du MSE en zéro vaut −2σ², donc elle est strictement négative dès qu'il y a du bruit, donc un petit λ positif fait toujours baisser l'erreur, donc l'OLS n'est optimal que dans la classe des estimateurs sans biais. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les deux lectures</div>
+    <p><b>Sur le cas orthonormé.</b> <span class="m">β</span> = 1, <span class="m">σ</span>² = 0,5 : 0,500 → 0,333 (−33 %). La pente en 0 vaut −1 : le premier centième de <span class="m">λ</span> rapporte déjà 0,01.</p>
+    <p><b>Sur le jeu fil rouge.</b> Erreur de validation croisée à <span class="m">λ</span> = 0,1 (l'OLS, en pratique) : <b>2,724</b>. À <span class="m">λ</span> = 2 : <b>2,650</b>. Le minimum n'est pas en 0, il est ailleurs, et on n'a rien fait d'autre que rétrécir.</p>
+    <p>Le théorème ne dit pas <i>lequel</i> : il garantit que la plage gagnante n'est pas vide, pas qu'on sait où elle est. Trouver <span class="m">λ</span> reste un problème de données (pas 7).</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Lasso : le même échange, plus une sélection</h3>
+    <p>Pénalité <span class="m">λ</span>Σ|<span class="m">β</span><sub><span class="m">j</span></sub>|. Cas orthonormé, la solution est un <b>seuillage doux</b> :</p>
+    <div class="eq"><span class="hat"><span class="m">β</span></span><sub><span class="m">λ</span></sub> = signe(<span class="hat"><span class="m">β</span></span>) · max(0, |<span class="hat"><span class="m">β</span></span>| − <span class="m">λ</span>/2) &nbsp;&nbsp;⇒&nbsp;&nbsp; zéro <b>exact</b> dès |<span class="hat"><span class="m">β</span></span>| ≤ <span class="m">λ</span>/2</div>
+    <p>Même compromis biais-variance qu'en ridge — mais le coude de |<span class="m">β</span>| en 0 rend les zéros atteignables (<a href="chain-p03-01-critere-escalier-vs-sensible.html#s8">p03-01, pas 8</a> ; <a href="chain-p02-02-prior-penalite.html#s6">p02-02, pas 6</a>), donc une <b>sélection de variables</b> au passage, gratuitement, là où la recherche de sous-ensembles (best subset) serait combinatoire.</p>
+    <p>Prix de la sélection : entre deux colonnes corrélées, un seul coin du polyèdre suffit — le lasso en garde <b>une, arbitrairement</b>, et le choix bascule d'un tirage à l'autre. La ridge, elle, <b>partage</b>. Elastic net = <span class="m">λ</span><sub>1</sub>Σ|<span class="m">β</span><sub><span class="m">j</span></sub>| + <span class="m">λ</span><sub>2</sub>‖<span class="m">β</span>‖² : les zéros du lasso, le partage de la ridge.</p>
+    <p class="say">« La pénalité L1 tire à force constante jusqu'à zéro, donc un coefficient que les données poussent moins fort que le mur y arrive exactement, donc le lasso sélectionne ; et entre deux colonnes corrélées un seul coin suffit, donc il en garde une, arbitrairement. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — partager ou choisir</div>
+    <p>Le jeu fil rouge à <span class="m">λ</span> = 50, sur les deux colonnes corrélées (vrai <span class="m">β</span> = 1,5 chacune) :</p>
+    <table>
+      <tr><th></th><th><span class="m">x</span><sub>1</sub></th><th><span class="m">x</span><sub>2</sub></th><th>somme</th><th>non nuls</th></tr>
+      <tr><td>OLS</td><td>0,735</td><td>2,663</td><td>3,40</td><td>6</td></tr>
+      <tr class="hl"><td>ridge</td><td><b>1,028</b></td><td><b>1,122</b></td><td>2,15</td><td>6</td></tr>
+      <tr><td>lasso</td><td>0,626</td><td>2,110</td><td>2,74</td><td><b>3</b></td></tr>
+    </table>
+    <p>La ridge a rapproché les deux coefficients l'un de l'autre (écart 0,09) ; le lasso a gardé <span class="m">x</span><sub>2</sub> et laissé <span class="m">x</span><sub>1</sub> loin derrière, tout en mettant trois coefficients à zéro exact. Lisibilité contre stabilité — et ici, les deux colonnes étant interchangeables, la répartition du lasso ne veut rien dire.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Le chemin de <span class="m">λ</span></h3>
+    <p>Plutôt qu'un <span class="m">λ</span>, on trace <span class="hat"><span class="m">β</span></span><sub><span class="m">λ</span></sub> pour tous les <span class="m">λ</span> de 0 à ∞ : le <b>chemin de régularisation</b>.</p>
+    <p>Ridge : six courbes lisses, toutes vers 0, aucune ne l'atteint. Lasso : linéaire par morceaux <i>en <span class="m">λ</span></i>, chaque courbe s'annule à un <span class="m">λ</span> précis et n'en repart plus — l'<b>ordre d'extinction</b> range les colonnes par ce que les données disent d'elles. (Tracé en log <span class="m">λ</span>, comme ci-dessous, les segments s'incurvent : c'est l'échelle, pas le chemin.)</p>
+    <p class="say">« Le chemin trace tous les λ d'un coup, donc on lit à quelle force de pénalité chaque variable s'éteint, donc l'ordre d'extinction range les colonnes par ce que les données disent d'elles, et il ne dit rien de plus. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — l'ordre d'extinction</div>
+    <p>Lasso sur le jeu fil rouge, <span class="m">λ</span> auquel chaque coefficient atteint zéro :</p>
+    <table>
+      <tr><th>colonne</th><th>vrai <span class="m">β</span></th><th><span class="m">λ</span> d'extinction</th></tr>
+      <tr><td><span class="m">x</span><sub>6</sub> (nulle)</td><td>0</td><td>8,5</td></tr>
+      <tr><td><span class="m">x</span><sub>5</sub> (nulle)</td><td>0</td><td>26,4</td></tr>
+      <tr><td><span class="m">x</span><sub>3</sub> (faible)</td><td>0,5</td><td>43,4</td></tr>
+      <tr><td><span class="m">x</span><sub>4</sub> (faible)</td><td>−0,4</td><td>62,6</td></tr>
+      <tr class="hl"><td><span class="m">x</span><sub>1</sub> (forte, corrélée)</td><td>1,5</td><td>173</td></tr>
+      <tr><td><span class="m">x</span><sub>2</sub> (forte, corrélée)</td><td>1,5</td><td>321</td></tr>
+    </table>
+    <p>L'ordre est le bon : les nulles partent en premier, les fortes en dernier. Mais entre <span class="m">x</span><sub>1</sub> et <span class="m">x</span><sub>2</sub>, l'écart 173 / 321 est du <b>bruit de tirage</b> : sur un autre jeu, c'est <span class="m">x</span><sub>1</sub> qui survit.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — les deux chemins, ridge au-dessus, lasso au-dessous</div>
+    <div id="f2ridge" class="wide"></div>
+    <div id="f2lasso" class="wide"></div>
+    <div id="f2sliders"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Les six coefficients en fonction de log<sub>10</sub> <span class="m">λ</span> ; la légende en haut à gauche nomme les trois paires, et les couleurs sont les mêmes sur les deux graphes. Fais glisser <span class="m">λ</span> : en ridge tout descend ensemble et <b>rien n'atteint zéro</b> ; en lasso les courbes s'éteignent <b>une à une</b> et le compteur de coefficients non nuls tombe. Regarde surtout les deux corrélées — la ridge les rapproche l'une de l'autre (l'écart passe de 1,93 à 0,41 en <span class="m">λ</span> = 10), le lasso en sacrifie une.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Choisir <span class="m">λ</span> : la courbe de CV et la règle 1 SE <span class="tag tronc">tronc</span></h3>
+    <p><span class="m">λ</span>* = <span class="m">σ</span>²/<span class="m">β</span>² ne se calcule pas : on ne connaît ni <span class="m">σ</span>² ni <span class="m">β</span>. On mesure donc le U sur des données non vues.</p>
+    <p><b>Grille en log</b> (10<sup>−3</sup> à 10<sup>3</sup>) : l'effet de <span class="m">λ</span> est multiplicatif, un cran doit multiplier, pas ajouter. <b>Standardisation refaite dans chaque pli</b> (<a href="chain-p06-02-cv-leakage.html#s6">p06-02, pas 6</a>) : la standardiser une fois sur tout le jeu fait fuir les moyennes du test dans l'entraînement.</p>
+    <p><b>Règle « one standard error »</b> : la courbe de CV est elle-même bruitée. On prend non pas le <span class="m">λ</span> du minimum, mais le <b>plus grand</b> <span class="m">λ</span> dont l'erreur reste à moins d'un écart-type-de-la-moyenne du minimum : même performance aux barres d'erreur près, modèle plus rétréci.</p>
+    <p class="say">« Le λ optimal dépend de quantités inconnues, donc on le choisit sur des données non vues, donc par CV sur une grille en log, et comme la courbe est bruitée, donc on retient le plus grand λ encore dans la marge d'un écart-type. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — 5-fold sur le jeu fil rouge</div>
+    <table>
+      <tr><th></th><th>ridge</th><th>lasso</th></tr>
+      <tr><td><span class="m">λ</span> du minimum</td><td>2,00</td><td>5,01</td></tr>
+      <tr><td>erreur CV au minimum</td><td>2,650</td><td>2,725</td></tr>
+      <tr><td>écart-type de la moyenne</td><td>0,398</td><td>0,412</td></tr>
+      <tr><td>seuil « 1 SE »</td><td>3,049</td><td>3,137</td></tr>
+      <tr class="hl"><td><span class="m">λ</span><sub>1SE</sub></td><td><b>12,6</b></td><td><b>31,6</b></td></tr>
+      <tr><td>erreur en <span class="m">λ</span><sub>1SE</sub></td><td>2,923</td><td>3,078</td></tr>
+    </table>
+    <p>Six fois plus de pénalité que le minimum, pour 0,27 d'erreur en plus — un dixième de la barre de bruit. Et les coefficients ridge à <span class="m">λ</span><sub>1SE</sub> = 12,6 : (1,30 ; 1,63 ; 0,28 ; −0,47 ; −0,14 ; 0,03), à comparer à la vérité (1,5 ; 1,5 ; 0,5 ; −0,4 ; 0 ; 0) et à l'OLS (0,74 ; 2,66 ; …). L'estimateur biaisé est plus près.</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — la courbe de CV, son minimum et sa marge</div>
+    <div class="sl-ctl" id="f3ctl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Erreur de validation croisée 5-fold en fonction de log<sub>10</sub> <span class="m">λ</span> ; les barres verticales valent ± un écart-type de la moyenne sur les 5 plis (une sur trois, pour rester lisible). La bande <b>rouge</b> marque le <span class="m">λ</span> du minimum, le <b>pointillé horizontal</b> le seuil « minimum + 1 SE », la bande <b>ocre</b> le <span class="m">λ</span><sub>1SE</sub> retenu — le plus à droite encore sous le pointillé. Le fond du U est <b>plat</b> : c'est ce qui rend la règle 1 SE bon marché. Bascule ridge / lasso : même U, même règle, un <span class="m">λ</span> différent — les deux échelles de <span class="m">λ</span> ne sont pas comparables.</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>« Régulariser, c'est éviter l'overfitting » ne suffit pas</h3>
+    <p>C'est la <b>conséquence</b>, pas le mécanisme. Le mécanisme est l'échange : on paie un biais, on encaisse une baisse de variance, et l'échange est rentable <i>parce qu'une direction privilégiée existe</i> — zéro.</p>
+    <p>Rétrécir vers 0 n'est une bonne idée que si les vrais coefficients sont <b>modérés</b> : c'est exactement le prior du fil B (<a href="chain-p02-02-prior-penalite.html#s2">p02-02, pas 2</a>). Quand ils sont grands, <span class="m">λ</span>* = <span class="m">σ</span>²/<span class="m">β</span>² s'écrase vers 0 et le gain avec lui.</p>
+    <p class="say">« Rétrécir vers zéro n'aide que si les vrais coefficients sont modérés, donc la régularisation est un pari sur leur ordre de grandeur, donc le mécanisme est un échange biais contre variance, et la baisse de l'overfitting n'en est que la conséquence. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — quand le pari ne paie plus</div>
+    <p>Cas orthonormé, <span class="m">σ</span>² = 0,5 fixé, on fait varier le vrai <span class="m">β</span>. Le fond du U vaut <span class="m">σ</span>²<span class="m">β</span>²/(<span class="m">σ</span>² + <span class="m">β</span>²).</p>
+    <table>
+      <tr><th>vrai <span class="m">β</span></th><th><span class="m">λ</span>*</th><th>MSE(0)</th><th>MSE(<span class="m">λ</span>*)</th><th>gain</th></tr>
+      <tr><td>0,5</td><td>2,000</td><td>0,500</td><td>0,100</td><td>−80 %</td></tr>
+      <tr class="hl"><td>1</td><td>0,500</td><td>0,500</td><td>0,333</td><td>−33 %</td></tr>
+      <tr><td>3</td><td>0,056</td><td>0,500</td><td>0,474</td><td>−5 %</td></tr>
+      <tr><td>10</td><td>0,005</td><td>0,500</td><td>0,498</td><td>−0,5 %</td></tr>
+    </table>
+    <p>Le gain n'est jamais nul (pas 4), mais il s'effondre. En entretien, dire « ça évite l'overfitting » et s'arrêter là ne passe pas : la phrase qui passe nomme le biais, la variance, et le fait que rétrécir vers zéro est un <b>pari</b>.</p>
+  </div>
+</div>
+
+<div class="step" id="s9">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>L'échange suppose que <span class="m">λ</span> pèse la même chose sur chaque colonne, que zéro est une bonne direction, et que <span class="m">λ</span> n'a pas été choisi sur les données qui servent à le juger.</p>
+    <p class="say">« Chacune des trois hypothèses tient le compromis, donc une colonne mal échelonnée, un vrai β loin de zéro ou un λ réglé sur le test cassent l'échange, donc on standardise dans le pli, on regarde le chemin, et on garde un test intouché. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Cinq limites</div>
+    <ul>
+      <li><b>Colonnes non standardisées (H2 tombe).</b> <span class="m">λ</span>‖<span class="m">β</span>‖² pénalise le <i>coefficient</i>, donc l'inverse de l'unité : une colonne en centimes a un coefficient 100 fois plus petit que la même en euros, donc une pénalité 10 000 fois plus faible. Elle traverse la régularisation intacte, l'autre est écrasée. Signature : le chemin de <span class="m">λ</span> où une seule variable survit très loin — et c'est celle qui a la plus grande échelle.</li>
+      <li><b>Intercept pénalisé (H3 tombe).</b> Rien ne justifie de tirer le niveau moyen vers 0 : cela introduit un biais qui dépend de l'unité de <span class="m">y</span>. On centre <span class="m">y</span> et on estime l'intercept à part.</li>
+      <li><b>λ choisi sur le test.</b> Prendre le meilleur <span class="m">λ</span> sur une grille de 60 valeurs <i>et</i> rapporter l'erreur à ce <span class="m">λ</span> sur les mêmes données, c'est le biais du maximum (<a href="../bridges/bridge-02-temoin-atteignable.html">b02</a>) : on rapporte le minimum de 60 variables bruitées. CV pour choisir, test <b>touché une fois</b> pour rapporter (<a href="chain-p06-02-cv-leakage.html#s9">p06-02, pas 9</a>).</li>
+      <li><b>Vrais coefficients grands et peu nombreux, avec la ridge.</b> Elle rétrécit <i>tout</i>, donc aussi ceux qu'il fallait garder, et ne met jamais à zéro ceux qu'il fallait jeter. Le lasso, ou l'elastic net, sont faits pour ce régime ; la ridge est faite pour « beaucoup de petits effets ».</li>
+      <li><b>Lasso avec <span class="m">p</span> &gt; <span class="m">n</span>.</b> Il ne peut sélectionner <b>au plus <span class="m">n</span></b> variables — contrainte géométrique, pas un réglage. Et avec des colonnes corrélées le choix est instable d'un tirage à l'autre : ne pas lire la liste des variables retenues comme une découverte. Elastic net stabilise.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>L'OLS est <b>sans biais</b>, de variance possiblement énorme. Sans biais n'est pas un optimum en MSE.</li>
+    <li>La ridge multiplie la direction propre <span class="m">i</span> par <span class="m">λ</span><sub><span class="m">i</span></sub>/(<span class="m">λ</span><sub><span class="m">i</span></sub> + <span class="m">λ</span>) : biais croissant, variance décroissante, erreur en <b>U</b>. Cas simple : <span class="m">λ</span>* = <span class="m">σ</span>²/<span class="m">β</span>².</li>
+    <li>Il existe <b>toujours</b> un <span class="m">λ</span> &gt; 0 qui bat l'OLS : la dérivée du MSE en 0 vaut −2<span class="m">σ</span>² (Hoerl-Kennard).</li>
+    <li>Le lasso, c'est le seuillage doux max(0, |<span class="hat"><span class="m">β</span></span>| − <span class="m">λ</span>/2) : même échange, plus une sélection — instable sur les colonnes corrélées, que la ridge partage. Elastic net : les deux.</li>
+    <li><span class="m">λ</span> par <b>CV</b>, grille en log, standardisation refaite dans chaque pli, règle <b>1 SE</b> (le plus grand <span class="m">λ</span> dans la marge du bruit).</li>
+    <li>Le mécanisme est <b>biais contre variance</b> ; « éviter l'overfitting » est la conséquence. Rétrécir vers 0 est un pari sur l'ordre de grandeur de <span class="m">β</span>.</li>
+  </ol>
+</div>
+<div class="phrase">« La régularisation échange un biais contre de la variance : la ridge rétrécit chaque direction propre en proportion de ce que les données y disent, la variance tombe plus vite que le biais ne monte, et il existe toujours un <span class="m">λ</span> positif qui bat les moindres carrés. Le lasso fait la même chose avec des zéros exacts. <span class="m">λ</span> se choisit par validation croisée sur une grille en log, standardisation refaite dans chaque pli, et je prends le plus grand <span class="m">λ</span> à un écart-type du minimum. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Que fait la ridge à <span class="hat"><span class="m">β</span></span><sub>OLS</sub> dans le cas orthonormé ?</div><div class="a hid">Elle le divise par 1 + λ. En général, elle multiplie la direction propre i par λ<sub>i</sub>/(λ<sub>i</sub> + λ) : fort là où les données sont plates.</div></li>
+    <li><div class="q">Quel est le prix, quel est le gain ?</div><div class="a hid">Biais² = (λ/(1+λ))²β², croissant ; variance = σ²/(1+λ)², décroissante. Somme en U, minimum en λ* = σ²/β².</div></li>
+    <li><div class="q">Pourquoi un <span class="m">λ</span> &gt; 0 bat-il toujours l'OLS ?</div><div class="a hid">La dérivée du MSE en λ = 0 vaut −2σ² &lt; 0 (Hoerl-Kennard). L'OLS n'est optimal que parmi les estimateurs sans biais — on n'a jamais demandé ça.</div></li>
+    <li><div class="q">Ridge contre lasso sur deux colonnes corrélées ?</div><div class="a hid">La ridge partage (1,03 et 1,12 sur le jeu fil rouge) ; le lasso en garde une, arbitrairement, et le choix bascule d'un tirage à l'autre. Elastic net stabilise.</div></li>
+    <li><div class="q">Comment choisit-on <span class="m">λ</span> ?</div><div class="a hid">CV sur une grille en log, standardisation refaite dans chaque pli, et règle 1 SE : le plus grand λ dont l'erreur reste à moins d'un écart-type de la moyenne du minimum.</div></li>
+    <li><div class="q">Pourquoi « régulariser pour éviter l'overfitting » ne suffit-il pas ?</div><div class="a hid">C'est la conséquence. Le mécanisme est l'échange biais contre variance, rentable parce que rétrécir vers 0 est une bonne direction quand les vrais coefficients sont modérés — c'est le prior.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="../bridges/bridge-03-biais-variance-partout.html"><b>Biais-variance partout</b><small>le même U sous d'autres noms : profondeur d'un arbre, nombre de voisins, rang d'une troncature SVD, <span class="m">λ</span> d'une pénalité — un seul curseur de rigidité</small></a>
+    <a href="../bridges/bridge-05-escalier-vs-sensible.html"><b>Escalier vs sensible</b><small>pourquoi L1 atteint zéro et L2 non : la pente de la pénalité, lue au même endroit qu'au pas 5</small></a>
+    <a href="chain-p02-02-prior-penalite.html"><b>p02-02 — Prior et pénalité</b><small>le <i>pourquoi</i> de λ‖β‖² (prior, existence, unicité) ; cette chaîne en donne le <i>combien</i></small></a>
+    <a href="chain-p06-01-biais-variance.html"><b>p06-01 — Biais-variance</b><small>la décomposition générale ; ici elle est calculée en fermé sur un cas d'un seul paramètre</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>ml::ridge</code> (rétrécissement par direction propre, λ* = σ²/β², Hoerl-Kennard) · <code>ml::lasso</code> (seuillage doux, sélection, instabilité sur les corrélées) · <code>ml::regularisation</code> (grille en log, standardisation dans le pli, règle 1 SE) · <code>ml::biais-variance</code> (le U, et le fait que son fond n'est jamais en λ = 0).</p>
+  <p>Les cartes <i>Ridge = gaussien, Lasso = Laplace</i> et <i>gradient de L1</i> sont acquises : cette chaîne les réemploie au pas 5 sans les redémontrer.</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p05-03 · v1 du 17/09/2026 · Prérequis : <a href="chain-p02-02-prior-penalite.html">p02-02</a>, <a href="chain-p06-01-biais-variance.html">p06-01</a>, <a href="chain-p06-02-cv-leakage.html">p06-02</a>, <a href="chain-p03-01-critere-escalier-vs-sensible.html">p03-01</a>. Suite : <a href="chain-p06-01-biais-variance.html">p06-01 Biais-variance</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').textContent.replace(/\s*(tronc|casse)\s*$/,'').trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== Figure 1 : le U du cas orthonormé ===== */
+(function(){
+const B=1;
+const P=SL.plot(document.getElementById('f1plot'),{x:[0,3],y:[0,1.2],w:600,h:300,
+  xt:[0,0.5,1,1.5,2,2.5,3],yt:[0.25,0.5,0.75,1],xl:'λ',yl:'erreur'});
+const out=document.getElementById('f1out');
+let curves=[],s2=0.5;
+function biais2(l){return (l/(1+l))*(l/(1+l))*B*B;}
+function vari(l,s){return s/((1+l)*(1+l));}
+function draw(){
+  curves.forEach(c=>c.remove());curves=[];P.clear();
+  curves.push(P.fn(l=>biais2(l),'sl-c3'));
+  curves.push(P.fn(l=>vari(l,s2),'sl-c1'));
+  curves.push(P.fn(l=>biais2(l)+vari(l,s2),'sl-c2'));
+  const ls=s2/(B*B), mmin=biais2(ls)+vari(ls,s2);
+  /* horizontale « OLS » : l'erreur sans pénalité, soit σ². Les étiquettes sont
+     redessinées après elle, dans le même calque, pour rester lisibles par-dessus. */
+  P.seg(0,s2,3,s2,'chord');
+  P.text(2.6,0.92,'biais²','sl-c3');P.text(2.4,0.18,'variance','sl-c1','end');
+  P.text(1.25,0.80,'MSE','sl-c2');P.text(0.07,s2+0.06,'OLS','sl-c3');
+  /* le trait du fond du U s'arrête à la courbe : il ne traverse pas le titre d'axe */
+  P.seg(ls,0,ls,mmin,'gain');P.dot(ls,mmin,'sl-c2',6);
+  out.innerHTML=`<div>λ* = σ²/β²<b>${SL.fmt(ls,3)}</b></div>`+
+    `<div>MSE(λ*)<b>${SL.fmt(mmin,3)}</b></div>`+
+    `<div>MSE(0) = σ²<b>${SL.fmt(s2,3)}</b></div>`+
+    `<div class="pos">gain au fond du U<b>${SL.fmt(100*(1-mmin/s2),1)} %</b></div>`;
+}
+function drawAt(l){
+  draw();
+  P.dot(l,biais2(l),'sl-c3 hollow',5);P.dot(l,vari(l,s2),'sl-c1 hollow',5);P.dot(l,biais2(l)+vari(l,s2),'sl-c2',5);
+  out.insertAdjacentHTML('afterbegin',
+    `<div>biais² en λ<b>${SL.fmt(biais2(l),3)}</b></div>`+
+    `<div>variance en λ<b>${SL.fmt(vari(l,s2),3)}</b></div>`+
+    `<div class="${biais2(l)+vari(l,s2)<=s2?'pos':'zero'}">MSE en λ<b>${SL.fmt(biais2(l)+vari(l,s2),3)}</b></div>`);
+}
+const sLam=SL.slider(document.getElementById('f1sliders'),{label:'λ',min:0,max:3,step:0.01,value:0.5},v=>drawAt(v));
+SL.slider(document.getElementById('f1sliders'),{label:'σ² (bruit)',min:0.05,max:1,step:0.05,value:0.5},v=>{s2=v;drawAt(sLam.get());});
+})();
+
+/* ===== jeu fil rouge : 50 lignes, 6 colonnes standardisées, y centré ===== */
+const XD=[[0.465,0.111,-1.009,0.224,1.42,0.505],[0.496,0.926,0.223,0.329,0.557,0.207],[0.462,0.108,1.869,0.778,-1.043,-0.283],[1.226,0.571,0.975,0.781,2.023,-0.168],[0.329,0.38,0.079,-1.213,-0.808,-0.702],[1.955,2.075,-0.418,-1.318,-0.231,-0.394],[-0.665,-0.708,0.303,-0.104,1.359,1.753],[0.97,0.708,0.834,-0.344,1.019,-0.828],[-0.471,-1.177,-0.834,0.828,-0.022,-0.969],[-0.049,0.511,1.209,0.072,-1.176,-1.89],[-0.768,-0.615,0.336,1.017,0.417,0.757],[-1.067,-0.64,1.237,-1.547,-0.48,-0.108],[-1.2,-0.967,-0.673,0.016,1.688,-1.553],[0.694,0.558,-0.973,2.843,0.778,-2.294],[-0.61,-0.67,0.871,-1.235,-0.273,0.35],[0.927,1.253,-1.483,1.046,0.655,1.23],[-0.536,-0.963,0,-1.96,0.381,0.359],[0.645,0.129,-1.128,-0.581,-1.162,-1.662],[-0.14,0.423,0.37,1.888,0.253,0.873],[0.754,0.621,-0.594,-1.436,-0.918,-0.225],[0.191,-0.066,-0.071,0.06,0.416,-0.374],[-0.629,-0.744,0.147,0.129,-0.637,1.319],[0.504,0.797,-2.235,-0.837,2.095,-1.026],[0.722,1.078,-0.07,-0.608,-0.488,0.007],[-1.323,-1.163,0.444,-1.827,0.267,1.399],[-1.388,-1.099,0.941,-0.495,-2.308,-0.745],[-0.714,-0.888,-0.613,0.031,0.043,1.548],[0.948,1.024,0.862,0.029,-1.332,-0.889],[0.304,-0.108,0.094,0.735,0.239,-0.097],[-0.687,-0.268,-0.718,-0.265,0.821,0.779],[1.207,1.31,-0.867,1.644,0.194,-1.222],[1.171,1.068,-0.263,-0.659,0.061,1.022],[-2.669,-2.161,-0.92,0.668,0.594,1.165],[0.187,-0.453,1.5,0.541,-1.901,0.404],[2.034,1.795,1.013,0.22,-0.531,-0.817],[0.987,0.966,2.397,-0.405,0.062,0.376],[0.684,1.017,0.32,0.375,0.087,-0.625],[0.17,0.004,-0.39,0.962,1.116,2.123],[1.629,1.55,0.335,0.039,0.369,0.813],[1.327,1.506,-0.794,0.484,-0.547,0.443],[-1.448,-1.897,-0.224,-1.14,-1.582,-0.057],[-0.967,-1.126,0.937,0.988,-0.14,0.072],[-1.186,-1.666,-0.334,-1.669,-1.193,-0.743],[-0.002,0.653,-0.65,0.866,1.653,0.899],[-0.191,-0.047,0.597,0.261,-0.158,-0.899],[-0.915,-0.936,-2.629,1.717,-1.066,1.711],[-1.627,-1.206,0.949,-0.635,0.073,-0.36],[-0.184,0.014,-1.734,-0.097,-0.191,-1.06],[-0.925,-0.668,1.17,-0.719,1.131,0.587],[-0.629,-0.919,-0.387,-0.477,-1.582,-0.712]];
+
+const YD=[-0.709,-0.557,-0.465,4.146,2.045,7.748,-1.749,1.916,-7.151,3.116,-3.422,-1.362,-5.226,0.603,-1.092,1.321,-1.495,-0.307,-1.495,5.001,-1.251,-1.529,2.597,3.193,-1.024,-2.629,-4.299,4.751,-0.289,-0.494,4.2,5.92,-7.411,-0.513,6.305,3.848,1.123,-1.854,7.016,3.045,-7.388,-2.144,-4.635,1.439,1.665,-2.533,-4.49,-2.103,-2.118,0.739];
+/* résolution d'un système 6×6 par élimination de Gauss avec pivot partiel */
+function solve(A,b){const n=b.length,M=A.map((r,i)=>r.concat([b[i]]));
+  for(let c=0;c<n;c++){let p=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[p][c]))p=r;
+    const t=M[c];M[c]=M[p];M[p]=t;
+    for(let r=c+1;r<n;r++){const f=M[r][c]/M[c][c];for(let k=c;k<=n;k++)M[r][k]-=f*M[c][k];}}
+  const x=new Array(n).fill(0);
+  for(let i=n-1;i>=0;i--){let s=M[i][n];for(let j=i+1;j<n;j++)s-=M[i][j]*x[j];x[i]=s/M[i][i];}
+  return x;}
+function gram(X){const p=X[0].length,G=[];for(let i=0;i<p;i++){G.push([]);for(let j=0;j<p;j++){let s=0;for(let k=0;k<X.length;k++)s+=X[k][i]*X[k][j];G[i].push(s);}}return G;}
+function xty(X,y){const p=X[0].length,v=[];for(let j=0;j<p;j++){let s=0;for(let k=0;k<X.length;k++)s+=X[k][j]*y[k];v.push(s);}return v;}
+function ridge(X,y,lam){const p=X[0].length,G=gram(X).map((r,i)=>r.map((v,j)=>i===j?v+lam:v));return solve(G,xty(X,y));}
+function lasso(X,y,lam){const n=X.length,p=X[0].length;const b=new Array(p).fill(0);
+  const xx=new Array(p).fill(0);for(let j=0;j<p;j++)for(let k=0;k<n;k++)xx[j]+=X[k][j]*X[k][j];
+  const r=y.slice();
+  for(let it=0;it<500;it++){let mx=0;
+    for(let j=0;j<p;j++){let rho=xx[j]*b[j];for(let k=0;k<n;k++)rho+=X[k][j]*r[k];
+      const a=Math.abs(rho)-lam/2;const nb=(a>0?Math.sign(rho)*a:0)/xx[j];const d=nb-b[j];
+      if(d!==0){for(let k=0;k<n;k++)r[k]-=X[k][j]*d;b[j]=nb;if(Math.abs(d)>mx)mx=Math.abs(d);}}
+    if(mx<1e-11)break;}
+  return b;}
+const COLS=[{c:'sl-c1',n:'x₁ forte'},{c:'sl-c2',n:'x₂ forte'},{c:'sl-c4',n:'x₃ faible'},
+            {c:'sl-c5',n:'x₄ faible'},{c:'sl-c3',n:'x₅ nulle'},{c:'sl-c3',n:'x₆ nulle'}];
+
+/* ===== Figure 2 : les deux chemins de λ ===== */
+(function(){
+const U0=-1,U1=3.5,NG=70;
+const us=[],pathR=[],pathL=[];
+for(let i=0;i<=NG;i++){const u=U0+(U1-U0)*i/NG;us.push(u);pathR.push(ridge(XD,YD,Math.pow(10,u)));pathL.push(lasso(XD,YD,Math.pow(10,u)));}
+function mk(host,title){return SL.plot(document.getElementById(host),{x:[U0,U1],y:[-1,3],w:600,h:230,
+  xt:[-1,0,1,2,3],yt:[-1,0,1,2,3],xl:'log₁₀ λ',yl:title});}
+const PR=mk('f2ridge','ridge'),PL=mk('f2lasso','lasso');
+function interp(path,j,u){const t=(u-U0)/(U1-U0)*NG;const i=Math.max(0,Math.min(NG-1,Math.floor(t)));const f=t-i;
+  return path[i][j]*(1-f)+path[i+1][j]*f;}
+COLS.forEach((c,j)=>{PR.fn(u=>interp(pathR,j,u),c.c,NG);PL.fn(u=>interp(pathL,j,u),c.c,NG);});
+/* légende dans la bande vide entre la courbe de x₂ (≈ 2,6) et celle de x₁ (≈ 0,8) */
+PR.label(-0.9,2.15,'x₁ x₂ fortes','sl-c2');PR.label(-0.9,1.75,'x₃ x₄ faibles','sl-c5');
+PR.label(-0.9,1.35,'x₅ x₆ nulles','sl-c3');
+const out=document.getElementById('f2out');
+function draw(u){
+  const lam=Math.pow(10,u);const br=ridge(XD,YD,lam),bl=lasso(XD,YD,lam);
+  [[PR,br],[PL,bl]].forEach(([P,b])=>{P.clear();P.vline(u,'chord');COLS.forEach((c,j)=>P.dot(u,b[j],c.c,4));});
+  const nz=bl.filter(v=>Math.abs(v)>1e-9).length;
+  out.innerHTML=
+    `<div>λ<b>${SL.fmt(lam,lam<10?2:0)}</b></div>`+
+    `<div>ridge β̂₁ · β̂₂<b>${SL.fmt(br[0],2)} · ${SL.fmt(br[1],2)}</b></div>`+
+    `<div>lasso β̂₁ · β̂₂<b>${SL.fmt(bl[0],2)} · ${SL.fmt(bl[1],2)}</b></div>`+
+    `<div class="${nz<6?'zero':'pos'}">lasso : coefs non nuls<b>${nz} / 6</b></div>`+
+    `<div>ridge β̂₁ + β̂₂<b>${SL.fmt(br[0]+br[1],2)}</b></div>`+
+    `<div>écart |β̂₁ − β̂₂|, ridge<b>${SL.fmt(Math.abs(br[0]-br[1]),2)}</b></div>`;
+}
+SL.slider(document.getElementById('f2sliders'),{label:'log₁₀ λ',min:U0,max:U1,step:0.05,value:1,fmt:v=>SL.fmt(v,2)},draw);
+})();
+
+/* ===== Figure 3 : erreur CV, minimum et règle 1 SE ===== */
+(function(){
+const K=5,NL=41;
+const lams=[];for(let i=0;i<NL;i++)lams.push(Math.pow(10,-1+0.1*i));
+const folds=[];for(let k=0;k<K;k++){const f=[];for(let i=k;i<XD.length;i+=K)f.push(i);folds.push(f);}
+function cv(kind){const mean=[],se=[];
+  lams.forEach(lam=>{const e=[];
+    for(let k=0;k<K;k++){const te=folds[k],tr=[];for(let i=0;i<XD.length;i++)if(folds[k].indexOf(i)<0)tr.push(i);
+      const p=XD[0].length,mu=new Array(p).fill(0),sd=new Array(p).fill(0);
+      tr.forEach(i=>{for(let j=0;j<p;j++)mu[j]+=XD[i][j];});for(let j=0;j<p;j++)mu[j]/=tr.length;
+      tr.forEach(i=>{for(let j=0;j<p;j++)sd[j]+=(XD[i][j]-mu[j])*(XD[i][j]-mu[j]);});for(let j=0;j<p;j++)sd[j]=Math.sqrt(sd[j]/tr.length);
+      const Xtr=tr.map(i=>XD[i].map((v,j)=>(v-mu[j])/sd[j]));
+      let ym=0;tr.forEach(i=>ym+=YD[i]);ym/=tr.length;
+      const ytr=tr.map(i=>YD[i]-ym);
+      const b=kind==='ridge'?ridge(Xtr,ytr,lam):lasso(Xtr,ytr,lam);
+      let s=0;te.forEach(i=>{let pr=ym;for(let j=0;j<p;j++)pr+=(XD[i][j]-mu[j])/sd[j]*b[j];s+=(YD[i]-pr)*(YD[i]-pr);});
+      e.push(s/te.length);}
+    const m=e.reduce((a,b)=>a+b,0)/K;let v=0;e.forEach(x=>v+=(x-m)*(x-m));v/=(K-1);
+    mean.push(m);se.push(Math.sqrt(v/K));});
+  let i=0;for(let k=1;k<NL;k++)if(mean[k]<mean[i])i=k;
+  const thr=mean[i]+se[i];let j=i;for(let k=NL-1;k>=0;k--)if(mean[k]<=thr){j=k;break;}
+  return {mean,se,i,j,thr};}
+const R={ridge:cv('ridge'),lasso:cv('lasso')};
+const P=SL.plot(document.getElementById('f3plot'),{x:[-1,1.6],y:[2.4,4.4],w:600,h:290,
+  xt:[-1,-0.5,0,0.5,1,1.5],yt:[2.5,3,3.5,4],xl:'log₁₀ λ',yl:'erreur CV (MSE, 5 plis)'});
+const out=document.getElementById('f3out'),ctl=document.getElementById('f3ctl');
+let kind='ridge',curve=null;
+/* la courbe moyenne passe par P.fn (calque `sl-fn`, donc colorée et épaisse) : une
+   suite de P.seg retomberait sur le gris de `.sl-seg`. On la retire à chaque bascule. */
+function interpM(m,u){const t=(u+1)/0.1;const i=Math.max(0,Math.min(NL-2,Math.floor(t)));
+  const f=t-i;return m[i]*(1-f)+m[i+1]*f;}
+function draw(){P.clear();if(curve){curve.remove();curve=null;}const r=R[kind];
+  /* barres d'erreur un point sur trois : les 41 barres se touchent et mangent la courbe */
+  curve=P.fn(u=>interpM(r.mean,u),'sl-c1',80);
+  for(let k=0;k<NL;k+=3){const u=-1+0.1*k;if(u>1.6)break;
+    P.seg(u,Math.max(2.4,r.mean[k]-r.se[k]),u,Math.min(4.4,r.mean[k]+r.se[k]),'');
+    P.dot(u,r.mean[k],'sl-c1',3);}
+  P.seg(-1,r.thr,1.6,r.thr,'chord');P.text(-0.97,r.thr+0.08,'minimum + 1 SE','sl-c3');
+  const ui=-1+0.1*r.i, uj=-1+0.1*r.j;
+  /* traits épais translucides, de la couleur de leur point et de leur étiquette :
+     un `sl-seg` nu serait le même gris que les barres d'erreur. */
+  P.vline(ui,'slope sl-c3');P.dot(ui,r.mean[r.i],'sl-c3',6);
+  P.vline(uj,'slope sl-c5');P.dot(uj,r.mean[r.j],'sl-c5',6);
+  /* λ₁SE peut tomber au bord droit : on retourne l'étiquette vers l'intérieur */
+  P.text(uj>1.15?uj-0.04:uj+0.04,4.25,'λ₁SE','sl-c5',uj>1.15?'end':'start');
+  P.text(ui+0.04,2.45,'λ min','sl-c3');
+  out.innerHTML=
+    `<div>λ du minimum<b>${SL.fmt(lams[r.i],2)}</b></div>`+
+    `<div>erreur au minimum<b>${SL.fmt(r.mean[r.i],3)}</b></div>`+
+    `<div>écart-type de la moyenne<b>${SL.fmt(r.se[r.i],3)}</b></div>`+
+    `<div>seuil 1 SE<b>${SL.fmt(r.thr,3)}</b></div>`+
+    `<div class="pos">λ retenu (1 SE)<b>${SL.fmt(lams[r.j],1)}</b></div>`+
+    `<div>erreur en λ₁SE<b>${SL.fmt(r.mean[r.j],3)}</b></div>`;}
+['ridge','lasso'].forEach(n=>{const b=document.createElement('button');b.className='tb';b.textContent=n;
+  b.onclick=()=>{kind=n;[...ctl.children].forEach(c=>c.setAttribute('aria-pressed',String(c===b)));draw();};ctl.appendChild(b);});
+ctl.children[0].setAttribute('aria-pressed','true');ctl.children[1].setAttribute('aria-pressed','false');
+draw();
+})();
+})();
+</script>
+</body>
+</html>
