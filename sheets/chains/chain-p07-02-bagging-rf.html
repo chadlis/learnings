@@ -1,0 +1,547 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Bagging et forêt aléatoire — la variance seule — chaîne</title>
+<meta name="sheet" content="series=chain;part=07;number=02;status=v1">
+<meta name="part" content="07 · Arbres, ensembles, k-means">
+<meta name="subtitle" content="arbres et ensembles — moyenner des arbres profonds réduit la variance, et tirer m features baisse ce que la moyenne ne peut pas baisser">
+<meta name="prereq" content="p07-01,p01-05,p00-02,p06-01">
+<meta name="anki" content="ml::bagging,ml::random-forest,ml::oob,ml::variance-correlee">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 07 · Arbres, ensembles, k-means › chaîne 02</div>
+  <h1>Bagging et forêt aléatoire — la <span>variance</span> seule</h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Pourquoi moyenner cent arbres profonds marche, pourquoi ça ne baisse pas le biais, pourquoi ajouter des arbres finit par ne plus rien changer, et à quoi sert de tirer <span class="m">m</span> features par nœud. Une seule formule tient toute la chaîne — <b>Var(moyenne) = <span class="m">ρσ</span>² + (1 − <span class="m">ρ</span>)<span class="m">σ</span>²/<span class="m">B</span></b> : le second terme s'éteint avec <span class="m">B</span>, le premier jamais. Fil rouge : un arbre profond de variance <span class="m">σ</span>² ; à <span class="m">ρ</span> = 0,5 cent arbres donnent 0,505 <span class="m">σ</span>², à <span class="m">ρ</span> = 0,1 ils donnent 0,109 <span class="m">σ</span>² — et c'est ce <span class="m">ρ</span> que la forêt achète en tirant <span class="m">m</span> features par nœud.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="chain-p07-01-arbres-impurete.html#s5">p07-01 · Arbres : profondeur = variance</a></li>
+    <li><a href="chain-p01-05-bootstrap.html#s4">p01-05 · Bootstrap, avec remise</a></li>
+    <li><a href="chain-p00-02-esperance-variance-densite.html">p00-02 · Variance d'une somme</a></li>
+    <li><a href="chain-p06-01-biais-variance.html#s3">p06-01 · Biais et variance</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>ml::bagging</code><code>ml::random-forest</code><code>ml::oob</code><code>ml::variance-correlee</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-04-variance-moyenne-correlee.html#s1">b04 · La variance d'une moyenne corrélée</a></li>
+    <li><a href="../bridges/bridge-03-biais-variance-partout.html#s6">b03 · Biais-variance partout</a></li>
+    <li><a href="../bridges/bridge-02-temoin-atteignable.html#s7">b02 · Le témoin atteignable</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>Un arbre profond est faible en biais et fort en variance.</b> Poussé à fond il isole les points et recopie le tirage (<a href="chain-p07-01-arbres-impurete.html#s5">p07-01 pas 5</a>) ; un seul point retiré change sa racine et tout ce qui en descend (<a href="chain-p07-01-arbres-impurete.html#s8">pas 8</a>).</li>
+      <li><b>Bootstrap.</b> Rééchantillonner <span class="m">n</span> lignes <b>avec remise</b> parmi <span class="m">n</span> : des doublons, et 1 − (1 − 1/<span class="m">n</span>)<sup><span class="m">n</span></sup> → 1 − e<sup>−1</sup> = <b>0,632</b> de lignes distinctes (<a href="chain-p01-05-bootstrap.html#s4">p01-05 pas 4</a>). Le 37 % de cette chaîne n'a pas d'autre origine que ce calcul.</li>
+      <li><b>La variance d'une moyenne corrélée.</b> Var(<span class="m">X̄</span>) = <span class="m">ρσ</span>² + (1 − <span class="m">ρ</span>)<span class="m">σ</span>²/<span class="m">B</span>, comptage des <span class="m">B</span>² cases de la matrice de covariance, <b>dérivée une fois pour toutes</b> dans <a href="../bridges/bridge-04-variance-moyenne-correlee.html#s1">b04 pas 1</a>. Ici on l'applique, on ne la redémontre pas.</li>
+      <li><b>Biais et variance.</b> L'erreur se décompose en biais² + variance + bruit, et ce qui est tiré est le <b>dataset entier</b> (<a href="chain-p06-01-biais-variance.html#s3">p06-01 pas 3</a>). Le bagging est le quatrième étage de <a href="../bridges/bridge-03-biais-variance-partout.html#s6">b03</a>.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>Les <span class="m">B</span> arbres ont la <b>même loi</b> : mêmes hyperparamètres, tirages identiquement distribués. Donc même biais, même variance <span class="m">σ</span>², et une seule corrélation <span class="m">ρ</span> deux à deux.</span>
+      <b>H2</b><span>On <b>moyenne</b> (régression) ou on <b>vote</b> (classification). Par linéarité de l'espérance, le biais de la moyenne est exactement le biais d'un arbre — rien dans la suite ne le touchera.</span>
+      <b>H3</b><span>Ce qui est tiré est le <b>dataset entier</b>. <span class="m">σ</span>² et <span class="m">ρ</span> se lisent donc sur la variabilité d'un <i>jeu de données</i> à l'autre, jamais sur celle des bootstraps à jeu fixé — à jeu fixé les bootstraps sont indépendants et <span class="m">ρ</span> vaudrait zéro.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor</h3>
+    <p>Un arbre poussé à fond a presque tout son erreur en <b>variance</b> : peu de biais, et une sensibilité maximale au tirage. Le bouton profondeur ne fait qu'échanger l'un contre l'autre le long du même compromis.</p>
+    <p>Pour sortir du compromis au lieu de le parcourir, il faut une autre ressource : plusieurs arbres.</p>
+    <p class="say">« Un arbre profond est presque sans biais et presque tout en variance, donc le régler en profondeur ne fait que déplacer le compromis sans l'améliorer, donc la seule sortie est d'en ajuster plusieurs et de les moyenner. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Fil rouge — un arbre profond, chiffré</div>
+    <p>Nuage 1D : <span class="m">n</span> = 30 points, <span class="m">x</span> uniforme sur [0 ; 4], <span class="m">y</span> = <span class="m">f</span>(<span class="m">x</span>) + <span class="m">ε</span> avec <span class="m">ε</span> ~ 𝒩(0 ; 1). Arbre de régression poussé à fond, on lit sa prédiction en <span class="m">x</span><sub>0</sub> = 2, où <span class="m">f</span>(<span class="m">x</span><sub>0</sub>) = 2,62.</p>
+    <p>Sur <b>4 000 jeux de données</b> tirés de la même population :</p>
+    <table>
+      <tr><th></th><th>moyenne</th><th>biais</th><th>variance</th><th>EQM</th></tr>
+      <tr class="hl"><td>un arbre profond</td><td>2,61</td><td>−0,005</td><td><b>0,98</b></td><td>0,98</td></tr>
+    </table>
+    <p>Le biais est à peine mesurable ; <b>toute</b> l'erreur est de la variance — et elle vaut à peu près le bruit lui-même. C'est le cas idéal pour ce qui suit.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Moyenner réduit la variance, pas le biais <span class="tag tronc">tronc</span></h3>
+    <p>Par linéarité, E[moyenne] = E[un arbre] : le <b>biais ne bouge pas d'un iota</b>. Tout le gain possible est donc en variance, et il est donné par le comptage des cases de la matrice de covariance (<a href="../bridges/bridge-04-variance-moyenne-correlee.html#s1">b04 pas 1</a>) :</p>
+    <div class="eq">Var(moyenne de <span class="m">B</span> arbres) = <b><span class="m">ρσ</span>² + (1 − <span class="m">ρ</span>) <span class="m">σ</span>²/<span class="m">B</span></b></div>
+    <p>Second terme : s'éteint avec <span class="m">B</span>. Premier terme : ne voit pas passer <span class="m">B</span>. À <span class="m">ρ</span> = 0 on retrouverait <span class="m">σ</span>²/<span class="m">B</span> — un cas particulier, jamais celui d'arbres entraînés sur les mêmes données.</p>
+    <p class="say">« La moyenne de <span class="m">B</span> arbres a le même centre qu'un arbre, donc le biais est inchangé, donc tout le gain est en variance, donc ce gain est plafonné par la corrélation entre arbres. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Fil rouge — 25 arbres baggés, mêmes 4 000 jeux</div>
+    <table>
+      <tr><th></th><th>moyenne</th><th>biais</th><th>variance</th></tr>
+      <tr><td>un arbre profond</td><td>2,61</td><td>−0,005</td><td>0,98</td></tr>
+      <tr class="hl"><td>moyenne de 25</td><td>2,61</td><td>−0,025</td><td><b>0,49</b></td></tr>
+    </table>
+    <p><b>Même centre</b> : l'écart des deux moyennes vaut 0,013, sous l'erreur Monte-Carlo (0,016). <b>Variance divisée par deux</b> : 0,49 / 0,98 = 0,50.</p>
+    <p>Mais 0,50, pas 1/25 = 0,04. Résolvons 0,50 = <span class="m">ρ</span> + (1 − <span class="m">ρ</span>)/25 : il vient <b><span class="m">ρ</span> = 0,47</b>. Les arbres ne sont pas indépendants, et ce nombre-là est tout le sujet des quatre pas suivants.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — même centre, largeur divisée</div>
+    <div id="f1a" class="wide"></div>
+    <div id="f1b" class="wide"></div>
+    <p class="cap">Deux histogrammes sur <b>la même échelle</b>. En haut : la prédiction en <span class="m">x</span><sub>0</sub> = 2 d'un <b>seul</b> arbre profond, un tirage = un nouveau jeu de 30 points. En bas : la <b>moyenne de 25</b> arbres ajustés sur 25 bootstraps de ce même jeu. Tire quelques centaines de fois des deux côtés : le trait rouge (la moyenne empirique) se cale au même endroit, près de <span class="m">f</span>(<span class="m">x</span><sub>0</sub>) = 2,62 — <b>le biais n'a pas bougé</b> — tandis que l'écart-type passe d'environ 0,99 à 0,70. Pas de 0,99 à 0,20 : ce n'est pas √25.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>D'où viennent des arbres différents : le bootstrap</h3>
+    <p>Chaque arbre est ajusté sur un rééchantillon de <span class="m">n</span> lignes tirées <b>avec remise</b> parmi les <span class="m">n</span> (<a href="chain-p01-05-bootstrap.html#s4">p01-05 pas 4</a>) : des doublons, 63 % de lignes distinctes, 37 % absentes.</p>
+    <p>Assez pour déplacer des seuils de coupure. <b>Pas assez</b> pour rendre deux arbres étrangers : ils voient les mêmes features fortes et les retrouvent aux mêmes endroits. D'où un <span class="m">ρ</span> non seulement positif, mais grand.</p>
+    <p class="say">« Chaque arbre voit 63 % des lignes, donc deux arbres en partagent 40 % et surtout toutes les features fortes, donc leurs coupures se ressemblent, donc <span class="m">ρ</span> est grand et pas petit. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — <span class="m">n</span> = 1 000 lignes</div>
+    <div class="eq">(1 − 1/1000)<sup>1000</sup> = 0,3677 &nbsp;→&nbsp; e<sup>−1</sup> = 0,3679</div>
+    <p>Un bootstrap contient <b>632 lignes distinctes</b> et en laisse <b>368</b> dehors. Deux bootstraps du même jeu : 0,632² = <b>40 %</b> des 1 000 lignes sont dans les deux — soit 63 % des lignes distinctes de l'un.</p>
+    <p>Et ce n'est que le recouvrement des <i>lignes</i>. Les <i>features</i>, elles, sont partagées à 100 % : si une feature domine, elle domine dans tous les arbres. Sur le fil rouge, le <span class="m">ρ</span> mesuré au pas 2 vaut <b>0,47</b>.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Le plancher <span class="m">ρσ</span>² <span class="tag tronc">tronc</span></h3>
+    <p>À <span class="m">ρ</span> = 0,5, cent arbres ne font pas mieux que 0,5 <span class="m">σ</span>² ; mille non plus. Ajouter des arbres n'est <b>jamais nuisible</b> — il n'y a pas de surapprentissage en <span class="m">B</span>, la courbe est monotone décroissante — mais devient vite inutile.</p>
+    <p>Pour descendre sous le plancher, il n'y a qu'un levier : baisser <span class="m">ρ</span>.</p>
+    <p class="say">« Le terme en 1/<span class="m">B</span> s'éteint, donc au-delà d'une centaine d'arbres il ne reste que <span class="m">ρσ</span>², donc le seul levier restant est la corrélation, donc il faut rendre les arbres différents autrement que par les lignes. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — deux <span class="m">ρ</span>, en unités de <span class="m">σ</span>² (un arbre seul)</div>
+    <table>
+      <tr><th><span class="m">B</span></th><th><span class="m">ρ</span> = 0,5 (bagging)</th><th><span class="m">ρ</span> = 0,1 (forêt)</th></tr>
+      <tr><td>10</td><td>0,5500</td><td>0,1900</td></tr>
+      <tr class="hl"><td><b>100</b></td><td><b>0,5050</b></td><td><b>0,1090</b></td></tr>
+      <tr><td>1 000</td><td>0,5005</td><td>0,1009</td></tr>
+      <tr><td>∞</td><td>0,5000</td><td>0,1000</td></tr>
+    </table>
+    <p>À <span class="m">ρ</span> = 0,5 : passer de 10 à 100 arbres gagne <b>0,045</b> ; passer de 100 à 1 000 en gagne <b>0,0045</b>. Dix fois le calcul pour un demi-centième de variance.</p>
+    <p>Changer <span class="m">ρ</span> de 0,5 à 0,1 à <span class="m">B</span> = 100 fait tomber la variance de 0,505 à 0,109 : <b>4,6 fois moins</b>. Aucun nombre d'arbres n'obtient cela à <span class="m">ρ</span> = 0,5.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — le plancher que <span class="m">B</span> ne franchit pas</div>
+    <div class="sl-ctl" id="f2presets"></div>
+    <div id="f2sliders"></div>
+    <div id="f2plot" class="wide"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Var(moyenne)/<span class="m">σ</span>² contre <span class="m">B</span>, en <b>échelle log</b> de 1 à 1 000. Bleu : <span class="m">ρ</span> = 0, la droite en <span class="m">σ</span>²/<span class="m">B</span> qui descend sans fin. Violet : la courbe au <span class="m">ρ</span> choisi ; rouge : son plancher <span class="m">ρσ</span>². Le segment vert mesure <b>tout ce que rapporte le passage de 10 à 100 arbres</b>. Les deux boutons posent les deux régimes du fil rouge : au preset <b>bagging</b> le violet colle à son plancher avant <span class="m">B</span> = 30, au preset <b>forêt</b> le plancher lui-même a baissé d'un facteur 5 et la courbe a de la place pour descendre.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>La forêt : tirer <span class="m">m</span> features par nœud <span class="tag tronc">tronc</span></h3>
+    <p>À <b>chaque nœud</b>, seules <span class="m">m</span> features tirées au hasard sont candidates — <span class="m">m</span> = √<span class="m">p</span> en classification, <span class="m">p</span>/3 en régression, par défaut. Une feature dominante n'est donc plus toujours disponible : d'autres coupures sont choisies, et les arbres cessent de se ressembler.</p>
+    <p>Le prix : chaque arbre est un peu plus biaisé, puisqu'il n'a pas toujours la meilleure coupure sous la main. Ce plancher divisé vaut bien plus que ce petit biais.</p>
+    <p class="say">« Restreindre les features candidates empêche une même feature de mener tous les arbres, donc <span class="m">ρ</span> tombe, donc le plancher baisse, donc la moyenne descend plus bas, au prix d'un léger biais par arbre. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — <span class="m">p</span> = 100 features</div>
+    <table>
+      <tr><th></th><th><span class="m">m</span></th><th>une feature donnée est candidate…</th></tr>
+      <tr class="hl"><td>classification</td><td>√100 = <b>10</b></td><td>dans <b>10 %</b> des nœuds</td></tr>
+      <tr><td>régression</td><td>100/3 ≈ <b>33</b></td><td>dans <b>33 %</b> des nœuds</td></tr>
+      <tr><td>bagging</td><td><span class="m">p</span> = <b>100</b></td><td>dans <b>100 %</b> des nœuds</td></tr>
+    </table>
+    <p>La probabilité qu'une feature donnée soit candidate est exactement <span class="m">m</span>/<span class="m">p</span>. En classification, <b>90 %</b> des nœuds doivent couper sans la feature dominante — c'est là que les arbres divergent.</p>
+    <p>Sur le fil rouge : <span class="m">ρ</span> passe de 0,5 à 0,1, le plancher de 0,5 <span class="m">σ</span>² à 0,1 <span class="m">σ</span>² (<b>divisé par 5</b>), et à <span class="m">B</span> = 100 la variance tombe de 0,505 à 0,109. <span class="m">m</span> est le vrai réglage d'une forêt ; <span class="m">B</span> ne l'est pas (pas 9).</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Out-of-bag : le test gratuit</h3>
+    <p>Chaque ligne est absente de ≈ 37 % des bootstraps — c'est le <b>même</b> calcul qu'au pas 3, lu dans l'autre sens. Prédire cette ligne avec ces arbres-là seulement donne une erreur sur <b>données non vues</b>, sans mettre le moindre pli de côté.</p>
+    <p>C'est le témoin atteignable de <a href="../bridges/bridge-02-temoin-atteignable.html#s7">b02 lieu 5</a> : un ensemble que le choix n'a pas touché. Légèrement <b>pessimiste</b>, puisqu'il note une forêt de 37 arbres et non de <span class="m">B</span>.</p>
+    <p class="say">« Chaque ligne est hors du sac de 37 % des arbres, donc on peut la prédire avec ces arbres-là seuls, donc l'erreur ainsi obtenue porte sur des données non vues, donc elle remplace un jeu de validation, à un léger pessimisme près. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — combien d'arbres pour chaque ligne</div>
+    <p><span class="m">n</span> = 1 000, <span class="m">B</span> = 100 : chaque ligne est hors-sac de <b>36,8 arbres</b> en moyenne. On la prédit avec ceux-là, on compare à son <span class="m">y</span>, on moyenne sur les 1 000 lignes : c'est l'erreur OOB.</p>
+    <p><b>Le pessimisme, chiffré.</b> À <span class="m">ρ</span> = 0,1, une moyenne de 36,8 arbres a une variance de 0,1 + 0,9/36,8 = <b>0,1245</b> <span class="m">σ</span>², contre 0,109 pour les 100 arbres qu'on déploiera. L'OOB note un modèle un peu moins bon que celui qu'on livre : c'est une <b>borne haute</b>, utilisable telle quelle.</p>
+    <p>Usage : tracer l'erreur OOB contre <span class="m">B</span> et s'arrêter quand la courbe est plate. C'est à cela que sert <span class="m">B</span>, et à rien d'autre.</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — qui a vu quoi : le sac et le hors-sac</div>
+    <div class="sl-ctl" id="f3ctl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">20 lignes en colonnes, 12 arbres en lignes. <b>Point violet plein</b> : la ligne est dans le bootstrap de cet arbre (il l'a vue). <b>Cercle rouge vide</b> : elle en est absente — cet arbre est <b>out-of-bag</b> pour elle, et lui seul a le droit de la prédire. La colonne 7 est marquée : compte ses cercles vides, ce sont les arbres qui votent pour la ligne 7. <b>Nouveau tirage</b> : la part de cercles vides retombe toujours autour de 35,8 % = (1 − 1/20)<sup>20</sup>, qui tend vers 36,8 % quand <span class="m">n</span> grandit. Aucune ligne n'est jamais orpheline longtemps, aucune n'est vue par tous.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Pourquoi des arbres <i>profonds</i></h3>
+    <p>Le bagging ne baisse que la variance. Il lui faut donc des composants dont l'erreur <b>est</b> de la variance : à faible biais, forte variance — des arbres profonds.</p>
+    <p>Des souches (profondeur 1) baggées restent des souches : leur biais traverse la moyenne intact, et il n'y avait presque pas de variance à prendre. Les arbres courts sont pour le <b>boosting</b>, qui lui attaque le biais (<a href="../../map.html#p07-03">p07-03</a>).</p>
+    <p class="say">« Moyenner ne touche pas au biais, donc il faut des composants dont l'erreur est surtout de la variance, donc arbres profonds pour le bagging et la forêt, donc arbres courts réservés au boosting, qui lui baisse le biais. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — profond contre souche, mêmes 3 000 jeux</div>
+    <table>
+      <tr><th></th><th>biais</th><th>variance</th><th>EQM</th><th>EQM baggé ×25</th></tr>
+      <tr class="hl"><td>arbre profond</td><td>−0,005</td><td>0,979</td><td>0,979</td><td><b>0,479</b> (−51 %)</td></tr>
+      <tr><td>souche&nbsp;(<span class="m">d</span>&nbsp;=&nbsp;1)</td><td><b>−0,610</b></td><td>0,083</td><td>0,454</td><td>0,407 (−10 %)</td></tr>
+    </table>
+    <p>La souche est déjà stable : variance 0,083, il n'y a presque rien à lui prendre. Son EQM est bloquée par son biais, et 25 souches ne le bougent pas (−0,610 → −0,579) ; 1 000 non plus.</p>
+    <p>L'arbre profond, lui, voit son EQM divisée par deux — et elle continuerait à descendre jusqu'à son plancher <span class="m">ρσ</span>².</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Importance des features : deux mesures, deux pièges</h3>
+    <p><b>MDI</b> — baisse d'impureté cumulée sur tous les nœuds où la feature a coupé. Gratuite, calculée pendant l'ajustement, et <b>biaisée vers les features à beaucoup de modalités</b> : plus de coupures candidates, donc plus de chances d'en trouver une bonne par hasard.</p>
+    <p><b>Permutation</b> — on brouille une colonne et on regarde l'erreur OOB monter. Plus honnête, plus chère. Dans les deux cas, « importance » n'est pas « causalité » : deux features corrélées se partagent le crédit.</p>
+    <p class="say">« Une feature à beaucoup de modalités offre plus de coupures candidates, donc elle gagne plus souvent par hasard, donc la MDI la surévalue, donc on lit l'importance par permutation sur l'out-of-bag dès que la réponse compte. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — deux features de bruit pur</div>
+    <p><span class="m">n</span> = 300, <span class="m">y</span> tiré à pile ou face, <b>indépendant de tout</b>. Deux features, elles aussi du bruit pur : une binaire (2 modalités), une continue (300 modalités). Arbre de profondeur 6, MDI moyennée sur 40 tirages :</p>
+    <table>
+      <tr><th>feature (bruit pur)</th><th>modalités</th><th>part de la MDI</th></tr>
+      <tr class="hl"><td>continue</td><td>300</td><td><b>94 %</b></td></tr>
+      <tr><td>binaire</td><td>2</td><td>6 %</td></tr>
+    </table>
+    <p>Aucune des deux ne sait quoi que ce soit sur <span class="m">y</span>. Le classement est un pur artefact du <b>nombre de coupures candidates</b>. À lire comme un avertissement : une MDI ne compare que des features de même granularité.</p>
+  </div>
+</div>
+
+<div class="step" id="s9">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Les quatre pannes sont la chaîne lue à l'envers : <span class="m">ρ</span> qui ne descend pas, un biais que la moyenne ne peut pas atteindre, et un <span class="m">B</span> pris pour un réglage.</p>
+    <p class="say">« Le bagging ne dispose que de la variance, donc il échoue partout où l'erreur est ailleurs, donc on diagnostique en regardant <span class="m">ρ</span> et le biais des composants, donc jamais en ajoutant des arbres. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b><span class="m">ρ</span> reste élevé malgré <span class="m">m</span>.</b> Une feature écrasante — souvent une fuite (<a href="chain-p06-02-cv-leakage.html#s7">p06-02 pas 7</a>) — n'est candidate que dans <span class="m">m</span>/<span class="m">p</span> des nœuds, mais quand elle l'est elle gagne <i>toujours</i>, et l'arbre y revient à chaque profondeur. La forêt redevient du bagging. Symptômes : une importance qui écrase tout, une OOB trop belle.</li>
+      <li><b>Biais partagé.</b> Mille arbres qui ne savent pas tourner les axes moyennent mille escaliers : le résultat est plus lisse, mais reste un escalier (<a href="chain-p07-01-arbres-impurete.html#s9">p07-01 casse</a>). La moyenne ne crée pas de capacité — elle ne fait que retirer du bruit.</li>
+      <li><b>Extrapolation.</b> Toute prédiction est une moyenne de <span class="m">y</span> observés : hors du support des <span class="m">x</span> d'entraînement, la forêt rend le palier du bord, exactement comme un arbre. Une tendance qui dérive n'est jamais prolongée.</li>
+      <li><b><span class="m">B</span> n'est pas un hyperparamètre à régler.</b> Assez grand pour que la courbe OOB soit plate, c'est tout : il n'y a rien à valider croisée sur <span class="m">B</span>, puisque la courbe est monotone. Ce qui se règle, c'est <span class="m">m</span> et la taille minimale de feuille.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Moyenner <span class="m">B</span> arbres : <b>biais inchangé</b>, variance <span class="m">ρσ</span>² + (1 − <span class="m">ρ</span>)<span class="m">σ</span>²/<span class="m">B</span>.</li>
+    <li>Le bootstrap fabrique des arbres <b>différents mais corrélés</b> : 63 % de lignes distinctes, et 100 % des features en commun.</li>
+    <li>Plancher <span class="m">ρσ</span>² : au-delà de ~100 arbres, plus de gain ; jamais de perte non plus.</li>
+    <li>Forêt : <span class="m">m</span> features par nœud ⇒ <span class="m">ρ</span> baisse (0,5 → 0,1) ⇒ plancher divisé par 5 ; léger biais par arbre, largement rentable.</li>
+    <li>OOB : chaque ligne prédite par les ≈ 37 % d'arbres qui ne l'ont pas vue — erreur de test gratuite, légèrement pessimiste.</li>
+    <li>Arbres <b>profonds</b> pour la forêt, <b>courts</b> pour le boosting ; <span class="m">B</span> se stabilise, <span class="m">m</span> et la profondeur se règlent.</li>
+  </ol>
+</div>
+<div class="phrase">« Le bagging moyenne des arbres profonds ajustés sur des bootstraps : le biais reste celui d'un arbre, la variance tombe à <span class="m">ρσ</span>² plus (1 − <span class="m">ρ</span>)<span class="m">σ</span>² sur <span class="m">B</span>. Au-delà d'une centaine d'arbres il ne reste que le plancher <span class="m">ρσ</span>², donc la forêt aléatoire tire <span class="m">m</span> features par nœud pour décorréler les arbres et baisser ce plancher. L'erreur out-of-bag, sur les 37 % d'arbres qui n'ont pas vu chaque ligne, est un test gratuit. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Que fait le bagging au biais et à la variance ?</div><div class="a hid">Biais inchangé (linéarité de l'espérance) ; variance ρσ² + (1 − ρ)σ²/B.</div></li>
+    <li><div class="q">Pourquoi cent arbres et pas mille ?</div><div class="a hid">Le terme en 1/B s'éteint ; il ne reste que ρσ². De 10 à 100 on gagne 0,045 σ², de 100 à 1 000 : 0,0045.</div></li>
+    <li><div class="q">À quoi sert <span class="m">m</span> dans une forêt ?</div><div class="a hid">Décorréler les arbres : une feature n'est candidate que dans m/p des nœuds, donc ρ baisse et le plancher avec lui. Prix : un léger biais par arbre.</div></li>
+    <li><div class="q">D'où vient le 37 % ?</div><div class="a hid">(1 − 1/n)<sup>n</sup> → e<sup>−1</sup> = 0,368 : la part des lignes absentes d'un bootstrap. Un seul calcul, deux usages — la corrélation entre arbres et l'OOB.</div></li>
+    <li><div class="q">Pourquoi des arbres profonds ici et courts en boosting ?</div><div class="a hid">Le bagging ne baisse que la variance, il lui faut donc des composants à faible biais. Le boosting baisse le biais, il part de composants faibles.</div></li>
+    <li><div class="q"><span class="m">B</span> se règle-t-il par validation croisée ?</div><div class="a hid">Non : la courbe OOB est monotone, on prend B assez grand pour qu'elle soit plate. Ce qui se règle, c'est m et la profondeur.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="../bridges/bridge-04-variance-moyenne-correlee.html#s1"><b>b04 — La variance d'une moyenne corrélée</b><small>la formule de cette chaîne, dérivée une fois et rejouée en k-fold, en bootstrap et en SE d'une moyenne : le plancher ρσ² et le B efficace 1/ρ</small></a>
+    <a href="../bridges/bridge-03-biais-variance-partout.html#s6"><b>b03 — Biais-variance partout</b><small>échelle 4 : les ensembles. B ne touche pas le biais, à aucune des six échelles où le compromis se rejoue</small></a>
+    <a href="../bridges/bridge-02-temoin-atteignable.html#s7"><b>b02 — Le témoin atteignable</b><small>lieu 5 : l'OOB comme ensemble que le choix n'a pas touché, et pourquoi son pessimisme est la bonne direction d'erreur</small></a>
+    <a href="chain-p07-01-arbres-impurete.html#s8"><b>p07-01 — Arbres : impureté, split, profondeur</b><small>l'instabilité d'un arbre unique, mesurée au pas 8 : c'est exactement ce que cette chaîne répare</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>ml::bagging</code> (biais inchangé, variance divisée, arbres profonds) · <code>ml::random-forest</code> (m par nœud, √p et p/3, ce que m achète) · <code>ml::oob</code> (37 %, test gratuit, pessimisme) · <code>ml::variance-correlee</code> (ρσ² + (1 − ρ)σ²/B, le plancher).</p>
+  <p>Le vocabulaire bagging / boosting ne se retient pas en slogans : il se retient sur cette formule unique. Qui baisse la variance moyenne des composants à faible biais ; qui baisse le biais additionne des composants faibles (p07-03).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p07-02 · v1 du 17/09/2026 · Prérequis : p07-01, p01-05, p00-02, p06-01. Suite : <a href="../../map.html#p07-03">p07-03 Boosting</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== Figure 1 : un arbre vs la moyenne de 25 =====
+   Ce qui est tiré est le JEU DE DONNÉES (H3), pas le bootstrap : à jeu fixé les B bootstraps
+   sont indépendants et la variance se diviserait exactement par B. C'est bien la variabilité
+   d'un échantillon à l'autre que le compromis biais-variance mesure, donc chaque tirage
+   régénère les 30 points, puis le bagging s'applique à CE jeu-là. */
+const N1=30, X0=2, FX0=2.617, NB=25;
+const f1=x=>2*Math.sin(1.1*x)+0.5*x;
+let spare=null;
+function gauss(){ if(spare!==null){const v=spare;spare=null;return v;}
+  let u=0,v=0; while(u===0)u=Math.random(); v=Math.random();
+  const r=Math.sqrt(-2*Math.log(u)); spare=r*Math.sin(2*Math.PI*v); return r*Math.cos(2*Math.PI*v); }
+function dataset(){const x=new Float64Array(N1),y=new Float64Array(N1);
+  for(let i=0;i<N1;i++){x[i]=Math.random()*4;y[i]=f1(x[i])+gauss();}return {x,y};}
+/* arbre de régression 1D poussé à fond : une feuille par valeur distincte de x.
+   La prédiction en x0 est donc la moyenne des y de la valeur de x la plus proche. */
+function deepTree(x,y,idx){
+  let bj=-1,bd=Infinity;
+  for(let k=0;k<idx.length;k++){const d=Math.abs(x[idx[k]]-X0);if(d<bd){bd=d;bj=idx[k];}}
+  let s=0,n=0;const xv=x[bj];
+  for(let k=0;k<idx.length;k++)if(x[idx[k]]===xv){s+=y[idx[k]];n++;}
+  return s/n;
+}
+const ALL=[];for(let i=0;i<N1;i++)ALL.push(i);
+function drawOne(){const d=dataset();return deepTree(d.x,d.y,ALL);}
+function drawBag(){const d=dataset();let s=0;const b=new Array(N1);
+  for(let t=0;t<NB;t++){for(let i=0;i<N1;i++)b[i]=(Math.random()*N1)|0;s+=deepTree(d.x,d.y,b);}
+  return s/NB;}
+const BINS=[-0.5,5.5,30], XT1=[0,1,2,3,4,5];
+const mark1=[{x:FX0,label:'f(x₀) = 2,62',cls:'slope sl-c5'}];
+const R1=SL.repeat(document.getElementById('f1a'),{draw:drawOne,bins:BINS,xt:XT1,marks:mark1,w:600,h:220,
+  xl:'prédiction en x₀ — UN arbre profond',yl:'fréquence',counts:[1,50,500],
+  empty:'Aucun tirage encore — un tirage = un nouveau jeu de 30 points.',
+  readout:(n,m,s)=>`${n} jeux · moyenne ${SL.fmt(m,3)} · écart-type ${SL.fmt(s,3)} · variance ${SL.fmt(s*s,3)}`});
+const R2=SL.repeat(document.getElementById('f1b'),{draw:drawBag,bins:BINS,xt:XT1,marks:mark1,w:600,h:220,
+  xl:'prédiction en x₀ — MOYENNE de 25 arbres baggés',yl:'fréquence',counts:[1,50,500],
+  empty:'Aucun tirage encore — un tirage = un nouveau jeu, puis 25 bootstraps de ce jeu.',
+  readout:(n,m,s)=>`${n} jeux · moyenne ${SL.fmt(m,3)} · écart-type ${SL.fmt(s,3)} · variance ${SL.fmt(s*s,3)}`});
+/* on amorce les deux histogrammes : une figure vide au chargement ne montre rien */
+function amorce(r,f,n){for(let i=0;i<n;i++)r.stats.push(f());r.render();}
+amorce(R1,drawOne,300);amorce(R2,drawBag,300);
+
+/* ===== Figure 2 : le plancher ρσ² =====
+   Axe x logarithmique : on trace en u = log10(B), puis on réécrit les étiquettes de
+   graduation — SL.plot imprime la valeur de la graduation, ici un logarithme.
+   Les ticks x sont posés avant les ticks y : ce sont les premiers text.sl-tick. */
+const L10=Math.log10, BT=[1,3,10,30,100,300,1000], XMAX=L10(1000);
+const VAR=(r,B)=>r+(1-r)/B;
+const P2=SL.plot(document.getElementById('f2plot'),{x:[0,XMAX],y:[0,1.18],w:600,h:300,
+  xt:BT.map(L10),yt:[.2,.4,.6,.8,1],xl:'B — nombre d’arbres moyennés (échelle log)',yl:'Var(moyenne) / σ²'});
+[...P2.svg.querySelectorAll('text.sl-tick')].slice(0,BT.length).forEach((e,i)=>{e.textContent=SL.fmt(BT[i],0);});
+P2.fn(u=>VAR(0,Math.pow(10,u)),'sl-c4');
+P2.label(XMAX,1.03,'ρ = 0 : σ²/B (arbres indépendants)','sl-c4','end');
+const out2=document.getElementById('f2out');
+let cur2=null,flo2=null;
+function draw2(r){
+  P2.clear(); if(cur2)cur2.remove(); if(flo2)flo2.remove();
+  const v10=VAR(r,10), v100=VAR(r,100), v1000=VAR(r,1000);
+  cur2=P2.fn(u=>VAR(r,Math.pow(10,u)),'sl-c2');
+  flo2=P2.fn(()=>r,'sl-c3');
+  P2.seg(L10(10),v10,L10(100),v10,'chord');
+  P2.seg(L10(100),v10,L10(100),v100,'gain');
+  P2.dot(L10(10),v10,'sl-c2',5);P2.dot(L10(100),v100,'sl-c2',5);
+  P2.text(L10(11),v10+.06,'B arbres corrélés','sl-c2');
+  if(r>.02)P2.text(XMAX,1.12,'plancher ρσ² = '+SL.fmt(r,2)+' σ²','sl-c3','end');
+  out2.innerHTML=`<div class="pos">B = 10<b>${SL.fmt(v10,4)} σ²</b></div>`
+    +`<div class="pos">B = 100<b>${SL.fmt(v100,4)} σ²</b></div>`
+    +`<div class="pos">B = 1 000<b>${SL.fmt(v1000,4)} σ²</b></div>`
+    +`<div class="${r>0?'zero':'pos'}">plancher, B → ∞<b>${SL.fmt(r,4)} σ²</b></div>`
+    +`<div class="pos">gain de 10 à 100<b>${SL.fmt(v10-v100,4)} σ²</b></div>`
+    +`<div class="pos">gain de 100 à 1 000<b>${SL.fmt(v100-v1000,4)} σ²</b></div>`;}
+const sR=SL.slider(document.getElementById('f2sliders'),{label:'corrélation ρ',min:0,max:.9,step:.05,value:.5},draw2);
+const pre2=document.getElementById('f2presets');
+[['bagging · ρ = 0,5',.5],['forêt · ρ = 0,1',.1],['arbres indépendants · ρ = 0',0]].forEach(([n,v])=>{
+  const b=document.createElement('button');b.className='tb';b.textContent=n;b.onclick=()=>sR.set(v);pre2.appendChild(b);});
+
+/* ===== Figure 3 : la grille du sac et du hors-sac =====
+   Aucune primitive ne dessine une grille d'appartenance : on la compose dans le `dyn`
+   d'un SL.plot, en points pleins / creux — les deux classes existent déjà. */
+const NL=20, NARB=12, LIGNE=7;
+const P3=SL.plot(document.getElementById('f3plot'),{x:[.2,20.8],y:[-.6,13.4],w:600,h:320,xt:[],yt:[]});
+P3.label(.6,13.0,'un point par (arbre, ligne) — plein : vu · creux : hors-sac');
+const out3=document.getElementById('f3out');
+function tirage(){
+  P3.clear();
+  let absents=0, oobL=0;
+  P3.seg(LIGNE,.55,LIGNE,12.45,'chord');
+  for(let a=1;a<=NARB;a++){
+    const vu=new Array(NL+1).fill(false);
+    for(let k=0;k<NL;k++)vu[1+((Math.random()*NL)|0)]=true;
+    for(let j=1;j<=NL;j++){
+      if(vu[j])P3.dot(j,a,'sl-c2',5);
+      else{P3.dot(j,a,'sl-c3 hollow',5);absents++;if(j===LIGNE)oobL++;}
+    }
+  }
+  P3.text(LIGNE,-.3,'ligne 7','sl-c3','middle');
+  const part=absents/(NL*NARB);
+  out3.innerHTML=`<div class="pos">part hors-sac<b>${SL.fmt(100*part,1)} %</b></div>`
+    +`<div class="pos">attendu (1 − 1/20)<sup>20</sup><b>35,8 %</b></div>`
+    +`<div class="pos">arbres OOB pour la ligne 7<b>${oobL} / 12</b></div>`
+    +`<div class="pos">attendu, ligne quelconque<b>4,3 / 12</b></div>`;}
+const b3=document.createElement('button');b3.className='tb';b3.textContent='nouveau tirage';
+b3.onclick=tirage;document.getElementById('f3ctl').appendChild(b3);
+tirage();
+})();
+</script>
+</body>
+</html>

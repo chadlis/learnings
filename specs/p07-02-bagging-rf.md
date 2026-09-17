@@ -10,7 +10,7 @@ prereq: [p07-01, p01-05, p00-02, p06-01]
 anki: [ml::bagging, ml::random-forest, ml::oob, ml::variance-correlee]
 bridges: [b04, b03, b02]
 next: p07-03
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -45,7 +45,7 @@ Un arbre profond : variance σ² (unité). Moyenne de B arbres corrélés à ρ 
 
 ## Figures exigées
 - **Figure 1 — `plot` + `slider` ρ ∈ [0, 0,9]** : Var(moyenne)/σ² en fonction de B (axe log 1…1 000), plancher ρ en pointillé ; presets « bagging ρ = 0,5 » et « forêt ρ = 0,1 ». Légende : à 100 arbres on est au plancher ; la forêt baisse le plancher.
-- **Figure 2 — `repeat`** : sur un nuage 1D bruité (n = 30), draw = prédiction en x₀ d'un arbre profond ajusté sur un bootstrap ; second bouton : moyenne de 25 tels arbres. Deux histogrammes : même centre, largeurs très différentes. Légende : même biais, variance divisée.
+- **Figure 2 — `repeat`** : sur un nuage 1D bruité (n = 30), un tirage = **un nouveau jeu de 30 points** ; histogramme du haut = prédiction en x₀ d'un arbre profond ajusté dessus, histogramme du bas = moyenne de 25 arbres ajustés sur 25 bootstraps de ce même jeu. Même centre, largeurs très différentes. Légende : même biais, variance divisée — mais par 2, pas par 25.
 - **Figure 3 — SVG custom via `plot`** : 20 lignes × 12 bootstraps en grille, case grisée si la ligne est absente du bootstrap ; readouts « part absente » (≈ 37 %) et « arbres OOB pour la ligne 7 ». Légende : le test gratuit.
 
 ## Où ça casse
@@ -76,6 +76,12 @@ Un arbre profond : variance σ² (unité). Moyenne de B arbres corrélés à ρ 
 - Diagnostic : « vocabulaire bagging/boosting » manquant (N2) ; la chaîne fixe le vocabulaire sur la formule unique de b04, pas sur des slogans.
 - Le 37 % apparaît en p01-05 (bootstrap) et ici (OOB) : une seule origine, dite au pas 3 et 6.
 - b02 (OOB pessimiste) et b04 (la formule) : renvoyer, ne pas redériver.
+
+## Questions pour la revue
+- **Figure 2, ce qui est tiré.** Le spec écrivait « draw = prédiction d'un arbre ajusté sur un bootstrap ». Pris au pied de la lettre, le jeu est fixé et les B bootstraps sont alors **indépendants** : la variance se diviserait exactement par B, ρ = 0, et la figure démontrerait le contraire de la chaîne. Corrigé : un tirage régénère le jeu de 30 points (c'est bien le dataset qui est tiré, p06-01 pas 3), puis le bagging s'applique à ce jeu-là. Posé en H3 dans la sheet. Vérifié : ratio var(25)/var(1) = 0,50 et non 1/25 = 0,04, d'où ρ = 0,47 — cohérent avec le ρ ≈ 0,5 annoncé pour le bagging.
+- **Figure 3, le 37 % à petit n.** La grille est 20 lignes × 12 arbres : (1 − 1/20)²⁰ = **35,8 %**, pas 36,8 %. L'écart est réel, pas un arrondi (la limite 1/e n'est atteinte qu'à grand n). La légende et le readout disent les deux nombres plutôt que d'écrire 37 % sur une figure qui produit 35,8 %.
+- **Aucun chiffre du fil rouge n'était faux** : 0,55 / 0,505 / 0,5 · 0,19 / 0,109 / 0,1 · gain 0,045 · 632 distinctes / 368 absentes · 36,8 arbres OOB à B = 100 — tous reproduits.
+- **Chiffres ajoutés, non demandés par le spec** (tous vérifiés en Python) : ρ empirique 0,47 du fil rouge ; recouvrement de deux bootstraps 40 % ; pessimisme OOB 0,1245 σ² contre 0,109 ; souche baggée −10 % d'EQM contre −51 % pour l'arbre profond ; MDI 94 % / 6 % entre deux features de bruit pur.
 
 ## Exclusions
 Pas d'extra-trees, pas de proximity, pas d'importance par permutation détaillée, pas de preuve de ρσ² + (1 − ρ)σ²/B (b04).
