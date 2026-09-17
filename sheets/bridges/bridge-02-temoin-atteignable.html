@@ -1,0 +1,448 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Le témoin atteignable — pont</title>
+<meta name="sheet" content="series=bridge;part=B;number=02;status=v1">
+<meta name="part" content="B · Ponts">
+<meta name="subtitle" content="pont — majorer un minimum par un point qu'on peut exhiber ; pourquoi « choisir le meilleur » ne peut que monter">
+<meta name="prereq" content="p04-01,p01-04,p05-01,p07-02">
+<meta name="anki" content="algebre::temoin,stats::multiplicite,ml::validation">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+</style>
+</head><body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Ponts › pont 02</div>
+  <h1>Le <span>témoin</span> atteignable</h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Pont. Un seul argument — <b>exhiber, dans le grand ensemble, un point qui vaut l'ancien optimum</b> — rejoué sur cinq lieux : le <span class="m">R</span>², l'erreur d'entraînement, le score du meilleur de <span class="m">k</span> essais, un test set qui a servi à choisir, l'OOB d'une forêt. Tout ce qui change d'un lieu à l'autre est <b>l'ensemble qui grandit</b> et <b>qui joue le témoin</b>. Fil rouge commun : cinq points, <span class="m">y</span> = (2 ; 3 ; 5 ; 4 ; 6), et une variable ajoutée qui ne sert à rien.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>Les lieux</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="../chains/chain-p04-01-matrice-action.html#s8">p04-01 · Le témoin atteignable</a></li>
+    <li><a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html#s6">p01-04 · Le max ment</a></li>
+    <li><a href="../../map.html#p05-01">p05-01 · Régression, modèle et OLS</a></li>
+    <li><a href="../../map.html#p07-02">p07-02 · Bagging et forêts</a></li>
+    <li><a href="../walkthroughs/walkthrough-p01-03-biais-du-max.html">w01-03 · Le biais du max</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>algebre::temoin</code><code>stats::multiplicite</code><code>ml::validation</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../../map.html#b03">b03 · Biais-variance partout</a></li>
+    <li><a href="bridge-01-une-seule-descente.html">b01 · Une seule descente</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que ce pont suppose acquis</div>
+    <ul>
+      <li><b>Le témoin, côté algèbre.</b> Ajouter une colonne à <span class="m">X</span> agrandit l'image ; la projection de <span class="m">y</span> ne peut que s'en rapprocher (<a href="../chains/chain-p04-01-matrice-action.html#s8">p04-01 pas 8</a>).</li>
+      <li><b>Le max ment.</b> Le meilleur de <span class="m">k</span> scores bruités est un maximum de variables aléatoires, donc son espérance dépasse la valeur commune (<a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html#s6">p01-04 pas 6</a>), et le remède est le protocole (<a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html#s7">pas 7</a>).</li>
+      <li><b>RSS, TSS, <span class="m">R</span>²</b> et <b>bagging, OOB</b> ne sont pas redéfinis ici : leurs chaînes propres sont <a href="../../map.html#p05-01">p05-01</a> et <a href="../../map.html#p07-02">p07-02</a>.</li>
+      <li><b><span class="up">E</span>[max de <span class="m">k</span> normales] n'est pas redérivée.</b> Le passage par <span class="up">P</span>(max ≤ <span class="m">t</span>) = Φ(<span class="m">t</span>/SE)<sup><span class="m">k</span></sup> vit dans <a href="../walkthroughs/walkthrough-p01-03-biais-du-max.html">w01-03</a> ; ce pont prend le tableau de valeurs tel quel et s'en sert.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span><b>Emboîtement</b> : <span class="m">S</span> ⊂ <span class="m">S</span>′, tout candidat de l'ancien ensemble est encore candidat dans le nouveau. Sans emboîtement, rien de ce pont ne tient.</span>
+      <b>H2</b><span><b>Même critère, mêmes données</b> : <span class="m">f</span> ne change pas quand l'ensemble grandit, et on le minimise sur le même jeu de lignes.</span>
+      <b>H3</b><span>Pour la version bruitée : les <span class="m">k</span> candidats valent <b>la même chose</b>, leurs bruits sont <b>indépendants</b> et de même écart-type SE. C'est le cas le plus favorable ; il suffit à produire le biais.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">Le même témoin, cinq lieux</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le témoin, écrit une fois <span class="tag tronc">tronc</span></h3>
+    <p>Deux ensembles de candidats emboîtés, un même critère <span class="m">f</span> à minimiser. Pour montrer que le minimum ne monte pas, on n'optimise rien : on <b>exhibe</b> un élément du grand ensemble qui reproduit l'ancien optimum.</p>
+    <div class="eq">min<sub><span class="m">S</span>′</sub> <span class="m">f</span> ≤ <span class="m">f</span>(témoin) = min<sub><span class="m">S</span></sub> <span class="m">f</span></div>
+    <p>L'inégalité est acquise <b>avant</b> tout calcul. Le calcul dit de combien ça baisse ; il ne peut pas dire que ça monte. Corollaire immédiat : un critère qui ne peut que baisser quand l'ensemble grandit <b>ne compare pas</b> deux ensembles de tailles différentes.</p>
+    <p class="say">« L'ancien optimum est atteignable dans le nouvel ensemble, donc le minimum du nouveau lui est au plus égal, donc élargir ne peut jamais faire monter un minimum, donc ce minimum ne juge pas l'élargissement. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le fil rouge, cinq points</div>
+    <p><span class="m">x</span> = (1 ; 2 ; 3 ; 4 ; 5), <span class="m">y</span> = (2 ; 3 ; 5 ; 4 ; 6), variable ajoutée <span class="m">z</span> = (1 ; 0 ; 1 ; 0 ; 1) choisie sans rapport avec <span class="m">y</span>. TSS = 10.</p>
+    <table>
+      <tr><th>espace des candidats</th><th>ajustement</th><th>RSS</th><th><span class="m">R</span>²</th></tr>
+      <tr><td>1 + <span class="m">x</span></td><td>1,3 + 0,9 <span class="m">x</span></td><td>19/10 = 1,9</td><td>0,81</td></tr>
+      <tr><td>1 + <span class="m">x</span> + <span class="m">z</span></td><td>0,8 + 0,9 <span class="m">x</span> + (5/6) <span class="m">z</span></td><td>16/15 ≈ 1,067</td><td>67/75 ≈ 0,893</td></tr>
+      <tr class="hl"><td><b>témoin</b> : <span class="m">β</span><sub><span class="m">z</span></sub> = 0</td><td>1,3 + 0,9 <span class="m">x</span></td><td><b>1,9</b></td><td>0,81</td></tr>
+    </table>
+    <p>La troisième ligne vit dans le grand espace et y vaut exactement l'ancien RSS : le minimum du grand espace lui est donc inférieur ou égal. Le chiffre confirme (1,067 &lt; 1,9), il n'était pas nécessaire. Le détail algébrique est en <a href="../chains/chain-p04-01-matrice-action.html#s8">p04-01 pas 8</a>.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Une ligne par lieu <span class="tag tronc">tronc</span></h3>
+    <p>Lire une de ces situations, c'est répondre à deux questions seulement : <b>quel ensemble grandit</b>, et <b>qui joue le témoin</b>. La conséquence suit sans calcul.</p>
+    <p>Trois lectures utiles : le <span class="m">R</span>² et l'erreur d'entraînement sont des <b>minima</b> déguisés ; le max de <span class="m">k</span> scores est le même fait <b>retourné</b> — on garde le plus haut, donc ça monte ; l'OOB est le seul lieu où l'élargissement ne triche pas, parce qu'aucun choix n'a été fait dessus.</p>
+    <p class="say">« Le mécanisme ne demande que deux noms — l'ensemble qui grandit et le point qui témoigne, donc la conséquence se lit sans calcul, donc les cinq lignes ci-contre sont un seul théorème en cinq habits. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Les cinq lieux, en un tableau</div>
+    <table>
+      <tr><th>lieu</th><th>l'ensemble qui grandit</th><th>le témoin</th><th>conséquence</th></tr>
+      <tr class="hl"><td><span class="m">R</span>² et RSS</td><td>les modèles avec une variable de plus</td><td><span class="m">β</span><sub>nouveau</sub> = 0</td><td>RSS ne monte jamais, <span class="m">R</span>² ne baisse jamais</td></tr>
+      <tr><td>Erreur train</td><td>un modèle plus flexible</td><td>l'ancien modèle est dans le nouveau</td><td>l'erreur train décroît toujours</td></tr>
+      <tr><td>Biais du max</td><td><span class="m">k</span> configs comparées sur le même test</td><td>le gagnant contient la chance qui l'a fait gagner</td><td>score ≈ vrai + SE·<span class="up">E</span>[max<sub><span class="m">k</span></sub>]</td></tr>
+      <tr><td>Tuning sur le test</td><td>le test set utilisé pour choisir</td><td>même chose</td><td>le test ne mesure plus</td></tr>
+      <tr><td>OOB vs test</td><td>les arbres qui n'ont pas vu la ligne</td><td>rien à racheter : aucun choix</td><td>OOB un peu pessimiste, mais valide</td></tr>
+    </table>
+    <p><b>Où c'est écrit</b>, ligne à ligne : <a href="../chains/chain-p04-01-matrice-action.html#s8">p04-01 pas 8</a> et <a href="../../map.html#p05-01">p05-01</a> · <a href="../../map.html#p06-01">p06-01</a> · <a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html#s6">p01-04 pas 6</a> et <a href="../walkthroughs/walkthrough-p01-03-biais-du-max.html">w01-03</a> · <a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html#s7">p01-04 pas 7</a> · <a href="../../map.html#p07-02">p07-02</a> et <a href="../chains/chain-p01-05-bootstrap.html#s4">p01-05 pas 4</a>.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Lieu 1 — <span class="m">R</span>² et RSS : le témoin est un zéro</h3>
+    <p>Ajouter une colonne à <span class="m">X</span>, c'est agrandir l'ensemble des ajustements atteignables. Le témoin est l'ancien vecteur de coefficients <b>complété par un zéro</b> : même prédiction, même RSS.</p>
+    <p>Donc RSS ne monte jamais et <span class="m">R</span>² = 1 − RSS/TSS ne baisse jamais, y compris pour une variable de pur bruit. Le <span class="m">R</span>² <b>ne décide pas d'un ajout</b>. Ce que répondent les pénalités — <span class="m">R</span>² ajusté, AIC — est de rendre le paramètre supplémentaire payant.</p>
+    <p class="say">« Le témoin est l'ancien <span class="m">β</span> complété par un zéro, donc le RSS du grand modèle lui est au plus égal, donc le <span class="m">R</span>² ne baisse jamais, donc il ne décide pas d'un ajout. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — ce que les pénalités changent, et ne changent pas</div>
+    <p>Les mêmes cinq points qu'au pas 1, avec la même variable inutile <span class="m">z</span>.</p>
+    <table>
+      <tr><th>critère</th><th>1 + <span class="m">x</span></th><th>1 + <span class="m">x</span> + <span class="m">z</span></th><th>qui gagne</th></tr>
+      <tr><td><span class="m">R</span>²</td><td>0,81</td><td>0,893</td><td>le grand, toujours</td></tr>
+      <tr class="hl"><td><span class="m">R</span>² ajusté</td><td>56/75 ≈ 0,747</td><td>59/75 ≈ 0,787</td><td><b>le grand, encore</b></td></tr>
+      <tr><td>AIC = <span class="m">n</span> log(RSS/<span class="m">n</span>) + 2<span class="m">k</span></td><td>1,16</td><td>0,28</td><td>le grand, encore</td></tr>
+    </table>
+    <p>Les pénalités <b>changent la question</b>, elles ne garantissent pas la bonne réponse : ici <span class="m">n</span> = 5, le coût d'un paramètre est faible devant la baisse de RSS (1,9 → 1,067), donc <span class="m">z</span> passe malgré tout. Le seul juge qu'un témoin ne peut pas jouer est un jeu de données que l'ajustement n'a pas vu.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Lieu 2 — erreur d'entraînement : le témoin est l'ancien modèle</h3>
+    <p>Même argument, autre habit. Un modèle plus flexible — degré supérieur, arbre plus profond, couche plus large — <b>contient</b> le moins flexible. Le témoin n'est plus un zéro isolé, c'est l'ancien modèle entier.</p>
+    <p>Donc l'erreur d'entraînement décroît à chaque gain de flexibilité, jusqu'à zéro quand il y a autant de paramètres que de points. Elle mesure une capacité d'interpolation, pas une qualité.</p>
+    <p class="say">« Le modèle moins flexible appartient à la famille plus flexible, donc il y est un témoin, donc l'erreur d'entraînement ne peut que décroître, donc sa décroissance n'a rien à interpréter. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les mêmes cinq points, degré 0 à 4</div>
+    <table>
+      <tr><th>degré</th><th>paramètres</th><th>RSS train</th><th><span class="m">R</span>² train</th></tr>
+      <tr><td>0 — la moyenne, 4</td><td>1</td><td>10</td><td>0</td></tr>
+      <tr><td>1 — 1,3 + 0,9 <span class="m">x</span></td><td>2</td><td>19/10 = 1,9</td><td>0,81</td></tr>
+      <tr><td>2</td><td>3</td><td>64/35 ≈ 1,829</td><td>0,817</td></tr>
+      <tr><td>3</td><td>4</td><td>10/7 ≈ 1,429</td><td>0,857</td></tr>
+      <tr class="hl"><td>4</td><td>5</td><td><b>0</b></td><td><b>1</b></td></tr>
+    </table>
+    <p>Cinq paramètres pour cinq points : le polynôme passe par tous. RSS = 0, <span class="m">R</span>² = 1, et le modèle ne vaut rien. La colonne RSS est <b>forcément</b> décroissante — poser le coefficient de tête à 0 redonne le degré précédent. Un chiffre qui ne peut pas monter ne porte aucune information sur le choix du degré.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Lieu 3 — bruité : le témoin devient la chance <span class="tag tronc">tronc</span></h3>
+    <p>L'argument retourné. Au lieu de minimiser sur un ensemble plus grand, on <b>garde le plus haut</b> de <span class="m">k</span> scores mesurés : un max ne peut que monter avec <span class="m">k</span>, c'est le même fait.</p>
+    <p>La différence est que sous H3 les <span class="m">k</span> candidats <b>valent la même chose</b> : ce qui monte est du pur bruit. Le gagnant est celui dont le bruit était le plus favorable, et son score affiché contient cette chance.</p>
+    <div class="eq">score du gagnant ≈ vrai + SE · <span class="up">E</span>[max de <span class="m">k</span> normales centrées réduites]</div>
+    <p class="say">« Les <span class="m">k</span> candidats valent la même chose, donc leur classement est fabriqué par le bruit, donc le score rapporté vaut le vrai plus SE fois l'espérance du max de <span class="m">k</span> normales, donc choisir le meilleur revient à choisir aussi sa chance. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — 40 configs qui valent toutes 0,87</div>
+    <table>
+      <tr><th><span class="m">k</span></th><td>1</td><td>2</td><td>5</td><td>10</td><td>40</td><td>100</td></tr>
+      <tr class="hl"><th><span class="up">E</span>[max<sub><span class="m">k</span></sub>]</th><td>0</td><td>0,56</td><td>1,16</td><td>1,54</td><td><b>2,16</b></td><td>2,51</td></tr>
+    </table>
+    <p><span class="m">n</span> = 1 000 lignes de test, <span class="m">π</span> = 0,87 pour les 40 : SE = √(0,87·0,13/1000) = 0,0106.</p>
+    <div class="eq"><span class="up">E</span>[max de 40] ≈ 0,87 + 2,16 · 0,0106 = <b>0,893</b></div>
+    <p>Le gagnant affiche <b>2,3 points</b> de plus qu'il ne vaut, sans qu'aucune des 40 mesures ne soit biaisée : chacune est sans biais, c'est leur max qui ne l'est pas. La croissance ralentit vite — de 1 à 10 configs le biais gagne 1,54 SE, de 10 à 100 seulement 0,97 de plus. Essayer moins n'est donc pas la parade.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — le max de <span class="m">k</span> tirages centrés n'est pas centré</div>
+    <div id="f1k"></div>
+    <div id="f1host"></div>
+    <div class="readouts" id="f1grid"></div>
+    <p class="cap">Chaque tirage est le max de <span class="m">k</span> normales centrées réduites : <span class="m">k</span> candidats qui valent <b>exactement la même chose</b>, à leur bruit près. Trait bleu <b>vrai</b> : 0, la valeur commune. Trait ambre <b>E[max]</b> : la valeur tabulée. Trait rouge fin : la moyenne des tirages effectués. À <span class="m">k</span> = 1 les trois se confondent ; monte <span class="m">k</span>, tire 500, et regarde l'histogramme <b>entier</b> glisser à droite alors qu'aucun candidat n'a changé de valeur. L'axe est en unités de SE : le décalage lu à <span class="m">k</span> = 40 est le 2,16 du tableau ci-dessus.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Lieu 4 — le test set qui a servi à choisir</h3>
+    <p>Le biais du pas 5 ne vient pas du nombre de configs, il vient du <b>jeu sur lequel on a choisi</b>. Le remède porte donc sur les rôles, pas sur <span class="m">k</span>.</p>
+    <p>On règle et on compare sur la <b>validation</b> : le score du gagnant y est gonflé, et on ne le publie pas. Le <b>test</b> s'ouvre une fois, à la fin — la sélection ne l'a jamais vu, donc son bruit est centré.</p>
+    <p class="say">« Le biais naît du jeu qui a servi à choisir, donc on le paie sur la validation, donc le test reste un tirage que la sélection n'a jamais vu, donc le chiffre rapporté redevient sans biais. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le même sweep, bien rangé</div>
+    <table>
+      <tr><th>jeu</th><th>rôle</th><th>combien de fois</th><th>chiffre</th></tr>
+      <tr><td>train</td><td>ajuster les poids</td><td>autant qu'on veut</td><td>aucun</td></tr>
+      <tr class="hl"><td>validation</td><td>choisir parmi les 40</td><td>autant qu'on veut</td><td>0,893 — gonflé, non publié</td></tr>
+      <tr><td>test</td><td>mesurer le retenu</td><td><b>une fois</b></td><td>≈ 0,870 ± 2 SE</td></tr>
+    </table>
+    <p><b>Ce que la <span class="m">k</span>-fold ne répare pas.</b> Moyenner sur 5 folds divise le SE par √5 (0,0106 → 0,0048), donc le biais du max d'autant : 2,3 → <b>1,0 point</b>. Réduit, pas supprimé — mesurer mieux ne défait pas « choisir sur ce qu'on a mesuré » (<a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html#s7">p01-04 pas 7</a>).</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Lieu 5 — l'OOB : un ensemble que le choix n'a pas touché</h3>
+    <p>Une forêt offre un test <b>gratuit</b> : pour chaque ligne, les arbres dont le bootstrap ne l'a pas tirée. Ici le témoin n'a rien à racheter — aucune sélection n'a été faite sur ces arbres, donc l'estimation est valide.</p>
+    <p>Le prix est ailleurs : chaque ligne n'est jugée que par la fraction d'arbres qui l'ont laissée dehors, (1 − 1/<span class="m">n</span>)<sup><span class="m">n</span></sup> → 1/<span class="up">e</span> ≈ 37 %. Une forêt à 37 % de sa taille est un peu moins bonne, donc l'OOB est <b>légèrement pessimiste</b> — un biais dans le bon sens.</p>
+    <p class="say">« L'OOB juge chaque ligne par les arbres qui ne l'ont pas vue, donc aucun choix n'a touché ces arbres, donc l'estimation est valide, donc le seul défaut est une forêt réduite à 37 % de sa taille et un chiffre légèrement pessimiste. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — <span class="m">n</span> = 1 000 lignes, <span class="m">B</span> = 500 arbres</div>
+    <table>
+      <tr><th>quantité</th><th>valeur</th></tr>
+      <tr><td>(1 − 1/1000)<sup>1000</sup></td><td>0,3677 &nbsp; (1/<span class="up">e</span> = 0,3679)</td></tr>
+      <tr class="hl"><td>arbres qui jugent une ligne donnée</td><td>500 × 0,3677 ≈ <b>184</b></td></tr>
+      <tr><td>variance d'une moyenne de <span class="m">m</span> arbres, <span class="m">ρ</span> = 0,3</td><td><span class="m">ρ</span> + (1 − <span class="m">ρ</span>)/<span class="m">m</span></td></tr>
+      <tr><td><span class="m">m</span> = 500 (la forêt entière)</td><td>0,3014</td></tr>
+      <tr><td><span class="m">m</span> = 184 (ce que voit l'OOB)</td><td>0,3038</td></tr>
+    </table>
+    <p>Soit +0,8 % de variance, +0,4 % d'écart-type : c'est tout le pessimisme de l'OOB, et il fond quand <span class="m">B</span> grandit. À comparer aux <b>2,3 points</b> d'optimisme d'un test tuné — les deux biais existent, ils ne sont ni du même ordre ni du même signe. La <span class="m">ρ</span> = 0,3 est une hypothèse de lecture, pas une mesure (<a href="../../map.html#p07-02">p07-02</a>).</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Où ça casse — de la même façon partout <span class="tag casse">casse</span></h3>
+    <p>Les trois pannes sont celles du <b>témoin</b>, pas celles du domaine : il lui faut un emboîtement et un critère inchangé, et la parade qui marche est toujours la même.</p>
+    <p class="say">« Le témoin suppose un emboîtement et un critère inchangé, donc dès qu'une des deux conditions saute l'inégalité ne vaut plus, donc les pannes se cherchent aux trois mêmes endroits. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Trois limites</div>
+    <ul>
+      <li><b>Pas d'emboîtement ⇒ pas d'inégalité.</b> Un arbre et une régression linéaire ne se comparent pas par ce mécanisme : aucun des deux ne contient l'autre, donc rien n'interdit au plus riche d'avoir le plus grand RSS. Le témoin donne une <b>garantie</b> dans un cas précis, pas une loi générale « plus gros, mieux ».</li>
+      <li><b>Pénaliser déplace la question, ne la ferme pas.</b> <span class="m">R</span>² ajusté et AIC rendent le paramètre payant, mais à un tarif fixé d'avance : sur les cinq points du pas 3, <span class="m">z</span> passe encore les deux. Ils supposent en outre un modèle bien spécifié et un <span class="m">n</span> identique d'un candidat à l'autre. La parade robuste reste un jeu que le choix n'a pas touché.</li>
+      <li><b>Corriger le seuil ne répare pas le score.</b> Bonferroni et FDR répondent à « combien de faux positifs parmi 40 tests » — au seuil de 5 %, 1 − 0,95<sup>40</sup> = 0,87 d'en avoir au moins un. Ils ne rendent pas au gagnant sa vraie valeur. Deux questions, deux remèdes : corriger le seuil pour <b>décider</b>, ouvrir un jeu neuf pour <b>mesurer</b>.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Ensemble plus grand ⇒ minimum plus bas. Il suffit d'exhiber un <b>témoin</b> : <span class="m">β</span> = 0 pour une variable ajoutée, l'ancien modèle pour une famille plus flexible. L'inégalité précède le calcul.</li>
+    <li>Bruité, l'argument se retourne : le max de <span class="m">k</span> tirages est biaisé de ≈ SE·<span class="up">E</span>[max<sub><span class="m">k</span></sub>] — 2,16 SE à <span class="m">k</span> = 40, soit 2,3 points sur un test de 1 000 lignes. Choisir, c'est capter la chance.</li>
+    <li>Conséquence unique : <b>ce qui a servi à choisir ne mesure plus</b>. Pénaliser aide, valider tranche ; l'OOB est le contre-exemple qui confirme — rien n'y a été choisi, donc il reste valide.</li>
+  </ol>
+</div>
+<div class="phrase">« Élargir l'espace ne peut jamais faire monter un minimum, il suffit d'un témoin — c'est pourquoi le <span class="m">R</span>² et l'erreur train ne jugent pas un ajout. Et le score du meilleur de <span class="m">k</span> essais bruités surestime sa valeur, parce qu'il a été choisi pour sa chance : ce qui a servi à choisir ne mesure plus. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">4 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Pourquoi le <span class="m">R</span>² ne baisse jamais quand on ajoute une variable ?</div><div class="a hid">Témoin : l'ancien <span class="m">β</span> complété par <span class="m">β</span><sub>nouveau</sub> = 0 vit dans le grand espace et y vaut l'ancien RSS — donc le minimum du grand espace est au plus l'ancien.</div></li>
+    <li><div class="q">Même argument, autre habit : pourquoi l'erreur d'entraînement décroît avec la flexibilité ?</div><div class="a hid">L'ancien modèle est dans la nouvelle famille — degré 4 contient degré 3 en posant le coefficient de tête à 0. Sur cinq points, RSS va de 10 à exactement 0.</div></li>
+    <li><div class="q">Version bruitée : pourquoi le meilleur de 40 configs surestime ?</div><div class="a hid">Le score rapporté est un max de 40 variables bruitées de même moyenne : ≈ vrai + 2,16 SE, soit +2,3 points avec SE = 0,0106.</div></li>
+    <li><div class="q">Que change-t-on au protocole, et pourquoi l'OOB y échappe-t-il ?</div><div class="a hid">Choisir sur la validation, mesurer sur le test une seule fois. L'OOB n'a servi à aucun choix, donc il reste valide — au prix de 37 % des arbres, ce qui le rend un peu pessimiste.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="../chains/chain-p04-01-matrice-action.html#s8"><b>p04-01 pas 8 — Le témoin atteignable</b><small>la version algébrique : ajouter une colonne agrandit l'image, la projection ne peut que se rapprocher</small></a>
+    <a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html#s6"><b>p01-04 pas 6–7 — Le max ment, puis le remède</b><small>le même témoin sous bruit, et pourquoi la séparation train / validation / test en découle</small></a>
+    <a href="../walkthroughs/walkthrough-p01-03-biais-du-max.html"><b>w01-03 — Le biais du max</b><small>d'où sort E[max de k] : P(max ≤ t) = Φ(t/SE)ᵏ, dérivée pas à pas — ce pont s'en sert sans la refaire</small></a>
+    <a href="../chains/chain-p01-05-bootstrap.html#s4"><b>p01-05 pas 4 — Pourquoi avec remise</b><small>d'où sortent les 37 % : la fraction de lignes qu'un bootstrap laisse dehors, et donc l'OOB</small></a>
+    <a href="../../map.html#b03"><b>b03 — Biais-variance partout</b><small>l'autre moitié du même sujet : ici on regarde ce qui ne peut que baisser, là ce qui se décompose</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>algebre::temoin</code> (l'inégalité et son témoin, <span class="m">β</span> = 0, l'ancien modèle) · <code>stats::multiplicite</code> (biais du max, SE·E[max<sub>k</sub>], correction de seuil ≠ correction de score) · <code>ml::validation</code> (train / validation / test, <span class="m">k</span>-fold, OOB).</p>
+  <p>Une carte qui résiste après ce pont est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Pont b02 · v1 du 17/09/2026 · Prérequis : p04-01, p01-04, p05-01, p07-02. Suite : <a href="../../map.html#b03">b03 — Biais-variance partout</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== Figure 1 : le max de k tirages centrés =====
+   E[max de k normales N(0,1)], intégré numériquement (Simpson, 4·10⁶ pas) :
+   k = 1, 2, 5, 10, 40, 100 → 0 ; 0,5642 ; 1,1630 ; 1,5388 ; 2,1608 ; 2,5076. */
+const KS=[1,2,5,10,40,100], EK=[0,0.5642,1.1630,1.5388,2.1608,2.5076];
+const st={i:0};
+function nrm(){let u=0,v=0;while(u===0)u=Math.random();while(v===0)v=Math.random();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+const MARKS=[{x:0,label:'vrai',cls:'slope sl-c1'}];
+const grid=document.getElementById('f1grid');
+function setGrid(n,mean){
+  const k=KS[st.i], e=EK[st.i];
+  grid.innerHTML=`<div class="pos">candidats comparés<b>k = ${k}</b></div>`
+    +`<div class="pos">E[max<sub>k</sub>] tabulé<b>${SL.fmt(e,2)} SE</b></div>`
+    +`<div class="${n?'zero':'pos'}">moyenne mesurée<b>${n?SL.fmt(mean,2)+' SE':'—'}</b></div>`
+    +`<div class="${n&&Math.abs(mean-e)>.15?'zero':'pos'}">écart au tabulé<b>${n?SL.fmt(mean-e,2):'—'}</b></div>`;}
+const R=SL.repeat(document.getElementById('f1host'),{
+  draw:()=>{const k=KS[st.i];let m=-Infinity;for(let j=0;j<k;j++){const z=nrm();if(z>m)m=z;}return m;},
+  bins:[-3.2,4.2,38], xt:[-3,-2,-1,0,1,2,3,4], xl:'max de k tirages, en unités de SE',
+  marks:MARKS, counts:[1,50,500], w:600, h:250,
+  empty:'Aucun tirage encore — clique « tirer 500 ».',
+  readout:(n,m,s)=>{setGrid(n,m);return `${n} tirages · moyenne ${SL.fmt(m,3)} · écart-type ${SL.fmt(s,3)}`;}});
+/* le conteneur du SVG devient scrollable : min-width 440px oblige, à 390 px de large */
+R.plot.svg.parentNode.className='wide';
+SL.slider(document.getElementById('f1k'),
+  {label:'k candidats',min:0,max:KS.length-1,step:1,value:0,fmt:v=>String(KS[v])},
+  v=>{st.i=v;
+    MARKS.length=1;
+    if(v>0)MARKS.push({x:EK[v],label:'E[max]',cls:'slope sl-c5'});
+    R.stats.length=0;R.render();setGrid(0,0);});
+})();
+</script>
+</body>
+</html>

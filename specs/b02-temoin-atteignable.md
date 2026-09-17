@@ -10,7 +10,7 @@ prereq: [p04-01, p01-04, p05-01, p07-02]
 anki: [algebre::temoin, stats::multiplicite, ml::validation]
 bridges: []
 next: b03
-status: ready
+status: built
 ---
 ## Le mécanisme
 Pour montrer que min_{S'} f ≤ min_S f quand S ⊂ S', il suffit d'un **témoin** : un point de S' qui vaut l'ancien optimum. Le minimum sur un ensemble plus grand ne peut pas monter. Version bruitée : le maximum de k tirages bruités est **biaisé vers le haut** — choisir le plus haut, c'est choisir aussi sa chance.
@@ -46,3 +46,26 @@ Pour montrer que min_{S'} f ≤ min_S f quand S ⊂ S', il suffit d'un **témoin
 
 ## Ce qui a cassé pour Salah
 - Q3 réussie, Q14.2 (multiplicité) ratée le 10/09, D3 « pas compris » à la première tentative : ce pont relie les deux par le même mot, **témoin**, sans redémontrer Φᵏ.
+
+## Questions pour la revue
+Tous les chiffres du spec ont été revérifiés par script avant écriture : **aucun n'était
+faux**. E[max de k normales N(0,1)] par intégration de Simpson — 0 ; 0,5642 ; 1,1630 ;
+1,5388 ; 2,1608 ; 2,5076 pour k = 1, 2, 5, 10, 40, 100, ce qui confirme la table de la
+figure. SE = √(0,87·0,13/1000) = 0,0106 et 0,87 + 2,16·0,0106 = 0,893 confirmés.
+(1 − 1/1000)^1000 = 0,3677 → 1/e, confirmé. Restent trois points de contenu :
+
+1. **« il monte en log k »** (légende de la figure). L'asymptotique exacte est √(2 ln k),
+   qui surestime nettement aux k usuels : 2,72 contre 2,16 à k = 40, 3,03 contre 2,51 à
+   k = 100. La sheet évite la formule et chiffre la décélération (de 1 à 10 configs :
+   +1,54 SE ; de 10 à 100 : +0,97 SE de plus). À trancher : rester qualitatif, ou nommer
+   √(2 ln k) explicitement comme asymptotique.
+2. **« il faut pénaliser (AIC, R² ajusté) »** ne tient pas sur le fil rouge. Sur les cinq
+   points, la variable inutile z passe les deux pénalités : R² ajusté 56/75 ≈ 0,747 →
+   59/75 ≈ 0,787, AIC 1,16 → 0,28 — le grand modèle gagne à chaque fois, parce qu'à
+   n = 5 le tarif d'un paramètre est faible devant 1,9 → 1,067 de RSS. La sheet le dit
+   tel quel (pas 3, puis « où ça casse ») : pénaliser déplace la question, valider la
+   tranche. Confirmer que c'est bien l'intention du spec.
+3. **ρ = 0,3** au pas 7 (corrélation entre arbres) est une hypothèse de lecture introduite
+   par la sheet, absente du spec : c'est elle qui permet de chiffrer le pessimisme de
+   l'OOB — variance ρ + (1 − ρ)/m, soit 0,3014 à m = 500 contre 0,3038 à m = 184, +0,8 %.
+   À valider contre p07-02 quand cette chaîne sera écrite.
