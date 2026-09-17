@@ -21,7 +21,7 @@ La sheet-mère du coding : le format que toutes les familles (c01–c09) rejouen
 
 ## Le TAP, règle par règle
 - **Invariant** : une propriété **inductive** (vraie avant le premier tour, préservée par un tour), qui nomme le **conteneur** et la **tranche exacte** qu'il décrit. « seen contient exactement les valeurs de nums[0:i] avec leur dernier indice » — pas « seen contient ce qu'on a vu ». Tranche par indices demi-ouverts [a:b) ; « exactement » (ni plus ni moins) ; l'indice courant exclu ou inclus, dit.
-- **Variant** : un **entier ≥ 0 strictement décroissant** à chaque tour. n − i pour une boucle simple ; (n − r) + (n − l) pour deux pointeurs ; hi − lo pour une dichotomie ; nombre de sommets non visités pour un parcours. S'il n'existe pas, la boucle peut ne pas terminer.
+- **Variant** : un **entier ≥ 0 strictement décroissant** à chaque tour. n − i pour une boucle simple ; (n − r) + (n − l) pour une **fenêtre glissante** — l et r n'avancent que vers la droite, chacun au plus n fois, et un tour en avance un des deux ; r − l pour **deux pointeurs qui se croisent**, qui se rapprochent l'un de l'autre ; hi − lo pour une dichotomie ; nombre de sommets non visités pour un parcours. S'il n'existe pas, la boucle peut ne pas terminer.
 - **Conclusion** : commence par **« donc »** et porte sur le **résultat**, pas sur le déroulement. « donc à la sortie, l'invariant sur [0:n) dit que … » — pas « donc on a parcouru tout le tableau ». La conclusion est l'invariant instancié à la valeur finale du variant.
 - **Complexité** : par **composition**. Hors boucle : les coûts s'**ajoutent** ; dans une boucle : le coût du corps se **multiplie** par le nombre de tours — sauf amortissement, qu'on justifie (chaque élément entre et sort au plus une fois). Espace : en **fonction de la taille de l'entrée**, jamais en valeur d'exécution : min(n, |Σ|) pour un dictionnaire de caractères, O(h) pour une pile de récursion sur un arbre, O(n) pour un set de vus.
 
@@ -31,6 +31,7 @@ nums = [2, 7, 11, 15], target = 9. Squelette : pour i, v dans enumerate(nums) : 
 - Variant : n − i, strictement décroissant.
 - Conclusion : donc si une paire (j, k), j < k, somme à target, au tour i = k son complément nums[j] est dans seen, donc elle est renvoyée ; et si la boucle finit, l'invariant sur [0:n) dit qu'aucune paire n'existe.
 - Complexité : n tours × O(1) par tour (test et insertion dans un dict) = O(n) temps ; espace O(min(n, |valeurs distinctes|)).
+- Doublons : `seen[v] = i` garde le **dernier** indice. La paire renvoyée reste valide et son k est bien le **premier** indice qui ferme une paire, mais son j n'est pas forcément le plus petit (358 cas sur 20 000 tirages). C'est pour ça que l'invariant dit « avec leur dernier indice » ; un énoncé qui exige la *première* paire exige un autre invariant, donc un autre code.
 
 ## Figure exigée
 - **Figure 1 — `SL.trace`** : nums = [2, 7, 11, 15], 4 images : pointeur i, cases marquées = seen, note = « cherche 9 − v », invariant affiché (`inv`) mis à jour à chaque image ; la dernière image surligne la paire. Légende : l'invariant se lit à chaque image, pas seulement à la fin.
