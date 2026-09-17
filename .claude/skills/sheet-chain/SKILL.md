@@ -42,6 +42,16 @@ texte casse le fil. En dessous de 6 cases, seulement si l'exemple est canonique
 (Two Sum sur `[2, 7, 11, 15]` : le raccourcir ou le rallonger le rendrait moins
 reconnaissable qu'il n'est court).
 
+**« Où ça casse » reste exigé**, en plus des pièges Python — le validateur le
+refuse absent, pour `coding` comme pour les autres séries. Les deux blocs ne
+disent pas la même chose : les pièges Python sont des erreurs qui *plantent* ou
+qui changent la complexité, le « Où ça casse » est le **contre-signal**, le cas
+qui rend la réponse fausse **sans erreur** — la fenêtre glissante sur des
+négatifs renvoie un nombre, poliment, et il est faux. Court : deux ou trois
+lignes de règle, le mécanisme, un contre-exemple minimal chiffré. c01 est le
+format de référence (pas « Où ça casse » = les négatifs ; `card.casse` = les
+pièges Python).
+
 ## Règles d'écriture
 
 - **Pas de prose.** Une règle tient en 2–5 lignes ; si elle en demande plus, c'est deux pas. Le validateur avertit au-delà de ~120 mots par règle.

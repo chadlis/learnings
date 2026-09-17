@@ -57,6 +57,9 @@ if all_steps != expected:
 steps = all_steps
 if len(steps) < 4: fail(f'{len(steps)} pas seulement (min 4)')
 if len(steps) > 14: warn(f'{len(steps)} pas : long, envisager de scinder')
+# Exigé pour toutes les séries, `coding` comprise (revue 6) : les pièges Python ne
+# remplacent pas le « Où ça casse ». Les pièges plantent ou changent la complexité ;
+# le contre-signal, lui, rend la réponse fausse sans erreur — c'est celui-là qui coûte.
 if 'class="card casse"' not in t: fail('pas de bloc « Où ça casse »')
 if 'class="tag tronc"' not in t: warn('aucun pas marqué tronc')
 say = re.findall(r'<p class="say">«(.*?)»</p>', t, re.S)
