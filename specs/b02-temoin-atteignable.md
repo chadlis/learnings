@@ -90,3 +90,8 @@ c'est le cas 3 ».
 Porté par la sheet : la phrase du cas 3 est au pas 6 (lieu 4, le test set qui a servi à choisir).
 
 **Arbitrage de revue 4, 17/09 — validé 17/09.** « Il monte en log k » est **remplacé** par « il monte lentement : 2,16 à k = 40, 2,51 à k = 100 », dans la légende du spec et dans celle de la sheet ; √(2 ln k) n'est pas nommée. AIC / R² ajusté insuffisants à n = 5 **validé** comme intention. ρ = 0,3 de l'OOB **validé** comme hypothèse de lecture, à réaligner quand p07-02 sortira. La phrase du cas 3 est ajoutée au pas 6 (voir « Révision v2 »). Statut `reviewed`.
+
+**Revue 5, 17/09 — ajout validé.** Les **deux petits cas 3** sont consignés ici : « choisir
+H₁ unilatérale après avoir vu le signe (double le taux de faux positifs) ; relever α après
+avoir vu p — la procédure regarde le tirage pour décider ». Ils complètent le cas 3 « gros »
+(le max de 40 configs) par deux gestes qui n'ont l'air de rien et relèvent du même mécanisme.
