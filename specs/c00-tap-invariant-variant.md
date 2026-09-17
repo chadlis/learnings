@@ -10,7 +10,7 @@ prereq: []
 anki: [coding::tap, coding::invariant, coding::complexite]
 bridges: []
 next: c01
-status: built
+status: reviewed
 ---
 
 ## Ce que cette sheet est
@@ -69,23 +69,28 @@ Vérification : chaque chiffre du fil rouge a été rejoué par script (résulta
 variant n − i = 4, 3, 2, 1 ; invariant I1/I2 vérifié à l'entrée de chaque tour sur
 20 000 entrées aléatoires ; O(n) = 2n opérations contre n(n−1)/2 + 2n pour la version
 liste — 20 / 65, 200 / 5 150, 2 000 / 501 500 à n = 10, 100, 1 000 ; espace min(n, |Σ|)).
-**Aucun chiffre du spec n'est faux**, rien n'a donc été corrigé ici. Restent quatre
-questions.
+**Aucun chiffre du spec n'est faux**, rien n'a donc été corrigé ici. Les quatre
+questions restées ouvertes ont été tranchées à la **revue 6 du 17/09/2026**.
 
-1. **Taille de la trace.** Le § « Format `coding` » demande une trace de **8 à 12 cases** ;
+1. **Taille de la trace** — validé 17/09. Le § « Format `coding` » demande une trace de **8 à 12 cases** ;
    le § « Figure exigée » impose `nums = [2, 7, 11, 15]`, soit **4 cases / 4 images**. J'ai
-   suivi « Figure exigée », le fil rouge faisant foi. À trancher pour c01–c09 : 8–12 cases
-   par défaut, avec dérogation quand le fil rouge est plus court ?
-2. **Le variant « deux pointeurs ».** Le spec donne (n − r) + (n − l). C'est le variant de la
+   suivi « Figure exigée », le fil rouge faisant foi. **Tranché** : 6 à 12 cases par défaut,
+   le fil rouge du spec prime, en dessous de 6 seulement si l'exemple est canonique — et
+   Two Sum sur `[2, 7, 11, 15]` l'est. La règle est dans le skill (§ Série `coding`).
+2. **Le variant « deux pointeurs »** — validé 17/09. Le spec donne (n − r) + (n − l). C'est le variant de la
    **fenêtre glissante** (l et r avancent tous les deux) ; pour deux pointeurs qui se
-   **croisent**, c'est r − l. Les deux lignes figurent dans le tableau du pas 3 ; le spec
-   n'a pas été retouché.
-3. **Doublons.** Une subtilité n'était pas dans le spec : `seen[v] = i` garde le **dernier**
+   **croisent**, c'est r − l. Les deux lignes figurent dans le tableau du pas 3. **Tranché** :
+   la lecture de la sheet est la bonne, et le § « Le TAP, règle par règle » a été corrigé pour
+   dire la même chose — c'est lui que c02 lira.
+3. **Doublons** — validé 17/09. Une subtilité n'était pas dans le spec : `seen[v] = i` garde le **dernier**
    indice, donc la paire renvoyée reste valide et son k reste le premier qui ferme une paire,
    mais son j n'est pas forcément le plus petit (358 cas sur 20 000 tirages). Ajoutée au pas 2
-   et au maillon 5 de la chaîne verbalisée — à confirmer qu'elle est dans le scope.
-4. **CSS de la série.** c00 est la première sheet `coding` et `SL.trace` n'avait aucun CSS
+   et au maillon 5 de la chaîne verbalisée. **Tranché** : dans le scope, et reportée au §
+   « Exemple fil rouge » du spec.
+4. **CSS de la série** — validé 17/09. c00 est la première sheet `coding` et `SL.trace` n'avait aucun CSS
    dans le dépôt. Un bloc « ajouts de la série `coding` » a été ajouté en fin de `<style>`
    (`.skel`, `.sl-trace`, `.sl-cell`, `.sl-ptr`, `.sl-inv`, table en `.wide`). À figer comme
    gold standard `coding` et recopier tel quel dans c01–c09, ou à remonter dans
-   `.claude/skills/sheet-chain/template.html` ?
+   `.claude/skills/sheet-chain/template.html` ? **Tranché** : remonté dans le gabarit, à sa
+   place dans l'ordre des sections, et propagé à c00 et c01 à l'octet près. c02–c09 l'auront
+   sans rien recopier.

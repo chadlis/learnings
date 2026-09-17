@@ -10,7 +10,7 @@ prereq: [c00]
 anki: [coding::fenetre-glissante, coding::deux-pointeurs, coding::amortissement]
 bridges: []
 next: c02
-status: built
+status: reviewed
 ---
 
 ## Signal dans l'énoncé
@@ -84,23 +84,30 @@ nums = [2, 3, 1, 2, 4, 3], target = 7, réponse 2 ([4, 3]). 16 images vérifiée
 Pas de fenêtre sur deque monotone, pas de préfixes — les deux sont le périmètre de c10 ; pas de fenêtre 2D.
 
 ## Questions pour la revue
-- **Aucun chiffre du spec n'est faux.** Les 16 images de la trace LC 209 ont été
+Toutes tranchées à la **revue 6 du 17/09/2026**.
+
+- **Aucun chiffre du spec n'est faux** — validé 17/09. Les 16 images de la trace LC 209 ont été
   regénérées par le code instrumenté et comparées une à une à la liste du spec :
   les 16 triplets (l, r, s) et les notes coïncident, et `s = Σ nums[l:r+1)` est
   recalculée à chaque image. `best = 2` confirmé par force brute, et par 20 000
   tirages aléatoires où fenêtre glissante et force brute ne divergent jamais.
   LC 424 sur « AABABBA », k = 1 → 4, confirmé par force brute.
-- **Figure 2, « 8 images » pour une chaîne de 7 caractères.** Un tour par
+- **Figure 2, « 8 images » pour une chaîne de 7 caractères** — validé 17/09. Un tour par
   caractère fait 7 images. J'ai lu « 8 » comme 7 tours + 1 image de conclusion
   (celle qui montre la fenêtre témoin `AABA` et le `maxfreq` resté à 3). À
-  confirmer : si le compte visé était 7, retirer la dernière image.
+  confirmer : si le compte visé était 7, retirer la dernière image. **Tranché** : les 8 images
+  sont validées, l'image de conclusion reste — c'est elle qui montre pourquoi `maxfreq` non
+  décrémenté ne fausse pas le résultat.
 - **Le contre-signal renvoie à « c08/c09 » pour les préfixes et la deque
-  monotone, mais ces deux ids sont pris** : `specs/c08` = Intervals,
+  monotone, mais ces deux ids sont pris** — validé 17/09. `specs/c08` = Intervals,
   `specs/c09` = DP 1D (le tableau de c00 dit la même chose). Aucune sheet de la
   série ne porte donc les sommes préfixes ni la deque monotone. La sheet nomme
   les remèdes (LC 560, deque monotone) **sans pointer d'id**, plutôt que de
-  fabriquer un lien faux. Quelle sheet doit les porter ?
-- **Chiffres ajoutés, tous calculés et non repris du spec** : LC 643 sur le fil
+  fabriquer un lien faux. **Tranché** : `c10 · Préfixes et deque monotone` est ouverte en
+  stub (LC 560, LC 239, « quand la fenêtre glissante ne s'applique pas »). Le nœud existe
+  dans la carte, donc l'ancre : c01 pointe vers `map.html#c10` au pas 1, au « Où ça casse »
+  et dans les ponts.
+- **Chiffres ajoutés, tous calculés et non repris du spec** — validé 17/09. LC 643 sur le fil
   rouge avec k = 3 → sommes glissantes 6, 6, 7, 9, maximum 9, moyenne maximale 3 ;
   amortissement compté sur le code instrumenté → 6 avancées de r, 5 de l, 11 au
   total contre 21 sous-tableaux en force brute ; contre-exemple minimal des
