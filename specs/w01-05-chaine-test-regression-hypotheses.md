@@ -10,7 +10,7 @@ prereq: [p01-03, p01-02, p01-01, p05-01]
 anki: [stats::inference, stats::estimation, ml::regression-lineaire, stats::pvalue, stats::procedure]
 bridges: [b02, b03]
 next: p02-01
-status: ready
+status: built
 ---
 
 ## Pourquoi ce déroulé existe
@@ -79,3 +79,10 @@ Deux procédures qui regardent le tirage pour décider, vues ce matin : choisir 
 
 ## Exclusions
 Pas de test F, pas de X aléatoires au-delà de l'exogénéité nommée, pas de SE robustes, pas de dérivation de E[σ̂²] = σ² (dire les deux contraintes, c'est tout).
+
+## Questions pour la revue
+- **Aucun chiffre du spec n'était faux.** Tous vérifiés par script : y, x̄ = 3, S_xx = 10, w, β̂₁ = 2,05, β̂₀ = 1,01, résidus (1,34 ; −1,21 ; −0,36 ; −1,01 ; 1,24), RSS = 5,947, σ̂² = 1,9823, σ̂ = 1,4080, SÊ = 0,44523, SE vrai = 0,31623, t = 4,6043, t_{0,975 ; 3} = 3,18245, p = 0,019264, IC = [0,6331 ; 3,4669]. Rien à corriger.
+- **Format.** Le spec et le CLAUDE.md décrivent un déroulé avec rail `nav.echelle` et `<figure>` (format « papier » des déroulés p01-01…p02-01). La sheet suit le standard « tableau noir v5 » des déroulés produits par le skill (p01-04, p03-01) : `aside.side` + `div.fig` + `assets/sheetlib.js`, parce que `tools/validate_sheet.py` l'exige (`#prereq`, `#hyp`, `.chain`, `div.step id="sN"`, `card apply`, `card casse`, `div.fig id="figN"`, `#resume`, `#verbal`, `#links`, `.phrase`). `tools/test_walkthroughs.mjs` accepte les deux rails. **À trancher : mettre à jour le tableau « les deux genres » du CLAUDE.md, ou refaire passer les anciens déroulés au standard v5 ?**
+- **Figure 1 du spec.** Le `stepper` sur les huit marches est livré comme `SL.stepper` sur `.chain` + deux badges (« règles » / « hypothèses », non consommées barrées) en marge de chaque marche — pas comme un `div.fig` : une figure doit produire du SVG au clic (`test_walkthroughs.mjs`), ce que le stepper ne fait pas. Les trois `div.fig` sont donc : les trois colonnes en action (nouveau tirage des ε), l'histogramme `repeat` de β̂₁ (figure 2 du spec), et la simulation « hypothèse cassée » (figure 3 du spec, promue de grille statique à simulation : les boutons surlignent les lignes du registre *et* redessinent l'histogramme).
+- **Nuance sur H3, mesurée.** Avec des ε en AR(1) φ = 0,8, la dépendance **rétrécit** la loi de β̂₁ (écart-type 0,278 contre 0,316) pendant que la couverture de l'IC₉₅ tombe à 79 %. « H2–H3 cassent la largeur » est donc à lire « cassent l'égalité Var(β̂₁) = σ²/S_xx », pas « élargissent ». La figure 3 et sa légende le disent ; le registre garde la formulation du spec. Valeurs mesurées (200 000 tirages) : vrai 2,000/0,316/95,0 % · H1 2,500/0,353/82,8 % · H2 (σ = 2 ; 0,5 ; 0,5 ; 0,5 ; 2) 2,000/0,570/87,9 % · H3 2,000/0,279/79,1 % · H4 (Student(3) normalisée) 2,000/0,312/95,5 %.
+- **Un `.card.large` ajouté** (`grid-column:1 / -1`) pour que le registre, à quatre colonnes, prenne toute la largeur du pas au lieu d'être serré dans la colonne de droite (405 px) et de défiler. Même geste que `.step .fig`.

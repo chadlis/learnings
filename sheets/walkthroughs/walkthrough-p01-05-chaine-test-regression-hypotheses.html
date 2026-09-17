@@ -1,0 +1,649 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>La chaîne du test en régression, hypothèse par hypothèse — déroulé</title>
+<meta name="sheet" content="series=walkthrough;part=01;number=05;status=v1">
+<meta name="part" content="01 · L'objet aléatoire">
+<meta name="subtitle" content="fil A — huit marches sur cinq points ; à chaque ligne, la règle et l'hypothèse qui servent, et rien de plus">
+<meta name="prereq" content="p01-03,p01-02,p01-01,p05-01">
+<meta name="anki" content="stats::inference,stats::estimation,ml::regression-lineaire,stats::pvalue,stats::procedure">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ---- marques de ce déroulé ---- */
+.badges{display:flex;gap:6px;flex-wrap:wrap;align-items:center;margin:2px 0 8px}
+.badges b{font:600 10px var(--sans);letter-spacing:.07em;text-transform:uppercase;color:var(--faint)}
+.bg{font:600 10.5px var(--sans);letter-spacing:.05em;border:1px solid currentColor;border-radius:3px;padding:1px 6px}
+.bg.r{color:var(--yellow)}.bg.h{color:var(--coral)}
+.bg.off{color:var(--faint);opacity:.6;text-decoration:line-through}
+.sl-seg.mk-vrai{stroke:var(--green);stroke-width:3.6}
+.sl-fn.mk-vrai{stroke:var(--green);fill:none}
+.sl-seg.mk-ols{stroke:var(--pen);stroke-width:2.2}
+.sl-seg.mk-ols.faint{stroke-width:1.2;opacity:.3}
+.sl-seg.mk-hat{stroke:#B7791F;stroke-width:3.4;stroke-dasharray:5 4}
+.sl-seg.mk-mean{stroke:var(--red);stroke-width:2}
+text.mk-vrai{fill:var(--green)}text.mk-ols{fill:var(--pen)}text.mk-hat{fill:#B7791F}text.mk-mean{fill:var(--red)}
+.sl-plot text.mk-vrai,.sl-plot text.mk-ols,.sl-plot text.mk-hat,.sl-plot text.mk-mean{font-family:var(--math);font-size:13px}
+.cap .kv{color:var(--green);font-weight:600}.cap .ko{color:var(--pen);font-weight:600}
+.cap .kh{color:#B7791F;font-weight:600}.cap .kr{color:var(--red);font-weight:600}
+tr.dim td{opacity:.38}
+/* le registre a quatre colonnes : sur téléphone il défile dans sa propre boîte,
+   il ne pousse pas la page (même geste que .fig .wide) */
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+/* le registre est le résultat du déroulé : il prend toute la largeur du pas,
+   comme une figure, au lieu d'être serré dans la colonne de droite */
+.step .card.large{grid-column:1 / -1}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 01 · L'objet aléatoire › déroulé 05</div>
+  <h1>La chaîne du <span>test</span> en régression, <span>hypothèse</span> par hypothèse</h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Fil A, huit marches sur <b>cinq points</b>. <span class="m">x</span> = (1, 2, 3, 4, 5), pente vraie <span class="m">β</span><sub>1</sub> = 2, un tirage de bruits, et tout le reste se calcule : <b><span class="hat"><span class="m">β</span></span><sub>1</sub> = 2,05</b>, <span class="hat"><span class="up">SE</span></span> = 0,445, <span class="m">t</span> = 4,60, <span class="m">p</span> = 0,019, IC<sub>95</sub> = [0,63 ; 3,47]. Chaque marche porte en marge <b>deux badges</b> : la règle qui sert, l'hypothèse qu'elle consomme — et rien de plus. Le résultat du déroulé n'est pas le rejet : c'est le <b>registre</b>, qui dit quelle hypothèse casse quoi.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>Les marches</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="../chains/chain-p01-03-inference-regression.html">p01-03 · Inférence en régression</a></li>
+    <li><a href="../chains/chain-p05-01-regression-modele-ols.html">p05-01 · Le modèle et OLS</a></li>
+    <li><a href="../chains/chain-p01-02-ic-test-procedure.html">p01-02 · IC, test, procédure</a></li>
+    <li><a href="../chains/chain-p01-01-objet-aleatoire.html">p01-01 · L'objet aléatoire</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::inference</code><code>stats::estimation</code><code>ml::regression-lineaire</code><code>stats::pvalue</code><code>stats::procedure</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-02-temoin-atteignable.html">b02 · Le témoin atteignable</a></li>
+    <li><a href="../bridges/bridge-03-biais-variance-partout.html">b03 · Biais et variance partout</a></li>
+  </ol>
+  <h4>Suite</h4>
+  <ol>
+    <li><a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">p02-01 · Du bruit à la loss</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que ce déroulé suppose acquis — et ne redémontre pas</div>
+    <ul>
+      <li><b>Les cinq règles</b> (<a href="../chains/chain-p00-02-esperance-variance-densite.html">p00-02</a>). <b>R1</b> <span class="m">E</span>[<span class="m">c</span>] = <span class="m">c</span> · <b>R2</b> <span class="m">E</span> est linéaire, <span class="m">E</span>[Σ <span class="m">a<sub>i</sub>X<sub>i</sub></span>] = Σ <span class="m">a<sub>i</sub>E</span>[<span class="m">X<sub>i</sub></span>], <a href="../chains/chain-p00-02-esperance-variance-densite.html#s2">sans aucune hypothèse</a> · <b>R3</b> <span class="up">Var</span>(<span class="m">c</span> + <span class="m">X</span>) = <span class="up">Var</span>(<span class="m">X</span>) · <b>R4</b> <a href="../chains/chain-p00-02-esperance-variance-densite.html#s4"><span class="up">Var</span>(<span class="m">aX</span>) = <span class="m">a</span>²<span class="up">Var</span>(<span class="m">X</span>)</a> · <b>R5</b> <a href="../chains/chain-p00-02-esperance-variance-densite.html#s5"><span class="up">Var</span>(Σ<span class="m">X<sub>i</sub></span>) = Σ<span class="up">Var</span>(<span class="m">X<sub>i</sub></span>) si indépendants</a>.</li>
+      <li><b>OLS et ses deux contraintes</b> (<a href="../chains/chain-p05-01-regression-modele-ols.html#s4">p05-01 pas 4</a> et <a href="../chains/chain-p05-01-regression-modele-ols.html#s5">pas 5</a>). <span class="hat"><span class="m">β</span></span><sub>1</sub> = Σ <span class="m">w<sub>i</sub>y<sub>i</sub></span> avec <span class="m">w<sub>i</sub></span> = (<span class="m">x<sub>i</sub></span> − <span class="m">x̄</span>)/<span class="m">S<sub>xx</sub></span> ; les résidus vérifient Σ<span class="m">r<sub>i</sub></span> = 0 et Σ<span class="m">r<sub>i</sub>x<sub>i</sub></span> = 0.</li>
+      <li><b>La chaîne de l'inférence</b> (<a href="../chains/chain-p01-03-inference-regression.html">p01-03</a>) : <a href="../chains/chain-p01-03-inference-regression.html#s3"><span class="hat"><span class="m">σ</span></span>² = RSS/(<span class="m">n</span> − <span class="m">p</span>)</a>, le plug-in dans le SE, <a href="../chains/chain-p01-03-inference-regression.html#s5">le quotient en Student</a>. Ce déroulé ne la refait pas : il la rejoue en <b>nommant à chaque ligne l'hypothèse consommée</b>.</li>
+      <li><b>IC, test, dualité</b> (<a href="../chains/chain-p01-02-ic-test-procedure.html#s6">p01-02 pas 6</a>) et <b>les trois colonnes</b> (<a href="../chains/chain-p01-01-objet-aleatoire.html#s2">p01-01 pas 2</a>).</li>
+      <li><b>Notation.</b> L'estimateur porte son chapeau. En fréquentiste on écrit <span class="m">p</span>(<span class="m">y</span> ; <span class="m">β</span>), jamais <span class="m">p</span>(<span class="m">y</span> | <span class="m">β</span>) : <span class="m">β</span> n'est pas aléatoire.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Les cinq hypothèses, nommées une fois pour toutes</div>
+    <div class="hyp">
+      <b>H0</b><span>Le <b>modèle linéaire est juste</b> : <span class="m">y<sub>i</sub></span> = <span class="m">β</span><sub>0</sub> + <span class="m">β</span><sub>1</sub><span class="m">x<sub>i</sub></span> + <span class="m">ε<sub>i</sub></span>, les <span class="m">x<sub>i</sub></span> posés fixes.</span>
+      <b>H1</b><span><b><span class="m">E</span>[<span class="m">ε<sub>i</sub></span>] = 0</b>. Version à <span class="m">X</span> aléatoire : <span class="m">E</span>[<span class="m">ε</span> | <span class="m">X</span>] = 0, dite <b>exogénéité</b>.</span>
+      <b>H2</b><span><b><span class="up">Var</span>(<span class="m">ε<sub>i</sub></span>) = <span class="m">σ</span>²</b>, la même pour tous — homoscédasticité.</span>
+      <b>H3</b><span>Les <span class="m">ε<sub>i</sub></span> sont <b>indépendants</b> entre eux.</span>
+      <b>H4</b><span>Les <span class="m">ε<sub>i</sub></span> sont <b>gaussiens</b>.</span>
+    </div>
+    <p style="margin-top:10px;color:var(--cardmuted);font-size:14.5px">« i.i.d. » n'est pas une hypothèse mais deux : le <b>i</b> d'indépendant, c'est H3 ; le <b>i.d.</b> d'identiquement distribué, c'est H2. Elles servent à des endroits différents, et elles cassent séparément.</p>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">Les huit marches, sur cinq points</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Les trois colonnes, estimateurs compris <span class="tag tronc">tronc</span></h3>
+    <p class="badges"><b>règles</b><span class="bg r">—</span><b>hypothèses</b><span class="bg h">H0</span><span class="bg h off">H1</span><span class="bg h off">H2</span><span class="bg h off">H3</span><span class="bg h off">H4</span></p>
+    <p>Avant la première formule, trois colonnes. <b>FIXE</b> : <span class="m">β</span><sub>0</sub>, <span class="m">β</span><sub>1</sub>, <span class="m">σ</span>², et les <span class="m">x<sub>i</sub></span>, posés fixes. <b>ALÉATOIRE</b> : les <span class="m">ε<sub>i</sub></span>. <b>PROCÉDURE</b> : la recette, écrite en toutes lettres.</p>
+    <p>Le piège est dans la colonne du milieu : elle ne contient pas que la <i>source</i> de l'aléa. Les <span class="m">y<sub>i</sub></span> sont fonction des <span class="m">ε<sub>i</sub></span>, et <span class="hat"><span class="m">β</span></span><sub>1</sub>, <span class="hat"><span class="m">σ</span></span>², <span class="hat"><span class="up">SE</span></span>, <span class="m">t</span>, <span class="m">p</span>, l'IC sont fonctions des <span class="m">y<sub>i</sub></span>. <b>Tous sont dans la colonne aléatoire.</b></p>
+    <p class="say">« Les <span class="m">ε</span> sont tirés, donc les <span class="m">y</span> le sont, donc toute fonction des <span class="m">y</span> l'est, donc les estimateurs sont dans la colonne aléatoire, et pas seulement le tirage. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Au tableau — marche 1</div>
+    <table>
+      <tr><th>FIXE</th><th>ALÉATOIRE</th><th>PROCÉDURE</th></tr>
+      <tr><td><span class="m">β</span><sub>0</sub> = 1, <span class="m">β</span><sub>1</sub> = 2<br><span class="m">σ</span>² = 1<br><span class="m">x</span> = (1, 2, 3, 4, 5)<br><span class="m">n</span> = 5, <span class="m">S<sub>xx</sub></span> = 10</td><td><span class="m">ε</span> <b>(seule source)</b><br>↓ <span class="m">y</span> = <span class="m">β</span><sub>0</sub> + <span class="m">β</span><sub>1</sub><span class="m">x</span> + <span class="m">ε</span><br>↓ <span class="hat"><span class="m">β</span></span><sub>1</sub>, <span class="hat"><span class="m">β</span></span><sub>0</sub>, <span class="hat"><span class="m">σ</span></span>²<br>↓ <span class="hat"><span class="up">SE</span></span>, <span class="m">t</span>, <span class="m">p</span>, l'IC</td><td>tirer les <span class="m">ε</span><br>→ ajuster par OLS<br>→ calculer <span class="m">t</span><br>→ comparer au seuil<br>→ reporter</td></tr>
+    </table>
+    <p>Les <span class="m">x<sub>i</sub></span> sont en colonne FIXE <b>par décision</b>, pas par nature : on conditionne dessus. C'est cette décision qui rend les <span class="m">w<sub>i</sub></span> de la marche 3 constants.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Aléatoire ≠ réalisé <span class="tag tronc">tronc</span></h3>
+    <p class="badges"><b>règles</b><span class="bg r">—</span><b>hypothèses</b><span class="bg h off">H0</span><span class="bg h off">H1</span><span class="bg h off">H2</span><span class="bg h off">H3</span><span class="bg h off">H4</span></p>
+    <p><span class="hat"><span class="m">β</span></span><sub>1</sub> est une variable aléatoire. <b>2,05 est sa réalisation sur ce tirage.</b> Les nombres 2,05 · 0,445 · 4,60 · 0,019 ne vont dans <b>aucune</b> colonne : ce sont des valeurs prises, pas des objets.</p>
+    <p>Écrire « <span class="hat"><span class="m">β</span></span><sub>1</sub> = 2,05 » est un raccourci commode. La phrase juste est « sur ce tirage, <span class="hat"><span class="m">β</span></span><sub>1</sub> vaut 2,05 ». Test de contrôle : un nombre n'a ni espérance ni variance.</p>
+    <p class="say">« L'objet est la règle appliquée au tirage, donc le nombre est ce qu'elle a donné cette fois, donc il n'a ni espérance ni variance, donc il n'est dans aucune colonne. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Au tableau — marche 2</div>
+    <table>
+      <tr><th>l'objet (aléatoire)</th><th>sa réalisation sur ce tirage</th></tr>
+      <tr><td><span class="hat"><span class="m">β</span></span><sub>1</sub> = Σ <span class="m">w<sub>i</sub>y<sub>i</sub></span></td><td>2,05</td></tr>
+      <tr><td><span class="hat"><span class="up">SE</span></span> = <span class="hat"><span class="m">σ</span></span>/√<span class="m">S<sub>xx</sub></span></td><td>0,445</td></tr>
+      <tr><td><span class="m">T</span> = <span class="hat"><span class="m">β</span></span><sub>1</sub>/<span class="hat"><span class="up">SE</span></span></td><td>4,60</td></tr>
+      <tr class="hl"><td>la <span class="m">p</span>-value, variable aléatoire</td><td>0,019</td></tr>
+    </table>
+    <p>Sous H₀, la <span class="m">p</span>-value est elle-même un objet aléatoire : elle suit une loi uniforme sur [0 ; 1]. 0,019 est l'un de ses tirages.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — ce qui bouge quand on retire les <span class="m">ε</span></div>
+    <div id="f1plot" class="wide"></div>
+    <div class="sl-ctl" id="f1ctl"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">La droite <span class="kv">verte</span> est <span class="m">β</span><sub>0</sub> + <span class="m">β</span><sub>1</sub><span class="m">x</span> = 1 + 2<span class="m">x</span> : colonne <b>FIXE</b>, elle ne bouge jamais. Les <span class="kr">points</span> et la droite <span class="ko">ajustée</span> sont la colonne <b>ALÉATOIRE</b>. Clique « nouveau tirage » : les cinq nombres du bandeau changent <b>tous les quatre</b> — <span class="hat"><span class="m">β</span></span><sub>1</sub>, <span class="hat"><span class="up">SE</span></span>, <span class="m">t</span> et les bornes de l'IC — alors que rien de vrai n'a bougé. « Superposer dix tirages » montre dix droites possibles : c'est la <b>procédure</b> qu'on regarde, pas un résultat. Et l'IC rate parfois le 2 : ça arrive à 5 % des tirages, sans que rien dans les données ne le dise.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3><span class="hat"><span class="m">β</span></span><sub>1</sub> est linéaire dans les bruits <span class="tag tronc">tronc</span></h3>
+    <p class="badges"><b>règles</b><span class="bg r">—</span><b>hypothèses</b><span class="bg h">H0</span><span class="bg h off">H1</span><span class="bg h off">H2</span><span class="bg h off">H3</span><span class="bg h off">H4</span></p>
+    <p>On branche le modèle dans la formule d'OLS, et on lit ce qui reste :</p>
+    <div class="eq"><span class="hat"><span class="m">β</span></span><sub>1</sub> = Σ <span class="m">w<sub>i</sub>y<sub>i</sub></span> = Σ <span class="m">w<sub>i</sub></span>(<span class="m">β</span><sub>0</sub> + <span class="m">β</span><sub>1</sub><span class="m">x<sub>i</sub></span> + <span class="m">ε<sub>i</sub></span>) = <span class="m">β</span><sub>1</sub> + Σ <span class="m">w<sub>i</sub>ε<sub>i</sub></span></div>
+    <p>parce que Σ<span class="m">w<sub>i</sub></span> = 0 tue le <span class="m">β</span><sub>0</sub> et Σ<span class="m">w<sub>i</sub>x<sub>i</sub></span> = 1 laisse le <span class="m">β</span><sub>1</sub> nu. <b>Une seule hypothèse consommée : H0</b>, le modèle est le bon. Rien n'a encore été supposé sur les <span class="m">ε</span>.</p>
+    <p class="say">« Les <span class="m">w<sub>i</sub></span> ne dépendent que des <span class="m">x</span>, donc <span class="hat"><span class="m">β</span></span><sub>1</sub> est une combinaison linéaire des <span class="m">y</span>, donc en y branchant le modèle il reste <span class="m">β</span><sub>1</sub> + Σ<span class="m">w<sub>i</sub>ε<sub>i</sub></span>, donc toute la suite porte sur cette seule somme. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Au tableau — marche 3</div>
+    <table>
+      <tr><th><span class="m">x<sub>i</sub></span></th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+      <tr><td><span class="m">w<sub>i</sub></span> = (<span class="m">x<sub>i</sub></span> − 3)/10</td><td>−0,2</td><td>−0,1</td><td>0</td><td>0,1</td><td>0,2</td></tr>
+      <tr><td><span class="m">ε<sub>i</sub></span> (ce tirage)</td><td>1,4</td><td>−1,1</td><td>−0,2</td><td>−0,8</td><td>1,5</td></tr>
+      <tr><td><span class="m">y<sub>i</sub></span> = 1 + 2<span class="m">x<sub>i</sub></span> + <span class="m">ε<sub>i</sub></span></td><td>4,4</td><td>3,9</td><td>6,8</td><td>8,2</td><td>12,5</td></tr>
+    </table>
+    <div class="eq">Σ<span class="m">w<sub>i</sub></span> = 0 &nbsp;·&nbsp; Σ<span class="m">w<sub>i</sub>x<sub>i</sub></span> = 1 &nbsp;·&nbsp; Σ<span class="m">w<sub>i</sub></span>² = 0,1 = 1/<span class="m">S<sub>xx</sub></span></div>
+    <p>Σ<span class="m">w<sub>i</sub>ε<sub>i</sub></span> = −0,28 + 0,11 + 0 − 0,08 + 0,30 = <b>0,05</b>, donc sur ce tirage <span class="hat"><span class="m">β</span></span><sub>1</sub> = 2 + 0,05 = <b>2,05</b>. Et <span class="hat"><span class="m">β</span></span><sub>0</sub> = <span class="m">ȳ</span> − <span class="hat"><span class="m">β</span></span><sub>1</sub><span class="m">x̄</span> = 7,16 − 6,15 = <b>1,01</b>.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Le centre : <span class="m">E</span>[<span class="hat"><span class="m">β</span></span><sub>1</sub>] = <span class="m">β</span><sub>1</sub></h3>
+    <p class="badges"><b>règles</b><span class="bg r">R1</span><span class="bg r">R2</span><b>hypothèses</b><span class="bg h">H0</span><span class="bg h">H1</span><span class="bg h off">H2</span><span class="bg h off">H3</span><span class="bg h off">H4</span></p>
+    <p>Trois lignes, chacune avec le nom de sa règle — et la troisième seule consomme une hypothèse sur le bruit :</p>
+    <div class="eq"><span class="m">E</span>[<span class="hat"><span class="m">β</span></span><sub>1</sub>] = <span class="m">E</span>[<span class="m">β</span><sub>1</sub>] + Σ <span class="m">E</span>[<span class="m">w<sub>i</sub>ε<sub>i</sub></span>] &nbsp;&nbsp;<b>(R2)</b><br>= <span class="m">β</span><sub>1</sub> + Σ <span class="m">w<sub>i</sub></span> <span class="m">E</span>[<span class="m">ε<sub>i</sub></span>] &nbsp;&nbsp;<b>(R1 sur <span class="m">β</span><sub>1</sub>, R2 pour sortir le <span class="m">w<sub>i</sub></span> fixe)</b><br>= <span class="m">β</span><sub>1</sub> &nbsp;&nbsp;<b>(H1)</b></div>
+    <p><b>Ni la variance, ni l'indépendance, ni la normalité n'ont servi.</b> Le non-biais ne coûte que <span class="m">E</span>[<span class="m">ε<sub>i</sub></span>] = 0.</p>
+    <p class="say">« Les <span class="m">w<sub>i</sub></span> sont fixes, donc <span class="m">E</span>[<span class="hat"><span class="m">β</span></span><sub>1</sub>] = <span class="m">β</span><sub>1</sub> + Σ<span class="m">w<sub>i</sub>E</span>[<span class="m">ε<sub>i</sub></span>], donc H1 annule la somme, donc <span class="hat"><span class="m">β</span></span><sub>1</sub> est sans biais, et seule H1 a servi. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Au tableau — marche 4, une ligne = une règle</div>
+    <table>
+      <tr><th>ligne</th><th>règle</th><th>hypothèse</th></tr>
+      <tr><td>sortir l'espérance de la somme</td><td>R2 (linéarité)</td><td>aucune</td></tr>
+      <tr><td><span class="m">E</span>[<span class="m">β</span><sub>1</sub>] = <span class="m">β</span><sub>1</sub> et <span class="m">E</span>[<span class="m">w<sub>i</sub>ε<sub>i</sub></span>] = <span class="m">w<sub>i</sub>E</span>[<span class="m">ε<sub>i</sub></span>]</td><td><b>R1 puis R2</b> — deux règles</td><td>aucune</td></tr>
+      <tr class="hl"><td>annuler la somme</td><td>—</td><td><b>H1</b></td></tr>
+    </table>
+    <p>La deuxième ligne est celle où deux règles se cachent sous un seul geste : R1 dit que l'espérance d'une constante est cette constante, R2 dit qu'un facteur fixe sort de l'espérance. Les nommer toutes les deux, séparément.</p>
+    <p><b>Ce qui la casse.</b> Une variable omise corrélée à <span class="m">x</span> — la saison, la taille du client — tombe dans <span class="m">ε</span> et donne <span class="m">E</span>[<span class="m">ε</span> | <span class="m">X</span>] ≠ 0. Le biais qui en résulte ne se corrige pas en ajoutant des données : c'est le centre qui est faux, pas la largeur.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>La largeur : <span class="up">Var</span>(<span class="hat"><span class="m">β</span></span><sub>1</sub>) = <span class="m">σ</span>²/<span class="m">S<sub>xx</sub></span> <span class="tag tronc">tronc</span></h3>
+    <p class="badges"><b>règles</b><span class="bg r">R3</span><span class="bg r">R4</span><span class="bg r">R5</span><b>hypothèses</b><span class="bg h">H0</span><span class="bg h off">H1</span><span class="bg h">H2</span><span class="bg h">H3</span><span class="bg h off">H4</span></p>
+    <div class="eq"><span class="up">Var</span>(<span class="hat"><span class="m">β</span></span><sub>1</sub>) = <span class="up">Var</span>(Σ <span class="m">w<sub>i</sub>ε<sub>i</sub></span>) &nbsp;&nbsp;<b>(R3 : <span class="m">β</span><sub>1</sub> est une constante)</b><br>= Σ <span class="up">Var</span>(<span class="m">w<sub>i</sub>ε<sub>i</sub></span>) &nbsp;&nbsp;<b>(R5, et c'est là que H3 sert)</b><br>= Σ <span class="m">w<sub>i</sub></span>² <span class="up">Var</span>(<span class="m">ε<sub>i</sub></span>) &nbsp;&nbsp;<b>(R4)</b><br>= <span class="m">σ</span>² Σ<span class="m">w<sub>i</sub></span>² = <span class="m">σ</span>²/<span class="m">S<sub>xx</sub></span> &nbsp;&nbsp;<b>(H2 : la même variance pour tous)</b></div>
+    <p>Deux hypothèses neuves, <b>H2 et H3</b>, et une qui n'a pas servi : H1 ne joue aucun rôle dans la <i>valeur</i> de cette variance. H4 n'a toujours pas été prononcée.</p>
+    <p class="say">« <span class="m">β</span><sub>1</sub> est une constante donc R3 l'efface, les <span class="m">ε</span> sont indépendants donc R5 additionne les variances, R4 sort les <span class="m">w<sub>i</sub></span> au carré, donc il reste <span class="m">σ</span>²Σ<span class="m">w<sub>i</sub></span>², c'est-à-dire <span class="m">σ</span>² sur l'étalement des <span class="m">x</span>. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Au tableau — marche 5</div>
+    <div class="eq"><span class="up">Var</span>(<span class="hat"><span class="m">β</span></span><sub>1</sub>) = 1² × 0,1 = 0,1 &nbsp;&nbsp; <span class="up">SE</span> = <span class="m">σ</span>/√<span class="m">S<sub>xx</sub></span> = 1/√10 = <b>0,316</b></div>
+    <p>C'est le <b>vrai</b> SE, celui qu'on ne connaît pas : il contient <span class="m">σ</span>. L'étalement des <span class="m">x</span> est au dénominateur — cinq points serrés autour de 3 donneraient un <span class="m">S<sub>xx</sub></span> minuscule et une pente illisible, à bruit identique.</p>
+    <p>Marche 4 consommait H1 et rien d'autre ; marche 5 consomme H2 et H3 et pas H1. <b>Le centre et la largeur ne reposent pas sur les mêmes hypothèses</b> — c'est toute la thèse du registre.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — l'objet, et le point qu'on en voit</div>
+    <div class="sl-ctl" id="f2mode"></div>
+    <div id="f2host" class="wide"></div>
+    <p class="cap">Chaque tirage refait cinq bruits gaussiens, rejoue OLS et pose le <span class="hat"><span class="m">β</span></span><sub>1</sub> obtenu dans l'histogramme. Le trait <span class="kv">vert</span> est <span class="m">β</span><sub>1</sub> = 2, <b>fixe</b> ; le trait <span class="kh">ambre pointillé</span> est 2,05, <b>le seul point qu'on observe dans la vraie vie</b> ; le trait <span class="kr">rouge</span> est la moyenne des tirages. Clique « tirer 500 » : l'écart-type mesuré converge vers le <b>0,316</b> calculé à gauche. <b>2,05 est un point de cet histogramme ; l'histogramme est l'objet.</b> « <span class="m">n</span> = 50 » rejoue le même plan d'expérience dix fois : <span class="m">S<sub>xx</sub></span> passe de 10 à 100, donc le SE passe de 0,316 à 0,100 — la cloche se resserre d'un facteur √10.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3><span class="m">σ</span> est inconnu : <span class="hat"><span class="m">σ</span></span>² = RSS/(<span class="m">n</span> − 2)</h3>
+    <p class="badges"><b>règles</b><span class="bg r">—</span><b>hypothèses</b><span class="bg h">H0</span><span class="bg h">H1</span><span class="bg h">H2</span><span class="bg h">H3</span><span class="bg h off">H4</span></p>
+    <p>Le SE de la marche 5 contient <span class="m">σ</span>, qu'on n'a pas. On l'estime sur les résidus. Ils portent <b>deux contraintes</b> — Σ<span class="m">r<sub>i</sub></span> = 0 et Σ<span class="m">r<sub>i</sub>x<sub>i</sub></span> = 0 (<a href="../chains/chain-p05-01-regression-modele-ols.html#s5">p05-01 pas 5</a>) — donc ils vivent dans un espace de dimension <span class="m">n</span> − 2, pas <span class="m">n</span>.</p>
+    <div class="eq"><span class="hat"><span class="m">σ</span></span>² = RSS/(<span class="m">n</span> − 2) &nbsp;&nbsp; <span class="hat"><span class="up">SE</span></span> = <span class="hat"><span class="m">σ</span></span>/√<span class="m">S<sub>xx</sub></span></div>
+    <p>Diviser par <span class="m">n</span> sous-estimerait <span class="m">σ</span>². Hypothèses consommées pour que <span class="m">E</span>[<span class="hat"><span class="m">σ</span></span>²] = <span class="m">σ</span>² : <b>H1, H2, H3</b>. Toujours pas H4.</p>
+    <p class="say">« Les résidus portent deux contraintes, donc il leur reste <span class="m">n</span> − 2 degrés de liberté, donc diviser par <span class="m">n</span> sous-estimerait <span class="m">σ</span>², donc le bon diviseur est 3 et <span class="hat"><span class="m">σ</span></span>² vaut 1,982. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Au tableau — marche 6</div>
+    <table>
+      <tr><th><span class="m">x<sub>i</sub></span></th><th>1</th><th>2</th><th>3</th><th>4</th><th>5</th></tr>
+      <tr><td><span class="hat"><span class="m">y</span></span><sub><span class="m">i</span></sub> = 1,01 + 2,05<span class="m">x<sub>i</sub></span></td><td>3,06</td><td>5,11</td><td>7,16</td><td>9,21</td><td>11,26</td></tr>
+      <tr><td><span class="m">r<sub>i</sub></span> = <span class="m">y<sub>i</sub></span> − <span class="hat"><span class="m">y</span></span><sub><span class="m">i</span></sub></td><td>1,34</td><td>−1,21</td><td>−0,36</td><td>−1,01</td><td>1,24</td></tr>
+    </table>
+    <div class="eq">RSS = <b>5,947</b> &nbsp; <span class="hat"><span class="m">σ</span></span>² = 5,947/3 = <b>1,982</b> &nbsp; <span class="hat"><span class="m">σ</span></span> = 1,408 &nbsp; <span class="hat"><span class="up">SE</span></span> = 1,408/√10 = <b>0,445</b></div>
+    <p>Le vrai SE vaut 0,316 : l'estimé se trompe de <b>41 %</b> vers le haut. Ce n'est pas une erreur de calcul, c'est <span class="m">n</span> = 5. <span class="hat"><span class="m">σ</span></span>² est lui-même une variable aléatoire, très dispersée à 3 degrés de liberté.</p>
+    <p>Et Σ<span class="m">r<sub>i</sub></span> = 0 se vérifie à l'œil : 1,34 − 1,21 − 0,36 − 1,01 + 1,24 = 0.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>La forme : <span class="m">t</span> ~ Student(3) <span class="tag tronc">tronc</span></h3>
+    <p class="badges"><b>règles</b><span class="bg r">—</span><b>hypothèses</b><span class="bg h">H0</span><span class="bg h">H1</span><span class="bg h">H2</span><span class="bg h">H3</span><span class="bg h">H4</span></p>
+    <p>Sous H₀ : <span class="m">β</span><sub>1</sub> = 0, on forme <span class="m">t</span> = <span class="hat"><span class="m">β</span></span><sub>1</sub>/<span class="hat"><span class="up">SE</span></span>. Le <b>numérateur</b> est une combinaison linéaire de gaussiennes, donc gaussien : c'est <b>H4</b>, et c'est son seul emploi. Le <b>dénominateur</b> est estimé, donc il fluctue, donc le quotient a des queues plus lourdes qu'une normale : c'est une Student à <span class="m">n</span> − 2 = 3 degrés de liberté.</p>
+    <p><b>i.i.d. se sépare.</b> L'indépendance (H3) sert deux fois — à R5 en marche 5, et à la loi du dénominateur ici. L'identique distribution (H2) sert une fois, à factoriser <span class="m">σ</span>². Ce sont deux hypothèses, avec deux emplois.</p>
+    <p class="say">« Le numérateur est normal par H4, donc le dénominateur estimé fait fluctuer le quotient, donc <span class="m">t</span> a des queues plus lourdes qu'une normale, donc <span class="m">t</span> suit une Student à <span class="m">n</span> − 2 = 3 degrés de liberté ; sans H4 la normale ne revient qu'à grand <span class="m">n</span>, par le TCL. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Au tableau — marche 7</div>
+    <div class="eq"><span class="m">t</span> = 2,05 / 0,445 = <b>4,60</b> &nbsp;&nbsp; ddl = <span class="m">n</span> − 2 = <b>3</b></div>
+    <table>
+      <tr><th>hypothèse</th><th>ce qu'elle donne ici</th><th>sans elle</th></tr>
+      <tr><td>H4 gaussien</td><td>Student <b>exacte</b> à 3 ddl</td><td>rien d'exact ; TCL à grand <span class="m">n</span></td></tr>
+      <tr><td>H3 indépendance</td><td><span class="hat"><span class="m">σ</span></span>² indépendant de <span class="hat"><span class="m">β</span></span><sub>1</sub></td><td>le quotient n'est plus une Student</td></tr>
+      <tr class="hl"><td>ddl = 3</td><td>seuil bilatéral 5 % = <b>3,18</b></td><td>1,96 seulement à <span class="m">n</span> grand</td></tr>
+    </table>
+    <p>Le prix des petits échantillons est là : 3,18 contre 1,96, soit <b>62 % de largeur en plus</b> avant même de parler de <span class="hat"><span class="up">SE</span></span>.</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Décider : <span class="m">p</span>-value, seuil, IC</h3>
+    <p class="badges"><b>règles</b><span class="bg r">—</span><b>hypothèses</b><span class="bg h">H0</span><span class="bg h">H1</span><span class="bg h">H2</span><span class="bg h">H3</span><span class="bg h">H4</span></p>
+    <p>Un seul calcul, <b>quatre lectures</b> (<a href="../chains/chain-p01-02-ic-test-procedure.html#s6">p01-02 pas 6</a>) :</p>
+    <div class="eq">rejeter à <span class="m">α</span> &nbsp;⇔&nbsp; <span class="m">p</span> &lt; <span class="m">α</span> &nbsp;⇔&nbsp; |<span class="m">t</span>| &gt; <span class="m">t<sub>α</sub></span> &nbsp;⇔&nbsp; 0 ∉ IC<sub>1−<span class="m">α</span></sub></div>
+    <p><b>Le piège.</b> <span class="m">p</span> = 0,019 est <span class="m">P</span>(|<span class="m">T</span><sub>3</sub>| ≥ 4,60 | <span class="m">β</span><sub>1</sub> = 0), une probabilité <b>sur le tirage, sous H₀</b>. Ce n'est ni <span class="m">P</span>(<span class="m">β</span><sub>1</sub> = 0 | données), ni « 98 % de chances que <span class="m">β</span><sub>1</sub> ≠ 0 » : <span class="m">β</span><sub>1</sub> est en colonne FIXE, aucune probabilité ne s'attache à lui.</p>
+    <p class="say">« Sous H₀ le centre est zéro et la largeur est le SE, donc la <span class="m">p</span>-value est l'aire au-delà de |<span class="m">t</span>|, donc rejeter à <span class="m">α</span>, <span class="m">p</span> &lt; <span class="m">α</span>, |<span class="m">t</span>| &gt; <span class="m">t<sub>α</sub></span> et zéro hors de l'IC sont la même inégalité, donc quatre phrases pour un seul calcul, et aucune n'est une probabilité sur <span class="m">β</span><sub>1</sub>. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Au tableau — marche 8</div>
+    <table>
+      <tr><th>lecture</th><th>le calcul</th><th>verdict</th></tr>
+      <tr><td>seuil</td><td>|<span class="m">t</span>| = 4,60 &gt; 3,18</td><td>rejet</td></tr>
+      <tr><td><span class="m">p</span>-value</td><td><span class="m">p</span> = 0,019 &lt; 0,05</td><td>rejet</td></tr>
+      <tr class="hl"><td>intervalle</td><td>IC<sub>95</sub> = 2,05 ± 3,18 × 0,445 = <b>[0,63 ; 3,47]</b></td><td>0 dehors ⇒ rejet</td></tr>
+      <tr><td>largeur</td><td>demi-largeur 1,417</td><td>énorme, à <span class="m">n</span> = 5</td></tr>
+    </table>
+    <p>L'IC contient 2, la vraie pente — <b>sans qu'on le sache</b>. Il contient aussi 1 et 3 : rejeter « la pente est nulle » ne veut pas dire « la pente vaut 2,05 ». Le rejet est une conclusion sur zéro, pas sur 2,05.</p>
+  </div>
+</div>
+
+<div class="step" id="s9">
+  <div class="rule">
+    <h3>Le registre : quelle hypothèse casse quoi <span class="tag tronc">tronc</span></h3>
+    <p class="badges"><b>règles</b><span class="bg r">R1</span><span class="bg r">R2</span><span class="bg r">R3</span><span class="bg r">R4</span><span class="bg r">R5</span><b>hypothèses</b><span class="bg h">H0</span><span class="bg h">H1</span><span class="bg h">H2</span><span class="bg h">H3</span><span class="bg h">H4</span></p>
+    <p>C'est le résultat du déroulé, et la réponse à la question d'entretien. Chaque conclusion ne consomme que les hypothèses de <b>sa</b> ligne : casser une hypothèse ne casse que les lignes qui la nomment.</p>
+    <p class="say">« Chaque conclusion ne consomme que les hypothèses de sa propre ligne, donc casser une hypothèse ne casse que les lignes qui la nomment, donc "quelle hypothèse casse quoi" se lit dans une seule colonne. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Au tableau — comment se lit le registre</div>
+    <p>Colonne 2 : ce que la conclusion <b>achète</b>. Colonne 3 : ce qu'elle laisse libre — c'est elle qu'on oublie de dire, et c'est elle qui répond en entretien. Colonne 4 : le contre-exemple à donner.</p>
+    <p>La dernière ligne est le fil B, posée ici seulement pour être trouvée : « les moindres carrés » et « le maximum de vraisemblance » ne coïncident que sous H4.</p>
+  </div>
+  <div class="card apply large"><div class="lbl">Le registre des hypothèses</div>
+    <div class="wide"><table id="registre">
+      <tr><th>conclusion</th><th>consomme</th><th>ne consomme pas</th><th>ce qui la casse</th></tr>
+      <tr data-cons="H0"><td><span class="hat"><span class="m">β</span></span><sub>1</sub> = <span class="m">β</span><sub>1</sub> + Σ<span class="m">w<sub>i</sub>ε<sub>i</sub></span></td><td><b>H0</b></td><td>tout le reste</td><td>modèle faux (non-linéarité)</td></tr>
+      <tr data-cons="H0 H1"><td><span class="m">E</span>[<span class="hat"><span class="m">β</span></span><sub>1</sub>] = <span class="m">β</span><sub>1</sub> — sans biais</td><td><b>H1</b></td><td>H2, H3, H4</td><td>variable omise corrélée à <span class="m">x</span></td></tr>
+      <tr data-cons="H0 H2 H3"><td><span class="up">Var</span>(<span class="hat"><span class="m">β</span></span><sub>1</sub>) = <span class="m">σ</span>²/<span class="m">S<sub>xx</sub></span></td><td><b>H2, H3</b></td><td>H1 (pour la valeur), H4</td><td>hétéroscédasticité, dépendance</td></tr>
+      <tr data-cons="H0 H1 H2 H3"><td><span class="hat"><span class="m">σ</span></span>² = RSS/(<span class="m">n</span> − 2) sans biais</td><td><b>H1, H2, H3</b></td><td>H4</td><td>idem</td></tr>
+      <tr data-cons="H0 H1 H2 H3 H4"><td><span class="m">t</span> ~ Student(<span class="m">n</span> − 2) <b>exactement</b></td><td><b>H4</b></td><td>—</td><td>non-gaussien à petit <span class="m">n</span> ; à grand <span class="m">n</span>, TCL</td></tr>
+      <tr data-cons="H0 H1 H2 H3 H4"><td><span class="m">p</span>, seuil, IC</td><td>tout ce qui précède</td><td>—</td><td>multiplicité ; procédure qui regarde le tirage</td></tr>
+      <tr data-cons="H0 H4"><td>OLS = maximum de vraisemblance</td><td><b>H4</b></td><td>—</td><td>autre loi de bruit ⇒ autre loss (<a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>)</td></tr>
+    </table></div>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — casser une hypothèse, et regarder ce qui tombe</div>
+    <div class="sl-ctl" id="f3mode"></div>
+    <div id="f3host" class="wide"></div>
+    <p class="cap">Le même histogramme qu'en figure 2, mais les bruits sont simulés avec <b>une hypothèse cassée</b>. Clique un bouton : les lignes du registre qui consomment cette hypothèse s'allument, les autres pâlissent. Puis « tirer 500 », et lis le readout — moyenne, écart-type, et surtout la <b>couverture</b> de l'IC<sub>95</sub>, qui devrait valoir 95 %. <span class="kv">H1 déplace le centre</span> (2,50 au lieu de 2,00) sans élargir grand-chose. <span class="kr">H2 et H3 cassent la largeur</span> et font tomber la couverture à 88 % et 79 % — et note que H3 <b>rétrécit</b> l'histogramme : la dépendance ne fait pas toujours « plus large », elle fait « plus faux ». <span class="kh">H4 ne déplace ni le centre ni la largeur</span> : la couverture reste à 95 %, seules les queues changent. C'est la ligne « <span class="m">t</span> ~ Student exactement » qui tombe, et elle seule.</p>
+  </div>
+</div>
+
+<div class="step" id="s10">
+  <div class="rule">
+    <h3>Le second exemple : 90 % contre 91 %</h3>
+    <p class="badges"><b>marches</b><span class="bg r">1</span><span class="bg r">2</span><span class="bg r">3</span><b>hypothèses</b><span class="bg h off">H0</span><span class="bg h off">H1</span><span class="bg h off">H2</span><span class="bg h off">H3</span><span class="bg h off">H4</span></p>
+    <p>Deux modèles A et B, <b>déjà entraînés</b>, évalués sur le même test set de <span class="m">n</span> lignes : 90 % et 91 %. Les marches 1 à 3 se rejouent telles quelles, sur un autre objet.</p>
+    <p>Le réflexe qui manque : mettre <span class="hat"><span class="m">p</span></span><sub>A</sub>, <span class="hat"><span class="m">p</span></span><sub>B</sub> et <span class="hat"><span class="m">D</span></span> dans la colonne aléatoire, et pas seulement « le test set ». Ce sont eux qu'on regarde.</p>
+    <p class="say">« Les modèles sont figés donc ils sont fixes, donc la seule chose tirée est le test set, donc <span class="hat"><span class="m">p</span></span><sub>A</sub>, <span class="hat"><span class="m">p</span></span><sub>B</sub> et leur différence sont aléatoires, donc 90 % et 91 % sont deux réalisations et non deux objets. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Au tableau — les trois colonnes, deuxième fois</div>
+    <table>
+      <tr><th>FIXE</th><th>ALÉATOIRE</th><th>PROCÉDURE</th></tr>
+      <tr><td><span class="m">p</span><sub>A</sub>, <span class="m">p</span><sub>B</sub><br><span class="m">D</span> = <span class="m">p</span><sub>B</sub> − <span class="m">p</span><sub>A</sub><br>les deux modèles</td><td>le test set<br>↓ <span class="hat"><span class="m">p</span></span><sub>A</sub>, <span class="hat"><span class="m">p</span></span><sub>B</sub><br>↓ <span class="hat"><span class="m">D</span></span> = <span class="hat"><span class="m">p</span></span><sub>B</sub> − <span class="hat"><span class="m">p</span></span><sub>A</sub></td><td>tirer <span class="m">n</span> lignes<br>→ évaluer A et B dessus<br>→ reporter <span class="hat"><span class="m">D</span></span><br>→ conclure</td></tr>
+      <tr class="hl"><td colspan="3">90 % et 91 % : deux <b>réalisations</b>. Aucune colonne.</td></tr>
+    </table>
+    <p>Test : « si je tirais un autre test set ». <span class="hat"><span class="m">p</span></span><sub>A</sub>, <span class="hat"><span class="m">p</span></span><sub>B</sub>, <span class="hat"><span class="m">D</span></span> bougent ; <span class="m">p</span><sub>A</sub>, <span class="m">p</span><sub>B</sub>, <span class="m">D</span> et les deux modèles ne bougent pas.</p>
+    <p>La suite — pourquoi il faut apparier, et pourquoi l'objet est <span class="m">D</span> et non le couple — est aux pas <a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html#s2">2</a> et <a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html#s3">3</a> de p01-04.</p>
+  </div>
+</div>
+
+<div class="step" id="s11">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p class="badges"><b>règles</b><span class="bg r">—</span><b>hypothèses</b><span class="bg h">H0</span><span class="bg h">H1</span><span class="bg h">H2</span><span class="bg h">H3</span><span class="bg h">H4</span></p>
+    <p>Le registre dit ce qui casse <i>dans</i> la chaîne. Reste ce qui casse <b>autour</b> : la procédure elle-même, quand elle n'est plus écrite d'avance.</p>
+    <p class="say">« La procédure doit être fixée avant le tirage, donc la choisir après avoir vu <span class="hat"><span class="m">β</span></span><sub>1</sub> ou <span class="m">p</span> change la loi de ce qu'elle produit, donc le 5 % annoncé n'est plus le taux réel, donc c'est exactement la panne du biais du max. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre pannes</div>
+    <ul>
+      <li><b>Choisir H₁ après avoir vu le signe.</b> Décider « unilatéral à droite » <i>parce que</i> <span class="hat"><span class="m">β</span></span><sub>1</sub> est positif met 5 % dans une seule queue alors que le tirage a déjà choisi la queue : le taux de faux positifs réel est de <b>10 %</b>, pas 5 %. L'unilatéral n'est légitime que décidé avant.</li>
+      <li><b>Relever <span class="m">α</span> après avoir vu <span class="m">p</span>.</b> « <span class="m">p</span> = 0,07, disons 10 % » : le seuil devient fonction du tirage, donc la garantie de 5 % ne porte plus sur rien. Même mécanisme que <a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html#s6">le biais du max</a> et que <a href="../bridges/bridge-02-temoin-atteignable.html">b02</a> : ce qu'on optimise sur le tirage ne se lit plus comme une mesure.</li>
+      <li><b>La multiplicité.</b> Tester dix pentes et rapporter la plus significative : sous H₀ vraie partout, <span class="m">P</span>(au moins un <span class="m">p</span> &lt; 0,05) = 1 − 0,95<sup>10</sup> = <b>40 %</b>. Le nombre de tests fait partie de la procédure, donc il doit être déclaré.</li>
+      <li><b><span class="m">n</span> = 5.</b> <span class="hat"><span class="up">SE</span></span> = 0,445 contre 0,316 vrai, seuil 3,18 au lieu de 1,96, IC large de 2,83. La chaîne est exacte et la conclusion est fragile : ici <b>rien n'est cassé</b>, c'est simplement ce que cinq points permettent de dire.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li><b>Colonnes</b> — FIXE <span class="m">β</span>, <span class="m">σ</span>², <span class="m">x</span> · ALÉATOIRE <span class="m">ε</span>, <span class="m">y</span>, <b>et tous les estimateurs</b> · PROCÉDURE tirer → OLS → <span class="m">t</span> → seuil → reporter. Les nombres tombés ne sont dans aucune colonne.</li>
+    <li><b>Marche 3</b> — <span class="hat"><span class="m">β</span></span><sub>1</sub> = <span class="m">β</span><sub>1</sub> + Σ<span class="m">w<sub>i</sub>ε<sub>i</sub></span>, par <b>H0 seule</b>. <span class="m">w</span> = (−0,2 ; −0,1 ; 0 ; 0,1 ; 0,2), Σ<span class="m">w<sub>i</sub>ε<sub>i</sub></span> = 0,05 ⇒ 2,05.</li>
+    <li><b>Marche 4, le centre</b> — R2, puis R1 + R2, puis <b>H1</b> : <span class="m">E</span>[<span class="hat"><span class="m">β</span></span><sub>1</sub>] = <span class="m">β</span><sub>1</sub>. H2, H3, H4 n'ont pas servi.</li>
+    <li><b>Marche 5, la largeur</b> — R3, R5 (<b>H3</b>), R4, <b>H2</b> : <span class="m">σ</span>²/<span class="m">S<sub>xx</sub></span> = 0,1, SE = 0,316. H1 n'a pas servi.</li>
+    <li><b>Marche 6</b> — deux contraintes sur les résidus ⇒ <span class="hat"><span class="m">σ</span></span>² = 5,947/3 = 1,982, <span class="hat"><span class="up">SE</span></span> = 0,445 (contre 0,316 vrai).</li>
+    <li><b>Marche 7</b> — <b>H4</b> ⇒ <span class="m">t</span> ~ Student(3), seuil 3,18. « i.i.d. » = deux hypothèses, H3 pour additionner, H2 pour factoriser.</li>
+    <li><b>Marche 8</b> — <span class="m">t</span> = 4,60, <span class="m">p</span> = 0,019, IC = [0,63 ; 3,47] : quatre lectures d'un seul calcul, et aucune n'est une probabilité sur <span class="m">β</span><sub>1</sub>.</li>
+  </ol>
+</div>
+<div class="phrase">« Les <span class="m">x</span> sont fixes et les <span class="m">ε</span> sont tirés, donc <span class="hat"><span class="m">β</span></span><sub>1</sub> s'écrit <span class="m">β</span><sub>1</sub> + Σ<span class="m">w<sub>i</sub>ε<sub>i</sub></span> : <span class="m">E</span>[<span class="m">ε</span>] = 0 suffit à le centrer sur <span class="m">β</span><sub>1</sub>, l'indépendance et l'homoscédasticité donnent <span class="m">σ</span>²/<span class="m">S<sub>xx</sub></span> pour sa largeur, et la normalité ne sert qu'à faire du quotient <span class="hat"><span class="m">β</span></span><sub>1</sub>/<span class="hat"><span class="up">SE</span></span> une Student exacte à <span class="m">n</span> − 2 degrés de liberté. Sur mes cinq points : <span class="m">t</span> = 4,60 contre un seuil de 3,18, <span class="m">p</span> = 0,019, IC = [0,63 ; 3,47] — je rejette une pente nulle à 5 %. Et si une variable omise était corrélée à <span class="m">x</span>, c'est le centre que je perdrais, pas la largeur. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — à voix haute, sans support</h2>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Nomme les trois colonnes pour une régression, estimateurs compris.</div><div class="a hid">FIXE : β₀, β₁, σ², les x. ALÉATOIRE : ε, donc y, donc β̂₁, β̂₀, σ̂², SÊ, t, p, l'IC. PROCÉDURE : tirer les ε → ajuster par OLS → calculer t → comparer au seuil → reporter.</div></li>
+    <li><div class="q">Où vont 2,05 et 0,019 ?</div><div class="a hid">Nulle part. Ce sont des réalisations, pas des objets : un nombre tombé n'a ni espérance ni variance.</div></li>
+    <li><div class="q">Quelle hypothèse seule donne le non-biais, et qu'est-ce qui le casse ?</div><div class="a hid">H1, E[εᵢ] = 0, et elle seule — R2 puis R1 + R2 font le reste. Ce qui le casse : une variable omise corrélée à x, donc E[ε | X] ≠ 0. Plus de données n'y change rien.</div></li>
+    <li><div class="q">Quelles hypothèses donnent σ²/S_xx, et pourquoi « i.i.d. » est deux hypothèses ?</div><div class="a hid">H3 (indépendance), qui autorise R5 à additionner les variances, et H2 (même σ²), qui autorise à factoriser après R4. L'une sert à additionner, l'autre à factoriser : deux hypothèses, deux emplois, deux façons de casser.</div></li>
+    <li><div class="q">À quoi sert la normalité, et que fait-on sans elle ?</div><div class="a hid">À une seule chose : rendre le numérateur exactement gaussien, donc t exactement Student(n − 2). Sans elle, plus de loi exacte ; la normale revient à grand n par le TCL, et rien ne la rend à n = 5.</div></li>
+    <li><div class="q">Écris les quatre lectures équivalentes d'un rejet à α.</div><div class="a hid">Rejet à α ⇔ p &lt; α ⇔ |t| &gt; t_α ⇔ 0 ∉ IC₁₋α. Un seul calcul, quatre phrases — et aucune n'est P(β₁ = 0 | données), parce que β₁ est en colonne FIXE.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">D'où ça vient, où ça va</div>
+  <div class="bridges">
+    <a href="../chains/chain-p01-03-inference-regression.html"><b>p01-03 — Inférence en régression</b><small>la chaîne que ce déroulé rejoue : mêmes pas, mêmes formules, mais ici chaque ligne dit l'hypothèse qu'elle consomme</small></a>
+    <a href="../chains/chain-p05-01-regression-modele-ols.html"><b>p05-01 — Le modèle et OLS</b><small>d'où viennent Σwᵢ = 0, Σwᵢxᵢ = 1 et les deux contraintes sur les résidus qui donnent le n − 2</small></a>
+    <a href="../bridges/bridge-02-temoin-atteignable.html"><b>b02 — Le témoin atteignable</b><small>même mécanisme que les deux pannes de procédure : optimiser sur le tirage, puis lire le résultat comme s'il n'avait pas été optimisé</small></a>
+    <a href="../bridges/bridge-03-biais-variance-partout.html"><b>b03 — Biais et variance partout</b><small>le registre en une phrase : H1 gouverne le biais, H2 et H3 gouvernent la variance, et ce ne sont pas les mêmes leviers</small></a>
+    <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html"><b>p02-01 — Du bruit à la loss</b><small>la seule ligne du registre laissée ouverte : « OLS = maximum de vraisemblance » consomme H4, et une autre loi de bruit donne une autre loss</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::inference</code> (registre des hypothèses, ce que chacune achète) · <code>stats::estimation</code> (non-biais, σ̂², n − 2) · <code>ml::regression-lineaire</code> (β̂₁ = β₁ + Σwᵢεᵢ, σ²/S_xx) · <code>stats::pvalue</code> (les quatre lectures, le piège) · <code>stats::procedure</code> (procédure écrite d'avance).</p>
+  <p>La carte à fabriquer en sortie de ce déroulé est le registre lui-même : « quelle hypothèse achète quoi », une ligne à la fois.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Déroulé p01-05 · v1 du 17/09/2026 · Prérequis : <a href="../chains/chain-p01-03-inference-regression.html">p01-03</a>, <a href="../chains/chain-p05-01-regression-modele-ols.html">p05-01</a>, <a href="../chains/chain-p01-02-ic-test-procedure.html">p01-02</a>, <a href="../chains/chain-p01-01-objet-aleatoire.html">p01-01</a>. Suite : <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">p02-01 Du bruit à la loss</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper : la révélation marche par marche */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== le plan d'expérience, partagé par les trois figures ===== */
+const X=[1,2,3,4,5], B0=1, B1=2, TC=3.1824463;      // seuil bilatéral 5 %, 3 ddl
+function randn(){const u=1-Math.random(),v=Math.random();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function fit(xs,ys){const n=xs.length,xb=xs.reduce((a,b)=>a+b,0)/n;
+  const sxx=xs.reduce((a,x)=>a+(x-xb)*(x-xb),0);
+  const b1=xs.reduce((a,x,i)=>a+(x-xb)/sxx*ys[i],0);
+  const b0=ys.reduce((a,b)=>a+b,0)/n-b1*xb;
+  let rss=0;for(let i=0;i<n;i++){const r=ys[i]-(b0+b1*xs[i]);rss+=r*r;}
+  const se=Math.sqrt(rss/(n-2)/sxx);
+  return {b0,b1,rss,se,sig:Math.sqrt(rss/(n-2)),t:b1/se};}
+/* survie de Student à 3 ddl, forme fermée : pas d'intégration numérique */
+function sf3(t){t=Math.abs(t);return .5-(1/Math.PI)*(t/(Math.sqrt(3)*(1+t*t/3))+Math.atan(t/Math.sqrt(3)));}
+function over(P){return SL.el('g',{},P.svg);}
+function oline(g,P,xa,ya,xb,yb,cls){return SL.el('line',{x1:P.sx(xa),y1:P.sy(ya),x2:P.sx(xb),y2:P.sy(yb),class:'sl-seg '+cls},g);}
+function otext(g,P,x,y,t,cls,anchor){const e=SL.el('text',{x:P.sx(x),y:P.sy(y),class:'sl-lbl '+(cls||''),'text-anchor':anchor||'start'},g);e.textContent=t;return e;}
+function legend(g,P,x0,y0,dy,len,items){items.forEach((it,i)=>{const y=y0-i*dy;oline(g,P,x0,y,x0+len,y,it.cls);otext(g,P,x0+len*1.4,y-dy*.25,it.t,it.cls,'start');});}
+
+/* ===== Figure 1 : ce qui bouge quand on retire les ε ===== */
+const EPS0=[1.4,-1.1,-0.2,-0.8,1.5];
+const YR=[0,15];
+const P1=SL.plot(document.getElementById('f1plot'),{x:[0,6],y:YR,w:600,h:300,
+  xt:[1,2,3,4,5],yt:[0,5,10,15],xl:'x (colonne FIXE)',yl:'y'});
+P1.fn(x=>B0+B1*x,'mk-vrai');
+P1.label(.55,14.2,'β₀ + β₁x = 1 + 2x  ·  FIXE, ne bouge jamais','mk-vrai','start');
+const f1out=document.getElementById('f1out');
+/* une droite sort du cadre dès que la pente s'emballe : on la coupe au cadre */
+function span(b0,b1){let a=0,b=6;if(Math.abs(b1)>1e-9){const xa=(YR[0]-b0)/b1,xb=(YR[1]-b0)/b1;
+  a=Math.max(a,Math.min(xa,xb));b=Math.min(b,Math.max(xa,xb));}else if(b0<YR[0]||b0>YR[1])return null;
+  return b>a?[a,b]:null;}
+function ols(eps){return fit(X,X.map((x,i)=>B0+B1*x+eps[i]));}
+function drawFit(eps,extra){P1.clear();
+  (extra||[]).forEach(e=>{const g=ols(e),s=span(g.b0,g.b1);
+    if(s)P1.seg(s[0],g.b0+g.b1*s[0],s[1],g.b0+g.b1*s[1],'mk-ols faint');});
+  const f=ols(eps),s=span(f.b0,f.b1);
+  if(s)P1.seg(s[0],f.b0+f.b1*s[0],s[1],f.b0+f.b1*s[1],'mk-ols');
+  P1.text(.55,13.1,'β̂₀ + β̂₁x  ·  ALÉATOIRE, une par tirage','mk-ols','start');
+  X.forEach((x,i)=>P1.dot(x,B0+B1*x+eps[i],'sl-c3',5));
+  const lo=f.b1-TC*f.se,hi=f.b1+TC*f.se,p=2*sf3(f.t);
+  f1out.innerHTML=`<div>β̂₁ sur ce tirage<b>${SL.fmt(f.b1,3)}</b></div>`
+   +`<div>SÊ estimé<b>${SL.fmt(f.se,3)}</b></div>`
+   +`<div>t et p<b>${f.t.toFixed(2).replace('.',',')} · ${SL.fmt(p,3)}</b></div>`
+   +`<div class="${lo<=B1&&B1<=hi?'pos':'zero'}">IC₉₅ contient β₁ = 2 ?<b>[${SL.fmt(lo,2)} ; ${SL.fmt(hi,2)}]</b></div>`;}
+const f1ctl=document.getElementById('f1ctl');
+function tb(host,label,fn){const b=document.createElement('button');b.className='tb';b.textContent=label;b.onclick=fn;host.appendChild(b);return b;}
+tb(f1ctl,'le tirage du fil rouge',()=>drawFit(EPS0));
+tb(f1ctl,'nouveau tirage des ε',()=>drawFit(X.map(()=>randn())));
+tb(f1ctl,'superposer dix tirages',()=>drawFit(EPS0,Array.from({length:10},()=>X.map(()=>randn()))));
+drawFit(EPS0);
+
+/* ===== Figure 2 : l'objet dont 2,05 est un point ===== */
+let rep=1;                                   // 1 ⇒ n = 5 ; 10 ⇒ n = 50, même plan répété
+const seVrai=()=>1/Math.sqrt(10*rep);
+function tirageB1(){const xs=[],ys=[];
+  for(let k=0;k<rep;k++)for(const x of X){xs.push(x);ys.push(B0+B1*x+randn());}
+  return fit(xs,ys).b1;}
+const R2=SL.repeat(document.getElementById('f2host'),{
+  draw:tirageB1,bins:[.5,3.5,30],xt:[.5,1,1.5,2,2.5,3,3.5],w:600,h:240,counts:[1,50,500],
+  xl:'β̂₁ sur un nouveau tirage des ε',yl:'fréquence',
+  marks:[{x:2,label:'',cls:'mk-vrai'},{x:2.05,label:'',cls:'mk-hat'}],
+  readout:(n,m,s)=>`${n} tirages · moyenne ${SL.fmt(m,3)} · écart-type mesuré ${SL.fmt(s,3)} · SE vrai σ/√Sxx = ${SL.fmt(seVrai(),3)}`,
+  empty:'Aucun tirage : clique « tirer 50 ».'});
+legend(over(R2.plot),R2.plot,2.68,.95,.075,.12,[
+  {t:'β₁ = 2 · FIXE',cls:'mk-vrai'},{t:'2,05 · ce tirage',cls:'mk-hat'},{t:'moyenne des tirages',cls:'mk-mean'}]);
+const f2mode=document.getElementById('f2mode');
+function setRep(r,b){rep=r;[...f2mode.children].forEach(c=>c.setAttribute('aria-pressed','false'));
+  b.setAttribute('aria-pressed','true');R2.stats.length=0;
+  for(let i=0;i<300;i++)R2.stats.push(tirageB1());R2.render();}
+const b2a=tb(f2mode,'n = 5 · le fil rouge',()=>setRep(1,b2a));
+const b2b=tb(f2mode,'n = 50 · le même plan ×10',()=>setRep(10,b2b));
+b2a.setAttribute('aria-pressed','true');
+for(let i=0;i<300;i++)R2.stats.push(tirageB1());R2.render();
+
+/* ===== Figure 3 : casser une hypothèse, et regarder ce qui tombe ===== */
+const SIG_H2=[2,.5,.5,.5,2];                 // bruit concentré aux extrémités : H2 tombe
+function studt3(){const z=randn();let c=0;for(let i=0;i<3;i++){const g=randn();c+=g*g;}
+  return (z/Math.sqrt(c/3))/Math.sqrt(3);}   // Student(3) ramenée à variance 1
+function bruits(sc){
+  if(sc==='H2')return SIG_H2.map(s=>s*randn());
+  if(sc==='H3'){const e=[randn()];for(let i=1;i<5;i++)e.push(.8*e[i-1]+Math.sqrt(1-.64)*randn());return e;}
+  if(sc==='H4')return X.map(()=>studt3());
+  return X.map(()=>randn());}
+let sc='ok';
+const COV=[];
+let R3=null;
+function tirageCasse(){
+  if(R3&&R3.stats.length===0)COV.length=0;
+  const e=bruits(sc);
+  let ys=X.map((x,i)=>B0+B1*x+e[i]);
+  if(sc==='H1')ys=ys.map((y,i)=>y+((X[i]-3)/2+.5*randn()));   // variable omise, corrélée à x
+  const f=fit(X,ys);
+  COV.push(Math.abs(f.b1-B1)<=TC*f.se?1:0);
+  return f.b1;}
+R3=SL.repeat(document.getElementById('f3host'),{
+  draw:tirageCasse,bins:[.2,3.8,36],xt:[.5,1,1.5,2,2.5,3,3.5],w:600,h:240,counts:[1,50,500],
+  xl:'β̂₁ sur un nouveau tirage, hypothèse cassée',yl:'fréquence',
+  marks:[{x:2,label:'',cls:'mk-vrai'}],
+  readout:(n,m,s)=>{const c=COV.slice(-n),k=c.reduce((a,b)=>a+b,0);
+    return `${n} tirages · moyenne ${SL.fmt(m,3)} · écart-type ${SL.fmt(s,3)} · couverture de l'IC₉₅ ${SL.fmt(100*k/Math.max(1,c.length),1)} % (promis : 95 %)`;},
+  empty:'Aucun tirage : clique « tirer 50 ».'});
+legend(over(R3.plot),R3.plot,2.75,.95,.075,.14,[{t:'β₁ = 2 · FIXE',cls:'mk-vrai'},{t:'moyenne des tirages',cls:'mk-mean'}]);
+const reg=document.getElementById('registre');
+function surligne(h){[...reg.querySelectorAll('tr[data-cons]')].forEach(tr=>{
+  const on=h&&tr.getAttribute('data-cons').split(' ').indexOf(h)>=0;
+  tr.classList.toggle('hl',!!on);tr.classList.toggle('dim',!!h&&!on);});}
+const f3mode=document.getElementById('f3mode');
+function setSc(s,h,b){sc=s;[...f3mode.children].forEach(c=>c.setAttribute('aria-pressed','false'));
+  b.setAttribute('aria-pressed','true');surligne(h);R3.stats.length=0;COV.length=0;
+  for(let i=0;i<300;i++)R3.stats.push(tirageCasse());R3.render();}
+const b3a=tb(f3mode,'tout est vrai',()=>setSc('ok',null,b3a));
+const b3b=tb(f3mode,'H1 cassée · variable omise',()=>setSc('H1','H1',b3b));
+const b3c=tb(f3mode,'H2 cassée · hétéroscédasticité',()=>setSc('H2','H2',b3c));
+const b3d=tb(f3mode,'H3 cassée · ε corrélés',()=>setSc('H3','H3',b3d));
+const b3e=tb(f3mode,'H4 cassée · queues lourdes',()=>setSc('H4','H4',b3e));
+b3a.setAttribute('aria-pressed','true');
+for(let i=0;i<300;i++)R3.stats.push(tirageCasse());R3.render();
+})();
+</script>
+</body>
+</html>
