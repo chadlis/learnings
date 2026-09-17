@@ -1,0 +1,561 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Régression linéaire, OLS, ce que R² ne dit pas — chaîne</title>
+<meta name="sheet" content="series=chain;part=05;number=01;status=v1">
+<meta name="part" content="05 · Modèles linéaires">
+<meta name="subtitle" content="une hypothèse sur y sachant x, des carrés parce que gaussien, une forme fermée parce que linéaire">
+<meta name="prereq" content="p02-01,p04-01,p00-02">
+<meta name="anki" content="ml::regression-lineaire,ml::ols,ml::r2,stats::residus">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 05 · Modèles linéaires › chaîne 01</div>
+  <h1>Régression linéaire : le <span>modèle</span>, OLS, ce que <span>R²</span> ne dit pas</h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Que suppose exactement <span class="m">Y</span> = <span class="m">β</span><sub>0</sub> + <span class="m">β</span><sub>1</sub><span class="m">X</span> + <span class="m">ε</span> ? <b>Le modèle ne parle que de <span class="m">Y</span> sachant <span class="m">X</span> : moyenne conditionnelle affine, bruit centré.</b> Les carrés viennent du bruit gaussien, la forme fermée vient de la linéarité en <span class="m">β</span>, et le R² monte quoi qu'on ajoute. Fil rouge : cinq points, <span class="m">x</span> = (1, 2, 3, 4, 5), <span class="m">y</span> = (2, 4, 5, 4, 5) — puis les 200 marchés de <i>Advertising</i>.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01 · Du bruit à la loss</a></li>
+    <li><a href="chain-p04-01-matrice-action.html">p04-01 · Une matrice est une action</a></li>
+    <li><a href="chain-p00-02-esperance-variance-densite.html">p00-02 · Espérance, variance, covariance</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>ml::regression-lineaire</code><code>ml::ols</code><code>ml::r2</code><code>stats::residus</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-06-convexite-forme-fermee.html">Convexité et forme fermée</a></li>
+    <li><a href="../bridges/bridge-02-temoin-atteignable.html">Le témoin atteignable</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>Le bruit décide de la loss</b> (<a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>). Poser une loi pour <span class="m">ε</span>, écrire la vraisemblance, passer au <span class="up">−</span>log : un bruit gaussien donne une somme de carrés, un bruit de Laplace une somme de valeurs absolues. Ici on utilise le résultat, on ne le redémontre pas.</li>
+      <li><b>MSE estime la moyenne conditionnelle</b> (p02-01). Le minimiseur de <span class="m">E</span>[(<span class="m">Y</span> − <span class="m">c</span>)²] à <span class="m">x</span> fixé est <span class="m">E</span>[<span class="m">Y</span> | <span class="m">x</span>] ; c'est pour cela qu'une régression aux moindres carrés estime une <i>moyenne</i>, pas une médiane.</li>
+      <li><b>Colonnes et projection</b> (<a href="chain-p04-01-matrice-action.html">p04-01</a>). <span class="m">X</span><span class="m">β</span> est une combinaison des colonnes de <span class="m">X</span> ; l'ensemble des <span class="m">X</span><span class="m">β</span> est le sous-espace qu'elles engendrent. Le mieux qu'on puisse faire pour approcher <span class="m">y</span> est d'y projeter.</li>
+      <li><b>Covariance et variance empiriques</b> (<a href="chain-p00-02-esperance-variance-densite.html">p00-02</a>). <span class="m">S</span><sub><span class="m">xy</span></sub> = Σ(<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">x̄</span>)(<span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">ȳ</span>) et <span class="m">S</span><sub><span class="m">xx</span></sub> = Σ(<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">x̄</span>)² ; leurs versions divisées par <span class="m">n</span> − 1 sont la covariance et la variance empiriques.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span><b>Linéarité en <span class="m">β</span></b> : <span class="m">E</span>[<span class="m">Y</span> | <span class="m">X</span> = <span class="m">x</span>] = <span class="m">β</span><sub>0</sub> + <span class="m">β</span><sub>1</sub><span class="m">x</span>. C'est linéaire <i>en <span class="m">β</span></i>, pas en <span class="m">x</span> : <span class="m">x</span>², log <span class="m">x</span>, une indicatrice, restent dans le cadre.</span>
+      <b>H2</b><span><b>Bruit centré à <span class="m">x</span> fixé</b> : <span class="m">E</span>[<span class="m">ε</span> | <span class="m">X</span> = <span class="m">x</span>] = 0, quel que soit <span class="m">x</span>. C'est cette hypothèse-là, et elle seule, qui rend <span class="hat"><span class="m">β</span></span> sans biais.</span>
+      <b>H3</b><span><b>Homoscédasticité et indépendance</b> : Var(<span class="m">ε</span> | <span class="m">x</span>) = <span class="m">σ</span>² constante, <span class="m">ε</span><sub><span class="m">i</span></sub> indépendants. Nécessaires pour les <b>SE</b> (<a href="chain-p01-03-inference-regression.html">p01-03</a>), pas pour <span class="hat"><span class="m">β</span></span>.</span>
+      <b>H4</b><span><b>Bruit gaussien</b> : nécessaire pour que OLS soit le maximum de vraisemblance et pour le Student exact. Pas nécessaire au non-biais.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor</h3>
+    <p>Un nuage, une droite. La question n'est pas « quelle droite passe le mieux », qui n'a pas de sens tant qu'on n'a pas dit « le mieux pour quoi ».</p>
+    <p>La question est : <b>que suppose-t-on pour qu'une droite soit la bonne réponse</b>, et une fois cela posé, <b>laquelle</b> ?</p>
+    <p class="say">« Tracer une droite dans un nuage ne veut rien dire tant qu'on n'a pas dit ce qu'on modélise, donc on pose d'abord ce que le modèle affirme, donc la droite choisie sera une conséquence et pas un goût. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Le fil rouge — cinq points</div>
+    <table>
+      <tr><th><span class="m">i</span></th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+      <tr><th><span class="m">x</span><sub><span class="m">i</span></sub></th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+      <tr><th><span class="m">y</span><sub><span class="m">i</span></sub></th><td>2</td><td>4</td><td>5</td><td>4</td><td>5</td></tr>
+    </table>
+    <p><span class="m">x̄</span> = 3, <span class="m">ȳ</span> = 4. Le nuage monte, mais pas régulièrement : le point 3 est au-dessus, le point 4 en dessous. Tout se jouera sur <b>cinq nombres</b> : <span class="m">S</span><sub><span class="m">xy</span></sub>, <span class="m">S</span><sub><span class="m">xx</span></sub>, les deux moyennes, et RSS.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Le modèle est une hypothèse sur <span class="m">y</span> sachant <span class="m">x</span> <span class="tag tronc">tronc</span></h3>
+    <p>Écrire <span class="m">Y</span> = <span class="m">β</span><sub>0</sub> + <span class="m">β</span><sub>1</sub><span class="m">X</span> + <span class="m">ε</span> avec <span class="m">E</span>[<span class="m">ε</span> | <span class="m">X</span>] = 0, c'est exactement écrire :</p>
+    <div class="eq"><span class="m">E</span>[<span class="m">Y</span> | <span class="m">X</span> = <span class="m">x</span>] = <span class="m">β</span><sub>0</sub> + <span class="m">β</span><sub>1</sub><span class="m">x</span></div>
+    <p>Une <b>moyenne conditionnelle affine</b> (H1) et un <b>reste centré</b> (H2). Rien d'autre. En particulier : rien sur la loi de <span class="m">X</span>, rien sur la forme du nuage en <span class="m">x</span>, rien sur la causalité.</p>
+    <p class="say">« Le modèle pose la moyenne conditionnelle affine et un bruit centré, donc il ne parle que de Y sachant X, donc les x peuvent être quelconques et même transformés. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — ce qui est dedans, ce qui est dehors</div>
+    <table>
+      <tr><th>écriture</th><th>linéaire en <span class="m">β</span> ?</th></tr>
+      <tr><td><span class="m">β</span><sub>0</sub> + <span class="m">β</span><sub>1</sub><span class="m">x</span> + <span class="m">β</span><sub>2</sub><span class="m">x</span>²</td><td>oui</td></tr>
+      <tr><td><span class="m">β</span><sub>0</sub> + <span class="m">β</span><sub>1</sub> log <span class="m">x</span></td><td>oui</td></tr>
+      <tr><td><span class="m">β</span><sub>0</sub> + <span class="m">β</span><sub>1</sub>𝟙[<span class="m">x</span> &gt; 3]</td><td>oui</td></tr>
+      <tr><td><span class="m">β</span><sub>0</sub> e<sup><span class="m">β</span><sub>1</sub><span class="m">x</span></sup></td><td>non</td></tr>
+    </table>
+    <p>« Régression <b>linéaire</b> » ne veut donc pas dire « le nuage est une droite ». Un nuage en cloche s'ajuste par une régression linéaire dès qu'on met <span class="m">x</span>² dans les colonnes.</p>
+    <p>Et ce que le modèle <b>ne dit pas</b> : la loi des <span class="m">x</span> (ils peuvent être choisis, déséquilibrés, non aléatoires), ni que <span class="m">x</span> cause <span class="m">y</span>.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Pourquoi des carrés</h3>
+    <p>Sous H4, <span class="m">y</span><sub><span class="m">i</span></sub> | <span class="m">x</span><sub><span class="m">i</span></sub> ~ 𝒩(<span class="m">β</span><sub>0</sub> + <span class="m">β</span><sub>1</sub><span class="m">x</span><sub><span class="m">i</span></sub>, <span class="m">σ</span>²). La log-vraisemblance négative s'écrit (<a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>) :</p>
+    <div class="eq">−log <span class="m">p</span>(<span class="m">y</span> ; <span class="m">β</span>, <span class="m">σ</span>) = (1/2<span class="m">σ</span>²) Σ<sub><span class="m">i</span></sub> (<span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">β</span><sub>0</sub> − <span class="m">β</span><sub>1</sub><span class="m">x</span><sub><span class="m">i</span></sub>)² + (<span class="m">n</span>/2) log(2π<span class="m">σ</span>²)</div>
+    <p>À <span class="m">σ</span> fixé, minimiser en <span class="m">β</span> revient à minimiser la somme des carrés : <b>OLS = MLE</b>. Un bruit de Laplace donnerait Σ|·| — donc la <b>médiane</b> conditionnelle, moins sensible aux grands résidus.</p>
+    <p class="say">« Le bruit gaussien met le carré dans l'exposant, donc la log-vraisemblance est une somme de carrés au signe près, donc minimiser RSS c'est maximiser la vraisemblance, donc les carrés sont une conséquence de H4 et pas un choix esthétique. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — chaque critère a sa droite</div>
+    <p>Sur les cinq points, deux droites, chacune optimale pour son critère :</p>
+    <table>
+      <tr><th>droite</th><th>Σ<span class="m">r</span><sub><span class="m">i</span></sub>²</th><th>Σ|<span class="m">r</span><sub><span class="m">i</span></sub>|</th></tr>
+      <tr class="hl"><td>OLS (2,2 ; 0,6)</td><td><b>2,4</b></td><td>3,2</td></tr>
+      <tr><td>MAE (3,33 ; 0,33)</td><td>3,67</td><td><b>3,0</b></td></tr>
+    </table>
+    <p>Chacune gagne sur sa colonne et perd sur l'autre. Il n'y a pas de « meilleure droite » dans l'absolu : il y a la droite du critère, et le critère vient de l'hypothèse de bruit.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>La forme fermée <span class="tag tronc">tronc</span></h3>
+    <p>RSS(<span class="m">β</span>) = Σ(<span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">β</span><sub>0</sub> − <span class="m">β</span><sub>1</sub><span class="m">x</span><sub><span class="m">i</span></sub>)² est convexe ; annuler son gradient donne deux équations <b>linéaires</b> en <span class="m">β</span> — les équations normales (<a href="../bridges/bridge-06-convexite-forme-fermee.html">b06</a>) :</p>
+    <div class="eq">Σ<span class="m">r</span><sub><span class="m">i</span></sub> = 0 &nbsp;&nbsp;et&nbsp;&nbsp; Σ<span class="m">r</span><sub><span class="m">i</span></sub><span class="m">x</span><sub><span class="m">i</span></sub> = 0 &nbsp;&nbsp;⟹&nbsp;&nbsp; <span class="hat"><span class="m">β</span></span><sub>1</sub> = <span class="m">S</span><sub><span class="m">xy</span></sub> / <span class="m">S</span><sub><span class="m">xx</span></sub> = <span class="up">Ĉov</span>(<span class="m">x</span>, <span class="m">y</span>) / <span class="up">V̂ar</span>(<span class="m">x</span>) &nbsp;&nbsp; <span class="hat"><span class="m">β</span></span><sub>0</sub> = <span class="m">ȳ</span> − <span class="hat"><span class="m">β</span></span><sub>1</sub><span class="m">x̄</span></div>
+    <p>La pente est « covariance sur variance » ; l'intercept est ce qu'il faut pour que la droite passe par <b>le centre du nuage</b> (<span class="m">x̄</span>, <span class="m">ȳ</span>). En matriciel, <span class="hat"><span class="m">β</span></span> = (<span class="m">X</span><sup>⊤</sup><span class="m">X</span>)<sup>−1</sup><span class="m">X</span><sup>⊤</sup><span class="m">y</span>, <b>écrit</b> ainsi et <b>calculé</b> par QR (<a href="chain-p04-03-spectral-svd-conditionnement.html">p04-03</a>), jamais en inversant.</p>
+    <p class="say">« Annuler le gradient d'une somme de carrés donne des équations linéaires en β, donc on résout d'un coup, donc la pente est la covariance sur la variance et l'intercept fait passer la droite par le centre du nuage. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les cinq points, à la main</div>
+    <p><span class="m">S</span><sub><span class="m">xy</span></sub> = (−2)(−2) + (−1)(0) + (0)(1) + (1)(0) + (2)(1) = <b>6</b> &nbsp;·&nbsp; <span class="m">S</span><sub><span class="m">xx</span></sub> = 4 + 1 + 0 + 1 + 4 = <b>10</b>.</p>
+    <div class="eq"><span class="hat"><span class="m">β</span></span><sub>1</sub> = 6/10 = <b>0,6</b> &nbsp;&nbsp;&nbsp; <span class="hat"><span class="m">β</span></span><sub>0</sub> = <span class="m">ȳ</span> − <span class="hat"><span class="m">β</span></span><sub>1</sub><span class="m">x̄</span> = 4 − 0,6 × 3 = <b>2,2</b></div>
+    <p><b>Le piège classique.</b> <span class="hat"><span class="m">β</span></span><sub>0</sub> n'est <i>pas</i> <span class="m">ȳ</span> : ici <span class="m">ȳ</span> = 4 et <span class="hat"><span class="m">β</span></span><sub>0</sub> = <b>2,2</b>. L'intercept est la valeur de la droite <b>en <span class="m">x</span> = 0</b>, pas au centre du nuage. Ce qui vaut <span class="m">ȳ</span> = 4, c'est la droite <b>en <span class="m">x</span> = <span class="m">x̄</span> = 3</b> : 2,2 + 0,6 × 3 = 4. Les deux coïncideraient seulement si <span class="m">x̄</span> = 0, c'est-à-dire sur des <span class="m">x</span> centrés.</p>
+    <p>Prédictions : 2,8 · 3,4 · 4 · 4,6 · 5,2.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — minimiser la somme des aires</div>
+    <div id="f1plot" class="wide"></div>
+    <div id="f1sliders"></div>
+    <div class="sl-ctl" id="f1ctl"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Bouge <span class="m">β</span><sub>0</sub> et <span class="m">β</span><sub>1</sub> <b>à la main</b>. Chaque carré violet a pour côté le résidu du point : son aire est proportionnelle à <span class="m">r</span><sub><span class="m">i</span></sub>², et RSS est la somme de ces aires. Cherche le minimum au doigt, puis clique <b>droite OLS</b> : la forme fermée y saute d'un coup, sans itérer. Aucune autre droite ne descend sous 2,4.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Les résidus ont une structure</h3>
+    <p>Les deux équations normales <i>sont</i> deux contraintes sur les résidus : Σ<span class="m">r</span><sub><span class="m">i</span></sub> = 0 et Σ<span class="m">r</span><sub><span class="m">i</span></sub><span class="m">x</span><sub><span class="m">i</span></sub> = 0. Autrement dit <span class="m">r</span> est <b>orthogonal aux deux colonnes</b> de <span class="m">X</span> (la colonne de 1 et la colonne des <span class="m">x</span>).</p>
+    <div class="eq"><span class="hat"><span class="m">y</span></span> = <span class="m">H</span><span class="m">y</span> avec <span class="m">H</span> = <span class="m">X</span>(<span class="m">X</span><sup>⊤</sup><span class="m">X</span>)<sup>−1</sup><span class="m">X</span><sup>⊤</sup> &nbsp;·&nbsp; <span class="m">r</span> = <span class="m">y</span> − <span class="hat"><span class="m">y</span></span> ⟂ Vect(1, <span class="m">x</span>)</div>
+    <p>Donc <span class="hat"><span class="m">y</span></span> est la <b>projection orthogonale</b> de <span class="m">y</span> sur le plan des colonnes (<a href="chain-p04-01-matrice-action.html">p04-01</a>). Deux directions de <span class="m">y</span> sont consommées par l'ajustement : c'est ce qui coûte <span class="m">p</span> + 1 = 2 degrés de liberté (<a href="chain-p01-03-inference-regression.html">p01-03</a>).</p>
+    <p class="say">« Annuler les deux dérivées, c'est dire que le résidu est orthogonal à la colonne de 1 et à la colonne des x, donc ŷ est la projection orthogonale de y sur le plan des colonnes, donc deux directions de y sont consommées et il reste n − 2 degrés de liberté pour estimer σ². »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les résidus des cinq points</div>
+    <table>
+      <tr><th><span class="m">x</span><sub><span class="m">i</span></sub></th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td></tr>
+      <tr><th><span class="hat"><span class="m">y</span></span><sub><span class="m">i</span></sub></th><td>2,8</td><td>3,4</td><td>4</td><td>4,6</td><td>5,2</td></tr>
+      <tr><th><span class="m">r</span><sub><span class="m">i</span></sub></th><td>−0,8</td><td>0,6</td><td>1</td><td>−0,6</td><td>−0,2</td></tr>
+    </table>
+    <p>Σ<span class="m">r</span><sub><span class="m">i</span></sub> = −0,8 + 0,6 + 1 − 0,6 − 0,2 = <b>0</b>.</p>
+    <p>Σ<span class="m">r</span><sub><span class="m">i</span></sub><span class="m">x</span><sub><span class="m">i</span></sub> = −0,8 + 1,2 + 3 − 2,4 − 1 = <b>0</b>.</p>
+    <p>Les deux zéros ne sont pas une coïncidence : ce sont les équations qu'on vient de résoudre. Et comme <span class="m">n</span> = 5 avec deux contraintes :</p>
+    <div class="eq"><span class="hat"><span class="m">σ</span></span>² = RSS/(<span class="m">n</span> − 2) = 2,4/3 = 0,8 &nbsp;&nbsp;·&nbsp;&nbsp; RSE = √0,8 = 0,894</div>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Les carrés amplifient — et c'est la position en <span class="m">x</span> qui décide de combien</h3>
+    <p><span class="hat"><span class="m">β</span></span><sub>1</sub> est <b>linéaire en <span class="m">y</span></b>, avec des poids qui ne dépendent que des <span class="m">x</span> :</p>
+    <div class="eq"><span class="hat"><span class="m">β</span></span><sub>1</sub> = Σ<sub><span class="m">i</span></sub> <span class="m">w</span><sub><span class="m">i</span></sub> <span class="m">y</span><sub><span class="m">i</span></sub> &nbsp;avec&nbsp; <span class="m">w</span><sub><span class="m">i</span></sub> = (<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">x̄</span>)/<span class="m">S</span><sub><span class="m">xx</span></sub> &nbsp;&nbsp;⟹&nbsp;&nbsp; ∂<span class="hat"><span class="m">β</span></span><sub>1</sub>/∂<span class="m">y</span><sub><span class="m">i</span></sub> = <span class="m">w</span><sub><span class="m">i</span></sub></div>
+    <p>Un point au <b>bord</b> du nuage a un <span class="m">w</span><sub><span class="m">i</span></sub> grand : c'est le <b>levier</b>. Un point au centre a <span class="m">w</span><sub><span class="m">i</span></sub> = 0 et ne peut pas bouger la pente. Le carré, lui, décide qu'on <i>subit</i> ce point : laisser un résidu grand coûte son carré, donc la droite va le chercher au lieu de l'ignorer.</p>
+    <p class="say">« Chaque y entre linéairement dans la pente, avec un poids qui ne dépend que de sa position en x, donc un point au bord du nuage pèse beaucoup et un point au centre ne pèse rien, donc c'est la position en x qui fixe l'influence, et le carré de la loss décide qu'on la subit. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le même outlier, à deux endroits</div>
+    <p>Poids : <span class="m">w</span> = (−0,2 ; −0,1 ; 0 ; 0,1 ; 0,2). Leviers <span class="m">h</span><sub><span class="m">ii</span></sub> = (0,6 ; 0,3 ; 0,2 ; 0,3 ; 0,6).</p>
+    <table>
+      <tr><th>perturbation</th><th><span class="hat"><span class="m">β</span></span><sub>1</sub></th><th><span class="hat"><span class="m">β</span></span><sub>0</sub></th><th>RSE</th></tr>
+      <tr><td>aucune</td><td>0,6</td><td>2,2</td><td>0,89</td></tr>
+      <tr class="hl"><td><span class="m">y</span><sub>5</sub> : 5 → 15 &nbsp;(bord, <span class="m">w</span> = 0,2)</td><td><b>2,6</b></td><td>−1,8</td><td>3,58</td></tr>
+      <tr><td><span class="m">y</span><sub>3</sub> : 5 → 15 &nbsp;(centre, <span class="m">w</span> = 0)</td><td><b>0,6</b></td><td>4,2</td><td>5,84</td></tr>
+    </table>
+    <p>Au bord : Δ<span class="hat"><span class="m">β</span></span><sub>1</sub> = 0,2 × 10 = 2, exactement — la pente est <b>multipliée par plus de quatre</b> par un point sur cinq. Au centre, le même écart de 10 laisse la pente <b>strictement inchangée</b> et ne déplace que l'intercept.</p>
+    <p>Diagnostic : résidus studentisés et levier <span class="m">h</span><sub><span class="m">ii</span></sub>. Remède : Huber, MAE, ou — d'abord — comprendre le point.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — un point tire la droite, selon où il est</div>
+    <div id="f2plot" class="wide"></div>
+    <div id="f2sliders"></div>
+    <div class="sl-ctl" id="f2ctl"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Le nuage des cinq points, la droite OLS recalculée à chaque cran, les résidus en pointillé rouge ; la droite fine en violet est l'ajustement d'origine. Monte <span class="m">y</span><sub>5</sub> (le point du <b>bord</b>) : la pente suit, +0,2 par unité. Monte <span class="m">y</span><sub>3</sub> (le point du <b>centre</b>) : la pente ne bouge <b>pas d'un cran</b>, seul l'intercept monte. Même écart, influence opposée — c'est le levier.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>R² = 1 − RSS/TSS <span class="tag tronc">tronc</span></h3>
+    <p>Part de la variance de <span class="m">y</span> « expliquée » par la droite, avec TSS = Σ(<span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">ȳ</span>)², c'est-à-dire le RSS du modèle qui ne prédit que la moyenne.</p>
+    <div class="eq">R² = 1 − RSS/TSS &nbsp;&nbsp;·&nbsp;&nbsp; R²<sub>aj</sub> = 1 − [RSS/(<span class="m">n</span> − <span class="m">p</span> − 1)] / [TSS/(<span class="m">n</span> − 1)]</div>
+    <p>Ajouter une colonne ne peut pas faire monter RSS : le <b>témoin</b> « nouveau coefficient = 0 » est atteignable (<a href="../bridges/bridge-02-temoin-atteignable.html">b02</a>), donc l'optimum fait au moins aussi bien. Donc R² <b>ne baisse jamais</b>, donc il ne juge pas un ajout. Ce qui juge : R² ajusté, AIC, ou la validation (<a href="chain-p06-02-cv-leakage.html">p06-02</a>).</p>
+    <p class="say">« R² compare RSS à TSS, donc ajouter une colonne ne peut que baisser RSS, donc R² monte toujours, donc il ne compare pas des modèles de tailles différentes. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — trois façons de se faire avoir</div>
+    <p><b>Le fil rouge.</b> RSS = 2,4, TSS = 6 ⟹ R² = <b>0,6</b>.</p>
+    <p><b>R² monte pendant que l'ajustement se dégrade.</b> Avec <span class="m">y</span><sub>5</sub> = 15 : RSS = 38,4 mais TSS = 106, donc R² = <b>0,638</b> — au-dessus de 0,6 — alors que le RSE passe de 0,89 à <b>3,58</b>. R² est un rapport : gonfler le dénominateur suffit à le faire monter.</p>
+    <p><b>Le bruit pur paie.</b> 30 points, une vraie variable : R² ≈ 0,50 <i>en moyenne</i>. Dix colonnes de bruit indépendant de <span class="m">y</span> en plus : R² ≈ <b>0,68</b>, R² ajusté ≈ 0,48 — immobile. Le gain moyen par colonne de bruit vaut (1 − R²)/(<span class="m">n</span> − <span class="m">p</span> − 1) ≈ 0,018 : petit, positif, et garanti.</p>
+    <p><b>Le même nombre ne vaut pas la même chose.</b> R² = 0,6 sur cinq points et R² = 0,61 sur 200 marchés : c'est le SE de la pente qui les sépare, pas R².</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — R² monte quoi qu'on ajoute</div>
+    <div id="f3plot" class="wide"></div>
+    <div class="sl-ctl" id="f3ctl"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">30 points, une vraie variable, puis des colonnes de <b>bruit pur</b> — tirées indépendamment de <span class="m">y</span>, donc sans aucune information. Trois colonnes sont déjà posées à l'ouverture ; clique <b>ajouter une colonne de bruit</b> pour continuer jusqu'à dix. Le R² (bleu) monte à chaque clic, <b>sans exception</b>, tandis que le R² ajusté (violet) ne suit pas : il fluctue autour de sa valeur de départ au lieu de monter. <b>Autre échantillon</b> rejoue le tirage : la montée du R² se reproduit à tous les coups.</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Ce que <span class="hat"><span class="m">β</span></span><sub>1</sub> veut dire</h3>
+    <p>Trois précautions, dans cet ordre. <b>En moyenne</b> : <span class="hat"><span class="m">β</span></span><sub>1</sub> est la pente de la <i>moyenne conditionnelle</i>, pas ce qui arrive à un individu. <b>Toutes choses égales</b> : si d'autres colonnes sont dans le modèle, c'est l'effet à ces colonnes fixées. <b>Corrélation</b> : rien dans H1–H4 ne parle de cause.</p>
+    <p>Deux chiffres accompagnent la lecture, et ils ne disent pas la même chose : le <b>SE</b> dit à quel point <span class="hat"><span class="m">β</span></span><sub>1</sub> est stable d'un échantillon à l'autre (<a href="chain-p01-03-inference-regression.html">p01-03</a>), le <b>R²</b> dit combien reste inexpliqué.</p>
+    <p class="say">« β̂₁ est la pente de la moyenne conditionnelle, donc il se lit comme une variation moyenne de Y pour une unité de x en plus, donc toutes choses égales quand d'autres colonnes sont là, donc jamais comme un effet causal sans un dispositif qui le garantisse. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — <i>Advertising</i>, <code>sales ~ TV</code> (<span class="m">n</span> = 200)</div>
+    <table>
+      <tr><th></th><th>estimation</th><th>SE</th></tr>
+      <tr><td>intercept</td><td>7,03</td><td>0,458</td></tr>
+      <tr class="hl"><td>TV</td><td><b>0,0475</b></td><td>0,0027</td></tr>
+    </table>
+    <p>RSE = 3,26 · R² = 0,61. Le budget TV est en milliers de dollars, les ventes en milliers d'unités : <b>mille dollars de TV en plus ⇒ 47,5 ventes en plus, en moyenne</b>.</p>
+    <p><b>Ce que le SE dit, et sur quoi.</b> 0,0027 face à une pente de 0,0475 : un rapport de 17,6. L'hypothèse testée porte sur <span class="m">β</span><sub>1</sub>, le <b>paramètre</b> — jamais sur <span class="hat"><span class="m">β</span></span><sub>1</sub>, qui est ce qu'on a observé. La procédure est celle de <a href="chain-p01-03-inference-regression.html">p01-03</a> ; on ne la rejoue pas ici.</p>
+    <p><b>Le contraste qui compte.</b> Sur les cinq points : SE(<span class="hat"><span class="m">β</span></span><sub>1</sub>) = RSE/√<span class="m">S</span><sub><span class="m">xx</span></sub> = 0,894/√10 = <b>0,283</b> pour une pente de 0,6 — un rapport de 2,1. Même R², confiance sans commune mesure. Et R² = 0,61 laisse 39 % de la variance des ventes ailleurs : la TV n'explique pas tout.</p>
+  </div>
+</div>
+
+<div class="step" id="s9">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Chaque hypothèse tombe à sa manière, et chacune laisse une trace différente dans les résidus. C'est pour cela qu'on les regarde <b>avant</b> de lire les coefficients.</p>
+    <p class="say">« Chaque hypothèse casse d'une manière différente, donc on trace les résidus contre x et contre ŷ avant de lire un coefficient, donc on sait laquelle est tombée : une forme pour H1, un éventail pour H3, un conditionnement pour l'unicité. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>Non-linéarité (H1 tombe).</b> La moyenne conditionnelle n'est pas affine : <span class="hat"><span class="m">β</span></span> est <b>biaisé</b>, et les résidus tracés contre <span class="m">x</span> montrent une <b>forme</b> (une courbe, un U). Remède : transformer <span class="m">x</span>, ajouter <span class="m">x</span>², ou changer de modèle — pas augmenter <span class="m">n</span>.</li>
+      <li><b>Hétéroscédasticité ou dépendance (H3 tombe).</b> <span class="hat"><span class="m">β</span></span> reste <b>sans biais</b> — H2 suffit — mais les <b>SE sont faux</b>, donc les intervalles et les tests aussi (<a href="chain-p01-03-inference-regression.html">p01-03</a>). Signature : un <b>éventail</b> des résidus contre <span class="hat"><span class="m">y</span></span>, ou une autocorrélation en série temporelle. Remède : SE robustes, moindres carrés pondérés, modèle de la dépendance.</li>
+      <li><b>Colinéarité.</b> Deux colonnes presque proportionnelles : <span class="m">X</span><sup>⊤</sup><span class="m">X</span> devient singulière ou mal conditionnée, donc <span class="hat"><span class="m">β</span></span> n'est plus unique, ou bouge énormément pour une perturbation minuscule (<a href="chain-p04-03-spectral-svd-conditionnement.html">p04-03</a>). Les prédictions, elles, restent stables. Remède : ridge (<a href="chain-p02-02-prior-penalite.html">p02-02</a>), ou retirer une colonne.</li>
+      <li><b>Extrapolation.</b> La droite n'est ajustée que sur le <b>support des <span class="m">x</span> observés</b>. Hors de ce support, H1 n'a jamais été mise à l'épreuve : l'intervalle de prédiction s'élargit, mais surtout le modèle lui-même n'est plus testé. L'intercept d'<i>Advertising</i>, 7,03, est une valeur en <span class="m">x</span> = 0 alors qu'aucun marché n'a un budget TV nul.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Le modèle est une hypothèse <b>sur <span class="m">Y</span> sachant <span class="m">X</span></b> : moyenne affine (H1), bruit centré (H2). H3–H4 servent aux SE et au MLE, pas au non-biais.</li>
+    <li>Carrés ⇐ gaussien ; valeurs absolues ⇐ Laplace. Le critère sort de l'hypothèse de bruit.</li>
+    <li>Forme fermée : <span class="hat"><span class="m">β</span></span><sub>1</sub> = <span class="up">Ĉov</span>/<span class="up">V̂ar</span>, <span class="hat"><span class="m">β</span></span><sub>0</sub> = <span class="m">ȳ</span> − <span class="hat"><span class="m">β</span></span><sub>1</sub><span class="m">x̄</span> = <b>2,2</b> et non 4 ; la droite passe par (<span class="m">x̄</span>, <span class="m">ȳ</span>) ; <span class="hat"><span class="m">y</span></span> est une projection.</li>
+    <li>Influence d'un point : <span class="m">w</span><sub><span class="m">i</span></sub> = (<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">x̄</span>)/<span class="m">S</span><sub><span class="m">xx</span></sub>. Au bord, 0,6 → 2,6 ; au centre, rien ne bouge.</li>
+    <li>R² ne baisse jamais quand on ajoute une colonne (témoin <span class="m">β</span> = 0) : il ne juge pas un ajout, et il peut monter pendant que l'ajustement se dégrade.</li>
+    <li><span class="hat"><span class="m">β</span></span><sub>1</sub> = effet <b>moyen</b>, toutes choses égales, <b>corrélation</b>. Le SE dit sa stabilité ; R² dit ce qui reste dehors.</li>
+  </ol>
+</div>
+<div class="phrase">« Le modèle linéaire pose que la moyenne de Y sachant X est affine et que le reste est un bruit centré ; les carrés viennent d'un bruit gaussien, et comme annuler leur gradient est linéaire en β, la solution est fermée : covariance sur variance, droite par le centre du nuage. Le R² ne baisse jamais quand on ajoute une variable, donc il ne juge pas un ajout ; c'est le SE de la pente et la validation qui jugent. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Que suppose <span class="m">Y</span> = <span class="m">β</span><sub>0</sub> + <span class="m">β</span><sub>1</sub><span class="m">X</span> + <span class="m">ε</span>, et sur quoi ?</div><div class="a hid">Moyenne conditionnelle affine (H1), bruit centré à <span class="m">x</span> fixé (H2). Uniquement sur <span class="m">Y</span> sachant <span class="m">X</span> : rien sur la loi des <span class="m">x</span>, rien sur la cause. Linéaire en <span class="m">β</span>, pas en <span class="m">x</span>.</div></li>
+    <li><div class="q">Pourquoi des carrés ?</div><div class="a hid">NLL gaussienne : le carré est dans l'exposant, donc OLS = MLE. Laplace donnerait Σ|·|, donc la médiane conditionnelle.</div></li>
+    <li><div class="q">Écris <span class="hat"><span class="m">β</span></span><sub>1</sub> et <span class="hat"><span class="m">β</span></span><sub>0</sub>, et dis d'où ils sortent.</div><div class="a hid"><span class="hat"><span class="m">β</span></span><sub>1</sub> = <span class="m">S</span><sub><span class="m">xy</span></sub>/<span class="m">S</span><sub><span class="m">xx</span></sub> = <span class="up">Ĉov</span>/<span class="up">V̂ar</span> ; <span class="hat"><span class="m">β</span></span><sub>0</sub> = <span class="m">ȳ</span> − <span class="hat"><span class="m">β</span></span><sub>1</sub><span class="m">x̄</span> — <b>pas</b> <span class="m">ȳ</span>. Gradient nul, équations linéaires en <span class="m">β</span>, donc forme fermée.</div></li>
+    <li><div class="q">Que fait un outlier, et pourquoi ça dépend d'où il est ?</div><div class="a hid">∂<span class="hat"><span class="m">β</span></span><sub>1</sub>/∂<span class="m">y</span><sub><span class="m">i</span></sub> = (<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">x̄</span>)/<span class="m">S</span><sub><span class="m">xx</span></sub>. Au bord (<span class="m">w</span> = 0,2) : 0,6 → 2,6. Au centre (<span class="m">w</span> = 0) : pente inchangée. Le carré fait qu'on le suit, le levier dit de combien.</div></li>
+    <li><div class="q">Pourquoi R² monte toujours ?</div><div class="a hid">Témoin <span class="m">β</span> = 0 atteignable : l'optimum avec la colonne en plus fait au moins aussi bien, donc RSS ne peut pas monter. Il peut même monter pendant que le RSE se dégrade (0,6 → 0,638 avec un outlier).</div></li>
+    <li><div class="q">Comment lis-tu <span class="hat"><span class="m">β</span></span><sub>1</sub> = 0,0475 ?</div><div class="a hid">Mille dollars de TV en plus ⇒ +47,5 ventes <b>en moyenne</b>, toutes choses égales, <b>corrélation</b>. SE 0,0027 : stable. R² 0,61 : 39 % restent ailleurs.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="../bridges/bridge-06-convexite-forme-fermee.html"><b>Convexité et forme fermée</b><small>annuler le gradient d'une somme de carrés donne des équations linéaires, donc on résout ; la logistique n'a pas cette chance et itère</small></a>
+    <a href="../bridges/bridge-02-temoin-atteignable.html"><b>Le témoin atteignable</b><small>le coefficient nul est toujours dans l'espace des candidats, donc l'optimum ne peut pas faire pire : c'est tout l'argument du R² qui ne baisse jamais</small></a>
+    <a href="chain-p02-01-bruit-vraisemblance-loss.html"><b>p02-01 — Du bruit à la loss</b><small>d'où vient la somme des carrés ; ici on l'applique au cas linéaire</small></a>
+    <a href="chain-p01-03-inference-regression.html"><b>p01-03 — Inférence en régression</b><small>ce que le SE de la pente mesure, et pourquoi l'hypothèse porte sur le paramètre</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>ml::regression-lineaire</code> (le modèle porte sur <span class="m">Y</span> | <span class="m">X</span> ; linéaire en <span class="m">β</span>) · <code>ml::ols</code> (forme fermée, <span class="hat"><span class="m">β</span></span><sub>0</sub> = <span class="m">ȳ</span> − <span class="hat"><span class="m">β</span></span><sub>1</sub><span class="m">x̄</span>, QR et non inversion) · <code>ml::r2</code> (ne baisse jamais ; R² ajusté) · <code>stats::residus</code> (Σ<span class="m">r</span> = 0, Σ<span class="m">r</span><span class="m">x</span> = 0, projection, <span class="m">n</span> − 2).</p>
+  <p>Suite directe : <a href="../../map.html#p05-02">p05-02, la logistique</a> — même charpente, mais la NLL n'est plus une somme de carrés, donc plus de forme fermée.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p05-01 · v1 du 17/09/2026 · Prérequis : <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, <a href="chain-p04-01-matrice-action.html">p04-01</a>, <a href="chain-p00-02-esperance-variance-densite.html">p00-02</a>. Suite : <a href="../../map.html#p05-02">p05-02 Régression logistique</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== données du fil rouge ===== */
+const XS=[1,2,3,4,5], YS=[2,4,5,4,5], XB=3;
+function fit(ys){const n=ys.length;let yb=0;for(let i=0;i<n;i++)yb+=ys[i];yb/=n;
+  let sxy=0,sxx=0;for(let i=0;i<n;i++){sxy+=(XS[i]-XB)*(ys[i]-yb);sxx+=(XS[i]-XB)*(XS[i]-XB);}
+  const b1=sxy/sxx, b0=yb-b1*XB;let rss=0,tss=0;
+  for(let i=0;i<n;i++){const r=ys[i]-b0-b1*XS[i];rss+=r*r;tss+=(ys[i]-yb)*(ys[i]-yb);}
+  return {b0,b1,rss,tss,r2:tss>1e-12?1-rss/tss:0,rse:Math.sqrt(rss/(n-2))};}
+
+/* ===== Figure 1 : minimiser la somme des aires ===== */
+const P1=SL.plot(document.getElementById('f1plot'),{x:[0,6],y:[0,10],w:600,h:340,xt:[1,2,3,4,5],yt:[2,4,6,8,10],xl:'x',yl:'y'});
+const out1=document.getElementById('f1out');
+let path1=[];const st1={b0:3,b1:.2};
+function draw1(){path1.forEach(p=>p.remove());path1=[];P1.clear();
+  const b0=st1.b0, b1=st1.b1;
+  path1.push(P1.fn(x=>b0+b1*x,'sl-c1'));
+  let rss=0;
+  for(let i=0;i<5;i++){const yh=b0+b1*XS[i], r=YS[i]-yh;rss+=r*r;
+    /* le carré du résidu : côté = |r| en pixels, centré sur le point — les aires sont
+       donc proportionnelles à r², à un facteur d'échelle près commun à tous les points. */
+    const side=Math.abs(P1.sy(YS[i])-P1.sy(yh));
+    if(side>0.5)SL.el('rect',{x:P1.sx(XS[i])-side/2,y:Math.min(P1.sy(YS[i]),P1.sy(yh)),width:side,height:side,class:'sl-bar'},P1.dyn);
+    P1.seg(XS[i],YS[i],XS[i],yh,'chord');}
+  for(let i=0;i<5;i++)P1.dot(XS[i],YS[i],'sl-c3',5);
+  const best=Math.abs(rss-2.4)<1e-9;
+  out1.innerHTML=`<div class="pos">β₀ à la main<b>${SL.fmt(b0,2)}</b></div>`+
+    `<div class="pos">β₁ à la main<b>${SL.fmt(b1,2)}</b></div>`+
+    `<div class="${best?'pos':'zero'}">somme des aires = RSS<b>${SL.fmt(rss,3)}</b></div>`+
+    `<div class="pos">minimum atteignable<b>2,4</b></div>`;}
+const s1b0=SL.slider(document.getElementById('f1sliders'),{label:'β₀ (intercept)',min:1,max:4,step:.1,value:3},v=>{st1.b0=v;draw1();});
+const s1b1=SL.slider(document.getElementById('f1sliders'),{label:'β₁ (pente)',min:0,max:1.2,step:.05,value:.2},v=>{st1.b1=v;draw1();});
+{const c=document.getElementById('f1ctl');
+ const b=document.createElement('button');b.className='tb';b.textContent='droite OLS (2,2 ; 0,6)';b.onclick=()=>{s1b0.set(2.2);s1b1.set(.6);};c.appendChild(b);}
+draw1();
+
+/* ===== Figure 2 : levier — un point tire la droite selon où il est ===== */
+const P2=SL.plot(document.getElementById('f2plot'),{x:[0,6],y:[0,21],w:600,h:330,xt:[1,2,3,4,5],yt:[5,10,15,20],xl:'x',yl:'y'});
+P2.fn(x=>2.2+.6*x,'sl-c2');P2.label(5.8,1.2,'droite initiale','sl-c2','end');
+const out2=document.getElementById('f2out');
+let path2=[];const st2={y3:5,y5:5};
+function draw2(){path2.forEach(p=>p.remove());path2=[];P2.clear();
+  const ys=YS.slice();ys[2]=st2.y3;ys[4]=st2.y5;
+  const f=fit(ys);
+  path2.push(P2.fn(x=>f.b0+f.b1*x,'sl-c1'));
+  for(let i=0;i<5;i++){P2.seg(XS[i],ys[i],XS[i],f.b0+f.b1*XS[i],'chord');}
+  for(let i=0;i<5;i++)P2.dot(XS[i],ys[i],(i===4||i===2)?'sl-c3':'sl-c4',(i===4||i===2)?6:5);
+  const bouge=Math.abs(f.b1-0.6)>1e-9;
+  out2.innerHTML=`<div class="${bouge?'zero':'pos'}">pente β̂₁<b>${SL.fmt(f.b1,3)}</b></div>`+
+    `<div class="pos">intercept β̂₀<b>${SL.fmt(f.b0,3)}</b></div>`+
+    `<div class="pos">RSS<b>${SL.fmt(f.rss,2)}</b></div>`+
+    `<div class="pos">RSE<b>${SL.fmt(f.rse,2)}</b></div>`+
+    `<div class="pos">R²<b>${SL.fmt(f.r2,3)}</b></div>`;}
+const s2y5=SL.slider(document.getElementById('f2sliders'),{label:'y₅ (bord, w = 0,2)',min:0,max:20,step:.5,value:5},v=>{st2.y5=v;draw2();});
+const s2y3=SL.slider(document.getElementById('f2sliders'),{label:'y₃ (centre, w = 0)',min:0,max:20,step:.5,value:5},v=>{st2.y3=v;draw2();});
+{const c=document.getElementById('f2ctl');
+ [['y₅ = 15 (bord)',15,5],['y₃ = 15 (centre)',5,15],['remettre à plat',5,5]].forEach(([n,a,b])=>{
+   const bt=document.createElement('button');bt.className='tb';bt.textContent=n;bt.onclick=()=>{s2y5.set(a);s2y3.set(b);};c.appendChild(bt);});}
+draw2();
+
+/* ===== Figure 3 : R² monte quoi qu'on ajoute ===== */
+/* générateur déterministe : la figure doit raconter la même histoire à chaque ouverture */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;let t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function gauss(rnd){let u=0,v=0;while(u===0)u=rnd();while(v===0)v=rnd();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+function solve(A,b){ /* élimination de Gauss avec pivot partiel, p ≤ 12 */
+  const n=b.length,M=A.map((r,i)=>r.concat([b[i]]));
+  for(let c=0;c<n;c++){let p=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[p][c]))p=r;
+    const t=M[c];M[c]=M[p];M[p]=t;if(Math.abs(M[c][c])<1e-12)continue;
+    for(let r=0;r<n;r++){if(r===c)continue;const k=M[r][c]/M[c][c];for(let j=c;j<=n;j++)M[r][j]-=k*M[c][j];}}
+  return M.map((r,i)=>Math.abs(r[i])<1e-12?0:r[n]/r[i]);}
+const N3=30;let cols=[],yv=[],hist=[],seed=20250338;
+function newSample(){const rnd=mulberry32(seed);cols=[];yv=[];
+  const one=[],x1=[];for(let i=0;i<N3;i++){one.push(1);x1.push(gauss(rnd));}
+  for(let i=0;i<N3;i++)yv.push(1+2*x1[i]+2*gauss(rnd));
+  cols=[one,x1];hist=[];pushFit(rnd);rng3=rnd;}
+let rng3=null;
+function pushFit(rnd){const p=cols.length-1;
+  const A=[],bb=[];
+  for(let a=0;a<cols.length;a++){const row=[];for(let b=0;b<cols.length;b++){let s=0;for(let i=0;i<N3;i++)s+=cols[a][i]*cols[b][i];row.push(s);}A.push(row);
+    let s=0;for(let i=0;i<N3;i++)s+=cols[a][i]*yv[i];bb.push(s);}
+  const be=solve(A,bb);
+  let ym=0;for(let i=0;i<N3;i++)ym+=yv[i];ym/=N3;
+  let rss=0,tss=0;for(let i=0;i<N3;i++){let yh=0;for(let a=0;a<cols.length;a++)yh+=be[a]*cols[a][i];rss+=(yv[i]-yh)*(yv[i]-yh);tss+=(yv[i]-ym)*(yv[i]-ym);}
+  const r2=1-rss/tss, adj=1-(1-r2)*(N3-1)/(N3-p-1);
+  hist.push({k:p-1,r2,adj});}
+const P3=SL.plot(document.getElementById('f3plot'),{x:[0,10],y:[0,1],w:600,h:300,xt:[0,2,4,6,8,10],yt:[.2,.4,.6,.8,1],xl:'colonnes de bruit ajoutées',yl:''});
+const out3=document.getElementById('f3out');
+function draw3(){P3.clear();
+  for(let i=1;i<hist.length;i++){P3.seg(hist[i-1].k,hist[i-1].r2,hist[i].k,hist[i].r2,'slope sl-c1');
+    P3.seg(hist[i-1].k,hist[i-1].adj,hist[i].k,hist[i].adj,'slope sl-c2');}
+  hist.forEach(h=>{P3.dot(h.k,h.r2,'sl-c1',4);P3.dot(h.k,h.adj,'sl-c2',4);});
+  const last=hist[hist.length-1], first=hist[0];
+  /* les deux courbes sont proches : on accroche chaque étiquette à son départ, décalée */
+  P3.text(.25,first.r2+.08,'R²','sl-c1','start');P3.text(.25,first.adj-.1,'R² ajusté','sl-c2','start');
+  out3.innerHTML=`<div class="pos">colonnes de bruit<b>${last.k}</b></div>`+
+    `<div class="pos">R²<b>${SL.fmt(last.r2,3)}</b></div>`+
+    `<div class="${last.adj<first.adj?'zero':'pos'}">R² ajusté<b>${SL.fmt(last.adj,3)}</b></div>`+
+    `<div class="pos">gagné sur R² depuis 0<b>${SL.fmt(last.r2-first.r2,3)}</b></div>`;
+  addBtn.disabled=last.k>=10;}
+const ctl3=document.getElementById('f3ctl');
+const addBtn=document.createElement('button');addBtn.className='tb';addBtn.textContent='ajouter une colonne de bruit';
+addBtn.onclick=()=>{if(hist[hist.length-1].k>=10)return;const c=[];for(let i=0;i<N3;i++)c.push(gauss(rng3));cols.push(c);pushFit(rng3);draw3();};
+const resBtn=document.createElement('button');resBtn.className='tb';resBtn.textContent='autre échantillon';
+resBtn.onclick=()=>{seed=(seed*1103515245+12345)>>>0;newSample();draw3();};
+ctl3.append(addBtn,resBtn);
+newSample();
+/* trois colonnes de bruit déjà posées : la figure raconte déjà quelque chose à l'ouverture */
+for(let i=0;i<3;i++)addBtn.onclick();
+draw3();
+})();
+</script>
+</body>
+</html>
