@@ -10,7 +10,7 @@ prereq: [p03-01, p00-03, p06-01]
 anki: [ml::arbres, ml::gini, ml::profondeur, ml::cart]
 bridges: [b05, b03]
 next: p07-02
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -80,3 +80,27 @@ Régression : même geste avec la variance des y dans le nœud ; la feuille pré
 
 ## Exclusions
 Pas d'élagage coût-complexité détaillé, pas de surrogate splits au-delà du nom, pas de CHAID/C4.5, pas d'importance des features (p07-02).
+
+## Questions pour la revue
+- **Tous les chiffres du fil rouge sont vérifiés et justes** (script Python, fractions exactes) :
+  gains Gini 1,5 → 1/14 = 0,071 · 2,5 → 1/6 = 0,167 · 3,5 → 1/30 = 0,033 · 4,5 → 1/8 = 0,125 ·
+  5,5 → 1/30 = 0,033 · 6,5 → 0 · 7,5 → 1/14 = 0,071 ; gain en erreur de classification 0,250 à
+  2,5 **et** à 4,5, donc égalité au sommet. Aucune correction à apporter au spec.
+- **Figures 2 et 3 : la frontière vraie est un coin (x < 0,40 ou y > 0,70), pas une diagonale.**
+  Le spec ne fixait pas la loi du nuage. Testé : avec une frontière diagonale le U de la figure 3
+  est plat (0,332 → 0,270 → 0,278, soit 0,008 d'amplitude) et ne se lit pas. Avec le coin et 12 %
+  d'étiquettes retournées, le U est net (0,292 → **0,182** à la profondeur 2 → 0,244 à 12).
+  Le prix payé : la figure 2 ne montre plus l'escalier des coupures le long d'une diagonale.
+  Le coût de la diagonale est donc traité **au pas 4, chiffré** (1/(2k) d'aire d'erreur pour k
+  marches, donc k = 50 pour 1 %) plutôt qu'en figure. À valider.
+- **Le minimum du U tombe à la profondeur 2** sur une échelle 1…12 : le creux est très à gauche.
+  C'est le régime honnête pour n = 40 ; augmenter n déplacerait le creux vers la droite mais
+  éloignerait la figure 3 du nuage de la figure 2. Gardé tel quel.
+- **« Isoler chaque point »** (pas 5 du spec) : l'arbre coupe jusqu'à ce que chaque *feuille* soit
+  pure, ce qui ne fait une feuille par point qu'à la limite. La sheet écrit « il finit par isoler
+  les points », et le compteur « feuilles » de la figure 2 montre 12 feuilles pour 40 points à
+  erreur train nulle. Formulation à confirmer.
+- **Instabilité du pas 8** : l'exemple chiffré retenu n'est pas un point *déplacé* mais le point
+  x = 3 *retiré* — c'est la perturbation minimale qui change effectivement la racine
+  (2,5 → 4,5, gain 0,167 → 0,276). Un simple déplacement ne change rien tant que l'ordre tient,
+  ce qui est justement le pas 3.

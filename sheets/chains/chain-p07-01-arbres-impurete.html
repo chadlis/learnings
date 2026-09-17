@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Arbres — impureté, split, profondeur — chaîne</title>
+<meta name="sheet" content="series=chain;part=07;number=01;status=v1">
+<meta name="part" content="07 · Arbres, ensembles, k-means">
+<meta name="subtitle" content="arbres et ensembles — un arbre coupe là où l'impureté baisse le plus, et sa profondeur est sa variance">
+<meta name="prereq" content="p03-01,p06-01,p00-03">
+<meta name="anki" content="ml::arbres,ml::gini,ml::profondeur,ml::cart">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 07 · Arbres, ensembles, k-means › chaîne 01</div>
+  <h1>Un arbre coupe là où l'<span>impureté</span> baisse le plus</h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Comment CART choisit une coupure, pourquoi avec Gini plutôt qu'avec l'accuracy, jusqu'où il coupe, et pourquoi un arbre profond est un modèle à forte variance. L'idée tient en une phrase : <b>un arbre compare toutes les coupures possibles par la baisse d'impureté qu'elles produisent, et sa profondeur est le seul bouton qui règle sa variance.</b> Fil rouge : huit points sur une droite, <span class="m">x</span> = 1…8, étiquettes + + − + − − + −, parent à 4 <b>+</b> / 4 <b>−</b>.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="chain-p03-01-critere-escalier-vs-sensible.html#s4">p03-01 · Tente vs dôme, Gini</a></li>
+    <li><a href="chain-p06-01-biais-variance.html#s2">p06-01 · Biais et variance</a></li>
+    <li><a href="chain-p00-03-conditionnement-bayes.html#s6">p00-03 · Proportions en effectifs</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>ml::arbres</code><code>ml::gini</code><code>ml::profondeur</code><code>ml::cart</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-05-escalier-vs-sensible.html">Escalier vs sensible</a></li>
+    <li><a href="../bridges/bridge-03-biais-variance-partout.html">Biais-variance partout</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>Tente vs dôme.</b> L'erreur de classification <span class="m">e</span>(<span class="m">p</span>) = min(<span class="m">p</span>, 1−<span class="m">p</span>) est une <b>tente</b> : affine de chaque côté de ½, donc gain de split exactement nul tant qu'aucun enfant ne change de classe majoritaire. Gini <span class="m">G</span>(<span class="m">p</span>) = 2<span class="m">p</span>(1−<span class="m">p</span>) et l'entropie sont des <b>dômes</b> strictement concaves, donc tout split qui sépare se voit (<a href="chain-p03-01-critere-escalier-vs-sensible.html#s3">p03-01, pas 3 et 4</a>). <b>On ne le redémontre pas ici</b> : on l'utilise.</li>
+      <li><b>Gini = deux tirages.</b> Tirer un individu du nœud, lui coller une étiquette tirée selon les proportions du nœud : Gini est la probabilité de se tromper. Entropie = surprise moyenne.</li>
+      <li><b>Surrogate.</b> L'impureté sert à <i>apprendre</i>, le taux d'erreur à <i>mesurer</i> — entropie = log-loss du nœud, Gini = son score de Brier (<a href="chain-p03-01-critere-escalier-vs-sensible.html#s5">p03-01, pas 5</a>).</li>
+      <li><b>Le tirage, c'est le dataset.</b> Un modèle réentraîné sur un autre échantillon de la même population est un autre modèle ; l'ampleur de ce changement est sa <b>variance</b> (<a href="chain-p06-01-biais-variance.html#s2">p06-01, pas 2</a>), et le compromis se lit sur un <a href="chain-p06-01-biais-variance.html#s6">U</a>.</li>
+      <li><b>Proportion et moyenne pondérée.</b> La proportion d'un parent est la moyenne pondérée des proportions de ses enfants, poids = effectifs (<a href="chain-p00-03-conditionnement-bayes.html#s6">p00-03, pas 6</a>).</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>Coupures <b>axe par axe</b> : une question ne porte que sur une feature et un seuil, « <span class="m">x</span><sub><span class="m">j</span></sub> ≤ <span class="m">t</span> ? ». La frontière obtenue est un pavage en rectangles, jamais une diagonale.</span>
+      <b>H2</b><span>Construction <b>gloutonne</b> : à chaque nœud on prend la meilleure coupure locale, sans regarder deux coups plus loin, et on ne revient jamais dessus.</span>
+      <b>H3</b><span>Critère : <b>impureté</b> (Gini par défaut) pour classer, <b>variance des <span class="m">y</span></b> du nœud pour régresser.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor</h3>
+    <p>Un arbre pose des questions « <span class="m">x</span><sub><span class="m">j</span></sub> ≤ <span class="m">t</span> ? » et range chaque point dans une <b>feuille</b>, qui prédit la classe majoritaire de ce qu'elle contient. Tout l'apprentissage se réduit à deux décisions locales — <b>quelle feature</b>, <b>quel seuil</b> — et à une décision globale : <b>quand s'arrêter</b>.</p>
+    <p>Les trois pas suivants traitent les deux premières, les pas 5 et 6 la troisième.</p>
+    <p class="say">« Un arbre range chaque point dans une feuille par une suite de questions, donc tout ce qu'il apprend tient dans le choix d'un couple (feature, seuil) à chaque nœud, donc il lui faut un critère qui compare des coupures. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Le fil rouge</div>
+    <p>Une seule feature <span class="m">x</span>, huit points, huit valeurs distinctes :</p>
+    <table>
+      <tr><th><span class="m">x</span></th><td>1</td><td>2</td><td>3</td><td>4</td><td>5</td><td>6</td><td>7</td><td>8</td></tr>
+      <tr><th>étiquette</th><td>+</td><td>+</td><td>−</td><td>+</td><td>−</td><td>−</td><td>+</td><td>−</td></tr>
+    </table>
+    <p>Parent : 4 <b>+</b> / 4 <b>−</b>, donc <span class="m">p</span> = 0,5, Gini = 2·0,5·0,5 = <b>0,5</b> et erreur de classification = min(0,5 ; 0,5) = <b>0,5</b>.</p>
+    <p>Huit valeurs distinctes ⇒ <b>sept</b> seuils candidats, un entre chaque paire de points consécutifs : 1,5 · 2,5 · 3,5 · 4,5 · 5,5 · 6,5 · 7,5.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Le critère : la baisse d'impureté <span class="tag tronc">tronc</span></h3>
+    <p>Pour chaque couple (feature, seuil), on calcule l'impureté du parent moins l'impureté <b>pondérée par les effectifs</b> des deux enfants :</p>
+    <div class="eq">gain(<span class="m">j</span>, <span class="m">t</span>) = imp(parent) − [ <span class="m">w</span><sub>L</sub> imp(L) + <span class="m">w</span><sub>R</sub> imp(R) ] &nbsp;&nbsp; avec <span class="m">w</span><sub>L</sub> = <span class="m">n</span><sub>L</sub>/<span class="m">n</span></div>
+    <p>On garde le couple de gain maximal. <b>Gini</b> par défaut, <b>entropie</b> presque équivalente ; l'erreur de classification, elle, est une tente et ne départage pas (p03-01).</p>
+    <p class="say">« L'arbre compare toutes les coupures par la baisse d'impureté, donc il lui faut un critère qui voit une purification sans basculement de majorité, donc un dôme strictement concave, donc Gini ou l'entropie. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les sept seuils, chiffrés</div>
+    <table>
+      <tr><th>seuil</th><th>gauche</th><th>droite</th><th>Gini pondéré</th><th>gain Gini</th><th>gain erreur</th></tr>
+      <tr><td>1,5</td><td>1 + / 0 −</td><td>3 + / 4 −</td><td>0,429</td><td>0,071</td><td>0,125</td></tr>
+      <tr class="hl"><td><b>2,5</b></td><td>2 + / 0 −</td><td>2 + / 4 −</td><td>0,333</td><td><b>0,167</b></td><td>0,250</td></tr>
+      <tr><td>3,5</td><td>2 + / 1 −</td><td>2 + / 3 −</td><td>0,467</td><td>0,033</td><td>0,125</td></tr>
+      <tr><td>4,5</td><td>3 + / 1 −</td><td>1 + / 3 −</td><td>0,375</td><td>0,125</td><td>0,250</td></tr>
+      <tr><td>5,5</td><td>3 + / 2 −</td><td>1 + / 2 −</td><td>0,467</td><td>0,033</td><td>0,125</td></tr>
+      <tr><td>6,5</td><td>3 + / 3 −</td><td>1 + / 1 −</td><td>0,500</td><td>0</td><td>0</td></tr>
+      <tr><td>7,5</td><td>4 + / 3 −</td><td>0 + / 1 −</td><td>0,429</td><td>0,071</td><td>0,125</td></tr>
+    </table>
+    <p>CART coupe à <b>2,5</b> : gauche {1, 2} <b>pure</b>, droite 2 <b>+</b> / 4 <b>−</b>.</p>
+    <p><b>L'accuracy ne départage pas.</b> Le gain en erreur de classification vaut 0,250 à 2,5 <i>et</i> à 4,5 : deux coupures ex æquo au sommet, alors que Gini les sépare nettement (0,167 contre 0,125). À 6,5, les deux enfants sont à 50/50 : les deux critères disent 0.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — la coupure mobile sur les huit points</div>
+    <div id="f1plot" class="wide"></div>
+    <div class="sl-ctl" id="f1presets"></div>
+    <div id="f1sliders"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">En bas, les huit points avec leur étiquette ; la barre verticale est la coupure. Les deux courbes sont le <b>gain</b> en fonction du seuil : violet pour Gini, ambre pour l'erreur de classification. Balaie le seuil : la courbe ambre a <b>deux</b> sommets à la même hauteur (2,5 et 4,5) — l'accuracy ne sait pas choisir ; la courbe violette a un sommet unique en <b>2,5</b>, la coupure qui produit une feuille pure.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>La recherche : trier, puis balayer</h3>
+    <p>Par feature : trier les valeurs, puis balayer les seuils entre valeurs consécutives en mettant à jour <b>deux compteurs</b> (effectif à gauche, positifs à gauche). Chaque gain se lit alors en O(1) : <b>O(<span class="m">n</span> log <span class="m">n</span>)</b> par feature et par nœud, le tri domine.</p>
+    <p>Le gain ne dépend que de la façon dont les points se répartissent de part et d'autre du seuil — donc de leur <b>ordre</b> seul, jamais de leurs valeurs.</p>
+    <p class="say">« Le gain ne dépend que du partage des points de part et d'autre du seuil, donc seul l'ordre des valeurs compte, donc aucune transformation monotone ne change l'arbre, donc standardiser ou passer au log avant un arbre ne sert à rien. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application</div>
+    <p>Sur le fil rouge : 8 valeurs triées, 7 seuils, 7 évaluations de gain en O(1) chacune une fois les compteurs en place. À chaque pas du balayage, le compteur « positifs à gauche » fait +1 ou +0 ; rien d'autre n'est recalculé.</p>
+    <p><b>Invariance monotone, vérifiée.</b> Remplacer <span class="m">x</span> = 1…8 par log <span class="m">x</span>, par <span class="m">x</span>³, ou par les rangs 1…8 : les mêmes points restent de part et d'autre de chaque coupure, donc <b>les sept gains sont inchangés</b>, seul le nombre écrit dans le nœud change. C'est pourquoi un pipeline d'arbres n'a pas de <code>StandardScaler</code>.</p>
+    <p>Coût d'un nœud à <span class="m">d</span> features : <span class="m">d</span>·<span class="m">n</span> log <span class="m">n</span>. C'est ce coût, répété à chaque nœud, que les implémentations (histogrammes de LightGBM, pré-tri de XGBoost) attaquent.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Glouton et axe par axe <span class="tag tronc">tronc</span></h3>
+    <p><b>Glouton</b> (H2) : on prend la meilleure coupure <i>maintenant</i>. Une coupure médiocre qui préparerait une excellente suivante n'est jamais essayée — l'arbre ne regarde jamais deux coups plus loin.</p>
+    <p><b>Axe par axe</b> (H1) : chaque coupure est parallèle à un axe. Une frontière diagonale n'est pas approchable par une coupure, seulement par un <b>escalier</b> de coupures.</p>
+    <p class="say">« Chaque nœud choisit sa coupure sans regarder la suite, donc un arbre rate les structures qui n'apparaissent qu'à deux coupures, donc un XOR ou une diagonale lui coûtent cher. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les deux coûts, chiffrés</div>
+    <p><b>XOR : gain exactement nul.</b> 40 points en quatre paquets de 10 aux coins d'un carré, étiquette = XOR des deux coordonnées. Parent 20 <b>+</b> / 20 <b>−</b>, Gini 0,5. Toute coupure sur <span class="m">x</span> sépare les coins en deux groupes de 10 <b>+</b> et 10 <b>−</b> : Gini 0,5 à gauche, 0,5 à droite, pondéré 0,5.</p>
+    <div class="eq">gain = 0,5 − (0,5·0,5 + 0,5·0,5) = <b>0</b> &nbsp;&nbsp; sur <span class="m">x</span> comme sur <span class="m">y</span></div>
+    <p>Aucune première coupure ne gagne quoi que ce soit, alors que <b>deux</b> coupures séparent parfaitement. Le glouton est aveugle exactement là.</p>
+    <p><b>Diagonale : le prix de l'escalier.</b> Frontière <span class="m">y</span> = <span class="m">x</span> sur le carré unité. Un escalier de <span class="m">k</span> marches égales laisse <span class="m">k</span> triangles d'aire ½(1/<span class="m">k</span>)², soit une erreur d'aire <b>1/(2<span class="m">k</span>)</b>. Pour 1 % d'erreur il faut <span class="m">k</span> = <b>50</b> marches, donc au moins 51 feuilles — là où une seule droite suffirait.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Jusqu'où couper : la profondeur est la variance <span class="tag tronc">tronc</span></h3>
+    <p>Sans limite, l'arbre coupe tant qu'une feuille est impure. Comme chaque coupure sépare, il finit par isoler les points : <b>erreur d'entraînement 0</b>, sauf si deux points ont les mêmes features et des étiquettes opposées — alors aucune question ne les sépare et le plancher est atteint.</p>
+    <p>Un tel arbre a <b>mémorisé le tirage</b> : sur un autre échantillon de la même population, ses coupures sont ailleurs et sa prédiction change entièrement. Profondeur maximale, taille minimale de feuille, nombre de feuilles : ce sont trois écritures du même <b>bouton de variance</b> (<a href="chain-p06-01-biais-variance.html#s5">p06-01</a>).</p>
+    <p class="say">« Un arbre profond a une feuille par point, donc il reproduit le bruit du tirage, donc sa variance est maximale, donc limiter la profondeur ou la taille des feuilles est le réglage de variance. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — deux plafonds</div>
+    <p><b>Fil rouge, sans doublon.</b> Les huit valeurs de <span class="m">x</span> sont distinctes, donc sept coupures isolent les huit points : erreur d'entraînement <b>0</b>, huit feuilles, profondeur au plus 7.</p>
+    <p><b>Avec un doublon contradictoire.</b> Ajouter un neuvième point en <span class="m">x</span> = 3 étiqueté <b>+</b> — il y a déjà un <b>−</b> en <span class="m">x</span> = 3. Aucun seuil ne passe entre deux points de même abscisse : ils tombent dans la même feuille quoi qu'il arrive, et cette feuille se trompe sur l'un des deux. Erreur d'entraînement minimale = <b>1/9 ≈ 0,111</b>, jamais 0.</p>
+    <p><b>Sur le nuage de la figure 2</b> (40 points) : erreur d'entraînement 0,250 à profondeur 1 · 0,175 à 2 · 0,125 à 3 · 0,050 à 4 · <b>0 dès la profondeur 6</b>. Ce zéro ne dit rien de la qualité du modèle — il dit seulement que l'arbre a fini de recopier.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — l'arbre qui pousse, coupure après coupure</div>
+    <div id="f2plot" class="wide"></div>
+    <div class="sl-ctl" id="f2ctl"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">40 points, deux classes (bleu plein = <b>+</b>, rouge creux = <b>−</b>), frontière vraie en pointillé et 12 % d'étiquettes retournées. <b>Coupure suivante</b> : à chaque clic l'arbre ajoute la coupure gloutonne de plus grand gain pondéré, et le pavage en rectangles se dessine. <b>Jusqu'au bout</b> : les feuilles deviennent pures et l'erreur d'entraînement tombe à zéro. Puis <b>nouveau tirage</b> : même population, même algorithme, autre échantillon — le pavage change du tout au tout. C'est cela, la variance.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Élagage : couper après coup, sur un autre critère</h3>
+    <p>L'impureté décroît à chaque coupure <b>par construction</b> : elle ne peut donc pas dire quand s'arrêter. La recette est de faire pousser à fond puis de <b>couper</b>, en évaluant chaque sous-arbre au <b>taux d'erreur</b> (ou au RSS) sur des données non vues — on mesure, on n'apprend plus (<a href="chain-p03-01-critere-escalier-vs-sensible.html#s5">p03-01, pas 5</a>).</p>
+    <p>Le nom de la procédure est l'<b>élagage coût-complexité</b> : on pénalise le nombre de feuilles par un <span class="m">α</span> choisi en validation. Ce que <span class="m">α</span> parcourt est le U de <a href="chain-p06-01-biais-variance.html#s6">p06-01</a>.</p>
+    <p class="say">« L'impureté sert à choisir une coupure, donc elle décroît à chaque coupure par construction, donc elle ne peut pas dire quand s'arrêter, donc on tranche au taux d'erreur mesuré sur des données non vues. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le U, chiffré</div>
+    <p>Même population que la figure 2, 40 points d'entraînement, moyenne sur 40 tirages, erreur mesurée sur 2000 points non vus :</p>
+    <table>
+      <tr><th>profondeur</th><th>erreur train</th><th>erreur test</th></tr>
+      <tr><td>1</td><td>0,229</td><td>0,292</td></tr>
+      <tr class="hl"><td><b>2</b></td><td>0,118</td><td><b>0,182</b></td></tr>
+      <tr><td>3</td><td>0,078</td><td>0,218</td></tr>
+      <tr><td>4</td><td>0,036</td><td>0,235</td></tr>
+      <tr><td>6</td><td>0,009</td><td>0,243</td></tr>
+      <tr><td>12</td><td>0,000</td><td>0,244</td></tr>
+    </table>
+    <p>L'erreur d'entraînement descend jusqu'à 0 sans jamais remonter : <b>elle ne contient aucune information sur où s'arrêter</b>. L'erreur test, elle, a un minimum net à la profondeur <b>2</b> et remonte de 0,182 à 0,244 ensuite — c'est la variance qu'on paie.</p>
+    <p><b>Le plancher.</b> 12 % des étiquettes sont retournées au hasard : aucune profondeur ne descend sous ≈ 0,11 en test. Un gap train−test de 0,244 à profondeur 12 n'est donc pas « 24 % de progrès possible », c'est 13 points de variance et 11 points de bruit irréductible.</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — le U de la profondeur</div>
+    <div id="f3plot" class="wide"></div>
+    <div id="f3sliders"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Erreur d'entraînement (bleu) et erreur de test (rouge) en fonction de la profondeur maximale, simulées sur le nuage de la figure 2. Déplace la profondeur : la courbe bleue ne remonte <b>jamais</b>, la rouge passe par un minimum puis remonte. La ligne horizontale est le plancher de bruit, que personne ne franchit. La profondeur est le bouton de variance ; l'élagage, c'est chercher le creux de la courbe rouge sur des données non vues.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Régression : le même geste, avec la variance</h3>
+    <p>Même algorithme, une seule substitution : l'impureté d'un nœud devient la <b>variance de ses <span class="m">y</span></b>, et la feuille prédit leur <b>moyenne</b>.</p>
+    <div class="eq">imp(nœud) = (1/<span class="m">n</span>) Σ<sub><span class="m">i</span></sub> (<span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">ȳ</span>)² &nbsp;&nbsp;&nbsp; gain = imp(parent) − [<span class="m">w</span><sub>L</sub> imp(L) + <span class="m">w</span><sub>R</sub> imp(R)]</div>
+    <p>La prédiction est donc <b>constante par morceaux</b> : une marche par feuille. Elle ne sort jamais de l'intervalle des <span class="m">y</span> vus, et ne prolonge aucune tendance.</p>
+    <p class="say">« La feuille prédit la moyenne de ses <span class="m">y</span>, donc l'impureté qui minimise l'erreur quadratique est la variance du nœud, donc le même balayage marche, donc la prédiction est une marche constante et ne sort jamais du support des <span class="m">y</span> vus. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — six points</div>
+    <p><span class="m">x</span> = 1…6, <span class="m">y</span> = 1, 2, 3, 10, 11, 12. Moyenne 6,5 ; variance du parent = 251/12 ≈ <b>20,917</b>.</p>
+    <table>
+      <tr><th>seuil</th><th>gauche (moy · var)</th><th>droite (moy · var)</th><th>var pondérée</th><th>gain</th></tr>
+      <tr><td>1,5</td><td>1 · 0</td><td>7,6 · 17,84</td><td>14,87</td><td>6,05</td></tr>
+      <tr><td>2,5</td><td>1,5 · 0,25</td><td>9 · 12,5</td><td>8,417</td><td>12,5</td></tr>
+      <tr class="hl"><td><b>3,5</b></td><td>2 · 0,667</td><td>11 · 0,667</td><td>0,667</td><td><b>20,25</b></td></tr>
+      <tr><td>4,5</td><td>4 · 12,5</td><td>11,5 · 0,25</td><td>8,417</td><td>12,5</td></tr>
+      <tr><td>5,5</td><td>5,4 · 17,84</td><td>12 · 0</td><td>14,87</td><td>6,05</td></tr>
+    </table>
+    <p>La coupure à 3,5 emporte tout : elle sépare le paquet bas du paquet haut, et il ne reste que 0,667 de variance intérieure.</p>
+    <p><b>Pas d'extrapolation.</b> La feuille droite prédit <b>11</b> pour <span class="m">x</span> = 5, pour <span class="m">x</span> = 6 et pour <span class="m">x</span> = 1000. Aucune valeur en dehors de [1 ; 12] n'est atteignable, quelle que soit la profondeur : un arbre de régression <i>interpole en marches</i>, il ne suit pas une tendance.</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Ce qu'un arbre sait faire — et ce qu'il paie</h3>
+    <p>Sans qu'on écrive quoi que ce soit : <b>seuils</b> et <b>interactions</b> (deux coupures sur deux features en descendance, c'est un produit croisé), features numériques et catégorielles mêlées, aucune standardisation (pas 3), valeurs manquantes traitées par <b>coupures de substitution</b>. À faible profondeur, l'arbre s'écrit en phrases — c'est le seul modèle de cette formation qu'on lit à voix haute.</p>
+    <p>Le prix est l'<b>instabilité</b> : déplacer un point change la première coupure, et tout ce qui en descend est recalculé.</p>
+    <p class="say">« Un arbre ne suppose ni forme fonctionnelle ni échelle, donc il attrape seuils et interactions sans qu'on les écrive, donc ce qu'il paie est l'instabilité : un point qui bouge change la première coupure et tout l'arbre en dessous. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — un seul point, un autre arbre</div>
+    <p>Fil rouge, on retire le point <span class="m">x</span> = 3 (le seul <b>−</b> au milieu des <b>+</b>). Il reste 4 <b>+</b> / 3 <b>−</b>, Gini du parent 0,490.</p>
+    <table>
+      <tr><th></th><th>meilleure coupure</th><th>gain Gini</th><th>feuille gauche</th></tr>
+      <tr><td>8 points</td><td><b>2,5</b></td><td>0,167</td><td>{1, 2} pure</td></tr>
+      <tr class="hl"><td>sans le point 3</td><td><b>4,5</b></td><td>0,276</td><td>{1, 2, 4} pure</td></tr>
+    </table>
+    <p>Un point sur huit retiré, et la <b>racine</b> change : tous les sous-arbres changent avec elle. L'arbre n'est pas légèrement différent, il est autre. Deux conséquences : ne pas sur-interpréter un arbre unique, et faire la moyenne de plusieurs arbres — c'est exactement ce que répare le bagging (<a href="../../map.html#p07-02">p07-02</a>).</p>
+  </div>
+</div>
+
+<div class="step" id="s9">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Les quatre limites viennent toutes des trois hypothèses : axe par axe, glouton, impureté.</p>
+    <p class="say">« Les défauts d'un arbre sont ses hypothèses lues à l'envers, donc on les répare en changeant de représentation ou en moyennant, donc jamais en augmentant la profondeur. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>XOR et diagonales</b> (H1 + H2). Le glouton ne voit pas ce qui ne se révèle qu'à deux coupures : sur un XOR pur, gain nul partout (pas 4). Les ensembles compensent en partie parce qu'ils explorent d'autres premières coupures — mais aucune forêt ne <i>tourne</i> les axes : une frontière diagonale reste un escalier.</li>
+      <li><b>Extrapolation impossible</b> (H3, régression). Hors du support des <span class="m">x</span> d'entraînement, la prédiction est la marche du bord. Un arbre ne prolonge jamais une tendance — pour une série temporelle qui dérive, il prédit le dernier palier et se trompe indéfiniment.</li>
+      <li><b>Instabilité</b> (H2). Un point retiré et la racine change (pas 8). L'importance des features d'un arbre unique, comme sa lecture « en phrases », est à prendre avec prudence : c'est une lecture de <i>ce tirage</i>, pas de la population.</li>
+      <li><b>Classes déséquilibrées</b> (H3). Sur 99 % / 1 %, un nœud à 1 % de positifs a une impureté Gini de 0,020 : presque pure, donc presque rien à gagner à le couper. Le critère de split lui-même défavorise la minorité, et le vote majoritaire de la feuille l'achève. Réponses : poids de classe dans l'impureté, ou seuil de décision déplacé après coup (<a href="chain-p06-04-calibration-desequilibre.html">p06-04</a>).</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Une coupure est un couple (feature, seuil) qui <b>maximise la baisse d'impureté</b> pondérée par les effectifs. Gini, un dôme — pas l'accuracy, une tente qui laisse 2,5 et 4,5 ex æquo.</li>
+    <li>Recherche par <b>tri puis balayage</b>, O(<span class="m">n</span> log <span class="m">n</span>) par feature et par nœud : seul l'ordre des valeurs compte, donc aucune standardisation.</li>
+    <li><b>Glouton et axe par axe</b> : gain exactement nul sur un XOR, et 50 marches pour approcher une diagonale à 1 %.</li>
+    <li><b>La profondeur est la variance.</b> Sans limite : erreur train 0 (sauf doublons contradictoires, plancher 1/<span class="m">n</span>) et mémorisation du tirage. Profondeur, taille de feuille, nombre de feuilles = un seul bouton.</li>
+    <li><b>Élagage au taux d'erreur sur validation</b>, jamais à l'impureté : elle décroît par construction. Coût-complexité = pénaliser le nombre de feuilles, <span class="m">α</span> choisi en validation.</li>
+    <li><b>Régression</b> : impureté = variance du nœud, feuille = moyenne, prédiction en marches, aucune extrapolation hors de [min <span class="m">y</span> ; max <span class="m">y</span>].</li>
+  </ol>
+</div>
+<div class="phrase">« Un arbre choisit à chaque nœud la coupure axe par axe qui fait le plus baisser l'impureté — Gini, parce que l'erreur de classification est une tente qui ne voit pas une purification sans basculement. Il est glouton, donc aveugle aux structures à deux coupures, et sa profondeur est son bouton de variance : à fond il isole chaque point et mémorise le tirage. On l'élague au taux d'erreur, sur des données non vues. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Comment CART choisit-il une coupure ?</div><div class="a hid">Pour chaque feature et chaque seuil, la baisse d'impureté du parent à l'impureté pondérée des enfants ; il garde la plus grande.</div></li>
+    <li><div class="q">Pourquoi Gini et pas l'accuracy ?</div><div class="a hid">Dôme contre tente : sur les huit points, 2,5 et 4,5 sont à égalité en accuracy (0,250) alors que Gini les sépare (0,167 contre 0,125).</div></li>
+    <li><div class="q">Pourquoi ne pas standardiser avant un arbre ?</div><div class="a hid">Le gain ne dépend que du partage des points autour du seuil, donc seul l'ordre des valeurs compte : toute transformation monotone laisse l'arbre identique.</div></li>
+    <li><div class="q">Que rate un arbre glouton ?</div><div class="a hid">Ce qui ne se révèle qu'à deux coupures : XOR (gain exactement nul sur la première) et diagonales (1/(2k) d'erreur pour k marches).</div></li>
+    <li><div class="q">Quel est le bouton de variance ?</div><div class="a hid">La profondeur — ou la taille minimale de feuille, ou le nombre de feuilles. À fond, erreur train 0 et mémorisation du tirage.</div></li>
+    <li><div class="q">Sur quel critère élaguer ?</div><div class="a hid">Le taux d'erreur ou le RSS sur des données non vues : l'impureté décroît par construction, donc elle ne peut pas dire quand s'arrêter.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="../bridges/bridge-05-escalier-vs-sensible.html"><b>Escalier vs sensible</b><small>le pas 2 est le premier habit du même argument : un critère n'informe que par sa pente, et l'accuracy n'en a pas entre deux basculements</small></a>
+    <a href="../bridges/bridge-03-biais-variance-partout.html"><b>Biais-variance partout</b><small>la profondeur d'un arbre est au même rang que λ d'une ridge et k d'un k-NN : un bouton qui règle la sensibilité au tirage</small></a>
+    <a href="../../map.html#p07-02"><b>p07-02 — Bagging et forêt aléatoire</b><small>l'instabilité du pas 8 n'est pas un défaut à corriger dans l'arbre : c'est la matière première du bagging, qui la moyenne</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>ml::arbres</code> (coupure = feature + seuil, glouton, axe par axe) · <code>ml::gini</code> (2<span class="m">p</span>(1−<span class="m">p</span>), deux tirages, gain pondéré) · <code>ml::profondeur</code> (bouton de variance, erreur train 0, élagage au taux d'erreur) · <code>ml::cart</code> (tri-balayage O(<span class="m">n</span> log <span class="m">n</span>), régression par la variance, pas d'extrapolation).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p07-01 · v1 du 17/09/2026 · Prérequis : p03-01, p06-01, p00-03. Suite : <a href="../../map.html#p07-02">p07-02 Bagging et forêt aléatoire</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== impureté, commun aux trois figures ===== */
+const gini=(a,n)=>{if(!n)return 0;const p=a/n;return 2*p*(1-p);};
+const errN=(a,n)=>{if(!n)return 0;return Math.min(a,n-a)/n;};
+
+/* ===== Figure 1 : la coupure mobile sur les huit points ===== */
+const XS=[1,2,3,4,5,6,7,8], LB=[1,1,0,1,0,0,1,0];
+function cut(t){let aL=0,nL=0,aR=0,nR=0;
+  for(let i=0;i<8;i++){if(XS[i]<t){nL++;aL+=LB[i];}else{nR++;aR+=LB[i];}}
+  const gL=gini(aL,nL),gR=gini(aR,nR),gw=(nL*gL+nR*gR)/8;
+  const ew=(nL*errN(aL,nL)+nR*errN(aR,nR))/8;
+  return {aL,nL,aR,nR,gL,gR,gw,gain:0.5-gw,egain:0.5-ew};}
+const P1=SL.plot(document.getElementById('f1plot'),{x:[0.4,8.6],y:[-0.14,0.55],w:600,h:320,
+  xt:[1,2,3,4,5,6,7,8],yt:[0,0.1,0.2,0.3,0.4,0.5],xl:'seuil de coupure sur x',yl:'gain'});
+P1.fn(t=>cut(t).gain,'sl-c2',560);
+P1.fn(t=>cut(t).egain,'sl-c5',560);
+P1.label(5.2,0.30,'gain Gini','sl-c2');
+P1.label(5.2,0.20,'gain erreur de classification','sl-c5');
+const out1=document.getElementById('f1out');
+function draw1(t){P1.clear();const c=cut(t);
+  P1.vline(t,'chord');
+  for(let i=0;i<8;i++)P1.text(XS[i],-0.075,LB[i]?'+':'−',LB[i]?'sl-c1':'sl-c3','middle');
+  P1.dot(t,c.gain,'sl-c2',6);P1.dot(t,c.egain,'sl-c5',6);
+  out1.innerHTML=
+    `<div class="pos">Gini gauche · ${c.aL}+/${c.nL-c.aL}−<b>${SL.fmt(c.gL,3)}</b></div>`+
+    `<div class="pos">Gini droite · ${c.aR}+/${c.nR-c.aR}−<b>${SL.fmt(c.gR,3)}</b></div>`+
+    `<div class="pos">Gini pondérée<b>${SL.fmt(c.gw,3)}</b></div>`+
+    `<div class="${c.gain<1e-9?'zero':'pos'}">gain Gini<b>${SL.fmt(c.gain,3)}</b></div>`+
+    `<div class="${c.egain<1e-9?'zero':'pos'}">gain erreur<b>${SL.fmt(c.egain,3)}</b></div>`;}
+const s1=SL.slider(document.getElementById('f1sliders'),{label:'seuil',min:1.5,max:7.5,step:1,value:2.5,fmt:v=>SL.fmt(v,1)},draw1);
+const pre1=document.getElementById('f1presets');
+[['2,5 · le meilleur pour Gini',2.5],['4,5 · même gain en accuracy',4.5],['6,5 · gain nul des deux côtés',6.5]]
+  .forEach(([n,v])=>{const b=document.createElement('button');b.className='tb';b.textContent=n;b.onclick=()=>s1.set(v);pre1.appendChild(b);});
+
+/* ===== nuage 2D, arbre glouton : figures 2 et 3 ===== */
+const MOD=2147483648;
+/* s·1103515245 dépasse 2^53 : produit en deux morceaux pour rester exact en double */
+function rnd(seed){let s=seed%MOD;const A=1103515245;
+  return ()=>{const hi=Math.floor(s/65536),lo=s%65536;s=((hi*A)%32768*65536+lo*A+12345)%MOD;return s/MOD;};}
+const BND=(x,y)=>(x<0.40||y>0.70)?1:0, NOISE=0.12;
+function sample(u,n){const P=[];for(let i=0;i<n;i++){const x=u(),y=u();let l=BND(x,y);if(u()<NOISE)l=1-l;P.push([x,y,l]);}return P;}
+function bestCut(idx,P){const n=idx.length;let tot=0;for(const i of idx)tot+=P[i][2];
+  const base=gini(tot,n);let b=null;
+  for(let j=0;j<2;j++){const o=idx.slice().sort((a,c)=>P[a][j]-P[c][j]);let cnt=0;
+    for(let k=1;k<n;k++){cnt+=P[o[k-1]][2];if(P[o[k]][j]===P[o[k-1]][j])continue;
+      const t=(P[o[k]][j]+P[o[k-1]][j])/2;
+      const g=base-(k/n*gini(cnt,k)+(n-k)/n*gini(tot-cnt,n-k));
+      if(!b||g>b.g+1e-12)b={g:g,j:j,t:t,L:o.slice(0,k),R:o.slice(k)};}}
+  return b;}
+function build(idx,P,d,md){let tot=0;for(const i of idx)tot+=P[i][2];
+  if(d>=md||idx.length<2||tot===0||tot===idx.length)return{leaf:2*tot>=idx.length?1:0};
+  const b=bestCut(idx,P);if(!b||b.g<=1e-12)return{leaf:2*tot>=idx.length?1:0};
+  return{j:b.j,t:b.t,L:build(b.L,P,d+1,md),R:build(b.R,P,d+1,md)};}
+function pred(nd,p){while(nd.leaf===undefined)nd=p[nd.j]<=nd.t?nd.L:nd.R;return nd.leaf;}
+function errRate(nd,P){let e=0;for(const p of P)if(pred(nd,p)!==p[2])e++;return e/P.length;}
+
+/* ===== Figure 2 : l'arbre qui pousse ===== */
+const P2=SL.plot(document.getElementById('f2plot'),{x:[0,1],y:[0,1],w:560,h:360,
+  xt:[0,0.25,0.5,0.75,1],yt:[0,0.25,0.5,0.75,1],xl:'x₁',yl:'x₂'});
+/* frontière vraie : x₁ = 0,40 sous x₂ = 0,70, puis x₂ = 0,70 */
+P2.label(0.08,0.93,'classe + (vraie)','sl-c1');
+let SEED=4242, DATA=sample(rnd(SEED),40), LEAVES=[], CUTS=[];
+function reset(){LEAVES=[{idx:DATA.map((_,i)=>i),x0:0,x1:1,y0:0,y1:1,d:0}];CUTS=[];}
+function trainErr(){let e=0;for(const L of LEAVES){let a=0;for(const i of L.idx)a+=DATA[i][2];
+  e+=Math.min(a,L.idx.length-a);}return e/40;}
+function depth(){return LEAVES.reduce((m,L)=>Math.max(m,L.d),0);}
+function nextCut(){let pick=null;
+  LEAVES.forEach((L,k)=>{let a=0;for(const i of L.idx)a+=DATA[i][2];
+    if(L.idx.length<2||a===0||a===L.idx.length)return;
+    const b=bestCut(L.idx,DATA);if(!b||b.g<=1e-12)return;
+    const w=b.g*L.idx.length/40;
+    if(!pick||w>pick.w+1e-12)pick={w,k,b,L};});
+  if(!pick)return false;
+  const {k,b,L}=pick;
+  const a={idx:b.L,x0:L.x0,x1:L.x1,y0:L.y0,y1:L.y1,d:L.d+1};
+  const c={idx:b.R,x0:L.x0,x1:L.x1,y0:L.y0,y1:L.y1,d:L.d+1};
+  if(b.j===0){a.x1=b.t;c.x0=b.t;CUTS.push({x0:b.t,x1:b.t,y0:L.y0,y1:L.y1});}
+  else{a.y1=b.t;c.y0=b.t;CUTS.push({x0:L.x0,x1:L.x1,y0:b.t,y1:b.t});}
+  LEAVES.splice(k,1,a,c);return true;}
+const out2=document.getElementById('f2out');
+function draw2(){P2.clear();
+  P2.seg(0.40,0,0.40,0.70,'chord');P2.seg(0.40,0.70,1,0.70,'chord');
+  CUTS.forEach(c=>P2.seg(c.x0,c.y0,c.x1,c.y1,'gain'));
+  DATA.forEach(p=>P2.dot(p[0],p[1],p[2]?'sl-c1':'sl-c3 hollow',4.5));
+  out2.innerHTML=
+    `<div class="pos">coupures<b>${CUTS.length}</b></div>`+
+    `<div class="pos">profondeur<b>${depth()}</b></div>`+
+    `<div class="pos">feuilles<b>${LEAVES.length}</b></div>`+
+    `<div class="${trainErr()<1e-9?'zero':'pos'}">erreur train<b>${SL.fmt(trainErr(),3)}</b></div>`;}
+const ctl2=document.getElementById('f2ctl');
+function mkb(txt,fn){const b=document.createElement('button');b.className='tb';b.textContent=txt;b.onclick=fn;ctl2.appendChild(b);}
+mkb('coupure suivante',()=>{nextCut();draw2();});
+mkb('jusqu’au bout',()=>{let n=0;while(nextCut()&&n++<200);draw2();});
+mkb('nouveau tirage',()=>{const n=CUTS.length;SEED=(SEED*7+13)%MOD;DATA=sample(rnd(SEED),40);reset();
+  for(let i=0;i<n;i++)if(!nextCut())break;draw2();});
+mkb('remettre à zéro',()=>{reset();draw2();});
+reset();draw2();
+
+/* ===== Figure 3 : le U de la profondeur ===== */
+const TEST=sample(rnd(777),2000);
+const DMAX=12, TR=[], TE=[];
+for(let d=1;d<=DMAX;d++){const u=rnd(20260917);let a=0,b=0;
+  for(let r=0;r<40;r++){const S=sample(u,40),T=build(S.map((_,i)=>i),S,0,d);a+=errRate(T,S);b+=errRate(T,TEST);}
+  TR.push(a/40);TE.push(b/40);}
+let FLOOR=0;for(const p of TEST)if(BND(p[0],p[1])!==p[2])FLOOR++;FLOOR/=TEST.length;
+const lin=arr=>t=>{const i=Math.max(1,Math.min(DMAX-1,Math.floor(t)));return arr[i-1]+(arr[i]-arr[i-1])*(t-i);};
+const P3=SL.plot(document.getElementById('f3plot'),{x:[1,DMAX],y:[0,0.34],w:600,h:300,
+  xt:[1,2,3,4,5,6,7,8,9,10,11,12],yt:[0,0.1,0.2,0.3],xl:'profondeur maximale',yl:'erreur'});
+P3.fn(lin(TR),'sl-c1',240);P3.fn(lin(TE),'sl-c3',240);
+P3.label(7.4,0.035,'erreur train','sl-c1');P3.label(7.4,0.275,'erreur test','sl-c3');
+P3.label(11.9,FLOOR+0.018,'plancher de bruit','','end');
+const out3=document.getElementById('f3out');
+let dmin=1;for(let i=1;i<DMAX;i++)if(TE[i]<TE[dmin-1]-1e-12)dmin=i+1;
+function draw3(d){P3.clear();
+  P3.seg(1,FLOOR,DMAX,FLOOR,'');
+  for(let i=1;i<=DMAX;i++){P3.dot(i,TR[i-1],'sl-c1',3);P3.dot(i,TE[i-1],'sl-c3',3);}
+  P3.vline(d,'chord');P3.dot(d,TR[d-1],'sl-c1',6);P3.dot(d,TE[d-1],'sl-c3',6);
+  out3.innerHTML=
+    `<div class="${TR[d-1]<1e-9?'zero':'pos'}">erreur train<b>${SL.fmt(TR[d-1],3)}</b></div>`+
+    `<div class="${d===dmin?'pos':''}">erreur test<b>${SL.fmt(TE[d-1],3)}</b></div>`+
+    `<div class="pos">écart test − train<b>${SL.fmt(TE[d-1]-TR[d-1],3)}</b></div>`+
+    `<div class="pos">minimum test à la profondeur<b>${dmin}</b></div>`;}
+SL.slider(document.getElementById('f3sliders'),{label:'profondeur',min:1,max:DMAX,step:1,value:2,fmt:v=>SL.fmt(v,0)},draw3);
+})();
+</script>
+</body>
+</html>
