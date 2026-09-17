@@ -34,6 +34,14 @@ Les pas portent les ids `s1`…`sN`, consécutifs : le numéro affiché vient d'
 
 Séries : `chain` (ci-dessus) · `walkthrough` (une seule colonne de marches règle | calcul, onglets si plusieurs exemples, `SL.stepper`) · `bridge` (une figure du mécanisme, une ligne par domaine avec lien vers le pas exact) · `coding` (signal → pattern → invariant/variant → `SL.trace` → complexité → pièges ; jamais la solution complète).
 
+### Série `coding`
+
+**Taille de la trace** : **6 à 12 cases** par défaut. Le fil rouge du spec prime —
+c'est lui qui traverse toute la sheet, et une trace sur d'autres chiffres que le
+texte casse le fil. En dessous de 6 cases, seulement si l'exemple est canonique
+(Two Sum sur `[2, 7, 11, 15]` : le raccourcir ou le rallonger le rendrait moins
+reconnaissable qu'il n'est court).
+
 ## Règles d'écriture
 
 - **Pas de prose.** Une règle tient en 2–5 lignes ; si elle en demande plus, c'est deux pas. Le validateur avertit au-delà de ~120 mots par règle.
