@@ -5,7 +5,7 @@ part: "B"
 number: "04"
 slug: variance-moyenne-correlee
 title: La variance d'une moyenne corrélée
-subtitle: pont — ρσ² + (1 − ρ)σ²/B : pourquoi « plus » ne suffit pas quand c'est corrélé
+subtitle: pont — ρσ² + (1 − ρ)σ²/B : à ρ = 0,2, mille lignes n'en valent que 208 et le SE est 2,19 fois plus grand
 prereq: [p00-02, p00-04, p07-02, p06-02, p01-05]
 anki: [ml::bagging, stats::variance, ml::validation, stats::bootstrap]
 bridges: []
@@ -69,3 +69,9 @@ B variables de même variance σ², corrélées deux à deux par ρ. Var de la m
   **Validé en revue 4.**
 
 **Arbitrage de revue 4, 17/09 — validé 17/09.** Doublon de table avec b03 **assumé** — les ponts se recoupent, b03 porte le compromis et b04 le plancher. Borne ρ ≥ −1/(B − 1) **validée**. ρ du pas 4 et fil rouge du SE groupé **validés**. Statut `reviewed`.
+
+**Arbitrage de revue 5, 17/09 — validé 17/09.** Le sous-titre annonçait un mécanisme
+(« pourquoi "plus" ne suffit pas quand c'est corrélé ») là où la sheet montre des chiffres.
+**Réaligné sur les valeurs réellement affichées** : à ρ = 0,2, mille lignes n'en valent que
+208 (n_eff = n/[1 + (m − 1)ρ] = 1 000/4,8) et le SE vaut 2,19 fois celui qu'annonce σ/√n
+(0,0693 contre 0,0316). Statut `reviewed`.
