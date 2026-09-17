@@ -316,6 +316,7 @@ text.mk-seuil{fill:var(--red)}
     <p><span class="m">n</span> = 1 000, <span class="m">π</span> = 0,87 pour les 40 : <span class="up">SE</span> = √(0,87·0,13/1000) = <b>0,0106</b>.</p>
     <div class="eq"><span class="up">E</span>[max de 40] ≈ 0,87 + 2,16 · 0,0106 = <b>0,893</b></div>
     <p>Le gagnant affiche <b>2,3 points</b> de plus qu'il ne vaut, sans qu'aucune des 40 mesures ne soit biaisée : chacune est sans biais, c'est leur max qui ne l'est pas.</p>
+    <p><b>Deux petits cas 3</b>, qui n'ont l'air de rien et relèvent du même mécanisme : choisir H<sub>1</sub> unilatérale <i>après</i> avoir vu le signe (cela <b>double le taux de faux positifs</b> — 10 % à un seuil annoncé à 5 %) ; relever <span class="m">α</span> <i>après</i> avoir vu <span class="m">p</span>. Dans les deux cas <b>la procédure regarde le tirage pour décider</b>, donc elle change la loi de ce qu'elle produit — il n'y a pas de seuil de correction qui rattrape ça.</p>
     <p><b>La même chose côté tests.</b> 40 comparaisons indépendantes au seuil de 5 % : P(au moins un faux positif) = 1 − 0,95<sup>40</sup> = <b>0,87</b>. Corriger le seuil (Bonferroni, FDR) répond à cette question-là ; cela ne répare pas le score du gagnant, qui est l'affaire du pas 7.</p>
   </div>
   <div class="fig" id="fig2">

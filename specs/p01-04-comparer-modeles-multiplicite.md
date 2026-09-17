@@ -125,3 +125,8 @@ tirage pour décider — choisir, s'arrêter — elle change la loi de ce qu'ell
 c'est le cas 3 ».
 
 Porté par la sheet : la phrase du cas 3 est au pas 6, juste avant le « au tableau ».
+
+**Revue 5, 17/09 — ajout validé.** Les **deux petits cas 3** sont consignés ici : « choisir
+H₁ unilatérale après avoir vu le signe (double le taux de faux positifs) ; relever α après
+avoir vu p — la procédure regarde le tirage pour décider ». Ils complètent le cas 3 « gros »
+(le max de 40 configs) par deux gestes qui n'ont l'air de rien et relèvent du même mécanisme.
