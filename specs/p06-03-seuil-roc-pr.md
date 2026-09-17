@@ -10,7 +10,7 @@ prereq: [p00-03, p01-01]
 anki: [ml::metriques, ml::roc-auc, ml::precision-rappel, ml::desequilibre]
 bridges: [b05]
 next: p06-04
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -79,3 +79,16 @@ Un modèle de fraude affiche 98,98 % d'accuracy : est-ce bon ? Que se passe-t-il
 
 ## Exclusions
 Pas de DeLong, pas de courbes de coût, pas de multi-classe (macro/micro) au-delà d'une phrase.
+
+## Questions pour la revue
+- Tous les chiffres du fil rouge ont été revérifiés par script : somme des quatre cases,
+  98,98 % / 99,70 %, 0,800 / 0,0096 / 0,200 / 0,9904, baseline 0,003, SE 0,023 et 0,012.
+  **Aucune correction nécessaire**, le spec était juste.
+- Les trois figures ont besoin d'un modèle de scores que le spec ne fixe pas. Choix retenu :
+  binormal à variances égales, négatifs ~ N(0,1) et positifs ~ N(D,1), avec D et le seuil
+  courant résolus *exactement* sur les quatre cases (D = 3,1821, seuil = 2,3405) — donc la
+  figure 1 affiche 240/60/960/98 740 sans arrondi forcé. Il en tombe une AUC de 0,988, qui
+  n'est pas dans le spec : à confirmer comme chiffre du fil rouge.
+- La figure 3 affiche un readout **AP** (aire sous la courbe PR) que le corps de la chaîne ne
+  définit pas — le spec ne le demandait pas. Le garder comme readout muet, ou lui donner une
+  ligne au pas 8 ?

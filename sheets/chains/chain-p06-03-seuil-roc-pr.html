@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Seuil, matrice de confusion, ROC, PR — chaîne</title>
+<meta name="sheet" content="series=chain;part=06;number=03;status=v1">
+<meta name="part" content="06 · Évaluer">
+<meta name="subtitle" content="évaluer — un score devient une décision par un seuil, et chaque métrique regarde une colonne">
+<meta name="prereq" content="p00-03,p01-01">
+<meta name="anki" content="ml::metriques,ml::roc-auc,ml::precision-rappel,ml::desequilibre">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 06 · Évaluer › chaîne 03</div>
+  <h1>Un score, un <span>seuil</span>, quatre <span>cases</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Un détecteur de fraude affiche 98,98 % d'accuracy. À 0,3 % de fraudes, le modèle qui ne détecte <i>jamais</i> rien en fait 99,70 % : l'accuracy dit que ce modèle est pire que rien. Le modèle ne sort pas une décision mais un <b>score</b> ; quelqu'un pose un seuil, et il n'y a plus que quatre cases — <b>chaque métrique est une case divisée par une somme de cases, et il faut dire laquelle</b>. Fil rouge : 100 000 transactions, 300 fraudes, et au seuil courant TP = 240, FN = 60, FP = 960, TN = 98 740.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="chain-p00-03-conditionnement-bayes.html">p00-03 · Conditionnement, Bayes, VPP</a></li>
+    <li><a href="chain-p01-01-objet-aleatoire.html">p01-01 · L'objet aléatoire, le SE</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>ml::metriques</code><code>ml::roc-auc</code><code>ml::precision-rappel</code><code>ml::desequilibre</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-05-escalier-vs-sensible.html">Escalier vs sensible</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>Propriétés du test.</b> Sensibilité = <span class="m">P</span>(test + | malade), spécificité = <span class="m">P</span>(test − | sain) : deux probabilités <i>conditionnées par la vérité</i>, mesurées une fois pour toutes sur le test lui-même (<a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>).</li>
+      <li><b>VPP et base rate.</b> <span class="m">P</span>(malade | test +) n'est pas la sensibilité : Bayes y fait entrer la prévalence, et quand elle est faible la VPP s'effondre même avec un très bon test (<a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>). Ici la précision <i>est</i> cette VPP.</li>
+      <li><b>Une proportion a un SE.</b> <span class="hat"><span class="m">p</span></span> = <span class="m">k</span>/<span class="m">n</span> sur <span class="m">n</span> tirages Bernoulli a pour erreur-type √(<span class="hat"><span class="m">p</span></span>(1−<span class="hat"><span class="m">p</span></span>)/<span class="m">n</span>) — reste à savoir quel <span class="m">n</span> (<a href="chain-p01-01-objet-aleatoire.html">p01-01</a>).</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>Le modèle sort un <b>score</b> ; la décision est « score ≥ seuil ». Les métriques de <b>décision</b> (accuracy, rappel, FPR, précision, F1) dépendent du seuil ; les métriques de <b>classement</b> (AUC) n'en dépendent pas.</span>
+      <b>H2</b><span>La <b>prévalence</b> du jeu de test est celle de la production. Sans cela, ni la précision ni l'accuracy ne se transportent — les rates, si (<a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>).</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor</h3>
+    <p>Le modèle ne dit pas « fraude ». Il sort un score continu, par exemple une probabilité. Quelqu'un — pas le modèle — pose un seuil, et la décision devient « score ≥ seuil ».</p>
+    <p>À partir de là, une vérité binaire croise une décision binaire : quatre cases, et rien d'autre à regarder.</p>
+    <p class="say">« Un classifieur sort un score, donc la décision naît d'un seuil posé par quelqu'un, donc tout ce qu'on mesure sur les décisions est indexé par ce seuil et non par le modèle seul. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le fil rouge</div>
+    <p>Un mois de transactions : <b>100 000</b> lignes, dont <b>300</b> fraudes. Prévalence <span class="m">π</span> = 300/100 000 = <b>0,3 %</b> ; 99 700 transactions légitimes.</p>
+    <p>Au seuil que l'équipe utilise aujourd'hui, le modèle déclare 1 200 transactions suspectes. Parmi elles 240 sont de vraies fraudes.</p>
+    <div class="eq">TP = 240 &nbsp; FN = 60 &nbsp; FP = 960 &nbsp; TN = 98 740 &nbsp; (somme = 100 000)</div>
+    <p>Ces quatre nombres tiennent toute la suite : les huit métriques qu'on va écrire n'ajoutent aucune information, elles en <i>choisissent</i> une.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>La matrice, en effectifs <span class="tag tronc">tronc</span></h3>
+    <p>Lignes = vérité, colonnes = décision. TP et FN sont sur la ligne des 300 positifs ; FP et TN sur celle des 99 700 négatifs. Les totaux de <b>lignes</b> sont fixés par les données ; les totaux de <b>colonnes</b>, eux, bougent avec le seuil.</p>
+    <div class="eq">rappel = <sup>TP</sup>⁄<sub>TP + FN</sub> &nbsp;&nbsp; FPR = <sup>FP</sup>⁄<sub>FP + TN</sub> &nbsp;&nbsp; précision = <sup>TP</sup>⁄<sub>TP + FP</sub> &nbsp;&nbsp; accuracy = <sup>TP + TN</sup>⁄<sub><span class="m">n</span></sub></div>
+    <p class="say">« Une décision binaire contre une vérité binaire donne quatre cases, donc chaque métrique est une case divisée par une somme de cases, donc il faut dire laquelle avant de la lire. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les quatre cases, en effectifs</div>
+    <table>
+      <tr><th></th><th>décidé positif</th><th>décidé négatif</th><th>total (vérité)</th></tr>
+      <tr><td><b>fraude</b></td><td>TP = 240</td><td>FN = 60</td><td><b>300</b></td></tr>
+      <tr><td><b>légitime</b></td><td>FP = 960</td><td>TN = 98 740</td><td><b>99 700</b></td></tr>
+      <tr><td>total (décision)</td><td>1 200</td><td>98 800</td><td>100 000</td></tr>
+    </table>
+    <p>En effectifs, pas en pourcentages : c'est en effectifs qu'on voit que 960 faux positifs écrasent 240 vrais, et que 60 fraudes passent au travers.</p>
+    <p>Nommer la case avant le mot : « 240 vraies fraudes détectées sur 300 » est une ligne, « 240 vraies sur 1 200 déclarées » est une colonne. Ce sont deux métriques différentes.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — deux distributions de scores, un seuil, quatre cases</div>
+    <div id="f1plot" class="wide"></div>
+    <div id="f1sliders"></div>
+    <div class="sl-ctl" id="f1ctl"></div>
+    <div id="f1mat"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Les deux courbes sont les scores des <b>légitimes</b> (99 700) et des <b>fraudes</b> (300), chacune ramenée à son propre maximum — sans quoi celle des fraudes serait 332 fois plus basse et invisible. Le trait vertical est le seuil ; tout ce qui est à sa droite est déclaré positif. <b>Baisse le seuil et regarde quelles cases bougent</b> : TP et FP montent ensemble, FN et TN descendent. Le repère à battre n'est pas 50 % mais le <b>trivial à 99,70 %</b> — l'accuracy passe au rouge dès qu'elle est en dessous.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Les « rates » regardent une ligne de vérité</h3>
+    <p>TPR (= rappel = sensibilité) divise par la ligne des vrais positifs ; FPR divise par la ligne des vrais négatifs. Chaque ligne est normalisée par son propre total, donc la taille relative des deux lignes n'entre nulle part : ces deux nombres <b>ne dépendent pas de la prévalence</b>.</p>
+    <p>Ce sont exactement les propriétés du test de <a href="chain-p00-03-conditionnement-bayes.html">p00-03</a> : TPR = sensibilité, FPR = 1 − spécificité.</p>
+    <p class="say">« Une rate divise par le total de sa ligne, donc elle est calculée à l'intérieur d'une classe, donc changer la taille des classes ne la change pas. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application</div>
+    <p>Rappel = 240/300 = <b>0,800</b> · FPR = 960/99 700 = <b>0,0096</b> · spécificité = 98 740/99 700 = 0,9904 = 1 − FPR.</p>
+    <p><b>Test de transport.</b> Double le nombre de légitimes sans toucher au modèle ni au seuil : 199 400 négatifs produisent ≈ 1 920 FP au même taux d'erreur. FPR = 1 920/199 400 = 0,0096, inchangé ; le rappel n'a pas bougé non plus, la ligne des positifs n'a pas changé.</p>
+    <p>C'est ce qui rend les rates comparables entre deux jeux de données et deux équipes — et ce qui les rend, seules, insuffisantes pour décider.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>La précision regarde une colonne — sans TN <span class="tag tronc">tronc</span></h3>
+    <p>Précision = TP/(TP + FP) : le dénominateur est la colonne « déclaré positif ». Les TN n'y figurent pas — c'est la seule métrique courante qui ignore une case entière.</p>
+    <p>Or les FP sont prélevés sur la classe majoritaire. Un taux d'erreur de 1 % sur 99 700 négatifs fabrique déjà 960 faux positifs, contre 240 vrais au mieux. La précision <b>dépend donc de la prévalence</b> : c'est la VPP de <a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>, réécrite avec les cases.</p>
+    <div class="eq">précision = <sup><span class="m">π</span> · TPR</sup>⁄<sub><span class="m">π</span> · TPR + (1 − <span class="m">π</span>) · FPR</sub></div>
+    <p class="say">« La précision divise par une colonne de décision où les négatifs entrent par leurs faux positifs, donc plus les négatifs sont nombreux plus la précision baisse, donc elle ne se transporte pas d'une population à l'autre. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le même modèle, trois prévalences</div>
+    <p>Précision = 240/1 200 = <b>0,200</b>. Sur 5 alertes, 1 est une vraie fraude.</p>
+    <p>À TPR = 0,800 et FPR = 0,0096 <b>figés</b> — le modèle et le seuil ne changent pas :</p>
+    <table>
+      <tr><th>prévalence <span class="m">π</span></th><th>précision</th><th>lecture</th></tr>
+      <tr class="hl"><td>0,3 % (le fil rouge)</td><td><b>0,200</b></td><td>1 alerte sur 5</td></tr>
+      <tr><td>5 %</td><td>0,814</td><td>4 alertes sur 5</td></tr>
+      <tr><td>50 %</td><td>0,988</td><td>presque toutes</td></tr>
+    </table>
+    <p>Le modèle est identique dans les trois lignes. Annoncer une précision sans annoncer la prévalence, c'est annoncer un nombre sans son unité.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>L'accuracy et le modèle trivial</h3>
+    <p>Accuracy = (TP + TN)/<span class="m">n</span>. Quand la classe positive est rare, TN pèse presque tout le numérateur : le score mesure surtout la capacité à dire « non ».</p>
+    <p>Le plancher n'est donc pas 50 % mais <b>1 − <span class="m">π</span></b>, atteint par le modèle trivial qui répond toujours « négatif ». Toute accuracy se lit contre ce témoin, jamais dans l'absolu.</p>
+    <p class="say">« L'accuracy est dominée par les vrais négatifs quand la classe positive est rare, donc son plancher est 1 − prévalence et non un demi, donc 98,98 % à 0,3 % de fraude est en dessous du modèle qui ne détecte rien. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — pire que rien</div>
+    <p>Accuracy = (240 + 98 740)/100 000 = 98 980/100 000 = <b>98,98 %</b>.</p>
+    <p>Trivial « jamais fraude » : 99 700/100 000 = <b>99,70 %</b>, avec un rappel de <b>0</b>. Il ne détecte aucune fraude et gagne de 0,72 point.</p>
+    <p><b>Pire.</b> Remonter le seuil améliore l'accuracy : à un seuil plus haut le modèle ne déclare plus que 239 suspects (TP = 155, FP = 84) et atteint 99,77 % — en laissant passer 145 fraudes sur 300. L'accuracy récompense ici le silence.</p>
+    <p>Conclusion opérationnelle : à 0,3 % de prévalence, l'accuracy n'est pas une mauvaise métrique, c'est une métrique <i>sans contenu</i>. On ne la cite qu'accompagnée du trivial.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Le seuil bouge tout dans un sens connu <span class="tag tronc">tronc</span></h3>
+    <p>Baisser le seuil, c'est déclarer positives des lignes qui ne l'étaient pas — jamais l'inverse. Des effectifs passent de la colonne négative vers la colonne positive : TP ↑, FP ↑, FN ↓, TN ↓, de façon monotone.</p>
+    <p>Donc rappel ↑ et FPR ↑ ensemble. La précision descend en général : elle ne monterait que si les lignes nouvellement déclarées étaient majoritairement vraies, ce que le classement rend rare.</p>
+    <p>Le seuil est un choix <b>métier</b> — coût d'un FN contre coût d'un FP (<a href="../../map.html#p06-04">p06-04</a>) — pas une propriété du modèle.</p>
+    <p class="say">« Baisser le seuil déplace des lignes de la colonne négative vers la colonne positive, donc TP et FP montent ensemble, donc le rappel et le FPR montent et la précision descend. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le même modèle à quatre seuils</div>
+    <table>
+      <tr><th>seuil</th><th>TP / FN</th><th>FP</th><th>rappel</th><th>précision</th><th>accuracy</th></tr>
+      <tr><td>haut</td><td>155 / 145</td><td>84</td><td>0,517</td><td>0,649</td><td>99,77 %</td></tr>
+      <tr class="hl"><td>courant</td><td>240 / 60</td><td>960</td><td>0,800</td><td>0,200</td><td>98,98 %</td></tr>
+      <tr><td>bas</td><td>285 / 15</td><td>6 153</td><td>0,950</td><td>0,044</td><td>93,83 %</td></tr>
+      <tr><td>très bas</td><td>298 / 2</td><td>22 881</td><td>0,993</td><td>0,013</td><td>77,12 %</td></tr>
+    </table>
+    <p>Une seule colonne monte quand le seuil descend : le rappel. Passer de 0,800 à 0,950 de rappel coûte 5 193 faux positifs de plus, soit autant d'enquêtes humaines. C'est ce prix-là qu'un seuil arbitre, et aucune métrique ne le fixe à la place de l'équipe.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>ROC : TPR contre FPR, pour tous les seuils</h3>
+    <p>Plutôt que de figer le seuil, on le fait glisser de +∞ à −∞ et on trace le point (FPR, TPR). Une courbe par modèle, de (0,0) à (1,1).</p>
+    <p>Les deux axes sont des rates, donc la courbe <b>ne dépend pas de la prévalence</b>. L'aire sous la courbe a une lecture exacte :</p>
+    <div class="eq">AUC = <span class="m">P</span>(score d'un positif tiré au hasard &gt; score d'un négatif tiré au hasard)</div>
+    <p>C'est une métrique de <b>classement</b>, pas de décision : elle résume le modèle sans qu'aucun seuil ne soit choisi. Diagonale = hasard, AUC = 0,5.</p>
+    <p class="say">« La ROC porte deux rates, donc elle ne dépend pas de la prévalence, donc son aire compare le classement de deux modèles sans qu'aucun seuil ne soit choisi. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application</div>
+    <p>Le point courant est (FPR = 0,0096 ; TPR = 0,800), très près de l'axe des ordonnées : 960 faux positifs ne pèsent presque rien rapportés aux 99 700 légitimes.</p>
+    <p>AUC ≈ <b>0,988</b> : sur une paire tirée au hasard (une fraude, une transaction légitime), le modèle donne le score le plus élevé à la fraude 98,8 fois sur 100. Le classement est excellent — et la précision reste à 0,20. Les deux énoncés sont vrais en même temps.</p>
+    <p>Rapprocher les deux distributions de scores dégrade le classement : l'AUC glisse vers 0,5 et la courbe s'écrase sur la diagonale, sans qu'aucun seuil n'ait été touché.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — la ROC est le seuil qu'on fait glisser</div>
+    <div id="f2plot" class="wide"></div>
+    <div id="f2sliders"></div>
+    <div class="sl-ctl" id="f2ctl"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Le point rouge est le seuil courant, posé sur la courbe : bouge-le et tu parcours la courbe sans la déformer — <b>la ROC est l'ensemble des seuils</b>. La seconde glissière écarte ou rapproche les deux distributions de scores : c'est elle, et elle seule, qui déforme la courbe et change l'AUC. « Mélanger les scores » les superpose et colle la courbe à la diagonale (AUC 0,5).</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>PR : précision contre rappel</h3>
+    <p>Même balayage du seuil, autres axes : la précision en fonction du rappel. La prévalence est au dénominateur de la précision, donc <b>toute la courbe se déplace</b> quand elle change.</p>
+    <p>La baseline n'est pas la diagonale mais l'horizontale à <span class="m">π</span> : un classement au hasard a pour précision la prévalence, 0,003 ici.</p>
+    <p>Quand la classe positive est rare et que c'est elle la cible, la ROC flatte — 960 FP donnent un FPR de 0,0096, un écrasement contre l'axe — là où la PR montre 0,20. Règle : <b>classe rare visée et faux positifs coûteux ⇒ PR ; comparaison de classements ⇒ ROC</b>.</p>
+    <p class="say">« La précision porte la prévalence à son dénominateur, donc la courbe PR se déplace quand la prévalence change alors que la ROC reste fixe, donc c'est la PR qu'on lit quand la classe rare est la cible. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application</div>
+    <p>Point courant : rappel 0,800, précision 0,200. Rapporté à la baseline 0,003, le modèle fait <b>67 fois mieux que le hasard</b> — et produit quand même 4 fausses alertes sur 5.</p>
+    <p>Les deux courbes lues ensemble : AUC 0,988 dit « le classement est presque parfait », PR dit « la décision à ce seuil noie 240 vraies fraudes dans 960 fausses ». La première juge le modèle, la seconde juge ce qu'on en fait.</p>
+    <p>Et si la même équipe déploie sur un flux à 5 % de fraude sans rien changer : la ROC est identique, la PR remonte, la précision passe à 0,814. Le modèle n'a pas progressé — la population a changé (H2).</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — la PR voit la prévalence, la ROC non</div>
+    <div id="f3plot" class="wide"></div>
+    <div id="f3sliders"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Les deux courbes dans le même carré unité — c'est possible parce que les quatre axes vont de 0 à 1 : la <b>ROC</b> porte TPR contre FPR, la <b>PR</b> porte la précision contre le rappel. Les points marquent le seuil du fil rouge sur chacune. <b>Fais varier la prévalence</b> : la ROC et son aire ne bougent pas d'un pixel, la PR et sa baseline en pointillé montent ou s'effondrent. Même modèle, même seuil, verdict opposé.</p>
+  </div>
+</div>
+
+<div class="step" id="s9">
+  <div class="rule">
+    <h3>Barres d'erreur : quel <span class="m">n</span> ?</h3>
+    <p>Le rappel est une proportion sur les <b>300 positifs</b>, pas sur les 100 000 lignes : c'est <span class="m">n</span> = 300 qui entre dans le SE. La précision est une proportion sur les <b>1 200 déclarés positifs</b>.</p>
+    <div class="eq">SE(<span class="hat"><span class="m">p</span></span>) = √(<span class="hat"><span class="m">p</span></span>(1 − <span class="hat"><span class="m">p</span></span>)/<span class="m">n</span>) &nbsp;&nbsp; avec <span class="m">n</span> = l'effectif du dénominateur de la métrique</div>
+    <p>Collecter 900 000 transactions de plus ne resserre le rappel que si elles apportent des fraudes : seul le dénominateur de la métrique compte (<a href="chain-p01-01-objet-aleatoire.html">p01-01</a>).</p>
+    <p class="say">« Le rappel est une Bernoulli sur les seuls positifs, donc son n vaut 300 et non 100 000, donc son SE vaut 0,023 et deux modèles séparés de trois points de rappel ne sont pas distingués. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — Wald sur les deux</div>
+    <p>Rappel 240/300 : SE = √(0,80 · 0,20/300) = √0,000533 = <b>0,023</b>. IC 95 % ≈ 0,80 ± 1,96 · 0,023 = [<b>0,755 ; 0,845</b>].</p>
+    <p>Précision 240/1 200 : SE = √(0,20 · 0,80/1 200) = <b>0,0115</b>. IC 95 % ≈ [0,177 ; 0,223].</p>
+    <p><b>Verdict.</b> Un modèle B à 0,83 de rappel contre 0,80 : l'écart vaut 0,03, soit 1,3 SE du seul rappel A — et les deux rappels sont mesurés sur les <i>mêmes</i> 300 fraudes, donc corrélés. Rien n'est tranché.</p>
+    <p>Les 300 positifs sont le budget statistique réel de l'évaluation. C'est eux qu'il faut compter avant d'annoncer une amélioration, pas les 100 000 lignes.</p>
+  </div>
+</div>
+
+<div class="step" id="s10">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Chaque métrique fixe une case au numérateur et une population au dénominateur. Changer la population change le chiffre sans que le modèle ait bougé.</p>
+    <p class="say">« Chaque métrique choisit une population au dénominateur, donc changer la population change la métrique sans que le modèle ait bougé, donc on annonce toujours la prévalence avec la précision et le témoin trivial avec l'accuracy. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>Prévalence du test ≠ prévalence de production.</b> Un test sous-échantillonné à 50 % de fraudes affichera 0,988 de précision pour 0,200 en production (pas 4). TPR et FPR, eux, se transportent : ré-estimer la précision avec la prévalence cible par la formule de Bayes plutôt que la mesurer sur un jeu rééquilibré.</li>
+      <li><b>AUC élevée, précision nulle.</b> 0,988 d'AUC et 0,20 de précision coexistent sans contradiction : l'AUC compare des <i>paires</i>, la précision compte des <i>décisions</i>. Une AUC seule ne dit jamais si le système est déployable.</li>
+      <li><b>F1.</b> Moyenne harmonique de la précision et du rappel <i>à un seuil</i> : il hérite donc de la dépendance au seuil et à la prévalence, et ignore les TN comme la précision. Utile pour résumer deux nombres en un, jamais pour choisir un seuil sans coûts explicites.</li>
+      <li><b>Métriques en marches.</b> Accuracy, F1, rappel à un seuil sont constants par morceaux : leur pente est nulle presque partout, donc on n'apprend pas avec — on évalue avec. C'est le même argument qu'en <a href="chain-p03-01-critere-escalier-vs-sensible.html#s10">p03-01</a> et au <a href="../bridges/bridge-05-escalier-vs-sensible.html">pont 05</a>.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Un score ne devient une décision que par un <b>seuil</b>. Quatre cases en effectifs ; chaque métrique est une case sur une somme de cases, à nommer avant de la lire.</li>
+    <li><b>Rates</b> (TPR, FPR) : dénominateur = une ligne de <i>vérité</i>, donc indépendantes de la prévalence. <b>Précision</b> : dénominateur = une colonne de <i>décision</i>, sans TN, donc dépendante de la prévalence — c'est la VPP.</li>
+    <li><b>Accuracy</b> dominée par les TN : plancher 1 − <span class="m">π</span>. Ici 98,98 % contre 99,70 % pour le trivial — pire que rien.</li>
+    <li>Baisser le seuil : TP ↑ FP ↑, FN ↓ TN ↓, donc rappel ↑ FPR ↑ précision ↓. Le seuil est un arbitrage de coûts, pas une propriété du modèle.</li>
+    <li><b>ROC</b> = classement, AUC = <span class="m">P</span>(s<sub>+</sub> &gt; s<sub>−</sub>), insensible à la prévalence. <b>PR</b> = décision, baseline = <span class="m">π</span>, à préférer quand la classe rare est la cible.</li>
+    <li>Barres d'erreur : le <span class="m">n</span> du rappel est le nombre de <b>positifs</b> (300 ⇒ SE 0,023), celui de la précision le nombre de <b>déclarés positifs</b> (1 200 ⇒ SE 0,0115). Trois points d'écart sont du bruit.</li>
+  </ol>
+</div>
+<div class="phrase">« À 0,3 % de fraude, 98,98 % d'accuracy est pire que le modèle qui ne détecte rien, à 99,70 %. Je regarde les cases : rappel 0,80 sur les 300 fraudes, FPR 1 % sur les 99 700 légitimes, mais précision 0,20 — parce que la précision divise par une colonne de décision, sans vrais négatifs, et que les faux positifs viennent de la classe majoritaire : elle dépend de la prévalence, les rates non. Le seuil déplace tout dans un sens connu ; la ROC compare le classement indépendamment de la prévalence, et la PR montre ce que vaut la décision quand la classe rare est celle qu'on cherche. Et sur 300 positifs, trois points de rappel sont du bruit. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">98,98 % d'accuracy à 0,3 % de prévalence : verdict ?</div><div class="a hid">Pire que le trivial « jamais fraude » (99,70 %), qui a un rappel de 0. À cette prévalence l'accuracy ne dit rien : on la cite avec son témoin.</div></li>
+    <li><div class="q">Quelles métriques ne dépendent pas de la prévalence, et pourquoi ?</div><div class="a hid">TPR et FPR : leur dénominateur est une ligne de vérité, chaque ligne normalisée par son propre total. Ce sont sensibilité et 1 − spécificité.</div></li>
+    <li><div class="q">Pourquoi la précision en dépend-elle ?</div><div class="a hid">Elle divise par une colonne de décision (TP + FP), sans TN ; les FP sont prélevés sur la classe majoritaire. C'est la VPP : π·TPR / (π·TPR + (1−π)·FPR).</div></li>
+    <li><div class="q">Que fait baisser le seuil ?</div><div class="a hid">TP ↑ et FP ↑, FN ↓ et TN ↓ ; donc rappel ↑, FPR ↑, précision ↓. Ici 0,80 → 0,95 de rappel coûte 5 193 faux positifs de plus.</div></li>
+    <li><div class="q">Que mesure l'AUC, et quand préférer la PR ?</div><div class="a hid">P(score d'un positif &gt; score d'un négatif) : un classement, sans seuil ni prévalence. PR dès que la classe rare est la cible et que les FP coûtent — baseline = π, pas la diagonale.</div></li>
+    <li><div class="q">SE du rappel 240/300 ?</div><div class="a hid">√(0,80 · 0,20/300) = 0,023 : n = les 300 positifs, pas les 100 000 lignes. IC ≈ [0,755 ; 0,845].</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="../bridges/bridge-05-escalier-vs-sensible.html"><b>Pont 05 — escalier vs sensible</b><small>accuracy, F1 et rappel à un seuil sont constants par morceaux : on évalue avec, on n'apprend pas avec — c'est la dernière limite de cette chaîne, vue côté critère</small></a>
+    <a href="chain-p00-03-conditionnement-bayes.html"><b>p00-03 — conditionnement et Bayes</b><small>la précision est la VPP : même formule, même effondrement quand le base rate est faible ; ici elle est lue sur des effectifs au lieu de probabilités</small></a>
+    <a href="chain-p06-02-cv-leakage.html"><b>p06-02 — validation croisée et fuite</b><small>ces métriques s'estiment sur des données non vues ; choisir le seuil sur le jeu de test est une fuite, au même titre qu'une sélection de features hors des plis</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>ml::metriques</code> (les quatre cases, nommer le dénominateur) · <code>ml::roc-auc</code> (AUC = P(s<sub>+</sub> &gt; s<sub>−</sub>), insensible à la prévalence) · <code>ml::precision-rappel</code> (précision sans TN, baseline PR = π) · <code>ml::desequilibre</code> (accuracy contre le trivial, précision en production).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p06-03 · v1 du 17/09/2026 · Prérequis : <a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>, <a href="chain-p01-01-objet-aleatoire.html">p01-01</a>. Suite : <a href="../../map.html#p06-04">p06-04 Calibration et déséquilibre</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== socle commun aux trois figures =====
+   Modèle binormal à variances égales calibré EXACTEMENT sur les quatre cases du fil rouge :
+   négatifs ~ N(0,1), positifs ~ N(D,1). T0 et D sont solutions de
+   1 − Φ(T0) = 960/99 700 et 1 − Φ(T0 − D) = 240/300, donc au seuil T0 la figure affiche
+   240 / 60 / 960 / 98 740 sans arrondi forcé. AUC = Φ(D/√2). */
+const NPOS=300, NNEG=99700, NTOT=NPOS+NNEG, PREV0=NPOS/NTOT;
+const D0=3.182124434754269, T0=2.3405032011813547;
+const COF=[-1.3026537197817094,6.4196979235649026e-1,1.9476473204185836e-2,-9.561514786808631e-3,
+  -9.46595344482036e-4,3.66839497852761e-4,4.2523324806907e-5,-2.0278578112534e-5,-1.624290004647e-6,
+  1.303655835580e-6,1.5626441722e-8,-8.5238095915e-8,6.529054439e-9,5.059343495e-9,-9.91364156e-10,
+  -2.27365122e-10,9.6467911e-11,2.394038e-12,-6.886027e-12,8.94487e-13,3.13092e-13,-1.12708e-13,3.81e-16,7.106e-15];
+/* erfc de Numerical Recipes : erreur RELATIVE < 1,2e-7, donc les queues (FPR de 1e-5) restent justes.
+   Une approximation à erreur absolue y rendrait la courbe PR bruitée à droite. */
+function erfc(x){const z=Math.abs(x),t=2/(2+z),ty=4*t-2;let d=0,dd=0;
+  for(let j=COF.length-1;j>0;j--){const tmp=d;d=ty*d-dd+COF[j];dd=tmp;}
+  const ans=t*Math.exp(-z*z+0.5*(COF[0]+ty*d)-dd);return x>=0?ans:2-ans;}
+const Phi=z=>0.5*erfc(-z/Math.SQRT2);
+const tpr=(t,d)=>1-Phi(t-d), fpr=t=>1-Phi(t);
+const auc=d=>Phi(d/Math.SQRT2);
+/* SL.fmt rabote les zéros de queue : un rappel de 0,800 s'afficherait « 0,8 » et une accuracy
+   de 99,70 % « 99,7 % ». Les readouts d'une matrice de confusion se lisent à décimales fixes. */
+const nf=(x,d)=>Number(x).toFixed(d).replace('.',',');
+const pct=(x,n)=>nf(x*100,n===undefined?2:n)+' %';
+const gr=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+function poly(P,pts,cls){let s='';for(let i=0;i<pts.length;i++){s+=(i?' L':'M')+P.sx(pts[i][0]).toFixed(1)+' '+P.sy(pts[i][1]).toFixed(1);}
+  return SL.el('path',{d:s,class:'sl-fn '+cls,fill:'none'},P.dyn);}
+function ro(host,label,value,cls){const d=document.createElement('div');if(cls)d.className=cls;
+  d.innerHTML=label+'<b>'+value+'</b>';host.appendChild(d);}
+
+/* ===== Figure 1 : les deux distributions, le seuil, les quatre cases ===== */
+const P1=SL.plot(document.getElementById('f1plot'),{x:[-3.6,6.8],y:[0,1.35],w:620,h:270,
+  xt:[-2,0,2,4,6],yt:[],xl:'score',yl:'densité (chaque classe à son propre maximum)'});
+P1.fn(x=>Math.exp(-x*x/2),'sl-c4');
+P1.fn(x=>Math.exp(-(x-D0)*(x-D0)/2),'sl-c3');
+P1.label(-3.4,.80,'légitimes · 99 700','sl-c4','start');
+P1.label(4.5,.80,'fraudes · 300','sl-c3','start');
+const f1mat=document.getElementById('f1mat'), f1out=document.getElementById('f1out');
+function draw1(t){
+  const TP=Math.round(NPOS*tpr(t,D0)), FP=Math.round(NNEG*fpr(t));
+  const FN=NPOS-TP, TN=NNEG-FP, dec=TP+FP;
+  const acc=(TP+TN)/NTOT, rec=TP/NPOS, fp=FP/NNEG, pre=dec?TP/dec:NaN;
+  P1.clear();P1.vline(t,'chord');P1.text(t,1.22,'seuil','','middle');
+  f1mat.innerHTML='<table>'+
+    '<tr><th></th><th>décidé positif</th><th>décidé négatif</th><th>total</th></tr>'+
+    '<tr><td><b>fraude</b></td><td>TP = '+gr(TP)+'</td><td>FN = '+gr(FN)+'</td><td>'+gr(NPOS)+'</td></tr>'+
+    '<tr><td><b>légitime</b></td><td>FP = '+gr(FP)+'</td><td>TN = '+gr(TN)+'</td><td>'+gr(NNEG)+'</td></tr>'+
+    '<tr><td>total</td><td>'+gr(dec)+'</td><td>'+gr(NTOT-dec)+'</td><td>'+gr(NTOT)+'</td></tr></table>';
+  f1out.innerHTML='';
+  ro(f1out,'accuracy',pct(acc),acc<=1-PREV0?'zero':'pos');
+  ro(f1out,'trivial « jamais fraude »',pct(1-PREV0));
+  ro(f1out,'rappel = TP/300',nf(rec,3));
+  ro(f1out,'FPR = FP/99 700',nf(fp,4));
+  ro(f1out,'précision = TP/déclarés',dec?nf(pre,3):'—',dec&&pre<.5?'zero':'pos');
+}
+const s1=SL.slider(document.getElementById('f1sliders'),{label:'seuil',min:-1.5,max:5.5,value:T0},draw1);
+const f1ctl=document.getElementById('f1ctl');
+[['seuil courant',T0],['seuil haut',T0+.8],['seuil bas',T0-.8]].forEach(([n,v])=>{
+  const b=document.createElement('button');b.className='tb';b.textContent=n;b.onclick=()=>s1.set(v);f1ctl.appendChild(b);});
+
+/* ===== Figure 2 : la ROC, parcourue par le seuil, déformée par la séparation ===== */
+/* y monte à 1,12 : le libellé d'axe est écrit à 10 px du haut du cadre par sheetlib, donc il
+   chevauche le tick « 1 » dès que 1 est le haut du domaine. */
+const P2=SL.plot(document.getElementById('f2plot'),{x:[0,1],y:[0,1.12],w:600,h:320,
+  xt:[0,.25,.5,.75,1],yt:[.25,.5,.75,1],xl:'FPR (fausses alertes / 99 700)',yl:'TPR (rappel)'});
+const f2out=document.getElementById('f2out');
+const st2={t:T0,d:D0};
+function rocPts(d){const p=[];for(let i=0;i<=320;i++){const t=7-13/320*i;p.push([fpr(t),tpr(t,d)]);}
+  p.unshift([0,0]);p.push([1,1]);return p;}
+function draw2(){P2.clear();
+  P2.seg(0,0,1,1,'chord');
+  poly(P2,rocPts(st2.d),'sl-c4');
+  const x=fpr(st2.t), y=tpr(st2.t,st2.d);
+  P2.seg(x,0,x,y,'');P2.seg(0,y,x,y,'');P2.dot(x,y,'',6);
+  P2.text(.52,.18,'diagonale = hasard','','start');
+  P2.text(.52,.10,'AUC = '+nf(auc(st2.d),3),'sl-c4','start');
+  f2out.innerHTML='';
+  ro(f2out,'AUC',nf(auc(st2.d),3),auc(st2.d)<.6?'zero':'pos');
+  ro(f2out,'paire bien classée',pct(auc(st2.d),1));
+  ro(f2out,'TPR au seuil',nf(y,3));
+  ro(f2out,'FPR au seuil',nf(x,4));
+  ro(f2out,'fausses alertes',gr(Math.round(NNEG*x)));
+}
+const s2t=SL.slider(document.getElementById('f2sliders'),{label:'seuil',min:-1.5,max:5.5,value:T0},v=>{st2.t=v;draw2();});
+const s2d=SL.slider(document.getElementById('f2sliders'),{label:'séparation des scores',min:0,max:4,value:D0},v=>{st2.d=v;draw2();});
+const f2ctl=document.getElementById('f2ctl');
+[['modèle du fil rouge',D0],['mélanger les scores',0]].forEach(([n,v])=>{
+  const b=document.createElement('button');b.className='tb';b.textContent=n;b.onclick=()=>s2d.set(v);f2ctl.appendChild(b);});
+
+/* ===== Figure 3 : ROC et PR dans le même carré unité, prévalence variable ===== */
+const P3=SL.plot(document.getElementById('f3plot'),{x:[0,1],y:[0,1.12],w:600,h:320,
+  xt:[0,.25,.5,.75,1],yt:[.25,.5,.75,1],xl:'FPR (ROC) · rappel (PR)',yl:'TPR (ROC) · précision (PR)'});
+const f3out=document.getElementById('f3out');
+const GRID=[];for(let i=0;i<=400;i++)GRID.push(7-13/400*i);
+const prec=(r,f,pi)=>{const num=pi*r, den=pi*r+(1-pi)*f;return den>0?num/den:1;};
+function draw3(pi){P3.clear();
+  P3.seg(0,0,1,1,'');
+  P3.seg(0,pi,1,pi,'chord');
+  const roc=[[0,0]],pr=[];
+  GRID.forEach(t=>{const r=tpr(t,D0),f=fpr(t);roc.push([f,r]);pr.push([r,prec(r,f,pi)]);});
+  roc.push([1,1]);pr.push([1,pi]);
+  poly(P3,roc,'sl-c4');poly(P3,pr,'sl-c3');
+  const r0=tpr(T0,D0), f0=fpr(T0), p0=prec(r0,f0,pi);
+  P3.dot(f0,r0,'sl-c4',6);P3.dot(r0,p0,'sl-c3',6);
+  P3.text(.66,.80,'ROC','sl-c4','start');
+  /* la PR descend : on accroche son étiquette sous la courbe, là où la chute sur la largeur du
+     mot dépasse le décalage — sinon le texte se pose sur le trait. */
+  const pAt=prec(tpr(D0,D0),fpr(D0),pi); /* précision au rappel 0,5 : t = D0 */
+  P3.text(.52,Math.min(.88,Math.max(.06,pAt-.13)),'PR','sl-c3','start');
+  /* le pointillé est bas à gauche et la diagonale y passe : l'étiquette se pose au milieu,
+     là où la diagonale est déjà au-dessus d'elle quelle que soit la prévalence. */
+  P3.text(.52,pi+.05,'baseline PR = prévalence','','end');
+  /* AP = aire sous la PR, intégrée en dR */
+  let ap=0,prev=0;for(let i=0;i<pr.length;i++){ap+=pr[i][1]*(pr[i][0]-prev);prev=pr[i][0];}
+  f3out.innerHTML='';
+  ro(f3out,'prévalence',pct(pi,pi<.01?2:1));
+  ro(f3out,'précision au seuil courant',nf(p0,3),p0<.5?'zero':'pos');
+  ro(f3out,'AUC ROC (inchangée)',nf(auc(D0),3),'pos');
+  ro(f3out,'AP (aire sous la PR)',nf(ap,3),ap<.5?'zero':'pos');
+  ro(f3out,'baseline PR',nf(pi,4));
+}
+SL.slider(document.getElementById('f3sliders'),
+  {label:'prévalence',min:-3,max:Math.log10(.5),value:Math.log10(PREV0),
+   fmt:v=>SL.fmt(Math.pow(10,v)*100,2)+' %'},v=>draw3(Math.pow(10,v)));
+})();
+</script>
+</body>
+</html>
