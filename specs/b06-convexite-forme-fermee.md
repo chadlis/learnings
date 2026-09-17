@@ -58,6 +58,8 @@ Minimiser L revient à résoudre ∇L(θ) = 0. Si ce système est **linéaire en
   un pas sans id numéroté (`s4b`, « Pourquoi c'est légitime : un surrogate ») : les ancres
   décalent d'un cran à partir de là, `#s7` s'affiche donc **pas 8**. Compter les ids donne
   un cran de moins que ce que le lecteur voit. Les liens de `bridge-05` étaient corrects.
+  **Réglé en revue 4** : les ids de p03-01 sont passés en suite consécutive `s1`…`s10`, le
+  décalage n'existe plus, et le validateur refuse désormais un id suffixé.
 - Les autres renvois du spec ont été vérifiés un à un et sont justes : `p02-02 pas 5`
   (+λI translate), `p04-02 pas 7` (translater le spectre), `p04-03 pas 7` (ne pas former
   XᵀX), `p03-02 pas 4–5` (convexité / forme fermée ou itération), `p03-02 casse`, `p00-04`.
@@ -67,6 +69,6 @@ Minimiser L revient à résoudre ∇L(θ) = 0. Si ce système est **linéaire en
   β̂ = (−2,2705 ; 0,9082), L = 2,34749, 3 pas de Newton contre 1 000 pas de gradient à
   η = 0,120 ; k-means sur {0,1,10,11,20,21}, k = 3 → SSE 1,5 ou 101 selon l'init ;
   Gram [[1, r],[r, 1]] avec r = 0,9999 → κ = 19 999, puis 199 à λ = 0,01 et 3,0 à λ = 1.
-  **À valider en revue** : ce fil rouge est un choix de la sheet, pas du spec.
-- Le spec ne nomme pas de `next`. La sheet renvoie vers la carte ; si un pont suivant est
-  prévu, le pied de page et la ligne « Ponts » sont à recâbler.
+  **Validé en revue 4** : ce fil rouge est un choix de la sheet, pas du spec, et il est retenu.
+- Le spec ne nomme pas de `next`. La sheet renvoie vers la carte ; **validé en revue 4** :
+  b06 ferme la partie B, le renvoi vers la carte est le bon.

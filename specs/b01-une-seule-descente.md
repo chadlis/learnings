@@ -75,4 +75,4 @@ Lloyd 1D, neurone de p08-01, valeurs propres de A) : un seul écart.
 
 3. **Outillage** : `tools/validate_sheet.py` n'acceptait que des parties numériques
    (`part=(\d+)`). Les ponts vivent dans la partie « B » de `build_index.py` ; le motif est
-   passé à `part=([0-9A-Z]+)`. Aucune autre sheet n'est affectée.
+   passé à `part=([0-9A-Z]+)`. Aucune autre sheet n'est affectée. **Validé en revue 4.**

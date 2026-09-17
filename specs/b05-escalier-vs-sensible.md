@@ -50,17 +50,18 @@ p03-01 qui ont été revérifiés). Gains de split sur 400 + / 400 − : accurac
 Gini 0,125 < 0,167, entropie 0,189 < 0,311. Split 7+/3− sans basculement : accuracy 0,
 Gini 0,0033, entropie 0,0058. Pentes de la log-loss −σ(−m) : −0,881 / −0,500 / −0,119 /
 −0,047 à m = −2 / 0 / +2 / +3 ; hinge 0 dès m ≥ 1. Pénalité (θ − 1)² : |L′(0)| = 2, L2
-1/(1 + λ), L1 max(0, 1 − λ/2). Trois points restent à trancher :
+1/(1 + λ), L1 max(0, 1 − λ/2). Les trois points ouverts sont tranchés :
 
-1. **Les « pas » de la colonne « où » sont des numéros affichés, pas des ancres.** p03-01
-   contient un pas d'id `s4b` (« Pourquoi c'est légitime : un surrogate ») : le compteur CSS
-   décale donc les ancres d'un cran à partir de là. `pas 7` = `#s6`, `pas 8` = `#s7`,
-   `pas 9` = `#s8`, `casse` = `#s9`. Les numéros du spec sont **justes** ; les liens de la
-   sheet pointent vers les ancres décalées correspondantes. À trancher : renuméroter les
-   ancres de p03-01 (`s4b` → `s5`, etc.) pour que numéro affiché et ancre coïncident, au
-   prix de liens entrants cassés, ou documenter le décalage une fois pour toutes.
+1. **Décalage ancre / numéro affiché — réglé en revue 4.** p03-01 portait un pas d'id
+   `s4b` (« Pourquoi c'est légitime : un surrogate ») que le compteur CSS numérotait quand
+   même, décalant toutes les ancres suivantes d'un cran. Les ids de p03-01 sont désormais
+   `s1`…`s10` consécutifs, les liens entrants ont suivi, et le validateur refuse une suite
+   non consécutive. Les numéros du spec étaient justes et le restent ; les liens de la
+   sheet pointent maintenant vers l'ancre qui porte ce numéro.
 2. **`p02-01` dans la ligne « Loss ».** La séparation parfaite n'est pas traitée dans
    p02-01 mais dans `D4` (walkthrough-p02-01, exemple 2). La sheet pointe vers les deux.
+   **Validé en revue 4.**
 3. **La table du pas 1 a été ramenée à quatre colonnes.** Les six colonnes du spec
    débordaient à 390 px dans la colonne « application ». Les colonnes « ce que ça explique »
    et « où » sont devenues une liste sous la table : contenu identique, liens plus lisibles.
+   **Validé en revue 4.**
