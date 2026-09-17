@@ -10,7 +10,7 @@ prereq: [p03-02, p07-01, p02-01, p03-01]
 anki: [ml::boosting, ml::gradient-boosting, ml::learning-rate, ml::rf-vs-gb]
 bridges: [b01, b03, b05]
 next: p07-04
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -33,7 +33,7 @@ Loss quadratique écrite **avec** le ½ : L = ½(y − F)², pour que le gradien
 ## Exemple fil rouge
 Quatre points x = 1, 2, 3, 4 ; y = 1, 2, 3, 6. F₀ = ȳ = 3 ; résidus (−2, −1, 0, 3), RSS = 14.
 Souche 1 (meilleure coupure des résidus : x ≤ 3) : h₁ = (−1, −1, −1, 3). ν = 0,1 : F₁ = (2,9 ; 2,9 ; 2,9 ; 3,3), résidus (−1,9 ; −0,9 ; 0,1 ; 2,7), RSS = 11,72. Chaque arbre corrige un dixième de ce qu'il voit.
-Après 50 souches à ν = 0,1 : F = (1,08 ; 2,01 ; 2,99 ; 5,93), RSS = 0,012. À ν = 1 : RSS ≈ 0 en quelques arbres — et sur des données bruitées, le bruit aussi est absorbé.
+Après 50 souches à ν = 0,1 : F = (1,08 ; 2,01 ; 2,99 ; 5,93), RSS = 0,012. À ν = 1 : RSS = 2,0 après 1 arbre, 0,52 après 3, 0,008 après 10 — et sur des données bruitées, le bruit aussi est absorbé.
 Classification (log-loss) : le pseudo-résidu au point i est y_i − p_i (p03-01) : « de combien la probabilité est fausse ».
 
 ## Pas de la chaîne
@@ -48,7 +48,7 @@ Classification (log-loss) : le pseudo-résidu au point i est y_i − p_i (p03-01
 9. **Où ça casse** [casse].
 
 ## Figures exigées
-- **Figure 1 — `plot` + bouton « arbre suivant » + `slider` ν** : les quatre points, F_m en marches, les résidus en segments ; readouts m, RSS ; à ν = 1 la RSS tombe à 0 en 3 arbres, à 0,1 en ~50. Légende : chaque arbre corrige une fraction ν du résidu.
+- **Figure 1 — `plot` + bouton « arbre suivant » + `slider` ν** : les quatre points, F_m en marches, les résidus en segments ; readouts m, RSS ; à ν = 1 la RSS passe sous 0,01 en 10 arbres (0,52 après 3), à ν = 0,1 il en faut 50 pour descendre à 0,012. Légende : chaque arbre corrige une fraction ν du résidu.
 - **Figure 2 — `plot`** : sur un jeu bruité (n = 40, sinusoïde + bruit), loss train et loss validation en fonction de M pour ν = 0,1 et ν = 1 ; minimum de validation marqué. Légende : ν petit décale le U vers la droite et le baisse.
 - **Figure 3 — `repeat`** : jeu avec 10 % de labels bruités ; draw = erreur test d'une forêt vs d'un boosting (simulations précalculées ou mini-implémentation JS de souches) ; deux histogrammes. Légende : le boosting poursuit le bruit.
 
@@ -83,3 +83,24 @@ Classification (log-loss) : le pseudo-résidu au point i est y_i − p_i (p03-01
 
 ## Exclusions
 Pas d'AdaBoost (poids exponentiels) au-delà du nom, pas de hessienne XGBoost (scope acté 10/09), pas de détails d'implémentation (histogrammes, LightGBM leaf-wise) au-delà d'une phrase.
+
+## Questions pour la revue
+
+- **Chiffre du spec corrigé (fil rouge et figure 1).** Le spec annonçait « à ν = 1 : RSS ≈ 0 en
+  quelques arbres » et « la RSS tombe à 0 en 3 arbres ». Vérifié par script : sur les quatre points,
+  souches gloutonnes, ν = 1 donne RSS = 2,0 après 1 arbre, **0,519 après 3**, 0,0081 après 10,
+  3·10⁻⁵ après 20. Une souche ne pouvant produire que deux valeurs, quatre valeurs distinctes ne
+  s'atteignent jamais en trois pas. Spec et sheet portent maintenant les chiffres exacts.
+- **p07-02 absente de `prereq`.** La chaîne s'appuie trois fois sur son résultat (moyenner ne touche
+  pas au biais ; arbres profonds là-bas, courts ici) et y renvoie par lien. La méta `prereq` a été
+  laissée conforme au spec (p03-02, p07-01, p02-01, p03-01) et p07-02 figure dans la carte des
+  prérequis et dans les ponts. Faut-il l'ajouter à la méta ?
+- **Valeur de feuille : gradient pur ou recherche linéaire ?** La sheet pose h_m = arbre des moindres
+  carrés sur les pseudo-résidus, ce qui est la lecture « descente de gradient » et ce que dit déjà b01.
+  L'algorithme de Friedman ajoute une recherche linéaire par feuille (γ_j = Σr / Σ p(1−p) pour la
+  log-loss). Ce n'est pas la hessienne XGBoost exclue du scope, mais ce n'est pas rien non plus :
+  demi-ligne à ajouter au pas 4, ou à laisser dehors ?
+- **Figure 3 : boosting volontairement non arrêté.** Pour que l'effet « le boosting poursuit le bruit »
+  soit visible, la simulation tourne à ν = 0,3, M = 200, sans arrêt anticipé (forêt 8,9 %, boosting
+  10,9 %, boosting pire dans 82 tirages sur 100). La légende le dit explicitement. Vaut-il mieux une
+  troisième série « boosting arrêté au minimum de validation », au prix d'une figure plus lourde ?

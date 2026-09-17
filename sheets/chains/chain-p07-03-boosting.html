@@ -1,0 +1,625 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Gradient boosting — une descente dans l'espace des fonctions — chaîne</title>
+<meta name="sheet" content="series=chain;part=07;number=03;status=v1">
+<meta name="part" content="07 · Arbres, ensembles, k-means">
+<meta name="subtitle" content="arbres et ensembles — chaque arbre ajuste le gradient négatif de la loss au modèle cumulé ; ν est le pas">
+<meta name="prereq" content="p03-02,p07-01,p02-01,p03-01">
+<meta name="anki" content="ml::boosting,ml::gradient-boosting,ml::learning-rate,ml::rf-vs-gb">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 07 · Arbres, ensembles, k-means › chaîne 03</div>
+  <h1>Gradient boosting — une descente dans l'espace des <span>fonctions</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Ce qu'un arbre de boosting ajuste exactement — et pourquoi ce n'est pas « les résidus de l'arbre précédent ». Une seule phrase tient la chaîne : <b>le <span class="m">m</span>-ième arbre ajuste le gradient négatif de la loss, pris au modèle cumulé <span class="m">F</span><sub><span class="m">m</span>−1</sub></b>, et <span class="m">ν</span> est le pas de cette descente. Fil rouge : quatre points <span class="m">y</span> = (1 ; 2 ; 3 ; 6) sur <span class="m">x</span> = 1, 2, 3, 4, <span class="m">F</span><sub>0</sub> = 3, RSS = 14 ; la première souche coupe en <span class="m">x</span> ≤ 3, et à <span class="m">ν</span> = 0,1 la RSS tombe à 11,72 — un dixième du chemin, cinquante fois.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="chain-p03-02-gradient-descente.html#s2">p03-02 · Le pas −<span class="m">η</span>∇</a></li>
+    <li><a href="chain-p07-01-arbres-impurete.html#s7">p07-01 · Arbre de régression</a></li>
+    <li><a href="chain-p07-02-bagging-rf.html#s2">p07-02 · Moyenner ne touche pas au biais</a></li>
+    <li><a href="chain-p02-01-bruit-vraisemblance-loss.html#s8">p02-01 · D'où vient la loss</a></li>
+    <li><a href="chain-p03-01-critere-escalier-vs-sensible.html#s7">p03-01 · Gradient <span class="m">p</span> − <span class="m">y</span></a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>ml::boosting</code><code>ml::gradient-boosting</code><code>ml::learning-rate</code><code>ml::rf-vs-gb</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-01-une-seule-descente.html#s4">b01 · Une seule descente</a></li>
+    <li><a href="../bridges/bridge-03-biais-variance-partout.html">b03 · Biais-variance partout</a></li>
+    <li><a href="../bridges/bridge-05-escalier-vs-sensible.html">b05 · Escalier vs sensible</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>La descente de gradient.</b> <span class="m">θ</span> ← <span class="m">θ</span> − <span class="m">η</span>∇<span class="m">L</span> : la direction de plus forte baisse locale, un pas <span class="m">η</span>, et un pas trop grand qui oscille (<a href="chain-p03-02-gradient-descente.html#s2">p03-02 pas 2–3</a>). Toute cette chaîne ne change qu'une chose : <i>par rapport à quoi</i> on dérive.</li>
+      <li><b>Un arbre de régression.</b> Coupures axe par axe, une feuille prédit la <b>moyenne</b> des <span class="m">y</span> qu'elle contient (<a href="chain-p07-01-arbres-impurete.html#s7">p07-01 pas 7</a>) ; la profondeur est le bouton de variance (<a href="chain-p07-01-arbres-impurete.html#s5">pas 5</a>).</li>
+      <li><b>Moyenner ne baisse que la variance.</b> Le biais de la moyenne est exactement le biais d'un composant — démontré en une ligne de linéarité dans <a href="chain-p07-02-bagging-rf.html#s2">p07-02 pas 2</a>, et c'est de là que vient « arbres profonds pour la forêt, arbres courts pour le boosting » (<a href="chain-p07-02-bagging-rf.html#s7">pas 7</a>). On l'applique ici, on ne le redémontre pas.</li>
+      <li><b>La loss vient de l'hypothèse de bruit.</b> Gaussien ⇒ quadratique, Bernoulli ⇒ log-loss (<a href="chain-p02-01-bruit-vraisemblance-loss.html#s8">p02-01 pas 8</a>). Choisir la loss est un choix de <i>modèle</i> ; le boosting, lui, ne change pas.</li>
+      <li><b>Le gradient de la log-loss.</b> Avec <span class="m">p</span> = <span class="m">σ</span>(<span class="m">F</span>), ∂<span class="m">L</span>/∂<span class="m">F</span> = <span class="m">p</span> − <span class="m">y</span>, le −1/<span class="m">p</span> du log compensant l'écrasement de <span class="m">σ</span>′ (<a href="chain-p03-01-critere-escalier-vs-sensible.html#s7">p03-01 pas 7</a>). C'est ce nombre-là que l'arbre ajuste quand on classe.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>Le modèle est une <b>somme</b> <span class="m">F</span><sub><span class="m">M</span></sub>(<span class="m">x</span>) = <span class="m">F</span><sub>0</sub> + <span class="m">ν</span> Σ<sub><span class="m">m</span>=1</sub><sup><span class="m">M</span></sup> <span class="m">h</span><sub><span class="m">m</span></sub>(<span class="m">x</span>), construite <b>séquentiellement</b> : une fois <span class="m">h</span><sub><span class="m">m</span></sub> posé, on n'y revient plus. Aucun terme n'est réajusté à la lumière des suivants.</span>
+      <b>H2</b><span>Chaque <span class="m">h</span><sub><span class="m">m</span></sub> est un <b>arbre de régression court</b> (profondeur 1 à 6), <b>quelle que soit la tâche</b> — classer ou régresser. En classification aussi, l'arbre régresse : il ajuste des nombres réels, jamais des étiquettes.</span>
+      <b>H3</b><span>La loss est <b>dérivable en <span class="m">F</span></b> : quadratique, log-loss, Huber, quantile. Une loss en marches (la 0/1) ne donnerait aucune cible à l'arbre — c'est exactement l'argument de <a href="../bridges/bridge-05-escalier-vs-sensible.html">b05</a>, lu ici dans l'espace des fonctions.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor : additionner, pas moyenner</h3>
+    <p>Le bagging moyenne des modèles <b>de même loi</b> et ne touche pas au biais : il divise ce qui reste de variance (<a href="chain-p07-02-bagging-rf.html#s2">p07-02 pas 2</a>). Le boosting prend l'autre côté du budget d'erreur : un modèle <b>additif</b> où chaque terme corrige ce que la somme des précédents laisse encore.</p>
+    <div class="eq"><span class="m">F</span><sub><span class="m">M</span></sub>(<span class="m">x</span>) = <span class="m">F</span><sub>0</sub> + <span class="m">ν h</span><sub>1</sub>(<span class="m">x</span>) + <span class="m">ν h</span><sub>2</sub>(<span class="m">x</span>) + … + <span class="m">ν h</span><sub><span class="m">M</span></sub>(<span class="m">x</span>)</div>
+    <p>D'où les composants <b>faibles</b> : un terme qui corrige n'a pas besoin d'être bon seul, il a besoin de laisser du travail aux suivants.</p>
+    <p class="say">« Moyenner laisse le biais intact, donc pour l'attaquer il faut additionner et non moyenner, donc chaque terme doit viser ce que les précédents laissent, donc le modèle se construit séquentiellement à partir de composants faibles. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Le fil rouge, posé</div>
+    <p>Quatre points : <span class="m">x</span> = 1, 2, 3, 4 et <span class="m">y</span> = 1, 2, 3, 6. Un seul feature, donc une souche ne peut que choisir sa coupure parmi <span class="m">x</span> ≤ 1, <span class="m">x</span> ≤ 2, <span class="m">x</span> ≤ 3.</p>
+    <table>
+      <tr><th></th><th><span class="m">x</span>=1</th><th><span class="m">x</span>=2</th><th><span class="m">x</span>=3</th><th><span class="m">x</span>=4</th></tr>
+      <tr><td><span class="m">y</span></td><td>1</td><td>2</td><td>3</td><td>6</td></tr>
+      <tr><td><span class="m">F</span><sub>0</sub> = <span class="m">ȳ</span></td><td>3</td><td>3</td><td>3</td><td>3</td></tr>
+      <tr class="hl"><td><span class="m">y</span> − <span class="m">F</span><sub>0</sub></td><td>−2</td><td>−1</td><td>0</td><td>+3</td></tr>
+    </table>
+    <p>RSS de départ : 4 + 1 + 0 + 9 = <b>14</b>. <span class="m">F</span><sub>0</sub> est la constante qui minimise la loss quadratique — c'est déjà le premier « arbre », de profondeur zéro.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Le geste : ajuster le gradient négatif <span class="tag tronc">tronc</span></h3>
+    <p>À l'étape <span class="m">m</span>, on calcule <b>un nombre par point d'entraînement</b> : de combien la loss baisserait si l'on remontait un peu la prédiction <i>en ce point</i>.</p>
+    <div class="eq"><span class="m">r</span><sub><span class="m">i</span></sub> = −∂<span class="m">L</span>(<span class="m">y</span><sub><span class="m">i</span></sub>, <span class="m">F</span>)/∂<span class="m">F</span> évalué en <span class="m">F</span> = <span class="m">F</span><sub><span class="m">m</span>−1</sub>(<span class="m">x</span><sub><span class="m">i</span></sub>) &nbsp;&nbsp;puis&nbsp;&nbsp; <span class="m">h</span><sub><span class="m">m</span></sub> = arbre ajusté sur (<span class="m">x</span><sub><span class="m">i</span></sub>, <span class="m">r</span><sub><span class="m">i</span></sub>) &nbsp;&nbsp;puis&nbsp;&nbsp; <span class="m">F</span><sub><span class="m">m</span></sub> = <span class="m">F</span><sub><span class="m">m</span>−1</sub> + <span class="m">ν h</span><sub><span class="m">m</span></sub></div>
+    <p>L'arbre ne fait qu'une chose : rendre ce gradient <b>utilisable ailleurs</b> qu'aux <span class="m">n</span> points où on sait le calculer. Deux mots portent tout : le gradient est pris <b>au modèle cumulé</b>, et il est pris <b>de la loss</b> — pas d'un résidu, pas du dernier arbre (<a href="../bridges/bridge-01-une-seule-descente.html#s4">b01 pas 4</a>).</p>
+    <p class="say">« La loss est une fonction de la prédiction en chaque point, donc son gradient négatif dit dans quel sens corriger chaque point, donc un arbre ajusté sur ces nombres est un pas de descente, donc le boosting descend la loss dans l'espace des fonctions. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le premier arbre, et le piège</div>
+    <p>Cible du premier arbre : (−2 ; −1 ; 0 ; +3). La souche qui minimise la SSE de ces nombres coupe en <span class="m">x</span> ≤ 3 :</p>
+    <table>
+      <tr><th>coupure</th><th>feuille gauche</th><th>feuille droite</th><th>SSE</th></tr>
+      <tr><td><span class="m">x</span> ≤ 1</td><td>−2</td><td>+0,667</td><td>8,667</td></tr>
+      <tr><td><span class="m">x</span> ≤ 2</td><td>−1,5</td><td>+1,5</td><td>5,000</td></tr>
+      <tr class="hl"><td><span class="m">x</span> ≤ 3</td><td><b>−1</b></td><td><b>+3</b></td><td><b>2,000</b></td></tr>
+    </table>
+    <p>Donc <span class="m">h</span><sub>1</sub> = (−1 ; −1 ; −1 ; +3). À <span class="m">ν</span> = 0,1 : <span class="m">F</span><sub>1</sub> = (2,9 ; 2,9 ; 2,9 ; 3,3), RSS 14 → <b>11,72</b>.</p>
+    <p><b>Le piège, en chiffres.</b> La cible du deuxième arbre est <span class="m">y</span> − <span class="m">F</span><sub>1</sub> = (−1,9 ; −0,9 ; +0,1 ; +2,7). Ce que beaucoup récitent — « les résidus laissés par <span class="m">h</span><sub>1</sub> », soit <span class="m">r</span><sub>1</sub> − <span class="m">h</span><sub>1</sub> = (−1 ; 0 ; +1 ; 0) — n'a <b>aucune</b> composante en commun avec elle. Les deux ne coïncideraient qu'à <span class="m">ν</span> = 1 : c'est ce qui rend la confusion durable.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Quadratique ⇒ les résidus, et seulement là</h3>
+    <p>Une seule loss fait coïncider le gradient négatif avec le résidu, et il faut pour cela garder le ½ :</p>
+    <div class="eq"><span class="m">L</span> = ½(<span class="m">y</span> − <span class="m">F</span>)² &nbsp;⇒&nbsp; ∂<span class="m">L</span>/∂<span class="m">F</span> = −(<span class="m">y</span> − <span class="m">F</span>) &nbsp;⇒&nbsp; <span class="m">r</span> = <span class="m">y</span> − <span class="m">F</span></div>
+    <p><b>Convention de ce dépôt</b> : le ½ est gardé <i>ici</i> pour que le pseudo-résidu soit exactement le résidu ; sans lui <span class="m">r</span> = 2(<span class="m">y</span> − <span class="m">F</span>) et le facteur 2 est absorbé par <span class="m">ν</span> — même mécanisme, chiffres doublés. Même ligne dans <a href="../bridges/bridge-01-une-seule-descente.html#s4">b01</a>. (À ne pas confondre avec la convention des pénalités, <span class="m">L</span> + <span class="m">λ</span>·pen, écrite <b>sans</b> ½.)</p>
+    <p class="say">« La dérivée de ½(y − F)² en F vaut −(y − F), donc son opposé est exactement le résidu, donc « chaque arbre ajuste les résidus » est vrai pour cette loss, donc c'est un cas particulier et non la définition. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — cinquante souches à <span class="m">ν</span> = 0,1</div>
+    <table>
+      <tr><th><span class="m">M</span></th><th><span class="m">F</span>(1)</th><th><span class="m">F</span>(2)</th><th><span class="m">F</span>(3)</th><th><span class="m">F</span>(4)</th><th>RSS</th></tr>
+      <tr><td>0</td><td>3</td><td>3</td><td>3</td><td>3</td><td>14</td></tr>
+      <tr><td>1</td><td>2,900</td><td>2,900</td><td>2,900</td><td>3,300</td><td>11,72</td></tr>
+      <tr><td>5</td><td>2,541</td><td>2,541</td><td>2,772</td><td>4,147</td><td>6,150</td></tr>
+      <tr><td>20</td><td>1,606</td><td>2,084</td><td>2,916</td><td>5,394</td><td>0,749</td></tr>
+      <tr class="hl"><td>50</td><td><b>1,080</b></td><td><b>2,007</b></td><td><b>2,988</b></td><td><b>5,925</b></td><td><b>0,0123</b></td></tr>
+    </table>
+    <p>Une souche ne sait produire que deux valeurs ; cinquante souches sommées en produisent quatre distinctes, et retrouvent (1 ; 2 ; 3 ; 6). <b>Le pouvoir d'expression est dans la somme, pas dans l'arbre.</b></p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — un arbre à la fois</div>
+    <div id="f1plot" class="wide"></div>
+    <div class="sl-ctl" id="f1ctl"></div>
+    <div id="f1sliders"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Les quatre points en rouge, <span class="m">F</span><sub><span class="m">m</span></sub> en <b>marches bleues</b>, les résidus en pointillés. Clique « arbre suivant » : la souche choisie coupe le résidu courant, et seule une fraction <span class="m">ν</span> en est ajoutée. Remonte <span class="m">ν</span> à 1 — la RSS passe de 14 à 2,0 en un arbre et sous 0,01 en dix ; redescends à 0,1 — il en faut cinquante pour arriver à 0,012. <b>Même direction à chaque fois ; seule la longueur du pas change.</b></p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Log-loss ⇒ <span class="m">y</span> − <span class="m">p</span> : on régresse quand même</h3>
+    <p>Pour classer, <span class="m">F</span> est un <b>logit</b> et <span class="m">p</span> = <span class="m">σ</span>(<span class="m">F</span>). Le gradient de la log-loss par rapport à <span class="m">F</span> est celui de <a href="chain-p03-01-critere-escalier-vs-sensible.html#s7">p03-01 pas 7</a> :</p>
+    <div class="eq">−∂<span class="m">L</span>/∂<span class="m">F</span> = <span class="m">y</span> − <span class="m">p</span> &nbsp;∈ ]−1 ; 1[ &nbsp;&nbsp;&nbsp; puis, comme toujours, &nbsp;<span class="m">h</span><sub><span class="m">m</span></sub> = arbre de <b>régression</b> sur ces <span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">p</span><sub><span class="m">i</span></sub></div>
+    <p>La cible n'est pas une étiquette mais un <b>écart de probabilité</b> : « de combien la probabilité est fausse, et dans quel sens ». Huber, quantile, Poisson donnent d'autres pseudo-résidus ; le geste, lui, ne bouge pas d'une ligne.</p>
+    <p class="say">« La cible d'un arbre est le gradient négatif de la loss, donc elle change avec la loss, donc en classification c'est y − p et non un label, donc l'arbre reste un arbre de régression. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — dix points, <span class="m">ν</span> = 0,5</div>
+    <p><span class="m">y</span> = 1 en <span class="m">x</span> = 6, 7, 9, 10 ; <span class="m">y</span> = 0 ailleurs. Taux de base <span class="m">p</span><sub>0</sub> = 0,4, donc <span class="m">F</span><sub>0</sub> = log(0,4/0,6) = <b>−0,405</b> partout.</p>
+    <table>
+      <tr><th></th><th>les 6 points <span class="m">y</span> = 0</th><th>les 4 points <span class="m">y</span> = 1</th></tr>
+      <tr><td>pseudo-résidu <span class="m">y</span> − <span class="m">p</span><sub>0</sub></td><td>−0,4</td><td>+0,6</td></tr>
+    </table>
+    <p>Meilleure souche sur ces nombres : <span class="m">x</span> ≤ 5, feuilles <b>−0,4</b> et <b>+0,4</b> (SSE 0,80 contre 1,50 en <span class="m">x</span> ≤ 8). Avec <span class="m">ν</span> = 0,5 les logits deviennent −0,605 à gauche et −0,205 à droite, soit <span class="m">p</span> = <b>0,353</b> et <b>0,449</b>. Log-loss moyenne : 0,673 → <b>0,598</b>.</p>
+    <p><b>Le point à contre-courant.</b> <span class="m">x</span> = 8 porte <span class="m">y</span> = 0 mais tombe dans la feuille droite : son pseudo-résidu <i>grandit</i>, de −0,400 à <b>−0,449</b>. Il réclamera plus fort au tour suivant — c'est le mécanisme, et c'est déjà la limite du pas 8.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3><span class="m">ν</span> : le pas, et une régularisation <span class="tag tronc">tronc</span></h3>
+    <p><span class="m">ν</span> ∈ ]0 ; 1] : chaque arbre ne corrige qu'une <b>fraction</b> de ce qu'il voit. C'est le <span class="m">η</span> de <a href="chain-p03-02-gradient-descente.html#s3">p03-02 pas 3</a>, avec un rôle de plus.</p>
+    <p>Un arbre ajusté sur le résidu courant ajuste aussi le <b>bruit</b> du résidu courant. À <span class="m">ν</span> = 1 cette part de bruit entre entièrement dans <span class="m">F</span> et aucun arbre suivant ne la reprendra (H1 : rien n'est réajusté). À <span class="m">ν</span> petit, chaque arbre n'en verse qu'un dixième et les suivants corrigent le reste : le modèle final est une moyenne implicite de beaucoup d'avis, au lieu de la somme de quelques-uns.</p>
+    <p class="say">« Un pas complet verse dans F tout le bruit du résidu courant, donc rien ne le reprendra ensuite, donc on prend un pas partiel et plus d'arbres, donc ν est à la fois le taux d'apprentissage et une régularisation. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le fil rouge aux deux vitesses</div>
+    <table>
+      <tr><th>RSS après <span class="m">M</span> arbres</th><th>1</th><th>3</th><th>5</th><th>10</th><th>50</th></tr>
+      <tr><td><span class="m">ν</span> = 0,1</td><td>11,72</td><td>8,377</td><td>6,150</td><td>2,958</td><td>0,0123</td></tr>
+      <tr class="hl"><td><span class="m">ν</span> = 1</td><td>2,000</td><td>0,519</td><td>0,107</td><td>0,0081</td><td>≈ 0</td></tr>
+    </table>
+    <p>Sur ces quatre points <b>sans bruit</b>, <span class="m">ν</span> = 1 est simplement plus rapide, et c'est très bien. L'arbitrage n'apparaît que quand <span class="m">y</span> contient du bruit : la figure 2 rejoue exactement la même comparaison sur quarante points bruités, et le classement s'inverse.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>La profondeur fixe l'ordre des interactions</h3>
+    <p>Une somme de <b>souches</b> est une somme de fonctions d'<b>une seule</b> variable à la fois : un modèle additif, incapable par construction de dire « si <span class="m">x</span><sub>1</sub> est grand <i>et</i> <span class="m">x</span><sub>2</sub> petit ». Un arbre de profondeur <span class="m">d</span> teste <span class="m">d</span> questions avant de prédire, donc exprime des interactions d'ordre <span class="m">d</span>.</p>
+    <p>D'où le réglage usuel <b>3 à 6</b> : assez pour les interactions utiles, assez court pour que le biais reste à réduire par la somme et non par l'arbre. Plus profond n'ajoute pas de la finesse, ça ajoute de la variance (<a href="chain-p07-01-arbres-impurete.html#s5">p07-01 pas 5</a>) — et c'est l'exact miroir de la forêt, qui veut des arbres profonds parce qu'elle ne sait baisser que la variance (<a href="chain-p07-02-bagging-rf.html#s7">p07-02 pas 7</a>).</p>
+    <p class="say">« Une souche ne voit qu'une variable à la fois, donc une somme de souches est un modèle additif, donc il faut une profondeur d pour exprimer une interaction d'ordre d, donc on règle la profondeur sur l'ordre des interactions attendues et non sur la précision voulue. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le XOR, en quatre points</div>
+    <p><span class="m">x</span><sub>1</sub>, <span class="m">x</span><sub>2</sub> ∈ {0, 1} et <span class="m">y</span> = 1 si exactement l'une des deux vaut 1. Cible <b>purement</b> interactive : chaque variable prise seule ne dit rien.</p>
+    <table>
+      <tr><th>(<span class="m">x</span><sub>1</sub>, <span class="m">x</span><sub>2</sub>)</th><th>(0,0)</th><th>(0,1)</th><th>(1,0)</th><th>(1,1)</th><th>RSS</th></tr>
+      <tr><td><span class="m">y</span></td><td>0</td><td>1</td><td>1</td><td>0</td><td>—</td></tr>
+      <tr><td>somme de souches, au mieux</td><td>0,5</td><td>0,5</td><td>0,5</td><td>0,5</td><td><b>1</b></td></tr>
+      <tr class="hl"><td>un arbre de profondeur 2</td><td>0</td><td>1</td><td>1</td><td>0</td><td><b>0</b></td></tr>
+    </table>
+    <p>Le meilleur modèle additif <span class="m">α</span> + <span class="m">β</span><sub>1</sub><span class="m">x</span><sub>1</sub> + <span class="m">β</span><sub>2</sub><span class="m">x</span><sub>2</sub> a pour solution des moindres carrés <span class="m">α</span> = 0,5 et <span class="m">β</span><sub>1</sub> = <span class="m">β</span><sub>2</sub> = <b>0</b> : il prédit la moyenne partout. Mille souches n'y changent rien — <b>ce n'est pas un manque d'arbres, c'est un manque de profondeur.</b></p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3><span class="m">M</span> : le seul réglage qui se lit sur une courbe</h3>
+    <p>La loss <b>d'entraînement</b> décroît à chaque arbre, toujours : on la descend par construction. La loss de <b>validation</b> fait un U (<a href="chain-p06-01-biais-variance.html#s6">p06-01 pas 6</a>, <a href="../bridges/bridge-03-biais-variance-partout.html">b03</a>). On prend le <span class="m">M</span> du minimum, mesuré et non choisi : c'est l'<b>arrêt anticipé</b>.</p>
+    <p>Autour, tous les autres boutons sont des boutons de <b>variance</b> posés sur un procédé qui, lui, attaque le biais : sous-échantillonner les lignes à chaque arbre (<i>stochastic gradient boosting</i>), sous-échantillonner les colonnes, pénaliser les valeurs de feuille, limiter le nombre de feuilles.</p>
+    <p class="say">« La loss d'entraînement décroît à chaque arbre par construction, donc elle ne peut pas servir à choisir M, donc on lit le minimum de la validation, donc M est mesuré et non réglé. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — quarante points bruités</div>
+    <p><span class="m">y</span> = sin(2<span class="m">πx</span>) + bruit d'écart-type 0,45, <span class="m">n</span> = 40 en entraînement, 200 en validation, souches, <span class="m">M</span> jusqu'à 200.</p>
+    <table>
+      <tr><th></th><th><span class="m">M</span> du min</th><th>val. au min</th><th>val. à <span class="m">M</span>=200</th><th>train à <span class="m">M</span>=200</th></tr>
+      <tr class="hl"><td><span class="m">ν</span> = 0,1</td><td><b>98</b></td><td><b>0,257</b></td><td>0,269</td><td>0,064</td></tr>
+      <tr><td><span class="m">ν</span> = 1</td><td>7</td><td>0,272</td><td>0,334</td><td>0,011</td></tr>
+    </table>
+    <p>Le pas court gagne sur les deux tableaux : son minimum arrive <b>plus tard</b> (98 contre 7) et <b>plus bas</b> (0,257 contre 0,272). À <span class="m">ν</span> = 1, la train tombe à 0,011 — six fois moins que l'autre — pendant que la validation remonte à 0,334 : la loss d'entraînement ne dit <b>rien</b> de ce qui se passe.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — le U de la validation, aux deux vitesses</div>
+    <div id="f2plot" class="wide"></div>
+    <div id="f2sliders"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Quatre courbes : train et validation, pour <span class="m">ν</span> = 0,1 et <span class="m">ν</span> = 1. Les deux <b>train</b> (violet, ambre) descendent sans jamais remonter. Les deux <b>validation</b> (bleu, rouge) font un U, dont le creux est marqué. Fais glisser <span class="m">M</span> : à <span class="m">M</span> = 7 le rouge est à son minimum et le bleu encore loin du sien ; à <span class="m">M</span> = 200 le rouge est remonté de 23 %, le bleu de 5 %. <b>Un pas court décale le creux vers la droite et le descend.</b></p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Forêt ou boosting : la question est le bruit des labels <span class="tag tronc">tronc</span></h3>
+    <p>Les deux ensemblent des arbres, et c'est tout ce qu'ils ont en commun. La forêt <b>moyenne</b> : un label faux entre dans une minorité d'arbres et se dilue dans le vote. Le boosting <b>corrige</b> : un label faux produit à chaque étape un pseudo-résidu qui ne se résorbe pas, et reçoit donc une correction à chaque étape (pas 4, le point <span class="m">x</span> = 8).</p>
+    <p>Bien réglé sur des labels propres, le boosting gagne presque toujours — c'est un procédé qui baisse le biais, et la forêt plafonne à <span class="m">ρσ</span>² (<a href="chain-p07-02-bagging-rf.html#s4">p07-02 pas 4</a>). Le prix est le nombre de boutons : <span class="m">ν</span>, la profondeur, <span class="m">M</span>, et un jeu de validation pour les régler.</p>
+    <p class="say">« La forêt moyenne et dilue un label faux, donc le boosting le corrige et le poursuit, donc sur des labels propres le boosting gagne, donc sur des labels bruités la forêt est le choix sûr. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — la table, et 10 % de labels retournés</div>
+    <table>
+      <tr><th></th><th>forêt aléatoire</th><th>gradient boosting</th></tr>
+      <tr><td>ce qu'elle baisse</td><td>la <b>variance</b></td><td>le <b>biais</b></td></tr>
+      <tr><td>composants</td><td>arbres <b>profonds</b>, faible biais</td><td>arbres <b>courts</b>, fort biais</td></tr>
+      <tr><td>comment</td><td>moyenne / vote</td><td>somme séquentielle</td></tr>
+      <tr><td>arbres indépendants</td><td>oui — parallélisable</td><td>non — l'arbre <span class="m">m</span> attend <span class="m">m</span>−1</td></tr>
+      <tr><td>ajouter des arbres</td><td>ne nuit jamais (plafond <span class="m">ρσ</span>²)</td><td>finit par nuire (le U)</td></tr>
+      <tr class="hl"><td>labels bruités</td><td><b>dilue</b></td><td><b>poursuit</b></td></tr>
+    </table>
+    <p>Simulation : frontière sinusoïdale dans le carré unité, 120 points d'entraînement dont <b>10 % d'étiquettes retournées</b>, 500 points de test propres. Forêt de 25 arbres profonds contre 200 arbres de profondeur 2 à <span class="m">ν</span> = 0,3, <b>sans arrêt anticipé</b>. Sur 100 tirages (les 25 de l’ouverture, puis trois fois « tirer 25 ») : erreur test moyenne <b>8,9 %</b> pour la forêt, <b>10,9 %</b> pour le boosting, qui est le pire des deux dans <b>82 tirages sur 100</b>.</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — deux ensembles sur des labels bruités</div>
+    <div id="f3plot" class="wide"></div>
+    <div class="sl-ctl" id="f3ctl"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Chaque tirage rejoue tout : un jeu d'entraînement, 10 % de labels retournés, une forêt, un boosting, deux erreurs de test. <b>Barres pleines</b> : la forêt. <b>Contour rouge</b> : le boosting. Les traits épais marquent les deux moyennes. Tire une centaine de fois : les deux histogrammes se chevauchent largement — ce n'est pas une catastrophe, c'est un décalage —, mais celui du boosting est franchement à droite. <b>Un arrêt anticipé sur validation en récupérerait l'essentiel : ici, exprès, il n'y en a pas.</b></p>
+  </div>
+</div>
+
+<div class="step" id="s9">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Le boosting est le procédé le plus précis du ML tabulaire et le plus facile à mal régler. Trois de ses quatre limites ont la même racine : il <b>corrige</b>, donc il corrige aussi ce qui n'aurait pas dû l'être.</p>
+    <p class="say">« Chaque arbre corrige ce que le cumul laisse, donc ce qu'un point faux laisse ne se résorbe jamais, donc il reçoit une correction à chaque étape, donc le remède est de borner la loss ou de s'arrêter tôt. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>Labels bruités et outliers.</b> La log-loss n'est pas bornée (<a href="chain-p03-01-critere-escalier-vs-sensible.html#s10">p03-01, casse</a>) et la quadratique pèse le carré de l'écart : un point faux appelle une correction à chaque étape et finit par déplacer la frontière. Remèdes : <b>Huber</b> ou <b>quantile</b> en régression, arrêt anticipé, sous-échantillonnage — ou la forêt, qui dilue.</li>
+      <li><b>Profond et pressé.</b> Grande profondeur <i>et</i> <span class="m">ν</span> grand mémorisent en quelques dizaines d'arbres : la train tombe, la validation remonte, et <b>ajouter des arbres n'y change rien</b> — ce n'est pas <span class="m">M</span> qui est mal réglé. Baisser <span class="m">ν</span> et la profondeur, dans cet ordre.</li>
+      <li><b>Séquentiel par construction (H1).</b> Aucun parallélisme <i>entre</i> arbres ; seul le choix des coupures dans un arbre se parallélise. À nombre d'arbres égal, un boosting s'entraîne plus lentement qu'une forêt, et une forêt reste le premier modèle à essayer.</li>
+      <li><b>« Chaque arbre ajuste les résidus du précédent ».</b> Faux deux fois : hors loss quadratique il n'y a pas de résidu (pas 4), et même en quadratique le gradient est pris au <b>modèle cumulé</b>, pas au dernier arbre (pas 2). La formulation exacte est la seule à retenir : <i>le gradient négatif de la loss, évalué au modèle cumulé</i>.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li><span class="m">F</span><sub><span class="m">M</span></sub> = <span class="m">F</span><sub>0</sub> + <span class="m">ν</span> Σ <span class="m">h</span><sub><span class="m">m</span></sub> : modèle <b>additif</b>, construit <b>séquentiellement</b>, à partir de composants faibles.</li>
+    <li>Chaque arbre ajuste <span class="m">r</span><sub><span class="m">i</span></sub> = −∂<span class="m">L</span>/∂<span class="m">F</span> pris <b>au modèle cumulé</b> : une descente de gradient dont la variable est la fonction (<a href="../bridges/bridge-01-une-seule-descente.html#s4">b01</a>).</li>
+    <li>Quadratique avec ½ ⇒ le résidu <span class="m">y</span> − <span class="m">F</span> ; log-loss ⇒ <span class="m">y</span> − <span class="m">p</span> ; dans tous les cas un arbre de <b>régression</b>.</li>
+    <li><span class="m">ν</span> est le pas <b>et</b> une régularisation : petit <span class="m">ν</span>, beaucoup d'arbres — le creux de validation se décale à droite et descend.</li>
+    <li>La <b>profondeur</b> fixe l'ordre des interactions (3 à 6) ; le biais est réduit par la somme, pas par l'arbre.</li>
+    <li><span class="m">M</span> se lit au minimum de la validation (arrêt anticipé) ; forêt si les labels sont bruités, boosting s'ils sont propres et le réglage soigné.</li>
+  </ol>
+</div>
+<div class="phrase">« Le gradient boosting est une descente de gradient où la variable est la fonction : à chaque étape j'ajuste un petit arbre sur le gradient négatif de la loss au modèle cumulé — les résidus pour une loss quadratique, <span class="m">y</span> moins <span class="m">p</span> pour la log-loss — et j'ajoute une fraction <span class="m">ν</span> de cet arbre. <span class="m">ν</span> est à la fois le pas et la régularisation, la profondeur fixe l'ordre des interactions, le nombre d'arbres se choisit par arrêt anticipé. La forêt dilue le bruit, le boosting le poursuit : c'est le critère de choix. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Que cible exactement le <span class="m">m</span>-ième arbre ?</div><div class="a hid">−∂<span class="m">L</span>/∂<span class="m">F</span> évalué au modèle cumulé <span class="m">F</span><sub><span class="m">m</span>−1</sub>, point d'entraînement par point d'entraînement. Ni un résidu d'arbre, ni une étiquette.</div></li>
+    <li><div class="q">Pourquoi dit-on « les résidus », et quand est-ce vrai ?</div><div class="a hid">Uniquement pour <span class="m">L</span> = ½(<span class="m">y</span> − <span class="m">F</span>)², où −∂<span class="m">L</span>/∂<span class="m">F</span> = <span class="m">y</span> − <span class="m">F</span>. Cas particulier, pas définition — et le résidu est celui du cumul, pas du dernier arbre.</div></li>
+    <li><div class="q">Et en classification ?</div><div class="a hid"><span class="m">F</span> est un logit, <span class="m">p</span> = <span class="m">σ</span>(<span class="m">F</span>), pseudo-résidu <span class="m">y</span> − <span class="m">p</span> : un écart de probabilité. L'arbre reste un arbre de régression.</div></li>
+    <li><div class="q">Que fait <span class="m">ν</span>, et pourquoi le prendre petit ?</div><div class="a hid">C'est le pas de la descente. Petit, chaque arbre ne verse qu'une fraction du bruit du résidu courant et les suivants le corrigent : creux de validation plus tardif et plus bas.</div></li>
+    <li><div class="q">Arbres courts ou profonds, et pourquoi pas comme la forêt ?</div><div class="a hid">Courts : la profondeur <span class="m">d</span> ne sert qu'à exprimer des interactions d'ordre <span class="m">d</span>, le biais étant réduit par la somme. La forêt veut des arbres profonds, elle ne sait baisser que la variance.</div></li>
+    <li><div class="q">Labels bruités : forêt ou boosting ?</div><div class="a hid">Forêt. Elle moyenne, donc elle dilue le label faux ; le boosting lui envoie une correction à chaque étape. À défaut : Huber, quantile, arrêt anticipé.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="../bridges/bridge-01-une-seule-descente.html#s4"><b>b01 — Une seule descente</b><small>le même pas −<span class="m">η</span>·gradient sur un vecteur, sur une fonction (ici), sur des centroïdes, sur des poids : l'habit 2 est cette chaîne réduite à son squelette</small></a>
+    <a href="../bridges/bridge-03-biais-variance-partout.html"><b>b03 — Biais-variance partout</b><small>bagging et boosting sont deux étages du même tableau : l'un baisse la variance, l'autre le biais, et le U de validation est le même U</small></a>
+    <a href="../bridges/bridge-05-escalier-vs-sensible.html"><b>b05 — Escalier vs sensible</b><small>H3 en est un cas : une loss en marches n'a pas de gradient à donner à l'arbre, donc pas de boosting possible dessus</small></a>
+    <a href="chain-p07-02-bagging-rf.html#s7"><b>p07-02 — Bagging et forêt aléatoire</b><small>la sheet sœur : c'est elle qui démontre que moyenner ne touche pas au biais, et donc pourquoi les arbres sont profonds là-bas et courts ici</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>ml::boosting</code> (modèle additif séquentiel, composants faibles) · <code>ml::gradient-boosting</code> (la cible est −∂<span class="m">L</span>/∂<span class="m">F</span> au modèle cumulé ; <span class="m">y</span> − <span class="m">p</span> en classification) · <code>ml::learning-rate</code> (<span class="m">ν</span> pas et régularisation ; petit <span class="m">ν</span> + grand <span class="m">M</span>) · <code>ml::rf-vs-gb</code> (variance vs biais, profond vs court, dilue vs poursuit).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p07-03 · v1 du 17/09/2026 · Prérequis : p03-02, p07-01, p02-01, p03-01. Suite : <a href="../../map.html#p07-04">p07-04 k-means</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outils communs aux figures ===== */
+/* mulberry32 : générateur 32 bits exactement reproductible (Math.imul), pour que la
+   figure rejoue la simulation vérifiée hors ligne et non un tirage différent à chaque visite. */
+function rng(seed){let a=seed>>>0;return function(){a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;};}
+function gauss(u){const a=Math.max(1e-12,u()),b=u();return Math.sqrt(-2*Math.log(a))*Math.cos(2*Math.PI*b);}
+function courbe(P,arr,cls,hote){let d='';for(let i=0;i<arr.length;i++){d+=(i?' L':'M')+P.sx(i+1).toFixed(1)+' '+P.sy(arr[i]).toFixed(1);}
+  return SL.el('path',{d,class:'sl-fn '+cls,fill:'none'},hote||P.layer);}
+function ro(hote,items){hote.innerHTML='';items.forEach(it=>{const d=document.createElement('div');if(it[2])d.className=it[2];d.innerHTML=it[0]+'<b>'+it[1]+'</b>';hote.appendChild(d);});}
+
+/* ===== Figure 1 : le fil rouge, un arbre à la fois ===== */
+(function(){
+const X=[1,2,3,4], Y=[1,2,3,6];
+function souche(r){let best=null;
+  for(const s of [1,2,3]){const L=[],R=[];X.forEach((x,i)=>(x<=s?L:R).push(i));
+    const mL=L.reduce((a,i)=>a+r[i],0)/L.length, mR=R.reduce((a,i)=>a+r[i],0)/R.length;
+    const sse=L.reduce((a,i)=>a+(r[i]-mL)*(r[i]-mL),0)+R.reduce((a,i)=>a+(r[i]-mR)*(r[i]-mR),0);
+    if(!best||sse<best.sse-1e-12)best={sse,s,mL,mR};}
+  return best;}
+const P=SL.plot(document.getElementById('f1plot'),{x:[.3,4.7],y:[0,7],w:600,h:290,xt:[1,2,3,4],yt:[0,2,4,6],xl:'x',yl:'y'});
+const out=document.getElementById('f1out');
+let F=[3,3,3,3], m=0, nu=.1, coupe=null;
+function reset(){F=[3,3,3,3];m=0;coupe=null;}
+function pas(){const r=Y.map((y,i)=>y-F[i]);const b=souche(r);
+  F=F.map((v,i)=>v+nu*(X[i]<=b.s?b.mL:b.mR));m++;coupe=b.s;}
+function dessine(){P.clear();
+  for(let i=0;i<4;i++){P.seg(X[i]-.42,F[i],X[i]+.42,F[i],'slope sl-c1');
+    P.seg(X[i],F[i],X[i],Y[i],'chord');P.dot(X[i],Y[i],'sl-c3',5.5);}
+  P.text(1.05,6.6,'F'+(m?'ₘ ('+m+' arbres)':'₀'),'sl-c1','start');
+  const rss=Y.reduce((a,y,i)=>a+(y-F[i])*(y-F[i]),0);
+  const r=Y.map((y,i)=>y-F[i]);
+  ro(out,[['arbres <span class="m">M</span>','&nbsp;'+m],['RSS',SL.fmt(rss,rss<1?4:3)],
+    ['dernière coupure',coupe===null?'—':'x ≤ '+coupe],
+    ['cible du prochain arbre','('+r.map(v=>SL.fmt(v,2)).join(' ; ')+')']]);}
+const ctl=document.getElementById('f1ctl');
+function bouton(t,f){const b=document.createElement('button');b.className='tb';b.textContent=t;b.onclick=f;ctl.appendChild(b);return b;}
+bouton('arbre suivant',()=>{if(m<200){pas();dessine();}});
+bouton('+ 10 arbres',()=>{for(let k=0;k<10&&m<200;k++)pas();dessine();});
+bouton('recommencer',()=>{reset();dessine();});
+SL.slider(document.getElementById('f1sliders'),{label:'pas ν',min:.05,max:1,step:.05,value:.1},v=>{nu=v;reset();dessine();});
+})();
+
+/* ===== Figure 2 : train et validation en fonction de M ===== */
+(function(){
+function souche1(xs,r){const n=xs.length;const o=xs.map((v,i)=>i).sort((a,b)=>xs[a]-xs[b]);
+  let tot=0;for(let i=0;i<n;i++)tot+=r[i];
+  let sl=0,best=null;
+  for(let k=0;k<n-1;k++){sl+=r[o[k]];if(xs[o[k+1]]===xs[o[k]])continue;const c=k+1;
+    const sc=sl*sl/c+(tot-sl)*(tot-sl)/(n-c);
+    if(!best||sc>best.sc)best={sc,t:(xs[o[k]]+xs[o[k+1]])/2,mL:sl/c,mR:(tot-sl)/(n-c)};}
+  if(!best){const mm=tot/n;return {t:xs[0],mL:mm,mR:mm};}
+  return best;}
+function boost(xtr,ytr,xva,yva,nu,M){
+  const n=xtr.length,nv=xva.length;let F0=0;for(let i=0;i<n;i++)F0+=ytr[i];F0/=n;
+  const Ftr=new Array(n).fill(F0),Fva=new Array(nv).fill(F0),tr=[],va=[];
+  for(let m=0;m<M;m++){const r=new Array(n);for(let i=0;i<n;i++)r[i]=ytr[i]-Ftr[i];
+    const b=souche1(xtr,r);
+    for(let i=0;i<n;i++)Ftr[i]+=nu*(xtr[i]<=b.t?b.mL:b.mR);
+    for(let j=0;j<nv;j++)Fva[j]+=nu*(xva[j]<=b.t?b.mL:b.mR);
+    let a=0;for(let i=0;i<n;i++)a+=(ytr[i]-Ftr[i])*(ytr[i]-Ftr[i]);tr.push(a/n);
+    let c=0;for(let j=0;j<nv;j++)c+=(yva[j]-Fva[j])*(yva[j]-Fva[j]);va.push(c/nv);}
+  return {tr,va};}
+const u=rng(20260917), n=40, M=200, f=x=>Math.sin(2*Math.PI*x);
+const xtr=[],ytr=[];for(let i=0;i<n;i++){const x=i/(n-1);xtr.push(x);ytr.push(f(x)+.45*gauss(u));}
+const xva=[],yva=[];for(let j=0;j<200;j++)xva.push(u());
+for(let j=0;j<200;j++)yva.push(f(xva[j])+.45*gauss(u));
+const A=boost(xtr,ytr,xva,yva,.1,M), B=boost(xtr,ytr,xva,yva,1,M);
+const iA=A.va.indexOf(Math.min(...A.va)), iB=B.va.indexOf(Math.min(...B.va));
+const P=SL.plot(document.getElementById('f2plot'),{x:[0,M],y:[0,.82],w:600,h:310,
+  xt:[0,50,100,150,200],yt:[.1,.2,.3,.4,.5,.6,.7],xl:'M (nombre d’arbres)',yl:'erreur quadratique moyenne'});
+courbe(P,A.va,'sl-c1');courbe(P,A.tr,'sl-c2');courbe(P,B.va,'sl-c3');courbe(P,B.tr,'sl-c5');
+P.label(M-4,A.va[M-1]+.032,'validation ν = 0,1','sl-c1','end');
+P.label(M-4,A.tr[M-1]+.032,'train ν = 0,1','sl-c2','end');
+P.label(M-4,B.va[M-1]+.032,'validation ν = 1','sl-c3','end');
+P.label(45,B.tr[44]+.045,'train ν = 1','sl-c5','start');
+const out=document.getElementById('f2out');
+function dessine(k){const i=Math.max(1,Math.round(k))-1;P.clear();
+  P.seg(iA+1,0,iA+1,A.va[iA],'slope sl-c1');P.dot(iA+1,A.va[iA],'sl-c1',6);
+  P.seg(iB+1,0,iB+1,B.va[iB],'slope sl-c3');P.dot(iB+1,B.va[iB],'sl-c3',6);
+  P.vline(i+1,'');
+  P.dot(i+1,A.va[i],'sl-c1 hollow',4.5);P.dot(i+1,A.tr[i],'sl-c2 hollow',4.5);
+  P.dot(i+1,B.va[i],'sl-c3 hollow',4.5);P.dot(i+1,B.tr[i],'sl-c5 hollow',4.5);
+  ro(out,[['ν = 0,1 · val. / train',SL.fmt(A.va[i],3)+' / '+SL.fmt(A.tr[i],3)],
+    ['ν = 1 · val. / train',SL.fmt(B.va[i],3)+' / '+SL.fmt(B.tr[i],3)],
+    ['creux de validation ν = 0,1','M = '+(iA+1)+' · '+SL.fmt(A.va[iA],3),'pos'],
+    ['creux de validation ν = 1','M = '+(iB+1)+' · '+SL.fmt(B.va[iB],3),'zero']]);}
+SL.slider(document.getElementById('f2sliders'),{label:'M',min:1,max:M,step:1,value:7,fmt:v=>SL.fmt(v,0)},dessine);
+})();
+
+/* ===== Figure 3 : forêt vs boosting sur 10 % de labels retournés ===== */
+(function(){
+const NTR=120,B=25,MB=200,NU=.3,FLIP=.10,NTE=500;
+const vrai=(a,b)=>b>.5+.25*Math.sin(2*Math.PI*a)?1:0;
+function bati(X,y,idx,prof,maxd,mtry,u){
+  const n=idx.length;let mean=0;for(const i of idx)mean+=y[i];mean/=n;
+  if(prof>=maxd||n<2)return {f:-1,v:mean};
+  const feats=mtry<2?[u()<.5?0:1]:[0,1];
+  let best=null;
+  for(const ff of feats){const o=idx.slice().sort((a,b)=>X[a][ff]-X[b][ff]);
+    let tot=0;for(const i of o)tot+=y[i];let sl=0;
+    for(let k=0;k<n-1;k++){sl+=y[o[k]];if(X[o[k+1]][ff]===X[o[k]][ff])continue;const c=k+1;
+      const sc=sl*sl/c+(tot-sl)*(tot-sl)/(n-c);
+      if(!best||sc>best.sc+1e-12)best={sc,f:ff,t:(X[o[k]][ff]+X[o[k+1]][ff])/2};}}
+  if(!best)return {f:-1,v:mean};
+  const L=[],R=[];for(const i of idx)(X[i][best.f]<=best.t?L:R).push(i);
+  if(!L.length||!R.length)return {f:-1,v:mean};
+  return {f:best.f,t:best.t,L:bati(X,y,L,prof+1,maxd,mtry,u),R:bati(X,y,R,prof+1,maxd,mtry,u)};}
+function pred(t,x){while(t.f>=0)t=x[t.f]<=t.t?t.L:t.R;return t.v;}
+const ut=rng(999),Xte=[],yte=[];
+for(let j=0;j<NTE;j++){const p=[ut(),ut()];Xte.push(p);yte.push(vrai(p[0],p[1]));}
+function tirage(u){
+  const X=[],y=[];
+  for(let i=0;i<NTR;i++){const p=[u(),u()];X.push(p);y.push(vrai(p[0],p[1]));}
+  for(let i=0;i<NTR;i++)if(u()<FLIP)y[i]=1-y[i];
+  const votes=new Array(NTE).fill(0);
+  for(let b=0;b<B;b++){const idx=[];for(let i=0;i<NTR;i++)idx.push(Math.floor(u()*NTR));
+    const t=bati(X,y,idx,0,12,1,u);
+    for(let j=0;j<NTE;j++)votes[j]+=pred(t,Xte[j]);}
+  let eF=0;for(let j=0;j<NTE;j++)if((votes[j]/B>.5?1:0)!==yte[j])eF++;
+  let p0=0;for(let i=0;i<NTR;i++)p0+=y[i];p0/=NTR;
+  const F0=Math.log(Math.max(1e-6,p0)/Math.max(1e-6,1-p0));
+  const Ftr=new Array(NTR).fill(F0),Fte=new Array(NTE).fill(F0),ai=[];
+  for(let i=0;i<NTR;i++)ai.push(i);
+  for(let m=0;m<MB;m++){const r=new Array(NTR);
+    for(let i=0;i<NTR;i++)r[i]=y[i]-1/(1+Math.exp(-Ftr[i]));
+    const t=bati(X,r,ai,0,2,2,u);
+    for(let i=0;i<NTR;i++)Ftr[i]+=NU*pred(t,X[i]);
+    for(let j=0;j<NTE;j++)Fte[j]+=NU*pred(t,Xte[j]);}
+  let eB=0;for(let j=0;j<NTE;j++)if((Fte[j]>0?1:0)!==yte[j])eB++;
+  return [eF/NTE,eB/NTE];}
+const u=rng(2026),EF=[],EB=[];let pire=0;
+const B0=.02,B1=.22,K=20,bw=(B1-B0)/K;
+const P=SL.plot(document.getElementById('f3plot'),{x:[B0,B1],y:[0,1.1],w:600,h:260,
+  xt:[.04,.08,.12,.16,.20],xl:'erreur de test',yl:'fréquence'});
+const out=document.getElementById('f3out');
+function hist(a){const c=new Array(K).fill(0);
+  a.forEach(v=>{const i=Math.min(K-1,Math.max(0,Math.floor((v-B0)/bw)));c[i]++;});return c;}
+function dessine(){P.clear();
+  if(!EF.length){ro(out,[['tirages','0'],['forêt','—'],['boosting','—'],['boosting pire','—']]);return;}
+  const cF=hist(EF),cB=hist(EB),mx=Math.max(1,...cF,...cB);
+  cF.forEach((v,i)=>{if(!v)return;const x=B0+i*bw;
+    SL.el('rect',{x:P.sx(x)+1,y:P.sy(v/mx),width:Math.max(1,P.sx(x+bw)-P.sx(x)-2),
+      height:P.sy(0)-P.sy(v/mx),class:'sl-bar'},P.dyn);});
+  let d='M'+P.sx(B0).toFixed(1)+' '+P.sy(0).toFixed(1);
+  cB.forEach((v,i)=>{const x=B0+i*bw;d+=' L'+P.sx(x).toFixed(1)+' '+P.sy(v/mx).toFixed(1)+
+    ' L'+P.sx(x+bw).toFixed(1)+' '+P.sy(v/mx).toFixed(1);});
+  d+=' L'+P.sx(B1).toFixed(1)+' '+P.sy(0).toFixed(1);
+  SL.el('path',{d,class:'sl-fn sl-c3',fill:'none'},P.dyn);
+  const mF=EF.reduce((a,b)=>a+b,0)/EF.length, mB=EB.reduce((a,b)=>a+b,0)/EB.length;
+  P.seg(mF,0,mF,1.02,'slope sl-c2');P.seg(mB,0,mB,1.02,'slope sl-c3');
+  P.text(mF-.002,1.06,'forêt','sl-c2','end');P.text(mB+.002,1.06,'boosting','sl-c3','start');
+  ro(out,[['tirages',String(EF.length)],['forêt · erreur test',SL.fmt(100*mF,1)+' %','pos'],
+    ['boosting · erreur test',SL.fmt(100*mB,1)+' %','zero'],
+    ['boosting pire dans',pire+' / '+EF.length]]);}
+function tirer(n){let i=0;const lot=SL.reduced?n:5;
+  const suite=()=>{for(let k=0;k<lot&&i<n;k++,i++){const e=tirage(u);EF.push(e[0]);EB.push(e[1]);if(e[1]>e[0])pire++;}
+    dessine();if(i<n)requestAnimationFrame(suite);};suite();}
+const ctl=document.getElementById('f3ctl');
+function bouton(t,f){const b=document.createElement('button');b.className='tb';b.textContent=t;b.onclick=f;ctl.appendChild(b);}
+bouton('tirer 10',()=>tirer(10));
+bouton('tirer 25',()=>tirer(25));
+bouton('effacer',()=>{EF.length=0;EB.length=0;pire=0;dessine();});
+dessine();tirer(25);
+})();
+})();
+</script>
+</body>
+</html>
