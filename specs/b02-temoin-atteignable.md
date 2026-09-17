@@ -10,7 +10,7 @@ prereq: [p04-01, p01-04, p05-01, p07-02]
 anki: [algebre::temoin, stats::multiplicite, ml::validation]
 bridges: []
 next: b03
-status: built
+status: reviewed
 ---
 ## Le mécanisme
 Pour montrer que min_{S'} f ≤ min_S f quand S ⊂ S', il suffit d'un **témoin** : un point de S' qui vaut l'ancien optimum. Le minimum sur un ensemble plus grand ne peut pas monter. Version bruitée : le maximum de k tirages bruités est **biaisé vers le haut** — choisir le plus haut, c'est choisir aussi sa chance.
@@ -88,3 +88,5 @@ tirage pour décider — choisir, s'arrêter — elle change la loi de ce qu'ell
 c'est le cas 3 ».
 
 Porté par la sheet : la phrase du cas 3 est au pas 6 (lieu 4, le test set qui a servi à choisir).
+
+**Arbitrage de revue 4, 17/09 — validé 17/09.** « Il monte en log k » est **remplacé** par « il monte lentement : 2,16 à k = 40, 2,51 à k = 100 », dans la légende du spec et dans celle de la sheet ; √(2 ln k) n'est pas nommée. AIC / R² ajusté insuffisants à n = 5 **validé** comme intention. ρ = 0,3 de l'OOB **validé** comme hypothèse de lecture, à réaligner quand p07-02 sortira. La phrase du cas 3 est ajoutée au pas 6 (voir « Révision v2 »). Statut `reviewed`.

@@ -10,7 +10,7 @@ prereq: [p03-02, p05-01, p02-02, p07-04, p05-02, p04-03]
 anki: [ml::optimisation, ml::regression-lineaire, ml::ridge, ml::kmeans, algebre::conditionnement]
 bridges: []
 next: 
-status: built
+status: reviewed
 ---
 ## Le mécanisme
 Minimiser L revient à résoudre ∇L(θ) = 0. Si ce système est **linéaire en θ**, on le résout d'un coup (forme fermée) ; sinon on itère (p03-02). La **convexité** garantit que le point trouvé est le minimum global (stricte : unique). Le **conditionnement** dit combien d'itérations, et si la forme fermée est numériquement fiable.
@@ -72,3 +72,5 @@ Minimiser L revient à résoudre ∇L(θ) = 0. Si ce système est **linéaire en
   **Validé en revue 4** : ce fil rouge est un choix de la sheet, pas du spec, et il est retenu.
 - Le spec ne nomme pas de `next`. La sheet renvoie vers la carte ; **validé en revue 4** :
   b06 ferme la partie B, le renvoi vers la carte est le bon.
+
+**Arbitrage de revue 4, 17/09 — validé 17/09.** Fil rouge chiffré construit par la sheet **validé**. Renvoi vers la carte en pied de page **validé** : b06 ferme la partie B. Le décalage d'ancres signalé ici est **réglé** par la renumérotation de p03-01. Statut `reviewed`.

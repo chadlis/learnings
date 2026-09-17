@@ -10,7 +10,7 @@ prereq: [p03-01]
 anki: [ml::arbres, ml::logistique, stats::regularisation, ml::svm]
 bridges: []
 next: b06
-status: built
+status: reviewed
 ---
 ## Le mécanisme
 Déjà écrit en entier dans p03-01 : ce pont est la **table d'entrée**, pas une répétition. Un critère n'informe l'apprentissage que par sa pente ; les fonctions en marches (accuracy, 0/1 loss) sont muettes presque partout ; les dômes et les bols (Gini, entropie, log-loss) transmettent chaque amélioration ; les pentes qui s'annulent quelque part (L2 en 0, hinge au-delà de la marge) expliquent un comportement précis.
@@ -65,3 +65,5 @@ Gini 0,0033, entropie 0,0058. Pentes de la log-loss −σ(−m) : −0,881 / −
    débordaient à 390 px dans la colonne « application ». Les colonnes « ce que ça explique »
    et « où » sont devenues une liste sous la table : contenu identique, liens plus lisibles.
    **Validé en revue 4.**
+
+**Arbitrage de revue 4, 17/09 — validé 17/09.** Le décalage ancre / numéro affiché est **réglé à la source** : les ids de p03-01 passent en suite consécutive s1…s10, les liens entrants suivent, le validateur refuse désormais un id suffixé. Renvoi vers D4 pour la séparation parfaite **validé**. Table du pas 1 à quatre colonnes **validée**. Statut `reviewed`.

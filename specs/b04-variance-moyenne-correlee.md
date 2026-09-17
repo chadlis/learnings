@@ -10,7 +10,7 @@ prereq: [p00-02, p00-04, p07-02, p06-02, p01-05]
 anki: [ml::bagging, stats::variance, ml::validation, stats::bootstrap]
 bridges: []
 next: b05
-status: built
+status: reviewed
 ---
 ## Le mécanisme
 B variables de même variance σ², corrélées deux à deux par ρ. Var de la moyenne = (1/B²)·[B·σ² + B(B − 1)·ρσ²] = σ²/B + (B − 1)ρσ²/B = **ρσ² + (1 − ρ)σ²/B**. Quand B → ∞, il reste ρσ² : un plancher que moyenner ne franchit pas. Dérivé une fois ici, utilisé partout.
@@ -67,3 +67,5 @@ B variables de même variance σ², corrélées deux à deux par ρ. Var de la m
   Choix retenu : 1 000 lignes = 50 utilisateurs × 20, ρ = 0,2, pour que la figure 2 tire
   exactement la même expérience que la table (effet de grappe 4,80, n_eff = 208, SE × 2,19).
   **Validé en revue 4.**
+
+**Arbitrage de revue 4, 17/09 — validé 17/09.** Doublon de table avec b03 **assumé** — les ponts se recoupent, b03 porte le compromis et b04 le plancher. Borne ρ ≥ −1/(B − 1) **validée**. ρ du pas 4 et fil rouge du SE groupé **validés**. Statut `reviewed`.

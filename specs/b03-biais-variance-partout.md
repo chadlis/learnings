@@ -10,7 +10,7 @@ prereq: [p06-01, p01-01, p06-02, p07-02, p05-03, p02-03]
 anki: [ml::biais-variance, stats::estimation, ml::validation, ml::regularisation]
 bridges: []
 next: b04
-status: built
+status: reviewed
 ---
 ## Le mécanisme
 Une quantité estimée sur un tirage a un centre (biais = écart entre la moyenne sur les tirages et la vérité) et une largeur (variance). Erreur quadratique = biais² + variance (+ bruit irréductible). Presque tout réglage en ML déplace l'un contre l'autre ; l'erreur totale est en U.
@@ -75,3 +75,5 @@ Chiffres des autres échelles, tous recalculés : Bessel `n` = 25 (MSE 0,0833 / 
   souplesse, degré, 1/k, profondeur, 1/λ, τ², ν·arbres. **Validé en revue 4.**
 - **La décomposition est quadratique.** Elle n'a pas d'équivalent additif pour la 0/1 loss ;
   la sheet le pose en H1 et le redit en limite 4. **Validé en revue 4** : bon niveau de détail.
+
+**Arbitrage de revue 4, 17/09 — validé 17/09.** **Sept échelles**, boosting compris : sous-titre, chapeau et titre de section alignés sur les sept lignes de la table. « Deux intrus utiles » (n, B) **validé**. Table **validée**. Limite au coût quadratique posée en H1 **validée**. Statut `reviewed`.

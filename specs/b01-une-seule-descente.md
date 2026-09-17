@@ -10,7 +10,7 @@ prereq: [p03-02, p07-03, p07-04, p08-01]
 anki: [ml::optimisation, ml::boosting, ml::kmeans, dl::backprop]
 bridges: []
 next: b02
-status: built
+status: reviewed
 ---
 ## Le mécanisme
 Un critère L, un objet θ qui bouge, un pas : θ ← θ − η·∇L(θ). Tout ce qui change d'un domaine à l'autre est **ce qu'est θ** et **où l'on prend le gradient**. Le pas, le signal (la pente, p03-01), la condition de convergence (η < 2/courbure) et la casse (non-convexité, pas trop grand) sont les mêmes.
@@ -76,3 +76,5 @@ Lloyd 1D, neurone de p08-01, valeurs propres de A) : un seul écart.
 3. **Outillage** : `tools/validate_sheet.py` n'acceptait que des parties numériques
    (`part=(\d+)`). Les ponts vivent dans la partie « B » de `build_index.py` ; le motif est
    passé à `part=([0-9A-Z]+)`. Aucune autre sheet n'est affectée. **Validé en revue 4.**
+
+**Arbitrage de revue 4, 17/09 — validé 17/09.** La **convention de la loss du boosting est tranchée** : loss écrite avec le ½, le pseudo-résidu est le résidu, ligne reportée dans `specs/p07-03` sous « Convention » ; L affichée au pas 4 passe de 26 → 14 à 13 → 7, les cibles sont inchangées. Correction κ = 71 / 114 pas **validée**. Motif `part=([0-9A-Z]+)` du validateur **validé**. Statut `reviewed`.
