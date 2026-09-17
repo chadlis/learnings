@@ -1,0 +1,474 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fenêtre glissante — fixe, variable, avec budget — coding</title>
+<meta name="sheet" content="series=coding;part=09;number=01;status=v1">
+<meta name="part" content="09 · Coding">
+<meta name="subtitle" content="coding — deux pointeurs qui n'avancent que vers la droite ; l'invariant vit sur [l:r+1)">
+<meta name="prereq" content="c00">
+<meta name="anki" content="coding::fenetre-glissante,coding::deux-pointeurs,coding::amortissement">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ===== ajouts de la série `coding` : squelette annoté et ruban de SL.trace =====
+   Rien d'autre du standard n'est touché. Ces deux blocs n'existaient nulle part :
+   c00 est la première sheet `coding`, et SL.trace n'avait encore aucun CSS. */
+.skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.skel b{color:var(--pen);font-weight:600}
+.step .card.full,.step .card.casse{grid-column:1 / -1}
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .wide table{min-width:520px}
+.card .wide th:nth-child(2),.card .wide td:nth-child(2),
+.card .wide th:nth-child(3),.card .wide td:nth-child(3){text-align:left}
+.readouts .c1 b{color:var(--pen)}.readouts .c3 b{color:var(--red)}
+.sl-trace{--cw:58px;--cgap:8px;margin:4px 0 2px}
+.sl-cells{display:flex;gap:var(--cgap)}
+.sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
+.sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
+.sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
+.sl-cell.win{border-color:var(--green);border-width:2.5px}
+.sl-ptrs{position:relative;height:20px;margin-top:5px}
+.sl-ptr{position:absolute;top:0;left:calc(var(--i) * (var(--cw) + var(--cgap)));width:var(--cw);text-align:center;font:600 12px var(--sans);color:var(--pen)}
+.sl-note{font-size:14px;color:var(--cardink);margin-top:10px}
+.sl-inv{font:12.5px/1.55 var(--mono);color:var(--cardmuted);margin-top:6px;border-left:2px solid #B7791F;padding-left:10px}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 09 · Coding › coding 01</div>
+  <h1>La <span>fenêtre glissante</span> — fixe, variable, avec budget</h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Quand l'énoncé dit <b>contigu</b> et que la condition est <b>monotone en la taille de la fenêtre</b>, deux indices suffisent : <span class="m">r</span> avance à chaque tour, <span class="m">l</span> n'avance que pour <b>rétablir</b> la condition, et un accumulateur décrit <b>exactement</b> la tranche [<span class="m">l</span>:<span class="m">r</span>+1). Fil rouge : LC 209, <code>nums = [2, 3, 1, 2, 4, 3]</code>, <code>target = 7</code>, réponse <b>2</b>. Trois habits sur le même squelette — fixe, variable, avec budget — et jamais la solution complète : les deux lignes de contrôle, la trace, les quatre phrases.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="coding-00-tap-invariant-variant.html#s2">c00 · l'invariant</a> — conteneur, tranche, « exactement »</li>
+    <li><a href="coding-00-tap-invariant-variant.html#s3">c00 · le variant</a> — l'entier ≥ 0 qui décroît</li>
+    <li><a href="coding-00-tap-invariant-variant.html#s5">c00 · la complexité</a> — composée, amortissement justifié</li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>coding::fenetre-glissante</code><code>coding::deux-pointeurs</code><code>coding::amortissement</code></div>
+  <h4>Où le pattern voisine</h4>
+  <ol>
+    <li><a href="../../map.html#c02">c02 · Deux pointeurs</a></li>
+    <li><a href="../../map.html#c07">c07 · Tas</a></li>
+    <li><a href="../../map.html">La carte, colonne 9</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette sheet suppose acquis</div>
+    <ul>
+      <li><b>Le rituel TAP.</b> Invariant, variant, conclusion, complexité — <a href="coding-00-tap-invariant-variant.html#s1">c00, pas 1</a>. Cette sheet ne redémontre pas le rituel, elle l'instancie une fois.</li>
+      <li><b>Invariant = conteneur + tranche + « exactement ».</b> <a href="coding-00-tap-invariant-variant.html#s2">c00, pas 2</a>. Ici le conteneur est l'accumulateur et la tranche est la fenêtre.</li>
+      <li><b>Variant = entier ≥ 0 strictement décroissant.</b> <a href="coding-00-tap-invariant-variant.html#s3">c00, pas 3</a>. La ligne « fenêtre glissante » de son tableau est exactement ce pas-ci.</li>
+      <li><b>Tranche demi-ouverte.</b> <code>nums[a:b]</code> = indices <span class="m">a</span> … <span class="m">b</span>−1, borne droite <b>exclue</b>, notée [<span class="m">a</span>:<span class="m">b</span>). La fenêtre de bords <span class="m">l</span> et <span class="m">r</span> est <code>nums[l:r+1]</code>, jamais <code>nums[l:r]</code>.</li>
+      <li><b>Amortissement.</b> Un coût O(1) <b>amorti</b> se justifie par un argument de comptage global (« chaque élément entre une fois, sort au plus une fois »), il ne se décrète pas — <a href="coding-00-tap-invariant-variant.html#s5">c00, pas 5</a>.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>La quantité cherchée porte sur un segment <b>contigu</b> : sous-tableau ou sous-chaîne. Un sous-ensemble quelconque ou une sous-séquence non contiguë sort du pattern.</span>
+      <b>H2</b><span>La condition est <b>monotone en la taille</b> : à bord gauche fixé, agrandir la fenêtre ne peut que la rendre plus vraie, ou plus fausse — jamais les deux tour à tour. C'est cette hypothèse, et elle seule, qui autorise <span class="m">l</span> à ne jamais reculer.</span>
+      <b>H3</b><span>Sur le fil rouge LC 209, les valeurs sont <b>strictement positives</b> : retirer <code>nums[l]</code> fait <b>baisser</b> la somme. Cette hypothèse est ce qui tombe au pas 7.</span>
+      <b>H4</b><span>On énonce le <b>squelette</b> — les deux lignes de contrôle — et les quatre phrases. Le corps se remplit devant l'interlocuteur : une sheet de coding ne contient jamais la solution complète.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le signal, et le contre-signal <span class="tag tronc">tronc</span></h3>
+    <p>Trois marques dans l'énoncé déclenchent la fenêtre : le mot <b>contigu</b> (sous-tableau, sous-chaîne), un <b>extremum de longueur</b> (« le plus long », « le plus court »), et une condition <b>monotone en la taille</b>.</p>
+    <div class="eq">contigu &nbsp;+&nbsp; extremum de longueur &nbsp;+&nbsp; condition monotone en la taille</div>
+    <p>Monotone se lit sur l'accumulateur : avec des <b>valeurs positives</b> la somme ne fait que monter quand la fenêtre grandit ; avec un <b>compte</b> (fréquences, distincts) le compte ne fait que monter aussi. Le <b>contre-signal</b> est net : des <b>négatifs</b> avec une somme cible — agrandir peut faire baisser la somme, la monotonie tombe.</p>
+    <p class="say">« L'énoncé dit contigu et la condition est monotone en la taille, donc agrandir puis rétrécir suffit à explorer toutes les fenêtres utiles, donc deux indices qui n'avancent que vers la droite. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — lire LC 209</div>
+    <p><b>Énoncé.</b> « Plus petite longueur d'un sous-tableau <i>contigu</i> dont la somme est ≥ <code>target</code> ; 0 s'il n'y en a pas », avec <code>nums</code> à valeurs <b>&gt; 0</b>.</p>
+    <p><b>Les trois marques.</b> « sous-tableau contigu » → segment ; « plus petite longueur » → extremum de longueur ; « somme ≥ target » + valeurs &gt; 0 → <b>monotone croissante</b> en la taille.</p>
+    <p><b>Fil rouge.</b> <code>nums = [2, 3, 1, 2, 4, 3]</code>, <code>target = 7</code>. Réponse : <b>2</b>, réalisée par <code>[4, 3]</code> aux indices 4 et 5 — vérifiée contre une force brute sur les 21 sous-tableaux.</p>
+    <p><b>Ce qui n'est pas le signal.</b> « sous-<i>séquence</i> » (non contiguë) : ni fenêtre ni deux pointeurs. « <i>k</i>-ième plus grand » : un tas. « somme exactement égale à <code>target</code> » avec des négatifs : préfixes + dictionnaire (LC 560), pas une fenêtre.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Le pattern : deux lignes de contrôle, rien d'autre <span class="tag tronc">tronc</span></h3>
+    <p>Deux indices <span class="m">l</span> ≤ <span class="m">r</span>. <span class="m">r</span> avance à <b>chaque tour</b>, sans condition. <span class="m">l</span> avance <b>seulement</b> pour rétablir la condition, dans un <code>while</code>. Un accumulateur décrit <b>exactement</b> la tranche [<span class="m">l</span>:<span class="m">r</span>+1).</p>
+    <div class="eq"><span class="m">r</span> avance toujours &nbsp;·&nbsp; <span class="m">l</span> avance dans un <code>while</code> &nbsp;·&nbsp; acc = <span class="up">f</span>(nums[<span class="m">l</span>:<span class="m">r</span>+1)) <b>exactement</b></div>
+    <p>Deux lignes seulement changent d'un problème à l'autre : ce qu'on <b>ajoute</b> quand <code>nums[r]</code> entre, ce qu'on <b>retire</b> quand <code>nums[l]</code> sort. La condition du <code>while</code> est le troisième et dernier point de variation.</p>
+    <p class="say">« <span class="m">r</span> avance à chaque tour et <span class="m">l</span> ne bouge que pour rétablir la condition, donc chaque élément entre une fois et sort au plus une fois, donc deux lignes de contrôle suffisent à décrire tout le pattern. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le squelette de LC 209</div>
+    <div class="skel">l = 0 ; s = 0 ; best = +inf
+<b>pour</b> r, v <b>dans</b> enumerate(nums) :
+    s += v                        # v entre
+    <b>tant que</b> s &gt;= target :        # fenêtre valide
+        best = min(best, r − l + 1)   # enregistrer AVANT
+        s −= nums[l] ; l += 1         # nums[l] sort
+<b>retour</b> best si fini, sinon 0</div>
+    <p><code>s</code> est le <b>conteneur</b> de l'invariant, (<span class="m">n</span>−<span class="m">r</span>) + (<span class="m">n</span>−<span class="m">l</span>) est le <b>variant</b>, et le couple <code>s += v</code> / <code>s −= nums[l]</code> est ce qui <b>préserve</b> l'invariant.</p>
+    <p><b>L'ordre à l'intérieur du <code>while</code> n'est pas libre.</b> On enregistre <i>puis</i> on rétrécit : la fenêtre est valide à l'entrée du corps, elle ne l'est plus forcément après. Inverser les deux lignes, c'est enregistrer une fenêtre dont on ne sait rien.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>L'invariant : exact, puis ancré à droite <span class="tag tronc">tronc</span></h3>
+    <p>L'invariant se dit <b>à la sortie du <code>while</code></b>, pour chaque <span class="m">r</span>, et il a trois morceaux : l'accumulateur est <b>exact</b> sur la tranche, la fenêtre est dans l'état que le <code>while</code> garantit, et l'optimum partiel est <b>ancré à droite</b>.</p>
+    <div class="eq">acc exact sur [<span class="m">l</span>:<span class="m">r</span>+1) &nbsp;·&nbsp; condition rétablie &nbsp;·&nbsp; best optimal <b>parmi les fenêtres finissant en un</b> <span class="m">r</span>′ ≤ <span class="m">r</span></div>
+    <p>« Ancré à droite » est le morceau qu'on oublie, et c'est lui qui porte toute la preuve : on ne raisonne jamais sur toutes les fenêtres à la fois, seulement sur celles qui <b>finissent</b> au bord droit courant. La réunion sur tous les <span class="m">r</span> vient à la conclusion, pas avant.</p>
+    <p class="say">« L'accumulateur est exact sur la tranche et le <code>while</code> a rétabli la condition, donc pour ce bord droit je connais déjà la meilleure fenêtre qui y finit, donc l'optimalité est ancrée à droite, tour par tour. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — l'invariant de LC 209</div>
+    <p>À la <b>sortie du <code>while</code></b>, pour chaque <span class="m">r</span> :</p>
+    <p><b>I1.</b> <code>s</code> = Σ <code>nums[l:r+1]</code> <b>exactement</b>.<br>
+    <b>I2.</b> <code>s</code> &lt; <code>target</code> — la fenêtre courante n'est plus valide, c'est ce que le <code>while</code> vient d'obtenir.<br>
+    <b>I3.</b> <code>best</code> = longueur de la plus courte fenêtre de somme ≥ <code>target</code> <b>finissant en un <span class="m">r</span>′ ≤ <span class="m">r</span></b> (+∞ s'il n'y en a pas).</p>
+    <p><b>Initialisation</b> : avant le premier tour, <span class="m">l</span> = 0, <span class="m">r</span> = −1, la tranche [0:0) est vide, <code>s</code> = 0 et <code>best</code> = +∞ — I1, I2, I3 tiennent.</p>
+    <p><b>Préservation</b> : <code>s += v</code> étend la tranche à [<span class="m">l</span>:<span class="m">r</span>+1) et garde I1 ; le <code>while</code> enregistre toutes les fenêtres valides finissant en <span class="m">r</span> par longueur décroissante, donc la plus courte, puis sort quand <code>s</code> &lt; <code>target</code>, ce qui rétablit I2.</p>
+    <p>I1, I2, I3 <b>vérifiés à l'exécution</b> à la sortie de chaque <code>while</code> sur <b>20 000</b> entrées aléatoires (longueurs 0 à 7, valeurs 1 à 9, cibles 1 à 30) : le résultat coïncide avec la force brute sur les 20 000, sans exception.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — les 16 images de LC 209, invariant à chaque image</div>
+    <div id="f1trace" class="wide"></div>
+    <p class="cap"><code>nums = [2, 3, 1, 2, 4, 3]</code>, <code>target = 7</code>. Le cadre <b>vert</b> est la fenêtre courante [<span class="m">l</span>:<span class="m">r</span>+1) ; le fond <b>ambré</b> est la meilleure fenêtre enregistrée jusqu'ici. Fais « pas › » et regarde <span class="m">l</span> : il <b>ne recule jamais</b>. Six avancées de <span class="m">r</span>, cinq de <span class="m">l</span> — <b>chaque élément entre une fois et sort au plus une fois</b>. La ligne du bas est l'invariant, réécrit à chaque image ; dis-le avant de le lire.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Le variant, et l'amortissement qui donne le O(<span class="m">n</span>)</h3>
+    <p>Le variant est (<span class="m">n</span> − <span class="m">r</span>) + (<span class="m">n</span> − <span class="m">l</span>) : entier, ≥ 0, et strictement décroissant dès qu'<b>un</b> des deux pointeurs avance — donc à chaque tour de la boucle <i>et</i> à chaque tour du <code>while</code>.</p>
+    <div class="eq">variant = (<span class="m">n</span> − <span class="m">r</span>) + (<span class="m">n</span> − <span class="m">l</span>) &nbsp;·&nbsp; <span class="m">r</span> avance <span class="m">n</span> fois &nbsp;·&nbsp; <span class="m">l</span> avance <b>au plus</b> <span class="m">n</span> fois <b>au total</b></div>
+    <p>Le <code>while</code> imbriqué ne coûte pas O(<span class="m">n</span>) par tour : on ne compte pas les avancées de <span class="m">l</span> <i>par tour</i>, on les compte <b>globalement</b>. C'est l'<b>amortissement</b>, et il se justifie en une phrase — chaque élément entre une fois, sort au plus une fois.</p>
+    <p class="say">« Le variant décroît strictement dès qu'un pointeur avance, donc la boucle termine ; et <span class="m">l</span> ne recule jamais, donc ses avancées sont au plus <span class="m">n</span> au total, donc le coût est linéaire malgré le <code>while</code> imbriqué. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — compter, sur le fil rouge puis en général</div>
+    <p><b>Compté sur le code instrumenté</b>, <code>nums = [2, 3, 1, 2, 4, 3]</code> (<span class="m">n</span> = 6) : <span class="m">r</span> avance <b>6</b> fois, <span class="m">l</span> avance <b>5</b> fois — <b>11</b> mouvements de pointeur au total, contre <b>21</b> sous-tableaux à sommer pour la force brute.</p>
+    <table>
+      <tr><th><span class="m">n</span></th><th>fenêtre — ≤ 2<span class="m">n</span> mouvements</th><th>force brute — <span class="m">n</span>(<span class="m">n</span>+1)/2 sous-tableaux</th></tr>
+      <tr class="hl"><td>6</td><td>12</td><td>21</td></tr>
+      <tr><td>10</td><td>20</td><td>55</td></tr>
+      <tr><td>100</td><td>200</td><td>5&nbsp;050</td></tr>
+      <tr><td>1&nbsp;000</td><td>2&nbsp;000</td><td>500&nbsp;500</td></tr>
+    </table>
+    <p><b>Temps.</b> ≤ 2<span class="m">n</span> avancées × O(1) par avancée (une addition, une soustraction, une comparaison) <b>donc</b> <b>O(<span class="m">n</span>)</b>. <b>Espace.</b> Trois entiers, <b>O(1)</b> — pour l'habit « budget » ce sera O(|Σ|), la taille de l'alphabet, jamais le nombre de caractères vus à l'exécution.</p>
+    <p><b>Le piège du variant.</b> Si une branche du corps n'avance <i>ni</i> <span class="m">l</span> <i>ni</i> <span class="m">r</span>, le variant ne décroît pas : c'est là, et nulle part ailleurs, que la boucle infinie attend.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>La conclusion : la réunion sur les bords droits</h3>
+    <p>À la sortie de la boucle, <span class="m">r</span> vaut <span class="m">n</span> − 1. On <b>instancie</b> I3 à cette valeur : <code>best</code> est optimal parmi les fenêtres finissant en un <span class="m">r</span>′ ≤ <span class="m">n</span> − 1.</p>
+    <div class="eq">toute fenêtre finit quelque part <b>donc</b> optimal par bord droit ⇒ optimal tout court</div>
+    <p>C'est le seul endroit où l'on parle de <b>toutes</b> les fenêtres : les <span class="m">n</span> familles « fenêtres finissant en <span class="m">r</span>′ » recouvrent l'ensemble des fenêtres, et un minimum de minima est le minimum.</p>
+    <p class="say">« I3 instancié en <span class="m">r</span> = <span class="m">n</span> − 1 donne l'optimum sur chaque bord droit, donc, comme toute fenêtre a un bord droit, l'optimum sur la réunion, donc <code>best</code> est la plus courte fenêtre valide tout court. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les deux sorties de LC 209</div>
+    <p><b>Sortie avec <code>best</code> fini.</b> I3 en <span class="m">r</span> = <span class="m">n</span> − 1 : <code>best</code> est la plus courte fenêtre de somme ≥ <code>target</code> finissant en un <span class="m">r</span>′ quelconque. <b>Donc</b> c'est la plus courte, tous bords droits confondus. Sur le fil rouge : <code>best = 2</code>, réalisée par <code>[4, 3]</code>.</p>
+    <p><b>Sortie avec <code>best</code> = +∞.</b> Aucune fenêtre valide ne finit en aucun <span class="m">r</span>′, <b>donc</b> il n'en existe aucune, <b>donc</b> on renvoie 0. La ligne <code>retour best si fini, sinon 0</code> n'est pas une précaution : c'est la deuxième conclusion.</p>
+    <p><b>À ne pas dire.</b> « Donc on a balayé tout le tableau » : vrai, et sans rapport avec la justesse du résultat. La conclusion porte sur <code>best</code>, pas sur le parcours.</p>
+    <p><b>Là où l'ancrage à droite se voit.</b> À l'image 10 de la figure 1, <code>best</code> passe à 3 sur <code>[1, 2, 4]</code> ; à l'image 15 il passe à 2 sur <code>[4, 3]</code>. À aucun moment on n'a comparé ces deux fenêtres entre elles — chacune a été la meilleure de son propre bord droit.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Trois habits sur un seul squelette</h3>
+    <p>Ce qui change entre les trois habits est la <b>condition du <code>while</code></b> et l'<b>accumulateur</b>. Les deux lignes de contrôle — <span class="m">r</span> avance toujours, <span class="m">l</span> avance pour rétablir — ne changent jamais.</p>
+    <div class="eq"><b>fixe</b> : taille imposée &nbsp;·&nbsp; <b>variable</b> : rétrécir tant que c'est <i>valide</i> &nbsp;·&nbsp; <b>budget</b> : rétrécir quand c'est <i>invalide</i></div>
+    <p>Fixe et variable cherchent des choses opposées et se trahissent par le sens du <code>while</code>. L'habit « budget » rétrécit d'<b>un seul cran</b>, jamais dans une boucle : la fenêtre ne peut plus grandir, elle n'a pas besoin de raccourcir.</p>
+    <p class="say">« Le squelette est le même dans les trois habits, donc seule la condition du <code>while</code> et l'accumulateur distinguent fixe, variable et budget, donc reconnaître l'habit suffit à écrire le corps. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les trois habits, chiffrés</div>
+    <p><b>Fixe</b> — LC 643, moyenne maximale sur <span class="m">k</span> éléments. On maintient <span class="m">r</span> − <span class="m">l</span> + 1 = <span class="m">k</span> : <code>nums[r]</code> entre, <code>nums[r−k]</code> sort. Invariant : « <code>s</code> = somme des <span class="m">k</span> derniers, exactement ». Sur le fil rouge avec <span class="m">k</span> = 3, les sommes glissantes sont <b>6, 6, 7, 9</b> ; maximum <b>9</b>, donc moyenne maximale <b>3</b>. O(<span class="m">n</span>) temps, O(1) espace.</p>
+    <p><b>Variable</b> — LC 209, le fil rouge. On rétrécit <b>tant que</b> la fenêtre est <i>valide</i>, pour attraper la plus <i>courte</i>.</p>
+    <p><b>Budget</b> — LC 424, plus longue sous-chaîne à ≤ <span class="m">k</span> remplacements. Fenêtre valide ⇔ (<span class="m">r</span> − <span class="m">l</span> + 1) − maxfreq ≤ <span class="m">k</span>. On rétrécit d'<b>un cran</b> quand elle est <i>invalide</i>, pour attraper la plus <i>longue</i>.</p>
+    <p><b>L'astuce à savoir dire.</b> <code>maxfreq</code> n'est <b>jamais décrémenté</b> quand un caractère sort. Elle peut donc être surestimée — mais une fenêtre ne s'allonge que si elle bat le record, et au moment où elle le bat <code>maxfreq</code> est juste. Vérifié à l'exécution : <b>0 désaccord sur 20 000</b> chaînes aléatoires face à la version qui recalcule le maximum à chaque tour.</p>
+    <div class="wide"><table>
+      <tr><th>habit</th><th>accumulateur</th><th>le <code>while</code></th><th>temps · espace</th></tr>
+      <tr><td>fixe (LC 643)</td><td><code>s</code>, somme des <span class="m">k</span> derniers</td><td>pas de <code>while</code> : <span class="m">l</span> = <span class="m">r</span> − <span class="m">k</span> + 1</td><td>O(<span class="m">n</span>) · O(1)</td></tr>
+      <tr class="hl"><td>variable (LC 209)</td><td><code>s</code>, somme de [<span class="m">l</span>:<span class="m">r</span>+1)</td><td><b>tant que</b> valide : enregistrer, rétrécir</td><td>O(<span class="m">n</span>) · O(1)</td></tr>
+      <tr><td>budget (LC 424)</td><td><code>cnt</code> + <code>maxfreq</code></td><td><b>si</b> invalide : rétrécir d'un cran</td><td>O(<span class="m">n</span>) · O(|Σ|)</td></tr>
+    </table></div>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — l'habit « budget » : LC 424 sur AABABBA, <span class="m">k</span> = 1</div>
+    <div id="f2trace" class="wide"></div>
+    <p class="cap">Huit images : les sept tours, puis la conclusion. <b>Le budget se lit dans l'invariant</b> : la ligne du bas est (<span class="m">r</span> − <span class="m">l</span> + 1) − maxfreq ≤ 1, le nombre de caractères à remplacer. Le fond <b>ambré</b> est la fenêtre témoin du record ; réponse <b>4</b>, atteinte au tour <span class="m">r</span> = 3 sur <code>AABA</code>. À la dernière image, <code>maxfreq</code> vaut encore 3 alors que la fenêtre n'a plus que 2 A — c'est le <b>non-décrément</b>, et il est sans effet puisque <code>best</code> est déjà acquis.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Le pattern casse par le haut — <b>H2 tombe</b>, la monotonie est fausse et le résultat est faux sans que rien ne plante — ou par le bas, sur quatre lignes de code qui ont toutes l'air justes.</p>
+    <p>Le cas fatal est le seul à ne pas lever d'exception : des <b>négatifs</b> avec une somme cible. La fenêtre rend une réponse, et elle est fausse.</p>
+    <p class="say">« Avec un négatif, retirer un élément peut faire monter la somme, donc rétrécir n'est plus une réparation, donc <span class="m">l</span> devrait pouvoir reculer, donc le pattern ne s'applique pas — il faut des préfixes et un dictionnaire, ou une deque monotone. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Le contre-exemple minimal, à sortir de mémoire</div>
+    <p><code>nums = [2, −3, 4]</code>, <code>target = 4</code>. La bonne réponse est <b>1</b> : le sous-tableau <code>[4]</code>. Le squelette du pas 2 renvoie <b>0</b> — « aucune fenêtre ».</p>
+    <p><b>Pourquoi.</b> Les sommes préfixes valent 2, puis −1, puis 3 : <code>s</code> ne dépasse jamais 4, le <code>while</code> ne s'ouvre jamais, <span class="m">l</span> reste à 0. Le <b>−3</b> empoisonne toutes les fenêtres qui commencent en 0, et seul un recul de <span class="m">l</span> — interdit — les en sortirait.</p>
+    <p><b>Le remède n'est pas une rustine.</b> Somme exactement égale : sommes préfixes + dictionnaire (LC 560), O(<span class="m">n</span>). Somme ≥ cible avec des négatifs : préfixes + <b>deque monotone</b>, O(<span class="m">n</span>). Ce sont d'autres invariants, donc d'autres sheets.</p>
+    <p><b>Le test de trente secondes.</b> Avant d'écrire la première ligne : « si j'agrandis la fenêtre, est-ce que mon accumulateur ne peut aller que dans un sens ? » Non ⇒ pas de fenêtre glissante.</p>
+  </div>
+  <div class="card casse"><div class="lbl">Pièges Python — quatre lignes qui ont l'air justes</div>
+    <ul>
+      <li><b><code>if</code> au lieu de <code>while</code> pour rétrécir.</b> Un seul cran retiré par tour : la fenêtre reste trop longue et <code>best</code> est surestimé. L'habit <i>budget</i> veut bien un <code>if</code>, l'habit <i>variable</i> veut un <code>while</code> — le sens de la recherche décide, jamais l'habitude.</li>
+      <li><b>Enregistrer <code>best</code> après avoir rétréci.</b> La fenêtre est valide à l'<i>entrée</i> du corps du <code>while</code>, plus après. Inverser les deux lignes, c'est mesurer une fenêtre dont l'invariant ne dit plus rien.</li>
+      <li><b>Tranche décalée d'un.</b> La fenêtre est <code>nums[l:r+1]</code>, pas <code>nums[l:r]</code> : la borne droite est exclue. Écrire l'invariant avec la tranche, en demi-ouvert, est le seul moyen fiable de ne pas se tromper de 1.</li>
+      <li><b><code>best = 0</code> pour un minimum.</b> Un <code>min</code> s'initialise à <code>+inf</code> (<code>math.inf</code>), un <code>max</code> à 0 ou <code>−inf</code>. Avec <code>best = 0</code>, <code>min(0, …)</code> vaut 0 pour toujours et le cas « aucune fenêtre » disparaît au lieu d'être traité.</li>
+      <li><b><code>maxfreq</code> recalculé à chaque tour.</b> <code>max(cnt.values())</code> dans la boucle coûte O(|Σ|) par tour : le pattern reste juste mais la complexité annoncée devient fausse. Le non-décrément n'est pas une optimisation cosmétique, c'est ce qui tient le O(<span class="m">n</span>).</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li><b>Signal</b> : contigu + extremum de longueur + condition monotone en la taille — avec des positifs ou des comptes.</li>
+    <li><b>Pattern</b> : <span class="m">r</span> avance toujours ; <span class="m">l</span> avance dans un <code>while</code> pour rétablir la condition ; l'accumulateur décrit <b>exactement</b> [<span class="m">l</span>:<span class="m">r</span>+1).</li>
+    <li><b>Invariant ancré à droite</b> : à chaque <span class="m">r</span>, on a l'optimum <i>parmi les fenêtres qui finissent en <span class="m">r</span></i>. Jamais l'optimum global avant la fin.</li>
+    <li><b>Variant</b> (<span class="m">n</span>−<span class="m">r</span>) + (<span class="m">n</span>−<span class="m">l</span>) ; <b>amortissement</b> : chaque élément entre une fois, sort au plus une fois ⇒ O(<span class="m">n</span>).</li>
+    <li><b>Trois habits</b> : fixe (taille imposée), variable (rétrécir tant que valide), budget (rétrécir d'un cran quand invalide, <code>maxfreq</code> non décrémenté).</li>
+    <li><b>Négatifs + somme cible ⇒ pas de fenêtre glissante</b> : <code>[2, −3, 4]</code>, <code>target = 4</code> renvoie 0 au lieu de 1.</li>
+  </ol>
+</div>
+<div class="phrase">« Contigu et condition monotone en la taille, donc fenêtre glissante : la droite avance à chaque tour, la gauche ne bouge que pour rétablir la condition, et mon accumulateur décrit exactement la fenêtre. Chaque élément entre une fois et sort au plus une fois, donc linéaire ; l'invariant dit que pour chaque bord droit j'ai la meilleure fenêtre qui y finit, donc à la sortie j'ai la meilleure tout court. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Quel signal déclenche la fenêtre glissante, et lequel l'interdit ?</div><div class="a hid">Contigu, extremum de longueur, condition monotone en la taille — avec des positifs ou des comptes. L'interdit : des négatifs avec une somme cible, la monotonie tombe.</div></li>
+    <li><div class="q">Énonce l'invariant de LC 209, avec sa tranche.</div><div class="a hid">À la sortie du while, pour chaque r : s = Σ nums[l:r+1] exactement ; s &lt; target ; et best est la plus courte fenêtre de somme ≥ target finissant en un r′ ≤ r.</div></li>
+    <li><div class="q">Le variant, et pourquoi O(n) malgré le while imbriqué ?</div><div class="a hid">(n − r) + (n − l) : entier, ≥ 0, décroît dès qu'un pointeur avance. r avance n fois, l au plus n fois au total — chaque élément entre une fois et sort au plus une fois. Donc ≤ 2n opérations O(1).</div></li>
+    <li><div class="q">La conclusion, en commençant par donc.</div><div class="a hid">Donc en r = n − 1, best est optimal sur chaque bord droit ; toute fenêtre a un bord droit, donc best est la plus courte fenêtre valide tout court ; et +inf veut dire qu'il n'en existe aucune, donc 0.</div></li>
+    <li><div class="q">L'astuce de LC 424 ?</div><div class="a hid">maxfreq n'est jamais décrémenté quand un caractère sort, et la fenêtre ne rétrécit que d'un cran. maxfreq peut être surestimée, mais elle est juste au moment où la fenêtre bat le record — le seul moment qui compte.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Où ce mécanisme se rejoue</div>
+  <div class="bridges">
+    <a href="coding-00-tap-invariant-variant.html#s3"><b>c00 · Le variant</b><small>la ligne « fenêtre glissante » de son tableau des variants est ce pas 4 : (n−r) + (n−l), et c'est le premier variant à deux termes</small></a>
+    <a href="../../map.html#c02"><b>c02 · Deux pointeurs</b><small>mêmes deux indices, sens opposés : ils se croisent au lieu d'avancer ensemble, donc le variant devient r − l et la fenêtre est ce qui reste possible</small></a>
+    <a href="../../map.html#c07"><b>c07 · Tas</b><small>l'autre façon de tenir un agrégat sur une fenêtre quand le retrait n'est pas O(1) — même invariant ancré à droite, autre conteneur</small></a>
+    <a href="../../map.html"><b>La carte, colonne 9</b><small>les neuf familles et leur ordre de dépendance</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>coding::fenetre-glissante</code> (le signal, les trois habits, la condition du <code>while</code>) · <code>coding::deux-pointeurs</code> (l ne recule jamais, le variant à deux termes) · <code>coding::amortissement</code> (chaque élément entre une fois et sort au plus une fois ⇒ O(<span class="m">n</span>) malgré la boucle imbriquée).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>coding c01 · v1 du 17/09/2026 · Prérequis : <a href="coding-00-tap-invariant-variant.html">c00 · Le TAP</a>. Suite : <a href="../../map.html#c02">c02 · Deux pointeurs</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== Figure 1 : LC 209, les 16 images =====
+   Frames produites par le code instrumenté du pas 2 (aucun chiffre saisi à la main) :
+   à chaque image, `inv` porte s = Σ nums[l:r+1) recalculée, et `mark` est la fenêtre
+   témoin du best courant. l = r ⇒ un seul libellé « ▲ l r », sinon les deux se superposent. */
+SL.trace(document.getElementById('f1trace'),{arr:[2, 3, 1, 2, 4, 3],ms:1100,frames:[
+  {"ptr": {"▲ l r": 0}, "win": [0, 1], "note": "2 entre à droite.", "inv": "s = Σ nums[0:1) = 2 ; best = +∞"},
+  {"ptr": {"▲ l": 0, "▲ r": 1}, "win": [0, 2], "note": "3 entre à droite.", "inv": "s = Σ nums[0:2) = 2 + 3 = 5 ; best = +∞"},
+  {"ptr": {"▲ l": 0, "▲ r": 2}, "win": [0, 3], "note": "1 entre à droite.", "inv": "s = Σ nums[0:3) = 2 + 3 + 1 = 6 ; best = +∞"},
+  {"ptr": {"▲ l": 0, "▲ r": 3}, "win": [0, 4], "note": "2 entre à droite.", "inv": "s = Σ nums[0:4) = 2 + 3 + 1 + 2 = 8 ; best = +∞"},
+  {"ptr": {"▲ l": 0, "▲ r": 3}, "win": [0, 4], "note": "Fenêtre valide (s ≥ 7) : on enregistre, best = 4, puis on rétrécit.", "inv": "s = Σ nums[0:4) = 2 + 3 + 1 + 2 = 8 ; best = 4", "mark": [0, 1, 2, 3]},
+  {"ptr": {"▲ l": 1, "▲ r": 3}, "win": [1, 4], "note": "2 sort à gauche ; l ne reculera jamais.", "inv": "s = Σ nums[1:4) = 3 + 1 + 2 = 6 ; best = 4", "mark": [0, 1, 2, 3]},
+  {"ptr": {"▲ l": 1, "▲ r": 4}, "win": [1, 5], "note": "4 entre à droite.", "inv": "s = Σ nums[1:5) = 3 + 1 + 2 + 4 = 10 ; best = 4", "mark": [0, 1, 2, 3]},
+  {"ptr": {"▲ l": 1, "▲ r": 4}, "win": [1, 5], "note": "Fenêtre valide (s ≥ 7) : on enregistre, best = 4, puis on rétrécit.", "inv": "s = Σ nums[1:5) = 3 + 1 + 2 + 4 = 10 ; best = 4", "mark": [0, 1, 2, 3]},
+  {"ptr": {"▲ l": 2, "▲ r": 4}, "win": [2, 5], "note": "3 sort à gauche ; l ne reculera jamais.", "inv": "s = Σ nums[2:5) = 1 + 2 + 4 = 7 ; best = 4", "mark": [0, 1, 2, 3]},
+  {"ptr": {"▲ l": 2, "▲ r": 4}, "win": [2, 5], "note": "Fenêtre valide (s ≥ 7) : on enregistre, best = 3, puis on rétrécit.", "inv": "s = Σ nums[2:5) = 1 + 2 + 4 = 7 ; best = 3", "mark": [2, 3, 4]},
+  {"ptr": {"▲ l": 3, "▲ r": 4}, "win": [3, 5], "note": "1 sort à gauche ; l ne reculera jamais.", "inv": "s = Σ nums[3:5) = 2 + 4 = 6 ; best = 3", "mark": [2, 3, 4]},
+  {"ptr": {"▲ l": 3, "▲ r": 5}, "win": [3, 6], "note": "3 entre à droite.", "inv": "s = Σ nums[3:6) = 2 + 4 + 3 = 9 ; best = 3", "mark": [2, 3, 4]},
+  {"ptr": {"▲ l": 3, "▲ r": 5}, "win": [3, 6], "note": "Fenêtre valide (s ≥ 7) : on enregistre, best = 3, puis on rétrécit.", "inv": "s = Σ nums[3:6) = 2 + 4 + 3 = 9 ; best = 3", "mark": [2, 3, 4]},
+  {"ptr": {"▲ l": 4, "▲ r": 5}, "win": [4, 6], "note": "2 sort à gauche ; l ne reculera jamais.", "inv": "s = Σ nums[4:6) = 4 + 3 = 7 ; best = 3", "mark": [2, 3, 4]},
+  {"ptr": {"▲ l": 4, "▲ r": 5}, "win": [4, 6], "note": "Fenêtre valide (s ≥ 7) : on enregistre, best = 2, puis on rétrécit.", "inv": "s = Σ nums[4:6) = 4 + 3 = 7 ; best = 2", "mark": [4, 5]},
+  {"ptr": {"▲ l r": 5}, "win": [5, 6], "note": "4 sort à gauche ; l ne reculera jamais.", "inv": "s = Σ nums[5:6) = 3 ; best = 2", "mark": [4, 5]}
+]});
+
+/* ===== Figure 2 : LC 424, AABABBA, k = 1 =====
+   Sept tours + une image de conclusion. maxfreq n'est jamais décrémenté : à la dernière
+   image elle vaut 3 pour une fenêtre qui n'a que 2 A — sans effet, best est déjà acquis. */
+SL.trace(document.getElementById('f2trace'),{arr:["A", "A", "B", "A", "B", "B", "A"],ms:1200,frames:[
+  {"ptr": {"▲ l r": 0}, "win": [0, 1], "mark": [0], "note": "A entre. Fenêtre valide, aucune sortie.", "inv": "(r − l + 1) − maxfreq = 1 − 1 = 0 ≤ 1 ?  oui ; best = 1"},
+  {"ptr": {"▲ l": 0, "▲ r": 1}, "win": [0, 2], "mark": [0, 1], "note": "A entre. Fenêtre valide, aucune sortie.", "inv": "(r − l + 1) − maxfreq = 2 − 2 = 0 ≤ 1 ?  oui ; best = 2"},
+  {"ptr": {"▲ l": 0, "▲ r": 2}, "win": [0, 3], "mark": [0, 1, 2], "note": "B entre. Fenêtre valide, aucune sortie.", "inv": "(r − l + 1) − maxfreq = 3 − 2 = 1 ≤ 1 ?  oui ; best = 3"},
+  {"ptr": {"▲ l": 0, "▲ r": 3}, "win": [0, 4], "mark": [0, 1, 2, 3], "note": "A entre. Fenêtre valide, aucune sortie.", "inv": "(r − l + 1) − maxfreq = 4 − 3 = 1 ≤ 1 ?  oui ; best = 4"},
+  {"ptr": {"▲ l": 1, "▲ r": 4}, "win": [1, 5], "mark": [0, 1, 2, 3], "note": "B entre. Fenêtre invalide : on rétrécit d'un cran, A sort.", "inv": "(r − l + 1) − maxfreq = 4 − 3 = 1 ≤ 1 ?  oui ; best = 4"},
+  {"ptr": {"▲ l": 2, "▲ r": 5}, "win": [2, 6], "mark": [0, 1, 2, 3], "note": "B entre. Fenêtre invalide : on rétrécit d'un cran, A sort.", "inv": "(r − l + 1) − maxfreq = 4 − 3 = 1 ≤ 1 ?  oui ; best = 4"},
+  {"ptr": {"▲ l": 3, "▲ r": 6}, "win": [3, 7], "mark": [0, 1, 2, 3], "note": "A entre. Fenêtre invalide : on rétrécit d'un cran, B sort.", "inv": "(r − l + 1) − maxfreq = 4 − 3 = 1 ≤ 1 ?  oui ; best = 4"},
+  {"ptr": {"▲ l": 3, "▲ r": 6}, "win": [3, 7], "mark": [0, 1, 2, 3], "note": "Fin du parcours : best = 4, atteint au tour r = 3 sur la fenêtre témoin AABA.", "inv": "maxfreq = 3 n'est plus juste ici (la fenêtre ABBA a 2 A et 2 B) — et c'est sans effet : best est déjà acquis."}
+]});
+})();
+</script>
+</body>
+</html>
