@@ -63,7 +63,9 @@ Commit : `feat(sheet): <id> <titre>` ; mettre le spec au statut `built`. Un spec
 
 ## Ce que ce skill ne fait pas
 
-Il n'invente pas de spec, il ne fusionne pas deux specs, il ne réécrit pas le gold standard, il ne touche pas aux sheets de `archive/`.
+Il n'invente pas de spec, il ne fusionne pas deux specs, il ne touche pas aux sheets de `archive/`.
+
+Le gold standard, `template.html` et `assets/sheetlib.js` se modifient **uniquement pour un correctif de rendu** (bug d'affichage, débordement, cas dégénéré), jamais pour le contenu ni l'esthétique ; tout correctif est propagé aux sheets existantes et vérifié au rendu.
 
 **Ne pas invoquer le skill `frontend-design` (ou tout skill de design) pour une sheet** : le CSS et la mise en page viennent du gold standard, sans variation. Une sheet qui « a son propre style » est une sheet cassée — c'est l'uniformité qui rend la relecture rapide.
 
