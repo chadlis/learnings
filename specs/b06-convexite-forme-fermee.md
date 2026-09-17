@@ -10,7 +10,7 @@ prereq: [p03-02, p05-01, p02-02, p07-04, p05-02, p04-03]
 anki: [ml::optimisation, ml::regression-lineaire, ml::ridge, ml::kmeans, algebre::conditionnement]
 bridges: []
 next: 
-status: ready
+status: built
 ---
 ## Le mécanisme
 Minimiser L revient à résoudre ∇L(θ) = 0. Si ce système est **linéaire en θ**, on le résout d'un coup (forme fermée) ; sinon on itère (p03-02). La **convexité** garantit que le point trouvé est le minimum global (stricte : unique). Le **conditionnement** dit combien d'itérations, et si la forme fermée est numériquement fiable.
@@ -23,7 +23,7 @@ Minimiser L revient à résoudre ∇L(θ) = 0. Si ce système est **linéaire en
 | Ridge | (XᵀX + λI)β = Xᵀy | oui | forme fermée ; +λI rend inversible | stricte pour λ > 0 | p02-02 pas 5 ; p04-02 pas 7 |
 | Centroïde (Lloyd, demi-pas) | Σ(xᵢ − μ) = 0 sur le cluster | oui | μ = moyenne du cluster | oui à affectation fixée ; **non** globalement | p07-04 |
 | Logistique | Σ(σ(xᵢᵀβ) − yᵢ)xᵢ = 0 | non (σ) | itérer (GD, Newton) | oui : minimum global, pas de forme fermée | p05-02 ; p03-02 pas 4–5 |
-| Lasso | sous-gradient, coude en 0 | non (signe) | itérer (coordinate descent, soft-threshold) | oui, non lisse | p02-02 pas 6 ; p03-01 pas 8 |
+| Lasso | sous-gradient, coude en 0 | non (signe) | itérer (coordinate descent, soft-threshold) | oui, non lisse | p02-02 pas 6 ; p03-01 pas 7 |
 | Réseau | ∇ par backprop | non | itérer, minibatch | **non** : local | p08-01 ; p03-02 casse |
 
 ## Figure exigée
@@ -51,3 +51,22 @@ Minimiser L revient à résoudre ∇L(θ) = 0. Si ce système est **linéaire en
 ## Ce qui a cassé pour Salah
 - Vocabulaire : « solution en forme fermée », pas « système en forme fermée » (learnings).
 - D4 / p02-02 : « la pénalité rend le minimum existant ou unique » — ce pont lui donne son nom général (stricte convexité) sans redémontrer.
+
+## Questions pour la revue
+- **Corrigé dans ce spec** : la ligne « Lasso » renvoyait à `p03-01 pas 8`. Dans
+  `chain-p03-01`, le pas 8 est « Habit 4 — la marge (SVM) » ; la pénalité et le coude de L1
+  sont au **pas 7**. Corrigé en `p03-01 pas 7`, et c'est ce lien que la sheet pose.
+  Même décalage d'un cran dans `bridge-05` (trois liens : `#s6` étiqueté « pas 7 », `#s7`
+  « pas 8 », `#s8` « pas 9 ») — **non corrigé ici**, hors périmètre de b06.
+- Les autres renvois du spec ont été vérifiés un à un et sont justes : `p02-02 pas 5`
+  (+λI translate), `p04-02 pas 7` (translater le spectre), `p04-03 pas 7` (ne pas former
+  XᵀX), `p03-02 pas 4–5` (convexité / forme fermée ou itération), `p03-02 casse`, `p00-04`.
+- Aucun nombre n'était donné par le spec ; le fil rouge de la sheet a été **construit** puis
+  vérifié par script : x = (1,2,3,4), y = (2,3,5,4) → OLS (1,5 ; 0,8), RSS 1,80, ridge
+  4/(5+λ), Lasso à zéro exact dès λ = |L′(0)| = 8 ; mêmes x avec y = (0,1,0,1) → logistique
+  β̂ = (−2,2705 ; 0,9082), L = 2,34749, 3 pas de Newton contre 1 000 pas de gradient à
+  η = 0,120 ; k-means sur {0,1,10,11,20,21}, k = 3 → SSE 1,5 ou 101 selon l'init ;
+  Gram [[1, r],[r, 1]] avec r = 0,9999 → κ = 19 999, puis 199 à λ = 0,01 et 3,0 à λ = 1.
+  **À valider en revue** : ce fil rouge est un choix de la sheet, pas du spec.
+- Le spec ne nomme pas de `next`. La sheet renvoie vers la carte ; si un pont suivant est
+  prévu, le pied de page et la ligne « Ponts » sont à recâbler.
