@@ -10,7 +10,7 @@ prereq: []
 anki: [coding::tap, coding::invariant, coding::complexite]
 bridges: []
 next: c01
-status: ready
+status: built
 ---
 
 ## Ce que cette sheet est
@@ -62,3 +62,29 @@ nums = [2, 7, 11, 15], target = 9. Squelette : pour i, v dans enumerate(nums) : 
 
 ## Exclusions
 Pas de preuve formelle par récurrence, pas de notation Θ/Ω, pas de master theorem.
+
+## Questions pour la revue
+Vérification : chaque chiffre du fil rouge a été rejoué par script (résultat (0, 1) ;
+variant n − i = 4, 3, 2, 1 ; invariant I1/I2 vérifié à l'entrée de chaque tour sur
+20 000 entrées aléatoires ; O(n) = 2n opérations contre n(n−1)/2 + 2n pour la version
+liste — 20 / 65, 200 / 5 150, 2 000 / 501 500 à n = 10, 100, 1 000 ; espace min(n, |Σ|)).
+**Aucun chiffre du spec n'est faux**, rien n'a donc été corrigé ici. Restent quatre
+questions.
+
+1. **Taille de la trace.** Le § « Format `coding` » demande une trace de **8 à 12 cases** ;
+   le § « Figure exigée » impose `nums = [2, 7, 11, 15]`, soit **4 cases / 4 images**. J'ai
+   suivi « Figure exigée », le fil rouge faisant foi. À trancher pour c01–c09 : 8–12 cases
+   par défaut, avec dérogation quand le fil rouge est plus court ?
+2. **Le variant « deux pointeurs ».** Le spec donne (n − r) + (n − l). C'est le variant de la
+   **fenêtre glissante** (l et r avancent tous les deux) ; pour deux pointeurs qui se
+   **croisent**, c'est r − l. Les deux lignes figurent dans le tableau du pas 3 ; le spec
+   n'a pas été retouché.
+3. **Doublons.** Une subtilité n'était pas dans le spec : `seen[v] = i` garde le **dernier**
+   indice, donc la paire renvoyée reste valide et son k reste le premier qui ferme une paire,
+   mais son j n'est pas forcément le plus petit (358 cas sur 20 000 tirages). Ajoutée au pas 2
+   et au maillon 5 de la chaîne verbalisée — à confirmer qu'elle est dans le scope.
+4. **CSS de la série.** c00 est la première sheet `coding` et `SL.trace` n'avait aucun CSS
+   dans le dépôt. Un bloc « ajouts de la série `coding` » a été ajouté en fin de `<style>`
+   (`.skel`, `.sl-trace`, `.sl-cell`, `.sl-ptr`, `.sl-inv`, table en `.wide`). À figer comme
+   gold standard `coding` et recopier tel quel dans c01–c09, ou à remonter dans
+   `.claude/skills/sheet-chain/template.html` ?

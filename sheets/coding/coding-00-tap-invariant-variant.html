@@ -1,0 +1,482 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>TAP — invariant, variant, conclusion, complexité — coding</title>
+<meta name="sheet" content="series=coding;part=09;number=00;status=v1">
+<meta name="part" content="09 · Coding">
+<meta name="subtitle" content="coding — le rituel qui rend une solution défendable au tableau ; jamais le code, toujours la preuve">
+<meta name="prereq" content="aucun">
+<meta name="anki" content="coding::tap,coding::invariant,coding::complexite">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ===== ajouts de la série `coding` : squelette annoté et ruban de SL.trace =====
+   Rien d'autre du standard n'est touché. Ces deux blocs n'existaient nulle part :
+   c00 est la première sheet `coding`, et SL.trace n'avait encore aucun CSS. */
+.skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.skel b{color:var(--pen);font-weight:600}
+.step .card.full,.step .card.casse{grid-column:1 / -1}
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .wide table{min-width:520px}
+.card .wide th:nth-child(2),.card .wide td:nth-child(2),
+.card .wide th:nth-child(3),.card .wide td:nth-child(3){text-align:left}
+.readouts .c1 b{color:var(--pen)}.readouts .c3 b{color:var(--red)}
+.sl-trace{--cw:58px;--cgap:8px;margin:4px 0 2px}
+.sl-cells{display:flex;gap:var(--cgap)}
+.sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
+.sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
+.sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
+.sl-cell.win{border-color:var(--green);border-width:2.5px}
+.sl-ptrs{position:relative;height:20px;margin-top:5px}
+.sl-ptr{position:absolute;top:0;left:calc(var(--i) * (var(--cw) + var(--cgap)));width:var(--cw);text-align:center;font:600 12px var(--sans);color:var(--pen)}
+.sl-note{font-size:14px;color:var(--cardink);margin-top:10px}
+.sl-inv{font:12.5px/1.55 var(--mono);color:var(--cardmuted);margin-top:6px;border-left:2px solid #B7791F;padding-left:10px}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 09 · Coding › coding 00</div>
+  <h1>Le <span>TAP</span> — invariant, variant, conclusion, complexité</h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Un problème résolu n'est pas fini tant que quatre choses ne sont pas dites : l'<b>invariant</b> (ce qui est vrai à chaque tour), le <b>variant</b> (pourquoi ça s'arrête), la <b>conclusion</b> (pourquoi l'invariant à la sortie donne le résultat), la <b>complexité</b> (composée, pas devinée). C'est la sheet-mère du coding : le format que les neuf familles c01–c09 rejouent à l'identique. Fil rouge : Two Sum, <code>nums = [2, 7, 11, 15]</code>, <code>target = 9</code>. Jamais la solution complète en clair — le squelette, la trace, les quatre phrases.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li>Aucune sheet : c'est la première de la partie 9.</li>
+    <li>Savoir lire une boucle Python et un dictionnaire.</li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>coding::tap</code><code>coding::invariant</code><code>coding::complexite</code></div>
+  <h4>Où le rituel se rejoue</h4>
+  <ol>
+    <li><a href="../../map.html#c01">c01 · Fenêtre glissante</a></li>
+    <li><a href="../../map.html#c02">c02 · Deux pointeurs</a></li>
+    <li><a href="../../map.html#c03">c03 · Binary search</a></li>
+    <li><a href="../../map.html">… et les six autres</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette sheet suppose acquis</div>
+    <ul>
+      <li><b>Lire une boucle Python.</b> <code>for i, v in enumerate(nums)</code> donne l'indice <i>et</i> la valeur ; <code>while</code> avec un ou deux indices ; <code>d[k] = v</code> écrit, <code>k in d</code> teste.</li>
+      <li><b>Tranche demi-ouverte.</b> <code>nums[a:b]</code> contient les indices <span class="m">a</span>, <span class="m">a</span>+1, …, <span class="m">b</span>−1 : la borne droite est <b>exclue</b>. On la note [<span class="m">a</span>:<span class="m">b</span>) et on dit « exclue » à voix haute.</li>
+      <li><b>O(·) comme ordre de grandeur.</b> O(<span class="m">f</span>(<span class="m">n</span>)) = « borné par <span class="m">c</span>·<span class="m">f</span>(<span class="m">n</span>) pour <span class="m">n</span> assez grand ». On compare des ordres, on ne compte pas les constantes.</li>
+      <li><b>Dictionnaire et ensemble.</b> Test d'appartenance et insertion en O(1) <b>amorti</b> (table de hachage) ; le même test sur une <i>liste</i> est en O(<span class="m">n</span>). La différence porte toute la complexité du fil rouge.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>L'entrée est <b>finie</b>, de taille <span class="m">n</span> connue avant la boucle. Tout ce qui suit parle de <span class="m">n</span>, jamais des valeurs.</span>
+      <b>H2</b><span>Le coût se compte en <b>opérations élémentaires</b> — comparaison, accès indexé, accès haché amorti — toutes à coût unitaire. Pas de coût des grands entiers, pas de constantes.</span>
+      <b>H3</b><span>On énonce le <b>squelette</b> (les lignes de contrôle) et les quatre phrases ; le corps se remplit devant l'interlocuteur. Une sheet de coding ne contient jamais la solution complète : ce qui s'apprend ici n'est pas le code, c'est la preuve.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le rituel : cinq cases, dans l'ordre <span class="tag tronc">tronc</span></h3>
+    <p>Devant un énoncé, on ne code pas d'abord. On remplit cinq cases : <b>signal</b> (ce que la phrase impose), <b>pattern</b> (la structure qui répond au signal), <b>squelette</b> (les lignes de contrôle, pas le corps), <b>TAP</b>, <b>trace</b> (l'exemple déroulé, invariant affiché).</p>
+    <div class="eq">signal → pattern → squelette → TAP → trace</div>
+    <p>Les quatre lettres du TAP ne sont pas un ordre d'<i>écriture</i>, c'est un ordre de <b>preuve</b> : l'invariant dit ce qui est vrai, le variant dit qu'on s'arrête, la conclusion branche l'un sur l'autre, la complexité chiffre le prix.</p>
+    <p class="say">« L'énoncé donne un signal, donc le signal donne un pattern, donc le pattern donne un squelette, donc le squelette se défend par quatre phrases et se vérifie sur une trace. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — Two Sum</div>
+    <p><b>Signal.</b> « Deux éléments », « somme égale à une cible », « renvoyer les <i>indices</i> », tableau <b>non trié</b>. Le mot « indices » interdit de trier ; « deux éléments » appelle un complément.</p>
+    <p><b>Pattern.</b> Un seul passage + un dictionnaire <i>valeur → indice</i> des déjà vus. On échange de la mémoire contre du temps.</p>
+    <p><b>Squelette</b> — les lignes de contrôle seulement :</p>
+    <div class="skel">seen = {}
+pour i, v dans enumerate(nums):
+    si (target − v) dans seen :
+        <b>renvoyer</b> (seen[target − v], i)
+    seen[v] = i</div>
+    <p><code>seen</code> est le <b>conteneur</b> de l'invariant, <span class="m">n</span> − <span class="m">i</span> est le <b>variant</b>, et <code>seen[v] = i</code> est la ligne qui <b>préserve</b> l'invariant. Deux sorties — par <code>renvoyer</code> ou par épuisement — donc deux conclusions (pas 4).</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>L'invariant : conteneur, tranche, « exactement » <span class="tag tronc">tronc</span></h3>
+    <p>Un invariant est une propriété <b>inductive</b> : vraie avant le premier tour, <b>préservée</b> par un tour quelconque. Trois exigences de formulation, sans quoi il n'est pas démontrable :</p>
+    <div class="eq">le <b>conteneur</b> a un nom &nbsp;·&nbsp; la <b>tranche</b> est en indices [<span class="m">a</span>:<span class="m">b</span>) &nbsp;·&nbsp; le mot <b>exactement</b> y est</div>
+    <p>Sans « exactement », « <code>seen</code> contient les valeurs de <code>nums[0:i)</code> » est encore vrai si <code>seen</code> contient tout le tableau — l'invariant ne sert plus à rien. Et « <code>seen</code> contient ce qu'on a vu » n'est pas un invariant du tout : aucun énoncé, donc aucune conclusion.</p>
+    <p class="say">« L'invariant est vrai avant le premier tour et préservé par un tour, donc il est vrai à l'entrée de chaque tour, donc il l'est encore à la sortie — et c'est cette dernière instance qui sert de preuve. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — l'invariant de Two Sum</div>
+    <p>À l'<b>entrée</b> du tour <span class="m">i</span> (indice courant <b>exclu</b>) :</p>
+    <p><b>I1.</b> <code>seen</code> contient <b>exactement</b> les valeurs de <code>nums[0:i)</code>, chacune associée à son <b>dernier</b> indice.<br>
+    <b>I2.</b> Aucune paire (<span class="m">j</span>, <span class="m">k</span>) avec <span class="m">k</span> &lt; <span class="m">i</span> ne somme à <code>target</code>.</p>
+    <p><b>Initialisation</b> : <span class="m">i</span> = 0, <code>nums[0:0)</code> est vide et <code>seen = {}</code> — I1 et I2 tiennent. <b>Préservation</b> : le tour <span class="m">i</span> teste toutes les paires (·, <span class="m">i</span>) d'un coup, puis écrit <code>seen[v] = i</code> ; la tranche passe de [0:<span class="m">i</span>) à [0:<span class="m">i</span>+1).</p>
+    <p>Vérifié à l'exécution sur <b>20 000</b> entrées aléatoires (longueurs 0 à 7, doublons compris) : I1 et I2 tiennent à l'entrée de chaque tour, sans exception.</p>
+    <p><b>Le « dernier indice » n'est pas un détail.</b> Avec un doublon, <code>seen[v] = i</code> écrase l'entrée précédente. La paire renvoyée reste valide et son <span class="m">k</span> reste le premier qui ferme une paire, mais son <span class="m">j</span> n'est pas forcément le plus petit — sur les mêmes 20 000 tirages, 358 cas où <span class="m">j</span> diffère de la force brute. Un énoncé qui exige la <i>première</i> paire exige un autre invariant, donc un autre code.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — la trace, l'invariant à chaque image</div>
+    <div id="f1trace" class="wide"></div>
+    <p class="cap">Two Sum sur <code>nums = [2, 7, 11, 15]</code>, <code>target = 9</code>, quatre images. Le pointeur est <span class="m">i</span> ; les cases <b>ambrées</b> sont celles dont la valeur est dans <code>seen</code> ; la dernière image <b>encadre en vert</b> la paire renvoyée. La ligne du bas est l'invariant, réécrit à chaque image : il se lit <b>à chaque tour</b>, pas seulement à la fin. Fais « pas › » et dis l'invariant avant de le lire.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Le variant : l'entier qui décroît</h3>
+    <p>Le variant est un <b>entier</b>, <b>≥ 0</b>, qui <b>décroît strictement</b> à chaque tour. Les trois conditions ensemble interdisent une suite infinie de tours : un entier positif ne peut décroître qu'un nombre fini de fois.</p>
+    <div class="eq"><span class="m">n</span> − <span class="m">i</span> &nbsp;·&nbsp; (<span class="m">n</span> − <span class="m">r</span>) + (<span class="m">n</span> − <span class="m">l</span>) &nbsp;·&nbsp; <span class="m">r</span> − <span class="m">l</span> &nbsp;·&nbsp; hi − lo &nbsp;·&nbsp; |sommets non visités|</div>
+    <p>S'il n'existe pas, la boucle <b>peut</b> ne pas terminer — et c'est le seul endroit où une boucle infinie se cache. L'écrire force à vérifier que <i>chaque branche</i> du corps le fait décroître.</p>
+    <p class="say">« Le variant est un entier positif qui décroît strictement à chaque tour, donc la suite des tours est finie, donc la boucle termine — et sans variant, on n'a rien dit sur la terminaison. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — un variant par forme de boucle</div>
+    <table>
+      <tr><th>boucle</th><th>variant</th><th>décroît : à chaque tour…</th></tr>
+      <tr class="hl"><td><code>for i in range(n)</code></td><td><span class="m">n</span> − <span class="m">i</span></td><td><span class="m">i</span> augmente de 1</td></tr>
+      <tr><td>fenêtre glissante (<span class="m">l</span>, <span class="m">r</span> avancent)</td><td>(<span class="m">n</span>−<span class="m">r</span>) + (<span class="m">n</span>−<span class="m">l</span>)</td><td>on avance <span class="m">l</span> <b>ou</b> <span class="m">r</span></td></tr>
+      <tr><td>deux pointeurs qui se croisent</td><td><span class="m">r</span> − <span class="m">l</span></td><td><span class="m">l</span> monte ou <span class="m">r</span> descend</td></tr>
+      <tr><td>dichotomie</td><td>hi − lo</td><td>l'intervalle est coupé au moins en deux</td></tr>
+      <tr><td>BFS / DFS</td><td>sommets non visités</td><td>un dépilement marque un sommet neuf</td></tr>
+    </table>
+    <p>Two Sum : <span class="m">n</span> − <span class="m">i</span> vaut 4, 3, 2, 1 aux tours 0 à 3 — entier, positif, −1 par tour. Le fil rouge renvoie au tour 1 ; le variant garantit juste qu'on ne peut pas dépasser 4 tours.</p>
+    <p><b>Le piège du <code>while</code>.</b> Si une branche du corps ne bouge <i>ni</i> <span class="m">l</span> <i>ni</i> <span class="m">r</span>, le variant ne décroît pas et la boucle tourne pour toujours. C'est là, et nulle part ailleurs, que se cachent les boucles infinies de deux pointeurs et de dichotomie.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>La conclusion : « donc », sur le résultat</h3>
+    <p>La conclusion <b>commence par donc</b> et porte sur le <b>résultat</b>, pas sur le déroulement. « donc on a parcouru tout le tableau » est vrai et inutile : personne n'en doutait, et ça ne dit pas pourquoi la réponse est juste.</p>
+    <div class="eq">conclusion = invariant <b>instancié</b> à la valeur finale du variant</div>
+    <p>Le variant dit <i>où</i> la boucle s'arrête, l'invariant dit ce qui est vrai <i>à cet endroit</i> : leur conjonction est l'énoncé du problème. Deux sorties ⇒ deux conclusions : la sortie par <code>renvoyer</code> et la sortie par épuisement.</p>
+    <p class="say">« Le variant donne la valeur finale de l'indice, donc l'invariant instancié à cette valeur est vrai, donc il dit exactement ce que le problème demandait — la conclusion porte sur le résultat, pas sur le parcours. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les deux sorties de Two Sum</div>
+    <p><b>Sortie par <code>renvoyer</code>, au tour <span class="m">i</span> = <span class="m">k</span>.</b> I1 dit que <code>seen</code> contient exactement les valeurs de <code>nums[0:k)</code> avec leur indice ; le test qui vient de réussir dit que <code>target − nums[k]</code> y est, à un indice <span class="m">j</span> &lt; <span class="m">k</span>. <b>Donc</b> <code>nums[j] + nums[k] = target</code> avec <span class="m">j</span> &lt; <span class="m">k</span> : la paire renvoyée est valide.</p>
+    <p><b>Sortie par épuisement, <span class="m">i</span> = <span class="m">n</span></b> (variant nul). I2 sur [0:<span class="m">n</span>) dit qu'aucune paire ne somme à <code>target</code>. <b>Donc</b> <code>None</code> est la bonne réponse.</p>
+    <p><b>Complétude.</b> Si une paire (<span class="m">j</span>, <span class="m">k</span>) existe, au tour <span class="m">i</span> = <span class="m">k</span> son complément est dans <code>seen</code> par I1, <b>donc</b> la boucle ne peut pas atteindre <span class="m">i</span> = <span class="m">n</span> sans avoir renvoyé. Confronté à une force brute sur les 20 000 tirages : même existence, même <span class="m">k</span>, paire toujours valide.</p>
+    <p>À ne <i>pas</i> dire : « donc on a parcouru tout le tableau ». C'est le déroulement.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>La complexité : composée, pas devinée <span class="tag tronc">tronc</span></h3>
+    <p>On ne devine pas une complexité, on la <b>compose</b>. Hors boucle, les coûts s'<b>ajoutent</b> ; dans une boucle, le coût du corps se <b>multiplie</b> par le nombre de tours — que le variant a déjà donné.</p>
+    <div class="eq"><span class="m">T</span>(<span class="m">n</span>) = Σ coûts hors boucle + (nombre de tours) × (coût du corps)</div>
+    <p>Un coût <b>amorti</b> se justifie (« chaque élément entre et sort au plus une fois »), il ne se décrète pas. L'<b>espace</b> se donne en fonction de la <b>taille de l'entrée</b>, jamais en valeur d'exécution : « 4 entrées » n'est pas une complexité, min(<span class="m">n</span>, |Σ|) en est une.</p>
+    <p class="say">« Le nombre de tours vient du variant et le coût du corps se lit ligne à ligne, donc le total est leur produit augmenté des coûts hors boucle, donc la complexité se compose au lieu de se deviner. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — une boucle, deux complexités</div>
+    <p><b>Temps.</b> <span class="m">n</span> tours (variant <span class="m">n</span> − <span class="m">i</span>) ; corps = un test d'appartenance + une insertion dans un <code>dict</code>, O(1) amorti chacun. <b>Donc</b> <span class="m">n</span> × O(1) = <b>O(<span class="m">n</span>)</b>.</p>
+    <p>Le <i>même</i> squelette avec une <b>liste</b> de vus : le test parcourt les vus, coût <span class="m">i</span> au tour <span class="m">i</span>, <b>donc</b> Σ<span class="m">i</span> = <span class="m">n</span>(<span class="m">n</span>−1)/2 = <b>O(<span class="m">n</span>²)</b>. Une boucle, deux complexités : c'est le <b>corps</b> qui décide, jamais le nombre de boucles.</p>
+    <p>Opérations comptées exactement sur le code instrumenté, pire cas (aucune paire, la boucle va au bout) :</p>
+    <table>
+      <tr><th><span class="m">n</span></th><th>dict — 2<span class="m">n</span></th><th>liste — <span class="m">n</span>(<span class="m">n</span>−1)/2 + 2<span class="m">n</span></th></tr>
+      <tr><td>10</td><td>20</td><td>65</td></tr>
+      <tr><td>100</td><td>200</td><td>5&nbsp;150</td></tr>
+      <tr class="hl"><td>1&nbsp;000</td><td>2&nbsp;000</td><td>501&nbsp;500</td></tr>
+    </table>
+    <p><b>Espace.</b> <code>seen</code> a au plus une entrée par valeur distincte rencontrée, <b>donc</b> O(min(<span class="m">n</span>, |valeurs distinctes|)). Sur le fil rouge il finit à <i>1</i> entrée : c'est une valeur d'exécution, pas une complexité. Les autres formes utiles : O(<span class="m">h</span>) pour la pile de récursion sur un arbre de hauteur <span class="m">h</span>, O(<span class="m">n</span>) pour un <code>set</code> de vus, O(1) pour deux pointeurs.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — le corps décide, pas la boucle</div>
+    <div id="f2plot" class="wide"></div>
+    <div id="f2sliders"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Opérations élémentaires comptées sur les <b>deux versions du même squelette</b>, pire cas : <span class="sl-c1">dict</span> (2<span class="m">n</span>) et <span class="sl-c3">liste</span> (<span class="m">n</span>(<span class="m">n</span>−1)/2 + 2<span class="m">n</span>). Déplace <span class="m">n</span> : la courbe du dict reste collée à l'axe. <b>Le nombre de boucles est le même dans les deux cas</b> — seul le coût du corps change, et c'est lui qui fait passer de O(<span class="m">n</span>) à O(<span class="m">n</span>²).</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Où le TAP se rate <span class="tag casse">casse</span></h3>
+    <p>Chacune de ces erreurs produit une réponse qui <b>sonne</b> juste et ne prouve rien. C'est exactement ce que l'interlocuteur écoute : pas si tu sais coder Two Sum, mais si ce que tu dis démontre quelque chose.</p>
+    <p class="say">« Un invariant sans conteneur ni tranche n'est pas démontrable, une conclusion sur le déroulement ne porte pas sur le résultat, une complexité devinée ignore le coût du corps, donc la réponse sonne juste et ne prouve rien. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Les cinq façons de rater</div>
+    <ul>
+      <li><b>Invariant sans conteneur ni tranche.</b> « On a vu les éléments » : rien à initialiser, rien à préserver, rien à instancier à la sortie. Indémontrable, donc faux.</li>
+      <li><b>Conclusion sur le déroulement.</b> « On a tout parcouru » : vrai, et sans rapport avec la justesse du résultat.</li>
+      <li><b>Espace en valeur d'exécution.</b> « 4 entrées » au lieu de min(<span class="m">n</span>, |valeurs distinctes|) : un nombre au lieu d'une fonction de <span class="m">n</span>.</li>
+      <li><b>Complexité devinée.</b> « O(<span class="m">n</span>) parce qu'il y a une boucle » — sans lire le corps. Un <code>in</code> sur une liste dans la boucle donne O(<span class="m">n</span>²) avec exactement la même boucle.</li>
+      <li><b>Variant oublié sur un <code>while</code>.</b> Deux pointeurs, dichotomie : sans variant, rien ne dit que la boucle s'arrête, et c'est là que la boucle infinie attend.</li>
+    </ul>
+  </div>
+  <div class="card casse"><div class="lbl">Pièges Python — les mêmes erreurs, en code</div>
+    <ul>
+      <li><b><code>in</code> ne dit pas sa structure.</b> <code>x in vus</code> coûte O(1) amorti si <code>vus</code> est un <code>set</code> ou un <code>dict</code>, O(<span class="m">n</span>) si c'est une <code>list</code>. La ligne est la même, la complexité de la boucle ne l'est pas.</li>
+      <li><b>Muter ce qu'on itère.</b> <code>for x in a: a.remove(x)</code> casse l'invariant : la tranche parcourue n'est plus celle qu'on croit. Itérer sur une copie, ou construire une nouvelle liste.</li>
+      <li><b><code>d[k]</code>, <code>d.get(k)</code>, <code>k in d</code> : trois lignes, trois invariants.</b> La première lève <code>KeyError</code>, la deuxième renvoie <code>None</code> — et <code>None</code> peut être une valeur légitime, auquel cas <code>d.get(k) is None</code> ne veut <i>pas</i> dire « absent ».</li>
+      <li><b><code>defaultdict</code> insère à la lecture.</b> Lire <code>d[k]</code> crée l'entrée : l'invariant « <code>d</code> contient exactement les clés vues » devient faux sans qu'aucune ligne d'écriture n'apparaisse.</li>
+      <li><b><code>//</code> et le milieu.</b> <code>mid = (lo + hi) // 2</code> ne déborde pas en Python (entiers non bornés), mais garder <code>lo + (hi − lo) // 2</code> transporte l'habitude aux langages où il déborde — et c'est la même ligne qu'on écrit en entretien Java ou C++.</li>
+      <li><b><code>enumerate</code> plutôt que <code>range(len(...))</code>.</b> Le TAP est identique ; les occasions de se tromper d'indice sont doublées dans la seconde forme, et un invariant faux sur un indice ne se voit pas à la relecture.</li>
+    </ul>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Le même rituel, neuf familles</h3>
+    <p>Ce qui change d'une famille à l'autre est le <b>conteneur</b> de l'invariant et la <b>forme</b> du variant. Le rituel, lui, ne change pas : c'est cette sheet, neuf fois.</p>
+    <p>Apprendre le coding, c'est donc apprendre à lire le <b>signal</b> dans l'énoncé — les trois ou quatre mots qui nomment le pattern — pas à mémoriser du code.</p>
+    <p class="say">« Le signal de l'énoncé nomme le pattern, donc le pattern fixe le conteneur de l'invariant et la forme du variant, donc les quatre phrases s'écrivent avant la première ligne de code. »</p>
+  </div>
+  <div class="card apply full"><div class="lbl">Cartes « signal → pattern »</div>
+    <div class="wide"><table>
+      <tr><th>signal dans l'énoncé</th><th>pattern</th><th>conteneur de l'invariant</th><th>variant</th></tr>
+      <tr><td>« sous-tableau <b>contigu</b> », « au plus <span class="m">k</span> … »</td><td><a href="../../map.html#c01">c01 · fenêtre glissante</a></td><td>la fenêtre [<span class="m">l</span>:<span class="m">r</span>) et son agrégat</td><td>(<span class="m">n</span>−<span class="m">r</span>) + (<span class="m">n</span>−<span class="m">l</span>)</td></tr>
+      <tr><td>« trié », « une paire », « sans mémoire auxiliaire »</td><td><a href="../../map.html#c02">c02 · deux pointeurs</a></td><td>le segment [<span class="m">l</span>:<span class="m">r</span>] encore possible</td><td><span class="m">r</span> − <span class="m">l</span></td></tr>
+      <tr><td>« trié », « le premier indice tel que »</td><td><a href="../../map.html#c03">c03 · dichotomie</a></td><td>[lo:hi) contient la réponse</td><td>hi − lo</td></tr>
+      <tr><td>« en place », « inverser », « cycle »</td><td><a href="../../map.html#c04">c04 · listes chaînées</a></td><td>le préfixe déjà retourné</td><td>nœuds non visités</td></tr>
+      <tr><td>« sous-arbre », « profondeur », « BST »</td><td><a href="../../map.html#c05">c05 · arbres</a></td><td>le chemin racine → nœud, la pile d'appels</td><td>nœuds non visités</td></tr>
+      <tr><td>« composantes », « plus court en nombre d'arêtes »</td><td><a href="../../map.html#c06">c06 · graphes</a></td><td>l'ensemble des visités</td><td>sommets non visités</td></tr>
+      <tr><td>« les <span class="m">k</span> plus grands », « un flux »</td><td><a href="../../map.html#c07">c07 · tas</a></td><td>le tas des <span class="m">k</span> meilleurs de [0:<span class="m">i</span>)</td><td><span class="m">n</span> − <span class="m">i</span></td></tr>
+      <tr><td>« fusionner », « chevauchement »</td><td><a href="../../map.html#c08">c08 · intervalles</a></td><td>les fusionnés de [0:<span class="m">i</span>), triés</td><td><span class="m">n</span> − <span class="m">i</span></td></tr>
+      <tr><td>« nombre de façons », « maximum sur des choix »</td><td><a href="../../map.html#c09">c09 · DP 1D</a></td><td><code>dp[0:i)</code> = réponse sur chaque préfixe</td><td><span class="m">n</span> − <span class="m">i</span></td></tr>
+    </table></div>
+    <p>Trois variants sur neuf sont <span class="m">n</span> − <span class="m">i</span> : la boucle simple est la forme par défaut, et les six autres lignes sont exactement les cas où elle ne suffit pas.</p>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Un problème n'est fini que quand quatre phrases sont dites : invariant, variant, conclusion, complexité.</li>
+    <li><b>Invariant</b> : inductif (vrai avant, préservé par un tour), conteneur nommé, tranche en indices demi-ouverts, le mot « exactement ».</li>
+    <li><b>Variant</b> : un entier ≥ 0 qui décroît strictement. Sans lui, rien n'a été dit sur la terminaison.</li>
+    <li><b>Conclusion</b> : commence par « donc », porte sur le résultat, = l'invariant instancié à la valeur finale du variant. Une conclusion par sortie.</li>
+    <li><b>Complexité</b> : + hors boucle, × dans la boucle, amortissement justifié. C'est le coût du corps qui décide, pas le nombre de boucles.</li>
+    <li><b>Espace</b> en fonction de la taille de l'entrée — min(<span class="m">n</span>, |Σ|), O(<span class="m">h</span>), O(<span class="m">n</span>) — jamais en valeur d'exécution.</li>
+    <li>D'une famille à l'autre, seuls changent le conteneur de l'invariant et la forme du variant. Le rituel est le même neuf fois.</li>
+  </ol>
+</div>
+<div class="phrase">« Avant d'écrire, je dis ce qui est vrai à chaque tour, sur quel conteneur et quelle tranche ; ce qui décroît et garantit l'arrêt ; pourquoi l'invariant à la sortie est le résultat ; et je compose la complexité au lieu de la deviner. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Énonce l'invariant de Two Sum.</div><div class="a hid">À l'entrée du tour i : seen contient exactement les valeurs de nums[0:i), chacune avec son dernier indice ; et aucune paire (j, k) avec k &lt; i ne somme à target.</div></li>
+    <li><div class="q">Le variant ?</div><div class="a hid">n − i : entier, ≥ 0, décroît de 1 à chaque tour, donc la boucle termine en au plus n tours.</div></li>
+    <li><div class="q">La conclusion, en commençant par donc.</div><div class="a hid">Donc au tour k le complément de la paire est dans seen, donc elle est renvoyée ; et si la boucle finit, l'invariant sur [0:n) dit qu'aucune paire n'existe, donc None.</div></li>
+    <li><div class="q">La complexité, composée.</div><div class="a hid">n tours × O(1) par tour (test + insertion dans un dict) = O(n) en temps ; espace O(min(n, |valeurs distinctes|)). Avec une liste au lieu du dict : Σi = n(n−1)/2, donc O(n²).</div></li>
+    <li><div class="q">Ton invariant tient-il avec des doublons ?</div><div class="a hid">Oui — c'est pour ça que I1 dit « son dernier indice » : seen[v] = i écrase. La paire renvoyée reste valide et son k est le premier qui ferme, mais son j n'est pas forcément le plus petit.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Où ce rituel se rejoue</div>
+  <div class="bridges">
+    <a href="../../map.html#c01"><b>c01 · Fenêtre glissante</b><small>le conteneur devient la fenêtre [l:r) et son agrégat ; le variant devient (n−r) + (n−l)</small></a>
+    <a href="../../map.html#c02"><b>c02 · Deux pointeurs</b><small>le conteneur est le segment encore possible ; c'est le premier variant qui n'est pas n − i</small></a>
+    <a href="../../map.html#c03"><b>c03 · Binary search</b><small>l'invariant « la réponse est dans [lo:hi) » et le variant hi − lo : le TAP y est le plus court et le plus rentable</small></a>
+    <a href="../../map.html"><b>La carte, colonne 9</b><small>les neuf familles et leur ordre de dépendance</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>coding::tap</code> (les quatre phrases et leur ordre) · <code>coding::invariant</code> (conteneur, tranche demi-ouverte, « exactement », initialisation / préservation) · <code>coding::complexite</code> (composition + hors boucle, × dans la boucle, amortissement, espace en fonction de <span class="m">n</span>).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>coding c00 · v1 du 17/09/2026 · sheet-mère du format <code>coding</code> (c01–c09). Prérequis : aucun. Suite : <a href="../../map.html#c01">c01 · Fenêtre glissante</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== Figure 1 : la trace de Two Sum, invariant à chaque image =====
+   Les quatre images sont celles du déroulé vérifié : seen={} au tour 0 (on cherche 9−2=7,
+   absent), seen={2:0} à l'entrée du tour 1, puis 9−7=2 trouvé à l'indice 0 → (0, 1). */
+SL.trace(document.getElementById('f1trace'),{arr:[2,7,11,15],ms:1500,frames:[
+  {ptr:{'▲ i':0},mark:[],
+   note:'Entrée du tour 0. seen = {} · variant n − i = 4.',
+   inv:'I1 : seen contient exactement les valeurs de nums[0:0) = ∅.  I2 : aucune paire dans [0:0).'},
+  {ptr:{'▲ i':0},mark:[],
+   note:'Tour 0 : v = 2, on cherche 9 − 2 = 7 → absent de seen. On écrit seen[2] = 0.',
+   inv:'I1 : seen contient exactement les valeurs de nums[0:0) = ∅ (l\'indice courant est exclu).'},
+  {ptr:{'▲ i':1},mark:[0],
+   note:'Entrée du tour 1. seen = {2: 0} · variant n − i = 3.',
+   inv:'I1 : seen contient exactement les valeurs de nums[0:1) = {2 → 0}.  I2 : aucune paire dans [0:1).'},
+  {ptr:{'▲ i':1},mark:[0],win:[0,2],
+   note:'Tour 1 : v = 7, on cherche 9 − 7 = 2 → présent, à l\'indice 0. Donc on renvoie (0, 1).',
+   inv:'Conclusion : I1 donne nums[0] = 2 avec 0 < 1, et 2 + 7 = 9 = target → la paire est valide.'}
+]});
+
+/* ===== Figure 2 : le coût du corps, pas le nombre de boucles =====
+   Opérations comptées exactement sur les deux versions instrumentées, pire cas
+   (aucune paire) : dict = 2n ; liste = n(n−1)/2 + 2n. */
+const opsDict=n=>2*n, opsList=n=>n*(n-1)/2+2*n;
+const P2=SL.plot(document.getElementById('f2plot'),{x:[0,200],y:[0,21000],w:600,h:300,
+  xt:[0,50,100,150,200],yt:[5000,10000,15000,20000],xl:'n (taille de l\'entrée)',yl:'opérations élémentaires'});
+P2.fn(opsList,'sl-c3');P2.fn(opsDict,'sl-c1');
+P2.label(118,17200,'liste : O(n²)','sl-c3','middle');P2.label(150,2100,'dict : O(n)','sl-c1','middle');
+const out2=document.getElementById('f2out');
+function draw2(n){P2.clear();n=Math.round(n);const a=opsDict(n),b=opsList(n);
+  P2.vline(n,'');P2.dot(n,a,'sl-c1',5);P2.dot(n,b,'sl-c3',5);
+  out2.innerHTML=`<div class="c1">dict — 2n<b>${SL.fmt(a,0)} op.</b></div>`
+    +`<div class="c3">liste — n(n−1)/2 + 2n<b>${SL.fmt(b,0)} op.</b></div>`
+    +`<div>rapport<b>× ${SL.fmt(b/a,1)}</b></div>`;}
+SL.slider(document.getElementById('f2sliders'),{label:'n',min:4,max:200,step:1,value:100,fmt:v=>SL.fmt(v,0)},draw2);
+})();
+</script>
+</body>
+</html>
