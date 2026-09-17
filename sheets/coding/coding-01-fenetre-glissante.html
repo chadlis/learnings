@@ -222,7 +222,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <p><b>Énoncé.</b> « Plus petite longueur d'un sous-tableau <i>contigu</i> dont la somme est ≥ <code>target</code> ; 0 s'il n'y en a pas », avec <code>nums</code> à valeurs <b>&gt; 0</b>.</p>
     <p><b>Les trois marques.</b> « sous-tableau contigu » → segment ; « plus petite longueur » → extremum de longueur ; « somme ≥ target » + valeurs &gt; 0 → <b>monotone croissante</b> en la taille.</p>
     <p><b>Fil rouge.</b> <code>nums = [2, 3, 1, 2, 4, 3]</code>, <code>target = 7</code>. Réponse : <b>2</b>, réalisée par <code>[4, 3]</code> aux indices 4 et 5 — vérifiée contre une force brute sur les 21 sous-tableaux.</p>
-    <p><b>Ce qui n'est pas le signal.</b> « sous-<i>séquence</i> » (non contiguë) : ni fenêtre ni deux pointeurs. « <i>k</i>-ième plus grand » : un tas. « somme exactement égale à <code>target</code> » avec des négatifs : préfixes + dictionnaire (LC 560), pas une fenêtre.</p>
+    <p><b>Ce qui n'est pas le signal.</b> « sous-<i>séquence</i> » (non contiguë) : ni fenêtre ni deux pointeurs. « <i>k</i>-ième plus grand » : un tas. « somme exactement égale à <code>target</code> » avec des négatifs : préfixes + dictionnaire (LC 560, <a href="../../map.html#c10">c10</a>), pas une fenêtre.</p>
   </div>
 </div>
 
@@ -346,7 +346,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="card apply"><div class="lbl">Le contre-exemple minimal, à sortir de mémoire</div>
     <p><code>nums = [2, −3, 4]</code>, <code>target = 4</code>. La bonne réponse est <b>1</b> : le sous-tableau <code>[4]</code>. Le squelette du pas 2 renvoie <b>0</b> — « aucune fenêtre ».</p>
     <p><b>Pourquoi.</b> Les sommes préfixes valent 2, puis −1, puis 3 : <code>s</code> ne dépasse jamais 4, le <code>while</code> ne s'ouvre jamais, <span class="m">l</span> reste à 0. Le <b>−3</b> empoisonne toutes les fenêtres qui commencent en 0, et seul un recul de <span class="m">l</span> — interdit — les en sortirait.</p>
-    <p><b>Le remède n'est pas une rustine.</b> Somme exactement égale : sommes préfixes + dictionnaire (LC 560), O(<span class="m">n</span>). Somme ≥ cible avec des négatifs : préfixes + <b>deque monotone</b>, O(<span class="m">n</span>). Ce sont d'autres invariants, donc d'autres sheets.</p>
+    <p><b>Le remède n'est pas une rustine.</b> Somme exactement égale : sommes préfixes + dictionnaire (LC 560), O(<span class="m">n</span>). Somme ≥ cible avec des négatifs : préfixes + <b>deque monotone</b>, O(<span class="m">n</span>). Ce sont d'autres invariants, donc une autre sheet : <a href="../../map.html#c10">c10 · Préfixes et deque monotone</a>.</p>
     <p><b>Le test de trente secondes.</b> Avant d'écrire la première ligne : « si j'agrandis la fenêtre, est-ce que mon accumulateur ne peut aller que dans un sens ? » Non ⇒ pas de fenêtre glissante.</p>
   </div>
   <div class="card casse"><div class="lbl">Pièges Python — quatre lignes qui ont l'air justes</div>
@@ -397,6 +397,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="bridges">
     <a href="coding-00-tap-invariant-variant.html#s3"><b>c00 · Le variant</b><small>la ligne « fenêtre glissante » de son tableau des variants est ce pas 4 : (n−r) + (n−l), et c'est le premier variant à deux termes</small></a>
     <a href="../../map.html#c02"><b>c02 · Deux pointeurs</b><small>mêmes deux indices, sens opposés : ils se croisent au lieu d'avancer ensemble, donc le variant devient r − l et la fenêtre est ce qui reste possible</small></a>
+    <a href="../../map.html#c10"><b>c10 · Préfixes et deque monotone</b><small>l'autre versant du contre-signal : quand la condition n'est plus monotone en la taille, l ne peut plus se contenter d'avancer — somme préfixe + dictionnaire, ou deque décroissante</small></a>
     <a href="../../map.html#c07"><b>c07 · Tas</b><small>l'autre façon de tenir un agrégat sur une fenêtre quand le retrait n'est pas O(1) — même invariant ancré à droite, autre conteneur</small></a>
     <a href="../../map.html"><b>La carte, colonne 9</b><small>les neuf familles et leur ordre de dépendance</small></a>
   </div>

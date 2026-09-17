@@ -14,7 +14,7 @@ status: built
 ---
 
 ## Signal dans l'énoncé
-« Sous-tableau / sous-chaîne **contigu** », « le plus long / le plus court tel que … », une **condition monotone** en la taille de la fenêtre (agrandir ne peut que la rendre plus vraie, ou plus fausse), des **valeurs positives** ou un **compte** (fréquences, distincts). Contre-signal : des négatifs avec une somme cible (la monotonie tombe ; préfixes + dict, ou deque : c08/c09).
+« Sous-tableau / sous-chaîne **contigu** », « le plus long / le plus court tel que … », une **condition monotone** en la taille de la fenêtre (agrandir ne peut que la rendre plus vraie, ou plus fausse), des **valeurs positives** ou un **compte** (fréquences, distincts). Contre-signal : des négatifs avec une somme cible (la monotonie tombe ; préfixes + dict, ou deque monotone : c10).
 
 ## Pattern
 Deux indices l ≤ r ; r avance à chaque tour ; l avance seulement pour **rétablir** la condition. Un accumulateur (somme, dict de fréquences, compteur de distincts) décrit **exactement** [l:r+1). Trois habits : **fixe** (taille k, LC 643), **variable** (rétrécir tant que la condition est atteinte, LC 209), **avec budget** (rétrécir quand le budget est dépassé, LC 424).
@@ -81,7 +81,7 @@ nums = [2, 3, 1, 2, 4, 3], target = 7, réponse 2 ([4, 3]). 16 images vérifiée
 - Jamais la solution complète : le squelette ci-dessus ne contient que les lignes de contrôle.
 
 ## Exclusions
-Pas de fenêtre sur deque monotone (c08), pas de préfixes (c09), pas de fenêtre 2D.
+Pas de fenêtre sur deque monotone, pas de préfixes — les deux sont le périmètre de c10 ; pas de fenêtre 2D.
 
 ## Questions pour la revue
 - **Aucun chiffre du spec n'est faux.** Les 16 images de la trace LC 209 ont été
