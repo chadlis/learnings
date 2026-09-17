@@ -10,7 +10,7 @@ prereq: [c00]
 anki: [coding::arbres, coding::dfs, coding::bfs, coding::bst]
 bridges: []
 next: c06
-status: ready
+status: built
 ---
 ## Signal
 Une structure **hiérarchique** sans cycle : chaque nœud a des enfants, un seul parent. Questions : hauteur, diamètre, chemin, somme, validité BST, niveaux. Contre-signal : un graphe avec cycles (c06 : il faut un ensemble de vus).
@@ -73,3 +73,28 @@ Valider un BST en comparant seulement chaque nœud à ses enfants : accepte des 
 
 ## Ce qui a cassé pour Salah
 - Famille t09 : « DFS récursif pré/in/post, BFS par niveaux, hauteur/diamètre, BST invariant de bornes » ; le contre-exemple du BST est celui qui doit sortir sans hésiter.
+
+## Questions pour la revue
+- **Aucun chiffre du spec n'était faux.** Tout a été revérifié par script avant écriture :
+  pré `4, 2, 1, 3, 6, 5, 7` · in `1 … 7` · post `1, 3, 2, 5, 7, 6, 4` ; hauteurs remontées
+  `1, 1, 2, 1, 1, 2, 3` ; `pile = [4, 2, 1]` au 3ᵉ pas du pré-ordre ; diamètre 4 arêtes
+  (chemin 1 – 2 – 4 – 6 – 5) ; B passe le test local, échoue aux bornes, le 4 recevant
+  bien **(5, 6)** ; in-ordre de B `1, 5, 4, 6, 7`, pas trié.
+- **Trois figures au lieu de deux.** Les deux du spec y sont (fig. 1 = les trois ordres +
+  la hauteur ; fig. 3 = test local contre bornes). Une **figure 2** s'est intercalée : un
+  `SL.trace` de 7 cases sur le BFS par niveaux, parce que la série `coding` attend un
+  ruban de trace et que « `k = len(q)` capturé » est un des cinq points du résumé sans
+  quoi il restait sans image. La « figure 2 » du spec est donc la **figure 3** de la sheet.
+- **Chiffres mesurés ajoutés** (pas dans le spec, à valider) : sur 200 000 arbres tirés au
+  hasard (0 à 7 nœuds, valeurs dans 1…7), **67 015** passent le test local et **3 183**
+  d'entre eux ne sont pas des BST, soit **4,75 %** — c'est ce qui justifie « le bug ne se
+  révèle pas à l'essai ». Et le seuil de `RecursionError` : une chaîne de **998** nœuds
+  avec `sys.getrecursionlimit() = 1000` (997 passe). Enfin le piège « feuille = un enfant
+  `None` » sur un chemin de somme cible : **16,8 %** de désaccords sur 200 000 tirages.
+- **Convention du diamètre**, posée en H4 : hauteur **en nœuds** (feuille = 1), diamètre
+  **en arêtes** (4 sur A). Les deux conventions circulent ; si tu préfères l'autre, c'est
+  H4 et le pas 3 à changer.
+- **Liens sortants non repris.** `c03` et `c04` pointent encore vers `map.html#c04` /
+  `map.html#c05` dans leur pied de page alors que les sheets existent. C'est la convention
+  du dépôt (ne pas rouvrir une sheet publiée) — à confirmer, sinon c'est un `sed` de deux
+  lignes par sheet.

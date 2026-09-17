@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Arbres — récursion, parcours, bornes — coding</title>
+<meta name="sheet" content="series=coding;part=09;number=05;status=v1">
+<meta name="part" content="09 · Coding">
+<meta name="subtitle" content="coding — la récursion porte l'invariant ; l'ordre du parcours est le seul choix ; un BST se valide par des bornes, pas par les enfants">
+<meta name="prereq" content="c00">
+<meta name="anki" content="coding::arbres,coding::dfs,coding::bfs,coding::bst">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- série `coding` : squelette annoté et ruban de SL.trace (inerte hors coding) ---- */
+.skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.skel b{color:var(--pen);font-weight:600}
+.step .card.full,.step .card.casse{grid-column:1 / -1}
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .wide table{min-width:520px}
+.card .wide th:nth-child(2),.card .wide td:nth-child(2),
+.card .wide th:nth-child(3),.card .wide td:nth-child(3){text-align:left}
+.readouts .c1 b{color:var(--pen)}.readouts .c3 b{color:var(--red)}
+.sl-trace{--cw:58px;--cgap:8px;margin:4px 0 2px}
+.sl-cells{display:flex;gap:var(--cgap)}
+.sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
+.sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
+.sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
+.sl-cell.win{border-color:var(--green);border-width:2.5px}
+.sl-ptrs{position:relative;height:20px;margin-top:5px}
+.sl-ptr{position:absolute;top:0;left:calc(var(--i) * (var(--cw) + var(--cgap)));width:var(--cw);text-align:center;font:600 12px var(--sans);color:var(--pen)}
+.sl-note{font-size:14px;color:var(--cardink);margin-top:10px}
+.sl-inv{font:12.5px/1.55 var(--mono);color:var(--cardmuted);margin-top:6px;border-left:2px solid #B7791F;padding-left:10px}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ---- marques propres à cette chaîne (l'arbre dessiné dans un SL.plot) ---- */
+.sl-plot text.nodeval{font:600 15px var(--mono);fill:var(--cardink)}
+.sl-plot text.badge{font:600 13px var(--mono)}
+.sl-plot text.bnd{font:12px var(--mono)}
+.sl-plot text.ok{fill:var(--green)}
+.sl-plot .sl-seg.edge{stroke:rgba(34,48,43,.42);stroke-width:2}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 09 · Coding › coding 05</div>
+  <h1>Arbres — <span>récursion</span>, parcours, bornes</h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Une hiérarchie sans cycle : chaque nœud a des enfants, un seul parent, et toute question porte sur un <b>sous-arbre</b>. D'où une seule technique — <b>la récursion porte l'invariant</b> : l'invariant est <b>le contrat de f</b>, ce que f(<span class="m">n</span>) promet sur le sous-arbre de <span class="m">n</span>. Le seul choix qui reste est <b>quand on traite le nœud</b> : pré, in, post. Fil rouge : l'arbre <code>[4, 2, 6, 1, 3, 5, 7]</code>, dont l'in-ordre donne <b>1 … 7</b> trié et dont la hauteur remonte <b>1, 1, 2, 1, 1, 2, 3</b> ; puis <code>[5, 1, 6, ∅, ∅, 4, 7]</code>, qui passe le test « gauche &lt; nœud &lt; droit » et <b>n'est pas un BST</b>. Jamais la solution complète : le squelette, la trace, les phrases.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="coding-00-tap-invariant-variant.html#s2">c00 · l'invariant</a> — conteneur, tranche, « exactement »</li>
+    <li><a href="coding-00-tap-invariant-variant.html#s3">c00 · le variant</a> — l'entier ≥ 0 qui décroît</li>
+    <li><a href="coding-00-tap-invariant-variant.html#s5">c00 · la complexité</a> — composée, jamais devinée</li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>coding::arbres</code><code>coding::dfs</code><code>coding::bfs</code><code>coding::bst</code></div>
+  <h4>Où le pattern voisine</h4>
+  <ol>
+    <li><a href="coding-04-listes-chainees.html">c04 · Listes chaînées</a></li>
+    <li><a href="coding-03-binary-search.html">c03 · Binary search</a></li>
+    <li><a href="../../map.html#c06">c06 · Graphes</a></li>
+    <li><a href="../../map.html">La carte, colonne 9</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette sheet suppose acquis</div>
+    <ul>
+      <li><b>Le rituel TAP.</b> Invariant, variant, conclusion, complexité — <a href="coding-00-tap-invariant-variant.html#s1">c00, pas 1</a>. Ici il change de forme : il n'y a plus de boucle, donc plus d'« entrée de tour » où réciter l'invariant. Le pas 3 dit où il se loge.</li>
+      <li><b>Invariant = conteneur + tranche + « exactement ».</b> <a href="coding-00-tap-invariant-variant.html#s2">c00, pas 2</a>. Sur un arbre, la tranche est <b>le sous-arbre de <span class="m">n</span></b> et le conteneur est <b>la valeur renvoyée</b> : l'invariant devient un <i>contrat</i>.</li>
+      <li><b>Variant = entier ≥ 0 strictement décroissant.</b> <a href="coding-00-tap-invariant-variant.html#s3">c00, pas 3</a>. Ce n'est pas un indice : c'est la <b>taille du sous-arbre</b>, qui perd au moins le nœud courant à chaque appel.</li>
+      <li><b>Complexité composée.</b> <a href="coding-00-tap-invariant-variant.html#s5">c00, pas 5</a>. Le temps est facile (O(1) par nœud) ; ce qui se discute est l'<b>espace</b>, et il ne vaut pas O(1) — pas 4.</li>
+      <li><b>Les flèches de <a href="coding-04-listes-chainees.html">c04</a>.</b> Un arbre est une liste chaînée qui bifurque : mêmes pointeurs, même absence d'indice. La différence tient en un mot — il y a <b>deux</b> suites possibles, donc il faut une <b>pile</b> pour retenir celle qu'on n'a pas prise.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>Arbre <b>binaire</b> : au plus deux enfants, un seul parent, aucun cycle. Un nœud ne connaît <b>pas</b> son parent — pas de champ <code>up</code>. C'est ce qui rend la pile nécessaire : la remontée n'existe que dans les appels.</span>
+      <b>H2</b><span>La récursion est autorisée, et <b>la pile d'appels compte dans l'espace</b>. Dire « O(1) » d'un DFS récursif est faux : c'est O(<span class="m">h</span>), et <span class="m">h</span> peut valoir <span class="m">n</span>.</span>
+      <b>H3</b><span>BST <b>strict</b> : pas de doublons, donc les bornes sont des inégalités <b>strictes</b>. Autoriser les doublons impose de choisir un côté et de remplacer un « &lt; » par un « ≤ » — autre énoncé, autre code.</span>
+      <b>H4</b><span>Conventions chiffrées, à annoncer avant de coder : la <b>hauteur</b> se compte <b>en nœuds</b> (arbre vide 0, feuille 1), le <b>diamètre</b> <b>en arêtes</b>. Les deux conventions coexistent dans la nature ; seule l'ambiguïté coûte.</span>
+      <b>H5</b><span>On énonce le <b>squelette</b> et les phrases. Le corps se remplit devant l'interlocuteur : une sheet de coding ne contient jamais la solution complète.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le signal, et le contre-signal <span class="tag tronc">tronc</span></h3>
+    <p>Une structure <b>hiérarchique sans cycle</b>, et une question qui porte sur un <b>sous-arbre</b> : hauteur, diamètre, chemin, somme, validité BST, niveaux. Toutes ont la même forme — la réponse pour <span class="m">n</span> se fabrique à partir des réponses pour ses enfants.</p>
+    <div class="eq">hiérarchie sans cycle &nbsp;+&nbsp; question sur un sous-arbre &nbsp;⇒&nbsp; <b>une fonction récursive, et son contrat</b></div>
+    <p>Le <b>contre-signal</b> est net : un <b>graphe avec cycles</b>. Sans cycle et avec un seul parent, on ne peut pas revenir sur ses pas, <b>donc</b> rien à mémoriser ; dès qu'un cycle existe il faut un ensemble de <b>vus</b>, et c'est <a href="../../map.html#c06">c06</a>.</p>
+    <p class="say">« La question porte sur un sous-arbre et un sous-arbre est un arbre, donc j'écris une fonction qui répond pour un nœud en appelant ses enfants, donc tout ce que j'ai à décider est ce qu'elle promet et quand elle traite le nœud. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les deux arbres du fil rouge, posés d'avance</div>
+    <p><b>L'arbre A</b>, par niveaux : <code>[4, 2, 6, 1, 3, 5, 7]</code>. Racine 4 ; enfants 2 et 6 ; feuilles 1, 3, 5, 7. Parfaitement équilibré, <b>7</b> nœuds, hauteur <b>3</b>. Il sert à tout : les trois ordres, la hauteur, le diamètre, les niveaux.</p>
+    <p><b>L'arbre B</b>, le contre-exemple : <code>[5, 1, 6, ∅, ∅, 4, 7]</code>. Racine 5, enfants 1 et 6, et <b>sous 6</b> les enfants 4 et 7. Il passe le test « gauche &lt; nœud &lt; droit » à tous les nœuds et <b>n'est pas un BST</b> — pas 6.</p>
+    <p><b>Trois familles de questions, un seul geste.</b> <i>Agréger</i> (hauteur, somme, diamètre) : post-ordre. <i>Ordonner</i> (BST trié, k-ième plus petit) : in-ordre. <i>Copier, sérialiser, propager vers le bas</i> (bornes, somme restante) : pré-ordre.</p>
+    <p><b>Ce que la sheet n'aborde pas.</b> Les arbres <span class="m">n</span>-aires (une boucle sur <code>enfants</code> remplace <code>l</code> et <code>r</code>, rien d'autre ne change) et l'équilibrage (AVL, rouge-noir) : autre sujet, autre sheet.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Le pattern : un seul choix, <i>quand</i> on traite le nœud <span class="tag tronc">tronc</span></h3>
+    <p>Toute fonction récursive sur un arbre a la même charpente : un cas de base sur <code>None</code>, deux appels, une combinaison.</p>
+    <div class="eq">f(<span class="m">n</span>) = combiner( f(<span class="m">n</span>.gauche), f(<span class="m">n</span>.droit), <span class="m">n</span>.valeur )</div>
+    <p>Les deux appels sont figés — gauche puis droit. La <b>seule</b> liberté est la place de <code>n.valeur</code> : avant les appels (<b>pré</b>), entre les deux (<b>in</b>), après (<b>post</b>). Trois ordres, trois usages : pré <b>descend</b> de l'information (copier, sérialiser, propager des bornes), in <b>range</b> (l'in-ordre d'un BST est trié), post <b>remonte</b> (hauteur, diamètre, libérer).</p>
+    <p class="say">« Le cas de base est l'arbre vide et la combinaison est une ligne, donc il ne me reste qu'une décision : je traite le nœud avant, entre ou après les appels, donc je choisis pré si je descends une information, in si je veux l'ordre, post si je remonte une valeur. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le squelette de la hauteur, et les trois ordres sur A</div>
+    <div class="skel">def h(n) :
+    <b>si</b> n est None : <b>retour</b> 0    <i># cas de base</i>
+    <b>retour</b> 1 + max(h(n.gauche), h(n.droit))</div>
+    <p><b>Trois lignes.</b> Le nœud est traité <b>après</b> les deux appels (le <code>1 +</code> s'applique à ce qui remonte) : c'est un post-ordre, et c'est le cas de tout ce qui agrège.</p>
+    <p><b>Les trois ordres sur A</b>, chacun sur une ligne — la valeur du nœud écrite avant, entre, après :</p>
+    <ul>
+      <li><b>pré</b> (nœud, g, d) → <code>4, 2, 1, 3, 6, 5, 7</code> — copier, sérialiser, descendre des bornes.</li>
+      <li><b>in</b> (g, nœud, d) → <code>1, 2, 3, 4, 5, 6, 7</code> — <b>trié</b>, et c'est là tout le test du BST.</li>
+      <li><b>post</b> (g, d, nœud) → <code>1, 3, 2, 5, 7, 6, 4</code> — hauteur, diamètre, libérer.</li>
+    </ul>
+    <p><b>La même fonction, la même récursion.</b> Ces trois suites sortent du <i>même</i> parcours : les nœuds sont visités dans le même ordre physique, seule change la ligne où l'on écrit la valeur. C'est ce que la figure fait voir.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — le même parcours, trois moments d'écrire</div>
+    <div id="f1ctl"></div>
+    <div id="f1plot" class="wide"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">L'arbre A. <b>La position horizontale est l'ordre in-ordre</b> : les abscisses valent 1 à 7 de gauche à droite, et les valeurs aussi — c'est exactement ce que dit « l'in-ordre d'un BST est trié ». Clique <b>pré</b>, <b>in</b>, <b>post</b> : les nœuds se numérotent dans l'ordre de visite, <b>le chemin vert est la pile d'appels</b> (racine → nœud courant), et le compteur de droite l'écrit — au 3<sup>e</sup> pas du pré-ordre, <code>pile = [4, 2, 1]</code>, trois cadres, jamais plus de 3 pour cet arbre. Clique <b>hauteur</b> : le même post-ordre, mais chaque nœud reçoit ce que <i>renvoie</i> f — les feuilles 1, puis 2 et 6 à 2, la racine à 3. Le fait à retenir : <b>les trois boutons parcourent l'arbre identiquement</b>, seule la ligne où l'on écrit change.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>L'invariant est le <i>contrat</i> de f <span class="tag tronc">tronc</span></h3>
+    <p>Il n'y a pas de boucle, donc pas d'« entrée de tour » où réciter l'invariant. Il se loge ailleurs : dans <b>ce que f promet</b>, et il se vérifie en deux points, exactement comme pour une boucle.</p>
+    <div class="eq">contrat : <b>h(<span class="m">n</span>) = le nombre de nœuds du plus long chemin de <span class="m">n</span> à une feuille de son sous-arbre</b></div>
+    <p><b>Initialisation</b> — le cas de base : <code>h(None) = 0</code>, l'arbre vide n'a aucun nœud sur aucun chemin. <b>Préservation</b> — la combinaison : si les deux appels tiennent leur promesse, le plus long chemin depuis <span class="m">n</span> est le nœud <span class="m">n</span> plus le plus long des deux, <b>donc</b> <code>1 + max(…)</code> tient la promesse à son tour.</p>
+    <p class="say">« Je suppose le contrat vrai pour les deux enfants, donc le plus long chemin depuis le nœud vaut un de plus que le meilleur des deux, donc la combinaison tient le contrat, donc il est vrai partout puisqu'il est vrai sur l'arbre vide. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — la remontée sur A, et le contrat à deux quantités</div>
+    <p><b>Post-ordre sur A</b>, dans l'ordre où les valeurs remontent : <code>h(1) = 1</code>, <code>h(3) = 1</code>, <b><code>h(2) = 2</code></b>, <code>h(5) = 1</code>, <code>h(7) = 1</code>, <b><code>h(6) = 2</code></b>, <b><code>h(4) = 3</code></b>. Chaque valeur n'utilise que les deux qui viennent d'être posées — jamais rien d'autre. C'est le bouton « hauteur » de la figure 1.</p>
+    <p><b>Vérifié à l'exécution.</b> Ce squelette confronté à un comptage de niveaux par BFS (implémentation indépendante) sur <b>200&nbsp;000</b> arbres aléatoires (0 à 8 nœuds, formes et valeurs tirées au hasard) : <b>0 désaccord</b>.</p>
+    <p><b>Le diamètre : deux quantités, une seule remontée.</b> Le contrat dit « je <b>renvoie</b> la hauteur » <i>et</i> « je <b>mets à jour</b> un maximum global avec <span class="m">h</span><sub>g</sub> + <span class="m">h</span><sub>d</sub> ». Sur A, à la racine : 2 + 2 = <b>4</b> arêtes — le chemin 1 – 2 – 4 – 6 – 5. Le piège est de croire que le diamètre passe par la racine ; il passe par le nœud qui maximise la somme, et c'est précisément pour ça que le maximum est <b>global</b> et non renvoyé.</p>
+    <p><b>Le test de trente secondes.</b> Avant d'écrire le corps : « qu'est-ce que f promet, exactement, sur le sous-arbre de <span class="m">n</span> ? » Si la phrase ne se dit pas en une ligne, le code ne se trouvera pas.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Le variant, et l'espace qui n'est pas O(1)</h3>
+    <p>Le variant est la <b>taille du sous-arbre</b> : un entier ≥ 0, et chaque appel le fait décroître <b>strictement</b> — le sous-arbre d'un enfant a perdu au moins le nœud courant. Terminaison acquise, sans compter les nœuds.</p>
+    <div class="eq">temps : chaque nœud visité <b>une</b> fois, O(1) par visite &nbsp;⇒&nbsp; O(<span class="m">n</span>) &nbsp;·&nbsp; espace : <b>profondeur de la pile</b> = O(<span class="m">h</span>)</div>
+    <p>L'espace est le seul chiffre qu'on rate. Il ne dépend pas de <span class="m">n</span> mais de <span class="m">h</span> : O(log <span class="m">n</span>) si l'arbre est équilibré, <b>O(<span class="m">n</span>)</b> s'il dégénère en liste. Et la pile est bien réelle — elle plante.</p>
+    <p class="say">« Chaque nœud est visité une fois et coûte O(1), donc le temps est linéaire, et la récursion garde un cadre par ancêtre du nœud courant, donc l'espace est la profondeur de la pile, donc O(<span class="m">h</span>) — qui vaut <span class="m">n</span> quand l'arbre dégénère. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — la pile, mesurée</div>
+    <div class="wide"><table>
+      <tr><th>arbre</th><th>pile = <span class="m">h</span></th></tr>
+      <tr class="hl"><td>A équilibré, <span class="m">n</span> = 7</td><td><b>3</b> cadres</td></tr>
+      <tr><td>A dégénéré, <span class="m">n</span> = 7</td><td>7 cadres</td></tr>
+      <tr><td>parfait, <span class="m">n</span> ≈ 10<sup>6</sup></td><td>20 cadres</td></tr>
+      <tr><td>liste, <span class="m">n</span> = 1&nbsp;000</td><td><b>RecursionError</b></td></tr>
+    </table></div>
+    <p><b>Le seuil, mesuré.</b> Avec la limite CPython par défaut (<code>sys.getrecursionlimit() = 1000</code>), <code>h</code> passe jusqu'à une chaîne de <b>997</b> nœuds et lève <code>RecursionError</code> à <b>998</b> — les quelques cadres manquants sont ceux de l'appelant. Un arbre parfait de hauteur 20 porte <b>1&nbsp;048&nbsp;575</b> nœuds et ne coûte que <b>20</b> cadres ; une liste de <b>1 000</b> nœuds, elle, plante. <b>C'est <span class="m">h</span> qui décide, jamais <span class="m">n</span></b>.</p>
+    <p><b>La sortie de secours, et ce qu'elle coûte.</b> DFS itératif avec une pile explicite : même O(<span class="m">h</span>), mais sur le tas, donc pas de <code>RecursionError</code>. <code>sys.setrecursionlimit</code> marche aussi — à condition de le <b>dire</b> : on déplace la limite, on ne la supprime pas, et le segfault remplace l'exception.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>BFS : la taille de la file dit où finit le niveau</h3>
+    <p>Quand la question parle de <b>niveaux</b> — « par profondeur », « le plus proche », « vue de droite » — le DFS ne convient plus : il plonge. Une file donne l'ordre par niveaux, mais la file <b>mélange les niveaux</b>, puisqu'on y ajoute les enfants pendant qu'on retire les parents.</p>
+    <div class="eq"><code>k = len(file)</code> <b>capturé avant la boucle du niveau</b> &nbsp;⇒&nbsp; les <span class="m">k</span> premiers défilés sont exactement ce niveau</div>
+    <p>Une seule ligne porte toute l'idée : <code>for _ in range(len(q))</code>. Elle fige <span class="m">k</span> au moment où la file ne contient <i>que</i> le niveau courant — après, elle contient déjà des enfants.</p>
+    <p class="say">« La file ne contient que le niveau courant juste avant d'entamer le niveau, donc sa taille à cet instant est le nombre de nœuds du niveau, donc je la capture avant de défiler, donc les <span class="m">k</span> nœuds suivants forment le niveau et tout ce qui s'empile derrière est le suivant. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les trois niveaux de A, et ce qui se passe sans la capture</div>
+    <p><b>Sur A.</b> Tailles capturées : <b>1</b>, puis <b>2</b>, puis <b>4</b> — niveaux <code>[4]</code>, <code>[2, 6]</code>, <code>[1, 3, 5, 7]</code>. Trois tours de la boucle extérieure ⇒ hauteur <b>3</b>, calculée sans récursion : c'est l'implémentation indépendante qui a servi de témoin au pas 3.</p>
+    <p><b>Sans la capture</b> (<code>while q</code> à l'intérieur au lieu de <code>for _ in range(len(q))</code>) : la boucle intérieure vide la file <i>et</i> tout ce qu'on y ajoute. Résultat sur A : <b>un seul niveau</b>, <code>[4, 2, 6, 1, 3, 5, 7]</code> — l'ordre par niveaux est juste, le découpage a disparu, et aucune erreur n'est levée.</p>
+    <p><b>Profondeur minimale.</b> Premier niveau qui contient une <b>feuille</b>. Sur A : niveau 3. Sur B : niveau <b>2</b> — le nœud 1 est une feuille. C'est le cas où le BFS bat le DFS : il s'arrête à la première feuille rencontrée au lieu d'explorer tout l'arbre.</p>
+    <p><b>Coût.</b> O(<span class="m">n</span>) en temps comme le DFS ; en espace, <b>la largeur maximale</b> et non la hauteur — O(<span class="m">n</span>/2) sur un arbre parfait. Les deux parcours échangent exactement leur faiblesse : profond et étroit pour le DFS, large et plat pour le BFS.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — la file, niveau par niveau : <code>k = len(q)</code> capturé avant de défiler</div>
+    <div id="f2trace" class="wide"></div>
+    <p class="cap">Les cases sont les nœuds de A <b>dans l'ordre où la file les rend</b> — c'est-à-dire l'ordre par niveaux, <code>4, 2, 6, 1, 3, 5, 7</code> ; l'indice sous chaque case est son rang de défilement. Fais « pas › » : le cadre <b>vert</b> est le niveau en cours de traitement, c'est-à-dire <b>les <span class="m">k</span> cases que la capture vient de figer</b>, et l'<b>ambre</b> ce qui est déjà sorti. Regarde la ligne du bas : <code>k</code> vaut 1, puis 2, puis 4, et à chaque fois le cadre vert contient exactement <span class="m">k</span> cases. <b>La capture est ce qui dessine les frontières</b> : sans elle, le vert couvrirait les sept cases d'un coup, l'ordre resterait bon et les niveaux auraient disparu.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Le BST se valide par des <i>bornes</i>, pas par les enfants <span class="tag tronc">tronc</span></h3>
+    <p>La propriété BST n'est pas locale. Elle dit : <b>tout</b> le sous-arbre gauche est &lt; <span class="m">n</span>, <b>tout</b> le droit est &gt; <span class="m">n</span> — pas seulement les deux enfants. La récursion qui la vérifie descend donc une information : c'est un <b>pré-ordre</b>.</p>
+    <div class="eq">valid(<span class="m">n</span>, lo, hi) : lo &lt; <span class="m">n</span>.val &lt; hi &nbsp;·&nbsp; gauche dans (lo, <span class="m">n</span>.val) &nbsp;·&nbsp; droit dans (<span class="m">n</span>.val, hi)</div>
+    <p>Appel initial <code>valid(racine, −∞, +∞)</code>. Chaque descente <b>resserre</b> une borne et garde l'autre : un nœud hérite ainsi des contraintes de <b>tous</b> ses ancêtres, pas seulement de son parent.</p>
+    <p class="say">« La propriété porte sur tout le sous-arbre et pas sur les enfants, donc chaque nœud doit tenir dans un intervalle, donc je descends cet intervalle en le resserrant à chaque pas, donc un nœud voit les contraintes de tous ses ancêtres et pas seulement celle de son père. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — l'arbre B, qui passe le test local et n'est pas un BST</div>
+    <p><b>B = <code>[5, 1, 6, ∅, ∅, 4, 7]</code>.</b> Test <b>local</b> à chaque nœud : <code>1 &lt; 5 &lt; 6</code> ✓, <code>4 &lt; 6 &lt; 7</code> ✓ — <b>valide partout</b>. Test par <b>bornes</b> : la racine reçoit (−∞, +∞), le nœud 6 reçoit <b>(5, +∞)</b>, et son fils gauche 4 reçoit <b>(5, 6)</b>. Or <b>4 ∉ (5, 6)</b> : refusé. Le 4 est sous le droit de 5, <b>donc</b> il devait dépasser 5.</p>
+    <p><b>Le témoin qui ne ment pas.</b> L'in-ordre de B vaut <code>1, 5, 4, 6, 7</code> — <b>pas trié</b>, le 4 arrive après le 5. C'est la seconde façon de valider un BST, et elle est équivalente : <b>0 désaccord</b> entre « bornes » et « in-ordre strictement croissant » sur <b>200&nbsp;000</b> arbres aléatoires.</p>
+    <p><b>Combien de faux positifs ?</b> Sur ces <b>200&nbsp;000</b> arbres (0 à 7 nœuds, valeurs dans 1…7), <b>67 015</b> passent le test local ; parmi eux <b>3 183</b> ne sont pas des BST — <b>4,75 %</b>. Un test au hasard a donc toutes les chances de <i>passer</i> : le bug ne se révèle pas à l'essai.</p>
+    <p><b>Le squelette.</b> <code>valid(n, lo, hi)</code> : <code>None</code> ⇒ vrai ; sinon <code>lo &lt; n.val &lt; hi</code> <b>et</b> <code>valid(n.gauche, lo, n.val)</code> <b>et</b> <code>valid(n.droit, n.val, hi)</code>. Quatre lignes, et les deux <code>None</code> initiaux (plutôt que <code>±inf</code>) évitent de comparer des flottants à des entiers.</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — l'arbre B : le test local dit oui, les bornes disent non</div>
+    <div id="f3ctl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">L'arbre B, <code>[5, 1, 6, ∅, ∅, 4, 7]</code>. Clique <b>test local</b> : chaque nœud interne compare sa valeur à ses <i>enfants</i> et tout passe au vert — <code>1 &lt; 5 &lt; 6</code>, <code>4 &lt; 6 &lt; 7</code>. Clique <b>bornes</b> : le même arbre reçoit l'intervalle que ses ancêtres lui imposent, affiché sous chaque nœud ; la racine a (−∞, +∞), le nœud 6 hérite de <b>(5, +∞)</b> parce qu'il est à droite de 5, et son fils gauche n'a plus droit qu'à <b>(5, 6)</b>. Le <b>4 passe au rouge</b> : il respecte son père et viole son grand-père. <b>Ce que la figure fait voir</b> : le vert du premier bouton ne regarde qu'une arête à la fois, les bornes du second descendent depuis la racine — et c'est exactement la différence entre un test qui accepte des arbres faux et un test qui conclut.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Le cas fatal est silencieux : <b>valider un BST en comparant chaque nœud à ses seuls enfants</b>. Aucune exception, aucun ralentissement — la fonction renvoie <code>True</code> sur un arbre qui n'est pas un BST, poliment.</p>
+    <p>Le mécanisme : la contrainte d'un nœud ne vient pas de son parent mais de <b>tous</b> ses ancêtres, et un test local n'en voit qu'un. Chaque fois qu'on descend à gauche on <b>plafonne</b>, à droite on <b>planche</b> ; ces bornes s'accumulent, et le test local les jette.</p>
+    <p class="say">« Le test local ne regarde qu'une arête, donc il ignore les bornes héritées des ancêtres, donc il accepte un nœud qui viole son grand-père, donc il renvoie vrai sur un arbre qui n'est pas un BST, sans lever la moindre erreur. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Le contre-exemple minimal, à sortir de mémoire</div>
+    <p><b>Trois nœuds suffisent-ils ?</b> Non — avec trois nœuds, parent et grand-parent se confondent. Il en faut <b>quatre</b>, et B est le plus petit témoin utile : <code>[5, 1, 6, ∅, ∅, 4, 7]</code>. Version réduite à quatre nœuds : <code>5</code>, à droite <code>6</code>, sous 6 à gauche <code>4</code>. Le test local voit <code>4 &lt; 6</code> et dit oui ; les bornes voient <code>4 ∉ (5, +∞)</code> et disent non.</p>
+    <p><b>La phrase qui tue.</b> « Le 4 est dans le sous-arbre <b>droit</b> de 5, <b>donc</b> il doit dépasser 5 — et il vaut 4. » Elle se dit sans dessiner.</p>
+    <p><b>Mesuré.</b> Sur <b>200&nbsp;000</b> arbres tirés au hasard, le test local et le test par bornes <b>divergent 3 183 fois</b> — soit <b>4,75 %</b> des arbres que le test local accepte. Un cas sur vingt : assez rare pour survivre à trois essais à la main, assez fréquent pour tomber en entretien.</p>
+    <p><b>Le deuxième silence, même famille.</b> « Feuille » veut dire <b>aucun</b> enfant. Écrire <code>if n.l is None or n.r is None</code> au lieu de <code>and</code> dans un « chemin de somme cible » traite un nœud à un seul enfant comme une feuille : sur l'arbre <code>1</code> → (gauche) <code>2</code>, cible 1, la version fautive répond <b>vrai</b> (le chemin 1 s'arrête à la racine) alors que le seul chemin racine→feuille vaut 3 ; et pour la cible 3 elle répond <b>faux</b>. Mesuré : <b>16,8 %</b> de désaccords sur 200 000 tirages.</p>
+  </div>
+  <div class="card casse"><div class="lbl">Pièges Python — quatre lignes qui ont l'air justes</div>
+    <ul>
+      <li><b><code>RecursionError</code> vers 1 000 niveaux.</b> Un arbre <b>dégénéré</b> (une liste) atteint la limite CPython — mesuré : <b>998</b> nœuds avec <code>sys.getrecursionlimit() = 1000</code>. Réponse : DFS <b>itératif</b> avec une pile explicite, ou <code>sys.setrecursionlimit</code> <i>en le disant</i> — on déplace la limite, on ne la retire pas.</li>
+      <li><b>Feuille = « pas d'enfant ».</b> <code>n.l is None <u>and</u> n.r is None</code>. Avec <code>or</code>, un nœud à un seul enfant devient une feuille : chemin de somme faux, profondeur minimale fausse — et rien ne plante.</li>
+      <li><b>BFS par niveaux sans capturer <code>len(q)</code></b> avant la boucle du niveau : les niveaux fusionnent en un seul. L'ordre reste correct, la structure disparaît.</li>
+      <li><b>Le maximum du diamètre en variable « globale ».</b> Sans <code>nonlocal</code> (ou un objet mutable, ou un attribut), l'affectation crée une variable <b>locale</b> à l'appel et le maximum ne remonte pas : la fonction renvoie la valeur initiale, souvent 0.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li><b>Récursion = contrat.</b> L'invariant est ce que f(<span class="m">n</span>) promet sur le sous-arbre de <span class="m">n</span> ; vrai sur <code>None</code>, préservé par la combinaison.</li>
+    <li><b>Pré / in / post</b> : le seul choix est <i>quand</i> on traite le nœud. Pré descend, in range — l'in-ordre d'un BST est <b>trié</b> —, post remonte.</li>
+    <li><b>Variant</b> = taille du sous-arbre. <b>O(<span class="m">n</span>)</b> en temps, <b>O(<span class="m">h</span>)</b> en espace : jamais O(1), et O(<span class="m">n</span>) si l'arbre dégénère.</li>
+    <li><b>BFS par niveaux</b> : <code>k = len(q)</code> capturé <b>au début du niveau</b> ; sans ça les niveaux fusionnent, sans erreur.</li>
+    <li><b>BST</b> : bornes propagées depuis la racine, jamais les seuls enfants. <code>[5, 1, 6, ∅, ∅, 4, 7]</code> passe le test local et n'est pas un BST — 4 ∉ (5, 6).</li>
+  </ol>
+</div>
+<div class="phrase">« Sur un arbre, la récursion porte l'invariant : je dis ce que la fonction promet sur un sous-arbre, je vérifie que c'est vrai pour l'arbre vide et préservé par la combinaison. Le seul choix est quand je traite le nœud — pré, in, post — et pour un BST je valide par des bornes venues de tous les ancêtres, jamais par les seuls enfants. Espace : la profondeur de la pile, O(n) si l'arbre dégénère. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Quel est l'invariant d'une fonction récursive sur un arbre ?</div><div class="a hid">Son contrat sur le sous-arbre : ce que f(n) promet de renvoyer pour le sous-arbre de n. Il se vérifie en deux points, comme pour une boucle — vrai sur None (le cas de base), préservé par la combinaison des deux appels.</div></li>
+    <li><div class="q">Quel ordre pour la hauteur, pour un BST trié, pour sérialiser ?</div><div class="a hid">Post, in, pré. Post remonte une valeur agrégée, in donne l'ordre croissant d'un BST, pré descend de l'information — une copie, une sérialisation, des bornes.</div></li>
+    <li><div class="q">Pourquoi « gauche &lt; nœud &lt; droit » ne valide-t-il pas un BST ?</div><div class="a hid">Parce que la contrainte d'un nœud vient de tous ses ancêtres, pas de son seul parent. Contre-exemple : racine 5, à droite 6, et sous 6 à gauche un 4. Le test local passe ; les bornes donnent (5, 6) pour ce 4, et il est dehors.</div></li>
+    <li><div class="q">Complexité en espace d'un DFS récursif ?</div><div class="a hid">O(h), la profondeur de la pile d'appels : O(log n) si l'arbre est équilibré, O(n) s'il dégénère en liste — et à mille niveaux, RecursionError. Jamais O(1).</div></li>
+    <li><div class="q">Comment un BFS sait-il où finit un niveau ?</div><div class="a hid">En capturant len(q) juste avant de défiler le niveau : à cet instant la file ne contient que ce niveau, donc sa taille en est le nombre de nœuds. Sans la capture, les enfants ajoutés en cours de route fusionnent tous les niveaux en un seul.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Où ce mécanisme se rejoue</div>
+  <div class="bridges">
+    <a href="coding-00-tap-invariant-variant.html#s2"><b>c00 · L'invariant</b><small>le même rituel sans boucle : la « tranche » devient le sous-arbre, le « conteneur » la valeur renvoyée, et l'invariant se lit à l'entrée d'un appel au lieu d'un tour</small></a>
+    <a href="coding-04-listes-chainees.html#s1"><b>c04 · Listes chaînées</b><small>mêmes flèches, même absence d'indice ; il y a juste deux suites au lieu d'une, donc une pile pour retenir celle qu'on n'a pas prise — et c'est cette pile qui fait l'espace O(h)</small></a>
+    <a href="coding-03-binary-search.html#s3"><b>c03 · Binary search</b><small>le BST est la dichotomie faite structure : à chaque nœud on jette une moitié. Même promesse en O(log n), même effondrement en O(n) quand l'arbre n'est plus équilibré</small></a>
+    <a href="../../map.html#c06"><b>c06 · Graphes</b><small>le contre-signal du pas 1 : dès qu'un cycle existe, il faut un ensemble de vus. Un arbre est exactement le cas où l'on peut s'en passer</small></a>
+    <a href="../chains/chain-p07-01-arbres-impurete.html#s5"><b>p07 · Arbres d'impureté</b><small>la même récursion, côté ML : construire l'arbre au lieu de le parcourir, et la hauteur y devient le bouton de variance qu'on règle</small></a>
+    <a href="../../map.html"><b>La carte, colonne 9</b><small>les neuf familles et leur ordre de dépendance</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>coding::arbres</code> (le signal, le contrat de f, le variant, O(<span class="m">h</span>) en espace) · <code>coding::dfs</code> (pré / in / post et ce que chacun sert, la pile = le chemin racine → courant) · <code>coding::bfs</code> (la file, <code>len(q)</code> capturé, la profondeur minimale) · <code>coding::bst</code> (les bornes propagées et le contre-exemple à quatre nœuds).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>coding c05 · v1 du 17/09/2026 · Prérequis : <a href="coding-00-tap-invariant-variant.html">c00 · Le TAP</a>. Suite : <a href="../../map.html#c06">c06 · Graphes</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== l'arbre dessiné : aucune primitive ne dessine un arbre, on compose donc
+   à l'intérieur d'un SL.plot (P.dyn, P.sx/P.sy). Les abscisses ne sont pas un hasard :
+   x = rang in-ordre, y = niveau — d'où le fait, visible, que l'in-ordre d'un BST se lit
+   de gauche à droite. Tout ce qui est dessiné porte une classe, jamais un fill inline. ===== */
+function arbre(id){
+  const P=SL.plot(document.getElementById(id),{x:[0.4,7.6],y:[0.35,3.6],w:600,h:300,xt:[],yt:[]});
+  /* ce plot n'est pas un graphe de fonction : ses deux axes n'ont aucun sens, et le cadre
+     en L qu'ils dessinent se lit à tort comme un repère. On les retire de ce plot-ci seul. */
+  P.svg.querySelectorAll('.sl-axis').forEach(e=>e.parentNode.removeChild(e));
+  return P;
+}
+/* o = {cls:{i:classe}, badge:{i:texte}, bnd:{i:texte}, bcls:{i:classe}, path:[i,…]} */
+function dessine(P,T,o){
+  o=o||{};P.clear();
+  const path=o.path||[];
+  /* de quel côté poser le badge : à l'opposé de l'arête qui monte vers le parent,
+     sinon « h=2 » se pose exactement sur elle. */
+  const par={};T.forEach((n,i)=>[n.l,n.r].forEach(j=>{if(j!==undefined)par[j]=i;}));
+  T.forEach((n,i)=>[n.l,n.r].forEach(j=>{if(j===undefined)return;
+    P.seg(n.x,n.y,T[j].x,T[j].y,(path.indexOf(i)>=0&&path.indexOf(j)>=0)?'gain':'edge');}));
+  T.forEach((n,i)=>{
+    const cls=(o.cls&&o.cls[i])||'sl-c1';
+    P.dot(n.x,n.y,'hollow '+cls,15);
+    P.text(n.x,n.y,String(n.v),'nodeval','middle').setAttribute('dy','0.36em');
+    if(o.badge&&o.badge[i]){const g=(par[i]!==undefined&&n.x<T[par[i]].x)?-1:1;
+      P.text(n.x+g*0.26,n.y+0.26,o.badge[i],'badge '+cls,g<0?'end':'start');}
+    /* les bornes se posent au-dessus des nœuds internes et au-dessous des feuilles :
+       entre deux arêtes en haut, dans le vide en bas — aucun chevauchement possible. */
+    if(o.bnd&&o.bnd[i])P.text(n.x,n.y>=2?n.y+0.42:n.y-0.44,o.bnd[i],'bnd '+((o.bcls&&o.bcls[i])||'ok'),'middle');
+  });
+}
+
+/* ===== Figure 1 : l'arbre A = [4, 2, 6, 1, 3, 5, 7], les trois ordres et la hauteur =====
+   Les trois suites ne sont PAS saisies à la main : parcours() les produit, et elles
+   coïncident avec le script de vérification (pré 4,2,1,3,6,5,7 · in 1…7 · post 1,3,2,5,7,6,4). */
+const A=[{v:4,x:4,y:3,l:1,r:4},{v:2,x:2,y:2,l:2,r:3},{v:1,x:1,y:1},{v:3,x:3,y:1},
+         {v:6,x:6,y:2,l:5,r:6},{v:5,x:5,y:1},{v:7,x:7,y:1}];
+function parcours(T,ordre){const out=[],st=[];(function go(i){if(i===undefined)return;const n=T[i];
+  st.push(i);
+  if(ordre==='pre')out.push({i:i,pile:st.slice()});
+  go(n.l);
+  if(ordre==='in')out.push({i:i,pile:st.slice()});
+  go(n.r);
+  if(ordre==='post')out.push({i:i,pile:st.slice()});
+  st.pop();})(0);return out;}
+function haut(T,i){return i===undefined?0:1+Math.max(haut(T,T[i].l),haut(T,T[i].r));}
+const EV={pre:parcours(A,'pre'),in:parcours(A,'in'),post:parcours(A,'post')};
+const LBL={pre:'pré-ordre',in:'in-ordre',post:'post-ordre',h:'hauteur · post'};
+const P1=arbre('f1plot'),out1=document.getElementById('f1out');
+let mode1='pre',k1=0,t1=null;
+function ev1(){return EV[mode1==='h'?'post':mode1];}
+function draw1(){
+  const ev=ev1(),cls={},badge={};let path=[];
+  for(let j=0;j<k1;j++){const i=ev[j].i;cls[i]='sl-c5';badge[i]=mode1==='h'?('h='+haut(A,i)):String(j+1);}
+  if(k1>0){const cur=ev[k1-1];cls[cur.i]='sl-c3';path=cur.pile;}
+  dessine(P1,A,{cls:cls,badge:badge,path:path});
+  const seq=ev.slice(0,k1).map(e=>mode1==='h'?haut(A,e.i):A[e.i].v).join(', ');
+  const pile=k1?('['+path.map(i=>A[i].v).join(', ')+']'):'[]';
+  out1.innerHTML='<div>parcours<b>'+LBL[mode1]+' · '+k1+' / '+ev.length+'</b></div>'
+    +'<div class="c1">pile d\'appels<b>'+pile+'</b></div>'
+    +'<div class="c3">'+(mode1==='h'?'hauteurs remontées':'ordre de visite')+'<b>'+(seq||'—')+'</b></div>';
+}
+const C1=SL.h('div','sl-ctl',document.getElementById('f1ctl')),B1={};
+function maj1(){Object.keys(B1).forEach(m=>B1[m].setAttribute('aria-pressed',String(m===mode1)));}
+[['pre','pré'],['in','in'],['post','post'],['h','hauteur']].forEach(function(p){
+  const b=SL.h('button','tb',C1,p[1]);B1[p[0]]=b;
+  b.onclick=()=>{clearInterval(t1);mode1=p[0];k1=0;maj1();draw1();
+    if(SL.reduced){k1=ev1().length;draw1();return;}
+    t1=setInterval(()=>{if(k1>=ev1().length){clearInterval(t1);return;}k1++;draw1();},700);};
+});
+const b1p=SL.h('button','tb',C1,'‹ pas');b1p.onclick=()=>{clearInterval(t1);k1=Math.max(0,k1-1);draw1();};
+const b1n=SL.h('button','tb',C1,'pas ›');b1n.onclick=()=>{clearInterval(t1);k1=Math.min(ev1().length,k1+1);draw1();};
+maj1();k1=EV.pre.length;draw1();
+
+/* ===== Figure 2 : BFS par niveaux sur A — les cases sont l'ordre de défilement =====
+   k = len(q) capturé au début du niveau ; `win` = le niveau figé par cette capture,
+   `mark` = ce qui est déjà sorti de la file. */
+SL.trace(document.getElementById('f2trace'),{arr:[4,2,6,1,3,5,7],ms:1400,frames:[
+  {"ptr":{"▲ file":0},"win":[0,1],"mark":[],
+   "note":"Niveau 1. k = len(q) = 1, capturé AVANT de défiler : à cet instant la file ne contient que la racine.",
+   "inv":"file = [4]  ·  k = 1  ·  niveau = [4]  ·  profondeur = 1"},
+  {"ptr":{"▲ file":1},"win":[1,3],"mark":[0],
+   "note":"Niveau 2. Défiler 4 a empilé 2 et 6 ; la file vaut [2, 6], donc k = 2.",
+   "inv":"file = [2, 6]  ·  k = 2  ·  niveau = [2, 6]  ·  profondeur = 2"},
+  {"ptr":{"▲ file":3},"win":[3,7],"mark":[0,1,2],
+   "note":"Niveau 3. Les quatre feuilles ont été empilées pendant le niveau 2 : k = 4.",
+   "inv":"file = [1, 3, 5, 7]  ·  k = 4  ·  niveau = [1, 3, 5, 7]  ·  profondeur = 3"},
+  {"win":[7,7],"mark":[0,1,2,3,4,5,6],
+   "note":"La file est vide : aucune feuille n'a d'enfant. 3 tours de la boucle extérieure ⇒ hauteur 3.",
+   "inv":"k = 1, 2, 4  ·  1 + 2 + 4 = 7 nœuds, chacun défilé une fois ⇒ O(n)"}
+]});
+
+/* ===== Figure 3 : l'arbre B = [5, 1, 6, ∅, ∅, 4, 7] — test local contre bornes =====
+   Les bornes ne sont pas saisies : bornesDe() les propage depuis (−∞, +∞), et le nœud
+   fautif est celui qui sort de son intervalle — le 4, dans (5, 6). */
+const B=[{v:5,x:4,y:3,l:1,r:2},{v:1,x:2,y:2},{v:6,x:6,y:2,l:3,r:4},{v:4,x:5,y:1},{v:7,x:7,y:1}];
+function bornesDe(T,i,lo,hi,out){if(i===undefined)return out;
+  out[i]=[lo,hi];bornesDe(T,T[i].l,lo,T[i].v,out);bornesDe(T,T[i].r,T[i].v,hi,out);return out;}
+const BN=bornesDe(B,0,-Infinity,Infinity,{});
+const fmtB=b=>'('+(b[0]===-Infinity?'−∞':b[0])+', '+(b[1]===Infinity?'+∞':b[1])+')';
+const faux=B.map((n,i)=>i).filter(i=>!(BN[i][0]<B[i].v&&B[i].v<BN[i][1]));
+function inOrdre(T,i,out){if(i===undefined)return out;inOrdre(T,T[i].l,out);out.push(T[i].v);inOrdre(T,T[i].r,out);return out;}
+const INB=inOrdre(B,0,[]).join(', ');
+const P3=arbre('f3plot'),out3=document.getElementById('f3out');
+let mode3='local';
+function draw3(){
+  const cls={},bnd={},bcls={};
+  if(mode3==='local'){
+    B.forEach((n,i)=>{if(n.l===undefined&&n.r===undefined)return;
+      let s='';if(n.l!==undefined)s+=B[n.l].v+' < ';s+=n.v;if(n.r!==undefined)s+=' < '+B[n.r].v;
+      bnd[i]=s+' ✓';});
+    out3.innerHTML='<div class="pos">test local<b>valide ✓</b></div>'
+      +'<div>ce qu\'il regarde<b>1 arête</b></div>'
+      +'<div class="zero">verdict réel<b>pas un BST</b></div>'
+      +'<div class="c3">in-ordre<b>'+INB+'</b></div>';
+  }else{
+    B.forEach((n,i)=>{bnd[i]=fmtB(BN[i]);if(faux.indexOf(i)>=0){bnd[i]=B[i].v+' ∉ '+fmtB(BN[i]);bcls[i]='sl-c3';cls[i]='sl-c3';}});
+    out3.innerHTML='<div class="zero">bornes<b>4 ∉ (5, 6)</b></div>'
+      +'<div>d\'où vient ce 5<b>de la racine</b></div>'
+      +'<div class="pos">verdict<b>refusé ✓</b></div>'
+      +'<div class="c3">in-ordre — pas trié<b>'+INB+'</b></div>';
+  }
+  dessine(P3,B,{cls:cls,bnd:bnd,bcls:bcls});
+}
+const C3=SL.h('div','sl-ctl',document.getElementById('f3ctl')),B3={};
+function maj3(){Object.keys(B3).forEach(m=>B3[m].setAttribute('aria-pressed',String(m===mode3)));}
+[['local','test local'],['bornes','bornes']].forEach(function(p){
+  const b=SL.h('button','tb',C3,p[1]);B3[p[0]]=b;
+  b.onclick=()=>{mode3=p[0];maj3();draw3();};
+});
+maj3();draw3();
+})();
+</script>
+</body>
+</html>
