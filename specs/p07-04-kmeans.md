@@ -10,7 +10,7 @@ prereq: [p03-02, p00-02, p04-04]
 anki: [ml::kmeans, ml::lloyd, ml::kmeans-plus-plus, ml::inertie]
 bridges: [b01, b06]
 next: p08-01
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -29,7 +29,7 @@ Que minimise k-means, pourquoi Lloyd converge toujours mais pas vers le bon endr
 ## Exemple fil rouge
 Six points sur une droite : 1, 2, 3, 10, 11, 12 ; k = 2.
 - Init μ = (1 ; 2). Affectation : {1} et {2, 3, 10, 11, 12} (10 est à 8 de 2 et à 9 de 1). Mise à jour : μ = (1 ; 7,6). Affectation : {1, 2, 3} (3 est à 2 de 1, à 4,6 de 7,6) et {10, 11, 12}. Mise à jour : μ = (2 ; 11). Affectation inchangée : convergé. J = (1 + 0 + 1) + (1 + 0 + 1) = 4.
-- Init « ratée » en 2D : trois centroïdes tirés dans le même amas alors qu'il y a trois amas ; Lloyd les répartit dans l'amas et laisse deux amas fusionnés sous un seul centroïde, avec J deux à trois fois plus grand que l'optimum. Un centroïde ne traverse pas une zone vide : il ne bouge que vers la moyenne des points qui lui sont affectés.
+- Init « ratée » en 2D (vérifiée) : trois amas gaussiens de 30 points, écart-type 0,6, centrés en (1 ; 1), (2,4 ; 3,6), (6,4 ; 1,4). Trois centroïdes tirés dans l'amas de droite. Au premier recentrage, **deux y restent** (16 et 14 points) et **le troisième hérite des 60 points des deux amas de gauche** et va se poser à leur barycentre : il ne les séparera plus jamais. J = 165,30 contre J* = 65,18, soit **2,54 fois** l'optimum, en 7 itérations. Le mécanisme exact : un centroïde ne va qu'à la moyenne des points qui lui sont affectés, donc **rien ne l'attire vers un amas qu'il n'a pas** — les deux qui se partagent l'amas de droite ont chacun leurs points et n'ont aucune raison de venir aider.
 - k-means++ : premier centroïde au hasard, les suivants tirés avec probabilité ∝ distance² au plus proche centroïde déjà choisi ; garantie O(log k)-optimale en espérance (nommer).
 
 ## Pas de la chaîne
@@ -63,13 +63,13 @@ Six points sur une droite : 1, 2, 3, 10, 11, 12 ; k = 2.
 5. k : J décroît toujours (témoin) ; coude, silhouette, usage — un choix.
 6. Euclidienne ⇒ sphères de tailles comparables ; standardiser ; quantification vectorielle = même algorithme.
 
-**Phrase d'entretien** : « k-means minimise l'inertie en alternant deux minimisations exactes : affecter au centroïde le plus proche, recentrer sur la moyenne. Chaque demi-pas fait baisser une quantité bornée, donc ça converge — mais vers un optimum local, parce qu'un centroïde ne bouge que vers la moyenne de ses points et ne traverse jamais une zone vide. D'où k-means++ et des redémarrages ; et k reste un choix, puisque l'inertie décroît toujours avec lui. »
+**Phrase d'entretien** : « k-means minimise l'inertie en alternant deux minimisations exactes : affecter au centroïde le plus proche, recentrer sur la moyenne. Chaque demi-pas fait baisser une quantité bornée, donc ça converge — mais vers un optimum local, parce qu'un centroïde ne va qu'à la moyenne des points qui lui sont affectés : rien ne l'attire vers un amas qu'il n'a pas. D'où k-means++ et des redémarrages ; et k reste un choix, puisque l'inertie décroît toujours avec lui. »
 
 ## Chaîne verbalisée
 1. Que minimise k-means ? → L'inertie J, somme des carrés des distances aux centroïdes.
 2. Pourquoi chaque demi-pas de Lloyd est-il exact ? → Plus proche à μ fixés ; moyenne à c fixées (la moyenne minimise les carrés).
 3. Pourquoi ça converge ? → J ne monte jamais et est ≥ 0 ; affectations finies.
-4. Pourquoi pas vers l'optimum global ? → Non convexe ; un centroïde ne traverse pas le vide.
+4. Pourquoi pas vers l'optimum global ? → Non convexe ; rien n'attire un centroïde vers un amas qu'il n'a pas, donc deux centroïdes coincés dans le même amas y restent.
 5. Que fait k-means++ ? → Centroïdes initiaux tirés ∝ d² au plus proche ; loin les uns des autres.
 6. Pourquoi J ne donne-t-il pas k ? → Il décroît toujours en k (témoin) ; coude ou silhouette, un choix.
 
@@ -80,3 +80,26 @@ Six points sur une droite : 1, 2, 3, 10, 11, 12 ; k = 2.
 
 ## Exclusions
 Pas de mélanges gaussiens/EM au-delà du nom, pas de preuve de k-means++, pas de silhouette détaillée, pas de DBSCAN.
+
+## Questions pour la revue
+
+Aucun chiffre du spec ne s'est révélé faux : le fil rouge 1D est exact
+(J = 246 → 89,2 → 41,68 → 4 ; 10 est bien à 8 de 2 et à 9 de 1), et le « J deux à
+trois fois plus grand » de l'init ratée se mesure à 2,54. Trois points à trancher :
+
+1. **« Un centroïde ne traverse jamais une zone vide » est une formule fausse**, et
+   la figure 2 la contredit à l'écran : le centroïde qui s'échappe saute bel et bien
+   de x ≈ 5,25 à x ≈ 1,64 en coupant à travers le trou entre les amas. Ce qui est
+   vrai, c'est qu'il atterrit toujours dans l'enveloppe convexe des points **qui lui
+   sont affectés** — donc que rien ne l'attire vers un amas qu'il n'a pas. La sheet
+   et le spec (pas 4, phrase d'entretien, chaîne verbalisée) ont été réécrits en ce
+   sens. À valider : c'est une phrase que t07 avait ancrée sous sa forme courte.
+2. **Le fil rouge 1D ne piège jamais Lloyd** : les 15 initialisations possibles à
+   partir de deux des six points convergent toutes vers J = 4, qui est l'optimum
+   global. Le pas 4 repose donc entièrement sur l'exemple 2D ; la sheet le dit
+   explicitement plutôt que de laisser croire que le fil rouge illustre le piège.
+3. **Précision sur l'init ratée** (corrigée ci-dessus) : avec trois centroïdes dans
+   un même amas, Lloyd n'en garde pas trois dans cet amas — c'est impossible, le
+   plus à gauche récupère tout le reste dès la première affectation. Il en reste
+   deux, et le troisième couvre seul les deux amas fusionnés.
+

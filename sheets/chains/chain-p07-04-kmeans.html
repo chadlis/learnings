@@ -1,0 +1,609 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>k-means — une descente alternée sur l'inertie — chaîne</title>
+<meta name="sheet" content="series=chain;part=07;number=04;status=v1">
+<meta name="part" content="07 · Arbres, ensembles, k-means">
+<meta name="subtitle" content="arbres et ensembles — Lloyd alterne deux minimisations exactes et converge vers un optimum local ; l'initialisation décide">
+<meta name="prereq" content="p03-02,p00-02,p04-04">
+<meta name="anki" content="ml::kmeans,ml::lloyd,ml::kmeans-plus-plus,ml::inertie">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+</style></head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 07 · Arbres, ensembles, k-means › chaîne 04</div>
+  <h1>k-means — une descente alternée sur l'<span>inertie</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Seule chaîne <b>non supervisée</b> de la partie : il n'y a plus de <span class="m">y</span>, donc plus de témoin extérieur — le critère est tout ce qu'on a. Une phrase tient l'algorithme : <b>k-means minimise l'inertie en alternant deux minimisations exactes, et un centroïde ne bouge que vers la moyenne de ses points</b>. De la première suit la convergence, de la seconde suit le minimum local. Fil rouge : six points sur une droite, 1, 2, 3, 10, 11, 12, avec <span class="m">k</span> = 2 et <span class="m">μ</span> = (1 ; 2) au départ — <span class="m">J</span> passe de 246 à 4 en deux tours, sans jamais remonter.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="chain-p03-02-gradient-descente.html#s4">p03-02 · Optimum local, non-convexité</a></li>
+    <li><a href="chain-p00-02-esperance-variance-densite.html#s3">p00-02 · La moyenne et les carrés</a></li>
+    <li><a href="chain-p04-04-pca.html#s6">p04-04 · Les unités, la distance</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>ml::kmeans</code><code>ml::lloyd</code><code>ml::kmeans-plus-plus</code><code>ml::inertie</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-01-une-seule-descente.html#s5">b01 · Une seule descente</a></li>
+    <li><a href="../bridges/bridge-06-convexite-forme-fermee.html#s3">b06 · Convexité, forme fermée</a></li>
+    <li><a href="../bridges/bridge-02-temoin-atteignable.html">b02 · Le témoin atteignable</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>Descente, optimum local, non-convexité.</b> Un algorithme qui ne fait que descendre s'arrête dans le creux où il est tombé, et rien dans ce qu'il observe ne dit si c'est le bon (<a href="chain-p03-02-gradient-descente.html#s4">p03-02 pas 4</a>). Toute la seconde moitié de cette chaîne est ce constat, appliqué à des centroïdes.</li>
+      <li><b>La moyenne minimise la somme des carrés.</b> <span class="m">m</span> ↦ Σ(<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">m</span>)² est une parabole en <span class="m">m</span>, de dérivée −2Σ(<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">m</span>), nulle en la moyenne (<a href="chain-p00-02-esperance-variance-densite.html#s3">p00-02 pas 3</a>). C'est exactement le second demi-pas de Lloyd — on l'applique, on ne le redémontre pas.</li>
+      <li><b>Les unités portent la distance.</b> Une feature en milliers écrase toutes les autres dans une norme euclidienne (<a href="chain-p04-04-pca.html#s6">p04-04 pas 6</a>). Même piège ici, même remède : standardiser avant, pas après.</li>
+      <li><b>Le témoin atteignable.</b> Quand un critère peut toujours être amélioré par un modèle plus gros qui <i>reproduit</i> le plus petit, ce critère ne choisit pas la taille (<a href="../bridges/bridge-02-temoin-atteignable.html">b02</a>). C'est mot pour mot ce qui empêche <span class="m">J</span> de donner <span class="m">k</span>.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>La distance est <b>euclidienne</b>. Ce n'est pas un détail d'implémentation : elle récompense des amas <b>sphériques, de tailles et de variances comparables</b>, et c'est elle qui découpe l'espace en cellules convexes (pas 7).</span>
+      <b>H2</b><span><span class="m">k</span> est <b>donné</b>. L'algorithme ne le cherche pas et ne peut pas le chercher : le critère qu'il minimise décroît avec <span class="m">k</span> (pas 6).</span>
+      <b>H3</b><span>Les features sont <b>standardisées</b>. Sans cela, celle dont l'échelle est la plus grande décide seule des affectations, quelle que soit sa pertinence.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor : un critère, deux inconnues</h3>
+    <p><span class="m">n</span> points, <span class="m">k</span> centroïdes à placer. Le critère est l'<b>inertie</b> (aussi : SSE intra-cluster) — la somme des carrés des distances de chaque point au centroïde qui lui est affecté.</p>
+    <div class="eq"><span class="m">J</span>(<span class="m">c</span>, <span class="m">μ</span>) = Σ<sub><span class="m">i</span>=1</sub><sup><span class="m">n</span></sup> ‖<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">μ</span><sub><span class="m">c</span>(<span class="m">i</span>)</sub>‖²</div>
+    <p>Deux objets sont inconnus, pas un : l'<b>affectation</b> <span class="m">c</span> : {1…<span class="m">n</span>} → {1…<span class="m">k</span>}, et les <b>centroïdes</b> <span class="m">μ</span><sub>1</sub>…<span class="m">μ</span><sub><span class="m">k</span></sub>. Il n'y a pas de <span class="m">y</span> : <span class="m">J</span> est à la fois ce qu'on optimise et tout ce qu'on peut mesurer.</p>
+    <p class="say">« Le critère additionne le carré de la distance de chaque point à son centroïde, donc il dépend à la fois des affectations et des centroïdes, donc minimiser <span class="m">J</span> c'est chercher deux objets à la fois, donc l'algorithme devra fixer l'un pour traiter l'autre. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Le fil rouge, posé</div>
+    <p>Six points sur une droite : 1, 2, 3, 10, 11, 12. <span class="m">k</span> = 2, centroïdes de départ <span class="m">μ</span> = (1 ; 2). L'affectation au plus proche donne <b>{1}</b> et <b>{2, 3, 10, 11, 12}</b> — 10 est à 8 de 2 et à 9 de 1, il part donc à droite.</p>
+    <table>
+      <tr><th>point</th><th>1</th><th>2</th><th>3</th><th>10</th><th>11</th><th>12</th></tr>
+      <tr><td>plus proche</td><td><span class="m">μ</span><sub>1</sub></td><td><span class="m">μ</span><sub>2</sub></td><td><span class="m">μ</span><sub>2</sub></td><td><span class="m">μ</span><sub>2</sub></td><td><span class="m">μ</span><sub>2</sub></td><td><span class="m">μ</span><sub>2</sub></td></tr>
+      <tr class="hl"><td>carré de l'écart</td><td>0</td><td>0</td><td>1</td><td>64</td><td>81</td><td>100</td></tr>
+    </table>
+    <p>Inertie de départ : <span class="m">J</span> = <b>246</b>. C'est le nombre que les deux demi-pas suivants vont faire tomber.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Deux inconnues, deux minimisations exactes <span class="tag tronc">tronc</span></h3>
+    <p>Prise séparément, chacune des deux inconnues se résout <b>en forme fermée</b>, sans itération ni approximation.</p>
+    <div class="eq">à <span class="m">μ</span> fixés : &nbsp;<span class="m">c</span>(<span class="m">i</span>) = argmin<sub><span class="m">j</span></sub> ‖<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">μ</span><sub><span class="m">j</span></sub>‖² &nbsp;&nbsp;·&nbsp;&nbsp; à <span class="m">c</span> fixée : &nbsp;∂<span class="m">J</span>/∂<span class="m">μ</span><sub><span class="m">j</span></sub> = −2 Σ<sub><span class="m">i</span>∈<span class="m">C</span><sub><span class="m">j</span></sub></sub>(<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">μ</span><sub><span class="m">j</span></sub>) = 0 &nbsp;⇒&nbsp; <span class="m">μ</span><sub><span class="m">j</span></sub> = moyenne de <span class="m">C</span><sub><span class="m">j</span></sub></div>
+    <p>La première est une décision <b>point par point</b> : les termes de <span class="m">J</span> sont indépendants une fois <span class="m">μ</span> figé. La seconde est un système <b>linéaire</b> en <span class="m">μ</span>, un par cluster — la moyenne de <a href="chain-p00-02-esperance-variance-densite.html#s3">p00-02</a>, lue comme le demi-pas de <a href="../bridges/bridge-06-convexite-forme-fermee.html#s3">b06 pas 3</a>.</p>
+    <p class="say">« À centroïdes fixés le meilleur cluster d'un point est le plus proche, donc le premier demi-pas se résout point par point, donc à clusters fixés le gradient en <span class="m">μ</span> est linéaire et le meilleur centroïde est la moyenne, donc chaque demi-pas de Lloyd est un minimum exact et non une approximation. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les deux demi-pas, en chiffres</div>
+    <p>Sur le fil rouge, avec <span class="m">μ</span> = (1 ; 7,6) obtenu au recentrage, le point 3 est à 2 de <span class="m">μ</span><sub>1</sub> et à 4,6 de <span class="m">μ</span><sub>2</sub> : il change de camp.</p>
+    <table>
+      <tr><th>demi-pas</th><th>ce qui bouge</th><th>résultat</th><th><span class="m">J</span></th></tr>
+      <tr><td>départ</td><td>—</td><td><span class="m">μ</span> = (1 ; 2), {1} · {2,3,10,11,12}</td><td>246</td></tr>
+      <tr><td>recentrer</td><td><span class="m">μ</span></td><td><span class="m">μ</span><sub>2</sub> = 38/5 = <b>7,6</b></td><td>89,2</td></tr>
+      <tr><td>affecter</td><td><span class="m">c</span></td><td>{1, 2, 3} · {10, 11, 12}</td><td>41,68</td></tr>
+      <tr class="hl"><td>recentrer</td><td><span class="m">μ</span></td><td><span class="m">μ</span> = (<b>2</b> ; <b>11</b>)</td><td><b>4</b></td></tr>
+    </table>
+    <p>Détail du 89,2 : à gauche 0, à droite 5,6² + 4,6² + 2,4² + 3,4² + 4,4² = 31,36 + 21,16 + 5,76 + 11,56 + 19,36. <b>Aucun des deux gestes n'est un compromis</b> : chacun est le minimum exact de <span class="m">J</span> sur sa variable.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Lloyd : deux exacts alternés, donc ça s'arrête <span class="tag tronc">tronc</span></h3>
+    <p>L'algorithme de Lloyd — ce qu'on appelle « k-means » — répète <b>affecter</b>, <b>recentrer</b>. Chaque demi-pas minimise <span class="m">J</span> sur une variable, l'autre figée : il ne peut donc pas la faire monter.</p>
+    <div class="eq"><span class="m">J</span> décroît à chaque demi-pas &nbsp;et&nbsp; <span class="m">J</span> ≥ 0 &nbsp;⇒&nbsp; la suite converge ; les affectations possibles sont <b>en nombre fini</b> ⇒ l'arrêt est atteint en un nombre <b>fini</b> d'itérations</div>
+    <p>L'argument de finitude est celui qui compte : deux passages par la même affectation donneraient la même valeur de <span class="m">J</span>, or <span class="m">J</span> décroît strictement tant que l'affectation change — aucune ne revient. Le recentrage est aussi un pas de gradient, avec <span class="m">η</span> = 1/(2<span class="m">n</span><sub><span class="m">j</span></sub>) qui tombe pile sur le minimum (<a href="../bridges/bridge-01-une-seule-descente.html#s5">b01 habit 3</a>).</p>
+    <p class="say">« Chaque demi-pas minimise <span class="m">J</span> sur une variable à l'autre figée, donc <span class="m">J</span> ne monte jamais, donc la suite décroît en restant au-dessus de zéro, donc elle converge — et comme les affectations sont en nombre fini, Lloyd s'arrête en un nombre fini d'itérations. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le fil rouge jusqu'à l'arrêt</div>
+    <p>Quatre demi-pas, puis un cinquième qui ne change rien : l'affectation est stable, donc le recentrage aussi, donc c'est fini.</p>
+    <table>
+      <tr><th>demi-pas</th><th>geste</th><th><span class="m">J</span></th></tr>
+      <tr><td>1</td><td>affecter</td><td>246</td></tr>
+      <tr><td>2</td><td>recentrer</td><td>89,2</td></tr>
+      <tr><td>3</td><td>affecter</td><td>41,68</td></tr>
+      <tr class="hl"><td>4</td><td>recentrer</td><td><b>4</b></td></tr>
+      <tr><td>5</td><td>affecter</td><td>4 — rien ne bouge</td></tr>
+    </table>
+    <p>Et <b>4</b> est ici l'optimum <i>global</i> : parmi les cinq découpages en deux paquets contigus, {1,2,3} · {10,11,12} est le meilleur. Sur cet exemple aucune initialisation ne piège Lloyd — il faut deux dimensions pour fabriquer le piège, c'est le pas suivant.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — les six points, un demi-pas à la fois</div>
+    <div id="f1plot" class="wide"></div>
+    <div class="sl-ctl" id="f1ctl"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Les six points sur leur droite, colorés par cluster ; les <b>traits verticaux</b> sont les centroïdes, et la <b>barre sous chaque point</b> est sa contribution (<span class="m">x</span> − <span class="m">μ</span>)² à l'inertie — <span class="m">J</span> est la hauteur totale des barres. Clique « demi-pas » : un clic sur deux réaffecte (les couleurs changent, les centroïdes ne bougent pas), l'autre recentre (l'inverse). <b>Regarde le readout <span class="m">J</span> : il baisse aux deux gestes et ne remonte jamais.</b> Au cinquième demi-pas plus rien ne bouge — et les barres ont alors pratiquement disparu : 4 contre 246 au départ.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Mais vers un optimum local</h3>
+    <p>Chaque demi-pas est exact, et pourtant le résultat dépend du départ. <span class="m">J</span> n'est pas convexe en (<span class="m">c</span>, <span class="m">μ</span>) : c'est un <b>minimum de morceaux</b> quadratiques, un par découpage possible — convexe sur chaque morceau, non convexe sur l'ensemble (<a href="../bridges/bridge-06-convexite-forme-fermee.html#s3">b06 pas 3</a>).</p>
+    <p>La raison mécanique tient en une ligne : un centroïde <b>ne va qu'à la moyenne des points qui lui sont affectés</b>. Il reste donc dans leur enveloppe convexe, et <b>rien ne l'attire vers un amas qu'il n'a pas</b>. Une fois la partition installée, chacun a ses points et plus personne n'a de raison de bouger — fût-ce pour aller séparer deux amas manifestement distincts.</p>
+    <p class="say">« Un centroïde ne va qu'à la moyenne des points qui lui sont affectés, donc rien ne l'attire vers un amas qu'il n'a pas, donc deux centroïdes qui se partagent un même amas y restent tous les deux, donc Lloyd s'arrête avec deux amas fusionnés sous un seul centroïde et ne le signale pas. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — 90 points, trois amas, deux départs</div>
+    <p>Trois amas gaussiens de 30 points (écart-type 0,6 par axe), centrés en (1 ; 1), (2,4 ; 3,6) et (6,4 ; 1,4). Même algorithme, deux initialisations.</p>
+    <table>
+      <tr><th>départ</th><th>itérations</th><th>ce qu'on obtient</th><th><span class="m">J</span></th></tr>
+      <tr><td>un centroïde par amas</td><td>2</td><td>30 · 30 · 30</td><td><b>65,18</b></td></tr>
+      <tr class="hl"><td>trois points de l'amas de droite</td><td>7</td><td>60 · 16 · 14</td><td><b>165,30</b></td></tr>
+    </table>
+    <p>Au premier recentrage, le plus à gauche des trois hérite d'un coup des <b>60</b> points des deux amas de gauche et va se poser à leur barycentre, entre les deux — il ne les séparera plus jamais, seul. Les deux autres ont chacun leurs points (16 et 14) : rien ne les appelle à l'aide. Coût : <b>2,5 fois</b> l'optimum. Et <span class="m">J</span> décroît proprement tout du long — 956 → 198 → 168 → 166,6 → … → 165,30 — <b>sans jamais remonter et sans jamais avertir</b>.</p>
+    <p>Le chiffre qui pique : le meilleur découpage à <span class="m">k</span> = 2 vaut 174,36. Ce piège à <span class="m">k</span> = 3 fait donc à peine mieux qu'avec un centroïde de moins — le troisième est gaspillé.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — Lloyd en 2D, et le piège</div>
+    <div id="f2plot" class="wide"></div>
+    <div class="sl-ctl" id="f2ctl"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Choisis un départ, puis « jouer » (ou « demi-pas » pour avancer à la main). Les <b>grands cercles creux</b> sont les centroïdes, la <b>ligne fine</b> derrière chacun est sa trajectoire depuis l'init. Avec « <b>init ratée</b> », les trois partent dans l'amas de droite : le plus à gauche hérite des 60 points de gauche et va se poser <b>à leur barycentre, entre les deux amas</b> — il ne pourra plus les séparer, et les deux autres, qui ont chacun leurs points, ne viendront pas. <span class="m">J</span> s'arrête à 165,30 au lieu de 65,18. « <b>init au hasard</b> » tire trois points au sort à chaque clic : environ un lancer sur quatre finit dans ce piège.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Initialiser : k-means++ et redémarrages</h3>
+    <p>Si le départ décide, alors le départ est l'algorithme. <b>k-means++</b> : le premier centroïde est tiré uniformément parmi les points ; chacun des suivants est tiré avec une probabilité proportionnelle au <b>carré</b> de sa distance au plus proche centroïde déjà choisi.</p>
+    <div class="eq">ℙ(<span class="m">x</span> choisi) = <span class="m">d</span>(<span class="m">x</span>)² / Σ<sub><span class="m">x</span>′</sub> <span class="m">d</span>(<span class="m">x</span>′)² &nbsp;&nbsp;avec&nbsp;&nbsp; <span class="m">d</span>(<span class="m">x</span>) = min<sub><span class="m">μ</span> déjà choisi</sub> ‖<span class="m">x</span> − <span class="m">μ</span>‖</div>
+    <p>Un amas non couvert a de grands <span class="m">d</span>², donc il est probable. La garantie qui l'accompagne est en <b>espérance</b> et en <b>ordre</b> : 𝔼[<span class="m">J</span>] = <span class="up">O</span>(log <span class="m">k</span>)·<span class="m">J</span>*, avant même le premier demi-pas de Lloyd. Elle réduit le risque, elle ne l'annule pas : on lance donc <span class="m">n</span><sub>init</sub> fois et on garde le plus petit <span class="m">J</span>.</p>
+    <p class="say">« Un point loin de tous les centroïdes déjà choisis a un <span class="m">d</span>² grand, donc il est probable au tirage suivant, donc les centroïdes initiaux tombent dans des amas différents, donc le piège devient rare — rare et non impossible, donc on relance et on garde le plus petit <span class="m">J</span>. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — 500 lancers sur les mêmes 90 points</div>
+    <table>
+      <tr><th>initialisation</th><th>lancers piégés</th><th>taux</th><th>10 lancers tous piégés</th></tr>
+      <tr><td>trois points au hasard</td><td>118 / 500</td><td>23,6 %</td><td>≈ 5·10<sup>−7</sup></td></tr>
+      <tr class="hl"><td>k-means++</td><td><b>47 / 500</b></td><td><b>9,4 %</b></td><td>≈ 5·10<sup>−11</sup></td></tr>
+    </table>
+    <p>Un tirage de <span class="m">n</span><sub>init</sub> = 10 lancers au hasard donne ici 8 fois 65,18, une fois 165,30 et une fois 168,71 : le minimum retenu est le bon. <b>Garder le plus petit <span class="m">J</span> est légitime</b> — <span class="m">J</span> est le critère qu'on optimise, pas une performance estimée sur des données mises de côté ; il n'y a rien ici à sur-ajuster par sélection (<a href="chain-p01-04-comparer-modeles-multiplicite.html">à l'inverse du cas supervisé</a>).</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Choisir <span class="m">k</span> : le critère ne le donne pas</h3>
+    <p>Ajouter un centroïde ne peut pas dégrader <span class="m">J</span> : la solution à <span class="m">k</span> reste <b>atteignable</b> à <span class="m">k</span>+1, en posant le centroïde de trop sur un existant. C'est le témoin de <a href="../bridges/bridge-02-temoin-atteignable.html">b02</a>, appliqué ici.</p>
+    <div class="eq"><span class="m">J</span>*(<span class="m">k</span>+1) ≤ <span class="m">J</span>*(<span class="m">k</span>) pour tout <span class="m">k</span> &nbsp;&nbsp;·&nbsp;&nbsp; <span class="m">J</span>*(<span class="m">n</span>) = 0 &nbsp;⇒&nbsp; <span class="m">J</span> n'a pas de minimum en <span class="m">k</span></div>
+    <p>Restent trois lectures, aucune n'étant une preuve : le <b>coude</b> de <span class="m">J</span>(<span class="m">k</span>), la <b>silhouette</b> (nommée ici, pas détaillée), et le <span class="m">k</span> dicté par l'usage — le nombre de segments qu'on saura traiter. <span class="m">k</span> est un choix qu'on assume, pas un paramètre qu'on estime.</p>
+    <p class="say">« <span class="m">k</span>+1 centroïdes peuvent reproduire la solution à <span class="m">k</span> en posant celui de trop sur un existant, donc <span class="m">J</span> décroît toujours en <span class="m">k</span>, donc <span class="m">J</span> n'a pas de minimum à chercher, donc <span class="m">k</span> se lit sur un coude ou se décide par l'usage — jamais ne se trouve. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — <span class="m">J</span>(<span class="m">k</span>) sur les 90 points</div>
+    <table>
+      <tr><th><span class="m">k</span></th><th><span class="m">J</span>*(<span class="m">k</span>)</th><th>gain sur <span class="m">k</span>−1</th></tr>
+      <tr><td>1</td><td>630,2</td><td>—</td></tr>
+      <tr><td>2</td><td>174,4</td><td>455,8</td></tr>
+      <tr class="hl"><td>3</td><td><b>65,2</b></td><td><b>109,2</b></td></tr>
+      <tr><td>4</td><td>53,9</td><td>11,2</td></tr>
+      <tr><td>5</td><td>44,9</td><td>9,0</td></tr>
+      <tr><td>6</td><td>36,7</td><td>8,2</td></tr>
+      <tr><td>7</td><td>31,0</td><td>5,7</td></tr>
+      <tr><td>8</td><td>27,2</td><td>3,9</td></tr>
+    </table>
+    <p>Le coude est net : le gain passe de <b>109,2</b> (de <span class="m">k</span> = 2 à 3) à <b>11,2</b>, soit dix fois moins, en passant de <span class="m">k</span> = 3 à <span class="m">k</span> = 4. Au-delà, chaque centroïde supplémentaire rapporte un peu — et rapportera encore quelque chose jusqu'à <span class="m">k</span> = 90, où <span class="m">J</span> = 0. <b>Le coude se lit, il ne se calcule pas.</b></p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — redémarrages, et le coude</div>
+    <div id="f3a" class="wide"></div>
+    <div class="sl-ctl" id="f3ctl"></div>
+    <div class="readouts" id="f3out"></div>
+    <div id="f3b" class="wide"></div>
+    <p class="cap"><b>En haut</b>, dix lancers de Lloyd depuis des départs au hasard : chaque point est le <span class="m">J</span> final d'un lancer, le trait horizontal marque le meilleur trouvé. Clique « relancer 10 » plusieurs fois — la plupart des lancers tombent sur 65,18, deux ou trois montent à 165, et <b>le minimum des dix est presque toujours le bon</b> : c'est tout ce que fait <span class="m">n</span><sub>init</sub>. <b>En bas</b>, <span class="m">J</span>*(<span class="m">k</span>) pour <span class="m">k</span> = 1…8 : toujours décroissante, avec un coude marqué en <span class="m">k</span> = 3 — et rien, dans la courbe, qui dise que 3 est la bonne réponse plutôt que la réponse lisible.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Ce que la distance suppose <span class="tag tronc">tronc</span></h3>
+    <p>Affecter au plus proche découpe l'espace en <b>cellules de Voronoï</b> : la frontière entre deux centroïdes est leur plan médiateur. Chaque cluster est donc un polyèdre <b>convexe</b>, et la question « quelles formes k-means sait-il produire ? » a une réponse exacte : celles-là, et pas d'autres.</p>
+    <p>D'où les échecs prévisibles : deux anneaux concentriques (non convexes), un amas allongé à côté d'un amas rond (le plan médiateur coupe le long), un amas de 1000 points contre un de 20 (le gros se fait couper en deux avant que le petit ait son centroïde). Pour ces formes-là : <b>DBSCAN</b>, <b>mélanges gaussiens</b> (nommés, pas développés).</p>
+    <p class="say">« Affecter au centroïde le plus proche découpe l'espace en cellules de Voronoï, donc tout cluster produit par k-means est convexe, donc une forme non convexe ne peut pas en être un, donc l'algorithme la coupe en morceaux et s'arrête sans erreur. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — H3 en chiffres : 80 personnes, deux features</div>
+    <p>Deux groupes de 40, séparés par l'<b>âge</b> (30 ans contre 52 ans) et rigoureusement identiques en <b>salaire</b> (45 000 € ± 6 000, même loi pour les deux groupes). <span class="m">k</span> = 2.</p>
+    <table>
+      <tr><th></th><th>écart-type âge</th><th>écart-type salaire</th><th>pureté des clusters</th></tr>
+      <tr><td>données brutes</td><td>11,2</td><td>5 641</td><td><b>53,8 %</b></td></tr>
+      <tr class="hl"><td>standardisées</td><td>1</td><td>1</td><td><b>100 %</b></td></tr>
+    </table>
+    <p>Le salaire pèse <b>502 fois</b> l'âge dans la distance : k-means coupe donc sur le salaire — « hauts salaires » contre « bas salaires » — alors que le salaire ne porte <i>aucune</i> structure. 53,8 % de pureté, c'est le hasard. Une seule ligne de standardisation (<a href="chain-p04-04-pca.html#s6">p04-04 pas 6</a>) et la structure réapparaît intacte.</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>k-means comme quantification</h3>
+    <p>Remplacer chaque point par son centroïde, c'est une <b>compression avec perte</b> : on garde un <i>codebook</i> de <span class="m">k</span> vecteurs et un index par point. L'erreur moyenne de cette compression est exactement <span class="m">J</span>/<span class="m">n</span>.</p>
+    <div class="eq"><span class="hat"><span class="m">x</span></span><sub><span class="m">i</span></sub> = <span class="m">μ</span><sub><span class="m">c</span>(<span class="m">i</span>)</sub> &nbsp;&nbsp;·&nbsp;&nbsp; distorsion moyenne = <span class="m">J</span>/<span class="m">n</span></div>
+    <p>C'est la <b>quantification vectorielle</b> des index de recherche : un index <b>IVF</b> partitionne la base par k-means et ne parcourt que les listes dont le centroïde est proche de la requête ; la <b>product quantization</b> fait tourner un k-means par tranche de coordonnées. Même algorithme, autre nom, autre métier.</p>
+    <p class="say">« Chaque point est remplacé par son centroïde, donc ce qu'on conserve de lui est un index sur <span class="m">k</span> valeurs, donc l'erreur moyenne de reconstruction vaut <span class="m">J</span> divisée par <span class="m">n</span>, donc minimiser l'inertie c'est minimiser la distorsion d'un quantificateur. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les 90 points, compressés</div>
+    <p>90 points en 2D, soit 180 nombres. Après k-means à <span class="m">k</span> = 3 : <b>6 nombres</b> de codebook et 90 index de <b>2 bits</b>.</p>
+    <table>
+      <tr><th></th><th>valeur</th></tr>
+      <tr><td>distorsion <span class="m">J</span>*/<span class="m">n</span> = 65,18/90</td><td><b>0,724</b></td></tr>
+      <tr class="hl"><td>bruit intrinsèque des amas : 2 × 0,6²</td><td><b>0,720</b></td></tr>
+    </table>
+    <p>Les deux nombres coïncident, et ce n'est pas un hasard : à <span class="m">k</span> = 3 le quantificateur a atteint la dispersion des amas eux-mêmes. <b>Aucun codebook de trois vecteurs ne fera mieux</b> — pour descendre, il faut plus de centroïdes, c'est-à-dire des index plus longs. Le pas 6 devient ici un arbitrage de débit, et le coude un choix de compression.</p>
+  </div>
+</div>
+
+<div class="step" id="s9">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Les limites de k-means ont toutes la même racine : le critère est une somme de carrés euclidiens, et <b>rien d'extérieur ne vient le contredire</b>. Un résultat faux a exactement la même tête qu'un résultat juste.</p>
+    <p class="say">« Il n'y a pas de <span class="m">y</span>, donc aucune quantité observable ne distingue un bon arrêt d'un mauvais, donc chaque limite ci-dessous passe inaperçue au moment où elle agit, donc le seul garde-fou est de savoir ce que le critère récompense avant de le lancer. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Cinq limites</div>
+    <ul>
+      <li><b>Formes non sphériques, tailles inégales.</b> Les clusters sont des cellules de Voronoï convexes (pas 7) : deux anneaux concentriques ou un amas allongé sont coupés en travers, avec un <span class="m">J</span> parfaitement minimisé. Remède : changer d'algorithme (DBSCAN, mélanges gaussiens), pas de <span class="m">k</span>.</li>
+      <li><b>Échelles.</b> Sans standardisation, la feature de plus grande échelle décide seule — 502 contre 1 dans l'exemple du pas 7, et 53,8 % de pureté. C'est la panne la plus fréquente, et la plus facile à corriger.</li>
+      <li><b>Outliers.</b> La moyenne est tirée par un point isolé (<a href="chain-p05-01-regression-modele-ols.html#s3">p05-01 pas 3</a>). Ajoute un 60 au fil rouge : le meilleur découpage à <span class="m">k</span> = 2 devient {1…12} et {60}, avec <span class="m">μ</span> = (6,5 ; 60) et <span class="m">J</span> = 125,5. <b>Un seul point confisque un centroïde</b> et efface la structure des six autres. Remède : <b>k-medoids</b> (nommé), ou retirer les outliers avant.</li>
+      <li><b>Cluster vide.</b> Un centroïde à qui plus aucun point n'est affecté n'a plus de moyenne : il ne bougera plus jamais, et <span class="m">k</span> effectif tombe à <span class="m">k</span>−1 sans que rien ne le dise. Les implémentations le réinitialisent sur le point le plus éloigné de son centroïde.</li>
+      <li><b><span class="m">k</span>, encore.</b> Choisi, jamais trouvé : <span class="m">J</span> décroît toujours (pas 6), donc aucune optimisation ne le livrera. Coude et silhouette sont des lectures, et deux lecteurs peuvent lire deux <span class="m">k</span> différents sur la même courbe.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li><span class="m">J</span> = Σ‖<span class="m">x</span> − <span class="m">μ</span><sub><span class="m">c</span>(<span class="m">x</span>)</sub>‖² : deux inconnues, deux minimisations <b>exactes</b> — le plus proche, puis la moyenne.</li>
+    <li>Lloyd alterne les deux ; <span class="m">J</span> ne monte jamais et reste ≥ 0, et les affectations sont finies ⇒ <b>convergence en temps fini</b>.</li>
+    <li>Non convexe ⇒ optimum <b>local</b> : rien n'attire un centroïde vers un amas qu'il n'a pas, donc l'initialisation décide (65,18 contre 165,30 sur les mêmes points).</li>
+    <li>k-means++ (tirages ∝ <span class="m">d</span>²) fait tomber le taux de piège de 23,6 % à 9,4 % ; les redémarrages font le reste — on garde le plus petit <span class="m">J</span>.</li>
+    <li><span class="m">J</span>*(<span class="m">k</span>) décroît toujours (témoin atteignable, <a href="../bridges/bridge-02-temoin-atteignable.html">b02</a>) : coude, silhouette ou usage — <span class="m">k</span> est un choix.</li>
+    <li>Euclidienne ⇒ cellules convexes, amas ronds de tailles comparables ; standardiser d'abord, sinon une seule feature décide.</li>
+    <li>Quantification vectorielle (IVF, product quantization) : le même algorithme, avec la distorsion <span class="m">J</span>/<span class="m">n</span> pour nom.</li>
+  </ol>
+</div>
+<div class="phrase">« k-means minimise l'inertie en alternant deux minimisations exactes : affecter au centroïde le plus proche, recentrer sur la moyenne. Chaque demi-pas fait baisser une quantité bornée, donc ça converge — mais vers un optimum local, parce qu'un centroïde ne va qu'à la moyenne des points qui lui sont affectés : rien ne l'attire vers un amas qu'il n'a pas. D'où k-means++ et des redémarrages ; et <span class="m">k</span> reste un choix, puisque l'inertie décroît toujours avec lui. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Que minimise k-means ?</div><div class="a hid">L'inertie <span class="m">J</span> = Σ‖<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">μ</span><sub><span class="m">c</span>(<span class="m">i</span>)</sub>‖², somme des carrés des distances de chaque point à son centroïde — en deux inconnues : l'affectation et les centroïdes.</div></li>
+    <li><div class="q">Pourquoi chaque demi-pas de Lloyd est-il exact ?</div><div class="a hid">À <span class="m">μ</span> fixés, le meilleur cluster d'un point est le plus proche, point par point. À <span class="m">c</span> fixée, le gradient en <span class="m">μ</span> est linéaire et s'annule en la moyenne du cluster.</div></li>
+    <li><div class="q">Pourquoi ça converge, et pourquoi ça s'arrête ?</div><div class="a hid"><span class="m">J</span> ne monte jamais et reste ≥ 0, donc elle converge ; et comme il y a un nombre fini d'affectations et qu'aucune ne revient, l'arrêt est atteint en un nombre fini d'itérations.</div></li>
+    <li><div class="q">Pourquoi pas vers l'optimum global ?</div><div class="a hid"><span class="m">J</span> est non convexe en (<span class="m">c</span>, <span class="m">μ</span>), et un centroïde ne va qu'à la moyenne de ses points : rien ne l'attire vers un amas qu'il n'a pas, donc deux centroïdes coincés dans le même amas y restent.</div></li>
+    <li><div class="q">Que fait k-means++ ?</div><div class="a hid">Il tire les centroïdes initiaux avec une probabilité ∝ <span class="m">d</span>² au plus proche déjà choisi, donc loin les uns des autres. Garantie <span class="up">O</span>(log <span class="m">k</span>) en espérance ; le reste est fait par les redémarrages.</div></li>
+    <li><div class="q">Pourquoi <span class="m">J</span> ne donne-t-il pas <span class="m">k</span> ?</div><div class="a hid">Parce que <span class="m">k</span>+1 centroïdes reproduisent la solution à <span class="m">k</span> : <span class="m">J</span>* décroît toujours, jusqu'à 0 en <span class="m">k</span> = <span class="m">n</span>. Coude ou silhouette sont des lectures, pas des preuves.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="../bridges/bridge-01-une-seule-descente.html#s5"><b>b01 — Une seule descente</b><small>habit 3 : <span class="m">θ</span>, ce sont des centroïdes — le recentrage est le pas −<span class="m">η</span>∇ avec <span class="m">η</span> = 1/(2<span class="m">n</span><sub><span class="m">j</span></sub>), c'est-à-dire le pas pris à son <span class="m">η</span> optimal</small></a>
+    <a href="../bridges/bridge-06-convexite-forme-fermee.html#s3"><b>b06 — Convexité et forme fermée</b><small>habit 2 : le demi-pas de Lloyd est le système linéaire de la moyenne ; c'est l'affectation, pas le recentrage, qui rend le critère global non convexe</small></a>
+    <a href="../bridges/bridge-02-temoin-atteignable.html"><b>b02 — Le témoin atteignable</b><small><span class="m">k</span>+1 centroïdes reproduisent la solution à <span class="m">k</span> : même argument que l'erreur d'entraînement qui ne choisit pas la complexité</small></a>
+    <a href="chain-p07-03-boosting.html"><b>p07-03 — Gradient boosting</b><small>la sheet sœur, et le contraste : là-bas une descente supervisée avec un <span class="m">y</span> pour témoin, ici une descente sans témoin où le critère est aussi le seul juge</small></a>
+    <a href="chain-p04-04-pca.html#s6"><b>p04-04 — PCA</b><small>deux méthodes non supervisées sur les mêmes données centrées, et le même piège d'unités : standardiser change la réponse, pas seulement l'échelle</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>ml::inertie</code> (<span class="m">J</span> = Σ‖<span class="m">x</span> − <span class="m">μ</span><sub><span class="m">c</span></sub>‖², décroît toujours en <span class="m">k</span>) · <code>ml::lloyd</code> (deux minimisations exactes alternées ; convergence en temps fini) · <code>ml::kmeans</code> (optimum local, cellules de Voronoï, standardiser) · <code>ml::kmeans-plus-plus</code> (tirage ∝ <span class="m">d</span>², <span class="up">O</span>(log <span class="m">k</span>) en espérance, <span class="m">n</span><sub>init</sub>).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p07-04 · v1 du 17/09/2026 · Prérequis : p03-02, p00-02, p04-04. Suite : <a href="chain-p08-01-jacobienne-chain-rule-backprop.html">p08-01 jacobienne, chain rule, backprop</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outils communs aux figures ===== */
+/* mulberry32 : générateur 32 bits exactement reproductible (Math.imul), pour que les figures
+   rejouent la simulation vérifiée hors ligne et non un tirage différent à chaque visite. */
+function rng(seed){let a=seed>>>0;return function(){a=(a+0x6D2B79F5)>>>0;let t=a;t=Math.imul(t^(t>>>15),t|1);t^=t+Math.imul(t^(t>>>7),t|61);return ((t^(t>>>14))>>>0)/4294967296;};}
+function gauss(u){const a=Math.max(1e-12,u()),b=u();return Math.sqrt(-2*Math.log(a))*Math.cos(2*Math.PI*b);}
+function ro(hote,items){hote.innerHTML='';items.forEach(it=>{const d=document.createElement('div');if(it[2])d.className=it[2];d.innerHTML=it[0]+'<b>'+it[1]+'</b>';hote.appendChild(d);});}
+const COUL=['sl-c1','sl-c3','sl-c5'];
+function bouton(ctl,t,f){const b=document.createElement('button');b.className='tb';b.textContent=t;b.onclick=f;ctl.appendChild(b);return b;}
+
+/* les 90 points des pas 4 à 6 : trois amas gaussiens, graine fixe */
+const CENTRES=[[1,1],[2.4,3.6],[6.4,1.4]], SD=.6, JETOILE=65.177;
+const DATA=(function(){const u=rng(20260917),P=[];
+  for(const c of CENTRES)for(let i=0;i<30;i++)P.push([c[0]+SD*gauss(u),c[1]+SD*gauss(u)]);return P;})();
+function d2(p,m){return (p[0]-m[0])*(p[0]-m[0])+(p[1]-m[1])*(p[1]-m[1]);}
+function affecte(P,mu){return P.map(p=>{let b=0,bd=Infinity;mu.forEach((m,j)=>{const d=d2(p,m);if(d<bd){bd=d;b=j;}});return b;});}
+function inertie(P,mu){let s=0;for(const p of P)s+=Math.min.apply(null,mu.map(m=>d2(p,m)));return s;}
+function recentre(P,mu,c){return mu.map((m,j)=>{let sx=0,sy=0,n=0;
+  for(let i=0;i<P.length;i++)if(c[i]===j){sx+=P[i][0];sy+=P[i][1];n++;}
+  return n?[sx/n,sy/n]:m.slice();});}
+function lloyd(P,mu0,max){let mu=mu0.map(m=>m.slice());let it=0;
+  for(let k=0;k<(max||100);k++){const c=affecte(P,mu);const nw=recentre(P,mu,c);it++;
+    const fixe=nw.every((m,j)=>Math.abs(m[0]-mu[j][0])<1e-12&&Math.abs(m[1]-mu[j][1])<1e-12);
+    mu=nw;if(fixe)break;}
+  return {mu,it};}
+function kpp(P,u,k){const mu=[P[Math.floor(u()*P.length)].slice()];
+  while(mu.length<k){const d=P.map(p=>Math.min.apply(null,mu.map(m=>d2(p,m))));
+    const s=d.reduce((a,v)=>a+v,0);let r=u()*s,i=0;
+    for(;i<d.length-1;i++){r-=d[i];if(r<=0)break;}
+    mu.push(P[i].slice());}
+  return mu;}
+function forgy(P,u,k){const s=new Set();while(s.size<k)s.add(Math.floor(u()*P.length));
+  return [...s].sort((a,b)=>a-b).map(i=>P[i].slice());}
+
+/* ===== Figure 1 : les six points 1D, un demi-pas à la fois ===== */
+(function(){
+const X=[1,2,3,10,11,12], MU0=[1,2];
+const P=SL.plot(document.getElementById('f1plot'),{x:[-.3,13.6],y:[0,1],w:600,h:236,
+  xt:[1,2,3,10,11,12],xl:'position sur la droite'});
+const out=document.getElementById('f1out');
+let mu,c,n,geste,fini;
+function reset(){mu=MU0.slice();c=null;n=0;geste='affecter';fini=false;pas();}
+function J(){if(!c)return null;let s=0;for(let i=0;i<X.length;i++)s+=(X[i]-mu[c[i]])*(X[i]-mu[c[i]]);return s;}
+function pas(){if(fini)return;
+  if(geste==='affecter'){const nc=X.map(x=>Math.abs(x-mu[0])<=Math.abs(x-mu[1])?0:1);
+    const idem=c&&nc.every((v,i)=>v===c[i]);c=nc;n++;geste='recentrer';if(idem)fini=true;}
+  else{mu=mu.map((m,j)=>{let s=0,k=0;for(let i=0;i<X.length;i++)if(c[i]===j){s+=X[i];k++;}return k?s/k:m;});
+    n++;geste='affecter';}}
+function paquet(j){return '{'+X.filter((x,i)=>c[i]===j).join(' ; ')+'}';}
+function dessine(){P.clear();
+  mu.forEach((m,j)=>{P.vline(m,'slope '+COUL[j]);
+    P.text(m+.22,.975-.085*j,'μ'+(j?'₂':'₁')+' = '+SL.fmt(m,2),COUL[j],'start');});
+  X.forEach((x,i)=>{const cls=c?COUL[c[i]]:'sl-c4';
+    if(c){const dd=(x-mu[c[i]])*(x-mu[c[i]]);
+      P.seg(x,.80,x,.80-.70*Math.min(1,dd/100),'slope '+cls);}
+    P.dot(x,.80,cls,5.5);});
+  const j=J();
+  ro(out,[['demi-pas','&nbsp;'+n+(fini?' · arrêt':'')],
+    ['geste suivant',fini?'aucun':geste],
+    ['inertie <span class="m">J</span>',j===null?'—':SL.fmt(j,2),j!==null&&j<5?'pos':''],
+    ['clusters',c?paquet(0)+' · '+paquet(1):'—']]);}
+const ctl=document.getElementById('f1ctl');
+bouton(ctl,'demi-pas',()=>{pas();dessine();});
+bouton(ctl,'jouer',()=>{reset();dessine();
+  if(SL.reduced){for(let k=0;k<6&&!fini;k++)pas();dessine();return;}
+  const t=setInterval(()=>{if(fini){clearInterval(t);return;}pas();dessine();},700);});
+bouton(ctl,'recommencer',()=>{reset();dessine();});
+reset();dessine();
+})();
+
+/* ===== Figure 2 : Lloyd en 2D, trajectoires des centroïdes ===== */
+(function(){
+const P=SL.plot(document.getElementById('f2plot'),{x:[-.5,8],y:[-.7,4.7],w:560,h:369,
+  xt:[0,2,4,6,8],yt:[0,2,4],xl:'x₁',yl:'x₂'});
+const out=document.getElementById('f2out'), u=rng(4242);
+let mu,c,trace,it,geste,fini,nom,timer=null;
+function depart(kind){
+  if(timer){clearInterval(timer);timer=null;}
+  if(kind==='ratee')mu=[77,80,81].map(i=>DATA[i].slice());
+  else if(kind==='pp')mu=kpp(DATA,u,3);
+  else mu=forgy(DATA,u,3);
+  nom={ratee:'init ratée',pp:'k-means++',hasard:'init au hasard'}[kind];
+  c=affecte(DATA,mu);trace=mu.map(m=>[m.slice()]);it=0;geste='recentrer';fini=false;dessine();}
+function pas(){if(fini)return;
+  if(geste==='recentrer'){const nw=recentre(DATA,mu,c);
+    const bouge=nw.some((m,j)=>Math.abs(m[0]-mu[j][0])>1e-9||Math.abs(m[1]-mu[j][1])>1e-9);
+    mu=nw;mu.forEach((m,j)=>trace[j].push(m.slice()));it++;geste='affecter';if(!bouge)fini=true;}
+  else{c=affecte(DATA,mu);geste='recentrer';}
+  dessine();}
+function dessine(){P.clear();
+  trace.forEach((tr,j)=>{for(let k=1;k<tr.length;k++)P.seg(tr[k-1][0],tr[k-1][1],tr[k][0],tr[k][1],'');});
+  DATA.forEach((p,i)=>P.dot(p[0],p[1],COUL[c[i]],3.2));
+  mu.forEach((m,j)=>P.dot(m[0],m[1],'hollow '+COUL[j],9));
+  const tail=[0,1,2].map(j=>c.filter(v=>v===j).length).sort((a,b)=>b-a);
+  const J=inertie(DATA,mu), rate=J>JETOILE*1.05;
+  ro(out,[['départ',nom],['itérations','&nbsp;'+it+(fini?' · arrêt':'')],
+    ['inertie <span class="m">J</span>',SL.fmt(J,2),fini?(rate?'zero':'pos'):''],
+    ['tailles des clusters',tail.join(' · ')]]);}
+const ctl=document.getElementById('f2ctl');
+bouton(ctl,'init au hasard',()=>depart('hasard'));
+bouton(ctl,'init ratée',()=>depart('ratee'));
+bouton(ctl,'k-means++',()=>depart('pp'));
+bouton(ctl,'demi-pas',()=>pas());
+bouton(ctl,'jouer',()=>{if(timer)clearInterval(timer);
+  if(SL.reduced){for(let k=0;k<80&&!fini;k++)pas();return;}
+  timer=setInterval(()=>{if(fini){clearInterval(timer);timer=null;return;}pas();},420);});
+depart('ratee');
+})();
+
+/* ===== Figure 3 : dix redémarrages, puis le coude J(k) ===== */
+(function(){
+/* -- panneau du haut : n_init lancers depuis des départs au hasard -- */
+const A=SL.plot(document.getElementById('f3a'),{x:[.4,10.6],y:[0,200],w:560,h:230,
+  xt:[1,2,3,4,5,6,7,8,9,10],yt:[50,100,150,200],xl:'numéro du lancer',yl:'J final'});
+const out=document.getElementById('f3out');
+let u=rng(4242), Js=[];
+function lancer10(){Js=[];for(let t=0;t<10;t++)Js.push(inertie(DATA,lloyd(DATA,forgy(DATA,u,3)).mu));}
+function dessineA(){A.clear();
+  const mn=Math.min.apply(null,Js), piege=Js.filter(v=>v>JETOILE*1.05).length;
+  A.seg(.4,mn,10.6,mn,'gain');
+  A.text(10.4,mn+11,'minimum retenu : '+SL.fmt(mn,2),'sl-c1','end');
+  Js.forEach((v,i)=>{const bon=v<=JETOILE*1.05;
+    A.dot(i+1,Math.min(v,198),bon?'sl-c1':'sl-c3',6);});
+  ro(out,[['lancers','&nbsp;10'],['meilleur <span class="m">J</span> des dix',SL.fmt(mn,2),'pos'],
+    ['lancers piégés','&nbsp;'+piege+' / 10',piege?'zero':''],
+    ['optimum connu','65,18']]);}
+const ctl=document.getElementById('f3ctl');
+bouton(ctl,'relancer 10',()=>{lancer10();dessineA();});
+bouton(ctl,'repartir de la graine',()=>{u=rng(4242);lancer10();dessineA();});
+lancer10();dessineA();
+
+/* -- panneau du bas : J*(k), meilleur de 30 lancers k-means++ par k -- */
+const B=SL.plot(document.getElementById('f3b'),{x:[.6,8.4],y:[0,760],w:560,h:230,
+  xt:[1,2,3,4,5,6,7,8],yt:[200,400,600],xl:'k (nombre de centroïdes)',yl:'J*(k)'});
+const JK=[];
+for(let k=1;k<=8;k++){const uu=rng(1000+k);let best=Infinity;
+  for(let t=0;t<30;t++)best=Math.min(best,inertie(DATA,lloyd(DATA,kpp(DATA,uu,k)).mu));
+  JK.push(best);}
+let d='';JK.forEach((v,i)=>{d+=(i?' L':'M')+B.sx(i+1).toFixed(1)+' '+B.sy(v).toFixed(1);});
+SL.el('path',{d,class:'sl-fn sl-c1',fill:'none'},B.layer);
+JK.forEach((v,i)=>B.dot(i+1,v,i===2?'sl-c3':'sl-c1',i===2?7:5));
+B.text(3.15,JK[2]+62,'coude : k = 3','sl-c3','start');
+B.text(1.15,JK[0]-52,'J*(1) = 630,2 — un seul centroïde, la moyenne générale','sl-c1','start');
+B.text(8.35,JK[7]+50,'J*(8) = 27,2 · et J*(90) = 0','sl-c1','end');
+})();
+})();
+</script>
+</body>
+</html>
