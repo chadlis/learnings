@@ -35,7 +35,7 @@ chose à faire devant un fichier à intégrer.
 | | **fiche** | **déroulé** |
 | --- | --- | --- |
 | but | s'auto-tester à voix haute | lire une fois, lentement |
-| signes | `<details>`, `class="q"`, onglets Labo/Parcours/Carte | `nav.echelle` (rail des marches), `<figure>` à boutons |
+| signes | `<details>`, `class="q"`, onglets Labo/Parcours/Carte | rail des marches + figures à boutons — **deux gabarits**, voir ci-dessous |
 | chemin | `sheets/topics/sheet-tNN-<sujet>.html`<br>`sheets/weekly/sheet-wNN-<sujet>.html` | `sheets/walkthroughs/walkthrough-dNN-<sujet>.html` |
 | `<title>` | `<sujet> — fiche thématique` | `<sujet> — déroulé` |
 | `series=` | `topic` / `weekly` | `walkthrough` |
@@ -44,6 +44,15 @@ chose à faire devant un fichier à intégrer.
 
 Tout est calculé par `tools/build_index.py` à partir du fichier : ne jamais
 écrire un de ces libellés à la main.
+
+**Les déroulés ont deux gabarits, et un seul est encore ouvert.** Les quatre
+anciens (D1–D4) sont en `nav.echelle` : rail des marches en `<nav>`, figures en
+`<figure>` à boutons. Tout **nouveau** déroulé suit le standard « tableau noir
+v5 », celui des chaînes et des ponts — `aside.side`, `div.fig`, `assets/sheetlib.js`
+— parce que c'est ce que `tools/validate_sheet.py` impose, et le validateur fait
+foi. `tools/test_walkthroughs.mjs` accepte les deux rails, donc les anciens ne
+sont pas à migrer : ne jamais renommer ni refondre un déroulé publié pour
+uniformiser. Le premier déroulé v5 est D5 (`walkthrough-p01-05`).
 
 ## Intégrer un fichier de `inbox/`
 
