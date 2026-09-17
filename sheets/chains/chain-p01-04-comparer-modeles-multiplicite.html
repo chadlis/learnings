@@ -309,6 +309,7 @@ text.mk-seuil{fill:var(--red)}
     <p>Le score rapporté n'est plus un score, c'est un <b>maximum de 40 variables bruitées</b>. Un max ne peut que monter, et son espérance dépasse la valeur commune de</p>
     <div class="eq">biais ≈ <span class="up">SE</span> · <span class="up">E</span>[max de <span class="m">k</span> normales centrées réduites]</div>
     <p>Le calcul de cette espérance passe par P(max ≤ <span class="m">t</span>) = Φ(<span class="m">t</span>/SE)<sup><span class="m">k</span></sup> : elle est dérivée dans <a href="../walkthroughs/walkthrough-p01-03-biais-du-max.html">D3</a>, ici on la prend telle quelle. Même mécanisme que le <a href="../bridges/bridge-02-temoin-atteignable.html">témoin atteignable</a> : prendre le meilleur d'un ensemble ne peut que faire monter le chiffre affiché.</p>
+    <p>Le principe général, au-delà des 40 configs : <b>si la procédure regarde le tirage pour décider — choisir, s'arrêter — elle change la loi de ce qu'elle produit ; c'est le cas 3</b> (<a href="chain-p01-01-objet-aleatoire.html#s2">p01-01 pas 2</a>).</p>
     <p class="say">« La règle de sélection garde le plus haut des 40 scores, donc le chiffre rapporté est un maximum de variables bruitées, donc il contient la chance qui l'a fait gagner, donc un test set qui a servi à choisir ne mesure plus. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — 40 configs, toutes à 0,87</div>

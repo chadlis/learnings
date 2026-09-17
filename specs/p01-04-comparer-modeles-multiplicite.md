@@ -106,3 +106,22 @@ faux, rien n'a été corrigé ci-dessus. Restent quatre points de décision.
    précisant que c'est l'exemple *médiane* et non la différence appariée à n = 1 000.
    Le fil rouge de cette chaîne reste sans IC bootstrap chiffré : il faudrait un spec pour
    l'y mettre.
+
+## Révision v2
+Le mot **procédure** reçoit sa définition fixe, reprise mot pour mot partout où il sert :
+
+| FIXE | ce qui est vrai du monde, indépendamment des données, fixe et inconnu |
+| ALÉATOIRE | ce qui dépend du tirage, changerait à chaque nouveau tirage |
+| PROCÉDURE | la règle que l'expérimentateur applique au tirage, écrite d'avance, refaite à l'identique sur un autre tirage |
+
+Exemples de procédures : « évaluer A et B sur le même test set et reporter la différence » ·
+« garder la meilleure des k configs » · « s'arrêter dès que p < 0,05 » · « bootstrapper 1 000 fois ».
+
+La procédure est fixe, son résultat est aléatoire parce qu'elle s'applique à un tirage ;
+c'est la procédure qui fabrique l'estimateur.
+
+Et la conséquence, écrite dans p01-04 pas 6 et dans b02 : « si la procédure regarde le
+tirage pour décider — choisir, s'arrêter — elle change la loi de ce qu'elle produit ;
+c'est le cas 3 ».
+
+Porté par la sheet : la phrase du cas 3 est au pas 6, juste avant le « au tableau ».

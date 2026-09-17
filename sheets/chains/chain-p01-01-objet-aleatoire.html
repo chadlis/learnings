@@ -89,6 +89,8 @@ body.white .rule .eq{background:rgba(30,42,54,.06)}
 sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
 table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
 tr.hl td{background:rgba(240,209,120,.35)}
+/* table de définitions : de la prose, donc alignée à gauche, terme insécable */
+table.defs td{text-align:left}table.defs th{white-space:nowrap;vertical-align:top}
 /* ---- figures ---- */
 .fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
 .fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
@@ -215,7 +217,12 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <div class="step" id="s2">
   <div class="rule">
     <h3>Les trois colonnes <span class="tag tronc">tronc</span></h3>
-    <p>Le geste d'ouverture, avant tout calcul : ranger les objets en trois colonnes — <b>fixe</b>, <b>aléatoire</b>, <b>procédure</b>.</p>
+    <p>Le geste d'ouverture, avant tout calcul : ranger les objets en trois colonnes.</p>
+    <table class="defs">
+      <tr><th>FIXE</th><td>ce qui est vrai du monde, indépendamment des données, fixe et inconnu</td></tr>
+      <tr><th>ALÉATOIRE</th><td>ce qui dépend du tirage, changerait à chaque nouveau tirage</td></tr>
+      <tr class="hl"><th>PROCÉDURE</th><td>la règle que l'expérimentateur applique au tirage, écrite d'avance, refaite à l'identique sur un autre tirage</td></tr>
+    </table>
     <p>La colonne aléatoire n'a qu'<b>une entrée</b> : le test set. <span class="m">X</span> et <span class="m">p̂</span> en descendent, ce ne sont pas des sources d'aléa supplémentaires. Si une deuxième entrée apparaît (réentraînement, seuil choisi sur ce même jeu), c'est une autre chaîne.</p>
     <p class="say">« Le paramètre est fixe, l'échantillon est tiré, donc l'estimateur est une fonction de l'échantillon, donc c'est lui, et lui seul, qui a une distribution. »</p>
   </div>
@@ -225,6 +232,8 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr><td><span class="m">π</span> (accuracy vraie)<br>le modèle, ses poids<br><span class="m">n</span> = 1 000</td><td>le test set <b>(seule entrée)</b><br>↓ <span class="m">X</span> = 872<br>↓ <span class="m">p̂</span> = 0,872</td><td>tirer 1 000 lignes<br>→ compter les bonnes<br>→ diviser par <span class="m">n</span></td></tr>
     </table>
     <p>Lire de gauche à droite : la procédure prend ce qui est fixe, y injecte ce qui est tiré, et rend un nombre. <b>Ce nombre hérite de l'aléa du tirage</b> — c'est tout ce que dit la suite de la chaîne.</p>
+    <p>Exemples de procédures : « évaluer A et B sur le même test set et reporter la différence » · « garder la meilleure des <span class="m">k</span> configs » · « s'arrêter dès que <span class="m">p</span> &lt; 0,05 » · « bootstrapper 1 000 fois ».</p>
+    <p>La procédure est <b>fixe</b>, son résultat est <b>aléatoire</b> parce qu'elle s'applique à un tirage ; c'est la procédure qui fabrique l'estimateur.</p>
   </div>
 </div>
 

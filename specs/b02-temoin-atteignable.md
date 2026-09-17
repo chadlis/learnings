@@ -69,3 +69,22 @@ figure. SE = √(0,87·0,13/1000) = 0,0106 et 0,87 + 2,16·0,0106 = 0,893 confir
    par la sheet, absente du spec : c'est elle qui permet de chiffrer le pessimisme de
    l'OOB — variance ρ + (1 − ρ)/m, soit 0,3014 à m = 500 contre 0,3038 à m = 184, +0,8 %.
    **Validé en revue 4** comme hypothèse de lecture, à réaligner quand p07-02 sortira.
+
+## Révision v2
+Le mot **procédure** reçoit sa définition fixe, reprise mot pour mot partout où il sert :
+
+| FIXE | ce qui est vrai du monde, indépendamment des données, fixe et inconnu |
+| ALÉATOIRE | ce qui dépend du tirage, changerait à chaque nouveau tirage |
+| PROCÉDURE | la règle que l'expérimentateur applique au tirage, écrite d'avance, refaite à l'identique sur un autre tirage |
+
+Exemples de procédures : « évaluer A et B sur le même test set et reporter la différence » ·
+« garder la meilleure des k configs » · « s'arrêter dès que p < 0,05 » · « bootstrapper 1 000 fois ».
+
+La procédure est fixe, son résultat est aléatoire parce qu'elle s'applique à un tirage ;
+c'est la procédure qui fabrique l'estimateur.
+
+Et la conséquence, écrite dans p01-04 pas 6 et dans b02 : « si la procédure regarde le
+tirage pour décider — choisir, s'arrêter — elle change la loi de ce qu'elle produit ;
+c'est le cas 3 ».
+
+Porté par la sheet : la phrase du cas 3 est au pas 6 (lieu 4, le test set qui a servi à choisir).

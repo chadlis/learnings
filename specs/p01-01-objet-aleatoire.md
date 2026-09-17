@@ -116,3 +116,21 @@ Corrections faites d'office en écrivant la sheet (à valider) :
 
 **Arbitrage de revue, 16/09.** La puce « Notation » des prérequis est **conservée** : c'est la bonne façon d'adresser les scories (chapeau de l'estimateur, `p(x ; π)` en fréquentiste) — une règle posée une fois en tête, pas une correction répétée dans les pas. Les bornes des figures 2 ([0,76 ; 0,98], 66 bacs) et 3 ([0,70 ; 1,033 ; 10 bacs, alignés sur 1/30]) sont **validées telles quelles** : elles gardent l'axe fixe d'une valeur de n à l'autre et laissent voir la borne de Wald à 1,023, qui est l'objet même de la figure.
 
+## Révision v2
+Le mot **procédure** reçoit sa définition fixe, reprise mot pour mot partout où il sert :
+
+| FIXE | ce qui est vrai du monde, indépendamment des données, fixe et inconnu |
+| ALÉATOIRE | ce qui dépend du tirage, changerait à chaque nouveau tirage |
+| PROCÉDURE | la règle que l'expérimentateur applique au tirage, écrite d'avance, refaite à l'identique sur un autre tirage |
+
+Exemples de procédures : « évaluer A et B sur le même test set et reporter la différence » ·
+« garder la meilleure des k configs » · « s'arrêter dès que p < 0,05 » · « bootstrapper 1 000 fois ».
+
+La procédure est fixe, son résultat est aléatoire parce qu'elle s'applique à un tirage ;
+c'est la procédure qui fabrique l'estimateur.
+
+Et la conséquence, écrite dans p01-04 pas 6 et dans b02 : « si la procédure regarde le
+tirage pour décider — choisir, s'arrêter — elle change la loi de ce qu'elle produit ;
+c'est le cas 3 ».
+
+Porté par la sheet : le tableau remplace la ligne des trois colonnes au pas 2 ; exemples et phrase sont dans la carte d'application du même pas, pour tenir le plafond de mots de la règle.
