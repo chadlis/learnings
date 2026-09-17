@@ -10,7 +10,7 @@ prereq: [p06-03, p02-01, p00-03]
 anki: [ml::calibration, ml::brier, ml::desequilibre, ml::seuil]
 bridges: [b05]
 next: p07-01
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -28,9 +28,9 @@ Quand un modèle dit 0,8, est-ce que 80 % de ces cas sont positifs ? Pourquoi un
 ## Exemple fil rouge
 Fraude de p06-03 (0,3 %). Deux modèles avec la même AUC = 0,95 :
 - A calibré : parmi les transactions scorées 0,20, 20 % sont des fraudes.
-- B, entraîné sur un jeu **rééchantillonné à 50/50** : mêmes scores relatifs (même classement, même AUC), mais scoré 0,50 là où A dit 0,006 : ses probabilités portent une prévalence de 50 %, pas de 0,3 %.
-Coûts : FN = 100 €, FP = 1 €. Seuil optimal sur une probabilité calibrée : p* = c_FP/(c_FP + c_FN) = 1/101 = 0,0099. Sur B, ce seuil est faux d'un facteur ~150.
-Brier = moyenne des (p − y)² : 0,05 pour A ; 0,25 pour B (les 0,5 sur des négatifs coûtent 0,25 chacun) ; le trivial « p = 0,003 partout » fait 0,003.
+- B, entraîné sur un jeu **rééchantillonné à 50/50** : mêmes scores relatifs (même classement, même AUC), mais scoré 0,50 là où A dit 0,003 : ses probabilités portent une prévalence de 50 %, pas de 0,3 %.
+Coûts : FN = 100 €, FP = 1 €. Seuil optimal sur une probabilité calibrée : p* = c_FP/(c_FP + c_FN) = 1/101 = 0,0099. Sur les scores de B, la même décision se lit à 0,769 : 78 fois plus haut en probabilité, 332 fois en cote.
+Brier = moyenne des (p − y)² : 0,0026 pour A ; 0,088 pour B (ses scores gonflés sont payés sur la masse des négatifs) ; le trivial « p = 0,003 partout » fait 0,0030 = π(1 − π). Log-loss : 0,013 pour A, 0,286 pour B, 0,020 pour le trivial.
 
 ## Pas de la chaîne
 1. **Le décor.** Deux modèles, même AUC, même classement. L'un sert à décider, l'autre non. Ce qui les sépare n'est pas visible sur la ROC.
@@ -79,3 +79,21 @@ Brier = moyenne des (p − y)² : 0,05 pour A ; 0,25 pour B (les 0,5 sur des né
 
 ## Exclusions
 Pas de décomposition du Brier en formules, pas de conformal prediction, pas de calibration multi-classe au-delà de la température.
+
+## Questions pour la revue
+Trois chiffres du fil rouge ont été corrigés à l'écriture, après vérification par script
+(binormal à variances égales, AUC = 0,95, π = 0,3 %, A calibré par Bayes, B = A à prior 50/50) :
+
+- **« scoré 0,50 là où A dit 0,006 »** → **0,003**. Un score de 0,50 chez B est exactement la
+  cote 1 ; ramené à la prévalence de production il vaut π = 0,003, pas le double.
+- **« ce seuil est faux d'un facteur ~150 »** → le seuil équivalent sur les scores de B vaut
+  **0,769**, soit **×78 en probabilité** et **×332 en cote**. 150 ne correspond à aucune des deux
+  lectures ; 332 est le rapport des cotes déjà écrit correctement au pas 6.
+- **« Brier = 0,05 pour A ; 0,25 pour B »** → **0,0026 pour A**, **0,088 pour B**. Le 0,05
+  contredisait le pas 4 du spec lui-même : à π = 0,3 % le trivial vaut π(1 − π) = 0,0030, donc un
+  modèle calibré *doit* être en dessous. Le 0,25 supposait que B sorte 0,50 sur *tous* les
+  négatifs ; ses scores sont étalés, leur moyenne vaut 0,178.
+
+À trancher en revue : le C « sur-confiant » de la figure 1 est construit en étirant les logits
+autour du prior (facteur 1,8), faute de définition dans le spec. Son Brier (0,0056) est
+*au-dessus* du trivial — c'est pédagogiquement utile, mais c'est un choix d'auteur.

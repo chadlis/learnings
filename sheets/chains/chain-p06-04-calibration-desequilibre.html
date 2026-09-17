@@ -1,0 +1,650 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Scores, calibration, déséquilibre — chaîne</title>
+<meta name="sheet" content="series=chain;part=06;number=04;status=v1">
+<meta name="part" content="06 · Évaluer">
+<meta name="subtitle" content="évaluer — discriminer n'est pas être calibré, et le déséquilibre se traite par le seuil avant tout">
+<meta name="prereq" content="p06-03,p02-01,p00-03">
+<meta name="anki" content="ml::calibration,ml::brier,ml::desequilibre,ml::seuil">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 06 · Évaluer › chaîne 04</div>
+  <h1>Classer n'est pas <span>calibrer</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Même population qu'en <a href="chain-p06-03-seuil-roc-pr.html">p06-03</a> — 100 000 transactions, 300 fraudes, prévalence 0,3 % — et deux modèles de <b>même AUC 0,95</b>, donc de classement rigoureusement identique. Sur la même transaction, A annonce 0,003 et B annonce 0,50. <b>L'AUC ne regarde que l'ordre des scores, jamais leur valeur</b> ; or c'est la valeur qui permet de calculer un seuil par les coûts, et c'est elle que le rééchantillonnage à 50/50 détruit sans toucher au classement. Fil rouge : un faux négatif coûte 100 €, un faux positif 1 €, donc le seuil vaut 1/101 = 0,0099.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="chain-p06-03-seuil-roc-pr.html">p06-03 · Seuil, ROC, PR</a></li>
+    <li><a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01 · Du bruit à la loss</a></li>
+    <li><a href="chain-p00-03-conditionnement-bayes.html">p00-03 · Bayes, prévalence, VPP</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>ml::calibration</code><code>ml::brier</code><code>ml::desequilibre</code><code>ml::seuil</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-05-escalier-vs-sensible.html">Escalier vs sensible</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>Score, seuil, décision.</b> Le modèle sort un score ; quelqu'un pose un seuil ; les métriques de décision en dépendent, l'AUC non — elle vaut <span class="m">P</span>(score d'un positif &gt; score d'un négatif), une propriété du <i>classement</i> seul (<a href="chain-p06-03-seuil-roc-pr.html#s7">p06-03</a>).</li>
+      <li><b>La log-loss note des probabilités.</b> Elle est la <span class="up">NLL</span> d'une Bernoulli : −log <span class="m">p</span> sur un positif, −log(1−<span class="m">p</span>) sur un négatif. Elle sanctionne la <i>valeur</i> annoncée, pas la décision prise (<a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>).</li>
+      <li><b>Prévalence et VPP.</b> <span class="m">P</span>(fraude | alerte) fait entrer le base rate par Bayes ; à 0,3 % de prévalence il s'effondre même pour un excellent détecteur (<a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>).</li>
+      <li><b>Cote et logit.</b> cote = <span class="m">p</span>/(1−<span class="m">p</span>), logit <span class="m">p</span> = log(cote). Multiplier une cote par <span class="m">k</span> ajoute log <span class="m">k</span> au logit : c'est la <b>seule</b> opération algébrique de cette chaîne.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>On veut des probabilités <b>utilisables</b> : pour un seuil de coût, un tri par espérance, une décision chiffrée. Si la sortie ne sert qu'à ranger, la calibration ne se pose pas et l'AUC suffit.</span>
+      <b>H2</b><span>La <b>prévalence de production</b> est connue, ou estimée : 0,3 %. C'est elle que les probabilités doivent refléter — « calibré » n'a de sens que relativement à une population.</span>
+      <b>H3</b><span>Les deux modèles de l'exemple sont liés par une transformation <b>strictement croissante</b> du score. C'est le cas exact du rééchantillonnage : il déplace le prior, il ne réordonne rien.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor</h3>
+    <p>Deux modèles de fraude, entraînés sur les mêmes features. A a vu les données telles quelles ; B a vu un jeu <b>rééchantillonné à 50/50</b> pour « corriger le déséquilibre ».</p>
+    <p>Ils rangent les transactions dans le même ordre. Même AUC, même courbe ROC, même précision-rappel à rang égal. L'un sert à décider, l'autre non — et rien de ce qui les sépare n'est visible sur la ROC.</p>
+    <p class="say">« Les deux modèles rangent les transactions dans le même ordre, donc l'AUC et la ROC leur donnent la même note, donc ce qui les distingue n'est pas là où on a l'habitude de regarder. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le fil rouge</div>
+    <p>100 000 transactions, <b>300</b> fraudes : prévalence <span class="m">π</span> = <b>0,3 %</b>. Les deux modèles ont une <span class="up">AUC</span> de <b>0,950</b>.</p>
+    <table>
+      <tr><th>transaction</th><th>rang</th><th>score A</th><th>score B</th></tr>
+      <tr><td>t<sub>1</sub></td><td>médiane des légitimes</td><td>0,0002</td><td>0,063</td></tr>
+      <tr><td>t<sub>2</sub></td><td>1 % les plus suspectes</td><td>0,0021</td><td>0,406</td></tr>
+      <tr class="hl"><td>t<sub>3</sub></td><td>—</td><td><b>0,0030</b></td><td><b>0,500</b></td></tr>
+      <tr><td>t<sub>4</sub></td><td>très suspecte</td><td>0,178</td><td>0,986</td></tr>
+    </table>
+    <p>L'ordre est le même ligne après ligne. Sur t<sub>3</sub>, A annonce trois pour mille et B une chance sur deux. <b>Un seul des deux nombres est vrai.</b></p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Discrimination ≠ calibration <span class="tag tronc">tronc</span></h3>
+    <p><b>Discriminer</b>, c'est ranger les positifs au-dessus des négatifs : une propriété de l'<i>ordre</i>, mesurée par l'AUC. <b>Être calibré</b>, c'est que parmi les cas scorés <span class="m">p</span>, une fraction <span class="m">p</span> soit effectivement positive : une propriété de la <i>valeur</i>.</p>
+    <div class="eq"><span class="up">AUC</span> = <span class="m">P</span>(<span class="m">s</span><sub>+</sub> &gt; <span class="m">s</span><sub>−</sub>) &nbsp;&nbsp;&nbsp; calibré ⇔ <span class="m">P</span>(<span class="m">y</span> = 1 | <span class="hat"><span class="m">p</span></span> = <span class="m">p</span>) = <span class="m">p</span> pour tout <span class="m">p</span></div>
+    <p>Toute transformation strictement croissante du score — ×2, exp, rang, une sigmoïde décalée — laisse l'AUC intacte et peut détruire la seconde propriété. Les deux ne se déduisent donc pas l'une de l'autre.</p>
+    <p class="say">« L'AUC ne regarde que l'ordre, donc toute transformation croissante la conserve, donc elle ne dit rien de la valeur du score, donc la calibration est une propriété séparée qu'il faut mesurer à part. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — la transformation exacte</div>
+    <p>Ici B est A vu à travers un décalage constant en <b>logit</b> :</p>
+    <div class="eq">logit <span class="m">p</span><sub>B</sub> = logit <span class="m">p</span><sub>A</sub> − logit <span class="m">π</span> = logit <span class="m">p</span><sub>A</sub> + <b>5,806</b></div>
+    <p>Vérification sur t<sub>3</sub> : logit 0,0030 = −5,806, plus 5,806 donne 0, et <span class="m">σ</span>(0) = 0,500. C'est bien le 0,50 de B.</p>
+    <p>La fonction <span class="m">x</span> ↦ <span class="m">σ</span>(<span class="m">x</span> + 5,806) est strictement croissante : l'AUC des deux modèles est <b>identique au dernier chiffre</b>, 0,950. Le Brier et la log-loss, eux, ne le sont pas du tout — c'est tout le sujet.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Le diagramme de fiabilité</h3>
+    <p>Comment voir la calibration sans formule : regrouper les prédictions par tranche de score, puis tracer la <b>fréquence observée</b> contre le <b>score moyen</b> de la tranche.</p>
+    <p>Diagonale = calibré. Au-dessus = <b>sous-confiant</b> (on observe plus de positifs qu'annoncé). Au-dessous = <b>sur-confiant</b>. L'AUC ne mesure que la discrimination ; le Brier et la log-loss mesurent la calibration <b>et</b> la discrimination ensemble, en un seul nombre.</p>
+    <p class="say">« Le diagramme groupe les cas par score annoncé et lit la fréquence réellement observée, donc un écart à la diagonale est un mensonge de la probabilité, donc c'est là que se voit ce que l'AUC ne montre pas. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — trois tranches lues à la main</div>
+    <table>
+      <tr><th>tranche de score</th><th>modèle</th><th>score moyen</th><th>fréquence observée</th></tr>
+      <tr class="hl"><td>0,4 – 0,5</td><td>A</td><td>0,446</td><td><b>0,446</b></td></tr>
+      <tr><td>0,4 – 0,5</td><td>B</td><td>0,448</td><td>0,0025</td></tr>
+      <tr><td>0,9 – 1,0</td><td>B</td><td>0,947</td><td>0,092</td></tr>
+      <tr><td>0,8 – 0,9</td><td>C</td><td>0,851</td><td>0,168</td></tr>
+    </table>
+    <p>A tombe sur la diagonale tranche après tranche — c'est ce que « calibré » veut dire. B annonce une chance sur deux là où il y a 1 fraude sur 400 : sa courbe rampe au ras de l'axe. C est un cas plus ordinaire, celui du modèle simplement <b>trop sûr de lui</b>.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — même AUC, trois diagrammes de fiabilité</div>
+    <div id="f1plot" class="wide"></div>
+    <div class="sl-ctl" id="f1ctl"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Dix tranches de score ; chaque point porte (score moyen, fréquence observée) et son <b>aire croît avec l'effectif</b> de la tranche — d'où le gros point en bas à gauche : à 0,3 % de prévalence, presque toute la masse y est. Les boutons allument et éteignent chaque modèle. <b>A</b> suit la diagonale, <b>B</b> rampe sur l'axe (il annonce 0,95 pour une fréquence de 0,09), <b>C</b> passe sous la diagonale partout : sur-confiant. Les readouts donnent le Brier et la log-loss des trois — et la <b>même AUC</b> pour les trois, puisque l'ordre est commun.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Brier = MSE sur des probabilités</h3>
+    <p>Le score de Brier est la moyenne des carrés d'écart entre la probabilité annoncée et l'étiquette :</p>
+    <div class="eq">Brier = <sup>1</sup>⁄<sub><span class="m">n</span></sub> Σ<sub><span class="m">i</span></sub> (<span class="m">p</span><sub><span class="m">i</span></sub> − <span class="m">y</span><sub><span class="m">i</span></sub>)² &nbsp;&nbsp;&nbsp; témoin trivial « <span class="m">p</span> = <span class="m">π</span> partout » = <span class="m">π</span>(1 − <span class="m">π</span>)</div>
+    <p>Il se décompose en <b>calibration</b> (écart à la diagonale du diagramme) plus <b>résolution</b> (capacité à s'écarter de la prévalence), moins l'incertitude intrinsèque. La log-loss joue le même rôle mais n'est pas bornée : une erreur confiante y coûte sans limite (<a href="chain-p03-01-critere-escalier-vs-sensible.html#s10">p03-01</a>).</p>
+    <p class="say">« Le Brier est une MSE sur des probabilités, donc le modèle constant à la prévalence vaut π(1 − π), donc tout modèle utile passe sous ce témoin, donc un Brier au-dessus dit que les probabilités sont pires qu'une constante. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les trois modèles contre le témoin</div>
+    <table>
+      <tr><th>modèle</th><th>Brier</th><th>log-loss</th><th>AUC</th></tr>
+      <tr class="hl"><td><b>A</b> calibré</td><td><b>0,00257</b></td><td><b>0,0127</b></td><td>0,950</td></tr>
+      <tr><td><b>B</b> rééchantillonné</td><td>0,0882</td><td>0,286</td><td>0,950</td></tr>
+      <tr><td><b>C</b> sur-confiant</td><td>0,00564</td><td>0,0224</td><td>0,950</td></tr>
+      <tr><td>trivial <span class="m">p</span> = 0,003</td><td>0,00299</td><td>0,0204</td><td>0,500</td></tr>
+    </table>
+    <p>Témoin : <span class="m">π</span>(1 − <span class="m">π</span>) = 0,003 × 0,997 = <b>0,00299</b>. Seul A passe dessous. B est <b>30 fois pire</b> que la constante, C un peu pire — et tous les trois ont l'AUC d'un excellent détecteur.</p>
+    <p>C'est l'énoncé à retenir : <b>une AUC de 0,95 et des probabilités pires qu'une constante coexistent sans contradiction.</b></p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Le seuil vient des coûts, si les probabilités sont vraies <span class="tag tronc">tronc</span></h3>
+    <p>Sur un cas de probabilité <span class="m">p</span>, décider « négatif » coûte <span class="m">p</span>·<span class="m">c</span><sub>FN</sub> en espérance, décider « positif » coûte (1−<span class="m">p</span>)·<span class="m">c</span><sub>FP</sub>. On décide positif quand la première espérance dépasse la seconde :</p>
+    <div class="eq"><span class="m">p</span>·<span class="m">c</span><sub>FN</sub> &gt; (1−<span class="m">p</span>)·<span class="m">c</span><sub>FP</sub> &nbsp;⇔&nbsp; <span class="m">p</span> &gt; <span class="m">p</span>* = <span class="m">c</span><sub>FP</sub> / (<span class="m">c</span><sub>FP</sub> + <span class="m">c</span><sub>FN</sub>)</div>
+    <p>Le seuil ne se cherche pas par balayage : il <b>se calcule</b>, et il ne dépend que des coûts. Mais l'égalité des espérances suppose que <span class="m">p</span> soit la vraie probabilité — sur un score non calibré, ce calcul n'a aucun sens.</p>
+    <p class="say">« L'espérance de coût de chaque décision dépend de p, donc le seuil optimal est le point où les deux espérances s'égalent, donc il vaut c<sub>FP</sub> sur la somme des coûts, donc il exige un p calibré. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — 100 € contre 1 €</div>
+    <p><span class="m">c</span><sub>FN</sub> = 100 € (la fraude passe), <span class="m">c</span><sub>FP</sub> = 1 € (un appel au client). Donc <span class="m">p</span>* = 1/101 = <b>0,0099</b>.</p>
+    <table>
+      <tr><th>seuil sur A</th><th>fraudes prises</th><th>manquées</th><th>fausses alertes</th><th>coût</th></tr>
+      <tr class="hl"><td><b>0,0099</b></td><td>222</td><td>78</td><td>4 640</td><td><b>12 400 €</b></td></tr>
+      <tr><td>0,10</td><td>105</td><td>195</td><td>331</td><td>19 900 €</td></tr>
+      <tr><td>0,50</td><td>27</td><td>273</td><td>13</td><td>27 300 €</td></tr>
+      <tr><td>tout refuser</td><td>0</td><td>300</td><td>0</td><td>30 000 €</td></tr>
+    </table>
+    <p>Le seuil « naturel » 0,50 coûte <b>plus du double</b> de l'optimum. Et au seuil optimal la précision vaut 0,046 : 4 fausses alertes sur 5… sur 20. C'est voulu — à 100 contre 1, on <i>achète</i> des fausses alertes.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Rééchantillonner casse la calibration <span class="tag tronc">tronc</span></h3>
+    <p>Sur-échantillonner les positifs, sous-échantillonner les négatifs, <span class="up">SMOTE</span> : tous portent la prévalence d'entraînement à 50 %. Le modèle apprend alors <span class="m">p</span>(<span class="m">y</span> | <span class="m">x</span>) <b>pour cette prévalence</b>, pas pour la vraie.</p>
+    <p>Le prior se lit en cote, et l'écart entre les deux priors est un facteur constant :</p>
+    <div class="eq">cote<sub>prod</sub> = cote<sub>train</sub> × <sup><span class="m">π</span></sup>⁄<sub>1−<span class="m">π</span></sub> × (1−<span class="m">π</span><sub>train</sub>) / <span class="m">π</span><sub>train</sub></div>
+    <p>Le classement est intact, donc l'AUC ne bouge pas. Mais le seuil de coût est faux, et la <span class="up">VPP</span> lue sur les scores est fausse. Rééchantillonner, c'est <b>imposer un prior sans le dire</b> (<a href="chain-p02-03-conjugues-posterior.html">p02-03</a>, <a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>).</p>
+    <p class="say">« Changer la prévalence d'entraînement change le prior que le modèle apprend, donc ses probabilités portent le mauvais prior, donc elles ne sont plus calibrées pour la production alors que le classement, lui, n'a pas bougé. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le rapport des cotes vaut 332</div>
+    <p>De 50 % à 0,3 % : <sup>0,997</sup>⁄<sub>0,003</sub> × <sup>0,5</sup>⁄<sub>0,5</sub> = <b>332,3</b>. Toute cote annoncée par B est 332 fois trop grande.</p>
+    <table>
+      <tr><th>B annonce</th><th>cote B</th><th>cote vraie</th><th>probabilité vraie</th></tr>
+      <tr class="hl"><td>0,50</td><td>1</td><td>0,00301</td><td><b>0,0030</b></td></tr>
+      <tr><td>0,90</td><td>9</td><td>0,0271</td><td>0,0264</td></tr>
+      <tr><td>0,99</td><td>99</td><td>0,298</td><td>0,230</td></tr>
+    </table>
+    <p>Et en sens inverse, le seuil : <span class="m">p</span>* = 0,0099 vaut la cote 0,01, donc la cote 3,32 chez B, donc <b>0,769</b>. Sur les scores de B, la décision « fraude » commence à 0,77 — <b>78 fois plus haut</b> en probabilité, 332 fois en cote.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — ce que vaut vraiment un 0,5 appris à 50/50</div>
+    <div id="f2plot" class="wide"></div>
+    <div id="f2sliders"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">En abscisse le score annoncé par un modèle entraîné à la prévalence <span class="m">π</span><sub>train</sub>, en ordonnée ce qu'il vaut réellement en production (axe logarithmique : de 0,001 % à 100 %). <b>Fais glisser <span class="m">π</span><sub>train</sub> de 0,3 % à 50 %</b> : à 0,3 % la courbe est confondue avec le pointillé d'identité ; dès qu'on rééchantillonne, elle plonge, et le dernier readout donne le seuil qu'il faudrait poser sur ces scores pour prendre la décision de <a href="#s5">l'étape 5</a>.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Traiter le déséquilibre : seuil &gt; poids &gt; rééchantillonnage</h3>
+    <p>Trois remèdes, dans cet ordre. <b>(a) Le seuil</b> : ne rien changer aux données, le choisir par les coûts ou par la courbe PR. Gratuit, et les probabilités restent vraies.</p>
+    <p><b>(b) Les poids</b> (<code>class_weight</code>) : pondérer la loss. C'est un rééchantillonnage sans duplication — mêmes probabilités décalées, à recalibrer ensuite.</p>
+    <p><b>(c) Les données</b> : dernier recours, quand les positifs sont trop rares pour que la loss les voie. <span class="up">SMOTE</span> interpole entre positifs voisins : il fabrique des positifs là où il n'y en a pas, et n'aide guère un modèle non linéaire.</p>
+    <p class="say">« Le seuil se déplace sans toucher au modèle, donc il ne coûte rien et ne casse aucune probabilité, donc on l'essaie avant les poids, et les poids avant les données. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — ce que chaque remède casse</div>
+    <table>
+      <tr><th>remède</th><th>change</th><th>ordre</th><th>calibration</th></tr>
+      <tr class="hl"><td><b>seuil</b></td><td>la décision</td><td>intact</td><td><b>intacte</b></td></tr>
+      <tr><td>poids</td><td>la loss</td><td>un peu</td><td>cassée</td></tr>
+      <tr><td>rééch.</td><td>la population</td><td>un peu</td><td>cassée, ×332</td></tr>
+      <tr><td>SMOTE</td><td>les points</td><td>variable</td><td>cassée, biaisée</td></tr>
+    </table>
+    <p><i>rééch.</i> = sur- ou sous-échantillonnage ; <i>poids</i> = <code>class_weight</code> ; ×332 = le facteur sur la cote du pas 6.</p>
+    <p>Le déséquilibre en soi n'est pas une maladie : 300 positifs sur 100 000 suffisent à apprendre si le signal existe. Ce qui gêne, c'est <b>un seuil par défaut à 0,5</b> — et ça, ça se répare en une ligne, sans toucher aux données.</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Recalibrer</h3>
+    <p>Trois outils, tous des transformations <b>croissantes</b> du score — donc sans effet sur l'AUC.</p>
+    <div class="eq">Platt : <span class="hat"><span class="m">p</span></span> = <span class="m">σ</span>(<span class="m">a</span>·<span class="m">s</span> + <span class="m">b</span>) &nbsp;&nbsp; isotonique : escalier croissant &nbsp;&nbsp; température : softmax(<span class="m">z</span>/<span class="m">T</span>)</div>
+    <p><b>Platt</b> : deux paramètres, robuste sur peu de données. <b>Isotonique</b> : plus souple, corrige n'importe quelle forme, mais surapprend si les données manquent. <b>Température</b> : le Platt des réseaux, un seul paramètre.</p>
+    <p>Condition non négociable : sur des données <b>non vues</b> par le modèle et <b>à la prévalence cible</b>.</p>
+    <p class="say">« La recalibration apprend une transformation croissante du score, donc elle ne touche ni au classement ni à l'AUC, donc elle ne peut corriger que la valeur — et seulement si le jeu d'ajustement est non vu et à la bonne prévalence. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — un seul paramètre suffit ici</div>
+    <p>Le défaut de B est un prior, donc un décalage constant en logit : <span class="m">a</span> = 1 et <span class="m">b</span> = logit <span class="m">π</span> − logit <span class="m">π</span><sub>train</sub> = −5,806 + 0 = <b>−5,806</b>. Un Platt ajusté sur un jeu à 0,3 % retrouve ce nombre.</p>
+    <table>
+      <tr><th>B</th><th>Brier</th><th>log-loss</th><th>AUC</th></tr>
+      <tr><td>avant</td><td>0,0882</td><td>0,286</td><td>0,950</td></tr>
+      <tr class="hl"><td>après Platt</td><td><b>0,00257</b></td><td><b>0,0127</b></td><td>0,950</td></tr>
+    </table>
+    <p>L'AUC n'a pas bougé d'un millième : la recalibration n'a <b>rien appris sur les données</b>, elle a seulement remis le prior à l'endroit. Le piège symétrique : ajuster ce Platt sur le jeu rééchantillonné à 50/50 le ferait réapprendre le mauvais prior.</p>
+  </div>
+</div>
+
+<div class="step" id="s9">
+  <div class="rule">
+    <h3>Réversibilité de l'erreur</h3>
+    <p>D'où sortent <span class="m">c</span><sub>FN</sub> et <span class="m">c</span><sub>FP</sub> ? De ce qui se répare. Un faux positif en fraude coûte un appel au client ; un faux négatif coûte la fraude entière, plus le litige.</p>
+    <p>Règle de lecture : une décision <b>réversible</b> — une alerte qu'un humain revoit, une file de tri — tolère un seuil bas et beaucoup de faux positifs. Une décision <b>irréversible</b> — bloquer un compte, refuser un prêt, poser un diagnostic — exige de la précision, donc un seuil haut.</p>
+    <p class="say">« Le coût d'une erreur est ce qu'il faut dépenser pour la réparer, donc une erreur réversible a un coût borné et petit, donc le rapport c<sub>FN</sub>/c<sub>FP</sub> se lit dans la réparation avant de se lire dans un tableur. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — trois rapports de coûts</div>
+    <table>
+      <tr><th>coûts</th><th><span class="m">p</span>*</th><th>prises</th><th>alertes</th><th>rappel</th><th>précis.</th></tr>
+      <tr><td>10</td><td>0,0909</td><td>110</td><td>379</td><td>0,366</td><td>0,225</td></tr>
+      <tr class="hl"><td><b>100</b></td><td><b>0,0099</b></td><td>222</td><td>4 640</td><td>0,741</td><td>0,046</td></tr>
+      <tr><td>1 000</td><td>0,0010</td><td>285</td><td>24 451</td><td>0,949</td><td>0,012</td></tr>
+    </table>
+    <p><i>coûts</i> = <span class="m">c</span><sub>FN</sub>/<span class="m">c</span><sub>FP</sub> ; <i>prises</i> = fraudes détectées sur 300 ; <i>alertes</i> = faux positifs sur 99 700.</p>
+    <p>Le modèle est le <b>même</b> aux trois lignes. Seul le jugement sur la réparabilité a changé — et il fait passer le rappel de 0,37 à 0,95 et la précision de 0,23 à 0,01.</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — le seuil se calcule, si <span class="m">p</span> est vrai</div>
+    <div id="f3plot" class="wide"></div>
+    <div id="f3sliders"></div>
+    <div class="sl-ctl" id="f3ctl"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Coût total du mois en fonction du seuil (abscisse logarithmique), rapporté au <b>coût minimal atteignable</b> : le creux vaut donc 1 par construction. <b>Fais varier <span class="m">c</span><sub>FN</sub>/<span class="m">c</span><sub>FP</sub></b> : le creux de la courbe <b>A</b> se déplace et tombe exactement sur le trait vertical <span class="m">c</span><sub>FP</sub>/(<span class="m">c</span><sub>FP</sub> + <span class="m">c</span><sub>FN</sub>) — la formule du <a href="#s5">pas 5</a> n'est pas une approximation. La courbe <b>B</b> a le même creux… ailleurs : poser sur ses scores le seuil calculé pour A sort du cadre par le haut, et le readout donne la facture.</p>
+  </div>
+</div>
+
+<div class="step" id="s10">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>« Calibré » est une moyenne, sur une population, à une prévalence donnée. Chacun de ces trois mots est un endroit où ça lâche.</p>
+    <p class="say">« La calibration est une moyenne sur une population à une prévalence donnée, donc elle peut être vraie globalement et fausse par segment, donc elle se vérifie là où la décision est sensible et se resurveille quand la prévalence dérive. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>Calibré en moyenne, faux par sous-groupe.</b> Un diagramme global sur la diagonale peut cacher une sur-confiance sur un segment et une sous-confiance sur un autre, qui se compensent. Dès que la décision est sensible à l'appartenance (montant, canal, pays), tracer le diagramme <b>par segment</b>.</li>
+      <li><b>Recalibrer sur les données d'entraînement.</b> Le modèle y est sur-confiant par construction — il a vu ces étiquettes. Le Platt ajusté là-dessus apprend ce biais au lieu de le corriger, et la calibration semble parfaite exactement là où elle ne vaut rien. Jeu non vu, toujours (<a href="chain-p06-02-cv-leakage.html">p06-02</a>).</li>
+      <li><b>Dérive de prévalence.</b> Une calibration est relative à une prévalence : si la fraude passe de 0,3 % à 1 %, toutes les probabilités sont sous-estimées d'un facteur de cote de 3,4 sans qu'aucune alerte ne se déclenche. La prévalence se surveille comme une métrique.</li>
+      <li><b>Coûts inconnus.</b> Sans <span class="m">c</span><sub>FN</sub> ni <span class="m">c</span><sub>FP</sub>, <span class="m">p</span>* n'existe pas et tout seuil est arbitraire. Les substituts honnêtes : un point choisi sur la courbe PR (<a href="chain-p06-03-seuil-roc-pr.html#s8">p06-03</a>), ou un <b>budget d'alertes</b> — les <span class="m">k</span> plus hauts scores, ce que l'équipe peut traiter par jour.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li><b>Discrimination</b> (AUC, l'ordre) ≠ <b>calibration</b> (la valeur des <span class="m">p</span>). Toute transformation croissante conserve l'une et peut détruire l'autre.</li>
+    <li>Diagramme de fiabilité : fréquence observée contre score moyen. <b>Brier</b> = MSE sur les <span class="m">p</span>, témoin <span class="m">π</span>(1−<span class="m">π</span>) = 0,003 ; <b>log-loss</b> = même rôle, non bornée.</li>
+    <li>Seuil optimal <span class="m">p</span>* = <span class="m">c</span><sub>FP</sub>/(<span class="m">c</span><sub>FP</sub> + <span class="m">c</span><sub>FN</sub>) = 1/101 = <b>0,0099</b> — il se calcule, et seulement sur des <span class="m">p</span> calibrés.</li>
+    <li>Rééchantillonner déplace le <b>prior appris</b> : les cotes sont multipliées par <span class="m">π</span><sub>train</sub>/<span class="m">π</span> — ici 332. Classement intact, AUC intacte, décisions fausses.</li>
+    <li>Déséquilibre : <b>seuil &gt; poids &gt; données</b>. SMOTE en dernier. Puis recalibrer sur un jeu <b>non vu</b> et <b>à la prévalence cible</b> : Platt, isotonique, température.</li>
+    <li><b>Réversibilité de l'erreur</b> : ce qui se répare fixe <span class="m">c</span><sub>FN</sub> et <span class="m">c</span><sub>FP</sub>, donc le seuil. Décision réversible ⇒ seuil bas ; irréversible ⇒ précision.</li>
+  </ol>
+</div>
+<div class="phrase">« Deux modèles de même AUC peuvent différer du tout au tout sur leurs probabilités : l'AUC ne voit que l'ordre. Une probabilité calibrée permet de calculer le seuil par les coûts, <span class="m">c</span><sub>FP</sub> sur la somme ; rééchantillonner à 50/50 déplace le prior appris et multiplie toutes les cotes par 332, sans toucher au classement. Donc pour un déséquilibre, je change le seuil avant les poids, et les poids avant les données, et je recalibre sur un jeu non vu à la vraie prévalence. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Même AUC, mêmes décisions ?</div><div class="a hid">Non : même ordre, probabilités différentes. L'AUC ne voit que le classement, donc toute transformation croissante la laisse intacte.</div></li>
+    <li><div class="q">Que montre un diagramme de fiabilité, et que mesure le Brier ?</div><div class="a hid">Fréquence observée contre score moyen, par tranche : diagonale = calibré, dessous = sur-confiant. Brier = MSE sur les p ; témoin π(1−π) = 0,003.</div></li>
+    <li><div class="q">D'où vient le seuil optimal ?</div><div class="a hid">Égalité des coûts espérés : p·c<sub>FN</sub> = (1−p)·c<sub>FP</sub>, donc p* = c<sub>FP</sub>/(c<sub>FP</sub> + c<sub>FN</sub>) = 1/101. Valide seulement sur un p calibré.</div></li>
+    <li><div class="q">Que casse exactement le rééchantillonnage ?</div><div class="a hid">Le prior appris : les cotes sont multipliées par π<sub>train</sub>/π, ici 332. Le classement et l'AUC ne bougent pas ; le seuil de coût et la VPP sont faux.</div></li>
+    <li><div class="q">Ordre des remèdes au déséquilibre ?</div><div class="a hid">Seuil, puis poids de classe, puis données (SMOTE en dernier) — puis recalibrer. Le seuil ne casse rien, les deux autres cassent la calibration.</div></li>
+    <li><div class="q">Sur quoi recalibre-t-on ?</div><div class="a hid">Sur des données non vues par le modèle, à la prévalence cible. Platt (σ(as+b)), isotonique (escalier), température (un paramètre). Croissantes, donc AUC inchangée.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="../bridges/bridge-05-escalier-vs-sensible.html"><b>Pont 05 — escalier vs sensible</b><small>le Brier et la log-loss sont sensibles à la valeur du score, l'accuracy et l'AUC ne voient qu'un ordre ou qu'un comptage : la même opposition, lue côté évaluation</small></a>
+    <a href="chain-p06-03-seuil-roc-pr.html#s7"><b>p06-03 — seuil, ROC, PR</b><small>même population, même fil rouge ; la ROC y est déjà présentée comme une propriété du classement — cette chaîne dit ce que le classement ne dit pas</small></a>
+    <a href="chain-p00-03-conditionnement-bayes.html"><b>p00-03 — Bayes, prévalence, VPP</b><small>le rapport des cotes de 332 est exactement le facteur de Bayes du prior : rééchantillonner, c'est remplacer un prior par un autre</small></a>
+    <a href="chain-p02-03-conjugues-posterior.html"><b>p02-03 — prior et posterior</b><small>un prior noyé par les données, un prior décisif : ici le prior est imposé par la construction du jeu d'entraînement, donc sans qu'on l'ait écrit</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>ml::calibration</code> (diagramme de fiabilité, Platt vs isotonique, jeu non vu) · <code>ml::brier</code> (MSE sur les p, témoin π(1−π), log-loss non bornée) · <code>ml::desequilibre</code> (seuil &gt; poids &gt; données, SMOTE, rapport des cotes) · <code>ml::seuil</code> (p* = c<sub>FP</sub>/(c<sub>FP</sub> + c<sub>FN</sub>), réversibilité de l'erreur).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p06-04 · v1 du 17/09/2026 · Prérequis : <a href="chain-p06-03-seuil-roc-pr.html">p06-03</a>, <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, <a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>. Suite : <a href="../../map.html#p07-01">p07-01</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== socle commun aux trois figures =====
+   Population de p06-03 : 100 000 transactions, 300 fraudes, π = 0,3 %.
+   Binormal à variances égales : négatifs ~ N(0,1), positifs ~ N(D,1) avec
+   D = √2·Φ⁻¹(0,95), donc AUC = Φ(D/√2) = 0,950 exactement.
+   A est calibré PAR CONSTRUCTION : logit p_A = logit π + (D·s − D²/2), le second terme
+   étant le log-rapport de vraisemblance du binormal. B est le même modèle appris à 50/50 :
+   même log-rapport, prior nul. C étire les logits autour du prior (facteur 1,8) : sur-confiant.
+   Les trois sont des transformations croissantes l'une de l'autre, donc même AUC. */
+const PI=0.003, NTOT=100000, NPOS=300, NNEG=99700;
+const D=2.3261743073533467, LPI=Math.log(PI/(1-PI)); /* = −5,806138… */
+const ALPHA=1.8;
+const COF=[-1.3026537197817094,6.4196979235649026e-1,1.9476473204185836e-2,-9.561514786808631e-3,
+  -9.46595344482036e-4,3.66839497852761e-4,4.2523324806907e-5,-2.0278578112534e-5,-1.624290004647e-6,
+  1.303655835580e-6,1.5626441722e-8,-8.5238095915e-8,6.529054439e-9,5.059343495e-9,-9.91364156e-10,
+  -2.27365122e-10,9.6467911e-11,2.394038e-12,-6.886027e-12,8.94487e-13,3.13092e-13,-1.12708e-13,3.81e-16,7.106e-15];
+/* erfc de Numerical Recipes : erreur RELATIVE < 1,2e-7, donc les queues (FPR de 1e-5) restent justes. */
+function erfc(x){const z=Math.abs(x),t=2/(2+z),ty=4*t-2;let d=0,dd=0;
+  for(let j=COF.length-1;j>0;j--){const tmp=d;d=ty*d-dd+COF[j];dd=tmp;}
+  const ans=t*Math.exp(-z*z+0.5*(COF[0]+ty*d)-dd);return x>=0?ans:2-ans;}
+const Phi=z=>0.5*erfc(-z/Math.SQRT2);
+const sig=z=>z<-700?0:(z>700?1:1/(1+Math.exp(-z)));
+const logit=p=>Math.log(p/(1-p));
+const llr=s=>D*s-D*D/2;
+const phi=(s,m)=>Math.exp(-(s-m)*(s-m)/2)/Math.sqrt(2*Math.PI);
+const mix=s=>(1-PI)*phi(s,0)+PI*phi(s,D);
+const MOD=[
+  {k:'A',name:'A calibré',cls:'sl-c1',p:s=>sig(LPI+llr(s)),  inv:q=>((logit(q)-LPI)+D*D/2)/D},
+  {k:'B',name:'B rééchantillonné',cls:'sl-c3',p:s=>sig(llr(s)),inv:q=>(logit(q)+D*D/2)/D},
+  {k:'C',name:'C sur-confiant',cls:'sl-c5',p:s=>sig(LPI+ALPHA*llr(s)),inv:q=>((logit(q)-LPI)/ALPHA+D*D/2)/D}
+];
+/* SL.fmt rabote les zéros de queue ; une note de calibration se lit à décimales fixes. */
+const nf=(x,d)=>Number(x).toFixed(d).replace('.',',');
+const gr=n=>String(n).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+function poly(P,pts,cls,dyn){let s='',open=false;
+  for(let i=0;i<pts.length;i++){const q=pts[i];
+    if(!q||!isFinite(q[1])){open=false;continue;}
+    s+=(open?' L':'M')+P.sx(q[0]).toFixed(1)+' '+P.sy(q[1]).toFixed(1);open=true;}
+  return SL.el('path',{d:s,class:cls,fill:'none'},dyn===false?P.layer:P.dyn);}
+function ro(host,label,value,cls){const d=document.createElement('div');if(cls)d.className=cls;
+  d.innerHTML=label+'<b>'+value+'</b>';host.appendChild(d);}
+/* sheetlib écrit ses graduations avec SL.fmt : sur un axe logarithmique elles s'afficheraient
+   « −3, −2, −1, 0 ». On réécrit le texte après coup — les <text class="sl-tick"> sont ajoutés
+   dans l'ordre : ceux de l'axe x d'abord, ceux de l'axe y ensuite. */
+function relabel(P,from,labels){const t=P.svg.querySelectorAll('text.sl-tick');
+  labels.forEach((s,i)=>{if(t[from+i])t[from+i].textContent=s;});}
+/* Brier et log-loss par intégration sur le mélange (pas de tirage : les chiffres doivent être
+   les mêmes à chaque ouverture, et les mêmes que ceux des tableaux). */
+function scores(p){const lo=-10,hi=16,n=3000,h=(hi-lo)/n;let b=0,l=0;
+  for(let i=0;i<=n;i++){const s=lo+i*h,w=(i===0||i===n?0.5:1)*h;
+    const q=Math.min(Math.max(p(s),1e-15),1-1e-15);
+    b+=w*((1-PI)*phi(s,0)*q*q+PI*phi(s,D)*(1-q)*(1-q));
+    l+=w*(-(1-PI)*phi(s,0)*Math.log(1-q)-PI*phi(s,D)*Math.log(q));}
+  return {brier:b,ll:l};}
+MOD.forEach(m=>{const r=scores(m.p);m.brier=r.brier;m.ll=r.ll;});
+const TRIV={brier:PI*(1-PI),ll:-(PI*Math.log(PI)+(1-PI)*Math.log(1-PI))};
+
+/* ===== Figure 1 : diagrammes de fiabilité, dix tranches ===== */
+/* Chaque tranche [q, q+0,1] du score correspond à un intervalle de s, puisque p est croissant
+   en s. Masse et positifs s'obtiennent alors exactement par Φ ; seul le score moyen demande
+   une petite quadrature. Pas d'échantillonnage, donc pas de bruit de tirage. */
+function bins(m,k){k=k||10;const out=[];
+  for(let j=0;j<k;j++){
+    const qlo=j===0?1e-13:j/k, qhi=j===k-1?1-1e-13:(j+1)/k;
+    const slo=m.inv(qlo), shi=m.inv(qhi);
+    const mass=(1-PI)*(Phi(shi)-Phi(slo))+PI*(Phi(shi-D)-Phi(slo-D));
+    const pos=PI*(Phi(shi-D)-Phi(slo-D));
+    if(mass<1e-12){out.push(null);continue;}
+    const a=Math.max(slo,-12), b=Math.min(shi,16), n=120, h=(b-a)/n;let acc=0;
+    for(let i=0;i<=n;i++){const s=a+i*h,w=(i===0||i===n?0.5:1)*h;acc+=w*m.p(s)*mix(s);}
+    out.push({mean:acc/mass,freq:pos/mass,mass:mass});}
+  return out;}
+const P1=SL.plot(document.getElementById('f1plot'),{x:[0,1],y:[0,1.08],w:600,h:320,
+  xt:[0,.25,.5,.75,1],yt:[.25,.5,.75,1],xl:'score moyen de la tranche',yl:'fréquence observée'});
+const on={A:true,B:true,C:true};
+const f1out=document.getElementById('f1out');
+function draw1(){P1.clear();
+  P1.seg(0,0,1,1,'');
+  P1.text(.74,.66,'calibré','','start');
+  /* A en dernier : c'est lui qu'on veut voir par-dessus, et les disques sont creux pour que
+     les trois tranches les plus peuplées restent lisibles là où elles se superposent. */
+  MOD.slice().reverse().forEach(m=>{if(!on[m.k])return;const b=bins(m);
+    poly(P1,b.map(x=>x?[x.mean,x.freq]:null),'sl-fn '+m.cls);
+    b.forEach(x=>{if(x)P1.dot(x.mean,x.freq,m.cls+' hollow',3+10*Math.sqrt(x.mass));});});
+  f1out.innerHTML='';
+  MOD.forEach(m=>ro(f1out,m.name+' — Brier',nf(m.brier,5),m.brier<TRIV.brier?'pos':'zero'));
+  ro(f1out,'témoin <span class="m">π</span>(1−<span class="m">π</span>)',nf(TRIV.brier,5));
+  MOD.forEach(m=>ro(f1out,m.name+' — log-loss',nf(m.ll,4),m.ll<TRIV.ll?'pos':'zero'));
+  ro(f1out,'AUC des trois','0,950','pos');}
+const f1ctl=document.getElementById('f1ctl');
+MOD.forEach(m=>{const b=document.createElement('button');b.className='tb';b.textContent=m.name;
+  b.setAttribute('aria-pressed','true');
+  b.onclick=()=>{on[m.k]=!on[m.k];b.setAttribute('aria-pressed',String(on[m.k]));draw1();};
+  f1ctl.appendChild(b);});
+draw1();
+
+/* ===== Figure 2 : le prior d'entraînement déplace toutes les probabilités ===== */
+/* cote_prod = cote_train × (π/(1−π)) × ((1−π_tr)/π_tr) : un facteur constant sur la cote,
+   donc une translation en logit. L'ordonnée est en log10(p) pour que les 0,3 % restent lisibles. */
+const prod=(q,ptr)=>{const o=(q/(1-q))*(PI/(1-PI))*((1-ptr)/ptr);return o/(1+o);};
+const back=(q,ptr)=>{const o=(q/(1-q))*(ptr/(1-ptr))*((1-PI)/PI);return o/(1+o);};
+const P2=SL.plot(document.getElementById('f2plot'),{x:[0,1],y:[-5,.45],w:600,h:320,
+  xt:[0,.25,.5,.75,1],yt:[-5,-4,-3,-2,-1,0],
+  xl:'score annoncé par le modèle',yl:'probabilité vraie en production (%)'});
+/* graduations en pourcentage, sans le signe : « 0,001 % » déborde de la marge de gauche. */
+relabel(P2,5,['0,001','0,01','0,1','1','10','100']);
+const f2out=document.getElementById('f2out');
+const GRID2=[];for(let i=1;i<400;i++)GRID2.push(i/400);
+function draw2(ptr){P2.clear();
+  poly(P2,GRID2.map(q=>[q,Math.log10(q)]),'sl-seg chord');
+  poly(P2,GRID2.map(q=>[q,Math.log10(prod(q,ptr))]),'sl-fn sl-c3');
+  const y5=Math.log10(prod(.5,ptr));
+  P2.dot(.5,y5,'sl-c3',6);P2.text(.47,y5+.3,'un « 0,5 » vaut '+nf(prod(.5,ptr)*100,2)+' %','sl-c3','end');
+  const tb=back(1/101,ptr);
+  P2.vline(tb,'gain');P2.text(tb-.02,-4.6,'seuil équivalent '+nf(tb,3),'','end');
+  P2.text(.30,-1.15,'identité (aucun rééchantillonnage)','','start');
+  f2out.innerHTML='';
+  ro(f2out,'prévalence d\'entraînement',nf(ptr*100,2)+' %');
+  ro(f2out,'prévalence de production',nf(PI*100,2)+' %');
+  ro(f2out,'facteur sur la cote',nf((PI/(1-PI))*((1-ptr)/ptr),4));
+  ro(f2out,'un score de 0,50 vaut',nf(prod(.5,ptr),5),prod(.5,ptr)<.05?'zero':'pos');
+  ro(f2out,'un score de 0,90 vaut',nf(prod(.9,ptr),5));
+  ro(f2out,'seuil à poser pour p* = 0,0099',nf(tb,4),tb>.05?'zero':'pos');}
+SL.slider(document.getElementById('f2sliders'),
+  {label:'prévalence train',min:Math.log10(PI),max:Math.log10(.5),value:Math.log10(.5),
+   fmt:v=>nf(Math.pow(10,v)*100,2)+' %'},v=>draw2(Math.pow(10,v)));
+
+/* ===== Figure 3 : coût total en fonction du seuil ===== */
+/* Ordonnée = coût ÷ coût minimal atteignable : le creux vaut 1 quel que soit le rapport de
+   coûts, donc les axes restent fixes quand la glissière bouge. Abscisse en log10 du seuil,
+   parce que p* = 1/101 est collé à zéro sur un axe linéaire. */
+/* FN = positifs sous le seuil = Φ(s − D) ; FP = négatifs au-dessus = 1 − Φ(s). */
+function cost(tau,m,R){const s=m.inv(tau);
+  return NTOT*(R*PI*Phi(s-D)+(1-PI)*(1-Phi(s)));}
+const P3=SL.plot(document.getElementById('f3plot'),{x:[-3.3,.05],y:[0,4.2],w:600,h:320,
+  xt:[-3,-2,-1,0],yt:[1,2,3,4],xl:'seuil appliqué au score',yl:'coût ÷ coût minimal'});
+relabel(P3,0,['0,001','0,01','0,1','1']);
+const f3out=document.getElementById('f3out');
+const GRID3=[];for(let i=0;i<=340;i++)GRID3.push(-3.3+3.35*i/340);
+let showB=true;
+function draw3(R){P3.clear();
+  const tau=1/(1+R), cmin=cost(tau,MOD[0],R);
+  poly(P3,GRID3.map(x=>{const v=cost(Math.pow(10,x),MOD[0],R)/cmin;return v<=4.2?[x,v]:null;}),'sl-fn sl-c1');
+  if(showB)poly(P3,GRID3.map(x=>{const v=cost(Math.pow(10,x),MOD[1],R)/cmin;return v<=4.2?[x,v]:null;}),'sl-fn sl-c3');
+  P3.vline(Math.log10(tau),'gain');
+  P3.dot(Math.log10(tau),1,'sl-c1',6);
+  P3.text(Math.log10(tau)+.06,3.55,'p* = '+nf(tau,4),'','start');
+  const tauB=MOD[1].p(MOD[0].inv(tau));
+  if(showB){P3.dot(Math.log10(tauB),1,'sl-c3',6);
+    P3.text(Math.log10(tauB)-.06,1.3,'creux de B : '+nf(tauB,3),'sl-c3','end');}
+  /* la légende fuit le trait vertical : il balaie l'axe quand le rapport de coûts change. */
+  const lx=Math.log10(tau)>-1.8?-3.2:.02, la=lx<-1?'start':'end';
+  P3.text(lx,.62,'A calibré','sl-c1',la);
+  if(showB)P3.text(lx,.22,'B rééchantillonné','sl-c3',la);
+  const cB=cost(tau,MOD[1],R);
+  f3out.innerHTML='';
+  ro(f3out,'c<sub>FN</sub>/c<sub>FP</sub>',gr(Math.round(R)));
+  ro(f3out,'seuil optimal p*',nf(tau,4));
+  ro(f3out,'coût minimal (A)',gr(Math.round(cmin))+' €','pos');
+  ro(f3out,'p* posé sur les scores de B',gr(Math.round(cB))+' €','zero');
+  ro(f3out,'soit','× '+nf(cB/cmin,1),'zero');
+  ro(f3out,'seuil correct sur B',nf(tauB,3));}
+const s3=SL.slider(document.getElementById('f3sliders'),
+  {label:'c(FN)/c(FP)',min:0,max:3,value:2,
+   fmt:v=>'× '+gr(Math.round(Math.pow(10,v)))},v=>draw3(Math.pow(10,v)));
+const f3ctl=document.getElementById('f3ctl');
+const bB=document.createElement('button');bB.className='tb';bB.textContent='scores de B';
+bB.setAttribute('aria-pressed','true');
+bB.onclick=()=>{showB=!showB;bB.setAttribute('aria-pressed',String(showB));draw3(Math.pow(10,s3.get()));};
+f3ctl.appendChild(bB);
+[['réversible · 10 contre 1',1],['fil rouge · 100 contre 1',2],['irréversible · 1 000 contre 1',3]].forEach(([n,v])=>{
+  const b=document.createElement('button');b.className='tb';b.textContent=n;b.onclick=()=>s3.set(v);f3ctl.appendChild(b);});
+})();
+</script>
+</body>
+</html>
