@@ -5,12 +5,44 @@ part: "B"
 number: "04"
 slug: variance-moyenne-correlee
 title: La variance d'une moyenne corrélée
-subtitle: pont — un mécanisme, plusieurs domaines
-prereq: []
-anki: []
+subtitle: pont — ρσ² + (1 − ρ)σ²/B : pourquoi « plus » ne suffit pas quand c'est corrélé
+prereq: [p00-02, p00-04, p07-02, p06-02, p01-05]
+anki: [ml::bagging, stats::variance, ml::validation, stats::bootstrap]
 bridges: []
-next: 
-status: stub
+next: b05
+status: ready
 ---
-Périmètre : ρσ² + (1−ρ)σ²/B : bagging, LOOCV, SE d'une moyenne de lignes dépendantes, bootstrap par bloc. Pourquoi « plus » ne suffit pas quand c'est corrélé.
-Format bridge : une figure unique (le mécanisme), puis une ligne par domaine (règle | où on l'a vue | lien vers le pas exact), résumé en 3 lignes, chaîne verbalisée de 4 maillons « même argument, autre habit ».
+## Le mécanisme
+B variables de même variance σ², corrélées deux à deux par ρ. Var de la moyenne = (1/B²)·[B·σ² + B(B − 1)·ρσ²] = σ²/B + (B − 1)ρσ²/B = **ρσ² + (1 − ρ)σ²/B**. Quand B → ∞, il reste ρσ² : un plancher que moyenner ne franchit pas. Dérivé une fois ici, utilisé partout.
+
+## La table
+| lieu | les B termes | ρ | le plancher | ce qu'on fait | où |
+|---|---|---|---|---|---|
+| Bagging / RF | B arbres sur des bootstraps | ρ entre arbres (forte si mêmes features dominent) | ρσ² : ajouter des arbres ne le baisse pas | m features par split pour baisser ρ | p07-02 |
+| LOOCV | n estimations d'erreur | quasi 1 (modèles presque identiques) | la moyenne des n erreurs a une variance élevée | k-fold à k = 5–10 | p06-02 |
+| SE d'une moyenne | n lignes | > 0 si même utilisateur, série temporelle | σ²/n est trop optimiste | grouper, bloc, effectif « effectif » | p00-04 casse ; p01-01 casse |
+| Bootstrap | rééchantillons | dépendance entre lignes ignorée | SE_boot trop petit | bootstrap par bloc / par groupe | p01-05 casse |
+| Moyenne d'ensembles de modèles | K modèles différents | plus faible si les modèles diffèrent | diversité = ρ bas | modèles hétérogènes | p07-02 |
+
+## Figure exigée
+- **Figure 1 — `plot` + `slider` ρ ∈ [0, 0,9]** : Var(moyenne)/σ² en fonction de B ∈ [1, 200] (axe x log) ; ligne horizontale ρ (le plancher) ; courbes pour ρ = 0 (tend vers 0) et la valeur du slider. Readout à B = 10, 100, ∞. Légende : à ρ = 0,5, cent arbres valent à peine mieux que dix.
+
+## Ce qui casse partout de la même façon
+- Compter B sans regarder ρ : « plus d'arbres », « plus de lignes », « plus de rééchantillons » sans effet dès que ρ domine.
+- Estimer ρ est difficile ; on le baisse par construction (features aléatoires, blocs, groupes) plutôt que de le mesurer.
+
+## Résumé
+1. Var(moyenne de B corrélés) = ρσ² + (1 − ρ)σ²/B ; plancher ρσ².
+2. Bagging : baisser ρ (m features) plutôt que monter B ; LOOCV : ρ ≈ 1 ⇒ k-fold ; SE et bootstrap : grouper.
+3. Moyenner réduit la variance seulement de la part non corrélée.
+
+**Phrase d'entretien** : « La variance d'une moyenne de B termes corrélés est ρσ² plus (1 − ρ)σ²/B : le second terme s'éteint avec B, le premier jamais. C'est pourquoi une forêt aléatoire tire des features au hasard pour baisser ρ, pourquoi la LOOCV a une variance élevée, et pourquoi le SE de lignes dépendantes est trop optimiste. »
+
+## Chaîne verbalisée
+1. Dérive Var(moyenne) pour B termes corrélés. → B variances + B(B − 1) covariances, sur B² ⇒ ρσ² + (1 − ρ)σ²/B.
+2. Même argument, autre habit : pourquoi la forêt tire m features ? → Baisser ρ ; B ne suffit pas.
+3. Pourquoi la LOOCV a une variance élevée ? → n modèles quasi identiques, ρ ≈ 1.
+4. Que fait-on d'un SE sur des lignes d'un même utilisateur ? → Grouper ou bloquer ; σ²/n est faux.
+
+## Ce qui a cassé pour Salah
+- Le 37 % OOB (p01-05 pas 4, p07-02) et cette formule sont les deux endroits où le bootstrap et le bagging se rejoignent : le dire en une ligne.
