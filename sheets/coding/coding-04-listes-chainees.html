@@ -117,6 +117,11 @@ text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}te
 .skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
 .skel b{color:var(--pen);font-weight:600}
 .step .card.full,.step .card.casse{grid-column:1 / -1}
+.defs{display:grid;gap:8px;margin:10px 0 2px}
+.defs div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:14px;border-left:3px solid var(--cardline)}
+.defs div>b:first-child{display:block;font:600 11px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:2px}
+.defs div.hl{border-left-color:var(--green);background:rgba(240,209,120,.22)}
+.defs div .sep{color:var(--cardmuted)}
 .card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
 .card .wide table{min-width:520px}
 .card .wide th:nth-child(2),.card .wide td:nth-child(2),
@@ -259,14 +264,13 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   </div>
   <div class="card apply"><div class="lbl">Application — les cinq états du fil rouge, dits à voix haute</div>
     <p><code>1 → 2 → 3 → 4</code>. À chaque entrée de boucle, (<code>prev</code>, <code>cur</code>) et les deux tranches :</p>
-    <div class="wide"><table>
-      <tr><th>tour</th><th>prev — préfixe inversé</th><th>cur — suffixe intact</th></tr>
-      <tr><td>entrée 1</td><td><code>∅</code></td><td><code>1 → 2 → 3 → 4</code></td></tr>
-      <tr><td>entrée 2</td><td><code>1 → ∅</code></td><td><code>2 → 3 → 4</code></td></tr>
-      <tr class="hl"><td>entrée 3</td><td><code>2 → 1 → ∅</code></td><td><code>3 → 4</code></td></tr>
-      <tr><td>entrée 4</td><td><code>3 → 2 → 1 → ∅</code></td><td><code>4</code></td></tr>
-      <tr><td>sortie</td><td><code>4 → 3 → 2 → 1 → ∅</code></td><td><code>∅</code></td></tr>
-    </table></div>
+    <div class="defs">
+      <div><b>entrée 1</b><code>prev = ∅</code> <span class="sep">·</span> <code>cur = 1 → 2 → 3 → 4</code></div>
+      <div><b>entrée 2</b><code>prev = 1 → ∅</code> <span class="sep">·</span> <code>cur = 2 → 3 → 4</code></div>
+      <div class="hl"><b>entrée 3</b><code>prev = 2 → 1 → ∅</code> <span class="sep">·</span> <code>cur = 3 → 4</code></div>
+      <div><b>entrée 4</b><code>prev = 3 → 2 → 1 → ∅</code> <span class="sep">·</span> <code>cur = 4</code></div>
+      <div><b>sortie</b><code>prev = 4 → 3 → 2 → 1 → ∅</code> <span class="sep">·</span> <code>cur = ∅</code></div>
+    </div>
     <p><b>La conclusion s'instancie.</b> <code>cur = ∅</code> ⇒ le suffixe est vide ⇒ le préfixe [tête, ∅) est <i>toute</i> la liste, <b>donc</b> <code>prev</code> en est l'inversion. On conclut sur la <b>seconde</b> tranche : c'est elle qui, en devenant vide, fait tout le travail.</p>
     <p><b>Ce qu'il ne faut pas dire.</b> « <code>prev</code> contient le début inversé » — c'est vrai et ça ne conclut rien : sans « et <code>cur</code> est le reste, intact », rien n'interdit qu'un nœud ait été perdu en route. C'est exactement ce qui arrive au pas 7.</p>
   </div>
@@ -286,14 +290,14 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <p class="say">« Le suffixe perd un nœud par tour et sa longueur est un entier positif, donc la boucle fait exactement <span class="m">n</span> tours, donc O(<span class="m">n</span>) en temps, et comme je ne garde que trois pointeurs, donc O(1) en espace. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — compter les tours, et ce que chaque tour coûte</div>
-    <p><b>Sur le fil rouge</b> (<span class="m">n</span> = 4) : le variant vaut 4, 3, 2, 1, 0 aux cinq entrées de boucle — <b>4</b> tours, <b>4</b> écritures de <code>next</code>, <b>0</b> nœud créé. Le tableau du pas 3 est exactement cette suite, lue dans la colonne de droite.</p>
+    <p><b>Sur le fil rouge</b> (<span class="m">n</span> = 4) : le variant vaut 4, 3, 2, 1, 0 aux cinq entrées de boucle — <b>4</b> tours, <b>4</b> écritures de <code>next</code>, <b>0</b> nœud créé. Les blocs du pas 3 sont exactement cette suite, lue sur le <code>cur</code> de chacun.</p>
     <p><b>Le coût d'un tour est O(1)</b> : une lecture, une écriture, deux réaffectations de noms. <b>Donc</b> O(<span class="m">n</span>) — la complexité composée du prérequis, avec un second facteur trivial.</p>
-    <div class="wide"><table>
-      <tr><th>solution</th><th>temps</th><th>espace</th></tr>
-      <tr class="hl"><td>trois pointeurs, en place</td><td>O(<span class="m">n</span>)</td><td><b>O(1)</b> — 3 noms</td></tr>
-      <tr><td>copier les valeurs, renvoyer <code>vals[::-1]</code></td><td>O(<span class="m">n</span>)</td><td>O(<span class="m">n</span>)</td></tr>
-      <tr><td>récursion sur la queue</td><td>O(<span class="m">n</span>)</td><td>O(<span class="m">n</span>) — la pile d'appels</td></tr>
-    </table></div>
+    <table>
+      <tr><th>solution</th><th>temps · espace</th></tr>
+      <tr class="hl"><td>trois pointeurs, en place</td><td>O(<span class="m">n</span>) · <b>O(1)</b>, 3 noms</td></tr>
+      <tr><td>copier, renvoyer <code>vals[::-1]</code></td><td>O(<span class="m">n</span>) · O(<span class="m">n</span>)</td></tr>
+      <tr><td>récursion sur la queue</td><td>O(<span class="m">n</span>) · O(<span class="m">n</span>), la pile</td></tr>
+    </table>
     <p><b>La récursion n'est pas gratuite.</b> Elle a l'air « sans variable auxiliaire », mais chaque appel garde un cadre : O(<span class="m">n</span>) d'espace, et <code>RecursionError</code> au-delà de la limite CPython. Dire « O(1) » d'une inversion récursive est faux, et c'est une question d'entretien.</p>
   </div>
 </div>
