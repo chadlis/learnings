@@ -10,7 +10,7 @@ prereq: [p00-02, p00-04, p07-02, p06-02, p01-05]
 anki: [ml::bagging, stats::variance, ml::validation, stats::bootstrap]
 bridges: []
 next: b05
-status: ready
+status: built
 ---
 ## Le mécanisme
 B variables de même variance σ², corrélées deux à deux par ρ. Var de la moyenne = (1/B²)·[B·σ² + B(B − 1)·ρσ²] = σ²/B + (B − 1)ρσ²/B = **ρσ² + (1 − ρ)σ²/B**. Quand B → ∞, il reste ρσ² : un plancher que moyenner ne franchit pas. Dérivé une fois ici, utilisé partout.
@@ -46,3 +46,22 @@ B variables de même variance σ², corrélées deux à deux par ρ. Var de la m
 
 ## Ce qui a cassé pour Salah
 - Le 37 % OOB (p01-05 pas 4, p07-02) et cette formule sont les deux endroits où le bootstrap et le bagging se rejoignent : le dire en une ligne.
+
+## Questions pour la revue
+- **Aucun chiffre du spec n'était faux.** Le seul nombre explicite — « à ρ = 0,5, cent
+  arbres valent à peine mieux que dix » — est vérifié : 0,550 à B = 10 contre 0,505 à
+  B = 100, plancher 0,500. Tous les chiffres de la sheet sont calculés par script.
+- **Doublon de table avec b03.** `b03` pas 6 porte déjà une table ρ × B pour une forêt
+  (ρ = 0,6 / 0,3 / 0,1 / 0, avec B = 10 / 100 / 500). `b04` pas 3 en donne une autre
+  (ρ = 0,5 / 0,05, avec B = 10 / 100) pour ne pas la recopier, mais les deux décrivent
+  le même objet avec des ρ différents. À trancher : aligner les deux jeux de ρ, ou
+  assumer que b03 illustre le compromis et b04 le plancher.
+- **Les ρ du pas 4 (0,4 en k-fold, 0,9 en LOOCV) sont des hypothèses de lecture**, repris
+  tels quels de `b03` pas 5 pour que les deux sheets restent comparables. La sheet le dit
+  deux fois (pas 4 et limite 2), mais un chiffre non mesuré reste un chiffre à surveiller.
+- **Ajout hors spec, à valider** : la borne ρ ≥ −1/(B − 1), quatrième limite du pas 6.
+  Elle ferme la porte à « et si on rendait les termes anti-corrélés ? », une question que
+  la formule appelle naturellement et que le spec ne traitait pas.
+- **Taille du fil rouge du pas 5** : le spec ne fixait pas de dimensions pour le SE groupé.
+  Choix retenu : 1 000 lignes = 50 utilisateurs × 20, ρ = 0,2, pour que la figure 2 tire
+  exactement la même expérience que la table (effet de grappe 4,80, n_eff = 208, SE × 2,19).

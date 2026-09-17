@@ -1,0 +1,469 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>La variance d'une moyenne corrélée — pont</title>
+<meta name="sheet" content="series=bridge;part=B;number=04;status=v1">
+<meta name="part" content="B · Ponts">
+<meta name="subtitle" content="pont — ρσ² + (1 − ρ)σ²/B : pourquoi « plus » ne suffit pas quand c'est corrélé">
+<meta name="prereq" content="p00-02,p00-04,p07-02,p06-02,p01-05">
+<meta name="anki" content="ml::bagging,stats::variance,ml::validation,stats::bootstrap">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+</style>
+</head><body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Ponts › pont 04</div>
+  <h1>La variance d'une moyenne <span>corrélée</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Pont. Une seule ligne d'algèbre — <b>Var(moyenne de <span class="m">B</span> termes de variance <span class="m">σ</span>² corrélés deux à deux par <span class="m">ρ</span>) = <span class="m">ρσ</span>² + (1 − <span class="m">ρ</span>)<span class="m">σ</span>²/<span class="m">B</span></b> — et le premier terme <b>ne dépend pas de <span class="m">B</span></b>. Moyenner ne réduit que la part non corrélée ; le reste est un plancher. Dérivée une fois ici, elle explique pourquoi une forêt tire des features au hasard, pourquoi la LOOCV a une variance élevée, et pourquoi un SE sur des lignes dépendantes est trop optimiste. Fil rouge : <span class="m">σ</span>² = 1 et <span class="m">ρ</span> = 0,5 — cent termes valent <b>0,505</b>, dix en valent 0,550.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>Les habits</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="../chains/chain-p00-02-esperance-variance-densite.html#s5">p00-02 · Variance et covariance</a></li>
+    <li><a href="../chains/chain-p00-04-moyenne-lgn-tcl.html#s3">p00-04 · Var(<span class="m">x̄</span>) = <span class="m">σ</span>²/<span class="m">n</span></a></li>
+    <li><a href="../chains/chain-p01-05-bootstrap.html#s4">p01-05 · Bootstrap, les 37 %</a></li>
+    <li><a href="../../map.html#p07-02">p07-02 · Bagging et forêts</a></li>
+    <li><a href="../../map.html#p06-02">p06-02 · CV et fuite</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>ml::bagging</code><code>stats::variance</code><code>ml::validation</code><code>stats::bootstrap</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="bridge-03-biais-variance-partout.html">b03 · Biais et variance partout</a></li>
+    <li><a href="../../map.html#b05">b05 · Escalier vs sensible</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que ce pont suppose acquis</div>
+    <ul>
+      <li><b>La variance d'une somme.</b> Var(<span class="m">X</span> + <span class="m">Y</span>) = Var <span class="m">X</span> + Var <span class="m">Y</span> + 2 Cov(<span class="m">X</span>, <span class="m">Y</span>) : l'additivité n'est vraie qu'à covariance nulle (<a href="../chains/chain-p00-02-esperance-variance-densite.html#s5">p00-02 pas 5</a>), et Cov = <span class="m">ρσ</span><sub><span class="m">X</span></sub><span class="m">σ</span><sub><span class="m">Y</span></sub> (<a href="../chains/chain-p00-02-esperance-variance-densite.html#s6">pas 6</a>). Tout ce pont est cette parenthèse, comptée.</li>
+      <li><b>Var(<span class="m">x̄</span>) = <span class="m">σ</span>²/<span class="m">n</span> et le 1/√<span class="m">n</span></b> (<a href="../chains/chain-p00-04-moyenne-lgn-tcl.html#s3">p00-04 pas 3–4</a>). C'est le cas <span class="m">ρ</span> = 0 de la formule d'ici : le cas particulier, pas le cas général.</li>
+      <li><b>Le geste du bootstrap</b> : rééchantillonner <span class="m">n</span> lignes avec remise, et les 37 % de lignes laissées dehors (<a href="../chains/chain-p01-05-bootstrap.html#s3">p01-05 pas 3–4</a>).</li>
+      <li><b>Bagging, forêts, <span class="m">k</span>-fold</b> ne sont pas redéfinis : <a href="../../map.html#p07-02">p07-02</a> et <a href="../../map.html#p06-02">p06-02</a> les portent. Ce pont ne fournit qu'un chiffre, le même partout.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span><b>Échangeabilité.</b> Les <span class="m">B</span> termes ont la même variance <span class="m">σ</span>² et la <b>même</b> corrélation <span class="m">ρ</span> pour toutes les paires. Sinon la formule reste exacte en remplaçant <span class="m">ρ</span> par <span class="m">ρ̄</span>, la corrélation <b>moyenne</b> sur les <span class="m">B</span>(<span class="m">B</span> − 1) paires — c'est ce qui la rend transportable (pas 6).</span>
+      <b>H2</b><span><b>Rien n'est supposé sur ce que les termes estiment.</b> Arbres, erreurs de plis, lignes d'une table : la formule ne connaît que <span class="m">σ</span>² et <span class="m">ρ</span>. C'est pourquoi elle se relit telle quelle d'un domaine à l'autre.</span>
+      <b>H3</b><span><b>Variance seulement.</b> Moyenner ne déplace pas le centre : <span class="up">E</span>[moyenne] = <span class="up">E</span>[un terme]. Ce pont est muet sur le biais, qui ne bouge pas d'un pouce quand <span class="m">B</span> monte (<a href="bridge-03-biais-variance-partout.html#s6">b03 pas 6</a>).</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">Une formule, quatre habits</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>La formule, dérivée une fois <span class="tag tronc">tronc</span></h3>
+    <p>La moyenne de <span class="m">B</span> termes a pour variance la somme de <b>toutes</b> les cases de la matrice de covariance, divisée par <span class="m">B</span>². Il y a <span class="m">B</span> cases diagonales valant <span class="m">σ</span>², et <span class="m">B</span>(<span class="m">B</span> − 1) cases hors diagonale valant <span class="m">ρσ</span>².</p>
+    <div class="eq">Var(<span class="m">X̄</span>) = <sup>1</sup>⁄<sub><span class="m">B</span>²</sub> [ <span class="m">B σ</span>² + <span class="m">B</span>(<span class="m">B</span> − 1) <span class="m">ρσ</span>² ] = <b><span class="m">ρσ</span>² + (1 − <span class="m">ρ</span>) <span class="m">σ</span>²/<span class="m">B</span></b></div>
+    <p>Le second terme s'éteint avec <span class="m">B</span> ; le premier ne le voit pas. Quand <span class="m">B</span> → ∞ il reste <b><span class="m">ρσ</span>²</b>. À <span class="m">ρ</span> = 0 on retrouve <span class="m">σ</span>²/<span class="m">B</span>, le 1/√<span class="m">B</span> familier — un cas particulier, pas la règle.</p>
+    <p class="say">« La moyenne de <span class="m">B</span> termes a pour variance la somme des <span class="m">B</span>² cases de la matrice de covariance sur <span class="m">B</span>², donc <span class="m">B</span> variances et <span class="m">B</span>(<span class="m">B</span> − 1) covariances, donc <span class="m">ρσ</span>² plus (1 − <span class="m">ρ</span>)<span class="m">σ</span>² sur <span class="m">B</span>, donc un plancher à <span class="m">ρσ</span>² que moyenner ne franchit pas. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — compter les cases, <span class="m">B</span> = 10, <span class="m">ρ</span> = 0,5, <span class="m">σ</span>² = 1</div>
+    <p>La matrice de covariance a 10 × 10 = <b>100</b> cases. Dix diagonales à 1, quatre-vingt-dix hors diagonale à 0,5.</p>
+    <div class="eq">10 × 1 / 100 = 0,100 &nbsp;·&nbsp; 90 × 0,5 / 100 = 0,450 &nbsp;→&nbsp; <b>0,550</b></div>
+    <p>Les covariances pèsent <b>90 cases sur 100</b>, et déjà 82 % du résultat. Monter <span class="m">B</span> ne fait que renforcer leur part :</p>
+    <table>
+      <tr><th><span class="m">B</span></th><th>Var(<span class="m">X̄</span>)/<span class="m">σ</span>²</th><th>part des covariances</th><th>reste à gagner</th></tr>
+      <tr><td>1</td><td>1,0000</td><td>0 %</td><td>0,5000</td></tr>
+      <tr><td>10</td><td>0,5500</td><td>81,8 %</td><td>0,0500</td></tr>
+      <tr class="hl"><td><b>100</b></td><td><b>0,5050</b></td><td>98,0 %</td><td>0,0050</td></tr>
+      <tr><td>1 000</td><td>0,5005</td><td>99,8 %</td><td>0,0005</td></tr>
+      <tr><td>∞</td><td>0,5000</td><td>100 %</td><td>0</td></tr>
+    </table>
+    <p>Passer de 10 à 100 termes gagne 0,045 ; passer de 100 à l'infini en gagne <b>0,005</b>. Dix fois plus de calcul pour un centième de variance : c'est la ligne à retenir, avant de savoir de quels termes on parle.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Deux lectures du même nombre : le plancher et le <span class="m">B</span> efficace <span class="tag tronc">tronc</span></h3>
+    <p>Première lecture, <b>le plancher</b> : <span class="m">ρσ</span>² est ce qui reste après un nombre infini de termes. Seconde lecture, plus parlante : combien de termes <b>indépendants</b> cette moyenne vaut-elle ? On pose Var = <span class="m">σ</span>²/<span class="m">B</span><sub>eff</sub>, ce qui donne</p>
+    <div class="eq"><span class="m">B</span><sub>eff</sub> = 1 / [ <span class="m">ρ</span> + (1 − <span class="m">ρ</span>)/<span class="m">B</span> ] &nbsp;→&nbsp; <b>1/<span class="m">ρ</span></b> quand <span class="m">B</span> → ∞</div>
+    <p>Un <b>plafond d'information</b>, pas un plancher de variance : à <span class="m">ρ</span> = 0,5 on ne dépassera jamais <b>2</b> termes indépendants, quel que soit <span class="m">B</span>. Le bouton n'est donc pas <span class="m">B</span> mais <span class="m">ρ</span>.</p>
+    <p class="say">« Écrire la variance comme <span class="m">σ</span>² sur un nombre efficace de termes, donc <span class="m">B</span> efficace vaut un sur <span class="m">ρ</span> plus (1 − <span class="m">ρ</span>) sur <span class="m">B</span>, donc ce nombre plafonne à un sur <span class="m">ρ</span>, donc toute l'ingénierie porte sur <span class="m">ρ</span> et pas sur <span class="m">B</span>. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les cinq lieux, une seule formule</div>
+    <table>
+      <tr><th>lieu</th><th>les <span class="m">B</span> termes</th><th>d'où vient <span class="m">ρ</span></th><th>le bouton</th></tr>
+      <tr class="hl"><td>Bagging, forêt</td><td><span class="m">B</span> arbres</td><td>lignes et features en commun</td><td><b><span class="m">m</span></b> par split</td></tr>
+      <tr><td><span class="m">k</span>-fold, LOOCV</td><td><span class="m">k</span> erreurs de plis</td><td>modèles presque égaux</td><td><span class="m">k</span> = 5 à 10</td></tr>
+      <tr><td>SE d'une moyenne</td><td><span class="m">n</span> lignes</td><td>un même sujet, une série</td><td>grouper</td></tr>
+      <tr><td>Bootstrap</td><td><span class="m">B</span> tirages avec remise</td><td>la dépendance des lignes</td><td>par bloc</td></tr>
+      <tr><td>Ensemble de modèles</td><td><span class="m">K</span> modèles</td><td>mêmes données, mêmes erreurs</td><td>des modèles variés</td></tr>
+    </table>
+    <p><b>Où c'est écrit</b> : <a href="../../map.html#p07-02">p07-02</a> · <a href="../../map.html#p06-02">p06-02</a> · <a href="../chains/chain-p00-04-moyenne-lgn-tcl.html#s8">p00-04 casse</a> et <a href="../chains/chain-p01-01-objet-aleatoire.html#s10">p01-01 casse</a> · <a href="../chains/chain-p01-05-bootstrap.html#s6">p01-05 casse</a> · <a href="bridge-03-biais-variance-partout.html#s6">b03 pas 6</a>.</p>
+    <p>Les colonnes 2 et 3 sont tout le travail de lecture : nommer les <span class="m">B</span> termes, puis dire ce qu'ils <b>partagent</b>. Un bagging partage 63 % des lignes et les features dominantes ; deux plis d'une <span class="m">k</span>-fold partagent presque tout leur entraînement ; deux lignes d'un même utilisateur partagent l'utilisateur ; un bootstrap de lignes, lui, ne partage rien — et c'est précisément son erreur.</p>
+    <p><b>Le chiffre qui tue le réflexe « plus ».</b> Pour descendre à 1 % au-dessus du plancher il faut <span class="m">B</span> = (1 − <span class="m">ρ</span>)/(0,01 <span class="m">ρ</span>) : <b>100</b> termes à <span class="m">ρ</span> = 0,5, <b>900</b> à <span class="m">ρ</span> = 0,1, <b>1 900</b> à <span class="m">ρ</span> = 0,05. Plus <span class="m">ρ</span> est bas, plus <span class="m">B</span> sert — le nombre ne paie que là où la corrélation est déjà basse.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — le plancher que <span class="m">B</span> ne franchit pas</div>
+    <div id="f1slider"></div>
+    <div id="f1plot" class="wide"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Var(<span class="m">X̄</span>)/<span class="m">σ</span>² contre <span class="m">B</span>, en <b>échelle log</b> de 1 à 200. Bleu : <span class="m">ρ</span> = 0, la droite en <span class="m">σ</span>²/<span class="m">B</span> qui descend sans fin. Violet : la courbe à <span class="m">ρ</span> choisi ; rouge : son plancher <span class="m">ρσ</span>². Le trait vert entre les deux points mesure <b>tout ce que rapporte le passage de 10 à 100 termes</b>. Monte <span class="m">ρ</span> : les deux courbes se séparent d'emblée et le violet s'écrase sur son plancher avant <span class="m">B</span> = 20. À <span class="m">ρ</span> = 0,5, <b>cent arbres valent à peine mieux que dix</b> — 0,505 contre 0,550 — et jamais mieux que deux arbres indépendants.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>Habit 1 — bagging et forêts : le bootstrap fabrique <span class="m">ρ</span></h3>
+    <p>Les <span class="m">B</span> arbres d'un bagging sont entraînés sur des rééchantillons du <b>même</b> jeu : deux bootstraps partagent environ 40 % des lignes distinctes, et les mêmes features dominantes s'imposent dans tous. D'où <span class="m">ρ</span> &gt; 0, mécaniquement.</p>
+    <p>Une forêt aléatoire ne change rien à <span class="m">B</span> : elle tire <span class="m">m</span> features au hasard à chaque split pour empêcher les arbres de se ressembler. Elle achète du <span class="m">ρ</span> bas au prix d'arbres un peu moins bons chacun — donc d'un <span class="m">σ</span>² un peu plus grand.</p>
+    <p class="say">« Les arbres partagent leurs lignes et leurs features, donc <span class="m">ρ</span> est strictement positif, donc ajouter des arbres bute sur <span class="m">ρσ</span>², donc le réglage d'une forêt est <span class="m">m</span> et non <span class="m">B</span>. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — deux forêts, en unités de <span class="m">σ</span>² (un arbre seul)</div>
+    <p><span class="m">ρ</span> = 0,5 : <span class="m">m</span> = <span class="m">p</span>, du bagging pur, arbres très semblables. <span class="m">ρ</span> = 0,05 : <span class="m">m</span> petit, arbres largement décorrélés.</p>
+    <table>
+      <tr><th><span class="m">ρ</span></th><th><span class="m">B</span> = 10</th><th><span class="m">B</span> = 100</th><th>plancher</th><th><span class="m">B</span><sub>eff</sub> max</th></tr>
+      <tr><td>0,50</td><td>0,5500</td><td>0,5050</td><td>0,50</td><td>2,0</td></tr>
+      <tr class="hl"><td><b>0,05</b></td><td>0,1450</td><td><b>0,0595</b></td><td>0,05</td><td><b>20,0</b></td></tr>
+    </table>
+    <p>À <span class="m">B</span> = 100, passer de <span class="m">ρ</span> = 0,5 à <span class="m">ρ</span> = 0,05 fait tomber la variance de 0,505 à 0,0595 — <b>huit fois moins</b>. Aucun nombre d'arbres ne produit ce gain à <span class="m">ρ</span> = 0,5 : le plancher est à 0,50, et mille arbres n'y descendent qu'à 0,5005.</p>
+    <p><b>Le bootstrap entre deux fois dans un bagging</b>, et c'est le même 37 %. Chaque arbre voit 1 − (1 − 1/<span class="m">n</span>)<sup><span class="m">n</span></sup> ≈ <b>63,2 %</b> des lignes : c'est ce recouvrement qui fabrique <span class="m">ρ</span>. Il en laisse <b>36,8 %</b> dehors : ce sont les lignes out-of-bag, sur lesquelles se lit gratuitement l'erreur (<a href="../chains/chain-p01-05-bootstrap.html#s4">p01-05 pas 4</a>, <a href="../../map.html#p07-02">p07-02</a>). Un seul tirage, deux conséquences opposées — une variance qui plafonne, une validation offerte.</p>
+    <p><b>Même argument pour un ensemble de modèles hétérogènes</b> : moyenner cinq gradient boostings réglés pareil rapporte presque rien, un GBM plus un modèle linéaire plus un <span class="m">k</span>NN rapporte beaucoup. Ce n'est pas le nombre, c'est <span class="m">ρ</span>.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Habit 2 — <span class="m">k</span>-fold et LOOCV : <span class="m">ρ</span> ≈ 1, donc <span class="m">k</span> ne sert plus</h3>
+    <p>L'erreur estimée par validation croisée est la <b>moyenne de <span class="m">k</span> erreurs de plis</b>. En LOOCV, les <span class="m">n</span> modèles sont entraînés sur des jeux qui diffèrent d'<b>une ligne</b> : ils sont quasi identiques, leurs erreurs aussi, donc <span class="m">ρ</span> ≈ 1.</p>
+    <p>La formule s'applique mot pour mot avec <span class="m">B</span> = <span class="m">k</span> : la moyenne de mille erreurs quasi parfaitement corrélées a presque la variance d'<b>une seule</b>. C'est la vraie raison de préférer <span class="m">k</span> = 5 ou 10 — pas le temps de calcul.</p>
+    <p class="say">« Les <span class="m">k</span> modèles d'une validation croisée partagent presque toutes leurs lignes, donc leurs erreurs sont corrélées, donc la moyenne des <span class="m">k</span> erreurs a une variance proche de <span class="m">ρσ</span>², donc monter <span class="m">k</span> jusqu'à <span class="m">n</span> n'achète presque aucune précision. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — <span class="m">n</span> = 1 000, en unités de la variance d'<b>un</b> pli</div>
+    <p>Les <span class="m">ρ</span> sont des hypothèses de lecture, pas des mesures : une <span class="m">k</span>-fold à <span class="m">k</span> modéré donne des modèles assez différents (<span class="m">ρ</span> ≈ 0,4), une LOOCV des modèles quasi identiques (<span class="m">ρ</span> ≈ 0,9).</p>
+    <table>
+      <tr><th>schéma</th><th><span class="m">k</span></th><th><span class="m">ρ</span></th><th>Var de la moyenne</th><th><span class="m">k</span><sub>eff</sub></th></tr>
+      <tr><td>5-fold</td><td>5</td><td>0,4</td><td>0,5200</td><td>1,92</td></tr>
+      <tr class="hl"><td><b>10-fold</b></td><td>10</td><td>0,4</td><td><b>0,4600</b></td><td><b>2,17</b></td></tr>
+      <tr><td>10-fold, modèles semblables</td><td>10</td><td>0,9</td><td>0,9100</td><td>1,10</td></tr>
+      <tr><td>LOOCV</td><td>1 000</td><td>0,9</td><td>0,9001</td><td>1,11</td></tr>
+    </table>
+    <p>Entre le 10-fold et la LOOCV à <span class="m">ρ</span> = 0,9 : <b>cent fois plus d'entraînements</b> pour faire passer la variance de 0,9100 à 0,9001, soit 0,0099. Mille plis valent <b>1,11 pli indépendant</b>. Et le gain réel du 10-fold sur le 5-fold ne vient pas de <span class="m">k</span> mais de <span class="m">ρ</span> : c'est le même 0,4 ici, d'où un maigre 1,92 → 2,17.</p>
+    <p>Le versant biais — <span class="m">k</span> petit entraîne sur moins de lignes, donc surestime l'erreur — est l'autre moitié du réglage et vit dans <a href="bridge-03-biais-variance-partout.html#s5">b03 pas 5</a>. Ce pont ne traite que la largeur.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Habit 3 — le SE d'une moyenne, et le bootstrap qui l'imite <span class="tag casse">casse</span></h3>
+    <p>Ici les <span class="m">B</span> termes sont les <span class="m">n</span> <b>lignes</b> elles-mêmes. Vingt lignes d'un même utilisateur ne sont pas vingt observations : elles se ressemblent, donc <span class="m">ρ</span> &gt; 0, donc <span class="m">σ</span>²/<span class="m">n</span> est faux — trop petit.</p>
+    <p>Avec <span class="m">n</span> lignes en grappes de <span class="m">m</span>, corrélées par <span class="m">ρ</span> à l'intérieur et indépendantes entre grappes, la corrélation <b>moyenne</b> sur les paires vaut <span class="m">ρ̄</span> = (<span class="m">m</span> − 1)<span class="m">ρ</span>/(<span class="m">n</span> − 1), et la formule du pas 1 donne l'<b>effet de grappe</b> :</p>
+    <div class="eq">Var(<span class="m">x̄</span>) = <sup><span class="m">σ</span>²</sup>⁄<sub><span class="m">n</span></sub> · [ 1 + (<span class="m">m</span> − 1) <span class="m">ρ</span> ] &nbsp;&nbsp;·&nbsp;&nbsp; <span class="m">n</span><sub>eff</sub> = <span class="m">n</span> / [ 1 + (<span class="m">m</span> − 1) <span class="m">ρ</span> ]</div>
+    <p class="say">« Les lignes d'un même utilisateur sont corrélées, donc la corrélation moyenne sur les paires n'est pas nulle, donc la variance de la moyenne est <span class="m">σ</span>²/<span class="m">n</span> multipliée par 1 + (<span class="m">m</span> − 1)<span class="m">ρ</span>, donc l'échantillon compte <span class="m">n</span><sub>eff</sub> lignes et pas <span class="m">n</span>. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — 1 000 lignes, 50 utilisateurs × 20 lignes, <span class="m">σ</span> = 1</div>
+    <table>
+      <tr><th><span class="m">ρ</span> intra-utilisateur</th><th>effet de grappe</th><th><span class="m">n</span><sub>eff</sub></th><th>SE de <span class="m">x̄</span></th></tr>
+      <tr><td>0 — lignes indépendantes</td><td>1,00</td><td>1 000</td><td>0,0316</td></tr>
+      <tr><td>0,05</td><td>1,95</td><td>513</td><td>0,0442</td></tr>
+      <tr class="hl"><td><b>0,20</b></td><td><b>4,80</b></td><td><b>208</b></td><td><b>0,0693</b></td></tr>
+      <tr><td>0,50</td><td>10,50</td><td>95</td><td>0,1025</td></tr>
+      <tr><td>1 — lignes identiques</td><td>20,00</td><td>50</td><td>0,1414</td></tr>
+    </table>
+    <p>À <span class="m">ρ</span> = 0,2, le vrai SE est <b>2,19 fois</b> celui qu'annonce <span class="m">σ</span>/√<span class="m">n</span> : 0,0693 contre 0,0316. Un intervalle « 95 % » calculé naïvement (± 0,0620 au lieu de ± 0,1358) ne couvre en réalité que <b>62,9 %</b> — un test sur quatre déclaré significatif ne l'est pas.</p>
+    <p><b>Et le bootstrap ne rattrape rien.</b> Rééchantillonner les 1 000 <b>lignes</b> avec remise pose implicitement <span class="m">ρ̄</span> = 0 : le bootstrap reproduit fidèlement le mauvais modèle et sort le même 0,0316, trop petit du même facteur 2,19 (<a href="../chains/chain-p01-05-bootstrap.html#s6">p01-05 casse</a>). Le correctif n'est pas plus de rééchantillons, c'est de rééchantillonner les <b>50 utilisateurs</b> — bootstrap par grappe, ou par bloc pour une série temporelle. Même geste partout : ramener l'unité de tirage à ce qui est réellement indépendant.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — l'intervalle que <span class="m">σ</span>/√<span class="m">n</span> promet, et celui qu'on obtient</div>
+    <div id="f2slider"></div>
+    <div id="f2host"></div>
+    <div class="readouts" id="f2grid"></div>
+    <p class="cap">Chaque barre est <b>une expérience entière</b> : 50 utilisateurs, 20 lignes chacun, 1 000 lignes en tout, résumées par leur moyenne. Les deux traits bleus sont l'intervalle ± 1,96 <span class="m">σ</span>/√<span class="m">n</span> — ce que promet la formule qui ignore les grappes. Tire 500 fois à <span class="m">ρ</span> = 0 : l'histogramme remplit exactement les traits. Monte <span class="m">ρ</span> : il <b>déborde largement</b> sans que les traits bougent, parce que <span class="m">n</span> n'a pas changé — seul <span class="m">n</span><sub>eff</sub> a fondu. C'est la panne, vue de face.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Où ça casse — quatre pannes, la même partout <span class="tag casse">casse</span></h3>
+    <p>La formule est exacte ; ce qui casse est son usage. Trois des quatre pannes sont des façons de ne pas regarder <span class="m">ρ</span>, la quatrième est de croire qu'on peut le mesurer.</p>
+    <p class="say">« Le gain de moyenner vit entièrement dans <span class="m">ρ</span>, donc compter <span class="m">B</span> sans regarder <span class="m">ρ</span> ne dit rien, donc <span class="m">ρ</span> est ce qu'il faut estimer, donc — comme il est presque toujours inestimable — on le baisse par construction plutôt qu'on ne le mesure. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>Compter <span class="m">B</span> sans regarder <span class="m">ρ</span>.</b> « Plus d'arbres », « plus de lignes », « plus de rééchantillons », « plus de plis » : dès que <span class="m">ρ</span> domine, aucun de ces « plus » ne bouge le résultat. Le test mental coûte une division : <span class="m">B</span><sub>eff</sub> plafonne à 1/<span class="m">ρ</span> — à <span class="m">ρ</span> = 0,5 il vaut <b>2</b>, et mille termes n'y changent rien.</li>
+      <li><b><span class="m">ρ</span> ne se mesure presque jamais.</b> Il faudrait les covariances entre arbres, entre plis, entre lignes, sur des tirages répétés qu'on n'a pas. On le <b>baisse par construction</b> — features tirées au hasard, blocs, grappes, modèles hétérogènes — et on vérifie l'effet, pas la cause. Un <span class="m">ρ</span> « estimé » sur un seul jeu de données est une hypothèse de lecture, jamais un chiffre : les 0,4 et 0,9 du pas 4 en sont.</li>
+      <li><b>Un <span class="m">ρ</span> commun n'existe pas (H1).</b> C'est <span class="m">ρ̄</span>, la corrélation moyenne sur les paires, qui entre dans la formule — et elle reste exacte. Mais deux structures très différentes peuvent donner le même <span class="m">ρ̄</span> : une grappe énorme noyée dans des lignes indépendantes, ou une dépendance faible et diffuse. La variance de la moyenne est la même ; la <b>forme</b> de sa distribution, elle, ne l'est pas, et les quantiles du bootstrap non plus.</li>
+      <li><b>Un <span class="m">ρ</span> négatif n'est pas un cadeau non plus.</b> Var ≥ 0 impose <span class="m">ρ</span> ≥ −1/(<span class="m">B</span> − 1) : à <span class="m">B</span> = 10 la corrélation ne peut pas descendre sous −0,111, à <span class="m">B</span> = 100 sous −0,010. L'anti-corrélation fait mieux que l'indépendance, mais de moins en moins à mesure que <span class="m">B</span> monte — il n'existe pas de plancher <b>négatif</b> à exploiter.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li><b>Var(moyenne de <span class="m">B</span> corrélés) = <span class="m">ρσ</span>² + (1 − <span class="m">ρ</span>)<span class="m">σ</span>²/<span class="m">B</span></b> : <span class="m">B</span> variances plus <span class="m">B</span>(<span class="m">B</span> − 1) covariances, sur <span class="m">B</span>². Le second terme s'éteint, le premier jamais — plancher <span class="m">ρσ</span>².</li>
+    <li>Autre lecture : <span class="m">B</span><sub>eff</sub> = 1/[<span class="m">ρ</span> + (1 − <span class="m">ρ</span>)/<span class="m">B</span>] plafonne à <b>1/<span class="m">ρ</span></b>. À <span class="m">ρ</span> = 0,5 : cent termes valent 0,505 <span class="m">σ</span>², soit deux termes indépendants.</li>
+    <li>Bagging : baisser <span class="m">ρ</span> par <span class="m">m</span> plutôt que monter <span class="m">B</span> (0,505 → 0,0595). LOOCV : <span class="m">ρ</span> ≈ 0,9, mille plis valent 1,11 pli, donc <span class="m">k</span> = 5–10.</li>
+    <li>SE et bootstrap : <span class="m">n</span> lignes en grappes de <span class="m">m</span> donnent <span class="m">n</span><sub>eff</sub> = <span class="m">n</span>/[1 + (<span class="m">m</span> − 1)<span class="m">ρ</span>]. Le bootstrap de lignes pose <span class="m">ρ̄</span> = 0 et se trompe du même facteur : rééchantillonner les <b>groupes</b>.</li>
+    <li>Moyenner ne réduit que la part non corrélée — et ne touche pas au biais (<a href="bridge-03-biais-variance-partout.html#s6">b03</a>).</li>
+  </ol>
+</div>
+<div class="phrase">« La variance d'une moyenne de <span class="m">B</span> termes corrélés est <span class="m">ρσ</span>² plus (1 − <span class="m">ρ</span>)<span class="m">σ</span>²/<span class="m">B</span> : le second terme s'éteint avec <span class="m">B</span>, le premier jamais. C'est pourquoi une forêt aléatoire tire des features au hasard pour baisser <span class="m">ρ</span>, pourquoi la LOOCV a une variance élevée, et pourquoi le SE de lignes dépendantes est trop optimiste. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">4 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Dérive Var(moyenne) pour <span class="m">B</span> termes corrélés.</div><div class="a hid">Somme des <span class="m">B</span>² cases de la matrice de covariance sur <span class="m">B</span>² : <span class="m">B</span> variances <span class="m">σ</span>² et <span class="m">B</span>(<span class="m">B</span> − 1) covariances <span class="m">ρσ</span>². Soit <b><span class="m">ρσ</span>² + (1 − <span class="m">ρ</span>)<span class="m">σ</span>²/<span class="m">B</span></b>, plancher <span class="m">ρσ</span>², et <span class="m">B</span><sub>eff</sub> plafonné à 1/<span class="m">ρ</span>.</div></li>
+    <li><div class="q">Même argument, autre habit : pourquoi la forêt tire-t-elle <span class="m">m</span> features ?</div><div class="a hid">Pour baisser <span class="m">ρ</span>. <span class="m">B</span> ne franchit pas le plancher : à <span class="m">ρ</span> = 0,5, cent arbres donnent 0,505 <span class="m">σ</span>² et l'infini 0,50. Passer à <span class="m">ρ</span> = 0,05 donne 0,0595 — huit fois moins, à <span class="m">B</span> égal. Le bootstrap lui-même fabrique <span class="m">ρ</span> : 63 % de lignes en commun.</div></li>
+    <li><div class="q">Pourquoi la LOOCV a-t-elle une variance élevée ?</div><div class="a hid"><span class="m">n</span> modèles qui diffèrent d'une ligne, donc quasi identiques, donc <span class="m">ρ</span> ≈ 0,9. Mille plis valent 1,11 pli indépendant : 0,9001 au lieu de 0,9100 pour un 10-fold. Cent fois le calcul pour 1 % de variance. D'où <span class="m">k</span> = 5 ou 10.</div></li>
+    <li><div class="q">Que fait-on d'un SE sur des lignes d'un même utilisateur ?</div><div class="a hid">On le corrige par l'effet de grappe : <span class="m">n</span><sub>eff</sub> = <span class="m">n</span>/[1 + (<span class="m">m</span> − 1)<span class="m">ρ</span>]. 1 000 lignes, 20 par utilisateur, <span class="m">ρ</span> = 0,2 → <span class="m">n</span><sub>eff</sub> = 208 et SE × 2,19. Le bootstrap de lignes répète l'erreur : rééchantillonner les utilisateurs.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="bridge-03-biais-variance-partout.html#s6"><b>b03 pas 6 — Biais et variance partout</b><small>l'autre moitié : là ce qui se décompose, ici le seul terme que moyenner attaque — et le biais qui, lui, ne bouge pas avec <span class="m">B</span></small></a>
+    <a href="../chains/chain-p00-02-esperance-variance-densite.html#s5"><b>p00-02 pas 5–6 — Additivité et corrélation</b><small>la parenthèse 2 Cov que ce pont ne fait que compter <span class="m">B</span>(<span class="m">B</span> − 1) fois</small></a>
+    <a href="../chains/chain-p00-04-moyenne-lgn-tcl.html#s3"><b>p00-04 pas 3–4 — Var(<span class="m">x̄</span>) et le 1/√<span class="m">n</span></b><small>le cas <span class="m">ρ</span> = 0, et pourquoi il est l'exception plutôt que la règle</small></a>
+    <a href="../chains/chain-p01-05-bootstrap.html#s4"><b>p01-05 pas 4 et casse — Bootstrap</b><small>les 37 % out-of-bag, et ce qui arrive quand les lignes rééchantillonnées ne sont pas indépendantes</small></a>
+    <a href="../../map.html#p07-02"><b>p07-02 — Bagging et forêts aléatoires</b><small>d'où sortent <span class="m">m</span> et <span class="m">B</span> ; ce pont fournit le chiffre qui dit lequel régler</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>ml::bagging</code> (le plancher <span class="m">ρσ</span>², <span class="m">m</span> contre <span class="m">B</span>, OOB) · <code>stats::variance</code> (variance d'une somme, covariance, <span class="m">B</span> efficace) · <code>ml::validation</code> (<span class="m">k</span>-fold, variance de la LOOCV) · <code>stats::bootstrap</code> (bootstrap par bloc et par grappe).</p>
+  <p>Une carte qui résiste après ce pont est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Pont b04 · v1 du 17/09/2026 · Prérequis : p00-02, p00-04, p07-02, p06-02, p01-05. Suite : <a href="../../map.html#b05">b05 — Escalier vs sensible</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== Figure 1 : le plancher ρσ² =====
+   Var(moyenne de B corrélés)/σ² = ρ + (1 − ρ)/B.
+   Axe x logarithmique : on trace en u = log10(B) sur [0 ; log10 200], puis on réécrit
+   les étiquettes de graduation — SL.plot imprime la valeur de la graduation, ici un
+   logarithme. Les ticks x sont posés avant les ticks y : ce sont les premiers text.sl-tick. */
+const L10=Math.log10, BT=[1,2,5,10,20,50,100,200], XMAX=L10(200);
+const VAR=(r,B)=>r+(1-r)/B;
+/* La bande y ∈ [1 ; 1,18] n'est atteinte par aucune courbe (le maximum vaut 1, en B = 1) :
+   les deux étiquettes de droite y logent sans jamais croiser un tracé, à tout ρ. */
+const P1=SL.plot(document.getElementById('f1plot'),{x:[0,XMAX],y:[0,1.18],w:600,h:300,
+  xt:BT.map(L10),yt:[.2,.4,.6,.8,1],xl:'B — nombre de termes moyennés (échelle log)',yl:'Var(moyenne) / σ²'});
+[...P1.svg.querySelectorAll('text.sl-tick')].slice(0,BT.length).forEach((e,i)=>{e.textContent=SL.fmt(BT[i],0);});
+P1.fn(u=>VAR(0,Math.pow(10,u)),'sl-c4');
+P1.label(XMAX,1.03,'ρ = 0 : σ²/B','sl-c4','end');
+const st1={rho:.5};
+const out1=document.getElementById('f1out');
+let cur=null,flo=null;
+function draw1(){
+  P1.clear();
+  if(cur)cur.remove();if(flo)flo.remove();
+  const r=st1.rho, v10=VAR(r,10), v100=VAR(r,100);
+  cur=P1.fn(u=>VAR(r,Math.pow(10,u)),'sl-c2');
+  flo=P1.fn(()=>r,'sl-c3');
+  P1.seg(L10(10),v10,L10(100),v10,'chord');
+  P1.seg(L10(100),v10,L10(100),v100,'gain');
+  P1.dot(L10(10),v10,'sl-c2',5);P1.dot(L10(100),v100,'sl-c2',5);
+  P1.text(L10(11),v10+.045,'B corrélés','sl-c2');
+  if(r>.02)P1.text(XMAX,1.12,'plancher ρσ² = '+SL.fmt(r,2)+' σ²','sl-c3','end');
+  out1.innerHTML=`<div class="pos">B = 10<b>${SL.fmt(v10,4)} σ²</b></div>`
+    +`<div class="pos">B = 100<b>${SL.fmt(v100,4)} σ²</b></div>`
+    +`<div class="${r>0?'zero':'pos'}">plancher, B → ∞<b>${SL.fmt(r,4)} σ²</b></div>`
+    +`<div class="${r>0?'zero':'pos'}">B efficace, au mieux<b>${r>0?SL.fmt(1/r,2):'∞'}</b></div>`;}
+SL.slider(document.getElementById('f1slider'),{label:'corrélation ρ',min:0,max:.9,step:.05,value:.5},
+  v=>{st1.rho=v;draw1();});
+
+/* ===== Figure 2 : l'intervalle promis et l'intervalle obtenu =====
+   1 000 lignes = 50 grappes de 20, corrélées par ρ à l'intérieur, indépendantes entre elles.
+   Var(x̄) = σ²/n · [1 + (m − 1)ρ]. On ne tire pas les 1 000 lignes : la moyenne d'une grappe
+   vaut √ρ·u + √(1−ρ)·ē avec ē ~ N(0, 1/m) — même loi exacte, 100 gaussiennes au lieu de 1 000. */
+const NCL=50,MPC=20,NROW=NCL*MPC,SEN=1/Math.sqrt(NROW);
+function nrm(){let u=0,v=0;while(u===0)u=Math.random();while(v===0)v=Math.random();
+  return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*v);}
+const st2={rho:.2};
+/* SL.repeat centre l'étiquette d'une marque sur la marque : un libellé long déborderait
+   sur les barres du mode. On le garde court et on laisse la légende dire le reste. */
+const MARKS2=[{x:-1.96*SEN,label:'IC naïf',cls:'slope sl-c1'},{x:1.96*SEN,label:'',cls:'slope sl-c1'}];
+const grid2=document.getElementById('f2grid');
+function setGrid2(){
+  const d=1+(MPC-1)*st2.rho, se=Math.sqrt(d/NROW);
+  grid2.innerHTML=`<div class="pos">SE promis par σ/√n<b>${SL.fmt(SEN,4)}</b></div>`
+    +`<div class="${st2.rho>0?'zero':'pos'}">SE réel<b>${SL.fmt(se,4)}</b></div>`
+    +`<div class="${st2.rho>0?'zero':'pos'}">effet de grappe<b>${SL.fmt(d,2)}</b></div>`
+    +`<div class="${st2.rho>0?'zero':'pos'}">n effectif<b>${SL.fmt(NROW/d,0)}</b></div>`;}
+const R2=SL.repeat(document.getElementById('f2host'),{
+  draw:()=>{const a=Math.sqrt(st2.rho),b=Math.sqrt(1-st2.rho);let s=0;
+    for(let u=0;u<NCL;u++)s+=a*nrm()+b*nrm()/Math.sqrt(MPC);
+    return s/NCL;},
+  bins:[-.28,.28,40], xt:[-.2,-.1,0,.1,.2], xl:'moyenne des 1 000 lignes',
+  marks:MARKS2, counts:[1,50,500], w:600, h:250,
+  empty:'Aucune expérience tirée encore — clique « tirer 1 », puis « tirer 500 ».',
+  readout:(n,m,s)=>`${n} expériences · moyenne ${SL.fmt(m,4)} · écart-type observé ${SL.fmt(s,4)}`});
+/* le conteneur du SVG devient scrollable : min-width 440px oblige, à 390 px de large */
+R2.plot.svg.parentNode.className='wide';
+SL.slider(document.getElementById('f2slider'),{label:'ρ intra-grappe',min:0,max:.3,step:.05,value:.2},
+  v=>{st2.rho=v;R2.stats.length=0;R2.render();setGrid2();});
+draw1();
+})();
+</script>
+</body>
+</html>
