@@ -1,0 +1,552 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Heap — le minimum est le seuil d'entrée — coding</title>
+<meta name="sheet" content="series=coding;part=09;number=07;status=v1">
+<meta name="part" content="09 · Coding">
+<meta name="subtitle" content="coding — le plus petit du tas est le seuil d'entrée ; quand les clés sont bornées, un bucket bat le log">
+<meta name="prereq" content="c00">
+<meta name="anki" content="coding::heap,coding::top-k,coding::bucket-sort">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- série `coding` : squelette annoté et ruban de SL.trace (inerte hors coding) ---- */
+.skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.skel b{color:var(--pen);font-weight:600}
+.step .card.full,.step .card.casse{grid-column:1 / -1}
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .wide table{min-width:520px}
+.card .wide th:nth-child(2),.card .wide td:nth-child(2),
+.card .wide th:nth-child(3),.card .wide td:nth-child(3){text-align:left}
+.readouts .c1 b{color:var(--pen)}.readouts .c3 b{color:var(--red)}
+.sl-trace{--cw:58px;--cgap:8px;margin:4px 0 2px}
+.sl-cells{display:flex;gap:var(--cgap)}
+.sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
+.sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
+.sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
+.sl-cell.win{border-color:var(--green);border-width:2.5px}
+.sl-ptrs{position:relative;height:20px;margin-top:5px}
+.sl-ptr{position:absolute;top:0;left:calc(var(--i) * (var(--cw) + var(--cgap)));width:var(--cw);text-align:center;font:600 12px var(--sans);color:var(--pen)}
+.sl-note{font-size:14px;color:var(--cardink);margin-top:10px}
+.sl-inv{font:12.5px/1.55 var(--mono);color:var(--cardmuted);margin-top:6px;border-left:2px solid #B7791F;padding-left:10px}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ---- marques propres à cette chaîne ---- */
+/* le tas de taille 3, dessiné en arbre de trois cases : statique, il ne sert qu'à dire
+   que h[0] est la RACINE et que c'est le plus petit — pas une figure, un croquis. */
+.tas{display:grid;grid-template-columns:repeat(4,1fr);gap:4px 8px;max-width:270px;margin:10px 0 2px;text-align:center}
+.tas span{font:600 15px var(--mono);color:var(--cardink);background:var(--cardsoft);border:1.5px solid var(--cardline);border-radius:3px;padding:5px 0}
+.tas span.racine{background:rgba(240,209,120,.45);border-color:#B7791F}
+.tas b{grid-column:1 / -1;font:600 11px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cardmuted);text-align:left}
+.tasleg{font:12.5px var(--mono);color:var(--cardmuted);margin-top:4px}
+/* les buckets du pas 6 : une colonne par fréquence, lue de droite à gauche */
+.bk{display:grid;grid-template-columns:repeat(7,minmax(0,1fr));gap:5px;margin:10px 0 2px;max-width:420px}
+.bk span{height:38px;display:grid;place-items:center;border:1.5px solid var(--cardline);border-radius:3px;font:600 13px var(--mono);color:var(--cardmuted);background:var(--cardsoft)}
+.bk span.plein{background:rgba(31,122,68,.22);border-color:var(--green);color:var(--cardink)}
+.bk i{font:11px var(--mono);font-style:normal;color:var(--cardmuted);text-align:center}
+/* le curseur de la figure 2 s'aligne sur la largeur du tracé, sinon il barre toute la carte */
+#fig2 .sl-slider{max-width:640px;margin:6px auto 10px}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 09 · Coding › coding 07</div>
+  <h1>Heap — le minimum est le <span>seuil d'entrée</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">On demande <b>k</b> éléments extrêmes — les plus grands, les plus fréquents, les plus proches — et pas l'ordre complet. Trier, c'est répondre à une question qu'on n'a pas posée. Le pattern tient en une phrase : un <b>min-heap de taille k</b>, dont le minimum <code>h[0]</code> est le <b>seuil d'entrée</b> — un nouvel élément n'entre que s'il le dépasse, et il prend la place du minimum. Fil rouge : <code>arr = [5, 1, 9, 3, 7, 8]</code>, <span class="m">k</span> = 3, réponse <b>{7, 8, 9}</b> et 3<sup>e</sup> plus grand = <b>7</b> ; le tour qui compte est le quatrième, où <b>3 &gt; 1</b> fait sortir le 1. Coût O(<span class="m">n</span> log <span class="m">k</span>) contre O(<span class="m">n</span> log <span class="m">n</span>) — et quand les clés sont <b>bornées</b>, un bucket supprime le log tout entier. Jamais la solution complète : le squelette, la trace, les phrases.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="coding-00-tap-invariant-variant.html#s2">c00 · l'invariant</a> — conteneur, tranche, « exactement »</li>
+    <li><a href="coding-00-tap-invariant-variant.html#s3">c00 · le variant</a> — l'entier ≥ 0 qui décroît</li>
+    <li><a href="coding-00-tap-invariant-variant.html#s5">c00 · la complexité</a> — composée, jamais devinée</li>
+    <li><a href="coding-06-graphes.html#s2">c06 · la frontière</a> — le conteneur qu'on remplace ici par un tas</li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>coding::heap</code><code>coding::top-k</code><code>coding::bucket-sort</code></div>
+  <h4>Où le pattern voisine</h4>
+  <ol>
+    <li><a href="coding-06-graphes.html">c06 · Graphes</a></li>
+    <li><a href="coding-03-binary-search.html">c03 · Binary search</a></li>
+    <li><a href="coding-00-tap-invariant-variant.html">c00 · Le TAP</a></li>
+    <li><a href="../../map.html#c08">c08 · Intervalles</a></li>
+    <li><a href="../../map.html">La carte, colonne 9</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette sheet suppose acquis</div>
+    <ul>
+      <li><b>Le rituel TAP.</b> Invariant, variant, conclusion, complexité — <a href="coding-00-tap-invariant-variant.html#s1">c00, pas 1</a>. La boucle est ici la plus simple de toute la série : un balayage de <code>arr</code>, un tour par élément, jamais de retour en arrière.</li>
+      <li><b>Invariant = conteneur + tranche + « exactement ».</b> <a href="coding-00-tap-invariant-variant.html#s2">c00, pas 2</a>. Le conteneur est le tas, la tranche est <code>arr[0:i+1]</code>, et le mot <b>exactement</b> est celui qui fait tout le travail — pas 3.</li>
+      <li><b>Variant = entier ≥ 0 strictement décroissant.</b> <a href="coding-00-tap-invariant-variant.html#s3">c00, pas 3</a>. Ce n'est <b>pas</b> la taille du tas, qui monte jusqu'à <span class="m">k</span> puis ne bouge plus : c'est <span class="m">n</span> − <span class="m">i</span>, le nombre d'éléments non encore vus.</li>
+      <li><b>Complexité composée.</b> <a href="coding-00-tap-invariant-variant.html#s5">c00, pas 5</a>. O(<span class="m">n</span> log <span class="m">k</span>) est un <b>produit</b> : <span class="m">n</span> tours, chacun au pire en log <span class="m">k</span>. Le pas 4 montre que le pire cas n'arrive presque jamais.</li>
+      <li><b>Un tas, c'est un tableau.</b> Aucun pointeur, aucun nœud : l'élément <span class="m">i</span> a ses fils en 2<span class="m">i</span>+1 et 2<span class="m">i</span>+2, et la <b>racine est la case 0</b>. C'est tout ce qu'il faut savoir de la structure — cette sheet parle de ce qu'on en fait, pas de son implémentation.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span><b><span class="m">k</span> ≪ <span class="m">n</span></b>, et <span class="m">k</span> est donné avant de commencer. Tout l'intérêt vient de ce rapport : à <span class="m">k</span> = <span class="m">n</span> le tas fait exactement le travail d'un tri, en plus lent. Le pas 1 en fait un contre-signal explicite.</span>
+      <b>H2</b><span>Les éléments sont <b>comparables deux à deux</b> par la clé qui décide. Une clé composite se range dans un <b>tuple</b>, et l'ordre du tuple est lexicographique — ce qui est exactement le piège du pas 7.</span>
+      <b>H3</b><span><code>heapq</code> est un <b>min</b>-heap, et il n'existe pas de variante max en Python. Tout « max-heap » de cette sheet est un min-heap sur <b>−<span class="m">x</span></b> ou sur <code>(−clé, …)</code>.</span>
+      <b>H4</b><span>On ne demande <b>pas</b> les <span class="m">k</span> plus grands <b>triés</b>. Le tas les contient sans les ordonner ; si l'ordre compte, c'est un <code>sorted(h)</code> final en O(<span class="m">k</span> log <span class="m">k</span>), qui se dit à voix haute au lieu d'être oublié.</span>
+      <b>H5</b><span>On énonce le <b>squelette</b> et les phrases. Le corps se remplit devant l'interlocuteur : une sheet de coding ne contient jamais la solution complète.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le signal, et les deux contre-signaux <span class="tag tronc">tronc</span></h3>
+    <p>Un superlatif <b>partiel</b> : « les <span class="m">k</span> plus grands », « les <span class="m">k</span> plus fréquents », « les <span class="m">k</span> plus proches », « le <span class="m">k</span>-ième plus grand ». Et ses cousins : fusionner <span class="m">k</span> flux triés, servir par ordre de priorité. Dans tous les cas <span class="m">n</span> est grand et <span class="m">k</span> est petit.</p>
+    <div class="eq">on demande <span class="m">k</span> extrêmes, pas l'ordre &nbsp;⇒&nbsp; <b>un tas de taille <span class="m">k</span></b></div>
+    <p>Deux contre-signaux, et ils sont symétriques. <b><span class="m">k</span> ≈ <span class="m">n</span></b> : il n'y a plus rien à jeter, on trie — le tas ne fait qu'ajouter une constante. <b>Clés bornées</b> dans [0, <span class="m">m</span>] avec <span class="m">m</span> = O(<span class="m">n</span>) : on n'a plus besoin de comparer du tout, un tableau de listes suffit — pas 6.</p>
+    <p class="say">« On me demande k éléments extrêmes et pas l'ordre des n, donc trier répondrait à une question que personne n'a posée, donc il me suffit de retenir les k meilleurs vus jusqu'ici, donc le pattern est un tas de taille k et non un tri. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le fil rouge, et l'ordre de grandeur qui justifie tout</div>
+    <p><b>Le fil rouge.</b> <code>arr = [5, 1, 9, 3, 7, 8]</code>, <span class="m">k</span> = 3. Les trois plus grands sont <b>{7, 8, 9}</b>, et le 3<sup>e</sup> plus grand — le <span class="m">k</span>-ième — est <b>7</b>. Six valeurs : c'est assez court pour se tracer à la main au tableau, et assez long pour que <b>trois</b> évictions différentes s'y produisent.</p>
+    <p><b>Pourquoi le rapport <span class="m">k</span>/<span class="m">n</span> décide de tout.</b> Mesuré sur <span class="m">n</span> = 10<sup>6</sup> valeurs aléatoires : avec <span class="m">k</span> = 10, <b>999 880</b> d'entre elles — <b>99,988 %</b> — sont rejetées par <b>une seule</b> comparaison contre <code>h[0]</code>, et seuls <b>134</b> remplacements ont lieu. Avec <span class="m">k</span> = 1000 : <b>99,21 %</b> de rejets, <b>6 954</b> remplacements. Le tas n'est presque jamais touché ; c'est un <b>filtre</b>, et le log ne se paie que sur ce qui passe.</p>
+    <p><b>Le contre-signal <span class="m">k</span> ≈ <span class="m">n</span>, chiffré.</b> À <span class="m">n</span> = 10<sup>6</sup>, <span class="m">k</span> = 10 : la boucle du tas met <b>0,022 s</b>, le tri complet <b>0,147 s</b> — 6,7× plus. À <span class="m">k</span> = <span class="m">n</span>, les deux font le même travail et le tas le fait moins bien : on annonce <code>sorted()</code> et on passe à autre chose.</p>
+    <p><b>Ce que la sheet n'aborde pas.</b> L'implémentation du tas (percolation, <code>siftup</code>), les tas de Fibonacci, les files de priorité à clés modifiables. On les <b>nomme</b> si la question tombe ; ici, le tas est une boîte noire à trois opérations.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Le pattern : <code>h[0]</code> est le seuil d'entrée <span class="tag tronc">tronc</span></h3>
+    <p>Pour les <span class="m">k</span> plus <b>grands</b>, un <b>min</b>-heap — l'inverse du réflexe. Sa racine <code>h[0]</code> est le plus petit des <span class="m">k</span> retenus, c'est-à-dire exactement le <b>ticket d'entrée</b> : tout ce qui ne le dépasse pas est jeté en O(1).</p>
+    <div class="eq"><span class="m">v</span> &gt; <b>h[0]</b> &nbsp;⇒&nbsp; <code>heapreplace(h, v)</code> &nbsp;·&nbsp; sinon <b>rien</b></div>
+    <p><b>Remplacer, pas pousser-puis-retirer</b> : <code>heapreplace</code> est une seule percolation, <code>heappush</code> suivi de <code>heappop</code> en fait deux et laisse le tas passer par la taille <span class="m">k</span>+1. Pour les <span class="m">k</span> plus <b>petits</b>, on renverse tout : max-heap, donc min-heap sur <b>−<span class="m">x</span></b>.</p>
+    <p class="say">« Le tas est un min-heap, donc sa racine est le plus petit des k que je garde, donc c'est la barre à franchir pour entrer, donc un élément qui ne la dépasse pas ne peut être dans aucun top-k futur et se jette sans toucher au tas. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le squelette, et le croquis du tas</div>
+    <div class="skel">h = []
+<b>pour</b> v <b>dans</b> arr :
+    <b>si</b> len(h) &lt; k :
+        heappush(h, v)
+    <b>sinon si</b> v &gt; <b>h[0]</b> :    # h[0] = le seuil
+        heapreplace(h, v)
+<b>retour</b> h     # les k plus grands, NON triés</div>
+    <p><b>Quatre lignes, et une seule porte l'idée</b> : <code>v &gt; h[0]</code>. Le reste est de la plomberie. Le <code>si len(h) &lt; k</code> est l'amorce — les <span class="m">k</span> premiers entrent sans examen, puisqu'il n'y a pas encore de seuil à franchir.</p>
+    <div class="tas">
+      <b>le tas après le tour 3 — arr[0:3] = 5, 1, 9</b>
+      <span class="racine">1</span><span>5</span><span>9</span><span style="border:none;background:none"></span>
+    </div>
+    <p class="tasleg">case 0 = racine = <b>seuil</b> · fils de 0 : cases 1 et 2 · aucune relation entre 5 et 9</p>
+    <p><b>Ce que le croquis dit.</b> Le tas <b>n'est pas trié</b> : il garantit seulement que chaque parent est ≤ ses fils. Mesuré sur 2 000 tirages de 40 valeurs avec <span class="m">k</span> = 5 : <b>86,9 %</b> du temps le tableau sorti n'est pas dans l'ordre croissant. La seule case sur laquelle on peut compter est la <b>0</b> — et c'est la seule dont on a besoin.</p>
+    <p><b>Le <span class="m">k</span>-ième plus grand, gratuitement.</b> À la sortie, <code>h[0]</code> <i>est</i> la <span class="m">k</span>-ième plus grande valeur. LeetCode 215 ne demande rien d'autre : le même code, et on retourne <code>h[0]</code> au lieu de <code>h</code>.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — la course complète sur le fil rouge</div>
+    <div id="f1trace" class="wide"></div>
+    <p class="cap">Les six valeurs de <code>arr</code> : le grand chiffre est la valeur, le petit son indice. Cadre <b>vert</b> = l'élément du tour, <b>ambre</b> = les indices actuellement <i>dans</i> le tas, et la ligne <code>inv</code> donne le contenu du tas <b>trié</b> — attention, trié pour être lisible, pas parce que le tas l'est (voir le croquis ci-dessus). Fais « pas › » et arrête-toi à l'image <b>4</b> : c'est le premier tour où le tas est plein, <code>h[0] = 1</code> est le seuil, la valeur du tour vaut <b>3</b>, et <b>3 &gt; 1</b> — <b>donc le 1 sort et le 3 entre</b>. Les images 5 et 6 rejouent la même scène avec 7 &gt; 3 puis 8 &gt; 5, et à chaque fois le seuil <b>monte</b> : 1, puis 3, puis 5, puis 7. Ce seuil qui ne redescend jamais, c'est tout le mécanisme. Bilan : <b>3</b> poussées, <b>3</b> remplacements, <b>0</b> rejet — sur ces six valeurs rangées exprès, rien n'est jeté ; sur 10<sup>6</sup> valeurs aléatoires, 99,988 % le sont.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>L'invariant, le variant, la conclusion <span class="tag tronc">tronc</span></h3>
+    <p>L'invariant se récite sur la tranche déjà lue, et le mot qui porte tout est <b>exactement</b> :</p>
+    <div class="eq">après le tour <span class="m">i</span> : <b>h</b> = les min(<span class="m">k</span>, <span class="m">i</span>+1) plus grandes valeurs de <b>arr[0:<span class="m">i</span>+1]</b> &nbsp;·&nbsp; <b>h[0]</b> = la plus petite d'entre elles</div>
+    <p><b>Variant</b> : <span class="m">n</span> − <span class="m">i</span>, entier ≥ 0 qui décroît d'une unité par tour. Pas la taille du tas, qui croît jusqu'à <span class="m">k</span> puis reste fixe — elle ne prouve rien.</p>
+    <p class="say">« Le tas contient exactement les k plus grands de la tranche lue, donc une valeur qui ne dépasse pas le plus petit d'entre eux n'est plus grande qu'aucun des k, donc l'ignorer conserve l'invariant, donc à la dernière lecture le tas contient exactement les k plus grands de arr. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — l'invariant récité sur les six tours du fil rouge</div>
+    <ul>
+      <li><b><span class="m">i</span> = 0, <span class="m">v</span> = 5.</b> Tas non plein → on pousse. <code>h = {5}</code>, seuil 5. Exactement le plus grand de <code>[5]</code>. ✔</li>
+      <li><b><span class="m">i</span> = 1, <span class="m">v</span> = 1.</b> Non plein → on pousse. <code>h = {1, 5}</code>, seuil <b>1</b>. Exactement les 2 plus grands de <code>[5, 1]</code>. ✔</li>
+      <li><b><span class="m">i</span> = 2, <span class="m">v</span> = 9.</b> Non plein → on pousse. <code>h = {1, 5, 9}</code>, seuil <b>1</b>. Le tas est plein : le seuil devient actif.</li>
+      <li><b><span class="m">i</span> = 3, <span class="m">v</span> = 3.</b> <b>3 &gt; 1</b> → remplacement, <b>le 1 sort</b>. <code>h = {3, 5, 9}</code>, seuil <b>3</b>. Exactement les 3 plus grands de <code>[5, 1, 9, 3]</code>. ✔</li>
+      <li><b><span class="m">i</span> = 4, <span class="m">v</span> = 7.</b> <b>7 &gt; 3</b> → le 3 sort. <code>h = {5, 7, 9}</code>, seuil <b>5</b>.</li>
+      <li><b><span class="m">i</span> = 5, <span class="m">v</span> = 8.</b> <b>8 &gt; 5</b> → le 5 sort. <code>h = {7, 8, 9}</code>, seuil <b>7</b>.</li>
+      <li><b>Conclusion.</b> Variant nul <b>donc</b> la tranche vaut <code>arr</code> tout entier <b>donc</b> <code>h = {7, 8, 9}</code> est exactement le top-3, et <code>h[0] = 7</code> est le 3<sup>e</sup> plus grand.</li>
+    </ul>
+    <p><b>Le seuil est monotone, et c'est ce qui rend l'argument court.</b> 5 → 1 → 1 → 3 → 5 → 7 : dès que le tas est plein il ne peut que <b>monter</b>, puisqu'on ne remplace que par plus grand. Un élément rejeté à l'instant <span class="m">i</span> l'aurait donc été à tous les instants suivants : rien n'est perdu.</p>
+    <p><b>Vérifié à l'exécution.</b> La boucle confrontée à <code>sorted(arr)[-k:]</code> sur des tirages aléatoires, <span class="m">n</span> = 10<sup>6</sup> et <span class="m">k</span> ∈ {10, 100, 1000} : <b>0 désaccord</b>.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Le coût : un produit, et une borne très lâche</h3>
+    <p><span class="m">n</span> tours, et chaque tour touche un tas de <b>taille <span class="m">k</span></b> : une percolation coûte au pire log <span class="m">k</span>. Le tas <b>ne grandit jamais</b> au-delà de <span class="m">k</span>, donc le log est en <span class="m">k</span> et non en <span class="m">n</span>.</p>
+    <div class="eq">temps <b>O(<span class="m">n</span> log <span class="m">k</span>)</b> &nbsp;·&nbsp; espace <b>O(<span class="m">k</span>)</b> &nbsp;—&nbsp; contre O(<span class="m">n</span> log <span class="m">n</span>) et O(<span class="m">n</span>) pour le tri</div>
+    <p>Trois choses à nommer sans les dérouler. <b>Quickselect</b> : O(<span class="m">n</span>) en <b>moyenne</b>, O(<span class="m">n</span><sup>2</sup>) au pire, et il faut tout le tableau en mémoire. <b>heapify</b> : O(<span class="m">n</span>), pas O(<span class="m">n</span> log <span class="m">n</span>). Le tas de taille <span class="m">k</span>, lui, est le seul des trois qui tourne sur un <b>flux</b>.</p>
+    <p class="say">« Je fais un tour par élément et chaque tour ne touche qu'un tas de taille k, donc le coût d'un tour est log k et non log n, donc le total est n log k, donc le gain sur le tri est le rapport log n sur log k — un facteur six à un million d'éléments, pas un ordre de grandeur. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — comparaisons comptées, pas estimées</div>
+    <p><b>Ce que la borne annonce.</b> <span class="m">n</span> = 20 000, <span class="m">k</span> = 10 : <span class="m">n</span> log₂ <span class="m">k</span> = <b>66 439</b> comparaisons au pire.</p>
+    <p><b>Ce qui se passe vraiment</b> (comparaisons instrumentées) : <b>20 329</b> au total, soit <b>30,6 %</b> de la borne. Et la décomposition est l'idée du pas 2, chiffrée :</p>
+    <ul>
+      <li><b>19 990</b> comparaisons sont le seul test de seuil <code>v &gt; h[0]</code> — une par élément, en O(1) ;</li>
+      <li><b>84</b> remplacements seulement franchissent la barre ;</li>
+      <li><b>339</b> comparaisons se passent <i>à l'intérieur</i> du tas, soit ≈ 84 × log₂ 10. <b>C'est le seul endroit où le log existe.</b></li>
+    </ul>
+    <p><b>Les trois concurrents, même <span class="m">n</span>, même <span class="m">k</span>.</b> Min-heap de tous les <span class="m">n</span> puis <code>heappop</code> <span class="m">n</span>−<span class="m">k</span> fois : <b>293 204</b> comparaisons (<b>14×</b>). Max-heap de tous les <span class="m">n</span> puis <span class="m">k</span> retraits : <b>33 177</b> (<b>1,6×</b>, mais O(<span class="m">n</span>) d'espace — pas 7). Tri complet : <b>260 347</b>.</p>
+    <p><b>Chronométré, <span class="m">n</span> = 10<sup>6</sup>, <span class="m">k</span> = 10.</b> Tas de taille <span class="m">k</span> <b>0,022 s</b> · max-heap des <span class="m">n</span> <b>0,053 s</b> · tri <b>0,147 s</b> · min-heap des <span class="m">n</span> drainé <b>0,628 s</b>. Même réponse dans les quatre cas.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — <span class="m">n</span> log <span class="m">k</span>, <span class="m">n</span> log <span class="m">n</span> et <span class="m">n</span>, en échelles log</div>
+    <div id="f2ctl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Les deux axes sont <b>logarithmiques</b> : chaque graduation multiplie par 10. Trois droites, donc trois puissances de <span class="m">n</span> — et elles sont <b>parallèles</b>, ce qui est exactement le message. Bouge <b><span class="m">k</span></b> et regarde la ligne <b>bleue</b> : elle <b>glisse verticalement</b> entre la ligne <b>ambre</b> (<span class="m">n</span>, le plancher : lire l'entrée) et la <b>violette</b> (<span class="m">n</span> log <span class="m">n</span>, le tri), sans jamais changer de pente. <b>Ce que ça veut dire</b> : le tas ne change pas la <i>classe</i> de complexité, il divise une constante — à <span class="m">n</span> = 10<sup>6</sup> et <span class="m">k</span> = 10, le gain sur le tri est <b>6×</b>, pas mille. Pousse <span class="m">k</span> jusqu'à ce que les readouts virent au rouge : au-delà de <span class="m">k</span> = <span class="m">n</span> la ligne bleue passe <b>au-dessus</b> de la violette et le tas coûte plus cher que le tri — c'est le contre-signal du pas 1, vu de face. Et la ligne ambre reste toujours en dessous : le seul moyen de la toucher, c'est d'arrêter de comparer — pas 6.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Les variantes : même tas, autre clé</h3>
+    <p>La charpente ne bouge pas ; seule change la <b>clé</b> qu'on met dedans. <b><span class="m">k</span> plus fréquents</b> (LC 347) : compter dans un <code>dict</code>, puis top-<span class="m">k</span> sur la paire <code>(fréquence, valeur)</code>. <b><span class="m">k</span> plus proches de l'origine</b> : max-heap sur <span class="m">d</span><sup>2</sup> — on ne prend jamais la racine, elle ne change pas l'ordre.</p>
+    <div class="eq">fusion de <span class="m">k</span> listes triées : tas des <b><span class="m">k</span> têtes</b> <code>(valeur, i_liste, j)</code> &nbsp;⇒&nbsp; <b>O(<span class="m">N</span> log <span class="m">k</span>)</b></div>
+    <p>La fusion est le cas où le tas a une <b>autre</b> taille que la réponse : <span class="m">k</span> est le nombre de <b>flux</b>, pas le nombre de résultats. On sort <span class="m">N</span> valeurs au total, et chaque sortie ne coûte qu'une percolation d'un tas à <span class="m">k</span> éléments.</p>
+    <p class="say">« La structure ne sait rien du problème, elle ne sait comparer que des clés, donc changer de problème revient à changer de clé et rien d'autre, donc les k plus fréquents, les k plus proches et la fusion de k flux sont le même code avec trois tuples différents. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — la fusion, déroulée sur des chiffres</div>
+    <p><b>Cinq listes triées de six valeurs</b>, soit <span class="m">N</span> = 30 et <span class="m">k</span> = 5 :</p>
+    <div class="skel">[23, 33, 37, 83, 87, 87]
+[18, 28, 29, 82, 85, 93]
+[ 9, 16, 23, 27, 68, 95]
+[ 3, 16, 37, 55, 77, 87]
+[ 1, 10, 18, 33, 35, 57]</div>
+    <p><b>Le tas ne contient jamais que 5 éléments</b> — les têtes courantes : au départ <code>(23,0) (18,1) (9,2) (3,3) (1,4)</code>. On retire la plus petite, on sort <b>1</b>, et on repousse la suivante de la liste 4. Trente retraits plus tard, la fusion est <b>identique</b> à <code>sorted()</code> des 30 valeurs — vérifié. Coût : 30 × log₂ 5, contre 30 × log₂ 30 pour un tri naïf de la concaténation.</p>
+    <p><b>Le <span class="m">j</span> dans le tuple.</b> <code>(valeur, i_liste, j)</code> : <span class="m">i</span> dit dans quelle liste repêcher, <span class="m">j</span> dit où. Sans eux, on sait quelle valeur sortir mais pas quoi pousser à sa place — et le tuple à trois champs règle en prime le problème d'égalité du pas 7.</p>
+    <p><b>Les <span class="m">k</span> plus proches, et le piège du signe.</b> On veut les plus <b>petites</b> distances, donc un <b>max</b>-heap, donc un min-heap sur <b>−<span class="m">d</span><sup>2</sup></b>. Le seuil est alors le <b>plus mauvais</b> des <span class="m">k</span> retenus — même phrase, autre bout.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Quand on arrête de comparer : le bucket</h3>
+    <p>Le log de <span class="m">n</span> log <span class="m">k</span> vient d'une seule chose : on <b>compare</b>. Si les clés sont des entiers dans [0, <span class="m">m</span>] avec <span class="m">m</span> = O(<span class="m">n</span>), on peut s'en passer — la clé <b>est</b> un indice.</p>
+    <div class="eq">tableau de listes, <b>indice = clé</b> &nbsp;;&nbsp; lire depuis le haut &nbsp;⇒&nbsp; <b>O(<span class="m">n</span>)</b>, zéro comparaison</div>
+    <p>Le cas qui tombe en entretien est LC 347 : une <b>fréquence</b> est un entier de 0 à <span class="m">n</span>, donc bornée par construction. C'est le contre-signal du pas 1 : ce n'est pas que le tas soit lent, c'est que la question a changé de nature.</p>
+    <p class="say">« Le log vient de ce que je compare des clés entre elles, donc si une clé est un entier borné je peux m'en servir comme d'un indice, donc je range sans comparer et je lis depuis le haut, donc le coût tombe à n — et la borne sur la clé est l'hypothèse à énoncer avant de l'annoncer. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — LC 347 sur six valeurs, puis la nuance mesurée</div>
+    <p><code>arr = [1, 1, 1, 2, 2, 3]</code>, <span class="m">k</span> = 2. Comptage : <code>{1 : 3, 2 : 2, 3 : 1}</code>. On range chaque <b>valeur</b> dans le seau de sa <b>fréquence</b> :</p>
+    <div class="bk">
+      <span>—</span><span class="plein">3</span><span class="plein">2</span><span class="plein">1</span><span>—</span><span>—</span><span>—</span>
+      <i>f=0</i><i>f=1</i><i>f=2</i><i>f=3</i><i>f=4</i><i>f=5</i><i>f=6</i>
+    </div>
+    <p class="tasleg">on lit de <b>f = 6</b> vers <b>f = 1</b> et on s'arrête à <span class="m">k</span> = 2 → <b>[1, 2]</b></p>
+    <p><b>Le tableau a <span class="m">n</span>+1 seaux</b> et pas un de plus : une fréquence ne peut pas dépasser <span class="m">n</span>. C'est cette borne-là qu'on énonce, et c'est elle qui achète le O(<span class="m">n</span>).</p>
+    <p><b>La nuance, mesurée.</b> « O(<span class="m">n</span>) » n'est pas « plus rapide ». Sur <span class="m">n</span> = 10<sup>6</sup> avec <span class="m">k</span> = 3 : quand il n'y a que <b>50</b> valeurs distinctes, le bucket est <b>100× plus lent</b> que le tas (2,9 ms contre 0,03 ms), parce qu'allouer 10<sup>6</sup> seaux coûte O(<span class="m">n</span>) alors que le tas ne voit que 50 items. Avec 50 000 puis 600 000 distinctes, le bucket repasse devant — de <b>1,24×</b>. Asymptotiquement il gagne ; en constante, c'est mince, et le dire vaut mieux que l'annoncer trop fort.</p>
+    <p><b>La phrase à dire.</b> « Les fréquences sont bornées par <span class="m">n</span>, donc je peux les utiliser comme indices et descendre en O(<span class="m">n</span>) ; avec le tas je reste en <span class="m">n</span> log <span class="m">k</span>, et sur ce jeu de données ce sera probablement plus rapide. » On donne les deux, on choisit, et on justifie.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Le piège n'est pas le <b>sens</b> du tas, c'est sa <b>taille</b>. « <span class="m">k</span> plus grands ⇒ heap » se transforme en « je mets les <span class="m">n</span> éléments dans un tas », et de là il n'y a plus qu'un pas jusqu'à le vider. Rien n'est levé, la réponse est juste, la facture change d'ordre.</p>
+    <div class="eq">tas de taille <b><span class="m">k</span></b> : O(<span class="m">n</span> log <span class="m">k</span>), espace O(<span class="m">k</span>) &nbsp;→&nbsp; tas de taille <b><span class="m">n</span></b> : espace O(<span class="m">n</span>), et pas de flux</div>
+    <p>Et le cas <b>vraiment</b> silencieux, celui qui rend la réponse <b>fausse</b> : une clé composite dont on inverse un seul champ. Le tuple se compare champ par champ ; nier la fréquence sans nier le mot est la <b>seule</b> façon de garder le tri secondaire dans le bon sens.</p>
+    <p class="say">« Un tuple se compare lexicographiquement, donc renverser l'ordre en niant le premier champ renverse aussi l'ordre des suivants, donc l'égalité de fréquence se tranche à l'envers de ce que l'énoncé demande, donc la fonction rend deux mots dans le mauvais ordre sans lever la moindre erreur. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Les deux contre-exemples, à sortir de mémoire</div>
+    <p><b>Le tas de taille <span class="m">n</span>, chiffré.</b> <span class="m">n</span> = 10<sup>6</sup>, <span class="m">k</span> = 10. Min-heap de tous les <span class="m">n</span> puis <code>heappop</code> <b><span class="m">n</span>−<span class="m">k</span></b> fois : <b>0,628 s</b> et <b>293 204</b> comparaisons, contre <b>0,022 s</b> et <b>20 329</b> pour le tas de taille <span class="m">k</span> — <b>29×</b> en temps, <b>14×</b> en comparaisons. Max-heap de tous les <span class="m">n</span> puis <b><span class="m">k</span></b> retraits : <b>0,053 s</b>, donc <i>rapide</i> — mais O(<span class="m">n</span>) d'espace, et il faut connaître <span class="m">n</span>, <b>donc il ne tourne pas sur un flux</b>. Les trois rendent {les mêmes 10 valeurs} : aucun test ne les distingue.</p>
+    <p><b>La clé composite, LC 692</b> (<span class="m">k</span> mots les plus fréquents, égalité tranchée par l'ordre <b>alphabétique</b>). Sur <code>{pomme : 3, abricot : 3, cerise : 2, datte : 1}</code> avec <span class="m">k</span> = 2 : <code>nlargest</code> sur <code>(f, mot)</code> renvoie <code>['pomme', 'abricot']</code> — <b>faux</b>. <code>nsmallest</code> sur <code>(−f, mot)</code> renvoie <code>['abricot', 'pomme']</code> — juste. Quatre mots suffisent à le voir, et aucune exception n'est levée dans les deux cas.</p>
+    <p><b>Pourquoi c'est indétectable à la main.</b> Il faut une <b>égalité</b> de clé primaire <i>et</i> une clé secondaire qui compte. Sur des flottants tirés au hasard, l'égalité n'arrive jamais : la version fautive passe tous les tests aléatoires. Le contre-exemple doit être <b>construit</b>, pas cherché.</p>
+    <p><b>La phrase qui tue.</b> « Le tas doit avoir la taille de la <i>réponse</i>, pas celle de l'<i>entrée</i> — sinon j'ai payé l'espace de l'entrée pour rien, et je ne peux plus lire un flux. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Pièges Python — quatre lignes qui ont l'air justes</div>
+    <ul>
+      <li><b><code>heapq</code> est un <span class="up">min</span>-heap, et il n'y a pas d'option.</b> Un max-heap se fabrique en poussant <b>−<span class="m">x</span></b>, ou des tuples <code>(−clé, valeur)</code>. Oublier de re-nier à la sortie rend des valeurs négatives — bruyant, donc bénin. Nier <i>aussi</i> le second champ est silencieux : voir ci-dessus.</li>
+      <li><b>Tuples à clé égale et charge non comparable.</b> <code>heappush(h, (1, {'a': 1}))</code> puis <code>(1, {'b': 2})</code> lève <code>TypeError: '&lt;' not supported between instances of 'dict' and 'dict'</code> — vérifié. Le tas compare le second champ <b>uniquement</b> en cas d'égalité du premier, donc le bug est <b>intermittent</b> : il attend une égalité. Remède : un <b>compteur</b> monotone en deuxième position, <code>(clé, i, objet)</code>.</li>
+      <li><b><code>heapify</code> est O(<span class="m">n</span>), pousser <span class="m">n</span> fois est O(<span class="m">n</span> log <span class="m">n</span>).</b> Mesuré sur 10<sup>6</sup> flottants : <b>0,026 s</b> contre <b>0,052 s</b>, un facteur <b>2</b>. Le ratio est modeste en CPython parce que <code>heapify</code> et <code>heappush</code> sont tous deux en C — mais la différence de classe est réelle, et c'est elle qu'on énonce.</li>
+      <li><b>Retourner <code>h</code> en le croyant trié.</b> Il ne l'est pas : <b>86,9 %</b> des tirages donnent un tableau désordonné (2 000 essais, <span class="m">n</span> = 40, <span class="m">k</span> = 5). Seule la case <b>0</b> est garantie. Si l'énoncé demande l'ordre, <code>sorted(h)</code> — O(<span class="m">k</span> log <span class="m">k</span>), négligeable, mais à dire.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li><b>Signal</b> : <span class="m">k</span> extrêmes — plus grands, plus fréquents, plus proches, <span class="m">k</span>-ième — ou <span class="m">k</span> flux à fusionner, avec <span class="m">k</span> ≪ <span class="m">n</span>.</li>
+    <li><b>Le pattern</b> : min-heap de <b>taille <span class="m">k</span></b> pour les <span class="m">k</span> plus grands. <code>h[0]</code> est le <b>seuil d'entrée</b> ; <code>heapreplace</code>, jamais push-puis-pop.</li>
+    <li><b>Invariant</b> : h = <b>exactement</b> les <span class="m">k</span> plus grands de <code>arr[0:i+1]</code>, et <code>h[0]</code> le plus petit d'entre eux. <b>Variant</b> : <span class="m">n</span> − <span class="m">i</span>, jamais la taille du tas.</li>
+    <li><b>Coût</b> : O(<span class="m">n</span> log <span class="m">k</span>), espace O(<span class="m">k</span>). Borne lâche : 99,99 % des éléments sont rejetés par une comparaison. Gain sur le tri à <span class="m">n</span> = 10<sup>6</sup>, <span class="m">k</span> = 10 : <b>6×</b>, pas plus. Nommer <b>quickselect</b> (O(<span class="m">n</span>) moyen).</li>
+    <li><b>Clés bornées</b> dans [0, <span class="m">m</span>], <span class="m">m</span> = O(<span class="m">n</span>) ⇒ <b>bucket</b>, O(<span class="m">n</span>), zéro comparaison — les fréquences le sont toujours. <b><span class="m">k</span> ≈ <span class="m">n</span></b> ⇒ trier.</li>
+    <li><b>Où ça casse</b> : un tas de taille <span class="m">n</span> au lieu de <span class="m">k</span> — même réponse, O(<span class="m">n</span>) d'espace, et plus de flux (0,628 s contre 0,022 s en le drainant).</li>
+    <li><b>Le silence</b> : <code>(−f, mot)</code> et non <code>(f, mot)</code> nié après coup — nier les deux champs renverse le tri secondaire, sans erreur.</li>
+  </ol>
+</div>
+<div class="phrase">« Pour les k plus grands je garde un min-heap de taille k : son minimum est le seuil d'entrée, un élément n'entre que s'il le dépasse et prend sa place. À chaque instant le tas contient exactement les k plus grands vus, donc à la fin les k plus grands tout court, en n log k. Si les clés sont bornées, un bucket fait mieux, en linéaire. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Pourquoi un <span class="up">min</span>-heap pour les <span class="m">k</span> plus grands ?</div><div class="a hid">Parce que son minimum est le plus petit des k retenus, c'est-à-dire le seuil d'entrée : tout ce qui ne le dépasse pas se jette en une comparaison, et ce qui le dépasse prend sa place en O(log k). Un max-heap donnerait accès au plus grand — dont on n'a aucun besoin.</div></li>
+    <li><div class="q">L'invariant, et le variant ?</div><div class="a hid">Après le tour i, le tas contient exactement les min(k, i+1) plus grandes valeurs de arr[0:i+1], et h[0] est la plus petite d'entre elles. Le variant est n − i, pas la taille du tas : elle monte jusqu'à k puis ne bouge plus, donc elle ne prouve rien. Le seuil, lui, est monotone croissant — c'est ce qui rend la conclusion immédiate.</div></li>
+    <li><div class="q">Complexité, et contre quoi ?</div><div class="a hid">O(n log k) en temps, O(k) en espace, et c'est le seul des trois qui tourne sur un flux. Contre O(n log n) pour un tri — à n = 10⁶ et k = 10 le gain mesuré est 6×, pas mille — et contre quickselect, O(n) en moyenne mais O(n²) au pire et il lui faut tout le tableau. En pratique la borne est lâche : 99,99 % des éléments sont rejetés par une seule comparaison.</div></li>
+    <li><div class="q">Quand le bucket bat-il le tas ?</div><div class="a hid">Quand les clés sont des entiers dans [0, m] avec m = O(n) : la clé devient un indice, on range sans comparer et on lit depuis le haut, en O(n). Le cas canonique est LC 347, parce qu'une fréquence est bornée par n. En constante c'est mince — mesuré 1,24× — et si les valeurs distinctes sont rares, allouer les seaux coûte plus cher que tout le reste.</div></li>
+    <li><div class="q">Qu'est-ce qui casse sans lever d'erreur ?</div><div class="a hid">Deux choses. Un tas de taille n au lieu de k : même réponse, mais O(n) d'espace et plus de flux — et si on le draine n − k fois, 29× plus lent. Et une clé composite dont on nie les deux champs : sur LC 692, nlargest sur (f, mot) rend pomme avant abricot alors que l'égalité de fréquence doit se trancher alphabétiquement. Il faut une égalité pour le voir, donc aucun test aléatoire ne l'attrape.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Où ce mécanisme se rejoue</div>
+  <div class="bridges">
+    <a href="coding-06-graphes.html#s2"><b>c06 · Graphes</b><small>même charpente, autre frontière : remplacer la file du BFS par un tas à priorité donne Dijkstra. C'est la suite exacte du contre-signal « arêtes pondérées » du pas 1 de c06</small></a>
+    <a href="coding-00-tap-invariant-variant.html#s2"><b>c00 · L'invariant</b><small>« exactement les k plus grands de arr[0:i+1] » est un invariant de boucle ordinaire — le conteneur est un tas au lieu d'une fenêtre, le rituel ne change pas</small></a>
+    <a href="coding-00-tap-invariant-variant.html#s5"><b>c00 · La complexité composée</b><small>n log k est le produit type : n tours × le coût d'un tour, et le coût d'un tour dépend de la taille du conteneur, pas de celle de l'entrée</small></a>
+    <a href="coding-01-fenetre-glissante.html#s1"><b>c01 · Fenêtre glissante</b><small>l'autre façon de ne garder qu'une petite partie de l'entrée : là un intervalle contigu, ici les k meilleurs où qu'ils soient — même économie d'espace, autre critère d'appartenance</small></a>
+    <a href="coding-03-binary-search.html"><b>c03 · Binary search</b><small>l'autre source de log : là on coupe l'espace de recherche en deux, ici on percole dans un arbre de hauteur log k. Le log ne veut jamais dire la même chose</small></a>
+    <a href="../../map.html#c08"><b>c08 · Intervalles</b><small>le tas y revient sous un autre nom : les salles de réunion, c'est un min-heap des fins courantes, et sa racine est encore un seuil</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>coding::heap</code> (le min-heap de taille <span class="m">k</span>, <code>h[0]</code> = seuil, <code>heapreplace</code>, l'invariant, O(<span class="m">n</span> log <span class="m">k</span>) et O(<span class="m">k</span>)) · <code>coding::top-k</code> (le <span class="m">k</span>-ième gratuit, les <span class="m">k</span> plus proches par le signe, la fusion de <span class="m">k</span> flux, quickselect nommé) · <code>coding::bucket-sort</code> (clés dans [0, <span class="m">m</span>] avec <span class="m">m</span> = O(<span class="m">n</span>), indice = clé, LC 347, et la constante qui mord).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>coding c07 · v1 du 17/09/2026 · Prérequis : <a href="coding-00-tap-invariant-variant.html">c00 · Le TAP</a>. Suite : <a href="../../map.html#c08">c08 · Intervalles</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== Figure 1 : la course du min-heap de taille 3 sur le fil rouge =====
+   arr = [5, 1, 9, 3, 7, 8], k = 3.
+   mark = les INDICES actuellement dans le tas (ambre) · win = l'élément du tour (cadre vert) ·
+   inv  = le tas TRIÉ (lisibilité seule : le tas ne l'est pas, cf. le croquis du pas 2) + le seuil.
+   Les six images sont celles produites par le script de vérification. */
+SL.trace(document.getElementById('f1trace'),{arr:[5,1,9,3,7,8],ms:1500,frames:[
+  {"ptr":{"▲ v = 5":0},"win":[0,1],"mark":[0],
+   "note":"Le tas est vide, donc pas encore de seuil : on pousse sans examen. Il reste 2 places.",
+   "inv":"h = {5}  ·  seuil h[0] = 5  ·  1 poussée, 0 remplacement"},
+  {"ptr":{"▲ v = 1":1},"win":[1,2],"mark":[0,1],
+   "note":"Tas non plein : le 1 entre alors même qu'il est le plus petit vu. C'est l'amorce, et elle ne coûte rien à l'invariant — les 2 plus grands de [5, 1] sont bien 5 et 1.",
+   "inv":"h = {1, 5}  ·  seuil h[0] = 1  ·  2 poussées"},
+  {"ptr":{"▲ v = 9":2},"win":[2,3],"mark":[0,1,2],
+   "note":"Troisième poussée : le tas est plein. À partir de maintenant, et seulement maintenant, h[0] devient une barre à franchir.",
+   "inv":"h = {1, 5, 9}  ·  seuil h[0] = 1  ·  3 poussées, le tas est plein"},
+  {"ptr":{"▲ v = 3":3},"win":[3,4],"mark":[0,2,3],
+   "note":"v = 3 > h[0] = 1, DONC on remplace : le 1 sort, le 3 entre. Une seule percolation — heapreplace, pas push puis pop.",
+   "inv":"h = {3, 5, 9}  ·  seuil 1 → 3  ·  le 1 est sorti (indice 1 éteint)"},
+  {"ptr":{"▲ v = 7":4},"win":[4,5],"mark":[0,2,4],
+   "note":"v = 7 > h[0] = 3 : le 3 sort à son tour. Le seuil monte encore — il ne peut que monter, puisqu'on ne remplace que par plus grand.",
+   "inv":"h = {5, 7, 9}  ·  seuil 3 → 5  ·  2 remplacements"},
+  {"ptr":{"▲ v = 8":5},"win":[5,6],"mark":[2,4,5],
+   "note":"v = 8 > h[0] = 5 : le 5 sort. Fin du balayage. Le tas contient exactement les 3 plus grands, et sa racine est le 3e plus grand.",
+   "inv":"h = {7, 8, 9}  ·  seuil h[0] = 7 = le k-ième  ·  3 poussées, 3 remplacements, 0 rejet"}
+]});
+
+/* ===== Figure 2 : n log k, n log n et n, en échelles log-log =====
+   Aucune primitive ne trace un axe logarithmique : on trace en COORDONNÉES log10 —
+   l'abscisse est log10(n), l'ordonnée log10(coût) — puis on réécrit les graduations en
+   puissances de 10. Les trois courbes deviennent des droites de pente 1, décalées
+   verticalement de log10(log2 k) et log10(log2 n) : c'est précisément le message.
+   La courbe en k est la seule dynamique, donc elle vit hors du calque statique. */
+const L2=Math.LOG2E,SUP={'0':'⁰','1':'¹','2':'²','3':'³','4':'⁴','5':'⁵','6':'⁶','7':'⁷','8':'⁸','9':'⁹','-':'⁻'};
+function p10(v){return '10'+String(v).split('').map(c=>SUP[c]||c).join('');}
+function mil(x){return Math.round(x).toString().replace(/\B(?=(\d{3})+(?!\d))/g,' ');}
+const log2=x=>Math.log(x)*L2;
+
+const P2=SL.plot(document.getElementById('f2plot'),{x:[1,7],y:[0.8,8.8],w:600,h:320,
+  xt:[1,2,3,4,5,6,7],yt:[2,4,6,8],xl:'n',yl:'opérations'});
+/* les graduations sont des exposants : on les rend lisibles sans toucher à l'échelle */
+P2.svg.querySelectorAll('text.sl-tick').forEach(function(e){e.textContent=p10(e.textContent);});
+/* les deux courbes qui ne dépendent pas de k : calque statique.
+   `n` est en ambre et non dans un bleu : sl-c1 et sl-c4 sont deux bleus voisins, et la
+   droite du plancher se confondait avec celle du tas au rendu. */
+P2.fn(function(x){return x;},'sl-c5');
+P2.fn(function(x){return x+Math.log10(log2(Math.pow(10,x)));},'sl-c2');
+
+let ck=null;
+const out2=document.getElementById('f2out');
+function draw2(k){
+  if(ck&&ck.parentNode)ck.parentNode.removeChild(ck);
+  P2.clear();
+  const dk=Math.log10(Math.max(log2(k),1e-9));
+  ck=P2.fn(function(x){return x+dk;},'sl-c1');
+  /* étiquettes des trois droites au bord droit. À k = 2 la droite du tas tombe SUR celle
+     de n, à k = n elle tombe sur celle du tri : dans les deux cas les libellés se
+     superposeraient. On les empile donc en imposant un écart minimal d'un tiers de décade. */
+  const labs=[{y:7,t:'n',c:'sl-c5'},{y:7+dk,t:'n log k',c:'sl-c1'},
+              {y:7+Math.log10(log2(1e7)),t:'n log n',c:'sl-c2'}].sort(function(p,q){return p.y-q.y;});
+  let prev=-99;
+  labs.forEach(function(l){l.ly=Math.max(l.y+0.16,prev+0.34);prev=l.ly;
+    P2.text(6.95,Math.min(8.72,l.ly),l.t,l.c,'end');});
+  /* le repère à n = 10^6 */
+  P2.vline(6,'chord');
+  const n=1e6,a=n*log2(k),b=n*log2(n);
+  P2.dot(6,6,'sl-c5',4.5);
+  P2.dot(6,Math.log10(b),'sl-c2',5);
+  P2.dot(6,Math.log10(a),'sl-c1',5);
+  const gain=b/a,perdu=a>b;
+  out2.innerHTML='<div>k<b>'+mil(k)+'</b></div>'
+    +'<div class="c1">n log₂ k  à n = 10⁶<b>'+mil(a)+'</b></div>'
+    +'<div class="c3">n log₂ n  à n = 10⁶<b>'+mil(b)+'</b></div>'
+    +'<div class="'+(perdu?'zero':'pos')+'">gain sur le tri<b>'+(perdu?'aucun : '+SL.fmt(1/gain,2)+'× plus cher':SL.fmt(gain,2)+'×')+'</b></div>';
+}
+const ctl2=SL.h('div','',document.getElementById('f2ctl'));
+/* le curseur porte log10(k) : k doit balayer 2 → 10^7 sans que le bas soit inutilisable */
+SL.slider(ctl2,{label:'k',min:Math.log10(2),max:7,step:0.01,value:1,
+  fmt:function(v){return mil(Math.round(Math.pow(10,v)));}},
+  function(v){draw2(Math.max(2,Math.round(Math.pow(10,v))));});
+})();
+</script>
+</body>
+</html>
