@@ -31,7 +31,21 @@ Règles absolues :
 5. `sw.js` : si une liste de fichiers y est en dur, ajoute `assets/sheetlib.js`, `map.html`, les nouveaux chemins, retire les anciens.
 6. `python3 tools/build_index.py` ; commit `chore(site): squelette de la refonte — archive Q/A, déroulés renommés, index par dépendance` ; `git push -u origin refonte-sheets`.
 
-## Phase 2 — production, en autonomie
+## Phase 2 — production, en autonomie — **TERMINÉE pour la Phase 1 de la formation**
+
+> **État au 18/09/2026.** Les onze parties de la Phase 1 sont produites : `01`,
+> `02`, `03`, `08`, `06`, `05`, `07`, `04`, `00`, `09`, `B` — **56 sheets**, tous
+> les specs `ready` consommés. Sur les 56 specs correspondants, **44 sont
+> `reviewed`** et **12 encore `built`**, en attente d'une revue : les quatre de
+> `00`, les quatre de `08`, et `w01-01`, `w01-02`, `w01-03`, `w02-01`. Un seul
+> spec de Phase 1 n'a jamais été `ready` : `c10` (préfixes et deque monotone),
+> toujours `stub`.
+>
+> **La suite ne passe plus par cette phase.** On ne relance pas une production en
+> lot : les phases 2 à 4 se remplissent **une sheet par bloc, à la revue du
+> vendredi, via `/sheet <id>`** — un spec écrit dans le chat, un `/sheet`, un
+> commit. Ce qui suit reste la procédure de référence pour ce `/sheet`, et
+> servirait telle quelle si une partie entière redevenait un jour à produire.
 
 Ordre des parties : `01`, `02`, `03`, `08`, `06`, `05`, `07`, `04`, `00`, `09`, `B`. Pour chaque partie, dans l'ordre des numéros, pour chaque spec `ready` :
 - lance un **sous-agent à contexte frais** avec l'instruction de `.claude/commands/sheet.md` pour cet id (il lit lui-même skill, gold standard, template, lib, spec) ;
@@ -43,3 +57,18 @@ Si un spec `ready` te paraît incomplet, produis ce qui est déterminé et note 
 ## Phase 3 — rapport (le seul moment où tu t'adresses à Salah)
 
 Un tableau : id · statut (built / échec ×2 / stub sauté) · chemin · FAIL/WARN · questions pour la revue. Puis l'URL Pages de la branche (ou la commande pour créer la preview). Puis, en 5 lignes, ce qui manque pour que le site soit complet : la liste des stubs, par partie.
+
+## Après la Phase 2 — le régime courant
+
+Un bloc de formation se termine le vendredi ; sa revue produit un spec, et ce
+spec produit une sheet. Rien n'est lancé en lot.
+
+1. Salah écrit le spec dans le chat et le dépose en `ready` dans `specs/`.
+2. `/sheet <id>` dans Claude Code : la sheet, la validation au rendu, l'index,
+   le commit. Le spec passe `built`.
+3. La revue suivante tranche les questions ouvertes et passe le spec `reviewed`.
+
+Les stubs restants, dans l'ordre où ils viendront : `c10` (Phase 1), puis
+`p10` micrograd, `p11` makemore, `p12` transformer, `p13` tokenizer, `p14` mech
+interp (Phase 2), `p20` evals, `p21` fine-tuning, `p22` inference (Phase 3),
+`p30` system design (Phase 4).
