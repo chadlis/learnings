@@ -10,7 +10,7 @@ prereq: [p00-03, p01-01]
 anki: [ml::metriques, ml::roc-auc, ml::precision-rappel, ml::desequilibre]
 bridges: [b05]
 next: p06-04
-status: built
+status: reviewed
 ---
 
 ## Question de la chaîne
@@ -30,6 +30,7 @@ Un modèle de fraude affiche 98,98 % d'accuracy : est-ce bon ? Que se passe-t-il
 - Rappel (TPR) = 240/300 = 0,80 · FPR = 960/99 700 = 0,0096 · Précision = 240/1 200 = 0,20 · Spécificité = 0,9904.
 - Baisser le seuil : TP ↑ (jusqu'à 300), FN ↓, FP ↑, TN ↓ ; rappel ↑, FPR ↑, précision ↓ en général.
 - Baseline PR = prévalence = 0,003 (un classement au hasard a une précision de 0,3 %) ; baseline ROC = la diagonale.
+- **AUC = 0,988.** Le modèle de scores qui reproduit exactement les quatre cases est binormal à variances égales (négatifs ~ N(0,1), positifs ~ N(D,1), D = 3,1821, seuil = 2,3405) ; il en tombe AUC = Φ(D/√2) = **0,988**. C'est le chiffre du fil rouge : 0,988 de classement et 0,20 de précision coexistent.
 
 ## Pas de la chaîne
 1. **Le décor.** Le modèle ne dit pas « fraude », il donne un score. Quelqu'un choisit un seuil ; à partir de là, quatre cases.
@@ -39,14 +40,14 @@ Un modèle de fraude affiche 98,98 % d'accuracy : est-ce bon ? Que se passe-t-il
 5. **L'accuracy et le modèle trivial.** Accuracy = (TP + TN)/n : dominée par TN quand la prévalence est faible. Le trivial fait 99,7 % ; 98,98 % est une régression. Toujours comparer au trivial ; à 0,3 % de prévalence, l'accuracy ne dit rien.
 6. **Le seuil bouge tout dans un sens connu** [tronc]. Baisser le seuil : on déclare plus de positifs ⇒ TP ↑, FP ↑, FN ↓, TN ↓ ⇒ rappel ↑, FPR ↑, précision ↓ (sauf si les nouveaux positifs sont surtout vrais). Le seuil est une décision **métier** (coût d'un FN vs d'un FP, p06-04), pas une propriété du modèle. Au tableau : « Baisser le seuil déplace des lignes de la colonne négative vers la positive, donc TP et FP montent ensemble, donc rappel et FPR montent et la précision descend. »
 7. **ROC : TPR contre FPR pour tous les seuils.** Une courbe par modèle, indépendante de la prévalence ; l'aire AUC = P(score d'un positif > score d'un négatif) : une métrique de **classement**. Diagonale = hasard. Deux modèles se comparent sur toute la courbe, pas à un seuil.
-8. **PR : précision contre rappel.** Sensible à la prévalence ; baseline = prévalence. Quand la classe positive est rare et que c'est elle qu'on cherche, la ROC est trompeusement flatteuse (FPR minuscule même avec 960 FP) ; la PR montre la précision de 0,20. Règle : classe rare et coût des FP élevé ⇒ PR ; sinon ROC.
+8. **PR : précision contre rappel.** Sensible à la prévalence ; baseline = prévalence. Quand la classe positive est rare et que c'est elle qu'on cherche, la ROC est trompeusement flatteuse (FPR minuscule même avec 960 FP) ; la PR montre la précision de 0,20. Règle : classe rare et coût des FP élevé ⇒ PR ; sinon ROC. Deux résumés d'un seul chiffre se définissent ici, une ligne chacun : **F1** = moyenne harmonique de la précision et du rappel **au seuil courant** ; **AP** = aire sous la courbe PR, donc sur tous les seuils, à prévalence fixée. Le premier juge une décision, le second un classement.
 9. **Barres d'erreur.** Rappel = 240/300 : SE = √(0,8·0,2/300) = 0,023 (p01-01, n = nombre de positifs). Précision = 240/1 200 : SE = 0,012. Deux modèles à 0,80 et 0,83 de rappel sur 300 positifs sont dans le bruit.
 10. **Où ça casse** [casse].
 
 ## Figures exigées
 - **Figure 1 — SVG custom via `plot` (matrice interactive)** : deux distributions de scores (positifs, négatifs ; effectifs 300 et 99 700, dessinés en densité) avec un `slider` seuil ; la matrice de confusion se remplit en effectifs, readouts accuracy, rappel, FPR, précision, et « trivial : 99,70 % ». Légende : baisse le seuil, regarde quelles cases bougent.
 - **Figure 2 — `plot`** : la ROC tracée en direct par le même slider (point courant marqué), AUC en readout ; bouton « mélanger les scores » qui rapproche les distributions (AUC → 0,5). Légende : la courbe est le seuil qu'on fait glisser.
-- **Figure 3 — `plot`** : la PR du même modèle, baseline 0,003 en pointillé, point courant marqué ; `slider` prévalence ∈ [0,1 % ; 50 %] qui redessine la PR (la ROC, affichée à côté, ne bouge pas). Légende : la PR voit la prévalence, la ROC non.
+- **Figure 3 — `plot`** : la PR du même modèle, baseline 0,003 en pointillé, point courant marqué ; `slider` prévalence ∈ [0,1 % ; 50 %] qui redessine la PR (la ROC, affichée à côté, ne bouge pas). Légende : la PR voit la prévalence, la ROC non. Le readout **AP** est défini au pas 8.
 
 ## Où ça casse
 - **Prévalence du test ≠ production** : précision et accuracy changent, TPR et FPR non (p00-03). Ré-estimer avec la prévalence cible.
@@ -84,11 +85,17 @@ Pas de DeLong, pas de courbes de coût, pas de multi-classe (macro/micro) au-del
 - Tous les chiffres du fil rouge ont été revérifiés par script : somme des quatre cases,
   98,98 % / 99,70 %, 0,800 / 0,0096 / 0,200 / 0,9904, baseline 0,003, SE 0,023 et 0,012.
   **Aucune correction nécessaire**, le spec était juste.
-- Les trois figures ont besoin d'un modèle de scores que le spec ne fixe pas. Choix retenu :
-  binormal à variances égales, négatifs ~ N(0,1) et positifs ~ N(D,1), avec D et le seuil
-  courant résolus *exactement* sur les quatre cases (D = 3,1821, seuil = 2,3405) — donc la
-  figure 1 affiche 240/60/960/98 740 sans arrondi forcé. Il en tombe une AUC de 0,988, qui
-  n'est pas dans le spec : à confirmer comme chiffre du fil rouge.
+- Les trois figures ont besoin d'un modèle de scores que le spec ne fixe pas. — validé 17/09
+  Choix retenu : binormal à variances égales, négatifs ~ N(0,1) et positifs ~ N(D,1), avec D
+  et le seuil courant résolus *exactement* sur les quatre cases (D = 3,1821, seuil = 2,3405)
+  — donc la figure 1 affiche 240/60/960/98 740 sans arrondi forcé. L'AUC de 0,988 qui en
+  tombe est **adoptée comme chiffre du fil rouge**, dans le spec et dans la sheet.
 - La figure 3 affiche un readout **AP** (aire sous la courbe PR) que le corps de la chaîne ne
-  définit pas — le spec ne le demandait pas. Le garder comme readout muet, ou lui donner une
-  ligne au pas 8 ?
+  définissait pas. — validé 17/09 F1 reçoit sa ligne au pas 8 (« moyenne harmonique de la
+  précision et du rappel au seuil courant »), puisqu'il est cité en casse ; AP reçoit la
+  même, puisque c'est lui que la figure 3 affiche. Les deux tiennent en une phrase du pas 8.
+
+**Arbitrage de revue 5, 17/09 — validé 17/09.** AUC = 0,988 **adoptée** comme chiffre du fil
+rouge (spec et sheet). F1 **défini au pas 8** en une ligne, AP aussi — la figure 3 affiche AP,
+pas F1, et un readout sans définition est la chose que cette chaîne reproche aux métriques.
+Statut `reviewed`.

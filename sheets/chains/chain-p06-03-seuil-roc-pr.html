@@ -332,6 +332,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <p>Point courant : rappel 0,800, précision 0,200. Rapporté à la baseline 0,003, le modèle fait <b>67 fois mieux que le hasard</b> — et produit quand même 4 fausses alertes sur 5.</p>
     <p>Les deux courbes lues ensemble : AUC 0,988 dit « le classement est presque parfait », PR dit « la décision à ce seuil noie 240 vraies fraudes dans 960 fausses ». La première juge le modèle, la seconde juge ce qu'on en fait.</p>
     <p>Et si la même équipe déploie sur un flux à 5 % de fraude sans rien changer : la ROC est identique, la PR remonte, la précision passe à 0,814. Le modèle n'a pas progressé — la population a changé (H2).</p>
+    <p>Deux résumés d'un seul chiffre se lisent sur ces deux axes. <b>F1</b> = moyenne harmonique de la précision et du rappel <b>au seuil courant</b> : ici 2·0,200·0,800/(0,200 + 0,800) = <b>0,32</b>, un résumé de <i>décision</i>. <b>AP</b> = aire sous la courbe PR, sur <i>tous</i> les seuils à prévalence fixée : un résumé de <i>classement</i>, et c'est lui que la figure 3 affiche.</p>
   </div>
   <div class="fig" id="fig3">
     <div class="lbl">Figure 3 — la PR voit la prévalence, la ROC non</div>
