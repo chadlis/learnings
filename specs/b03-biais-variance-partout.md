@@ -5,7 +5,7 @@ part: "B"
 number: "03"
 slug: biais-variance-partout
 title: Biais et variance partout
-subtitle: pont — le même compromis à six échelles : estimateur, modèle, estimation de l'erreur, ensembles, pénalité, prior
+subtitle: pont — le même compromis à sept échelles : estimateur, modèle, estimation de l'erreur, ensembles, pénalité, prior, boosting
 prereq: [p06-01, p01-01, p06-02, p07-02, p05-03, p02-03]
 anki: [ml::biais-variance, stats::estimation, ml::validation, ml::regularisation]
 bridges: []
@@ -64,14 +64,14 @@ Chiffres des autres échelles, tous recalculés : Bessel `n` = 25 (MSE 0,0833 / 
 - **`p01-01 pas 8` corrigé en `pas 3 et 9`.** Le pas 8 de p01-01 est « La forme : TCL » ;
   « biais et variance vivent sur les répétitions » est porté par le pas 3 (la distribution
   d'échantillonnage) et le pas 9 (le SE décrit la procédure). La sheet pointe vers ces deux-là.
-- **Six ou sept échelles ?** Le sous-titre annonce six échelles, la table en liste sept
-  (Boosting). La sheet garde les sept lignes dans la table du pas 2 et replie le boosting
-  dans le pas « ensembles ». À trancher : ajouter le boosting au sous-titre, ou le sortir.
+- **Six ou sept échelles — tranché en revue 4** : sept. Le sous-titre, le chapeau et le
+  titre de section de la sheet annoncent désormais sept échelles, boosting compris, en
+  accord avec les sept lignes de la table du pas 2.
 - **`n` et `B` ne sont pas des boutons d'arbitrage.** Le résumé annonce « sept boutons, un
   seul U : n, flexibilité, k-fold, B, λ, τ², ν ». Or `n` baisse la variance sans monter le
   biais, et `B` fait de même jusqu'au plancher `ρσ²` : aucun des deux ne produit un U. La
   sheet les nomme « deux intrus utiles » et met à leur place le **diviseur** (Bessel) et **m**
   (features par split), qui, eux, arbitrent. Les sept boutons de la figure sont donc :
-  souplesse, degré, 1/k, profondeur, 1/λ, τ², ν·arbres.
+  souplesse, degré, 1/k, profondeur, 1/λ, τ², ν·arbres. **Validé en revue 4.**
 - **La décomposition est quadratique.** Elle n'a pas d'équivalent additif pour la 0/1 loss ;
-  la sheet le pose en H1 et le redit en limite 4. À confirmer que c'est le bon niveau de détail.
+  la sheet le pose en H1 et le redit en limite 4. **Validé en revue 4** : bon niveau de détail.

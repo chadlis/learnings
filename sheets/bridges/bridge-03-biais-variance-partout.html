@@ -6,7 +6,7 @@
 <title>Biais et variance partout — pont</title>
 <meta name="sheet" content="series=bridge;part=B;number=03;status=v1">
 <meta name="part" content="B · Ponts">
-<meta name="subtitle" content="pont — le même compromis à six échelles : estimateur, modèle, estimation de l'erreur, ensembles, pénalité, prior">
+<meta name="subtitle" content="pont — le même compromis à sept échelles : estimateur, modèle, estimation de l'erreur, ensembles, pénalité, prior, boosting">
 <meta name="prereq" content="p06-01,p01-01,p06-02,p07-02,p05-03,p02-03">
 <meta name="anki" content="ml::biais-variance,stats::estimation,ml::validation,ml::regularisation">
 <meta name="theme-color" content="#20312C">
@@ -137,7 +137,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <h1>Biais et <span>variance</span> partout</h1>
   <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
 </header>
-<p class="sub">Pont. Un seul compromis — <b>l'erreur quadratique d'une quantité estimée se coupe en biais² + variance</b>, et tout réglage déplace l'un contre l'autre — rejoué sur six échelles : l'estimateur, le modèle, l'estimation de l'erreur, les ensembles, la pénalité, le prior. Tout ce qui change d'une échelle à l'autre est <b>ce qui est estimé</b> et <b>quel bouton on tourne</b>. Fil rouge commun : une moyenne de <span class="m">n</span> = 16 mesures d'écart-type <span class="m">σ</span> = 4, rétrécie d'un facteur 1/(1 + <span class="m">λ</span>).</p>
+<p class="sub">Pont. Un seul compromis — <b>l'erreur quadratique d'une quantité estimée se coupe en biais² + variance</b>, et tout réglage déplace l'un contre l'autre — rejoué sur sept échelles : l'estimateur, le modèle, l'estimation de l'erreur, les ensembles, la pénalité, le prior, le boosting. Tout ce qui change d'une échelle à l'autre est <b>ce qui est estimé</b> et <b>quel bouton on tourne</b>. Fil rouge commun : une moyenne de <span class="m">n</span> = 16 mesures d'écart-type <span class="m">σ</span> = 4, rétrécie d'un facteur 1/(1 + <span class="m">λ</span>).</p>
 
 <div class="wrap">
 <aside class="side">
@@ -186,7 +186,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 </section>
 
 <section class="blk" id="chain-blk">
-<h2 style="--ac:var(--teal)">Le même compromis, six échelles</h2>
+<h2 style="--ac:var(--teal)">Le même compromis, sept échelles</h2>
 <div class="chain" id="chain">
 
 <div class="step" id="s1">
