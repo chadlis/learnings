@@ -138,7 +138,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <h1>Régularisation vue en <span>biais-variance</span> — le chemin de <span>λ</span></h1>
   <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
 </header>
-<p class="sub">Le fil B dit <i>d'où vient</i> <span class="m">λ</span>‖<span class="m">β</span>‖² (un prior) et <i>ce qu'il fournit</i> (existence, unicité). Cette chaîne dit ce qu'il <b>coûte et rapporte en erreur de prédiction</b> : rétrécir les coefficients achète de la variance au prix d'un biais, et l'échange est gagnant sur une plage de <span class="m">λ</span> qui n'est jamais vide. Fil rouge : le cas orthonormé à une coordonnée, calculé à la main, puis un jeu de 50 lignes et 6 colonnes dont deux corrélées à 0,94.</p>
+<p class="sub">Le fil B dit <i>d'où vient</i> <span class="m">λ</span>‖<span class="m">β</span>‖² (un prior) et <i>ce qu'il fournit</i> (existence, unicité). Cette chaîne dit ce qu'il <b>coûte et rapporte en erreur de prédiction</b> : rétrécir les coefficients achète de la variance au prix d'un biais, et l'échange est gagnant sur une plage de <span class="m">λ</span> qui n'est jamais vide. Fil rouge : le cas orthonormé à une coordonnée, calculé à la main, puis un jeu de 50 lignes et 6 colonnes : deux fortes, deux copies bruitées de ces fortes (corrélées à 0,93 et 0,95), deux nulles.</p>
 
 <div class="wrap">
 <aside class="side">
@@ -198,17 +198,17 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <p class="say">« L'OLS est sans biais, donc il vise juste en moyenne sur les tirages, donc rien ne borne l'écart d'un tirage donné, donc deux colonnes corrélées reçoivent des coefficients déséquilibrés dont seule la somme est bien estimée. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — le jeu fil rouge</div>
-    <p><span class="m">n</span> = 50, <span class="m">p</span> = 6, colonnes standardisées, <span class="m">y</span> centré. Vrais coefficients <span class="m">β</span> = (1,5 ; 1,5 ; 0,5 ; −0,4 ; 0 ; 0), bruit <span class="m">σ</span> = 1,5. Les colonnes <span class="m">x</span><sub>1</sub> et <span class="m">x</span><sub>2</sub> sont <b>corrélées à 0,94</b> et portent le même signal.</p>
+    <p><span class="m">n</span> = 50, <span class="m">p</span> = 6, colonnes standardisées, <span class="m">y</span> centré. Vrais coefficients <span class="m">β</span> = (1,5 ; 1,5 ; 0 ; 0 ; 0 ; 0), bruit <span class="m">σ</span> = 1,5. Deux colonnes portent le signal ; <span class="m">x</span><sub>3</sub> et <span class="m">x</span><sub>4</sub> en sont des <b>copies bruitées</b> (<span class="m">x</span><sub>3</sub> ≈ <span class="m">x</span><sub>1</sub>, corrélation <b>0,93</b> ; <span class="m">x</span><sub>4</sub> ≈ <span class="m">x</span><sub>2</sub>, <b>0,95</b>) et ne portent <i>aucun</i> signal propre ; <span class="m">x</span><sub>5</sub> et <span class="m">x</span><sub>6</sub> sont nulles.</p>
     <table>
       <tr><th>colonne</th><th>vrai <span class="m">β</span></th><th>OLS <span class="hat"><span class="m">β</span></span></th><th>écart-type</th></tr>
-      <tr class="hl"><td><span class="m">x</span><sub>1</sub> &nbsp;corrélée</td><td>1,5</td><td><b>0,735</b></td><td>0,63</td></tr>
-      <tr class="hl"><td><span class="m">x</span><sub>2</sub> &nbsp;corrélée</td><td>1,5</td><td><b>2,663</b></td><td>0,63</td></tr>
-      <tr><td><span class="m">x</span><sub>3</sub></td><td>0,5</td><td>0,300</td><td>0,22</td></tr>
-      <tr><td><span class="m">x</span><sub>4</sub></td><td>−0,4</td><td>−0,653</td><td>0,22</td></tr>
-      <tr><td><span class="m">x</span><sub>5</sub></td><td>0</td><td>−0,257</td><td>0,23</td></tr>
-      <tr><td><span class="m">x</span><sub>6</sub></td><td>0</td><td>0,137</td><td>0,22</td></tr>
+      <tr class="hl"><td><span class="m">x</span><sub>1</sub> &nbsp;forte</td><td>1,5</td><td><b>0,775</b></td><td>0,63</td></tr>
+      <tr class="hl"><td><span class="m">x</span><sub>3</sub> &nbsp;copie de <span class="m">x</span><sub>1</sub></td><td>0</td><td><b>0,692</b></td><td>0,62</td></tr>
+      <tr class="hl"><td><span class="m">x</span><sub>2</sub> &nbsp;forte</td><td>1,5</td><td><b>1,862</b></td><td>0,67</td></tr>
+      <tr class="hl"><td><span class="m">x</span><sub>4</sub> &nbsp;copie de <span class="m">x</span><sub>2</sub></td><td>0</td><td><b>−0,288</b></td><td>0,66</td></tr>
+      <tr><td><span class="m">x</span><sub>5</sub> &nbsp;nulle</td><td>0</td><td>0,014</td><td>0,23</td></tr>
+      <tr><td><span class="m">x</span><sub>6</sub> &nbsp;nulle</td><td>0</td><td>0,557</td><td>0,22</td></tr>
     </table>
-    <p>Aucun biais, et pourtant : 0,735 contre 2,663 pour deux vrais coefficients <b>égaux</b>. Ce qui est bien estimé, c'est la <b>somme</b> — 3,40 pour une vraie somme de 3,00 ; la répartition entre les deux, elle, est du bruit pur (écart-type trois fois plus grand que sur les colonnes indépendantes).</p>
+    <p>Aucun biais, et pourtant : le signal de <span class="m">x</span><sub>1</sub> fuit à moitié dans sa copie (0,775 et 0,692 pour un vrai 1,5 et un vrai 0), et <span class="m">x</span><sub>2</sub> part à 1,862 pendant que sa copie descend à −0,288. Ce qui est bien estimé, c'est la <b>somme de chaque paire</b> — 1,47 et 1,57 pour une vraie somme de 1,5 — et c'est lisible sur les écarts-types : <b>0,63 sur un coefficient, 0,22 sur la somme</b>. La somme est trois fois mieux déterminée que ses deux moitiés ; la répartition entre elles est du bruit pur.</p>
   </div>
 </div>
 
@@ -222,17 +222,17 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <p class="say">« La ridge divise chaque direction propre par sa valeur propre plus λ, donc elle rétrécit surtout les directions où les données sont plates, donc elle tue la variance là où elle est la plus grande. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — où le rétrécissement tombe</div>
-    <p>Valeurs propres de <span class="m">X</span><sup>⊤</sup><span class="m">X</span> sur le jeu fil rouge : 104,6 · 72,6 · 47,7 · 39,6 · 32,7 · <b>2,84</b>. La dernière direction est la <b>différence</b> <span class="m">x</span><sub>1</sub> − <span class="m">x</span><sub>2</sub> : les données n'y disent presque rien. Conditionnement 36,9.</p>
+    <p>Valeurs propres de <span class="m">X</span><sup>⊤</sup><span class="m">X</span> sur le jeu fil rouge : 112,2 · 83,2 · 62,7 · 36,2 · <b>3,2</b> · <b>2,4</b>. Les <b>deux dernières</b> directions sont les deux <b>différences</b> <span class="m">x</span><sub>1</sub> − <span class="m">x</span><sub>3</sub> et <span class="m">x</span><sub>2</sub> − <span class="m">x</span><sub>4</sub> — une par paire corrélée : les données n'y disent presque rien. Conditionnement 46,3.</p>
     <table>
       <tr><th>direction propre</th><th><span class="m">λ</span><sub><span class="m">i</span></sub></th><th>facteur à <span class="m">λ</span> = 10</th></tr>
-      <tr><td>1 (la plus informée)</td><td>104,6</td><td>0,913</td></tr>
-      <tr><td>2</td><td>72,6</td><td>0,879</td></tr>
-      <tr><td>3</td><td>47,7</td><td>0,827</td></tr>
-      <tr><td>4</td><td>39,6</td><td>0,798</td></tr>
-      <tr><td>5</td><td>32,7</td><td>0,766</td></tr>
-      <tr class="hl"><td>6 &nbsp;≈ <span class="m">x</span><sub>1</sub> − <span class="m">x</span><sub>2</sub></td><td><b>2,84</b></td><td><b>0,221</b></td></tr>
+      <tr><td>1 (la plus informée)</td><td>112,2</td><td>0,918</td></tr>
+      <tr><td>2</td><td>83,2</td><td>0,893</td></tr>
+      <tr><td>3</td><td>62,7</td><td>0,863</td></tr>
+      <tr><td>4</td><td>36,2</td><td>0,784</td></tr>
+      <tr class="hl"><td>5 &nbsp;≈ <span class="m">x</span><sub>1</sub> − <span class="m">x</span><sub>3</sub></td><td><b>3,2</b></td><td><b>0,242</b></td></tr>
+      <tr class="hl"><td>6 &nbsp;≈ <span class="m">x</span><sub>2</sub> − <span class="m">x</span><sub>4</sub></td><td><b>2,4</b></td><td><b>0,195</b></td></tr>
     </table>
-    <p>La ridge laisse les directions informatives à 80–91 % et coupe la direction plate à 22 %. Résultat : <span class="hat"><span class="m">β</span></span><sub>10</sub> = (1,307 ; 1,720 ; 0,283 ; −0,501 ; −0,151 ; 0,052). La somme passe de 3,40 à 3,03 (à peine touchée), l'écart entre <span class="m">x</span><sub>1</sub> et <span class="m">x</span><sub>2</sub> de 1,93 à 0,41. Elle rabote exactement ce qui était du bruit.</p>
+    <p>La ridge laisse les directions informatives à 78–92 % et coupe les deux directions plates à 24 % et 20 %. Résultat : <span class="hat"><span class="m">β</span></span><sub>10</sub> = (0,733 ; 0,956 ; 0,640 ; 0,488 ; −0,003 ; 0,469). La somme de la paire <span class="m">x</span><sub>2</sub>/<span class="m">x</span><sub>4</sub> passe de 1,57 à 1,44 (à peine touchée), leur écart de <b>2,15 à 0,47</b>. Elle rabote exactement ce qui était du bruit, et laisse ce qui était du signal.</p>
   </div>
 </div>
 
@@ -275,7 +275,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   </div>
   <div class="card apply"><div class="lbl">Application — les deux lectures</div>
     <p><b>Sur le cas orthonormé.</b> <span class="m">β</span> = 1, <span class="m">σ</span>² = 0,5 : 0,500 → 0,333 (−33 %). La pente en 0 vaut −1 : le premier centième de <span class="m">λ</span> rapporte déjà 0,01.</p>
-    <p><b>Sur le jeu fil rouge.</b> Erreur de validation croisée à <span class="m">λ</span> = 0,1 (l'OLS, en pratique) : <b>2,724</b>. À <span class="m">λ</span> = 2 : <b>2,650</b>. Le minimum n'est pas en 0, il est ailleurs, et on n'a rien fait d'autre que rétrécir.</p>
+    <p><b>Sur le jeu fil rouge.</b> Erreur de validation croisée à <span class="m">λ</span> = 0,1 (l'OLS, en pratique) : <b>3,192</b>. À <span class="m">λ</span> = 7,9 : <b>2,981</b>. Le minimum n'est pas en 0, il est ailleurs, et on n'a rien fait d'autre que rétrécir.</p>
     <p>Le théorème ne dit pas <i>lequel</i> : il garantit que la plage gagnante n'est pas vide, pas qu'on sait où elle est. Trouver <span class="m">λ</span> reste un problème de données (pas 7).</p>
   </div>
 </div>
@@ -290,14 +290,14 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <p class="say">« La pénalité L1 tire à force constante jusqu'à zéro, donc un coefficient que les données poussent moins fort que le mur y arrive exactement, donc le lasso sélectionne ; et entre deux colonnes corrélées un seul coin suffit, donc il en garde une, arbitrairement. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — partager ou choisir</div>
-    <p>Le jeu fil rouge à <span class="m">λ</span> = 50, sur les deux colonnes corrélées (vrai <span class="m">β</span> = 1,5 chacune) :</p>
+    <p>Le jeu fil rouge à <span class="m">λ</span> = 50, sur la paire <span class="m">x</span><sub>2</sub> / <span class="m">x</span><sub>4</sub> (une forte et sa copie, somme vraie = 1,5) :</p>
     <table>
-      <tr><th></th><th><span class="m">x</span><sub>1</sub></th><th><span class="m">x</span><sub>2</sub></th><th>somme</th><th>non nuls</th></tr>
-      <tr><td>OLS</td><td>0,735</td><td>2,663</td><td>3,40</td><td>6</td></tr>
-      <tr class="hl"><td>ridge</td><td><b>1,028</b></td><td><b>1,122</b></td><td>2,15</td><td>6</td></tr>
-      <tr><td>lasso</td><td>0,626</td><td>2,110</td><td>2,74</td><td><b>3</b></td></tr>
+      <tr><th></th><th><span class="m">x</span><sub>2</sub></th><th><span class="m">x</span><sub>4</sub> (copie)</th><th>somme</th><th>non nuls</th></tr>
+      <tr><td>OLS</td><td>1,862</td><td>−0,288</td><td>1,57</td><td>6</td></tr>
+      <tr class="hl"><td>ridge</td><td><b>0,608</b></td><td><b>0,482</b></td><td>1,09</td><td>6</td></tr>
+      <tr><td>lasso</td><td>1,152</td><td><b>0,000</b></td><td>1,15</td><td><b>4</b></td></tr>
     </table>
-    <p>La ridge a rapproché les deux coefficients l'un de l'autre (écart 0,09) ; le lasso a gardé <span class="m">x</span><sub>2</sub> et laissé <span class="m">x</span><sub>1</sub> loin derrière, tout en mettant trois coefficients à zéro exact. Lisibilité contre stabilité — et ici, les deux colonnes étant interchangeables, la répartition du lasso ne veut rien dire.</p>
+    <p>La ridge a <b>rapproché</b> les deux coefficients l'un de l'autre (écart 2,15 à l'OLS, 0,13 à <span class="m">λ</span> = 50) : elle répartit le signal entre la colonne et sa copie, sans trancher. Le lasso a <b>choisi</b> — <span class="m">x</span><sub>4</sub> à zéro exact, tout le signal sur <span class="m">x</span><sub>2</sub> — et met deux coefficients à zéro au passage. Lisibilité contre stabilité : ici les deux colonnes étant presque interchangeables, laquelle le lasso garde ne veut rien dire, et bascule d'un tirage à l'autre.</p>
   </div>
 </div>
 
@@ -314,12 +314,12 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr><th>colonne</th><th>vrai <span class="m">β</span></th><th><span class="m">λ</span> d'extinction</th></tr>
       <tr><td><span class="m">x</span><sub>6</sub> (nulle)</td><td>0</td><td>8,5</td></tr>
       <tr><td><span class="m">x</span><sub>5</sub> (nulle)</td><td>0</td><td>26,4</td></tr>
-      <tr><td><span class="m">x</span><sub>3</sub> (faible)</td><td>0,5</td><td>43,4</td></tr>
-      <tr><td><span class="m">x</span><sub>4</sub> (faible)</td><td>−0,4</td><td>62,6</td></tr>
-      <tr class="hl"><td><span class="m">x</span><sub>1</sub> (forte, corrélée)</td><td>1,5</td><td>173</td></tr>
-      <tr><td><span class="m">x</span><sub>2</sub> (forte, corrélée)</td><td>1,5</td><td>321</td></tr>
+      <tr><td><span class="m">x</span><sub>6</sub> (nulle)</td><td>0</td><td>55,5</td></tr>
+      <tr><td><span class="m">x</span><sub>3</sub> (copie de <span class="m">x</span><sub>1</sub>)</td><td>0</td><td>63,2</td></tr>
+      <tr class="hl"><td><span class="m">x</span><sub>1</sub> (forte)</td><td>1,5</td><td>173</td></tr>
+      <tr><td><span class="m">x</span><sub>2</sub> (forte)</td><td>1,5</td><td>185</td></tr>
     </table>
-    <p>L'ordre est le bon : les nulles partent en premier, les fortes en dernier. Mais entre <span class="m">x</span><sub>1</sub> et <span class="m">x</span><sub>2</sub>, l'écart 173 / 321 est du <b>bruit de tirage</b> : sur un autre jeu, c'est <span class="m">x</span><sub>1</sub> qui survit.</p>
+    <p>L'ordre est le bon dans les grandes largeurs : les deux fortes partent <b>en dernier</b>. Mais le détail est du <b>bruit de tirage</b> — <span class="m">x</span><sub>4</sub>, copie de <span class="m">x</span><sub>2</sub>, s'éteint dès 1,5 quand <span class="m">x</span><sub>3</sub>, copie de <span class="m">x</span><sub>1</sub>, tient jusqu'à 63 ; et <span class="m">x</span><sub>6</sub>, pourtant nulle, survit plus longtemps que <span class="m">x</span><sub>3</sub>. Sur un autre tirage, l'ordre change. <b>La liste des survivants n'est pas une découverte.</b></p>
   </div>
   <div class="fig" id="fig2">
     <div class="lbl">Figure 2 — les deux chemins, ridge au-dessus, lasso au-dessous</div>
@@ -327,7 +327,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <div id="f2lasso" class="wide"></div>
     <div id="f2sliders"></div>
     <div class="readouts" id="f2out"></div>
-    <p class="cap">Les six coefficients en fonction de log<sub>10</sub> <span class="m">λ</span> ; la légende en haut à gauche nomme les trois paires, et les couleurs sont les mêmes sur les deux graphes. Fais glisser <span class="m">λ</span> : en ridge tout descend ensemble et <b>rien n'atteint zéro</b> ; en lasso les courbes s'éteignent <b>une à une</b> et le compteur de coefficients non nuls tombe. Regarde surtout les deux corrélées — la ridge les rapproche l'une de l'autre (l'écart passe de 1,93 à 0,41 en <span class="m">λ</span> = 10), le lasso en sacrifie une.</p>
+    <p class="cap">Les six coefficients en fonction de log<sub>10</sub> <span class="m">λ</span> ; la légende en haut à gauche nomme les trois paires, et les couleurs sont les mêmes sur les deux graphes. Fais glisser <span class="m">λ</span> : en ridge tout descend ensemble et <b>rien n'atteint zéro</b> ; en lasso les courbes s'éteignent <b>une à une</b> et le compteur de coefficients non nuls tombe. Regarde surtout chaque <b>forte et sa copie</b> — <span class="m">x</span><sub>1</sub>/<span class="m">x</span><sub>3</sub> et <span class="m">x</span><sub>2</sub>/<span class="m">x</span><sub>4</sub> : la ridge les <b>rapproche l'une de l'autre</b> (l'écart <span class="m">x</span><sub>2</sub> − <span class="m">x</span><sub>4</sub> passe de 2,15 à 0,47 en <span class="m">λ</span> = 10), elle partage le signal sans trancher ; le lasso en <b>sacrifie une</b>, et laquelle est du bruit de tirage.</p>
   </div>
 </div>
 
@@ -342,21 +342,21 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="card apply"><div class="lbl">Application — 5-fold sur le jeu fil rouge</div>
     <table>
       <tr><th></th><th>ridge</th><th>lasso</th></tr>
-      <tr><td><span class="m">λ</span> du minimum</td><td>2,00</td><td>5,01</td></tr>
-      <tr><td>erreur CV au minimum</td><td>2,650</td><td>2,725</td></tr>
-      <tr><td>écart-type de la moyenne</td><td>0,398</td><td>0,412</td></tr>
-      <tr><td>seuil « 1 SE »</td><td>3,049</td><td>3,137</td></tr>
-      <tr class="hl"><td><span class="m">λ</span><sub>1SE</sub></td><td><b>12,6</b></td><td><b>31,6</b></td></tr>
-      <tr><td>erreur en <span class="m">λ</span><sub>1SE</sub></td><td>2,923</td><td>3,078</td></tr>
+      <tr><td><span class="m">λ</span> du minimum</td><td>7,94</td><td>15,9</td></tr>
+      <tr><td>erreur CV au minimum</td><td>2,981</td><td>2,822</td></tr>
+      <tr><td>écart-type de la moyenne</td><td>0,610</td><td>0,767</td></tr>
+      <tr><td>seuil « 1 SE »</td><td>3,590</td><td>3,588</td></tr>
+      <tr class="hl"><td><span class="m">λ</span><sub>1SE</sub></td><td><b>50,1</b></td><td><b>50,1</b></td></tr>
+      <tr><td>erreur en <span class="m">λ</span><sub>1SE</sub></td><td>3,514</td><td>3,410</td></tr>
     </table>
-    <p>Six fois plus de pénalité que le minimum, pour 0,27 d'erreur en plus — un dixième de la barre de bruit. Et les coefficients ridge à <span class="m">λ</span><sub>1SE</sub> = 12,6 : (1,30 ; 1,63 ; 0,28 ; −0,47 ; −0,14 ; 0,03), à comparer à la vérité (1,5 ; 1,5 ; 0,5 ; −0,4 ; 0 ; 0) et à l'OLS (0,74 ; 2,66 ; …). L'estimateur biaisé est plus près.</p>
+    <p>Six fois plus de pénalité que le minimum, pour 0,53 d'erreur en plus — moins d'un écart-type de la moyenne (0,61). Et les coefficients ridge à <span class="m">λ</span><sub>1SE</sub> = 50,1 : (0,54 ; 0,61 ; 0,49 ; 0,48 ; −0,03 ; 0,28). Comparés à l'OLS (0,78 ; 1,86 ; 0,69 ; −0,29 ; …), ils ne retrouvent pas la vérité (1,5 ; 1,5 ; 0 ; 0 ; 0 ; 0) — la ridge <b>répartit</b> le signal entre chaque forte et sa copie au lieu de choisir, et rend les deux paires presque indiscernables. Mais <b>elle prédit mieux</b> : c'est l'échange, et c'est tout ce qu'on lui demandait.</p>
   </div>
   <div class="fig" id="fig3">
     <div class="lbl">Figure 3 — la courbe de CV, son minimum et sa marge</div>
     <div class="sl-ctl" id="f3ctl"></div>
     <div id="f3plot" class="wide"></div>
     <div class="readouts" id="f3out"></div>
-    <p class="cap">Erreur de validation croisée 5-fold en fonction de log<sub>10</sub> <span class="m">λ</span> ; les barres verticales valent ± un écart-type de la moyenne sur les 5 plis (une sur trois, pour rester lisible). La bande <b>rouge</b> marque le <span class="m">λ</span> du minimum, le <b>pointillé horizontal</b> le seuil « minimum + 1 SE », la bande <b>ocre</b> le <span class="m">λ</span><sub>1SE</sub> retenu — le plus à droite encore sous le pointillé. Le fond du U est <b>plat</b> : c'est ce qui rend la règle 1 SE bon marché. Bascule ridge / lasso : même U, même règle, un <span class="m">λ</span> différent — les deux échelles de <span class="m">λ</span> ne sont pas comparables.</p>
+    <p class="cap">Erreur de validation croisée 5-fold en fonction de log<sub>10</sub> <span class="m">λ</span> ; les barres verticales valent ± un écart-type de la moyenne sur les 5 plis (une sur trois, pour rester lisible). La bande <b>rouge</b> marque le <span class="m">λ</span> du minimum, le <b>pointillé horizontal</b> le seuil « minimum + 1 SE », la bande <b>ocre</b> le <span class="m">λ</span><sub>1SE</sub> retenu — le plus à droite encore sous le pointillé. Le fond du U est <b>plat</b> : c'est ce qui rend la règle 1 SE bon marché. Bascule ridge / lasso : même U, même règle, un <span class="m">λ</span> différent — les deux échelles de <span class="m">λ</span> ne sont pas comparables. <b>La grille de recherche va de 10<sup>−3</sup> à 10<sup>3</sup></b>, comme le prescrit le pas 7 ; la figure <b>zoome sur la zone où l'erreur bouge</b>, de 10<sup>−1</sup> à 10<sup>1,8</sup> — en deçà la courbe est plate (l'OLS est atteint) et rien ne s'y décide, au-delà elle ne fait que remonter.</p>
   </div>
 </div>
 
@@ -422,7 +422,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <li><div class="q">Que fait la ridge à <span class="hat"><span class="m">β</span></span><sub>OLS</sub> dans le cas orthonormé ?</div><div class="a hid">Elle le divise par 1 + λ. En général, elle multiplie la direction propre i par λ<sub>i</sub>/(λ<sub>i</sub> + λ) : fort là où les données sont plates.</div></li>
     <li><div class="q">Quel est le prix, quel est le gain ?</div><div class="a hid">Biais² = (λ/(1+λ))²β², croissant ; variance = σ²/(1+λ)², décroissante. Somme en U, minimum en λ* = σ²/β².</div></li>
     <li><div class="q">Pourquoi un <span class="m">λ</span> &gt; 0 bat-il toujours l'OLS ?</div><div class="a hid">La dérivée du MSE en λ = 0 vaut −2σ² &lt; 0 (Hoerl-Kennard). L'OLS n'est optimal que parmi les estimateurs sans biais — on n'a jamais demandé ça.</div></li>
-    <li><div class="q">Ridge contre lasso sur deux colonnes corrélées ?</div><div class="a hid">La ridge partage (1,03 et 1,12 sur le jeu fil rouge) ; le lasso en garde une, arbitrairement, et le choix bascule d'un tirage à l'autre. Elastic net stabilise.</div></li>
+    <li><div class="q">Ridge contre lasso sur deux colonnes corrélées ?</div><div class="a hid">La ridge partage (0,61 et 0,48 sur la paire x₂/x₄ du jeu fil rouge, à λ = 50, contre 1,86 et −0,29 à l'OLS) ; le lasso en garde une, arbitrairement, et le choix bascule d'un tirage à l'autre. Elastic net stabilise.</div></li>
     <li><div class="q">Comment choisit-on <span class="m">λ</span> ?</div><div class="a hid">CV sur une grille en log, standardisation refaite dans chaque pli, et règle 1 SE : le plus grand λ dont l'erreur reste à moins d'un écart-type de la moyenne du minimum.</div></li>
     <li><div class="q">Pourquoi « régulariser pour éviter l'overfitting » ne suffit-il pas ?</div><div class="a hid">C'est la conséquence. Le mécanisme est l'échange biais contre variance, rentable parce que rétrécir vers 0 est une bonne direction quand les vrais coefficients sont modérés — c'est le prior.</div></li>
   </ol>
@@ -508,10 +508,12 @@ const sLam=SL.slider(document.getElementById('f1sliders'),{label:'λ',min:0,max:
 SL.slider(document.getElementById('f1sliders'),{label:'σ² (bruit)',min:0.05,max:1,step:0.05,value:0.5},v=>{s2=v;drawAt(sLam.get());});
 })();
 
-/* ===== jeu fil rouge : 50 lignes, 6 colonnes standardisées, y centré ===== */
-const XD=[[0.465,0.111,-1.009,0.224,1.42,0.505],[0.496,0.926,0.223,0.329,0.557,0.207],[0.462,0.108,1.869,0.778,-1.043,-0.283],[1.226,0.571,0.975,0.781,2.023,-0.168],[0.329,0.38,0.079,-1.213,-0.808,-0.702],[1.955,2.075,-0.418,-1.318,-0.231,-0.394],[-0.665,-0.708,0.303,-0.104,1.359,1.753],[0.97,0.708,0.834,-0.344,1.019,-0.828],[-0.471,-1.177,-0.834,0.828,-0.022,-0.969],[-0.049,0.511,1.209,0.072,-1.176,-1.89],[-0.768,-0.615,0.336,1.017,0.417,0.757],[-1.067,-0.64,1.237,-1.547,-0.48,-0.108],[-1.2,-0.967,-0.673,0.016,1.688,-1.553],[0.694,0.558,-0.973,2.843,0.778,-2.294],[-0.61,-0.67,0.871,-1.235,-0.273,0.35],[0.927,1.253,-1.483,1.046,0.655,1.23],[-0.536,-0.963,0,-1.96,0.381,0.359],[0.645,0.129,-1.128,-0.581,-1.162,-1.662],[-0.14,0.423,0.37,1.888,0.253,0.873],[0.754,0.621,-0.594,-1.436,-0.918,-0.225],[0.191,-0.066,-0.071,0.06,0.416,-0.374],[-0.629,-0.744,0.147,0.129,-0.637,1.319],[0.504,0.797,-2.235,-0.837,2.095,-1.026],[0.722,1.078,-0.07,-0.608,-0.488,0.007],[-1.323,-1.163,0.444,-1.827,0.267,1.399],[-1.388,-1.099,0.941,-0.495,-2.308,-0.745],[-0.714,-0.888,-0.613,0.031,0.043,1.548],[0.948,1.024,0.862,0.029,-1.332,-0.889],[0.304,-0.108,0.094,0.735,0.239,-0.097],[-0.687,-0.268,-0.718,-0.265,0.821,0.779],[1.207,1.31,-0.867,1.644,0.194,-1.222],[1.171,1.068,-0.263,-0.659,0.061,1.022],[-2.669,-2.161,-0.92,0.668,0.594,1.165],[0.187,-0.453,1.5,0.541,-1.901,0.404],[2.034,1.795,1.013,0.22,-0.531,-0.817],[0.987,0.966,2.397,-0.405,0.062,0.376],[0.684,1.017,0.32,0.375,0.087,-0.625],[0.17,0.004,-0.39,0.962,1.116,2.123],[1.629,1.55,0.335,0.039,0.369,0.813],[1.327,1.506,-0.794,0.484,-0.547,0.443],[-1.448,-1.897,-0.224,-1.14,-1.582,-0.057],[-0.967,-1.126,0.937,0.988,-0.14,0.072],[-1.186,-1.666,-0.334,-1.669,-1.193,-0.743],[-0.002,0.653,-0.65,0.866,1.653,0.899],[-0.191,-0.047,0.597,0.261,-0.158,-0.899],[-0.915,-0.936,-2.629,1.717,-1.066,1.711],[-1.627,-1.206,0.949,-0.635,0.073,-0.36],[-0.184,0.014,-1.734,-0.097,-0.191,-1.06],[-0.925,-0.668,1.17,-0.719,1.131,0.587],[-0.629,-0.919,-0.387,-0.477,-1.582,-0.712]];
+/* ===== jeu fil rouge : 50 lignes, 6 colonnes standardisées, y centré.
+   x₁, x₂ fortes (β = 1,5) ; x₃ ≈ x₁ et x₄ ≈ x₂ copies bruitées (β = 0, corr. 0,93 et 0,95) ;
+   x₅, x₆ nulles. σ = 1,5. Chiffres vérifiés sous numpy avant écriture. ===== */
+const XD=[[1.972,-0.21,1.753,-0.323,-1.364,-0.746],[0.129,-0.467,-0.28,-0.34,-1.113,1.261],[-1.227,0.031,-1.197,-0.303,0.684,-0.703],[1.015,0.965,0.841,1.306,-0.562,0.236],[0.926,0.336,0.195,-0.519,-1.396,0.576],[-2.259,0.159,-1.613,0.178,0.869,0.32],[-2.576,-0.138,-2.025,-0.072,-0.191,-0.138],[-0.076,-0.137,-0.007,-0.427,1.471,0.161],[-1.089,0.61,-1.52,0.52,0.697,-1.24],[-0.008,0.542,0.539,0.257,-0.279,-1.1],[-0.631,1.891,-0.931,2.049,-0.415,-1.582],[-1.101,-0.912,-1.179,-0.608,-1.416,1.701],[0.548,0.058,0.826,-0.067,-0.592,0.645],[-1.238,-1.404,-1.317,-1.037,1.425,0.675],[0.078,-0.717,0.028,-0.767,-0.559,-0.659],[0.28,-2.095,0.486,-2.262,-1.811,-0.156],[-0.924,0.273,-0.547,-0.031,0.099,-0.55],[-0.029,0.899,-0.594,0.599,1.299,-1.615],[0.652,1.562,0.576,1.665,-1.191,0.629],[0.562,0.796,0.153,0.557,-0.664,1.506],[-0.69,-0.253,0.175,-0.125,0.947,-0.121],[1.065,-0.319,0.361,-0.028,0.12,0.239],[0.894,2.08,0.907,1.95,0.313,-0.018],[1.122,-0.626,0.857,-0.073,0.323,0.048],[0.954,1.127,1.379,1.829,1.306,-2.035],[0.524,1.82,0.619,1.448,0.729,1.897],[-0.011,-0.846,0.219,-0.805,0.043,0.59],[0.473,-0.054,1.239,0.143,0.899,-2.041],[-0.63,0.328,-0.851,-0.185,1.213,-1.45],[0.317,-2.318,0.358,-2.844,-0.737,-1.053],[-0.023,-1.279,0.307,-0.846,-0.833,-0.271],[0.731,-1.485,0.82,-1.31,1.239,-0.025],[-0.602,0.014,-0.556,0.216,-1.226,1.09],[0.95,0.057,0.99,0.236,1.646,1.078],[0.218,0.753,-0.003,1.18,-1.705,0.001],[-1.268,0.08,-1.724,0.254,-1.43,-1.002],[-1.343,0.699,-1.283,0.824,0.832,1.779],[-1.501,0.204,-1.868,0.093,-0.431,1.381],[-0.761,-0.542,-0.767,-0.223,1.308,-1.389],[-0.474,-2.25,0.041,-2.182,0.366,0.309],[0.757,0.726,0.125,0.66,-0.977,0.397],[1.83,1.854,1.793,1.377,0.028,-0.035],[-0.487,-0.364,-0.616,-0.324,-0.501,0.747],[1.458,-0.135,1.671,-0.518,0.313,0.126],[0.706,0.577,0.91,0.252,0.58,1.279],[1.024,0.147,1.031,0.549,0.624,-0.628],[0.022,-0.24,0.566,-0.398,0.764,0.06],[-0.342,-0.789,-0.425,-0.093,-1.809,0.752],[-1.144,-1.242,-1.525,-1.24,1.581,-1.452],[1.222,0.231,1.066,-0.193,-0.513,0.527]];
 
-const YD=[-0.709,-0.557,-0.465,4.146,2.045,7.748,-1.749,1.916,-7.151,3.116,-3.422,-1.362,-5.226,0.603,-1.092,1.321,-1.495,-0.307,-1.495,5.001,-1.251,-1.529,2.597,3.193,-1.024,-2.629,-4.299,4.751,-0.289,-0.494,4.2,5.92,-7.411,-0.513,6.305,3.848,1.123,-1.854,7.016,3.045,-7.388,-2.144,-4.635,1.439,1.665,-2.533,-4.49,-2.103,-2.118,0.739];
+const YD=[-0.939,1.041,-2.583,2.642,2.436,-1.103,-5.558,0.974,-3.81,1.8,1.94,-0.686,0.738,-5.443,-1.697,-2.739,0.637,1.519,2.986,2.537,-1.45,0.658,4.749,-0.903,2.154,3.567,0.508,1.589,-3.321,-1.122,-4.165,-0.703,-2.892,3.331,2.045,-2.923,0.594,0.101,-3.043,-3.418,3.885,6.093,-1.254,-0.666,2.598,3.943,0.098,-1.445,-5.518,2.224];
 /* résolution d'un système 6×6 par élimination de Gauss avec pivot partiel */
 function solve(A,b){const n=b.length,M=A.map((r,i)=>r.concat([b[i]]));
   for(let c=0;c<n;c++){let p=c;for(let r=c+1;r<n;r++)if(Math.abs(M[r][c])>Math.abs(M[p][c]))p=r;
@@ -532,8 +534,8 @@ function lasso(X,y,lam){const n=X.length,p=X[0].length;const b=new Array(p).fill
       if(d!==0){for(let k=0;k<n;k++)r[k]-=X[k][j]*d;b[j]=nb;if(Math.abs(d)>mx)mx=Math.abs(d);}}
     if(mx<1e-11)break;}
   return b;}
-const COLS=[{c:'sl-c1',n:'x₁ forte'},{c:'sl-c2',n:'x₂ forte'},{c:'sl-c4',n:'x₃ faible'},
-            {c:'sl-c5',n:'x₄ faible'},{c:'sl-c3',n:'x₅ nulle'},{c:'sl-c3',n:'x₆ nulle'}];
+const COLS=[{c:'sl-c1',n:'x₁ forte'},{c:'sl-c2',n:'x₂ forte'},{c:'sl-c4',n:'x₃ copie de x₁'},
+            {c:'sl-c5',n:'x₄ copie de x₂'},{c:'sl-c3',n:'x₅ nulle'},{c:'sl-c3',n:'x₆ nulle'}];
 
 /* ===== Figure 2 : les deux chemins de λ ===== */
 (function(){
@@ -546,9 +548,10 @@ const PR=mk('f2ridge','ridge'),PL=mk('f2lasso','lasso');
 function interp(path,j,u){const t=(u-U0)/(U1-U0)*NG;const i=Math.max(0,Math.min(NG-1,Math.floor(t)));const f=t-i;
   return path[i][j]*(1-f)+path[i+1][j]*f;}
 COLS.forEach((c,j)=>{PR.fn(u=>interp(pathR,j,u),c.c,NG);PL.fn(u=>interp(pathL,j,u),c.c,NG);});
-/* légende dans la bande vide entre la courbe de x₂ (≈ 2,6) et celle de x₁ (≈ 0,8) */
-PR.label(-0.9,2.15,'x₁ x₂ fortes','sl-c2');PR.label(-0.9,1.75,'x₃ x₄ faibles','sl-c5');
-PR.label(-0.9,1.35,'x₅ x₆ nulles','sl-c3');
+/* légende à droite, où toutes les courbes sont retombées près de 0 : à gauche elle
+   heurterait le titre d'axe « ridge » et la courbe de x₂, qui part de ≈ 1,9 */
+PR.label(1.75,2.60,'x₁ x₂ fortes','sl-c2');PR.label(1.75,2.20,'x₃ x₄ leurs copies','sl-c5');
+PR.label(1.75,1.80,'x₅ x₆ nulles','sl-c3');
 const out=document.getElementById('f2out');
 function draw(u){
   const lam=Math.pow(10,u);const br=ridge(XD,YD,lam),bl=lasso(XD,YD,lam);
@@ -556,11 +559,11 @@ function draw(u){
   const nz=bl.filter(v=>Math.abs(v)>1e-9).length;
   out.innerHTML=
     `<div>λ<b>${SL.fmt(lam,lam<10?2:0)}</b></div>`+
-    `<div>ridge β̂₁ · β̂₂<b>${SL.fmt(br[0],2)} · ${SL.fmt(br[1],2)}</b></div>`+
-    `<div>lasso β̂₁ · β̂₂<b>${SL.fmt(bl[0],2)} · ${SL.fmt(bl[1],2)}</b></div>`+
+    `<div>ridge : x₂ · sa copie x₄<b>${SL.fmt(br[1],2)} · ${SL.fmt(br[3],2)}</b></div>`+
+    `<div>lasso : x₂ · sa copie x₄<b>${SL.fmt(bl[1],2)} · ${SL.fmt(bl[3],2)}</b></div>`+
     `<div class="${nz<6?'zero':'pos'}">lasso : coefs non nuls<b>${nz} / 6</b></div>`+
-    `<div>ridge β̂₁ + β̂₂<b>${SL.fmt(br[0]+br[1],2)}</b></div>`+
-    `<div>écart |β̂₁ − β̂₂|, ridge<b>${SL.fmt(Math.abs(br[0]-br[1]),2)}</b></div>`;
+    `<div>ridge : somme de la paire<b>${SL.fmt(br[1]+br[3],2)}</b></div>`+
+    `<div class="${Math.abs(br[1]-br[3])<1?'pos':'zero'}">écart dans la paire, ridge<b>${SL.fmt(Math.abs(br[1]-br[3]),2)}</b></div>`;
 }
 SL.slider(document.getElementById('f2sliders'),{label:'log₁₀ λ',min:U0,max:U1,step:0.05,value:1,fmt:v=>SL.fmt(v,2)},draw);
 })();
@@ -588,7 +591,7 @@ function cv(kind){const mean=[],se=[];
   const thr=mean[i]+se[i];let j=i;for(let k=NL-1;k>=0;k--)if(mean[k]<=thr){j=k;break;}
   return {mean,se,i,j,thr};}
 const R={ridge:cv('ridge'),lasso:cv('lasso')};
-const P=SL.plot(document.getElementById('f3plot'),{x:[-1,1.6],y:[2.4,4.4],w:600,h:290,
+const P=SL.plot(document.getElementById('f3plot'),{x:[-1,1.8],y:[2.4,4.4],w:600,h:290,
   xt:[-1,-0.5,0,0.5,1,1.5],yt:[2.5,3,3.5,4],xl:'log₁₀ λ',yl:'erreur CV (MSE, 5 plis)'});
 const out=document.getElementById('f3out'),ctl=document.getElementById('f3ctl');
 let kind='ridge',curve=null;
@@ -599,17 +602,17 @@ function interpM(m,u){const t=(u+1)/0.1;const i=Math.max(0,Math.min(NL-2,Math.fl
 function draw(){P.clear();if(curve){curve.remove();curve=null;}const r=R[kind];
   /* barres d'erreur un point sur trois : les 41 barres se touchent et mangent la courbe */
   curve=P.fn(u=>interpM(r.mean,u),'sl-c1',80);
-  for(let k=0;k<NL;k+=3){const u=-1+0.1*k;if(u>1.6)break;
+  for(let k=0;k<NL;k+=3){const u=-1+0.1*k;if(u>1.8)break;
     P.seg(u,Math.max(2.4,r.mean[k]-r.se[k]),u,Math.min(4.4,r.mean[k]+r.se[k]),'');
     P.dot(u,r.mean[k],'sl-c1',3);}
-  P.seg(-1,r.thr,1.6,r.thr,'chord');P.text(-0.97,r.thr+0.08,'minimum + 1 SE','sl-c3');
+  P.seg(-1,r.thr,1.8,r.thr,'chord');P.text(-0.97,r.thr+0.08,'minimum + 1 SE','sl-c3');
   const ui=-1+0.1*r.i, uj=-1+0.1*r.j;
   /* traits épais translucides, de la couleur de leur point et de leur étiquette :
      un `sl-seg` nu serait le même gris que les barres d'erreur. */
   P.vline(ui,'slope sl-c3');P.dot(ui,r.mean[r.i],'sl-c3',6);
   P.vline(uj,'slope sl-c5');P.dot(uj,r.mean[r.j],'sl-c5',6);
   /* λ₁SE peut tomber au bord droit : on retourne l'étiquette vers l'intérieur */
-  P.text(uj>1.15?uj-0.04:uj+0.04,4.25,'λ₁SE','sl-c5',uj>1.15?'end':'start');
+  P.text(uj>1.35?uj-0.04:uj+0.04,4.25,'λ₁SE','sl-c5',uj>1.15?'end':'start');
   P.text(ui+0.04,2.45,'λ min','sl-c3');
   out.innerHTML=
     `<div>λ du minimum<b>${SL.fmt(lams[r.i],2)}</b></div>`+

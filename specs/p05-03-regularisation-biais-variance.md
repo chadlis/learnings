@@ -10,7 +10,7 @@ prereq: [p02-02, p06-01, p06-02, p03-01]
 anki: [ml::ridge, ml::lasso, ml::regularisation, ml::biais-variance]
 bridges: [b03, b05]
 next: p06-01
-status: built
+status: reviewed
 ---
 
 ## Question de la chaîne
@@ -47,7 +47,7 @@ Cas orthonormé (XᵀX = I, une coordonnée) : β̂_OLS ~ N(β, σ²) ; ridge β
 
 ## Figures exigées
 - **Figure 1 — `plot` + `slider` λ ∈ [0, 3]** : biais², variance et MSE du cas orthonormé (β = 1, σ² = 0,5) en fonction de λ ; le minimum marqué à 0,5 ; `slider` σ² qui déplace le minimum (λ* = σ²/β²). Légende : plus de bruit, plus de pénalité.
-- **Figure 2 — `plot` (chemins de λ)** : sur un jeu synthétique de 6 colonnes (2 fortes, 2 faibles, 2 nulles, 2 corrélées), les chemins ridge et lasso en fonction de log λ, côte à côte ; readout du nombre de coefficients non nuls. Légende : ridge lisse tout, lasso éteint un à un ; les deux corrélées se partagent ou se disputent.
+- **Figure 2 — `plot` (chemins de λ)** : sur un jeu synthétique de **6 colonnes = 2 fortes (β = 1,5) + 2 copies bruitées de ces fortes (β = 0, corrélées à 0,93 et 0,95) + 2 nulles**, les chemins ridge et lasso en fonction de log λ, côte à côte ; readout du nombre de coefficients non nuls et de la paire x₂/x₄. Légende : ridge lisse tout, lasso éteint un à un ; **chaque forte et sa copie se partagent le signal (ridge) ou se le disputent (lasso)**.
 - **Figure 3 — `plot`** : erreur CV en fonction de log λ sur le même jeu (simulation 5-fold en JS), avec le minimum et la barre « 1 SE », λ_1SE marqué. Légende : choisir le plus simple dans la marge du bruit.
 
 ## Où ça casse
@@ -94,13 +94,17 @@ max(0, |β̂| − λ/2) conforme à la convention du dépôt. Rien n'a été cor
 
 Trois points restent à trancher :
 
-1. **Figure 2, composition du jeu.** Le spec demande « 6 colonnes (2 fortes,
-   2 faibles, 2 nulles, 2 corrélées) » — quatre rôles pour six colonnes. J'ai lu
-   « les deux fortes *sont* les deux corrélées », seule lecture qui tienne en six
-   colonnes et qui serve la légende (« les deux corrélées se partagent ou se
-   disputent »). Jeu effectivement construit : n = 50, x₁ et x₂ corrélées à 0,94
-   et de vrai β = 1,5 chacune, x₃ = 0,5, x₄ = −0,4, x₅ = x₆ = 0, σ = 1,5. Si la
-   lecture voulue était 8 colonnes, la figure est à refaire.
+1. **Figure 2, composition du jeu.** — validé 17/09 Le spec demandait « 6 colonnes
+   (2 fortes, 2 faibles, 2 nulles, 2 corrélées) » — quatre rôles pour six colonnes.
+   **Lecture retenue en revue 5 : les deux colonnes corrélées sont des copies bruitées
+   des deux fortes, et les « faibles » sont retirées** — 6 colonnes = 2 fortes +
+   2 copies corrélées aux fortes + 2 nulles. La première lecture (« les fortes *sont*
+   les corrélées », plus 2 faibles) ne correspondait pas : **le jeu a été refait**.
+   Jeu actuel : n = 50, β = (1,5 ; 1,5 ; 0 ; 0 ; 0 ; 0), σ = 1,5, x₃ ≈ x₁ (corr. 0,93)
+   et x₄ ≈ x₂ (corr. 0,95). Il sert la chaîne mieux que le précédent : le spectre a
+   **deux** directions plates (3,2 et 2,4), une par paire, et l'OLS y montre que la
+   somme d'une paire est trois fois mieux déterminée que ses deux moitiés (SE 0,22
+   contre 0,63).
 
 2. **ISLR Credit remplacé.** Le spec donne l'exemple Credit en *qualitatif*
    (« les coefficients de income, limit, rating se compensent »). Une sheet ne
@@ -110,7 +114,25 @@ Trois points restent à trancher :
    répartition du bruit pur — et tous les chiffres de la sheet en sortent.
    Credit n'est plus mentionné.
 
-3. **Grille de λ de la figure 3.** Le spec prescrit 10⁻³ à 10³ ; la figure
-   calcule sur 10⁻¹ à 10³ et n'affiche que 10⁻¹ à 10^1,6. En deçà de 10⁻¹ la
-   courbe est plate (l'OLS est atteint) et en deçà du minimum la règle 1 SE ne
-   change pas. Le texte du pas 7 prescrit toujours 10⁻³ à 10³.
+3. **Grille de λ de la figure 3.** — validé 17/09 L'affichage reste celui de la **zone
+   utile**, et la légende le dit désormais en clair : « la grille de recherche va de 10⁻³
+   à 10³ ; la figure zoome sur la zone où l'erreur bouge ». Une seule correction forcée
+   par le nouveau jeu : λ₁SE vaut maintenant **50,1** (log 1,70), qui tombait hors du
+   cadre 10⁻¹–10^1,6 — la bande ocre du λ retenu était invisible. Le cadre va donc
+   jusqu'à **10^1,8**, le minimum de ce qu'il faut pour voir ce que la figure prétend
+   montrer.
+
+2b. **Les chiffres de CV du spec étaient faux, et la sheet aussi.** — corrigé 17/09
+   La table de CV avait été calculée en Python avec des plis **contigus** et **sans**
+   restandardiser dans le pli, là où la figure fait l'inverse (plis entrelacés,
+   standardisation refaite dans chaque pli, comme p06-02 l'exige). La table annonçait
+   donc des nombres que la figure ne montrait pas. Table et figure sont maintenant
+   lues **du même code** : λ_min = 7,94 (err 2,981, SE 0,610), seuil 3,590,
+   λ₁SE = 50,1 (err 3,514) en ridge ; 15,9 / 2,822 / 0,767 / 3,588 / 50,1 / 3,410 en lasso.
+
+**Arbitrage de revue 5, 17/09 — validé 17/09.** Composition du jeu **tranchée** :
+2 fortes, 2 copies bruitées de ces fortes, 2 nulles ; les « faibles » sont retirées.
+La figure 2 **a été refaite** (données, libellés de colonnes, légende, readouts sur la
+paire x₂/x₄) parce qu'elle ne correspondait pas à cette lecture. ISLR *Credit* remplacé
+par un jeu synthétique **validé**. Grille de λ : affichage de la zone utile **validé**,
+mention de la grille 10⁻³–10³ ajoutée en légende. Statut `reviewed`.
