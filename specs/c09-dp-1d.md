@@ -89,3 +89,11 @@ Un dp[i] mal défini (« la réponse jusqu'à i » sans dire si i est inclus, ou
 - **Contre-signal du pas 1** : j'ai choisi le sous-tableau **circulaire** comme contre-exemple
   chiffré ([5, −3, 5] → 10 en circulaire contre 7 en linéaire). Le spec ne le nommait pas ;
   il dit seulement « le sous-problème dépend de tout le futur ». À arbitrer.
+
+**Arbitrage de revue 7, 17/09 — validé 17/09.** **Tous les chiffres hors spec sont
+gardés** — pièces [1, 3, 4] pour 6, LIS de [10, 9, 2, 5, 3, 7, 101, 18], 4 356 617 appels
+de la récursion naïve à n = 30, `best = 0` faux sur 9,9 %, max final oublié faux sur
+51,1 % : ce sont des **vérifications** de ce que le spec affirme, pas des ajouts de
+contenu, et ils restent à ce titre. La correction « max(7, 2 + 9) = 11 » est **validée**.
+Le **contre-signal du pas 1 est le sous-tableau circulaire** ([5, −3, 5] → 10 circulaire
+contre 7 linéaire) : nommé ici pour que le spec le porte, et non plus la seule sheet.

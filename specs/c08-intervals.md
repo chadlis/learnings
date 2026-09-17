@@ -90,3 +90,11 @@ Sans tri, ou trié par fin pour la fusion : un intervalle peut chevaucher un fus
   pour le balayage, alors que les comparaisons disent 15× (`sorted()` est en C, la boucle
   en Python). La sheet le dit explicitement ; à trancher si cette nuance mérite d'y rester
   ou si elle brouille le message asymptotique attendu en entretien.
+
+**Arbitrage de revue 7, 17/09 — validé 17/09.** **`[4,9]` pour LC 57 est validé** :
+insérer dans la sortie fusionnée du fil rouge plutôt qu'ouvrir un second exemple. La
+**nuance sur le tri est gardée** : dire que le tri domine en théorie (15× en
+comparaisons) et à peine en pratique (1,20 s contre 0,81 s à n = 10⁶, `sorted()` en C
+contre une boucle Python) ne brouille pas le message asymptotique, ça le date.
+Non tranché en revue 7 : le fil rouge ne distingue toujours pas les deux tris, et le
+« Où ça casse » garde son exemple propre `[[1,10],[2,3],[4,5]]`.

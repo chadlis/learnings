@@ -92,3 +92,10 @@ Inverser en écrasant `cur.next` avant d'avoir sauvé `nxt` : le suffixe est per
 - **Figure 2 tient en une seule `.fig` à deux rubans** (A : milieu · B : cycle), comme le
   demande le spec — une seule `.cap` pour les deux. Si tu les veux en deux figures
   numérotées, ça se scinde sans toucher au texte.
+
+**Arbitrage de revue 7, 17/09 — validé 17/09.** Les **deux corrections de chiffres sont
+validées** et font foi : Floyd se rencontre en **5 images** sur le fil rouge, et
+`while fast.next` sans `fast and` plante sur les longueurs **paires** (il passe sur les
+impaires — c'est ce qui rend le piège vicieux). La **formulation de la table du coût
+mémoire est validée** telle quelle : 32 Mo pour la table du set, hors objets nœuds.
+Figure 2 en une seule `.fig` à deux rubans : **maintenue**.

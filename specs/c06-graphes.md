@@ -116,3 +116,11 @@ inversé), plus petit témoin A→B, A→C, C→B ; trois couleurs contre Kahn *
 50 000 graphes orientés ; `RecursionError` à **998** appels avec la limite par défaut 1 000
 (dernier passage à 997) — cohérent avec c05 ; `list.pop(0)` contre `deque.popleft()` sur
 200 000 éléments, **3,5 s contre 0,011 s**, facteur **334**.
+
+**Arbitrage de revue 7, 17/09 — validé 17/09.** Le **fil rouge de la sheet est adopté
+dans le spec** : la grille est `[1100 / 1100 / 0011]`, l'île 1 est le carré
+`{0, 1, 4, 5}` à **4 cases**, et c'est cette grille qui fait foi partout — le spec, la
+sheet et toute carte Anki qui la reprendrait. La grille `[1100 / 0100 / 0011]` était
+une coquille : elle rendait la figure 2 sans objet. La **nuance sur « quadratique »**
+(×2 sur une grille, ×250 sur un graphe dense) est **gardée** : les deux chiffres valent
+mieux que le seul mot.

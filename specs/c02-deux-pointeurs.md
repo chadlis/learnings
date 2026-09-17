@@ -88,3 +88,10 @@ Non trié avec somme cible : l'élimination est fausse (a[l'] peut être plus pe
 - **Ajout non demandé par le spec** : le comptage 5 + 4 + 3 + 2 + 1 = 15 = C(6, 2)
   au pas 3, qui rend l'« élimination d'une classe » vérifiable à la main. À garder
   ou à couper si le tableau alourdit le pas.
+
+**Arbitrage de revue 7, 17/09 — validé 17/09.** Le **tableau de comptage des classes**
+du pas 3 (5 + 4 + 3 + 2 + 1 = 15 = C(6, 2)) est **gardé** : c'est lui qui rend
+l'« élimination d'une classe » vérifiable à la main, donc il porte le tronc et
+n'alourdit pas le pas. Le canal « grisé » manquant n'est plus un arbitrage de sheet :
+`SL.trace` reçoit un troisième canal `dim` (revue 7, point 3) et la figure 1 s'en sert
+pour les cases éliminées — l'ambré redevient ce qu'il est ailleurs dans la série.

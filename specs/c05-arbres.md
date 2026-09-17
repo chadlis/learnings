@@ -98,3 +98,12 @@ Valider un BST en comparant seulement chaque nœud à ses enfants : accepte des 
   `map.html#c05` dans leur pied de page alors que les sheets existent. C'est la convention
   du dépôt (ne pas rouvrir une sheet publiée) — à confirmer, sinon c'est un `sed` de deux
   lignes par sheet.
+
+**Arbitrage de revue 7, 17/09 — validé 17/09.** Les **chiffres mesurés sont gardés** :
+4,75 % d'arbres acceptés à tort par le test local (3 183 / 67 015 sur 200 000 tirages)
+et le seuil de `RecursionError` à **998** nœuds — ce sont eux qui justifient « le bug ne
+se révèle pas à l'essai ». La **convention H4 est validée** : hauteur **en nœuds**,
+diamètre **en arêtes**. Les trois figures sont **maintenues** dans l'ordre de la sheet.
+Les liens `map.html#…` de c03 et c04 sont recâblés vers les sheets réelles (revue 7,
+point 5) : la règle « ne pas rouvrir une sheet publiée » vise le renommage et la refonte,
+pas la réparation d'un lien dont la cible vient d'exister.

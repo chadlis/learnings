@@ -100,3 +100,12 @@ et rotation confrontée à `min(a)` (100 000 rotations) : 0 désaccord. Restent 
 4. **La sheet fait 8 pas** là où le spec en suggérait 7 : « toute la famille est un choix de
    P » (pas 6) et « chercher sur la réponse » (pas 7) ont été séparés, parce que le second
    change l'espace et le coût de P, et pas seulement le prédicat.
+
+**Arbitrage de revue 7, 17/09 — validé 17/09.** Les quatre points sont tranchés dans le
+sens de la sheet. **8 pas validés** : séparer « choix de P » et « chercher sur la
+réponse » est le bon découpage, le second change l'espace et le coût de P. La
+restriction **valeurs distinctes** pour `a[i] ≤ a[n−1]` est **validée** et reste au
+pas 6. La **nuance LC 875 validée** : dire au pas 7 que le jouet n'y gagne rien et
+donner l'échelle réelle (3 · 10⁵ contre 10¹³) vaut mieux qu'un h truqué pour faire
+gagner la dichotomie. Le troisième canal visuel manquant est réglé à la source : la
+zone connue **fausse** passe par `dim` (revue 7, point 3), plus par absence de marque.
