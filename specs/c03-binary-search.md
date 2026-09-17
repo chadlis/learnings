@@ -10,7 +10,7 @@ prereq: [c00]
 anki: [coding::binary-search, coding::monotone, coding::recherche-sur-reponse]
 bridges: []
 next: c04
-status: ready
+status: built
 ---
 ## Signal
 Un espace **ordonné** (tableau trié, entiers de 1 à n, un temps, une capacité) et un prédicat **monotone** dessus : faux…faux vrai…vrai. Y compris quand l'espace est **la réponse elle-même** : « la plus petite vitesse telle que Koko finisse en h heures » (LC 875), « la plus petite capacité qui expédie en d jours ». Contre-signal : prédicat non monotone (un seul minimum local n'est pas un premier vrai).
@@ -73,3 +73,30 @@ Prédicat non monotone (faux vrai faux) : la dichotomie converge vers n'importe 
 
 ## Ce qui a cassé pour Salah
 - Bornes inclusives/exclusives et « premier vrai » : t09 les listait ; ici un seul squelette pour toute la famille, et la figure 2 pour la recherche sur la réponse.
+
+## Questions pour la revue
+Tous les chiffres du spec ont été revérifiés par script avant écriture : **aucun n'était
+faux**. Trace de la figure 1 : (0, 5, 2, faux) → (3, 5, 4, vrai) → (3, 4, 3, vrai) → lo = hi = 3,
+3 tours = ⌈log₂ 6⌉, confirmée ; invariant « faux sur [0, lo), vrai sur (hi, n) » confronté à une
+force brute à chaque tour sur **200 000** espaces aléatoires, 0 désaccord. LC 875, piles
+[3, 6, 7, 11] : heures(v) = 27, 15, 10, **8**, 8, 6, 5, 5, 5, 5, 4 pour v = 1…11, premier vrai
+**4**, 4 tours = ⌈log₂ 11⌉, confirmés. Bornes inf/sup confrontées à `bisect` (100 000 tableaux)
+et rotation confrontée à `min(a)` (100 000 rotations) : 0 désaccord. Restent quatre points :
+
+1. **Le gain de LC 875 est nul sur le fil rouge du spec.** 4 tours × 4 piles = 16 divisions,
+   contre 4 vitesses × 4 piles = 16 pour un balayage depuis 1 — exactement à égalité. La
+   sheet le **dit** au pas 7 plutôt que de le taire, et donne l'échelle de l'énoncé réel
+   (10⁴ piles, vitesses ≤ 10⁹ : 3 · 10⁵ contre 10¹³). À valider : est-ce le bon parti, ou
+   faut-il un h plus petit dans la figure pour que le jouet gagne déjà ?
+2. **`a[i] ≤ a[n−1]` pour le tableau tourné suppose des valeurs distinctes.** La ligne du
+   spec ne le dit pas ; avec des doublons le prédicat n'est plus monotone (le cas
+   [3, 3, 1, 3] est le classique). La vérification par script a donc été faite sur des
+   valeurs distinctes, et la sheet pose la restriction explicitement au pas 6.
+3. **La figure 1 n'a que deux canaux visuels, pas trois.** `SL.trace` offre `win` (cadre) et
+   `mark` (fond) : la zone « encore possible » est le cadre vert, la zone connue **vraie**
+   est le fond ambré, et la zone connue **fausse** est rendue par *absence* de marque, pas
+   par un gris propre comme le demandait le spec. Ajouter un troisième canal voudrait dire
+   toucher `assets/sheetlib.js`, ce que le skill réserve aux correctifs de rendu.
+4. **La sheet fait 8 pas** là où le spec en suggérait 7 : « toute la famille est un choix de
+   P » (pas 6) et « chercher sur la réponse » (pas 7) ont été séparés, parce que le second
+   change l'espace et le coût de P, et pas seulement le prédicat.
