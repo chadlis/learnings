@@ -127,6 +127,8 @@ text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}te
 .sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
 .sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
 .sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.dim{background:rgba(34,48,43,.07);border-color:rgba(34,48,43,.18);border-style:dashed}
+.sl-cell.dim b,.sl-cell.dim i{color:var(--cardmuted);opacity:.5}
 .sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
 .sl-cell.win{border-color:var(--green);border-width:2.5px}
 .sl-ptrs{position:relative;height:20px;margin-top:5px}
@@ -318,7 +320,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="fig" id="fig2">
     <div class="lbl">Figure 2 — la file, niveau par niveau : <code>k = len(q)</code> capturé avant de défiler</div>
     <div id="f2trace" class="wide"></div>
-    <p class="cap">Les cases sont les nœuds de A <b>dans l'ordre où la file les rend</b> — c'est-à-dire l'ordre par niveaux, <code>4, 2, 6, 1, 3, 5, 7</code> ; l'indice sous chaque case est son rang de défilement. Fais « pas › » : le cadre <b>vert</b> est le niveau en cours de traitement, c'est-à-dire <b>les <span class="m">k</span> cases que la capture vient de figer</b>, et l'<b>ambre</b> ce qui est déjà sorti. Regarde la ligne du bas : <code>k</code> vaut 1, puis 2, puis 4, et à chaque fois le cadre vert contient exactement <span class="m">k</span> cases. <b>La capture est ce qui dessine les frontières</b> : sans elle, le vert couvrirait les sept cases d'un coup, l'ordre resterait bon et les niveaux auraient disparu.</p>
+    <p class="cap">Les cases sont les nœuds de A <b>dans l'ordre où la file les rend</b> — c'est-à-dire l'ordre par niveaux, <code>4, 2, 6, 1, 3, 5, 7</code> ; l'indice sous chaque case est son rang de défilement. Fais « pas › » : le cadre <b>vert</b> est le niveau en cours de traitement, c'est-à-dire <b>les <span class="m">k</span> cases que la capture vient de figer</b>, et le <b>gris</b> ce qui est déjà sorti. Regarde la ligne du bas : <code>k</code> vaut 1, puis 2, puis 4, et à chaque fois le cadre vert contient exactement <span class="m">k</span> cases. <b>La capture est ce qui dessine les frontières</b> : sans elle, le vert couvrirait les sept cases d'un coup, l'ordre resterait bon et les niveaux auraient disparu.</p>
   </div>
 </div>
 
@@ -520,13 +522,13 @@ SL.trace(document.getElementById('f2trace'),{arr:[4,2,6,1,3,5,7],ms:1400,frames:
   {"ptr":{"▲ file":0},"win":[0,1],"mark":[],
    "note":"Niveau 1. k = len(q) = 1, capturé AVANT de défiler : à cet instant la file ne contient que la racine.",
    "inv":"file = [4]  ·  k = 1  ·  niveau = [4]  ·  profondeur = 1"},
-  {"ptr":{"▲ file":1},"win":[1,3],"mark":[0],
+  {"ptr":{"▲ file":1},"win":[1,3],"dim":[0],
    "note":"Niveau 2. Défiler 4 a empilé 2 et 6 ; la file vaut [2, 6], donc k = 2.",
    "inv":"file = [2, 6]  ·  k = 2  ·  niveau = [2, 6]  ·  profondeur = 2"},
-  {"ptr":{"▲ file":3},"win":[3,7],"mark":[0,1,2],
+  {"ptr":{"▲ file":3},"win":[3,7],"dim":[0,1,2],
    "note":"Niveau 3. Les quatre feuilles ont été empilées pendant le niveau 2 : k = 4.",
    "inv":"file = [1, 3, 5, 7]  ·  k = 4  ·  niveau = [1, 3, 5, 7]  ·  profondeur = 3"},
-  {"win":[7,7],"mark":[0,1,2,3,4,5,6],
+  {"win":[7,7],"dim":[0,1,2,3,4,5,6],
    "note":"La file est vide : aucune feuille n'a d'enfant. 3 tours de la boucle extérieure ⇒ hauteur 3.",
    "inv":"k = 1, 2, 4  ·  1 + 2 + 4 = 7 nœuds, chacun défilé une fois ⇒ O(n)"}
 ]});

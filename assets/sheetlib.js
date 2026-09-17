@@ -82,12 +82,16 @@ SL.descent=function(host,o){
 
 /* ---------- trace : pointeurs sur un tableau (coding) ---------- */
 SL.trace=function(host,o){
-  // o.arr, o.frames=[{ptr:{g:0,d:3}, mark:[i,...], win:[g,d], note:'', inv:''}]
+  // o.arr, o.frames=[{ptr:{g:0,d:3}, mark:[i,...], dim:[i,...], win:[g,d], note:'', inv:''}]
+  // Trois canaux, et pas deux : `win` = le cadre (zone encore en jeu), `mark` = le fond
+  // ambré (ce qu'on a retenu), `dim` = le gris (ce qui est éliminé). Sans `dim`, une sheet
+  // qui veut montrer une élimination doit détourner l'ambré, qui veut dire l'inverse.
+  // Canal additif : une frame sans `dim` se rend exactement comme avant.
   const box=h('div','sl-trace',host);const row=h('div','sl-cells',box);
   const cells=o.arr.map((v,i)=>{const c=h('div','sl-cell',row);h('b','',c,String(v));h('i','',c,String(i));return c;});
   const ptrs=h('div','sl-ptrs',box);const note=h('p','sl-note',box,'');const inv=h('p','sl-inv',box,'');
   const ctl=h('div','sl-ctl',box);let k=0;
-  function show(){const f=o.frames[k];cells.forEach((c,i)=>{c.className='sl-cell'+((f.mark||[]).includes(i)?' on':'')+((f.win&&i>=f.win[0]&&i<f.win[1])?' win':'');});
+  function show(){const f=o.frames[k];cells.forEach((c,i)=>{c.className='sl-cell'+((f.dim||[]).includes(i)?' dim':'')+((f.mark||[]).includes(i)?' on':'')+((f.win&&i>=f.win[0]&&i<f.win[1])?' win':'');});
     ptrs.innerHTML='';Object.entries(f.ptr||{}).forEach(([name,i])=>{const p=h('span','sl-ptr',ptrs,name);p.style.setProperty('--i',i);});
     note.textContent=(k+1)+'/'+o.frames.length+' · '+(f.note||'');inv.textContent=f.inv||'';}
   const prev=h('button','tb',ctl,'‹ pas');prev.onclick=()=>{k=Math.max(0,k-1);show();};
