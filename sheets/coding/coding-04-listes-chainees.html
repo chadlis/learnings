@@ -1,0 +1,503 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Listes chaînées — pointeurs qui se suivent — coding</title>
+<meta name="sheet" content="series=coding;part=09;number=04;status=v1">
+<meta name="part" content="09 · Coding">
+<meta name="subtitle" content="coding — lent/rapide, inversion en place, tête factice : trois invariants sur des flèches">
+<meta name="prereq" content="c00">
+<meta name="anki" content="coding::listes-chainees,coding::lent-rapide,coding::dummy-head">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- série `coding` : squelette annoté et ruban de SL.trace (inerte hors coding) ---- */
+.skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.skel b{color:var(--pen);font-weight:600}
+.step .card.full,.step .card.casse{grid-column:1 / -1}
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .wide table{min-width:520px}
+.card .wide th:nth-child(2),.card .wide td:nth-child(2),
+.card .wide th:nth-child(3),.card .wide td:nth-child(3){text-align:left}
+.readouts .c1 b{color:var(--pen)}.readouts .c3 b{color:var(--red)}
+.sl-trace{--cw:58px;--cgap:8px;margin:4px 0 2px}
+.sl-cells{display:flex;gap:var(--cgap)}
+.sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
+.sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
+.sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
+.sl-cell.win{border-color:var(--green);border-width:2.5px}
+.sl-ptrs{position:relative;height:20px;margin-top:5px}
+.sl-ptr{position:absolute;top:0;left:calc(var(--i) * (var(--cw) + var(--cgap)));width:var(--cw);text-align:center;font:600 12px var(--sans);color:var(--pen)}
+.sl-note{font-size:14px;color:var(--cardink);margin-top:10px}
+.sl-inv{font:12.5px/1.55 var(--mono);color:var(--cardmuted);margin-top:6px;border-left:2px solid #B7791F;padding-left:10px}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 09 · Coding › coding 04</div>
+  <h1>Listes <span>chaînées</span> — pointeurs qui se suivent</h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Ni indice, ni longueur connue : sur une liste chaînée on n'a que des <b>flèches</b>, et tout se paie en parcours. D'où <b>trois habits</b>, et trois invariants — <b>lent / rapide</b>, <b>inversion en place</b>, <b>tête factice</b>. Fil rouge : <code>1 → 2 → 3 → 4</code> inversée en <b>4</b> tours, une flèche à la fois ; puis <code>1 → … → 6</code>, où lent s'arrête sur <b>4</b> au moment où rapide tombe, et où le même couple, avec le cycle <code>6 → 3</code>, se rencontre en <b>4</b> tours sur le nœud <b>5</b>. Jamais la solution complète : le squelette, la trace, les phrases.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="coding-00-tap-invariant-variant.html#s2">c00 · l'invariant</a> — conteneur, tranche, « exactement »</li>
+    <li><a href="coding-00-tap-invariant-variant.html#s3">c00 · le variant</a> — l'entier ≥ 0 qui décroît</li>
+    <li><a href="coding-00-tap-invariant-variant.html#s5">c00 · la complexité</a> — composée, jamais devinée</li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>coding::listes-chainees</code><code>coding::lent-rapide</code><code>coding::dummy-head</code></div>
+  <h4>Où le pattern voisine</h4>
+  <ol>
+    <li><a href="coding-02-deux-pointeurs.html">c02 · Deux pointeurs</a></li>
+    <li><a href="coding-01-fenetre-glissante.html">c01 · Fenêtre glissante</a></li>
+    <li><a href="../../map.html#c05">c05 · Arbres</a></li>
+    <li><a href="../../map.html">La carte, colonne 9</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette sheet suppose acquis</div>
+    <ul>
+      <li><b>Le rituel TAP.</b> Invariant, variant, conclusion, complexité — <a href="coding-00-tap-invariant-variant.html#s1">c00, pas 1</a>. Cette sheet ne le redémontre pas : elle l'instancie trois fois, une par habit.</li>
+      <li><b>Invariant = conteneur + tranche + « exactement ».</b> <a href="coding-00-tap-invariant-variant.html#s2">c00, pas 2</a>. Ici le conteneur n'est pas un accumulateur mais une <i>liste</i>, et il y en a <b>deux</b> à décrire, pas une : c'est tout l'enjeu du pas 3.</li>
+      <li><b>Variant = entier ≥ 0 strictement décroissant.</b> <a href="coding-00-tap-invariant-variant.html#s3">c00, pas 3</a>. Celui de l'inversion n'est pas un indice — il n'y en a pas — mais la <b>longueur du suffixe</b> non encore traité.</li>
+      <li><b>Complexité composée.</b> <a href="coding-00-tap-invariant-variant.html#s5">c00, pas 5</a>. Ici le second facteur est trivial (O(1) par tour) ; ce qui se discute est l'<b>espace</b>, et c'est là que Floyd se justifie (pas 5).</li>
+      <li><b>Un nœud est une identité, pas une valeur.</b> Deux nœuds peuvent porter le même entier. Comparer avec <code>is</code>, jamais <code>==</code> — la détection de cycle du pas 5 en dépend entièrement.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>Liste <b>simplement</b> chaînée : un <code>next</code>, pas de <code>prev</code>. On reçoit <code>head</code>, et <b>rien d'autre</b> — ni longueur, ni queue, ni accès par indice. Une liste doublement chaînée rend l'inversion triviale et n'est pas le sujet.</span>
+      <b>H2</b><span>L'espace exigé est <b>O(1)</b>. Sans cette contrainte, tout tombe : copier les valeurs dans une liste Python résout l'inversion, le milieu et le cycle en trois lignes. C'est cette hypothèse, et elle seule, qui rend les trois habits nécessaires.</span>
+      <b>H3</b><span>Les nœuds sont <b>distincts en identité</b> ; leurs valeurs peuvent se répéter. Tout test de rencontre se fait sur l'objet (<code>is</code>).</span>
+      <b>H4</b><span>« En place » signifie qu'on <b>réattribue des <code>next</code></b> et qu'on n'alloue aucun nœud — <i>sauf</i> la sentinelle du pas 6, qui est un unique nœud, donc O(1).</span>
+      <b>H5</b><span>On énonce le <b>squelette</b> et les phrases. Le corps se remplit devant l'interlocuteur : une sheet de coding ne contient jamais la solution complète.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le signal, et le contre-signal <span class="tag tronc">tronc</span></h3>
+    <p>Une structure à <b>accès séquentiel</b> — pas d'indice, pas de longueur connue — et une opération demandée « au <b>milieu</b> », « à l'<b>envers</b> » ou « y a-t-il un <b>cycle</b> », <b>en place</b>, en O(1) mémoire.</p>
+    <div class="eq">accès séquentiel &nbsp;+&nbsp; opération au milieu / à l'envers &nbsp;+&nbsp; O(1) espace &nbsp;⇒&nbsp; <b>faire porter l'information par la position des pointeurs</b></div>
+    <p>Le <b>contre-signal</b> est net : de l'accès aléatoire fréquent. <code>a[i]</code> coûte O(1) sur un tableau et O(<span class="m">i</span>) sur une liste — trier, dichotomiser ou glisser une fenêtre sur une liste chaînée, c'est se punir pour rien.</p>
+    <p class="say">« Je n'ai ni indice ni longueur, donc la seule information gratuite est la <b>position</b> de mes pointeurs, donc j'en pose deux à des vitesses différentes, ou trois à la file, donc trois habits et pas un de plus. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les trois habits, nommés d'avance</div>
+    <p><b>Lent / rapide.</b> Deux pointeurs, l'un avance de 1, l'autre de 2. Trois lectures d'une même idée : le <b>milieu</b> (quand rapide tombe, lent y est), le <b>k-ième depuis la fin</b> (un décalage de <span class="m">k</span>, pas une vitesse), la <b>détection de cycle</b> (Floyd).</p>
+    <p><b>Inversion en place.</b> Trois pointeurs <code>prev</code>, <code>cur</code>, <code>nxt</code> ; on retourne <b>une flèche à la fois</b>, jamais deux.</p>
+    <p><b>Tête factice.</b> Un nœud sentinelle <i>avant</i> la tête, pour que « supprimer la tête » et « insérer avant la tête » cessent d'être des cas spéciaux.</p>
+    <p><b>Le fil rouge.</b> <code>1 → 2 → 3 → 4</code> pour l'inversion ; <code>1 → 2 → 3 → 4 → 5 → 6</code> pour le milieu, puis la <i>même</i> liste refermée par <code>6 → 3</code> pour le cycle. Trois énoncés, deux listes, un seul jeu de flèches à suivre des yeux.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Le pattern : sauver avant de casser <span class="tag tronc">tronc</span></h3>
+    <p>L'inversion tient en trois pointeurs et quatre lignes. L'ordre des deux premières n'est pas négociable : <code>cur.next</code> est l'unique chemin vers le reste de la liste, et l'affectation suivante l'<b>écrase</b>.</p>
+    <div class="eq"><code>nxt = cur.next</code> &nbsp;puis&nbsp; <code>cur.next = prev</code> &nbsp;·&nbsp; jamais l'inverse</div>
+    <p>Une flèche retournée par tour, et <b>une seule</b>. Le tour ne touche ni <code>prev</code> ni le suffixe : il déplace exactement un nœud d'un côté à l'autre de la frontière.</p>
+    <p class="say">« <code>cur.next</code> est mon seul chemin vers le suffixe, donc je le copie dans <code>nxt</code> avant de l'écraser, donc je peux retourner la flèche sans perdre la suite, donc un tour déplace exactement un nœud du suffixe vers le préfixe inversé. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le squelette, à écrire de mémoire</div>
+    <div class="skel">prev, cur = None, head
+<b>tant que</b> cur :
+    nxt = cur.next     <i># sauver AVANT de casser</i>
+    cur.next = prev    <i># retourner la flèche</i>
+    prev, cur = cur, nxt
+<b>retour</b> prev          <i># prev, jamais head</i></div>
+    <p><b>Cinq lignes, et pas une de plus.</b> Il n'y a <b>pas</b> de cas particulier pour la liste vide : <code>head = None</code> ⇒ la boucle ne tourne pas ⇒ on renvoie <code>None</code>, qui est la bonne réponse. Ni pour la liste à un nœud : un tour, <code>1 → ∅</code>.</p>
+    <p><b>Le retour est <code>prev</code>.</b> À la sortie, <code>head</code> pointe sur l'<i>ancienne</i> tête, devenue la <b>queue</b>. Renvoyer <code>head</code> renvoie donc une liste d'un seul nœud : <code>[1]</code> au lieu de <code>[4, 3, 2, 1]</code>. Aucune erreur levée (pas 7).</p>
+    <p><b>Vérifié à l'exécution.</b> Ce squelette confronté à <code>vals[::-1]</code> sur <b>200&nbsp;000</b> listes aléatoires (longueurs 0 à 8, valeurs répétées comprises) : <b>0 désaccord</b>.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>L'invariant : deux tranches, et il faut dire les deux <span class="tag tronc">tronc</span></h3>
+    <p>À l'entrée de chaque tour, la liste coupée en <code>cur</code> a <b>deux</b> moitiés, et l'invariant en décrit <b>une chacune</b>. Ne dire que la première est l'erreur classique : elle ne suffit pas à conclure.</p>
+    <div class="eq"><code>prev</code> = inversion <b>exacte</b> du préfixe [tête, <code>cur</code>) &nbsp;·&nbsp; <code>cur</code> = suffixe [<code>cur</code>, fin) <b>intact</b></div>
+    <p><b>Initialisation</b> : <code>prev = ∅</code> inverse le préfixe vide, <code>cur = head</code> est la liste entière — vrai gratuitement. <b>Préservation</b> : le tour retire un nœud en tête du suffixe et l'empile en tête de <code>prev</code>, <b>donc</b> les deux moitiés restent exactes.</p>
+    <p class="say">« <code>prev</code> porte l'inversion exacte du préfixe et <code>cur</code> le suffixe intact, donc un tour transfère la tête du suffixe au sommet du préfixe, donc les deux moitiés restent exactes, donc quand le suffixe est vide <code>prev</code> est l'inversion de toute la liste. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les cinq états du fil rouge, dits à voix haute</div>
+    <p><code>1 → 2 → 3 → 4</code>. À chaque entrée de boucle, (<code>prev</code>, <code>cur</code>) et les deux tranches :</p>
+    <div class="wide"><table>
+      <tr><th>tour</th><th>prev — préfixe inversé</th><th>cur — suffixe intact</th></tr>
+      <tr><td>entrée 1</td><td><code>∅</code></td><td><code>1 → 2 → 3 → 4</code></td></tr>
+      <tr><td>entrée 2</td><td><code>1 → ∅</code></td><td><code>2 → 3 → 4</code></td></tr>
+      <tr class="hl"><td>entrée 3</td><td><code>2 → 1 → ∅</code></td><td><code>3 → 4</code></td></tr>
+      <tr><td>entrée 4</td><td><code>3 → 2 → 1 → ∅</code></td><td><code>4</code></td></tr>
+      <tr><td>sortie</td><td><code>4 → 3 → 2 → 1 → ∅</code></td><td><code>∅</code></td></tr>
+    </table></div>
+    <p><b>La conclusion s'instancie.</b> <code>cur = ∅</code> ⇒ le suffixe est vide ⇒ le préfixe [tête, ∅) est <i>toute</i> la liste, <b>donc</b> <code>prev</code> en est l'inversion. On conclut sur la <b>seconde</b> tranche : c'est elle qui, en devenant vide, fait tout le travail.</p>
+    <p><b>Ce qu'il ne faut pas dire.</b> « <code>prev</code> contient le début inversé » — c'est vrai et ça ne conclut rien : sans « et <code>cur</code> est le reste, intact », rien n'interdit qu'un nœud ait été perdu en route. C'est exactement ce qui arrive au pas 7.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — une flèche à la fois : les cinq états de <code>1 → 2 → 3 → 4</code></div>
+    <div id="f1trace" class="wide"></div>
+    <p class="cap"><code>arr = [1, 2, 3, 4]</code>, indices en petit sous chaque valeur. Les cases <b>ambrées</b> sont le préfixe <b>déjà inversé</b> (la liste que porte <code>prev</code>), le cadre <b>vert</b> le suffixe <b>encore intact</b> (la liste que porte <code>cur</code>) — les deux tranches de l'invariant, et rien entre elles : la frontière est exactement <code>cur</code>. Fais « pas › » et regarde le transfert : <b>une</b> case passe du vert à l'ambre par tour, jamais deux, et les deux zones restent complémentaires. La ligne du bas réécrit l'invariant à chaque image, <b>avec ses deux moitiés</b> ; dis-le avant de le lire. Au dernier pas le vert est vide : c'est la conclusion.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Le variant, et pourquoi l'espace est O(1)</h3>
+    <p>Le variant est la <b>longueur du suffixe</b> depuis <code>cur</code> : entier, ≥ 0, et il perd exactement 1 par tour puisque le tour déplace un nœud. Terminaison en <span class="m">n</span> tours, sans jamais avoir compté les nœuds.</p>
+    <div class="eq">variant = |[<code>cur</code>, fin)| &nbsp;·&nbsp; ← variant − 1 par tour &nbsp;⇒&nbsp; <span class="m">n</span> tours, O(<span class="m">n</span>) temps, O(1) espace</div>
+    <p>L'<b>espace</b> ne se devine pas non plus : trois noms de variables, quel que soit <span class="m">n</span>. Aucun nœud n'est alloué, aucune liste Python n'est construite — c'est la différence, et la seule, avec la solution « je copie les valeurs et je renvoie <code>vals[::-1]</code> ».</p>
+    <p class="say">« Le suffixe perd un nœud par tour et sa longueur est un entier positif, donc la boucle fait exactement <span class="m">n</span> tours, donc O(<span class="m">n</span>) en temps, et comme je ne garde que trois pointeurs, donc O(1) en espace. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — compter les tours, et ce que chaque tour coûte</div>
+    <p><b>Sur le fil rouge</b> (<span class="m">n</span> = 4) : le variant vaut 4, 3, 2, 1, 0 aux cinq entrées de boucle — <b>4</b> tours, <b>4</b> écritures de <code>next</code>, <b>0</b> nœud créé. Le tableau du pas 3 est exactement cette suite, lue dans la colonne de droite.</p>
+    <p><b>Le coût d'un tour est O(1)</b> : une lecture, une écriture, deux réaffectations de noms. <b>Donc</b> O(<span class="m">n</span>) — la complexité composée du prérequis, avec un second facteur trivial.</p>
+    <div class="wide"><table>
+      <tr><th>solution</th><th>temps</th><th>espace</th></tr>
+      <tr class="hl"><td>trois pointeurs, en place</td><td>O(<span class="m">n</span>)</td><td><b>O(1)</b> — 3 noms</td></tr>
+      <tr><td>copier les valeurs, renvoyer <code>vals[::-1]</code></td><td>O(<span class="m">n</span>)</td><td>O(<span class="m">n</span>)</td></tr>
+      <tr><td>récursion sur la queue</td><td>O(<span class="m">n</span>)</td><td>O(<span class="m">n</span>) — la pile d'appels</td></tr>
+    </table></div>
+    <p><b>La récursion n'est pas gratuite.</b> Elle a l'air « sans variable auxiliaire », mais chaque appel garde un cadre : O(<span class="m">n</span>) d'espace, et <code>RecursionError</code> au-delà de la limite CPython. Dire « O(1) » d'une inversion récursive est faux, et c'est une question d'entretien.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Lent / rapide : une vitesse double, trois lectures <span class="tag tronc">tronc</span></h3>
+    <p>Un seul invariant arithmétique : <b>rapide a parcouru exactement le double de lent</b>. Il se lit trois fois. <b>Milieu</b> : quand rapide tombe au bout, lent est à la moitié. <b>k-ième depuis la fin</b> : là, pas de vitesse double mais un <b>décalage</b> constant de <span class="m">k</span>. <b>Cycle</b> : si la liste boucle, rapide rattrape lent.</p>
+    <div class="eq">pas(rapide) = 2 · pas(lent) &nbsp;·&nbsp; dans un cycle de longueur <span class="m">L</span> : écart ← écart + 1 &nbsp;(mod <span class="m">L</span>)</div>
+    <p>Le cycle en découle : une fois les <b>deux</b> pointeurs dedans, l'écart gagne 1 par tour, <b>donc</b> il parcourt tous les résidus modulo <span class="m">L</span> et atteint 0 en moins de <span class="m">L</span> tours. Sans cycle, rapide atteint <code>∅</code>. Jamais de « ils pourraient se croiser sans se toucher » : l'écart change de 1, pas de 2.</p>
+    <p class="say">« Rapide avance de deux quand lent avance d'un, donc dans un cycle l'écart gagne 1 par tour modulo la longueur, donc il atteint 0, donc ils se rencontrent — et sans cycle rapide tombe sur <code>∅</code>. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le milieu, le k-ième, puis la rencontre</div>
+    <p><b>Milieu de <code>1 → … → 6</code>.</b> <code>while fast and fast.next</code> : (lent, rapide) = (0, 0) → (1, 2) → (2, 4) → (3, ∅). Lent s'arrête à l'indice 3, valeur <b>4</b> — le <b>second</b> des deux milieux d'une liste paire. Vérifié pour <span class="m">n</span> = 1…199 contre <code>n // 2 + 1</code> : <b>0 désaccord</b>. La variante <code>while fast.next and fast.next.next</code> donne le <b>premier</b> milieu, valeur 3 : deux boucles différentes, savoir laquelle on écrit.</p>
+    <p><b>k-ième depuis la fin.</b> On avance rapide de <span class="m">k</span> pas, <b>puis</b> les deux ensemble jusqu'à <code>rapide = ∅</code> : lent atterrit à l'indice <span class="m">n</span> − <span class="m">k</span>. Sur <code>1 → … → 6</code> : <span class="m">k</span> = 2 → <b>5</b>, <span class="m">k</span> = 1 → <b>6</b>. Ce n'est <i>pas</i> une vitesse double — c'est un écart figé.</p>
+    <p><b>Cycle <code>6 → 3</code>, la même liste refermée.</b> Cycle de longueur <span class="m">L</span> = 4 (nœuds 3, 4, 5, 6). (lent, rapide) par indice : (0, 0) → (1, 2) → (2, 4) → (3, 2) → (4, 4). Rencontre au <b>4<sup>e</sup></b> tour, sur le nœud de valeur <b>5</b>. Les écarts, une fois lent entré dans le cycle : <b>2, 3, 0</b> — +1 par tour modulo 4, exactement.</p>
+    <p><b>Contre le set de vus.</b> Les deux sont O(<span class="m">n</span>) en temps et donnent le même verdict — <b>0 désaccord</b> sur <b>200&nbsp;000</b> listes tirées au hasard (longueurs 0 à 8, cycle à pile ou face, point d'attache uniforme). L'écart est en <b>mémoire</b> : la table d'un set de 10<sup>6</sup> entrées pèse <b>33&nbsp;554&nbsp;648</b> octets, soit <b>32 Mo</b>, contre <b>16</b> octets pour deux pointeurs. C'est la phrase à dire quand on propose le set.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — A. l'arrêt de rapide donne le milieu</div>
+    <div id="f2a" class="wide"></div>
+    <div class="lbl">B. la même liste refermée par <code>6 → 3</code> : la rencontre</div>
+    <div id="f2b" class="wide"></div>
+    <p class="cap">Deux rubans, la même paire de pointeurs. <b>En A</b> (liste ouverte), le cadre <b>vert</b> s’arrête sur <b>lent</b>, l’<b>ambre</b> sur <b>rapide</b> — et c’est la ligne du bas qu’il faut lire, celle qui compte les <b>pas franchis</b> : 1 contre 2, puis 2 contre 4, puis 3 contre 6. Rapide en fait exactement le <b>double</b>, et c’est tout l’invariant. À la dernière image il est sorti du ruban — l’ambre s’arrête donc au bord — et lent est sur l’indice 3, valeur <b>4</b>, le second des deux milieux de 6. <b>En B</b>, la liste est la même mais <code>6</code> repointe sur <code>3</code> : le cadre <b>vert</b> n’est plus un chemin, c’est le <b>cycle</b> lui-même — les quatre nœuds 3, 4, 5, 6 — et rapide <i>recule</i> sur le ruban quand il boucle. Regarde la ligne du bas image par image : tant que lent est dehors, l’écart ne veut rien dire ; dès qu’il entre (image 3) l’écart vaut 2, puis 3, puis <b>0</b> — il gagne 1 par tour modulo 4, donc il ne peut pas sauter par-dessus 0. Rencontre à l’image 5, sur le nœud <b>5</b>.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>La tête factice : supprimer la tête cesse d'être un cas</h3>
+    <p>Toute modification d'une liste chaînée s'écrit depuis le nœud <b>précédent</b> — et la tête n'en a pas. D'où deux codes parallèles, l'un pour la tête, l'autre pour le reste. La sentinelle supprime la dissymétrie : un nœud jetable <i>avant</i> la tête, et tout nœud en a un devant lui.</p>
+    <div class="eq"><code>dummy = Node(); dummy.next = head</code> &nbsp;…&nbsp; <code>retour dummy.next</code></div>
+    <p>On renvoie <code>dummy.next</code>, jamais <code>head</code> : si la tête a été supprimée, <code>head</code> désigne un nœud qui n'est plus dans la liste. Coût : <b>un</b> nœud, donc O(1) — H4 tient.</p>
+    <p class="say">« Une suppression s'écrit depuis le précédent et la tête n'en a pas, donc je lui en fabrique un, donc la boucle n'a plus qu'un seul cas, donc je renvoie <code>dummy.next</code> et la tête supprimée disparaît toute seule. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — supprimer tous les 3 de <code>3 → 1 → 3 → 4 → 3</code></div>
+    <p><b>Avec la sentinelle.</b> <code>p = dummy</code> ; tant que <code>p.next</code> : si <code>p.next.v == 3</code> alors <code>p.next = p.next.next</code>, sinon <code>p = p.next</code>. Résultat : <code>[1, 4]</code>. La tête <i>et</i> la queue sont traitées par la même ligne.</p>
+    <p><b>Sans sentinelle, la boucle naïve.</b> Partir de <code>p = head</code> et boucler sur <code>p.next</code> : on renvoie <code>[3, 1, 4]</code> — la <b>tête survit</b>, silencieusement. Pire sur <code>3 → 3 → 3</code> : la bonne réponse est la liste <b>vide</b>, la naïve renvoie <code>[3]</code>.</p>
+    <p><b>Vérifié à l'exécution.</b> La version sentinelle confrontée à <code>[v for v in vals if v != 3]</code> sur <b>200&nbsp;000</b> listes aléatoires (longueurs 0 à 8, valeurs dans 0…3, donc listes entièrement à supprimer comprises) : <b>0 désaccord</b>.</p>
+    <p><b>Les deux autres emplois.</b> <i>Fusionner</i> deux listes triées : la sentinelle évite de traiter « le premier nœud du résultat » à part. <i>Insérer avant la tête</i> : même ligne que partout ailleurs. Dans les trois cas le gain est le même — <b>un</b> chemin de code au lieu de deux, donc une chance sur deux de bug en moins.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Le cas fatal est silencieux : <b>écraser <code>cur.next</code> avant d'avoir sauvé <code>nxt</code></b>. Rien ne plante, la boucle termine — plus vite, même — et renvoie une liste <b>tronquée</b>, parfaitement bien formée.</p>
+    <p>Le mécanisme : après <code>cur.next = prev</code>, lire <code>nxt = cur.next</code> donne <code>prev</code>. On repart donc <b>en arrière</b> dans le préfixe déjà inversé au lieu d'avancer dans le suffixe, et le suffixe n'est plus atteignable par personne.</p>
+    <p class="say">« <code>cur.next</code> écrasé vaut <code>prev</code>, donc le pointeur suivant repart dans le préfixe, donc le suffixe devient inatteignable, donc la fonction rend une liste tronquée sans lever la moindre erreur. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Le contre-exemple minimal, à sortir de mémoire</div>
+    <p><b>La ligne fautive.</b> <code>cur.next = prev</code> <i>puis</i> <code>nxt = cur.next</code>, au lieu de l'ordre du pas 2.</p>
+    <p><b>Sur le fil rouge.</b> <code>1 → 2 → 3 → 4</code> : tour 1, <code>1.next = ∅</code> puis <code>nxt = 1.next = ∅</code>, donc <code>cur = ∅</code> et la boucle <b>s'arrête au premier tour</b>. Retour : <code>[1]</code> au lieu de <code>[4, 3, 2, 1]</code>. Mesuré pour <span class="m">n</span> = 0…6 : la version fautive rend <code>[]</code>, puis <code>[1]</code> pour <b>tout</b> <span class="m">n</span> ≥ 1. Une liste valide, une longueur plausible, aucune exception.</p>
+    <p><b>Le variant l'attrape, l'invariant aussi.</b> Le variant devrait perdre 1 par tour et il s'effondre d'un coup de <span class="m">n</span> à 0. Et la seconde tranche de l'invariant du pas 3 — « <code>cur</code> est le suffixe intact » — est fausse dès le premier tour : <code>cur</code> désigne un nœud du <b>préfixe</b>. Dire l'invariant <b>en entier</b> suffit à voir le bug avant de lancer le code.</p>
+    <p><b>Le même silence, ailleurs.</b> Renvoyer <code>head</code> au lieu de <code>prev</code> donne aussi <code>[1]</code> — même symptôme, autre cause. Et la boucle naïve du pas 6 rend <code>[3, 1, 4]</code> quand la réponse est <code>[1, 4]</code> : trois façons de rendre une liste bien formée et fausse.</p>
+    <p><b>Le test de trente secondes.</b> Avant d'écrire la boucle : « après cette ligne, qui pointe encore vers le reste de la liste ? » Personne ⇒ le reste est perdu.</p>
+  </div>
+  <div class="card casse"><div class="lbl">Pièges Python — quatre lignes qui ont l'air justes</div>
+    <ul>
+      <li><b><code>while fast.next</code> sans <code>fast and</code>.</b> Sur une liste <b>vide</b> (<code>fast = None</code>) et sur toute longueur <b>paire</b>, rapide atterrit sur <code>None</code> et l'itération suivante lève <code>AttributeError: 'NoneType' object has no attribute 'next'</code>. Mesuré : ça plante pour <span class="m">n</span> = 2, 4, 6 et passe pour <span class="m">n</span> = 1, 3, 5 — donc un test sur une liste impaire ne voit rien. Écrire <code>while fast and fast.next</code>.</li>
+      <li><b>Retourner <code>head</code> au lieu de <code>prev</code>.</b> À la sortie <code>head</code> est devenue la <b>queue</b> : on renvoie <code>[1]</code>. Pas d'erreur, juste une liste d'un élément.</li>
+      <li><b>Se passer de la sentinelle</b> et traiter « supprimer la tête » à part : deux chemins de code, deux fois plus de bugs, et le cas « tout supprimer » (<code>3 → 3 → 3</code>) oublié dans l'un des deux.</li>
+      <li><b>Le set de vus pour le cycle.</b> Correct, O(<span class="m">n</span>) en temps — et O(<span class="m">n</span>) en <b>mémoire</b> : 32 Mo de table pour 10<sup>6</sup> nœuds, contre 16 octets. Le proposer est bien ; savoir dire <b>pourquoi Floyd fait O(1)</b> — l'écart +1 modulo <span class="m">L</span> — est ce qui est attendu. Et comparer avec <code>is</code>, jamais <code>==</code> : deux nœuds distincts peuvent porter la même valeur.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li><b>Signal</b> : accès séquentiel, opération au milieu ou à l'envers, <b>en place</b>, O(1) espace. Contre-signal : accès aléatoire fréquent — prendre un tableau.</li>
+    <li><b>Trois habits</b> : lent / rapide, inversion en place, tête factice. Rien d'autre à retenir dans la famille.</li>
+    <li><b>Inversion</b> : <code>nxt = cur.next</code> <b>puis</b> <code>cur.next = prev</code> ; retour <code>prev</code>, jamais <code>head</code>.</li>
+    <li><b>Invariant, avec ses deux tranches</b> : <code>prev</code> = inversion <b>exacte</b> de [tête, <code>cur</code>) <b>et</b> <code>cur</code> = suffixe [<code>cur</code>, fin) <b>intact</b>. Variant : longueur du suffixe, −1 par tour ⇒ <span class="m">n</span> tours, O(1) espace.</li>
+    <li><b>Lent / rapide</b> : rapide fait le double. Milieu (<code>while fast and fast.next</code> ⇒ le <b>second</b> milieu), k-ième depuis la fin (décalage de <span class="m">k</span>, pas une vitesse), cycle.</li>
+    <li><b>Floyd</b> : dans un cycle de longueur <span class="m">L</span>, l'écart gagne 1 par tour modulo <span class="m">L</span>, <b>donc</b> atteint 0. O(1) espace contre O(<span class="m">n</span>) pour un set de vus.</li>
+    <li><b>Casse silencieuse</b> : écraser <code>cur.next</code> avant de sauver <code>nxt</code> renvoie <code>[1]</code> pour toute liste non vide — bien formée, et fausse.</li>
+  </ol>
+</div>
+<div class="phrase">« Sur une liste chaînée je n'ai que des flèches, donc trois habits : deux pointeurs à vitesses différentes pour le milieu ou un cycle, trois pointeurs pour inverser en place en retournant une flèche à la fois, et une tête factice pour que la tête ne soit plus un cas spécial. L'invariant de l'inversion, c'est que prev porte l'inversion exacte du préfixe et cur le suffixe intact. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Énonce l'invariant de l'inversion — <b>en entier</b>.</div><div class="a hid">prev porte l'inversion exacte du préfixe [tête, cur), et cur porte le suffixe [cur, fin) intact. Les deux tranches, toujours : sans la seconde, rien n'interdit qu'un nœud ait été perdu en route.</div></li>
+    <li><div class="q">Pourquoi sauver <code>nxt</code> avant d'écrire <code>cur.next</code> ?</div><div class="a hid">cur.next est l'unique chemin vers le suffixe et l'affectation l'écrase. Sans nxt, on relit cur.next et on obtient prev : on repart en arrière, le suffixe est perdu, et la fonction renvoie [1] sans erreur.</div></li>
+    <li><div class="q">Pourquoi lent et rapide se rencontrent-ils dans un cycle ?</div><div class="a hid">Une fois les deux dedans, rapide gagne un pas par tour sur lent, donc l'écart gagne 1 modulo la longueur du cycle, donc il passe par tous les résidus et atteint 0 en moins de L tours. Il ne peut pas sauter par-dessus : il change de 1, pas de 2.</div></li>
+    <li><div class="q">À quoi sert la tête factice, et que renvoie-t-on ?</div><div class="a hid">À donner un précédent à la tête, pour que supprimer ou insérer en tête ne soit plus un cas spécial : un seul chemin de code. On renvoie dummy.next, jamais head — head peut désigner un nœud supprimé.</div></li>
+    <li><div class="q">Cycle : Floyd ou un set de vus ? Défends ton choix.</div><div class="a hid">Même verdict, même O(n) en temps. Le set coûte O(n) en mémoire — 32 Mo de table pour un million de nœuds — contre deux pointeurs, 16 octets, pour Floyd. Et la comparaison se fait sur l'identité du nœud, avec is.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Où ce mécanisme se rejoue</div>
+  <div class="bridges">
+    <a href="coding-00-tap-invariant-variant.html#s2"><b>c00 · L'invariant</b><small>le « exactement » du prérequis devient ici « exactement, <i>et</i> le reste intact » : c'est le seul invariant de la partie qui décrive <b>deux</b> conteneurs, et l'oublier est la panne du pas 7</small></a>
+    <a href="coding-02-deux-pointeurs.html#s3"><b>c02 · Deux pointeurs</b><small>même idée — deux marcheurs dont l'écart porte l'information — mais sur un tableau trié l'écart se referme, ici il se creuse à vitesse constante ; le k-ième depuis la fin est littéralement un écart figé</small></a>
+    <a href="coding-01-fenetre-glissante.html#s3"><b>c01 · Fenêtre glissante</b><small>le contre-signal de cette sheet est le signal de celle-là : dès qu'on veut glisser une fenêtre, il faut l'accès par indice, donc un tableau</small></a>
+    <a href="../../map.html#c05"><b>c05 · Arbres</b><small>un arbre est une liste chaînée qui bifurque : mêmes flèches, même absence d'indice, et le parcours y remplace le pointeur unique par une pile</small></a>
+    <a href="../../map.html"><b>La carte, colonne 9</b><small>les neuf familles et leur ordre de dépendance</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>coding::listes-chainees</code> (le signal, les trois habits, l'inversion et son invariant à deux tranches) · <code>coding::lent-rapide</code> (la vitesse double, le second milieu, le k-ième comme écart figé) · <code>coding::dummy-head</code> (la sentinelle, <code>dummy.next</code> au retour, les trois emplois).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>coding c04 · v1 du 17/09/2026 · Prérequis : <a href="coding-00-tap-invariant-variant.html">c00 · Le TAP</a>. Suite : <a href="../../map.html#c05">c05 · Arbres</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== Figure 1 : inversion de 1 -> 2 -> 3 -> 4 =====
+   Frames produites par le squelette instrumenté du pas 2 (aucun chiffre saisi à la main) :
+   `mark` = le préfixe déjà inversé (la liste que porte prev), `win` = le suffixe encore
+   intact (la liste que porte cur), bornes [cur, fin). Les deux zones sont complémentaires :
+   c'est l'invariant à deux tranches, dessiné. prev et cur sont toujours voisins, sauf à la
+   première et à la dernière image où l'un des deux vaut None et n'a donc pas de case. */
+SL.trace(document.getElementById('f1trace'),{arr:[1,2,3,4],ms:1500,frames:[
+  {"ptr":{"▲ cur":0,"▲ nxt":1},"win":[0,4],"mark":[],
+   "note":"prev = ∅. nxt = cur.next = 2 (sauvé), puis cur.next = prev : la flèche 1 → 2 devient 1 → ∅.",
+   "inv":"prev = inversion de [tête, cur) = ∅ (vide)  ·  cur = suffixe 1 → 2 → 3 → 4, intact  ·  variant = 4"},
+  {"ptr":{"▲ prev":0,"▲ cur":1,"▲ nxt":2},"win":[1,4],"mark":[0],
+   "note":"nxt = 3 (sauvé), puis flèche retournée : 2 → 1.",
+   "inv":"prev = inversion de [tête, cur) = 1 → ∅  ·  cur = suffixe 2 → 3 → 4, intact  ·  variant = 3"},
+  {"ptr":{"▲ prev":1,"▲ cur":2,"▲ nxt":3},"win":[2,4],"mark":[0,1],
+   "note":"nxt = 4 (sauvé), puis flèche retournée : 3 → 2.",
+   "inv":"prev = inversion de [tête, cur) = 2 → 1 → ∅  ·  cur = suffixe 3 → 4, intact  ·  variant = 2"},
+  {"ptr":{"▲ prev":2,"▲ cur":3},"win":[3,4],"mark":[0,1,2],
+   "note":"nxt = cur.next = ∅ (sauvé quand même), puis flèche retournée : 4 → 3. Dernier tour.",
+   "inv":"prev = inversion de [tête, cur) = 3 → 2 → 1 → ∅  ·  cur = suffixe 4, intact  ·  variant = 1"},
+  {"ptr":{"▲ prev":3},"win":[4,4],"mark":[0,1,2,3],
+   "note":"cur = ∅ : la boucle s'arrête. Retour prev = 4 → 3 → 2 → 1. 4 tours pour 4 nœuds, 0 nœud créé.",
+   "inv":"suffixe vide ⇒ le préfixe est toute la liste ⇒ prev en est l'inversion  ·  variant = 0"}
+]});
+
+/* ===== Figure 2A : milieu de 1 -> ... -> 6, while fast and fast.next =====
+   `win` = ce que lent a couvert, [0, lent] ; `mark` = ce que rapide a survolé, [0, rapide].
+   L'ambre fait exactement le double du vert — l'invariant pas(rapide) = 2 · pas(lent).
+   À la dernière image rapide est tombé hors du ruban : aucun pointeur ne lui est dessiné. */
+SL.trace(document.getElementById('f2a'),{arr:[1,2,3,4,5,6],ms:1300,frames:[
+  {"ptr":{"▲ lent·rap":0},"win":[0,1],"mark":[0],
+   "note":"Départ : les deux sur la tête. fast et fast.next existent ⇒ on entre dans la boucle.",
+   "inv":"pas(lent) = 0  ·  pas(rapide) = 0"},
+  {"ptr":{"▲ lent":1,"▲ rapide":2},"win":[0,2],"mark":[0,1,2],
+   "note":"lent +1 → indice 1 ; rapide +2 → indice 2.",
+   "inv":"pas(lent) = 1  ·  pas(rapide) = 2 = 2 × 1"},
+  {"ptr":{"▲ lent":2,"▲ rapide":4},"win":[0,3],"mark":[0,1,2,3,4],
+   "note":"lent → indice 2 ; rapide → indice 4. fast.next existe (indice 5) ⇒ un tour de plus.",
+   "inv":"pas(lent) = 2  ·  pas(rapide) = 4 = 2 × 2"},
+  {"ptr":{"▲ lent":3},"win":[0,4],"mark":[0,1,2,3,4,5],
+   "note":"rapide sort de la liste (∅) : la boucle s'arrête. Lent est à l'indice 3, valeur 4 — le second des deux milieux de 6.",
+   "inv":"pas(lent) = 3  ·  pas(rapide) = 6 = 2 × 3 ⇒ lent est à la moitié"}
+]});
+
+/* ===== Figure 2B : la même liste refermée par 6 -> 3 (indice 5 -> indice 2) =====
+   Le ruban reste linéaire — les cases ne bougent pas — et le retour en arrière de rapide
+   se lit sur la position du pointeur. `win` = le cycle, fixe : indices 2 à 5.
+   L'écart n'est défini modulo L que lorsque les DEUX pointeurs sont dans le cycle. */
+SL.trace(document.getElementById('f2b'),{arr:[1,2,3,4,5,6],ms:1300,frames:[
+  {"ptr":{"▲ lent·rap":0},"win":[2,6],"mark":[],
+   "note":"Départ, les deux sur la tête. Le cycle (cadre vert) est 3 → 4 → 5 → 6 → 3, de longueur L = 4.",
+   "inv":"aucun des deux n'est dans le cycle ⇒ l'écart ne se lit pas encore modulo 4"},
+  {"ptr":{"▲ lent":1,"▲ rapide":2},"win":[2,6],"mark":[],
+   "note":"Tour 1. Rapide entre dans le cycle (nœud 3) ; lent est encore dehors.",
+   "inv":"lent dehors ⇒ écart non défini modulo 4"},
+  {"ptr":{"▲ lent":2,"▲ rapide":4},"win":[2,6],"mark":[],
+   "note":"Tour 2. Lent entre à son tour : à partir d'ici tout se lit modulo 4.",
+   "inv":"lent en position 0 du cycle, rapide en position 2  ⇒  écart = 2 (mod 4)"},
+  {"ptr":{"▲ lent":3,"▲ rapide":2},"win":[2,6],"mark":[],
+   "note":"Tour 3. Rapide a bouclé : 5 → 6 → 3, donc il revient sur le nœud 3.",
+   "inv":"lent en position 1, rapide en position 0  ⇒  écart = 3 (mod 4) — il a gagné 1"},
+  {"ptr":{"▲ lent·rap":4},"win":[2,6],"mark":[],
+   "note":"Tour 4. Écart = 0 : rencontre sur le nœud de valeur 5. Il y a un cycle, et Floyd n'a coûté que deux pointeurs.",
+   "inv":"écart = 0 (mod 4) ⇒ même nœud  ·  écarts successifs : 2, 3, 0 — +1 par tour"}
+]});
+})();
+</script>
+</body>
+</html>
