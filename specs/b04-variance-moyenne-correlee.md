@@ -54,14 +54,16 @@ B variables de même variance σ², corrélées deux à deux par ρ. Var de la m
 - **Doublon de table avec b03.** `b03` pas 6 porte déjà une table ρ × B pour une forêt
   (ρ = 0,6 / 0,3 / 0,1 / 0, avec B = 10 / 100 / 500). `b04` pas 3 en donne une autre
   (ρ = 0,5 / 0,05, avec B = 10 / 100) pour ne pas la recopier, mais les deux décrivent
-  le même objet avec des ρ différents. À trancher : aligner les deux jeux de ρ, ou
-  assumer que b03 illustre le compromis et b04 le plancher.
+  le même objet avec des ρ différents. **Tranché en revue 4** : doublon assumé, les ponts
+  se recoupent — b03 illustre le compromis, b04 le plancher.
 - **Les ρ du pas 4 (0,4 en k-fold, 0,9 en LOOCV) sont des hypothèses de lecture**, repris
   tels quels de `b03` pas 5 pour que les deux sheets restent comparables. La sheet le dit
   deux fois (pas 4 et limite 2), mais un chiffre non mesuré reste un chiffre à surveiller.
-- **Ajout hors spec, à valider** : la borne ρ ≥ −1/(B − 1), quatrième limite du pas 6.
+  **Validé en revue 4.**
+- **Ajout hors spec, validé en revue 4** : la borne ρ ≥ −1/(B − 1), quatrième limite du pas 6.
   Elle ferme la porte à « et si on rendait les termes anti-corrélés ? », une question que
   la formule appelle naturellement et que le spec ne traitait pas.
 - **Taille du fil rouge du pas 5** : le spec ne fixait pas de dimensions pour le SE groupé.
   Choix retenu : 1 000 lignes = 50 utilisateurs × 20, ρ = 0,2, pour que la figure 2 tire
   exactement la même expérience que la table (effet de grappe 4,80, n_eff = 208, SE × 2,19).
+  **Validé en revue 4.**
