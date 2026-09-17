@@ -23,7 +23,7 @@ Minimiser L revient à résoudre ∇L(θ) = 0. Si ce système est **linéaire en
 | Ridge | (XᵀX + λI)β = Xᵀy | oui | forme fermée ; +λI rend inversible | stricte pour λ > 0 | p02-02 pas 5 ; p04-02 pas 7 |
 | Centroïde (Lloyd, demi-pas) | Σ(xᵢ − μ) = 0 sur le cluster | oui | μ = moyenne du cluster | oui à affectation fixée ; **non** globalement | p07-04 |
 | Logistique | Σ(σ(xᵢᵀβ) − yᵢ)xᵢ = 0 | non (σ) | itérer (GD, Newton) | oui : minimum global, pas de forme fermée | p05-02 ; p03-02 pas 4–5 |
-| Lasso | sous-gradient, coude en 0 | non (signe) | itérer (coordinate descent, soft-threshold) | oui, non lisse | p02-02 pas 6 ; p03-01 pas 7 |
+| Lasso | sous-gradient, coude en 0 | non (signe) | itérer (coordinate descent, soft-threshold) | oui, non lisse | p02-02 pas 6 ; p03-01 pas 8 |
 | Réseau | ∇ par backprop | non | itérer, minibatch | **non** : local | p08-01 ; p03-02 casse |
 
 ## Figure exigée
@@ -53,11 +53,11 @@ Minimiser L revient à résoudre ∇L(θ) = 0. Si ce système est **linéaire en
 - D4 / p02-02 : « la pénalité rend le minimum existant ou unique » — ce pont lui donne son nom général (stricte convexité) sans redémontrer.
 
 ## Questions pour la revue
-- **Corrigé dans ce spec** : la ligne « Lasso » renvoyait à `p03-01 pas 8`. Dans
-  `chain-p03-01`, le pas 8 est « Habit 4 — la marge (SVM) » ; la pénalité et le coude de L1
-  sont au **pas 7**. Corrigé en `p03-01 pas 7`, et c'est ce lien que la sheet pose.
-  Même décalage d'un cran dans `bridge-05` (trois liens : `#s6` étiqueté « pas 7 », `#s7`
-  « pas 8 », `#s8` « pas 9 ») — **non corrigé ici**, hors périmètre de b06.
+- **Fausse alerte, refermée** : le renvoi `p03-01 pas 8` de la ligne « Lasso » est juste.
+  `chain-p03-01` numérote ses pas par un compteur CSS (`.step .rule::before`) et contient
+  un pas sans id numéroté (`s4b`, « Pourquoi c'est légitime : un surrogate ») : les ancres
+  décalent d'un cran à partir de là, `#s7` s'affiche donc **pas 8**. Compter les ids donne
+  un cran de moins que ce que le lecteur voit. Les liens de `bridge-05` étaient corrects.
 - Les autres renvois du spec ont été vérifiés un à un et sont justes : `p02-02 pas 5`
   (+λI translate), `p04-02 pas 7` (translater le spectre), `p04-03 pas 7` (ne pas former
   XᵀX), `p03-02 pas 4–5` (convexité / forme fermée ou itération), `p03-02 casse`, `p00-04`.
