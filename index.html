@@ -51,21 +51,21 @@ footer{margin-top:36px;color:var(--faint);font-size:13px;border-top:1.5px solid 
 <a class="it" href="sheets/chains/chain-p04-04-pca.html"><span class="k">04</span><span class="t">PCA — diagonaliser la covariance<small>chaîne · trouver les directions de variance maximale, et les quatre pièges qui rendent le résultat faux sans erreur</small></span><span class="n">v1</span></a>
 </div>
 <div style="--ac:var(--sky)"><h2>5 · Modèles linéaires</h2>
-<div class="it todo"><span class="k">01</span><span class="t">Régression linéaire — le modèle et OLS<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
-<div class="it todo"><span class="k">02</span><span class="t">Régression logistique — logit, odds ratio, effet marginal<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
-<div class="it todo"><span class="k">03</span><span class="t">Régularisation vue en biais-variance — le chemin de λ<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">01</span><span class="t">Régression linéaire — le modèle, OLS, ce que R² ne dit pas<small>chaîne · modèles linéaires — une hypothèse sur y sachant x, des carrés parce que gaussien, une forme fermée parce que linéaire</small></span><span class="n">spec prêt</span></div>
+<div class="it todo"><span class="k">02</span><span class="t">Régression logistique — logit, odds ratio, effet marginal<small>chaîne · modèles linéaires — linéaire en log-cote, jamais en probabilité ; e^β multiplie une cote</small></span><span class="n">spec prêt</span></div>
+<div class="it todo"><span class="k">03</span><span class="t">Régularisation vue en biais-variance — le chemin de λ<small>chaîne · modèles linéaires — rétrécir les coefficients échange un biais contre de la variance ; λ se lit sur une courbe en U</small></span><span class="n">spec prêt</span></div>
 </div>
 <div style="--ac:var(--coral)"><h2>6 · Évaluer</h2>
-<div class="it todo"><span class="k">01</span><span class="t">Biais, variance, bruit — la décomposition<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
-<div class="it todo"><span class="k">02</span><span class="t">Estimer l&#x27;erreur — CV, LOOCV, leakage<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
-<div class="it todo"><span class="k">03</span><span class="t">Seuil, matrice de confusion, ROC, PR<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
-<div class="it todo"><span class="k">04</span><span class="t">Scores, calibration, déséquilibre<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">01</span><span class="t">Biais, variance, bruit — la décomposition<small>chaîne · évaluer — le tirage est le dataset entier, et l&#x27;erreur se coupe en trois</small></span><span class="n">spec prêt</span></div>
+<div class="it todo"><span class="k">02</span><span class="t">Estimer l&#x27;erreur — validation croisée, LOOCV, fuite<small>chaîne · évaluer — imiter des données non vues sans en gaspiller, et ne rien laisser passer du futur</small></span><span class="n">spec prêt</span></div>
+<div class="it todo"><span class="k">03</span><span class="t">Seuil, matrice de confusion, ROC, PR<small>chaîne · évaluer — un score devient une décision par un seuil, et chaque métrique regarde une colonne</small></span><span class="n">spec prêt</span></div>
+<div class="it todo"><span class="k">04</span><span class="t">Scores, calibration, déséquilibre — que vaut un 0,8 ?<small>chaîne · évaluer — discriminer n&#x27;est pas être calibré, et le déséquilibre se traite par le seuil avant tout</small></span><span class="n">spec prêt</span></div>
 </div>
 <div style="--ac:var(--violet)"><h2>7 · Arbres, ensembles, k-means</h2>
-<div class="it todo"><span class="k">01</span><span class="t">Arbres — impureté, split, profondeur<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
-<div class="it todo"><span class="k">02</span><span class="t">Bagging et random forest — la variance seule<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
-<div class="it todo"><span class="k">03</span><span class="t">Gradient boosting — une descente dans l&#x27;espace des fonctions<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
-<div class="it todo"><span class="k">04</span><span class="t">k-means — descente alternée sur l&#x27;inertie<small>chaîne · à écrire</small></span><span class="n">à venir</span></div>
+<div class="it todo"><span class="k">01</span><span class="t">Arbres — impureté, split, profondeur<small>chaîne · arbres et ensembles — un arbre coupe là où l&#x27;impureté baisse le plus, et sa profondeur est sa variance</small></span><span class="n">spec prêt</span></div>
+<div class="it todo"><span class="k">02</span><span class="t">Bagging et forêt aléatoire — la variance seule<small>chaîne · arbres et ensembles — moyenner des arbres profonds réduit la variance, et tirer m features baisse ce que la moyenne ne peut pas baisser</small></span><span class="n">spec prêt</span></div>
+<div class="it todo"><span class="k">03</span><span class="t">Gradient boosting — une descente dans l&#x27;espace des fonctions<small>chaîne · arbres et ensembles — chaque arbre ajuste le gradient négatif de la loss au modèle cumulé ; ν est le pas</small></span><span class="n">spec prêt</span></div>
+<div class="it todo"><span class="k">04</span><span class="t">k-means — une descente alternée sur l&#x27;inertie<small>chaîne · arbres et ensembles — Lloyd alterne deux minimisations exactes et converge vers un optimum local ; l&#x27;initialisation décide</small></span><span class="n">spec prêt</span></div>
 </div>
 <div style="--ac:var(--teal)"><h2>8 · Calcul, numérique, tenseurs</h2>
 <a class="it" href="sheets/chains/chain-p08-01-jacobienne-chain-rule-backprop.html"><span class="k">01</span><span class="t">Jacobienne, chain rule, backprop — pourquoi on part de la sortie<small>chaîne · la porte d&#x27;entrée de B1 (micrograd) : une dérivée est une matrice, et l&#x27;ordre des produits décide du coût</small></span><span class="n">v1</span></a>

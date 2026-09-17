@@ -4,12 +4,79 @@ series: chain
 part: "05"
 number: "01"
 slug: regression-modele-ols
-title: Régression linéaire — le modèle et OLS
-subtitle: à écrire
-prereq: [p02-01, p04-01]
-anki: []
-bridges: []
+title: Régression linéaire — le modèle, OLS, ce que R² ne dit pas
+subtitle: modèles linéaires — une hypothèse sur y sachant x, des carrés parce que gaussien, une forme fermée parce que linéaire
+prereq: [p02-01, p04-01, p00-02]
+anki: [ml::regression-lineaire, ml::ols, ml::r2, stats::residus]
+bridges: [b06, b02]
 next: p05-02
-status: stub
+status: ready
 ---
-Périmètre : Y = β₀ + β₁X + ε est un modèle ; E[ε|x] = 0, Var constante ; carrés ⇒ forme fermée et OLS = MLE gaussien ; β̂₁ = Ĉov/V̂ar, β̂₀ = ȳ − β̂₁x̄ ; outliers ; R² et témoin. Figure : nuage + droite + résidus, slider sur un outlier.
+
+## Question de la chaîne
+Qu'est-ce que « Y = β₀ + β₁X + ε » suppose exactement, pourquoi les moindres carrés et pas autre chose, d'où sort la forme fermée, et pourquoi R² monte toujours ?
+
+## Prérequis
+- p02-01 : bruit gaussien ⇒ MSE (les six pas) ; MSE estime la moyenne conditionnelle.
+- p04-01 : Ax = b, colonnes, témoin atteignable.
+- p00-02 : covariance, variance.
+
+## Hypothèses posées
+- H1 : **linéarité en β** : E[Y | x] = β₀ + β₁x (les x peuvent être transformés : x², log x — c'est toujours linéaire en β).
+- H2 : E[ε | x] = 0 : le bruit est centré quel que soit x — c'est ce qui rend β̂ sans biais.
+- H3 : Var(ε | x) = σ² (homoscédastique) et ε indépendants : nécessaires pour les **SE** (p01-03), pas pour β̂.
+- H4 : ε gaussien : nécessaire pour que OLS = MLE et pour le Student exact ; pas pour le non-biais.
+
+## Exemple fil rouge
+Cinq points : x = (1, 2, 3, 4, 5), y = (2, 4, 5, 4, 5). x̄ = 3, ȳ = 4. S_xy = Σ(xᵢ − x̄)(yᵢ − ȳ) = 6 ; S_xx = 10. β̂₁ = 0,6 ; β̂₀ = ȳ − β̂₁x̄ = 2,2. Prédictions 2,8 ; 3,4 ; 4 ; 4,6 ; 5,2 ; résidus −0,8 ; 0,6 ; 1 ; −0,6 ; −0,2 (somme 0). RSS = 2,4 ; TSS = 6 ; R² = 0,6.
+Un outlier : y₅ = 15 au lieu de 5 → ȳ = 6, S_xy = 26, β̂₁ = 2,6 : un point sur cinq a quadruplé la pente.
+ISLR Advertising, `sales ~ TV` : β̂₀ = 7,03, β̂₁ = 0,0475, RSE = 3,26, R² = 0,61 (n = 200).
+
+## Pas de la chaîne
+1. **Le décor.** Un nuage, une droite. La question n'est pas « quelle droite » mais « que suppose-t-on pour qu'une droite soit la bonne réponse, et laquelle ».
+2. **Le modèle est une hypothèse sur y sachant x** [tronc]. Y = β₀ + β₁X + ε dit : la moyenne de Y à x fixé est affine en x (H1), et ce qui reste est un bruit centré (H2). Rien sur la loi de X. Au tableau : « Le modèle pose la moyenne conditionnelle affine et un bruit centré, donc il ne parle que de Y sachant X, donc les x peuvent être quelconques et même transformés. »
+3. **Pourquoi des carrés** (p02-01). Bruit gaussien ⇒ la NLL est Σ(yᵢ − β₀ − β₁xᵢ)² : OLS = MLE. Bruit de Laplace donnerait Σ|·| (médiane conditionnelle, robuste aux outliers). Les carrés sont une conséquence de H4, pas un choix esthétique.
+4. **La forme fermée** [tronc]. ∂RSS/∂β = 0 est linéaire en β (b06) : β̂₁ = S_xy/S_xx = Ĉov(x, y)/V̂ar(x), β̂₀ = ȳ − β̂₁x̄. La droite passe par (x̄, ȳ) ; la pente est « covariance sur variance ». En matriciel : β̂ = (XᵀX)⁻¹Xᵀy, à calculer par QR (p04-03). Au tableau : « Annuler le gradient d'une somme de carrés donne des équations linéaires en β, donc on résout d'un coup, donc la pente est la covariance sur la variance et l'intercept fait passer la droite par le centre du nuage. »
+5. **Les résidus ont une structure.** Σrᵢ = 0 et Σrᵢxᵢ = 0 (les deux équations normales) : les résidus sont orthogonaux aux colonnes de X ; ŷ est la **projection** de y sur l'espace des colonnes. C'est ce qui coûte p degrés de liberté (p01-03).
+6. **Les carrés amplifient les outliers.** Un point loin tire la droite avec le carré de son écart : y₅ = 15 fait passer la pente de 0,6 à 2,6. Diagnostic : résidus studentisés, leverage (nommer) ; remède : Huber, MAE, ou comprendre le point.
+7. **R² = 1 − RSS/TSS** [tronc]. Part de la variance de y « expliquée » par la droite. Il **ne baisse jamais** quand on ajoute une variable (témoin β = 0, b02), donc il ne juge pas un ajout ; R² ajusté, AIC, ou validation (p06-02). R² = 0,6 sur cinq points, R² = 0,61 sur 200 marchés : le même nombre n'a pas la même valeur — le SE le dit, pas R². Au tableau : « R² compare RSS à TSS, donc ajouter une colonne ne peut que baisser RSS, donc R² monte toujours, donc il ne compare pas des modèles de tailles différentes. »
+8. **Ce que β̂₁ veut dire.** 0,0475 : mille euros de TV en plus ⇒ 47,5 ventes en plus **en moyenne**, **toutes choses égales** si d'autres variables sont dans le modèle — et corrélation, pas cause. Le SE 0,0027 (p01-03) dit que ce chiffre est stable ; le R² de 0,61 dit que la TV n'explique pas tout.
+9. **Où ça casse** [casse].
+
+## Figures exigées
+- **Figure 1 — `plot` + `slider` y₅ ∈ [0, 20]** : le nuage des cinq points, la droite OLS recalculée, les résidus en segments verticaux, readouts β̂₁, β̂₀, RSS, R². Légende : un point tire la droite avec le carré de son écart.
+- **Figure 2 — `plot`** : le même nuage avec un `slider` sur une droite « à la main » (β₀, β₁) et le RSS affiché comme somme des aires des carrés des résidus (dessinés en carrés) ; bouton « OLS » qui saute au minimum. Légende : minimiser la somme des aires.
+- **Figure 3 — `plot` + bouton « ajouter une variable de bruit »** : sur 30 points, R² et R² ajusté en fonction du nombre de colonnes de bruit ajoutées (jusqu'à 10). Légende : R² monte quoi qu'on ajoute.
+
+## Où ça casse
+- **Non-linéarité** : la moyenne conditionnelle n'est pas affine ⇒ biais ; résidus en forme ; transformer x ou changer de modèle.
+- **Hétéroscédasticité / dépendance** : β̂ reste sans biais, les SE sont faux (p01-03).
+- **Colinéarité** : XᵀX non inversible ou mal conditionné ⇒ β̂ non unique ou instable (p02-02, p04-03) ; ridge.
+- **Extrapolation** : la droite est ajustée sur le support des x ; hors support, H1 n'a jamais été testée.
+
+## Résumé
+1. Le modèle est une hypothèse sur Y sachant X : moyenne affine (H1), bruit centré (H2) ; H3–H4 servent aux SE et au MLE.
+2. Carrés ⇐ gaussien ; MAE ⇐ Laplace.
+3. Forme fermée : β̂₁ = Ĉov/V̂ar, β̂₀ = ȳ − β̂₁x̄ ; la droite passe par (x̄, ȳ) ; ŷ = projection.
+4. Les carrés amplifient les outliers (0,6 → 2,6).
+5. R² ne baisse jamais en ajoutant une variable ; il ne juge pas un ajout.
+6. β̂₁ = effet moyen, toutes choses égales, corrélation ; le SE dit sa stabilité.
+
+**Phrase d'entretien** : « Le modèle linéaire pose que la moyenne de Y sachant X est affine et que le reste est un bruit centré ; les carrés viennent d'un bruit gaussien, et comme annuler leur gradient est linéaire en β, la solution est fermée : covariance sur variance, droite par le centre du nuage. Le R² ne baisse jamais quand on ajoute une variable, donc il ne juge pas un ajout ; c'est le SE de la pente et la validation qui jugent. »
+
+## Chaîne verbalisée
+1. Que suppose Y = β₀ + β₁X + ε, et sur quoi ? → Moyenne conditionnelle affine, bruit centré ; sur Y sachant X seulement.
+2. Pourquoi des carrés ? → NLL gaussienne ; Laplace donnerait |·|.
+3. Écris β̂₁ et β̂₀ et dis d'où ils sortent. → Ĉov/V̂ar ; ȳ − β̂₁x̄ ; gradient nul, linéaire en β.
+4. Que fait un outlier, et pourquoi ? → Tire la droite avec le carré de l'écart : 0,6 → 2,6.
+5. Pourquoi R² monte toujours ? → Témoin β = 0 : RSS ne peut pas monter.
+6. Comment lis-tu β̂₁ = 0,0475 ? → +47,5 ventes en moyenne par millier d'euros, toutes choses égales, corrélation.
+
+## Ce qui a cassé pour Salah
+- Erreur récurrente : β̂₀ = ȳ au lieu de ȳ − β̂₁x̄ (learnings) — pas 4, écrit en clair et chiffré (2,2, pas 4).
+- ISLR ch. 3 : H₀ sur l'estimateur au lieu du paramètre — pas ici (p01-02, p01-03), mais le pas 8 doit dire « SE 0,0027 » en renvoyant à p01-03, pas refaire le test.
+- Q3 (témoin, R²) réussie : pas 7 renvoie à b02 sans redémontrer.
+- Scorie : estimateurs sans chapeau — chaque β̂ chapeauté.
+
+## Exclusions
+Pas de leverage/Cook au-delà du nom, pas de régression multiple au-delà de « p colonnes, toutes choses égales », pas d'interactions, pas de tests F.
