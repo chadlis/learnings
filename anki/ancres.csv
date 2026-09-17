@@ -1,0 +1,200 @@
+tag;id;titre;url;ancre
+algebre::affine;p04-01;Une matrice est une action;https://learnings-ek5.pages.dev/sheets/chains/chain-p04-01-matrice-action.html#s7;s7
+algebre::conditionnement;b06;Convexité et forme fermée;https://learnings-ek5.pages.dev/sheets/bridges/bridge-06-convexite-forme-fermee.html;
+algebre::conditionnement;p04-03;Spectral, SVD, conditionnement;https://learnings-ek5.pages.dev/sheets/chains/chain-p04-03-spectral-svd-conditionnement.html#s6;s6
+algebre::diagonalisation;p04-02;Valeurs propres et itération;https://learnings-ek5.pages.dev/sheets/chains/chain-p04-02-valeurs-propres-iteration.html;
+algebre::eigen;p02-02;Du prior à la pénalité;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-02-prior-penalite.html;
+algebre::eigen;p03-02;Gradient et descente;https://learnings-ek5.pages.dev/sheets/chains/chain-p03-02-gradient-descente.html;
+algebre::eigen;p04-02;Valeurs propres et itération;https://learnings-ek5.pages.dev/sheets/chains/chain-p04-02-valeurs-propres-iteration.html;
+algebre::markov;p04-02;Valeurs propres et itération;https://learnings-ek5.pages.dev/sheets/chains/chain-p04-02-valeurs-propres-iteration.html;
+algebre::matrice-action;p04-01;Une matrice est une action;https://learnings-ek5.pages.dev/sheets/chains/chain-p04-01-matrice-action.html;
+algebre::noyau;p04-01;Une matrice est une action;https://learnings-ek5.pages.dev/sheets/chains/chain-p04-01-matrice-action.html#s5;s5
+algebre::power-iteration;p04-02;Valeurs propres et itération;https://learnings-ek5.pages.dev/sheets/chains/chain-p04-02-valeurs-propres-iteration.html;
+algebre::spectral;p04-03;Spectral, SVD, conditionnement;https://learnings-ek5.pages.dev/sheets/chains/chain-p04-03-spectral-svd-conditionnement.html#s2;s2
+algebre::spectral;p04-04;PCA, diagonaliser la covariance;https://learnings-ek5.pages.dev/sheets/chains/chain-p04-04-pca.html;
+algebre::svd;p04-03;Spectral, SVD, conditionnement;https://learnings-ek5.pages.dev/sheets/chains/chain-p04-03-spectral-svd-conditionnement.html;
+algebre::temoin;b02;Le témoin atteignable;https://learnings-ek5.pages.dev/sheets/bridges/bridge-02-temoin-atteignable.html;
+algebre::temoin;p04-01;Une matrice est une action;https://learnings-ek5.pages.dev/sheets/chains/chain-p04-01-matrice-action.html#s8;s8
+algebre::valeurs-singulieres;p04-03;Spectral, SVD, conditionnement;https://learnings-ek5.pages.dev/sheets/chains/chain-p04-03-spectral-svd-conditionnement.html;
+analyse::chain-rule;p08-01;Jacobienne, chain rule, backprop;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-01-jacobienne-chain-rule-backprop.html#s3;s3
+analyse::gradient-jacobienne;p03-02;Gradient et descente;https://learnings-ek5.pages.dev/sheets/chains/chain-p03-02-gradient-descente.html;
+analyse::gradient-jacobienne;p08-01;Jacobienne, chain rule, backprop;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-01-jacobienne-chain-rule-backprop.html;
+coding::3sum;c02;Deux pointeurs — éliminer une classe à chaque pas;https://learnings-ek5.pages.dev/sheets/coding/coding-02-deux-pointeurs.html#s5;s5
+coding::amortissement;c01;Fenêtre glissante — fixe, variable, avec budget;https://learnings-ek5.pages.dev/sheets/coding/coding-01-fenetre-glissante.html#s4;s4
+coding::arbres;c05;Arbres — récursion, parcours, bornes;https://learnings-ek5.pages.dev/sheets/coding/coding-05-arbres.html;
+coding::balayage;c08;Intervals — trier par début, garder le dernier fusionné;https://learnings-ek5.pages.dev/sheets/coding/coding-08-intervals.html;
+coding::bfs;c05;Arbres — récursion, parcours, bornes;https://learnings-ek5.pages.dev/sheets/coding/coding-05-arbres.html;
+coding::bfs;c06;Graphes — marquer à l'enfilement;https://learnings-ek5.pages.dev/sheets/coding/coding-06-graphes.html;
+coding::binary-search;c03;Binary search — le premier vrai;https://learnings-ek5.pages.dev/sheets/coding/coding-03-binary-search.html;
+coding::bst;c05;Arbres — récursion, parcours, bornes;https://learnings-ek5.pages.dev/sheets/coding/coding-05-arbres.html;
+coding::bucket-sort;c07;Heap — le minimum est le seuil d'entrée;https://learnings-ek5.pages.dev/sheets/coding/coding-07-heap.html;
+coding::complexite;c00;TAP — invariant, variant, conclusion, complexité;https://learnings-ek5.pages.dev/sheets/coding/coding-00-tap-invariant-variant.html#s5;s5
+coding::deux-pointeurs;c01;Fenêtre glissante — fixe, variable, avec budget;https://learnings-ek5.pages.dev/sheets/coding/coding-01-fenetre-glissante.html;
+coding::deux-pointeurs;c02;Deux pointeurs — éliminer une classe à chaque pas;https://learnings-ek5.pages.dev/sheets/coding/coding-02-deux-pointeurs.html#s5;s5
+coding::dfs;c05;Arbres — récursion, parcours, bornes;https://learnings-ek5.pages.dev/sheets/coding/coding-05-arbres.html;
+coding::dfs;c06;Graphes — marquer à l'enfilement;https://learnings-ek5.pages.dev/sheets/coding/coding-06-graphes.html;
+coding::dp;c09;DP 1D — un sous-problème par position;https://learnings-ek5.pages.dev/sheets/coding/coding-09-dp-1d.html;
+coding::dummy-head;c04;Listes chaînées — pointeurs qui se suivent;https://learnings-ek5.pages.dev/sheets/coding/coding-04-listes-chainees.html;
+coding::elimination;c02;Deux pointeurs — éliminer une classe à chaque pas;https://learnings-ek5.pages.dev/sheets/coding/coding-02-deux-pointeurs.html#s3;s3
+coding::fenetre-glissante;c01;Fenêtre glissante — fixe, variable, avec budget;https://learnings-ek5.pages.dev/sheets/coding/coding-01-fenetre-glissante.html;
+coding::graphes;c06;Graphes — marquer à l'enfilement;https://learnings-ek5.pages.dev/sheets/coding/coding-06-graphes.html;
+coding::heap;c07;Heap — le minimum est le seuil d'entrée;https://learnings-ek5.pages.dev/sheets/coding/coding-07-heap.html;
+coding::intervals;c08;Intervals — trier par début, garder le dernier fusionné;https://learnings-ek5.pages.dev/sheets/coding/coding-08-intervals.html;
+coding::invariant;c00;TAP — invariant, variant, conclusion, complexité;https://learnings-ek5.pages.dev/sheets/coding/coding-00-tap-invariant-variant.html#s2;s2
+coding::kadane;c09;DP 1D — un sous-problème par position;https://learnings-ek5.pages.dev/sheets/coding/coding-09-dp-1d.html;
+coding::lent-rapide;c04;Listes chaînées — pointeurs qui se suivent;https://learnings-ek5.pages.dev/sheets/coding/coding-04-listes-chainees.html#s5;s5
+coding::listes-chainees;c04;Listes chaînées — pointeurs qui se suivent;https://learnings-ek5.pages.dev/sheets/coding/coding-04-listes-chainees.html;
+coding::monotone;c03;Binary search — le premier vrai;https://learnings-ek5.pages.dev/sheets/coding/coding-03-binary-search.html;
+coding::recherche-sur-reponse;c03;Binary search — le premier vrai;https://learnings-ek5.pages.dev/sheets/coding/coding-03-binary-search.html;
+coding::recurrence;c09;DP 1D — un sous-problème par position;https://learnings-ek5.pages.dev/sheets/coding/coding-09-dp-1d.html;
+coding::tap;c00;TAP — invariant, variant, conclusion, complexité;https://learnings-ek5.pages.dev/sheets/coding/coding-00-tap-invariant-variant.html;
+coding::top-k;c07;Heap — le minimum est le seuil d'entrée;https://learnings-ek5.pages.dev/sheets/coding/coding-07-heap.html;
+coding::topo;c06;Graphes — marquer à l'enfilement;https://learnings-ek5.pages.dev/sheets/coding/coding-06-graphes.html;
+coding::tri;c08;Intervals — trier par début, garder le dernier fusionné;https://learnings-ek5.pages.dev/sheets/coding/coding-08-intervals.html;
+dl::backprop;b01;Une seule descente;https://learnings-ek5.pages.dev/sheets/bridges/bridge-01-une-seule-descente.html;
+dl::backprop;p08-01;Jacobienne, chain rule, backprop;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-01-jacobienne-chain-rule-backprop.html#s6;s6
+dl::cross-entropy;p02-01;Du bruit à la loss;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-01-bruit-vraisemblance-loss.html;
+dl::cross-entropy;p03-01;Critère en escalier vs critère sensible;https://learnings-ek5.pages.dev/sheets/chains/chain-p03-01-critere-escalier-vs-sensible.html;
+dl::cross-entropy;p08-03;Cross-entropy, entropie, KL;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-03-cross-entropy-entropie-kl.html;
+dl::log-sum-exp;p08-02;Flottants et log-sum-exp;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-02-flottants-lse.html#s6;s6
+dl::perplexite;p08-03;Cross-entropy, entropie, KL;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-03-cross-entropy-entropie-kl.html;
+dl::softmax-stabilite;p08-02;Flottants et log-sum-exp;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-02-flottants-lse.html;
+dl::vjp;p08-01;Jacobienne, chain rule, backprop;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-01-jacobienne-chain-rule-backprop.html;
+ml::arbres;b05;Escalier vs sensible;https://learnings-ek5.pages.dev/sheets/bridges/bridge-05-escalier-vs-sensible.html;
+ml::arbres;p03-01;Critère en escalier vs critère sensible;https://learnings-ek5.pages.dev/sheets/chains/chain-p03-01-critere-escalier-vs-sensible.html;
+ml::arbres;p07-01;Arbres — impureté, split, profondeur;https://learnings-ek5.pages.dev/sheets/chains/chain-p07-01-arbres-impurete.html;
+ml::bagging;b04;La variance d'une moyenne corrélée;https://learnings-ek5.pages.dev/sheets/bridges/bridge-04-variance-moyenne-correlee.html#s3;s3
+ml::bagging;p07-02;Bagging et forêt aléatoire — la variance seule;https://learnings-ek5.pages.dev/sheets/chains/chain-p07-02-bagging-rf.html;
+ml::biais-variance;b03;Biais et variance partout;https://learnings-ek5.pages.dev/sheets/bridges/bridge-03-biais-variance-partout.html;
+ml::biais-variance;p05-03;Régularisation vue en biais-variance, le chemin de λ;https://learnings-ek5.pages.dev/sheets/chains/chain-p05-03-regularisation-biais-variance.html;
+ml::biais-variance;p06-01;Biais, variance et bruit;https://learnings-ek5.pages.dev/sheets/chains/chain-p06-01-biais-variance.html;
+ml::boosting;b01;Une seule descente;https://learnings-ek5.pages.dev/sheets/bridges/bridge-01-une-seule-descente.html;
+ml::boosting;p07-03;Gradient boosting — une descente dans l'espace des fonctions;https://learnings-ek5.pages.dev/sheets/chains/chain-p07-03-boosting.html#s8;s8
+ml::brier;p06-04;Scores, calibration, déséquilibre;https://learnings-ek5.pages.dev/sheets/chains/chain-p06-04-calibration-desequilibre.html#s4;s4
+ml::calibration;p06-04;Scores, calibration, déséquilibre;https://learnings-ek5.pages.dev/sheets/chains/chain-p06-04-calibration-desequilibre.html;
+ml::cart;p07-01;Arbres — impureté, split, profondeur;https://learnings-ek5.pages.dev/sheets/chains/chain-p07-01-arbres-impurete.html;
+ml::cross-validation;p06-02;Validation croisée, LOOCV et fuite;https://learnings-ek5.pages.dev/sheets/chains/chain-p06-02-cv-leakage.html;
+ml::desequilibre;p06-03;Seuil, matrice de confusion, ROC, PR;https://learnings-ek5.pages.dev/sheets/chains/chain-p06-03-seuil-roc-pr.html;
+ml::desequilibre;p06-04;Scores, calibration, déséquilibre;https://learnings-ek5.pages.dev/sheets/chains/chain-p06-04-calibration-desequilibre.html#s7;s7
+ml::effet-marginal;p05-02;Régression logistique : logit, odds ratio, effet marginal;https://learnings-ek5.pages.dev/sheets/chains/chain-p05-02-logistique.html#s6;s6
+ml::frontiere-lineaire;p05-02;Régression logistique : logit, odds ratio, effet marginal;https://learnings-ek5.pages.dev/sheets/chains/chain-p05-02-logistique.html;
+ml::gini;p07-01;Arbres — impureté, split, profondeur;https://learnings-ek5.pages.dev/sheets/chains/chain-p07-01-arbres-impurete.html;
+ml::gradient-boosting;p07-03;Gradient boosting — une descente dans l'espace des fonctions;https://learnings-ek5.pages.dev/sheets/chains/chain-p07-03-boosting.html;
+ml::inertie;p07-04;k-means — une descente alternée sur l'inertie;https://learnings-ek5.pages.dev/sheets/chains/chain-p07-04-kmeans.html;
+ml::kmeans;b01;Une seule descente;https://learnings-ek5.pages.dev/sheets/bridges/bridge-01-une-seule-descente.html;
+ml::kmeans;b06;Convexité et forme fermée;https://learnings-ek5.pages.dev/sheets/bridges/bridge-06-convexite-forme-fermee.html;
+ml::kmeans;p07-04;k-means — une descente alternée sur l'inertie;https://learnings-ek5.pages.dev/sheets/chains/chain-p07-04-kmeans.html;
+ml::kmeans-plus-plus;p07-04;k-means — une descente alternée sur l'inertie;https://learnings-ek5.pages.dev/sheets/chains/chain-p07-04-kmeans.html;
+ml::lasso;p02-02;Du prior à la pénalité;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-02-prior-penalite.html;
+ml::lasso;p05-03;Régularisation vue en biais-variance, le chemin de λ;https://learnings-ek5.pages.dev/sheets/chains/chain-p05-03-regularisation-biais-variance.html#s5;s5
+ml::leakage;p06-02;Validation croisée, LOOCV et fuite;https://learnings-ek5.pages.dev/sheets/chains/chain-p06-02-cv-leakage.html;
+ml::learning-rate;p03-02;Gradient et descente;https://learnings-ek5.pages.dev/sheets/chains/chain-p03-02-gradient-descente.html;
+ml::learning-rate;p07-03;Gradient boosting — une descente dans l'espace des fonctions;https://learnings-ek5.pages.dev/sheets/chains/chain-p07-03-boosting.html;
+ml::lloyd;p07-04;k-means — une descente alternée sur l'inertie;https://learnings-ek5.pages.dev/sheets/chains/chain-p07-04-kmeans.html#s3;s3
+ml::logistique;b05;Escalier vs sensible;https://learnings-ek5.pages.dev/sheets/bridges/bridge-05-escalier-vs-sensible.html;
+ml::logistique;p02-01;Du bruit à la loss;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-01-bruit-vraisemblance-loss.html;
+ml::logistique;p03-01;Critère en escalier vs critère sensible;https://learnings-ek5.pages.dev/sheets/chains/chain-p03-01-critere-escalier-vs-sensible.html;
+ml::logistique;p05-02;Régression logistique : logit, odds ratio, effet marginal;https://learnings-ek5.pages.dev/sheets/chains/chain-p05-02-logistique.html;
+ml::metriques;p00-03;Conditionnement et Bayes;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-03-conditionnement-bayes.html#s8;s8
+ml::metriques;p06-03;Seuil, matrice de confusion, ROC, PR;https://learnings-ek5.pages.dev/sheets/chains/chain-p06-03-seuil-roc-pr.html;
+ml::odds-ratio;p05-02;Régression logistique : logit, odds ratio, effet marginal;https://learnings-ek5.pages.dev/sheets/chains/chain-p05-02-logistique.html#s4;s4
+ml::ols;p05-01;Régression linéaire, OLS, ce que R² ne dit pas;https://learnings-ek5.pages.dev/sheets/chains/chain-p05-01-regression-modele-ols.html;
+ml::oob;p07-02;Bagging et forêt aléatoire — la variance seule;https://learnings-ek5.pages.dev/sheets/chains/chain-p07-02-bagging-rf.html;
+ml::optimisation;b01;Une seule descente;https://learnings-ek5.pages.dev/sheets/bridges/bridge-01-une-seule-descente.html;
+ml::optimisation;b06;Convexité et forme fermée;https://learnings-ek5.pages.dev/sheets/bridges/bridge-06-convexite-forme-fermee.html;
+ml::optimisation;p03-02;Gradient et descente;https://learnings-ek5.pages.dev/sheets/chains/chain-p03-02-gradient-descente.html;
+ml::optimisation;w03-01;Descente sur un bol allongé;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p03-01-descente-sur-ridge.html;
+ml::overfitting;p06-01;Biais, variance et bruit;https://learnings-ek5.pages.dev/sheets/chains/chain-p06-01-biais-variance.html;
+ml::pca;p04-04;PCA, diagonaliser la covariance;https://learnings-ek5.pages.dev/sheets/chains/chain-p04-04-pca.html;
+ml::precision-rappel;p06-03;Seuil, matrice de confusion, ROC, PR;https://learnings-ek5.pages.dev/sheets/chains/chain-p06-03-seuil-roc-pr.html;
+ml::profondeur;p07-01;Arbres — impureté, split, profondeur;https://learnings-ek5.pages.dev/sheets/chains/chain-p07-01-arbres-impurete.html#s5;s5
+ml::r2;p05-01;Régression linéaire, OLS, ce que R² ne dit pas;https://learnings-ek5.pages.dev/sheets/chains/chain-p05-01-regression-modele-ols.html;
+ml::random-forest;p07-02;Bagging et forêt aléatoire — la variance seule;https://learnings-ek5.pages.dev/sheets/chains/chain-p07-02-bagging-rf.html;
+ml::regression-lineaire;b06;Convexité et forme fermée;https://learnings-ek5.pages.dev/sheets/bridges/bridge-06-convexite-forme-fermee.html;
+ml::regression-lineaire;p01-03;Inférence en régression;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-03-inference-regression.html;
+ml::regression-lineaire;p02-01;Du bruit à la loss;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-01-bruit-vraisemblance-loss.html;
+ml::regression-lineaire;p05-01;Régression linéaire, OLS, ce que R² ne dit pas;https://learnings-ek5.pages.dev/sheets/chains/chain-p05-01-regression-modele-ols.html;
+ml::regression-lineaire;w01-05;La chaîne du test en régression, hypothèse par hypothèse;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p01-05-chaine-test-regression-hypotheses.html;
+ml::regularisation;b03;Biais et variance partout;https://learnings-ek5.pages.dev/sheets/bridges/bridge-03-biais-variance-partout.html;
+ml::regularisation;p05-03;Régularisation vue en biais-variance, le chemin de λ;https://learnings-ek5.pages.dev/sheets/chains/chain-p05-03-regularisation-biais-variance.html;
+ml::rf-vs-gb;p07-03;Gradient boosting — une descente dans l'espace des fonctions;https://learnings-ek5.pages.dev/sheets/chains/chain-p07-03-boosting.html;
+ml::ridge;b06;Convexité et forme fermée;https://learnings-ek5.pages.dev/sheets/bridges/bridge-06-convexite-forme-fermee.html#s2;s2
+ml::ridge;p02-02;Du prior à la pénalité;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-02-prior-penalite.html;
+ml::ridge;p05-03;Régularisation vue en biais-variance, le chemin de λ;https://learnings-ek5.pages.dev/sheets/chains/chain-p05-03-regularisation-biais-variance.html#s2;s2
+ml::roc-auc;p06-03;Seuil, matrice de confusion, ROC, PR;https://learnings-ek5.pages.dev/sheets/chains/chain-p06-03-seuil-roc-pr.html;
+ml::seuil;p06-04;Scores, calibration, déséquilibre;https://learnings-ek5.pages.dev/sheets/chains/chain-p06-04-calibration-desequilibre.html;
+ml::standardisation;p04-04;PCA, diagonaliser la covariance;https://learnings-ek5.pages.dev/sheets/chains/chain-p04-04-pca.html;
+ml::svm;b05;Escalier vs sensible;https://learnings-ek5.pages.dev/sheets/bridges/bridge-05-escalier-vs-sensible.html;
+ml::svm;p03-01;Critère en escalier vs critère sensible;https://learnings-ek5.pages.dev/sheets/chains/chain-p03-01-critere-escalier-vs-sensible.html;
+ml::validation;b02;Le témoin atteignable;https://learnings-ek5.pages.dev/sheets/bridges/bridge-02-temoin-atteignable.html;
+ml::validation;b03;Biais et variance partout;https://learnings-ek5.pages.dev/sheets/bridges/bridge-03-biais-variance-partout.html;
+ml::validation;b04;La variance d'une moyenne corrélée;https://learnings-ek5.pages.dev/sheets/bridges/bridge-04-variance-moyenne-correlee.html;
+ml::validation;p01-04;Comparer deux modèles, et pourquoi le max ment;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-04-comparer-modeles-multiplicite.html#s7;s7
+ml::validation;p06-01;Biais, variance et bruit;https://learnings-ek5.pages.dev/sheets/chains/chain-p06-01-biais-variance.html;
+ml::validation;p06-02;Validation croisée, LOOCV et fuite;https://learnings-ek5.pages.dev/sheets/chains/chain-p06-02-cv-leakage.html;
+ml::variance-correlee;p07-02;Bagging et forêt aléatoire — la variance seule;https://learnings-ek5.pages.dev/sheets/chains/chain-p07-02-bagging-rf.html;
+python::broadcasting;p08-04;Tenseurs : ruban, strides, vue vs copie, broadcasting;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-04-tenseurs-ruban-strides-broadcasting.html#s5;s5
+python::dtypes;p08-02;Flottants et log-sum-exp;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-02-flottants-lse.html#s8;s8
+python::flottants;p08-02;Flottants et log-sum-exp;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-02-flottants-lse.html#s4;s4
+python::keepdim;p08-04;Tenseurs : ruban, strides, vue vs copie, broadcasting;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-04-tenseurs-ruban-strides-broadcasting.html;
+python::strides;p08-04;Tenseurs : ruban, strides, vue vs copie, broadcasting;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-04-tenseurs-ruban-strides-broadcasting.html;
+python::tenseurs;p08-04;Tenseurs : ruban, strides, vue vs copie, broadcasting;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-04-tenseurs-ruban-strides-broadcasting.html;
+stats::base-rate;p00-03;Conditionnement et Bayes;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-03-conditionnement-bayes.html;
+stats::bayes;p00-03;Conditionnement et Bayes;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-03-conditionnement-bayes.html#s5;s5
+stats::bayes;p02-03;Le posterior entier;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-03-conjugues-posterior.html;
+stats::bessel;p01-03;Inférence en régression;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-03-inference-regression.html;
+stats::beta;p02-03;Le posterior entier;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-03-conjugues-posterior.html;
+stats::binomiale;p00-01;Lois usuelles — quelle situation déclenche quelle loi;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-01-lois-quand-laquelle.html#s3;s3
+stats::binomiale;p01-01;L'objet aléatoire;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-01-objet-aleatoire.html;
+stats::bootstrap;b04;La variance d'une moyenne corrélée;https://learnings-ek5.pages.dev/sheets/bridges/bridge-04-variance-moyenne-correlee.html;
+stats::bootstrap;p01-05;Bootstrap, la distribution d'échantillonnage sans formule;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-05-bootstrap.html;
+stats::comparaison;p01-04;Comparer deux modèles, et pourquoi le max ment;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-04-comparer-modeles-multiplicite.html;
+stats::comparaison;w01-02;Comparer deux modèles sur le même tirage;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p01-02-comparer-deux-modeles.html;
+stats::conditionnement;p00-03;Conditionnement et Bayes;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-03-conditionnement-bayes.html;
+stats::covariance;p00-02;Espérance, variance, masse vs densité;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-02-esperance-variance-densite.html;
+stats::densite;p00-02;Espérance, variance, masse vs densité;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-02-esperance-variance-densite.html#s7;s7
+stats::entropie;p08-03;Cross-entropy, entropie, KL;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-03-cross-entropy-entropie-kl.html#s4;s4
+stats::esperance;p00-02;Espérance, variance, masse vs densité;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-02-esperance-variance-densite.html;
+stats::estimation;b03;Biais et variance partout;https://learnings-ek5.pages.dev/sheets/bridges/bridge-03-biais-variance-partout.html#s5;s5
+stats::estimation;p01-01;L'objet aléatoire;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-01-objet-aleatoire.html;
+stats::estimation;p01-03;Inférence en régression;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-03-inference-regression.html;
+stats::estimation;w01-04;De l'accuracy au SE en quatre maillons;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p01-04-accuracy-vers-se.html;
+stats::estimation;w01-05;La chaîne du test en régression, hypothèse par hypothèse;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p01-05-chaine-test-regression-hypotheses.html;
+stats::exponentielle;p00-01;Lois usuelles — quelle situation déclenche quelle loi;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-01-lois-quand-laquelle.html#s5;s5
+stats::h0;p01-02;Intervalle de confiance et test;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-02-ic-test-procedure.html;
+stats::ic;p01-02;Intervalle de confiance et test;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-02-ic-test-procedure.html;
+stats::ic;w01-01;L’intervalle porte sur la procédure;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p01-01-intervalle-procedure.html;
+stats::inference;p01-01;L'objet aléatoire;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-01-objet-aleatoire.html;
+stats::inference;p01-02;Intervalle de confiance et test;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-02-ic-test-procedure.html;
+stats::inference;p01-03;Inférence en régression;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-03-inference-regression.html;
+stats::inference;p01-04;Comparer deux modèles, et pourquoi le max ment;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-04-comparer-modeles-multiplicite.html;
+stats::inference;p01-05;Bootstrap, la distribution d'échantillonnage sans formule;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-05-bootstrap.html;
+stats::inference;w01-05;La chaîne du test en régression, hypothèse par hypothèse;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p01-05-chaine-test-regression-hypotheses.html;
+stats::kl;p08-03;Cross-entropy, entropie, KL;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-03-cross-entropy-entropie-kl.html;
+stats::lgn;p00-04;Moyenne, loi des grands nombres, théorème central limite;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-04-moyenne-lgn-tcl.html;
+stats::lois;p00-01;Lois usuelles — quelle situation déclenche quelle loi;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-01-lois-quand-laquelle.html;
+stats::map;p02-02;Du prior à la pénalité;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-02-prior-penalite.html;
+stats::map;p02-03;Le posterior entier;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-03-conjugues-posterior.html;
+stats::mle;p02-01;Du bruit à la loss;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-01-bruit-vraisemblance-loss.html;
+stats::mle-map;p02-03;Le posterior entier;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-03-conjugues-posterior.html;
+stats::multiplicite;b02;Le témoin atteignable;https://learnings-ek5.pages.dev/sheets/bridges/bridge-02-temoin-atteignable.html;
+stats::multiplicite;p01-04;Comparer deux modèles, et pourquoi le max ment;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-04-comparer-modeles-multiplicite.html;
+stats::multiplicite;w01-03;Le biais du max;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p01-03-biais-du-max.html;
+stats::normale;p00-01;Lois usuelles — quelle situation déclenche quelle loi;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-01-lois-quand-laquelle.html#s6;s6
+stats::normale;p00-04;Moyenne, loi des grands nombres, théorème central limite;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-04-moyenne-lgn-tcl.html#s6;s6
+stats::poisson;p00-01;Lois usuelles — quelle situation déclenche quelle loi;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-01-lois-quand-laquelle.html#s4;s4
+stats::procedure;w01-05;La chaîne du test en régression, hypothèse par hypothèse;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p01-05-chaine-test-regression-hypotheses.html;
+stats::pvalue;p01-02;Intervalle de confiance et test;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-02-ic-test-procedure.html;
+stats::pvalue;w01-05;La chaîne du test en régression, hypothèse par hypothèse;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p01-05-chaine-test-regression-hypotheses.html;
+stats::regularisation;b05;Escalier vs sensible;https://learnings-ek5.pages.dev/sheets/bridges/bridge-05-escalier-vs-sensible.html;
+stats::regularisation;p02-02;Du prior à la pénalité;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-02-prior-penalite.html;
+stats::regularisation;p03-01;Critère en escalier vs critère sensible;https://learnings-ek5.pages.dev/sheets/chains/chain-p03-01-critere-escalier-vs-sensible.html;
+stats::regularisation;w02-01;Une chaîne, trois exemples;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html;
+stats::residus;p05-01;Régression linéaire, OLS, ce que R² ne dit pas;https://learnings-ek5.pages.dev/sheets/chains/chain-p05-01-regression-modele-ols.html#s5;s5
+stats::se;p00-04;Moyenne, loi des grands nombres, théorème central limite;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-04-moyenne-lgn-tcl.html;
+stats::tcl;p00-04;Moyenne, loi des grands nombres, théorème central limite;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-04-moyenne-lgn-tcl.html;
+stats::tcl;p01-01;L'objet aléatoire;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-01-objet-aleatoire.html;
+stats::variance;b04;La variance d'une moyenne corrélée;https://learnings-ek5.pages.dev/sheets/bridges/bridge-04-variance-moyenne-correlee.html;
+stats::variance;p00-02;Espérance, variance, masse vs densité;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-02-esperance-variance-densite.html;
+stats::vraisemblance;p02-01;Du bruit à la loss;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-01-bruit-vraisemblance-loss.html;
+stats::vraisemblance;w02-01;Une chaîne, trois exemples;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html;

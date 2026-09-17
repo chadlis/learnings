@@ -16,6 +16,10 @@ hooks:
 test:
 	@sh tools/run_tests.sh
 
+## anki : régénère anki/ancres.csv (tag → sheet → ancre, à coller dans le champ Extra)
+anki:
+	@$(PYTHON) tools/build_anki.py
+
 ## links : vérifie que tout href interne pointe sur un fichier et une ancre qui existent
 links:
 	@$(PYTHON) tools/check_links.py
@@ -27,4 +31,4 @@ check:
 		echo "index.html/sw.js ne sont pas à jour : lance 'make index' et committe."; exit 1; }
 	@echo "index à jour."
 
-.PHONY: index hooks test links check
+.PHONY: index hooks test anki links check
