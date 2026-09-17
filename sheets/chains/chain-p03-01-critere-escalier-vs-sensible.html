@@ -267,7 +267,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 </div>
 
 
-<div class="step" id="s4b">
+<div class="step" id="s5">
   <div class="rule">
     <h3>Pourquoi c'est légitime : un surrogate</h3>
     <p>On n'optimise pas l'impureté pour elle-même. Elle mesure le <b>progrès intermédiaire</b> vers une feuille pure, et chaque dôme est une loss connue lue au niveau du nœud : l'entropie d'un nœud est la <b>log-loss</b> moyenne de la prédiction « proportions du nœud », Gini est son <b>score de Brier</b>. Les deux sont indépendantes d'un seuil de décision — l'accuracy ne l'est pas.</p>
@@ -279,7 +279,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   </div>
 </div>
 
-<div class="step" id="s5">
+<div class="step" id="s6">
   <div class="rule">
     <h3>Le même argument, écrit en pente</h3>
     <p>Reformulé pour qu'il se transporte : la variation d'un critère sous une petite amélioration est sa <b>dérivée</b>. Une fonction en marches a une dérivée nulle presque partout — aucun signal entre deux marches. Une fonction strictement concave (ou convexe) et dérivable a une dérivée qui change continûment : chaque amélioration, même petite, déplace le critère.</p>
@@ -298,7 +298,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   </div>
 </div>
 
-<div class="step" id="s6">
+<div class="step" id="s7">
   <div class="rule">
     <h3>Habit 2 — la loss d'un classifieur</h3>
     <p>Marge <span class="m">m</span> = <span class="m">y</span>·<span class="m">z</span> avec <span class="m">z</span> = <span class="m">β</span><sup>⊤</sup><span class="m">x</span> et <span class="m">y</span> ∈ {−1,+1} : positive si bien classé, négative sinon.</p>
@@ -321,7 +321,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   </div>
 </div>
 
-<div class="step" id="s7">
+<div class="step" id="s8">
   <div class="rule">
     <h3>Habit 3 — la pénalité</h3>
     <p>Minimiser <span class="m">L</span>(<span class="m">θ</span>) + <span class="m">λ</span>·pen(<span class="m">θ</span>) — la loss <b>sans ½</b>, la pénalité pesée par <span class="m">λ</span> seul. La force de rappel vers 0 est la dérivée de la pénalité :</p>
@@ -351,7 +351,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   </div>
 </div>
 
-<div class="step" id="s8">
+<div class="step" id="s9">
   <div class="rule">
     <h3>Habit 4 — la marge (demi-chaîne SVM)</h3>
     <p>SVM linéaire : minimiser ½‖<span class="m">w</span>‖² + <span class="m">C</span> Σ<sub><span class="m">i</span></sub> max(0, 1 − <span class="m">y</span><sub><span class="m">i</span></sub>(<span class="m">w</span><sup>⊤</sup><span class="m">x</span><sub><span class="m">i</span></sub> + <span class="m">b</span>)). La marge géométrique vaut 2/‖<span class="m">w</span>‖ : minimiser ‖<span class="m">w</span>‖ l'élargit.</p>
@@ -378,7 +378,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   </div>
 </div>
 
-<div class="step" id="s9">
+<div class="step" id="s10">
   <div class="rule">
     <h3>Où ça casse <span class="tag casse">casse</span></h3>
     <p>« Sensible » n'est pas « meilleur partout ».</p>

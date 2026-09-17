@@ -163,7 +163,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <ol>
     <li><a href="../../map.html#p04-01">p04-01 · Matrice = application linéaire</a></li>
     <li><a href="chain-p03-02-gradient-descente.html#s2">p03-02 · Pourquoi −∇<span class="m">L</span></a></li>
-    <li><a href="chain-p03-01-critere-escalier-vs-sensible.html#s6">p03-01 · La compensation <span class="m">p</span> − <span class="m">y</span></a></li>
+    <li><a href="chain-p03-01-critere-escalier-vs-sensible.html#s7">p03-01 · La compensation <span class="m">p</span> − <span class="m">y</span></a></li>
   </ol>
   <h4>Cartes Anki liées</h4>
   <div class="tags"><code>analyse::gradient-jacobienne</code><code>analyse::chain-rule</code><code>dl::backprop</code><code>dl::vjp</code></div>
@@ -182,7 +182,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <li><b>Une matrice est une application linéaire.</b> Le produit matriciel est la <i>composition</i> de deux applications, et multiplier une (<span class="m">m</span>×<span class="m">k</span>) par une (<span class="m">k</span>×<span class="m">n</span>) coûte <span class="m">m</span>·<span class="m">k</span>·<span class="m">n</span> multiplications (<a href="../../map.html#p04-01">p04-01</a>, fiche à venir).</li>
       <li><b>Le gradient est la direction de plus forte pente</b> et on descend en −<span class="m">η</span>∇<span class="m">L</span> (<a href="chain-p03-02-gradient-descente.html#s2">p03-02, pas 2</a>). <b>Cette chaîne-ci calcule le gradient ; p03-02 l'utilise.</b> Ne pas confondre les deux moitiés d'une itération.</li>
       <li><b>La dérivée d'une fonction <span class="m">R</span> → <span class="m">R</span> est une pente locale</b> : <span class="m">f</span>(<span class="m">x</span> + <span class="m">δ</span>) ≈ <span class="m">f</span>(<span class="m">x</span>) + <span class="m">f</span>′(<span class="m">x</span>)<span class="m">δ</span>. Tout le pas 2 consiste à lire ce « ≈ » en dimension quelconque.</li>
-      <li><b>La compensation −1/<span class="m">p</span> contre <span class="m">p</span>(1−<span class="m">p</span>).</b> Déjà rencontrée comme « pourquoi la log-loss a un gradient sain » (<a href="chain-p03-01-critere-escalier-vs-sensible.html#s6">p03-01, pas 6</a>) ; ici elle devient un produit de jacobiennes.</li>
+      <li><b>La compensation −1/<span class="m">p</span> contre <span class="m">p</span>(1−<span class="m">p</span>).</b> Déjà rencontrée comme « pourquoi la log-loss a un gradient sain » (<a href="chain-p03-01-critere-escalier-vs-sensible.html#s7">p03-01, pas 7</a>) ; ici elle devient un produit de jacobiennes.</li>
     </ul>
   </div>
 </section>
@@ -262,7 +262,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <div class="step" id="s4">
   <div class="rule">
     <h3>Sur le neurone : chaque facteur a un sens</h3>
-    <p>Trois facteurs, trois lectures. ∂<span class="m">L</span>/∂<span class="m">p</span> = −1/<span class="m">p</span> : le log <b>punit les petites probabilités</b>, et d'autant plus fort qu'elles sont petites. ∂<span class="m">p</span>/∂<span class="m">z</span> = <span class="m">p</span>(1−<span class="m">p</span>) : la sigmoïde <b>écrase aux extrêmes</b>, au plus ¼ au centre. Leur produit vaut exactement <span class="m">p</span> − <span class="m">y</span> : les deux se compensent (<a href="chain-p03-01-critere-escalier-vs-sensible.html#s6">p03-01, pas 6</a>).</p>
+    <p>Trois facteurs, trois lectures. ∂<span class="m">L</span>/∂<span class="m">p</span> = −1/<span class="m">p</span> : le log <b>punit les petites probabilités</b>, et d'autant plus fort qu'elles sont petites. ∂<span class="m">p</span>/∂<span class="m">z</span> = <span class="m">p</span>(1−<span class="m">p</span>) : la sigmoïde <b>écrase aux extrêmes</b>, au plus ¼ au centre. Leur produit vaut exactement <span class="m">p</span> − <span class="m">y</span> : les deux se compensent (<a href="chain-p03-01-critere-escalier-vs-sensible.html#s7">p03-01, pas 7</a>).</p>
     <p>Reste ∂<span class="m">z</span>/∂<span class="m">w</span> = <span class="m">x</span> : le gradient d'un poids est <b>signal d'erreur × entrée</b>.</p>
     <p class="say">« Le gradient d'un poids est le gradient de sa sortie fois son entrée, donc une entrée nulle n'apprend rien, donc un signal d'erreur nul n'apprend rien. »</p>
   </div>
@@ -438,7 +438,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
   <div class="bridges">
     <a href="../../map.html#b01"><b>b01 — Une seule descente</b><small>ce que le gradient calculé ici sert à faire : le −η∇ est le même geste sur β, sur une fonction (boosting), sur des centroïdes</small></a>
-    <a href="chain-p03-01-critere-escalier-vs-sensible.html#s6"><b>p03-01, pas 6 — la compensation</b><small>« −1/p annule p(1−p) » y est un argument sur la pente d'une loss ; ici c'est un produit de deux jacobiennes, et la figure 3 le montre comme une somme de logarithmes</small></a>
+    <a href="chain-p03-01-critere-escalier-vs-sensible.html#s7"><b>p03-01, pas 6 — la compensation</b><small>« −1/p annule p(1−p) » y est un argument sur la pente d'une loss ; ici c'est un produit de deux jacobiennes, et la figure 3 le montre comme une somme de logarithmes</small></a>
     <a href="chain-p03-02-gradient-descente.html#s2"><b>p03-02, pas 2 — pourquoi −∇L</b><small>l'autre moitié de l'itération : cette chaîne fabrique le gradient, celle-là décide du pas</small></a>
     <a href="../../map.html#p08-02"><b>p08-02 — Flottants et log-sum-exp</b><small>ce que devient −log p quand p est un flottant : la même expression, mais calculée sans jamais former p</small></a>
   </div>

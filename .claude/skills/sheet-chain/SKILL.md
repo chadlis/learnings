@@ -30,6 +30,8 @@ Une sheet est une **chaîne d'enchaînements** que Salah relit de temps en temps
 | `#links` | ponts (titre + en quoi c'est le même mécanisme) et tags Anki commentés |
 | `footer` | id, version, date, prérequis, suite |
 
+Les pas portent les ids `s1`…`sN`, consécutifs : le numéro affiché vient d'un compteur CSS, donc **un pas inséré après coup est renuméroté, jamais suffixé** (`s4b` décale les ancres par rapport à ce que le lecteur voit et fait mentir tout lien entrant). Renuméroter impose de reprendre les liens entrants : `grep -rn 'chain-<id>[^"]*#s' sheets/`. Le validateur refuse une suite non consécutive.
+
 Séries : `chain` (ci-dessus) · `walkthrough` (une seule colonne de marches règle | calcul, onglets si plusieurs exemples, `SL.stepper`) · `bridge` (une figure du mécanisme, une ligne par domaine avec lien vers le pas exact) · `coding` (signal → pattern → invariant/variant → `SL.trace` → complexité → pièges ; jamais la solution complète).
 
 ## Règles d'écriture

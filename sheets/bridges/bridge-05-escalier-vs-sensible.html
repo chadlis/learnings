@@ -205,10 +205,10 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <p><b>Ce que chaque ligne explique — et où c'est écrit :</b></p>
     <ul>
       <li><b>Split</b> — CART ne coupe pas à l'accuracy ; l'impureté est un surrogate. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s2">p03-01 pas 2–5</a> · <a href="../../map.html#p07-01">p07-01</a></li>
-      <li><b>Loss</b> — gradient (<span class="m">p</span> − <span class="m">y</span>)<span class="m">x</span> jamais nul ; séparation parfaite. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s6">p03-01 pas 7</a> · <a href="../../map.html#p05-02">p05-02</a> · <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a></li>
-      <li><b>Pénalité</b> — zéros exacts du Lasso ; coude = mur. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s7">p03-01 pas 8</a> · <a href="../chains/chain-p02-02-prior-penalite.html#s6">p02-02 pas 6</a></li>
-      <li><b>SVM</b> — vecteurs de support. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s8">p03-01 pas 9</a></li>
-      <li><b>Évaluation</b> — on <b>évalue</b> en marches, on n'<b>apprend</b> pas avec. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s9">p03-01 casse</a> · <a href="../../map.html#p06-03">p06-03</a></li>
+      <li><b>Loss</b> — gradient (<span class="m">p</span> − <span class="m">y</span>)<span class="m">x</span> jamais nul ; séparation parfaite. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s7">p03-01 pas 7</a> · <a href="../../map.html#p05-02">p05-02</a> · <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a></li>
+      <li><b>Pénalité</b> — zéros exacts du Lasso ; coude = mur. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s8">p03-01 pas 8</a> · <a href="../chains/chain-p02-02-prior-penalite.html#s6">p02-02 pas 6</a></li>
+      <li><b>SVM</b> — vecteurs de support. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s9">p03-01 pas 9</a></li>
+      <li><b>Évaluation</b> — on <b>évalue</b> en marches, on n'<b>apprend</b> pas avec. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s10">p03-01 casse</a> · <a href="../../map.html#p06-03">p06-03</a></li>
     </ul>
     <p>Les colonnes 2 et 3 sont tout le travail de lecture. <b>Nommer ce qui bouge</b> vient en premier : tant qu'on ne l'a pas nommé, il n'y a pas de pente à regarder, et la table ne s'applique pas.</p>
   </div>
@@ -259,7 +259,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     </table>
     <p>Colonne 3 : rien, jamais. Colonne 5 : quelque chose, toujours. C'est la ligne entière de la table, en deux colonnes.</p>
     <p>La pente est négative en <span class="m">m</span> : descendre la loss, c'est <b>monter la marge</b>. Et comme elle ne s'annule jamais, un jeu séparable n'a pas de minimum atteignable — la pénalité le rend existant.</p>
-    <p><b>Où c'est écrit</b> : <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s6">p03-01 pas 7</a> (les deux étages de la chain rule, et pourquoi la MSE échoue là où la log-loss réussit) · <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a> et <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4 exemple 2</a> pour la séparation parfaite · <a href="../../map.html#p05-02">p05-02</a>.</p>
+    <p><b>Où c'est écrit</b> : <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s7">p03-01 pas 7</a> (les deux étages de la chain rule, et pourquoi la MSE échoue là où la log-loss réussit) · <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a> et <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4 exemple 2</a> pour la séparation parfaite · <a href="../../map.html#p05-02">p05-02</a>.</p>
   </div>
 </div>
 
@@ -282,7 +282,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr><td>8</td><td>0,111</td><td>0</td></tr>
     </table>
     <p>À <span class="m">λ</span> = 8, L2 est encore à 0,111 : quatre fois plus de pénalité que le seuil de L1, et toujours pas de zéro. Sur <span class="m">p</span> paramètres, c'est la sélection de variables du Lasso — et l'absence de sélection de la ridge.</p>
-    <p><b>Où c'est écrit</b> : <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s7">p03-01 pas 8</a> · <a href="../chains/chain-p02-02-prior-penalite.html#s6">p02-02 pas 6</a> (L1 tranche ailleurs : le même coude, vu depuis le prior de Laplace). La convention sans ½ est celle du dépôt : un ½ déplacerait tous les seuils en <span class="m">λ</span> d'un facteur 2.</p>
+    <p><b>Où c'est écrit</b> : <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s8">p03-01 pas 8</a> · <a href="../chains/chain-p02-02-prior-penalite.html#s6">p02-02 pas 6</a> (L1 tranche ailleurs : le même coude, vu depuis le prior de Laplace). La convention sans ½ est celle du dépôt : un ½ déplacerait tous les seuils en <span class="m">λ</span> d'un facteur 2.</p>
   </div>
 </div>
 
@@ -302,7 +302,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr><td>+3</td><td>0</td><td>0</td><td>−0,047</td><td>SVM : non · logistique : oui</td></tr>
     </table>
     <p>Toute la différence entre les deux modèles tient dans la ligne surlignée : à <span class="m">m</span> = +2 la logistique garde 0,119 de poussée, la SVM exactement 0. « Tous les points, pondérés » contre « les supports seuls ». La question d'entretien n'est presque jamais « SVM ou logistique », c'est <b>pourquoi la hinge est creuse</b>.</p>
-    <p><b>Où c'est écrit</b> : <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s8">p03-01 pas 9</a> — avec le noyau, qui ne change rien à cet argument : il remplace les produits scalaires, pas la forme de la loss.</p>
+    <p><b>Où c'est écrit</b> : <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s9">p03-01 pas 9</a> — avec le noyau, qui ne change rien à cet argument : il remplace les produits scalaires, pas la forme de la loss.</p>
   </div>
 </div>
 

@@ -46,7 +46,15 @@ need = {'#prereq': 'id="prereq"', '#hyp': 'id="hyp"', '.chain': 'class="chain"',
         '#verbal': 'id="verbal"', '#links': 'id="links"', '.phrase': 'class="phrase"'}
 for k, v in need.items():
     if v not in t: fail(f'bloc manquant : {k}')
-steps = re.findall(r'<div class="step" id="(s\d+)">', t)
+# Le numéro affiché vient d'un compteur CSS : un id suffixé (s4b) ou un trou dans la
+# suite décale les ancres par rapport à ce que le lecteur voit, et tout lien entrant ment.
+all_steps = re.findall(r'<div class="step" id="([^"]+)">', t)
+expected = [f's{i}' for i in range(1, len(all_steps) + 1)]
+if all_steps != expected:
+    bad = [a for a, e in zip(all_steps, expected) if a != e] or all_steps[len(expected):]
+    fail(f'ids des pas non consécutifs : {", ".join(all_steps)} (attendu s1…s{len(all_steps)}) '
+         f'— renuméroter, jamais suffixer : {", ".join(bad[:3])}')
+steps = all_steps
 if len(steps) < 4: fail(f'{len(steps)} pas seulement (min 4)')
 if len(steps) > 14: warn(f'{len(steps)} pas : long, envisager de scinder')
 if 'class="card casse"' not in t: fail('pas de bloc « Où ça casse »')
