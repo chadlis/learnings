@@ -10,7 +10,7 @@ prereq: [p01-01, p00-02]
 anki: [ml::biais-variance, ml::overfitting, ml::validation]
 bridges: [b03, b02]
 next: p06-02
-status: ready
+status: built
 ---
 
 ## Question de la chaîne
@@ -27,7 +27,7 @@ Un modèle appris sur un jeu de données se serait-il trompé pareil sur un autr
 
 ## Exemple fil rouge
 f(x) = x sur [0, 1], σ = 0,5, n = 10 points sur une grille. Trois apprenants, erreur en un x fixé, moyennée sur la grille (simulation, 20 000 tirages) :
-- **Constante** ŷ = ȳ : biais² ≈ 0,10 (elle ne peut pas suivre la pente), variance = σ²/n = 0,025. Total ≈ 0,125 + σ².
+- **Constante** ŷ = ȳ : biais² = 0,102 (elle ne peut pas suivre la pente), variance = σ²/n = 0,025. Total = 0,127 + σ².
 - **Droite** (OLS) : biais² ≈ 0, variance ≈ σ²·2/n = 0,05 (deux paramètres). Total ≈ 0,05 + σ².
 - **Plus proche voisin** (interpolation) : biais² ≈ 0, variance ≈ σ² = 0,25 (on recopie un bruit). Total ≈ 0,25 + σ².
 Plancher commun : σ² = 0,25, irréductible. La droite gagne parce que f est une droite ; si f était une sinusoïde, la droite aurait un biais et le voisin un avantage.
@@ -39,7 +39,7 @@ Plancher commun : σ² = 0,25, irréductible. La droite gagne parce que f est un
 4. **Biais = rigidité.** Un modèle qui ne peut pas représenter f (constante sur une pente, droite sur une courbe) a un centre faux quel que soit n. Le biais ne baisse pas avec plus de données ; il baisse avec plus de flexibilité.
 5. **Variance = sensibilité au tirage.** Un modèle qui peut tout représenter suit le bruit du dataset : le voisin recopie ε. La variance baisse avec n et monte avec la flexibilité. Au tableau : « Plus le modèle est souple, plus il épouse le tirage, donc plus sa prédiction change d'un dataset à l'autre, donc plus sa variance est grande. »
 6. **Le U** [tronc]. Flexibilité croissante : biais² décroît, variance croît, la somme passe par un minimum. Erreur train : décroît toujours (témoin, b02). Erreur test : le U. Le **gap** train/test grandit avec la flexibilité ; c'est le symptôme, pas la cause. Au tableau : « Le biais baisse et la variance monte avec la flexibilité, donc leur somme a un minimum, donc il existe une bonne flexibilité et elle ne se lit que sur des données non vues. »
-7. **Le plancher σ² ne se voit pas.** Les résidus d'un modèle souple sont **plus petits** que σ (il a absorbé du bruit) ; ceux d'un modèle rigide plus grands. σ² est une propriété du problème, pas une lecture des résidus. Sur le fil rouge : σ² = 0,25 est la moitié de l'erreur totale du meilleur modèle.
+7. **Le plancher σ² ne se voit pas.** Les résidus d'un modèle souple sont **plus petits** que σ (il a absorbé du bruit) ; ceux d'un modèle rigide plus grands. σ² est une propriété du problème, pas une lecture des résidus. Sur le fil rouge : σ² = 0,25 pèse 0,25/0,300 ≈ 83 % de l'erreur totale du meilleur modèle.
 8. **Où ça casse** [casse].
 
 ## Figures exigées
@@ -58,7 +58,7 @@ Plancher commun : σ² = 0,25, irréductible. La droite gagne parce que f est un
 2. Erreur = biais² + variance + σ² ; σ² irréductible et invisible dans les résidus.
 3. Biais = rigidité (ne baisse pas avec n) ; variance = sensibilité au tirage (baisse avec n, monte avec la flexibilité).
 4. Le U : la bonne flexibilité ne se lit que sur des données non vues ; le gap train/test est le symptôme.
-5. Fil rouge : constante 0,125, droite 0,05, voisin 0,25 — plus σ² = 0,25.
+5. Fil rouge : constante 0,127, droite 0,05, voisin 0,25 — plus σ² = 0,25.
 
 **Phrase d'entretien** : « Si je retirais le dataset, le modèle appris changerait : sa prédiction en un point a un centre et une largeur. L'écart du centre au vrai est le biais, la largeur est la variance, et il reste le bruit qu'aucun modèle n'enlève. Un modèle rigide a du biais, un modèle souple a de la variance ; leur somme passe par un minimum qui ne se lit que sur des données non vues, parce que l'erreur d'entraînement, elle, ne fait que descendre. »
 
@@ -76,3 +76,19 @@ Plancher commun : σ² = 0,25, irréductible. La droite gagne parce que f est un
 
 ## Exclusions
 Pas de double descente au-delà du nom, pas de décomposition pour la log-loss, pas de formule de la variance de kNN au-delà de σ²/k.
+
+## Questions pour la revue
+- **Chiffre faux, corrigé (pas 7).** Le spec disait « σ² = 0,25 est la moitié de l'erreur
+  totale du meilleur modèle ». L'erreur totale de la droite vaut 0 + 2σ²/n + σ² = 0,300,
+  donc σ² en fait **83 %** (5/6), pas la moitié. Corrigé ici et dans la sheet.
+- **Arrondis du fil rouge, resserrés.** Sur la grille xᵢ = i/9 (i = 0…9), le biais² de la
+  constante vaut exactement la variance de la grille, soit 0,10185 → **0,102**, et l'erreur
+  réductible 0,127 et non 0,125. Vérifié par matrice chapeau et contrôlé par Monte-Carlo
+  (200 000 tirages). La sheet affiche 0,102 / 0,127.
+- **Figures 2 et 3 : exactes plutôt que simulées.** Le spec demandait des courbes
+  « précalculées par simulation JS de 500 tirages ». Comme l'ajustement polynomial est
+  linéaire en y sur un design fixe, biais², variance, train et test se calculent
+  *exactement* par la matrice chapeau (variance moyenne = σ²·p/n, gap = 2σ²·p/n). La sheet
+  fait ce calcul-là : courbes lisses, chiffres reproductibles, et deux identités en prime
+  qui portent les pas 5 et 6. Le tirage aléatoire reste là où il se voit — le bouton
+  « nouveau dataset » de la figure 2. À valider.

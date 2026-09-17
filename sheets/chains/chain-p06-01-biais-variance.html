@@ -1,0 +1,549 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Biais, variance et bruit — chaîne</title>
+<meta name="sheet" content="series=chain;part=06;number=01;status=v1">
+<meta name="part" content="06 · Évaluer">
+<meta name="subtitle" content="évaluer — le tirage est le dataset entier, et l'erreur se coupe en trois">
+<meta name="prereq" content="p01-01,p00-02">
+<meta name="anki" content="ml::biais-variance,ml::overfitting,ml::validation">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 06 · Évaluer › chaîne 01</div>
+  <h1>Biais, <span>variance</span>, <span>bruit</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Un modèle appris sur un jeu de données se serait-il trompé pareil sur un autre jeu tiré de la même population ? Ici l'objet aléatoire est <b>le dataset d'entraînement entier</b> : la prédiction en un point a un centre et une largeur. L'erreur quadratique se coupe alors exactement en trois — <b>biais² + variance + σ²</b> — et le troisième terme ne part jamais. Fil rouge : <span class="m">f</span>(<span class="m">x</span>) = <span class="m">x</span> sur une grille de 10 points, σ = 0,5, trois apprenants (constante, droite, plus proche voisin).</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="chain-p01-01-objet-aleatoire.html#s2">p01-01 · Les trois colonnes</a></li>
+    <li><a href="chain-p00-02-esperance-variance-densite.html#s3">p00-02 · Variance = écart au carré</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>ml::biais-variance</code><code>ml::overfitting</code><code>ml::validation</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-03-biais-variance-partout.html">Biais-variance partout</a></li>
+    <li><a href="../bridges/bridge-02-temoin-atteignable.html">Le témoin atteignable</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette chaîne suppose acquis</div>
+    <ul>
+      <li><b>Les trois colonnes</b> (<a href="chain-p01-01-objet-aleatoire.html#s2">p01-01 · pas 2</a>) : devant toute question de variabilité, ranger ce qui est <i>fixe</i>, ce qui est <i>aléatoire</i>, et la <i>procédure</i> qui va de l'un à l'autre. Cette chaîne ne change qu'une case : la colonne aléatoire.</li>
+      <li><b>Variance = espérance de l'écart au carré</b> (<a href="chain-p00-02-esperance-variance-densite.html#s3">p00-02 · pas 3</a>), et sa forme décentrée : <span class="up">E</span>[(<span class="m">X</span> − <span class="m">c</span>)²] = Var(<span class="m">X</span>) + (<span class="up">E</span>[<span class="m">X</span>] − <span class="m">c</span>)² pour toute constante <span class="m">c</span>. Toute la décomposition n'est que cette identité, appliquée à la bonne variable aléatoire.</li>
+      <li><b>Moyenne d'un échantillon</b> : si <span class="m">y</span><sub>1</sub>…<span class="m">y</span><sub><span class="m">n</span></sub> sont indépendantes de variance σ², alors Var(<span class="up">ȳ</span>) = σ²/<span class="m">n</span>. C'est le seul calcul de variance fait à la main ici.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>Le monde s'écrit <span class="m">y</span> = <span class="m">f</span>(<span class="m">x</span>) + ε, avec <span class="up">E</span>[ε] = 0 et Var(ε) = σ². La fonction <span class="m">f</span> est <b>inconnue mais fixe</b> ; le bruit ε est indépendant d'un point à l'autre.</span>
+      <b>H2</b><span>On <b>répète l'expérience</b> : tirer un dataset <span class="m">D</span> de taille <span class="m">n</span>, apprendre <span class="hat"><span class="m">f</span></span><sub><span class="m">D</span></sub>, prédire en un <span class="m">x</span> fixé. La prédiction <span class="hat"><span class="m">f</span></span><sub><span class="m">D</span></sub>(<span class="m">x</span>) est une variable aléatoire <b>de <span class="m">D</span></b>, pas de <span class="m">x</span>.</span>
+      <b>H3</b><span>Erreur <b>quadratique</b>. La décomposition exacte en trois termes est propre à elle : pour la log-loss ou la 0/1, l'intuition rigide / souple tient, la formule non.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le décor</h3>
+    <p>On n'a qu'un seul dataset, on a appris un seul modèle, on lit une seule erreur. La question honnête est ailleurs : ce modèle-là se serait-il trompé pareil sur un <b>autre</b> jeu tiré de la même population ?</p>
+    <p>Même question qu'en <a href="chain-p01-01-objet-aleatoire.html">p01-01</a>, avec un objet aléatoire plus gros : là c'était une ligne de données, ici c'est le jeu entier.</p>
+    <p class="say">« Un seul jeu a été tiré, donc le modèle appris est lui-même un tirage, donc la question est ce qu'il aurait donné sur un autre jeu. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Le fil rouge</div>
+    <p><span class="m">f</span>(<span class="m">x</span>) = <span class="m">x</span> sur [0, 1], σ = 0,5, et <span class="m">n</span> = 10 points sur la grille <span class="m">x</span><sub><span class="m">i</span></sub> = <span class="m">i</span>/9 (<span class="m">i</span> = 0…9). Trois apprenants, du plus rigide au plus souple :</p>
+    <table>
+      <tr><th>apprenant</th><th>ce qu'il peut représenter</th><th>paramètres</th></tr>
+      <tr><td><b>constante</b> <span class="hat"><span class="m">y</span></span> = <span class="up">ȳ</span></td><td>une horizontale</td><td>1</td></tr>
+      <tr><td><b>droite</b> (OLS)</td><td>toutes les droites — dont la vraie</td><td>2</td></tr>
+      <tr><td><b>plus proche voisin</b></td><td>n'importe quoi : il interpole</td><td>10</td></tr>
+    </table>
+    <p>Le vrai <span class="m">f</span> <i>est</i> une droite : l'ordre de ces trois apprenants n'a rien d'universel, il dépend de <span class="m">f</span>. C'est justement ce qu'on veut nommer.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Le tirage, c'est le dataset <span class="tag tronc">tronc</span></h3>
+    <p>On rejoue les trois colonnes de p01-01, et la colonne aléatoire change d'objet.</p>
+    <div class="eq"><b>FIXE</b> <span class="m">f</span>, le point <span class="m">x</span> où l'on prédit, σ² &nbsp;·&nbsp; <b>ALÉATOIRE</b> <b>le dataset <span class="m">D</span> tout entier</b> → <span class="hat"><span class="m">f</span></span><sub><span class="m">D</span></sub> → <span class="hat"><span class="m">f</span></span><sub><span class="m">D</span></sub>(<span class="m">x</span>) &nbsp;·&nbsp; <b>PROCÉDURE</b> tirer <span class="m">D</span> → ajuster → prédire en <span class="m">x</span></div>
+    <p>Écrire « les données sont aléatoires » ne suffit pas : ce qui est tiré est <b>le jeu complet</b>, donc ce qui varie est <b>le modèle appris</b>, donc la prédiction en un <span class="m">x</span> fixé a une distribution.</p>
+    <p class="say">« Le modèle appris dépend du dataset, donc sa prédiction en <span class="m">x</span> est une variable aléatoire du tirage, donc elle a un centre et une largeur, donc on peut nommer chacun des deux. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — <span class="m">x</span> = 0,37, mille datasets imaginaires</div>
+    <p>Le point <span class="m">x</span> = 0,37 est fixe, la vraie valeur <span class="m">f</span>(0,37) = 0,37 aussi. Seul <span class="m">D</span> change. Ce que chaque apprenant produit alors :</p>
+    <table>
+      <tr><th>apprenant</th><th>centre <span class="up">E</span><sub><span class="m">D</span></sub>[<span class="hat"><span class="m">f</span></span><sub><span class="m">D</span></sub>(0,37)]</th><th>biais²</th><th>variance</th></tr>
+      <tr><td>constante</td><td>0,5</td><td>0,0169</td><td>0,0250</td></tr>
+      <tr class="hl"><td>droite</td><td>0,37</td><td>0</td><td>0,0291</td></tr>
+      <tr><td>voisin</td><td>0,333</td><td>0,0013</td><td>0,2500</td></tr>
+    </table>
+    <p>La constante est <b>décentrée</b> et serrée ; le voisin est presque centré et très <b>large</b> — il recopie le bruit du point le plus proche (<span class="m">x</span> = 1/3), donc sa variance vaut σ² tout rond.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — la distribution de la prédiction en <span class="m">x</span> = 0,37</div>
+    <div class="sl-ctl" id="f1modes"></div>
+    <div id="f1plot" class="wide"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Chaque tirage = un dataset neuf (<span class="m">n</span> = 10, σ = 0,5), un modèle réappris, <b>une</b> prédiction en <span class="m">x</span> = 0,37. Le trait <b>pointillé</b> rouge marque la vraie valeur <span class="m">f</span>(0,37) = 0,37, le trait <b>plein</b> la moyenne des tirages. Change d'apprenant : le <b>décalage</b> entre les deux traits est le biais, la <b>largeur</b> de l'histogramme est la variance. La constante est décalée et étroite, le voisin est bien placé et très étalé.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>La décomposition <span class="tag tronc">tronc</span></h3>
+    <p>Espérance sur les deux sources d'aléa — le dataset <span class="m">D</span> et le bruit ε du point de test :</p>
+    <div class="eq"><span class="up">E</span><sub><span class="m">D</span>,ε</sub>[(<span class="m">y</span> − <span class="hat"><span class="m">f</span></span><sub><span class="m">D</span></sub>(<span class="m">x</span>))²] = (<span class="up">E</span><sub><span class="m">D</span></sub>[<span class="hat"><span class="m">f</span></span><sub><span class="m">D</span></sub>(<span class="m">x</span>)] − <span class="m">f</span>(<span class="m">x</span>))² + Var<sub><span class="m">D</span></sub>(<span class="hat"><span class="m">f</span></span><sub><span class="m">D</span></sub>(<span class="m">x</span>)) + σ²<br>= <b>biais²</b> + <b>variance</b> + <b>bruit</b></div>
+    <p>Deux lignes : ajouter et retrancher <span class="up">E</span><sub><span class="m">D</span></sub>[<span class="hat"><span class="m">f</span></span><sub><span class="m">D</span></sub>(<span class="m">x</span>)] dans la parenthèse, développer le carré, et constater que le terme croisé s'annule (l'écart au centre est centré). Le σ² sort parce que ε du point de test est indépendant de <span class="m">D</span>.</p>
+    <p class="say">« L'écart au vrai se coupe en écart du centre au vrai plus écart au centre, donc l'erreur moyenne est le biais au carré plus la variance, donc il reste le bruit, qui ne dépend d'aucun modèle. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le fil rouge, chiffré</div>
+    <p>Erreur moyennée sur les 10 points de la grille (calcul exact, pas simulation) :</p>
+    <table>
+      <tr><th>apprenant</th><th>biais²</th><th>variance</th><th>σ²</th><th>total</th></tr>
+      <tr><td>constante</td><td>0,102</td><td>0,025</td><td>0,25</td><td>0,377</td></tr>
+      <tr class="hl"><td>droite</td><td>0</td><td>0,050</td><td>0,25</td><td><b>0,300</b></td></tr>
+      <tr><td>voisin</td><td>0</td><td>0,250</td><td>0,25</td><td>0,500</td></tr>
+    </table>
+    <p>La droite gagne <b>parce que <span class="m">f</span> est une droite</b> : elle est la seule à n'avoir aucun biais tout en restant peu variable. Si <span class="m">f</span> était une sinusoïde, la droite aurait un biais et le voisin reprendrait l'avantage.</p>
+    <p>Le 0,25 de la dernière colonne est le même pour les trois : c'est le <b>plancher</b>, et aucune colonne de gauche ne peut l'entamer.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Biais = rigidité</h3>
+    <p>Un modèle qui <b>ne peut pas</b> représenter <span class="m">f</span> a un centre faux, et il l'a quel que soit <span class="m">n</span> : ajouter des données rend le centre plus stable, pas plus juste.</p>
+    <p>Le biais se paie en <b>capacité de représentation</b>, pas en volume de données. Il baisse quand on donne au modèle de quoi épouser <span class="m">f</span> — plus de degrés, plus de features, moins de contrainte.</p>
+    <p class="say">« La constante ne peut pas suivre une pente, donc son centre reste la moyenne de <span class="m">f</span> quel que soit <span class="m">n</span>, donc son biais ne bouge pas quand on ajoute des données, donc seule la flexibilité le fait baisser. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — faire grossir <span class="m">n</span>, en <span class="m">x</span> = 0,37</div>
+    <p>Le centre de la constante est <span class="up">E</span>[<span class="up">ȳ</span>] = moyenne de <span class="m">f</span> sur la grille = <b>0,5</b>, pour tout <span class="m">n</span>. Le biais en 0,37 vaut donc 0,5 − 0,37 = 0,13, et biais² = 0,0169, pour tout <span class="m">n</span>.</p>
+    <table>
+      <tr><th><span class="m">n</span></th><th>biais² (constante)</th><th>variance σ²/<span class="m">n</span></th></tr>
+      <tr><td>10</td><td>0,0169</td><td>0,0250</td></tr>
+      <tr><td>100</td><td>0,0169</td><td>0,0025</td></tr>
+      <tr><td>1 000</td><td>0,0169</td><td>0,00025</td></tr>
+    </table>
+    <p>La colonne de droite fond, celle du milieu ne bouge pas d'un chiffre. Multiplier les données par cent ne rend pas une horizontale capable de monter.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Variance = sensibilité au tirage</h3>
+    <p>Symétriquement, un modèle qui peut <b>tout</b> représenter épouse le bruit du jeu qu'on lui a donné : le plus proche voisin recopie littéralement l'ε du point le plus proche.</p>
+    <p>Pour tout ajustement linéaire en <span class="m">y</span> (constante, OLS, polynôme, ridge) à <span class="m">p</span> paramètres sur un design fixe, la variance moyennée sur les points du design vaut exactement</p>
+    <div class="eq">moyenne des Var(<span class="hat"><span class="m">f</span></span>(<span class="m">x</span><sub><span class="m">i</span></sub>)) = σ² · <span class="m">p</span> / <span class="m">n</span></div>
+    <p>Elle baisse avec <span class="m">n</span> et monte avec <span class="m">p</span> : c'est la formule du compromis, écrite d'un seul côté.</p>
+    <p class="say">« Plus le modèle a de paramètres, plus il épouse le tirage, donc plus sa prédiction change d'un dataset à l'autre, donc sa variance monte proportionnellement au nombre de paramètres. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — la formule rend les trois chiffres du fil rouge</div>
+    <p>σ² = 0,25 et <span class="m">n</span> = 10 :</p>
+    <table>
+      <tr><th>apprenant</th><th><span class="m">p</span></th><th>σ²·<span class="m">p</span>/<span class="m">n</span></th><th>variance mesurée</th></tr>
+      <tr><td>constante</td><td>1</td><td>0,025</td><td>0,025</td></tr>
+      <tr><td>droite</td><td>2</td><td>0,050</td><td>0,050</td></tr>
+      <tr><td>voisin (interpole)</td><td>10</td><td>0,250</td><td>0,250</td></tr>
+    </table>
+    <p>Le voisin est le cas limite <span class="m">p</span> = <span class="m">n</span> : il a autant de paramètres que de points, donc σ²·<span class="m">n</span>/<span class="m">n</span> = σ². Interpoler, c'est prendre toute la variance du bruit à son compte.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — la flexibilité, vue sur un jeu et vue en moyenne</div>
+    <div id="f2fit" class="wide"></div>
+    <div class="sl-ctl" id="f2ctl"></div>
+    <div id="f2sliders"></div>
+    <div id="f2curves" class="wide"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Autre jeu de données : <span class="m">f</span> = sin(2π<span class="m">x</span>), <span class="m">n</span> = 12 points, σ = 0,3. <b>En haut</b>, le polynôme ajusté ; monte le degré et clique <b>nouveau dataset</b> : à degré 3 la courbe bouge à peine d'un tirage à l'autre, à <b>degré 9 elle change du tout au tout</b> — mêmes abscisses, même σ, courbe méconnaissable. <b>En bas</b>, les mêmes quantités en espérance sur tous les tirages : biais² descend, variance monte en ligne droite (σ²·<span class="m">p</span>/<span class="m">n</span>), et leur somme creuse un minimum.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Le U, et le gap qui n'est qu'un symptôme <span class="tag tronc">tronc</span></h3>
+    <p>Biais² décroît avec la flexibilité, variance croît : leur somme passe par un <b>minimum</b>. Il existe donc une bonne flexibilité, et elle ne se lit que sur des données <b>non vues</b>.</p>
+    <p>L'erreur d'entraînement, elle, ne fait que descendre — un modèle souple contient le rigide, c'est un <b>témoin atteignable</b> (<a href="../bridges/bridge-02-temoin-atteignable.html">b02</a>), pas un résultat à redémontrer. L'écart train / test grandit donc mécaniquement :</p>
+    <div class="eq">gap = <span class="up">E</span>[erreur test] − <span class="up">E</span>[erreur train] = 2σ² · <span class="m">p</span> / <span class="m">n</span></div>
+    <p>Le gap est le <b>symptôme</b> de la variance, pas sa cause : il grandit parce que le train baisse <i>et</i> que le test monte.</p>
+    <p class="say">« Le biais baisse et la variance monte avec la flexibilité, donc leur somme a un minimum, donc il existe une bonne flexibilité, donc elle ne se lit que sur des données non vues. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — sinusoïde, <span class="m">n</span> = 12, σ = 0,3 (σ² = 0,09)</div>
+    <table>
+      <tr><th>degré</th><th>biais²</th><th>variance</th><th>train</th><th>test</th><th>gap</th></tr>
+      <tr><td>0</td><td>0,458</td><td>0,008</td><td>0,541</td><td>0,556</td><td>0,015</td></tr>
+      <tr><td>1</td><td>0,254</td><td>0,015</td><td>0,329</td><td>0,359</td><td>0,030</td></tr>
+      <tr><td>2</td><td>0,254</td><td>0,023</td><td>0,321</td><td>0,366</td><td>0,045</td></tr>
+      <tr class="hl"><td>3</td><td>0,007</td><td>0,030</td><td>0,067</td><td><b>0,127</b></td><td>0,060</td></tr>
+      <tr><td>5</td><td>0,000</td><td>0,045</td><td>0,045</td><td>0,135</td><td>0,090</td></tr>
+      <tr><td>9</td><td>0,000</td><td>0,075</td><td>0,015</td><td>0,165</td><td>0,150</td></tr>
+    </table>
+    <p>Le train descend de 0,541 à 0,015 <b>sans jamais remonter</b> ; le test touche son minimum à <b>degré 3</b> puis remonte. Le gap, lui, double du degré 3 au degré 9 — exactement 2σ²<span class="m">p</span>/<span class="m">n</span>.</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — train, test, et l'écart entre les deux</div>
+    <div id="f3plot" class="wide"></div>
+    <div id="f3sliders"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Les deux erreurs en espérance, sur le même jeu qu'en figure 2. Déplace le degré : le <b>segment vert</b> est le gap. Le train descend toujours et finit <i>sous</i> le plancher σ² = 0,09 — signe qu'il a mangé du bruit ; le test fait le <b>U</b>, minimum au degré 3. Choisir la flexibilité au train, c'est choisir le degré 9.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Le plancher σ² ne se lit pas dans les résidus</h3>
+    <p>σ² est une propriété du <b>problème</b> — la part de <span class="m">y</span> qu'aucune fonction de <span class="m">x</span> ne prédit. Ce n'est pas la moyenne des résidus au carré d'un modèle ajusté.</p>
+    <div class="eq"><span class="up">E</span>[erreur train] = σ² · (<span class="m">n</span> − <span class="m">p</span>)/<span class="m">n</span> + biais²</div>
+    <p>Un modèle <b>souple</b> a absorbé une part du bruit : ses résidus sont <b>plus petits</b> que σ. Un modèle <b>rigide</b> a mis son biais dedans : ils sont plus grands. Aucun des deux ne rend σ.</p>
+    <p class="say">« Un modèle souple absorbe une part du bruit, donc ses résidus sont plus petits que σ, donc leur moyenne au carré sous-estime le plancher, donc σ² ne se lit jamais sur les données d'entraînement. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — deux lectures fausses du même σ = 0,3</div>
+    <table>
+      <tr><th>modèle</th><th><span class="m">p</span></th><th><span class="up">E</span>[erreur train]</th><th>« σ̂ » = √train</th><th>vrai σ</th></tr>
+      <tr><td>degré 0 (rigide)</td><td>1</td><td>0,541</td><td>0,74</td><td>0,30</td></tr>
+      <tr><td>degré 3 (juste)</td><td>4</td><td>0,067</td><td>0,26</td><td>0,30</td></tr>
+      <tr class="hl"><td>degré 9 (souple)</td><td>10</td><td>0,015</td><td><b>0,12</b></td><td>0,30</td></tr>
+    </table>
+    <p>Le rigide surestime de 150 %, le souple sous-estime de 60 %. La correction <span class="m">n</span>/(<span class="m">n</span> − <span class="m">p</span>) ne sauve que le cas sans biais.</p>
+    <p>Sur le fil rouge : σ² = 0,25 pèse 0,25 / 0,300 ≈ <b>83 %</b> de l'erreur totale du meilleur modèle. Tout le travail de modélisation se joue sur les 17 % restants.</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>La décomposition est une espérance sur des tirages qu'on n'a pas.</p>
+    <p class="say">« Les trois termes vivent sur des datasets répétés, donc un seul jeu ne les sépare pas, donc ce qu'on mesure en pratique est leur somme, donc on pilote la flexibilité sans jamais voir lequel des deux on paie. »</p>
+  </div>
+  <div class="card casse"><div class="lbl">Quatre limites</div>
+    <ul>
+      <li><b>Un seul dataset.</b> On n'observe ni le biais ni la variance, seulement leur somme, via un jeu de validation (<a href="../../map.html#p06-02">p06-02</a>). Les séparer demande de <i>répéter le tirage</i> : simulation quand on connaît <span class="m">f</span>, rééchantillonnage (<a href="chain-p01-05-bootstrap.html">bootstrap</a>) sinon — et le bootstrap ne rejoue pas la population, seulement l'échantillon.</li>
+      <li><b>Hors erreur quadratique.</b> La coupure exacte en trois termes n'existe pas pour la log-loss ni pour la 0/1 : les décompositions proposées sont conventionnelles et non additives. L'intuition rigide / souple survit, la formule non — ne pas l'écrire au tableau pour un classifieur.</li>
+      <li><b>Régime moderne.</b> Des réseaux très surparamétrés interpolent les données <i>et</i> généralisent (<b>double descente</b> : au-delà du point d'interpolation le test redescend). Le U reste vrai à taille de données fixée et flexibilité modérée, c'est-à-dire là où on l'utilise ; il ne décrit pas le régime <span class="m">p</span> ≫ <span class="m">n</span>.</li>
+      <li><b>Bruit hétérogène.</b> σ² = σ²(<span class="m">x</span>) : le plancher n'est pas le même partout. Une erreur totale plate peut cacher une zone bien modélisée et une zone irréductiblement bruitée — la moyenne sur <span class="m">x</span> mélange les deux.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Le tirage, c'est <b>le dataset entier</b> : <span class="hat"><span class="m">f</span></span><sub><span class="m">D</span></sub>(<span class="m">x</span>) est une variable aléatoire de <span class="m">D</span>, donc elle a un centre et une largeur.</li>
+    <li>Erreur = <b>biais² + variance + σ²</b>. Le σ² est irréductible, et il est invisible dans les résidus.</li>
+    <li><b>Biais = rigidité</b> : il ne baisse pas avec <span class="m">n</span>, seulement avec la flexibilité. <b>Variance = sensibilité au tirage</b> : σ²·<span class="m">p</span>/<span class="m">n</span>, elle baisse avec <span class="m">n</span> et monte avec <span class="m">p</span>.</li>
+    <li>Leur somme fait un <b>U</b> : la bonne flexibilité ne se lit que sur des données non vues. Le gap train/test (2σ²<span class="m">p</span>/<span class="m">n</span>) est le symptôme, pas la cause.</li>
+    <li>Fil rouge : constante 0,102 + 0,025 · droite 0 + 0,050 · voisin 0 + 0,250 — et pour tous, plus σ² = 0,25.</li>
+  </ol>
+</div>
+<div class="phrase">« Si je retirais le dataset, le modèle appris changerait : sa prédiction en un point a un centre et une largeur. L'écart du centre au vrai est le biais, la largeur est la variance, et il reste le bruit qu'aucun modèle n'enlève. Un modèle rigide a du biais, un modèle souple a de la variance ; leur somme passe par un minimum qui ne se lit que sur des données non vues, parce que l'erreur d'entraînement, elle, ne fait que descendre. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Quel est l'objet aléatoire ?</div><div class="a hid">Le <b>dataset d'entraînement entier</b> — pas une ligne. Donc le modèle appris f̂<sub>D</sub>, donc sa prédiction f̂<sub>D</sub>(x) en un x fixé.</div></li>
+    <li><div class="q">Écris la décomposition et dis d'où elle vient.</div><div class="a hid">biais² + variance + σ². On ajoute et retranche E<sub>D</sub>[f̂<sub>D</sub>(x)], on développe le carré, le terme croisé est nul parce que l'écart au centre est centré ; le σ² sort car le bruit du point de test est indépendant de D.</div></li>
+    <li><div class="q">Que fait plus de données ? Plus de flexibilité ?</div><div class="a hid">Plus de données : la variance baisse (σ²p/n), le biais ne bouge pas. Plus de flexibilité : le biais baisse, la variance monte.</div></li>
+    <li><div class="q">Pourquoi l'erreur d'entraînement ne fait-elle pas le U ?</div><div class="a hid">Témoin atteignable : un modèle souple contient le rigide, donc il fait au moins aussi bien sur les points qu'il a vus. Elle descend toujours, jusque sous σ².</div></li>
+    <li><div class="q">Peut-on lire σ² dans les résidus ?</div><div class="a hid">Non. E[train] = σ²(n − p)/n + biais² : un modèle souple rend les résidus plus petits que σ, un modèle rigide plus grands. σ² est une propriété du problème.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
+  <div class="bridges">
+    <a href="../bridges/bridge-03-biais-variance-partout.html"><b>Biais-variance partout</b><small>le même arbitrage sous d'autres noms : λ d'une régularisation, profondeur d'un arbre, k d'un kNN, nombre d'époques — un curseur de flexibilité, un U</small></a>
+    <a href="../bridges/bridge-02-temoin-atteignable.html"><b>Le témoin atteignable</b><small>pourquoi l'erreur d'entraînement ne remonte jamais : le modèle souple contient le rigide, donc son optimum ne peut pas être pire — c'est le pas 6, démontré une fois pour toutes</small></a>
+    <a href="chain-p01-01-objet-aleatoire.html#s2"><b>p01-01 — les trois colonnes</b><small>même grille de lecture, colonne aléatoire changée : une ligne de données là-bas, le dataset entier ici</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>ml::biais-variance</code> (la colonne aléatoire = le dataset ; la décomposition et sa dérivation ; σ²·p/n) · <code>ml::overfitting</code> (le U, le gap comme symptôme, double descente au nom près) · <code>ml::validation</code> (la bonne flexibilité ne se lit que sur des données non vues).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>Chaîne p06-01 · v1 du 17/09/2026 · Prérequis : <a href="chain-p01-01-objet-aleatoire.html">p01-01</a>, <a href="chain-p00-02-esperance-variance-densite.html">p00-02</a>. Suite : <a href="../../map.html#p06-02">p06-02 Estimer l'erreur — validation, CV, fuites</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outils communs ===== */
+let spare=null;
+function gauss(){ // Box-Muller polaire
+  if(spare!==null){const v=spare;spare=null;return v;}
+  let u,v,r;do{u=2*Math.random()-1;v=2*Math.random()-1;r=u*u+v*v;}while(r===0||r>=1);
+  const c=Math.sqrt(-2*Math.log(r)/r);spare=v*c;return u*c;}
+/* Gram-Schmidt modifié sur la matrice de Vandermonde : stable jusqu'au degré 9 sur 12 points,
+   là où les équations normales perdent la moitié des chiffres significatifs. */
+function qr(u,d){const n=u.length,p=d+1,Q=[],R=Array.from({length:p},()=>new Array(p).fill(0));
+  for(let k=0;k<p;k++){const v=u.map(t=>Math.pow(t,k));
+    for(let j=0;j<k;j++){let r=0;for(let i=0;i<n;i++)r+=Q[j][i]*v[i];R[j][k]=r;for(let i=0;i<n;i++)v[i]-=r*Q[j][i];}
+    let nr=0;for(let i=0;i<n;i++)nr+=v[i]*v[i];nr=Math.sqrt(nr);R[k][k]=nr;
+    Q.push(nr>1e-12?v.map(t=>t/nr):v.map(()=>0));}
+  return {Q,R};}
+function fitPoly(u,y,d){const {Q,R}=qr(u,d),p=d+1;
+  const b=Q.map(q=>q.reduce((s,qi,i)=>s+qi*y[i],0)),c=new Array(p).fill(0);
+  for(let k=p-1;k>=0;k--){let s=b[k];for(let j=k+1;j<p;j++)s-=R[k][j]*c[j];c[k]=R[k][k]>1e-12?s/R[k][k]:0;}
+  return c;}
+const evalPoly=(c,u)=>c.reduce((s,ck,k)=>s+ck*Math.pow(u,k),0);
+const lin=a=>t=>{const i=Math.max(0,Math.min(a.length-2,Math.floor(t)));return a[i]+(a[i+1]-a[i])*(t-i);};
+
+/* ===== Figure 1 : la prédiction en x = 0,37 est une variable aléatoire du dataset ===== */
+const N1=10,S1=.5,XS=.37;
+const gx=Array.from({length:N1},(_,i)=>i/(N1-1)),gf=gx.slice();
+const xbar=gx.reduce((a,b)=>a+b,0)/N1, Sxx=gx.reduce((s,v)=>s+(v-xbar)*(v-xbar),0);
+let jNN=0;gx.forEach((v,i)=>{if(Math.abs(v-XS)<Math.abs(gx[jNN]-XS))jNN=i;});
+const MODES=[
+  {k:'c',n:'constante',b2:(0.5-XS)**2,va:S1*S1/N1,f:y=>y.reduce((a,b)=>a+b,0)/N1},
+  {k:'d',n:'droite (OLS)',b2:0,va:S1*S1*(1/N1+(XS-xbar)*(XS-xbar)/Sxx),
+   f:y=>{const yb=y.reduce((a,b)=>a+b,0)/N1;let c=0;for(let i=0;i<N1;i++)c+=(gx[i]-xbar)*(y[i]-yb);const b1=c/Sxx;return yb-b1*xbar+b1*XS;}},
+  {k:'v',n:'plus proche voisin',b2:(gx[jNN]-XS)**2,va:S1*S1,f:y=>y[jNN]}];
+let cur=MODES[0];
+const out1=document.getElementById('f1out');
+function fill1(){out1.innerHTML=
+  `<div class="pos">biais² théorique<b>${SL.fmt(cur.b2,4)}</b></div>`+
+  `<div class="pos">variance théorique<b>${SL.fmt(cur.va,4)}</b></div>`+
+  `<div class="pos">erreur réductible<b>${SL.fmt(cur.b2+cur.va,4)}</b></div>`;}
+const R1=SL.repeat(document.getElementById('f1plot'),{
+  draw:()=>cur.f(gf.map(v=>v+S1*gauss())),
+  bins:[-.5,1.3,36],xt:[-.5,0,.37,.5,1,1.3],w:600,h:250,
+  xl:'prédiction en x = 0,37',
+  marks:[{x:XS,label:'f(0,37) = 0,37',cls:'chord sl-c3'}],
+  counts:[1,50,500],
+  empty:'Aucun tirage : clique « tirer 500 ».',
+  readout:(k,m,s)=>`${k} tirages · centre ${SL.fmt(m,3)} · biais² mesuré ${SL.fmt((m-XS)*(m-XS),4)} · variance mesurée ${SL.fmt(s*s,4)}`});
+const modes1=document.getElementById('f1modes');
+MODES.forEach(M=>{const b=document.createElement('button');b.className='tb';b.textContent=M.n;
+  b.setAttribute('aria-pressed',String(M===cur));
+  b.onclick=()=>{cur=M;R1.stats.length=0;R1.render();fill1();
+    [...modes1.children].forEach((c,i)=>c.setAttribute('aria-pressed',String(MODES[i]===cur)));};
+  modes1.appendChild(b);});
+fill1();
+
+/* ===== Figures 2 et 3 : polynômes sur une sinusoïde ===== */
+const N2=12,S2=.3;
+const px=Array.from({length:N2},(_,i)=>i/(N2-1));
+const pu=px.map(v=>2*v-1);
+const pf=px.map(v=>Math.sin(2*Math.PI*v));
+/* biais², variance, train, test : exacts via la matrice chapeau (projection), pas simulés.
+   Var moyenne = σ²·tr(H)/n = σ²·p/n ; E[train] = σ²(n−p)/n + biais². */
+const B2=[],VA=[],TR=[],TE=[];
+for(let d=0;d<10;d++){const {Q}=qr(pu,d);
+  const qf=Q.map(q=>q.reduce((s,qi,i)=>s+qi*pf[i],0));
+  let b2=0,tr=0;
+  for(let i=0;i<N2;i++){let h=0,v=0;for(let k=0;k<=d;k++){h+=Q[k][i]*Q[k][i];v+=Q[k][i]*qf[k];}tr+=h;b2+=(v-pf[i])*(v-pf[i]);}
+  b2/=N2;const va=S2*S2*tr/N2;
+  B2.push(b2);VA.push(va);TE.push(b2+va+S2*S2);TR.push(S2*S2*(N2-tr)/N2+b2);}
+
+const P2a=SL.plot(document.getElementById('f2fit'),{x:[0,1],y:[-2.2,2.2],w:600,h:260,
+  xt:[0,.25,.5,.75,1],yt:[-2,-1,0,1,2],xl:'x',yl:'y'});
+P2a.fn(x=>Math.sin(2*Math.PI*x),'sl-c5');
+P2a.label(.30,1.55,'vrai f','sl-c5');
+const P2b=SL.plot(document.getElementById('f2curves'),{x:[0,9],y:[0,.5],w:600,h:250,
+  xt:[0,1,2,3,4,5,6,7,8,9],yt:[.1,.2,.3,.4,.5],xl:'degré du polynôme',yl:'erreur'});
+P2b.fn(lin(B2),'sl-c3');P2b.fn(lin(VA),'sl-c2');P2b.fn(lin(B2.map((b,i)=>b+VA[i])),'sl-c1');
+P2b.label(5.6,.47,'biais²','sl-c3');P2b.label(5.6,.425,'variance','sl-c2');P2b.label(5.6,.38,'biais² + variance','sl-c1');
+let ydata=pf.map(v=>v+S2*gauss()),deg=3,fitPath=[];
+const out2=document.getElementById('f2out');
+function draw2(){
+  fitPath.forEach(p=>p.remove());fitPath=[];P2a.clear();P2b.clear();
+  const c=fitPoly(pu,ydata,deg);
+  fitPath.push(P2a.fn(x=>evalPoly(c,2*x-1),'sl-c1',260));
+  px.forEach((v,i)=>P2a.dot(v,ydata[i],'sl-c3',4));
+  P2b.vline(deg,'');P2b.dot(deg,B2[deg],'sl-c3',5);P2b.dot(deg,VA[deg],'sl-c2',5);P2b.dot(deg,B2[deg]+VA[deg],'sl-c1',5);
+  out2.innerHTML=`<div class="pos">degré<b>${deg}</b></div>`+
+    `<div class="${B2[deg]<1e-4?'zero':'pos'}">biais²<b>${SL.fmt(B2[deg],4)}</b></div>`+
+    `<div class="pos">variance σ²·p/n<b>${SL.fmt(VA[deg],4)}</b></div>`+
+    `<div class="pos">somme<b>${SL.fmt(B2[deg]+VA[deg],4)}</b></div>`;}
+SL.slider(document.getElementById('f2sliders'),{label:'degré',min:0,max:9,step:1,value:3,fmt:v=>String(v)},v=>{deg=v;draw2();});
+const nb=document.createElement('button');nb.className='tb';nb.textContent='nouveau dataset';
+nb.onclick=()=>{ydata=pf.map(v=>v+S2*gauss());draw2();};
+document.getElementById('f2ctl').appendChild(nb);
+
+/* ===== Figure 3 : le U et le gap ===== */
+const P3=SL.plot(document.getElementById('f3plot'),{x:[0,9],y:[0,.6],w:600,h:280,
+  xt:[0,1,2,3,4,5,6,7,8,9],yt:[.1,.2,.3,.4,.5,.6],xl:'degré du polynôme',yl:'erreur quadratique'});
+P3.fn(lin(TE),'sl-c1');P3.fn(lin(TR),'sl-c2');P3.fn(()=>S2*S2,'sl-c5');
+P3.label(5.3,.575,'erreur test','sl-c1');P3.label(5.3,.53,'erreur train','sl-c2');P3.label(5.3,.485,'plancher σ² = 0,09','sl-c5');
+const out3=document.getElementById('f3out');
+function draw3(d){P3.clear();
+  P3.seg(d,TR[d],d,TE[d],'gain');P3.dot(d,TE[d],'sl-c1',5);P3.dot(d,TR[d],'sl-c2',5);
+  const droite=d<7;P3.text(d+(droite?.15:-.15),(TE[d]+TR[d])/2,'gap '+SL.fmt(TE[d]-TR[d],3),'',droite?'start':'end');
+  out3.innerHTML=`<div class="pos">degré<b>${d}</b></div>`+
+    `<div class="pos">erreur train<b>${SL.fmt(TR[d],3)}</b></div>`+
+    `<div class="pos">erreur test<b>${SL.fmt(TE[d],3)}</b></div>`+
+    `<div class="pos">gap = 2σ²p/n<b>${SL.fmt(TE[d]-TR[d],3)}</b></div>`;}
+SL.slider(document.getElementById('f3sliders'),{label:'degré',min:0,max:9,step:1,value:3,fmt:v=>String(v)},draw3);
+draw2();
+})();
+</script>
+</body>
+</html>
