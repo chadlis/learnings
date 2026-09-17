@@ -10,7 +10,7 @@ prereq: [p02-01, p04-01, p00-02]
 anki: [ml::regression-lineaire, ml::ols, ml::r2, stats::residus]
 bridges: [b06, b02]
 next: p05-02
-status: built
+status: reviewed
 ---
 
 ## Question de la chaîne
@@ -44,7 +44,7 @@ ISLR Advertising, `sales ~ TV` : β̂₀ = 7,03, β̂₁ = 0,0475, RSE = 3,26, R
 9. **Où ça casse** [casse].
 
 ## Figures exigées
-- **Figure 2 (sheet) — `plot` + `slider` y₅ ∈ [0, 20] et y₃ ∈ [0, 20]** : le nuage des cinq points, la droite OLS recalculée, les résidus en segments verticaux, readouts β̂₁, β̂₀, RSS, R². Légende : un point tire la droite avec le carré de son écart.
+- **Figure 2 (sheet) — `plot` + `slider` y₅ ∈ [0, 20] et y₃ ∈ [0, 20]** : le nuage des cinq points, la droite OLS recalculée, les résidus en segments verticaux, readouts β̂₁, β̂₀, RSS, R². Légende : un point tire la droite proportionnellement à son écart **et à son levier** (xᵢ − x̄)/S_xx, sans borne ; la MAE borne l'influence.
 - **Figure 1 (sheet) — `plot`** : le même nuage avec un `slider` sur une droite « à la main » (β₀, β₁) et le RSS affiché comme somme des aires des carrés des résidus (dessinés en carrés) ; bouton « OLS » qui saute au minimum. Légende : minimiser la somme des aires.
 - **Figure 3 — `plot` + bouton « ajouter une variable de bruit »** : sur 30 points, R² et R² ajusté en fonction du nombre de colonnes de bruit ajoutées (jusqu'à 10). Légende : R² monte quoi qu'on ajoute.
 
@@ -68,9 +68,9 @@ ISLR Advertising, `sales ~ TV` : β̂₀ = 7,03, β̂₁ = 0,0475, RSE = 3,26, R
 1. Que suppose Y = β₀ + β₁X + ε, et sur quoi ? → Moyenne conditionnelle affine, bruit centré ; sur Y sachant X seulement.
 2. Pourquoi des carrés ? → NLL gaussienne ; Laplace donnerait |·|.
 3. Écris β̂₁ et β̂₀ et dis d'où ils sortent. → Ĉov/V̂ar ; ȳ − β̂₁x̄ ; gradient nul, linéaire en β.
-4. Que fait un outlier, et pourquoi ? → Tire la droite avec le carré de l'écart : 0,6 → 2,6.
+4. Que fait un outlier, et pourquoi ça dépend d'où il est ? → ∂β̂₁/∂yᵢ = (xᵢ − x̄)/S_xx : il tire la droite proportionnellement à son écart et à son levier, sans borne. Au bord 0,6 → 2,6 ; au centre, pente inchangée.
 5. Pourquoi R² monte toujours ? → Témoin β = 0 : RSS ne peut pas monter.
-6. Comment lis-tu β̂₁ = 0,0475 ? → +47,5 ventes en moyenne par millier d'euros, toutes choses égales, corrélation.
+6. Comment lis-tu β̂₁ = 0,0475 ? → +47,5 ventes en moyenne par millier de dollars, toutes choses égales, corrélation.
 
 ## Ce qui a cassé pour Salah
 - Erreur récurrente : β̂₀ = ȳ au lieu de ȳ − β̂₁x̄ (learnings) — pas 4, écrit en clair et chiffré (2,2, pas 4).
@@ -93,7 +93,7 @@ R² = 0,6, RSE = 0,894, SE(β̂₁) = 0,283). Trois corrections et deux ajouts :
 3. **« un point tire la droite avec le carré de son écart »** était imprécis : β̂ est *linéaire*
    en y, l’influence de yᵢ sur la pente vaut exactement (xᵢ − x̄)/S_xx — c’est le **levier**. Le
    carré explique qu’on subisse le point (laisser un résidu grand coûte son carré), pas de combien
-   la pente bouge. Le pas 6 de la sheet dit les deux séparément. À valider en revue.
+   la pente bouge. Le pas 6 de la sheet dit les deux séparément. — validé 17/09
 4. **Ajout vérifié** : le même écart de 10 posé sur le point du **centre** (y₃ = 15, w = 0) laisse
    β̂₁ strictement inchangée (0,6) et ne déplace que β̂₀ (2,2 → 4,2). C’est le contraste qui fait
    comprendre le levier ; la figure 2 de la sheet a donc deux sliders au lieu d’un.
@@ -104,3 +104,13 @@ R² = 0,6, RSE = 0,894, SE(β̂₁) = 0,283). Trois corrections et deux ajouts :
    4 000 tirages → R² 0,50 → 0,68, R² ajusté ≈ 0,48 immobile ; gain moyen par colonne de bruit
    = (1 − R²)/(n − p − 1), vérifié à 0,0178 contre 0,0179 théorique. La graine du générateur de la
    figure a été choisie pour que le tirage affiché colle à ces moyennes (0,494 → 0,668).
+
+**Arbitrage de revue 5, 17/09 — validé 17/09.** Les trois corrections **validées** (4,33 et
+« plus que quadruplé » ; dollars, pas euros ; influence = écart × levier, pas carré de l'écart).
+La formulation juste est fixée ainsi, au pas 6 de la sheet et ici : « un point tire la droite
+proportionnellement à son écart et à son levier (xᵢ − x̄)/S_xx, **sans borne** ; la MAE borne
+l'influence ». La légende de la figure 1 (« minimiser la somme des aires ») parle de la **loss**
+et non de l'influence : vérifiée, elle ne contredit pas la phrase et reste inchangée ; c'est la
+légende de la **figure 2** qui porte l'influence, et elle dit déjà « même écart, influence
+opposée — c'est le levier ». Deux résidus de la correction traînaient encore dans le spec seul
+(maillon 4 de la chaîne verbalisée, « euros » au maillon 6) : **corrigés**. Statut `reviewed`.
