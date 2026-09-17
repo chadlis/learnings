@@ -10,7 +10,7 @@ prereq: [p03-02, p07-03, p07-04, p08-01]
 anki: [ml::optimisation, ml::boosting, ml::kmeans, dl::backprop]
 bridges: []
 next: b02
-status: ready
+status: built
 ---
 ## Le mécanisme
 Un critère L, un objet θ qui bouge, un pas : θ ← θ − η·∇L(θ). Tout ce qui change d'un domaine à l'autre est **ce qu'est θ** et **où l'on prend le gradient**. Le pas, le signal (la pente, p03-01), la condition de convergence (η < 2/courbure) et la casse (non-convexité, pas trop grand) sont les mêmes.
@@ -25,7 +25,7 @@ Une figure unique, puis une ligne par domaine : ce qu'est θ · ce qu'est le gra
 | Gradient boosting | la **fonction** F(x) | −∂L/∂F(xᵢ) en chaque point (résidus si MSE) | F ← F + ν·h, où h ≈ le gradient négatif ajusté par un arbre | p07-03 |
 | k-means (Lloyd) | les centroïdes μ_j et les affectations | deux gradients **exacts** en alternance : affecter au plus proche, recentrer | descente alternée, chaque demi-pas à son optimum | p07-04 |
 | Réseau (backprop) | tous les poids W | ∂L/∂W par VJP depuis la sortie | W ← W − η∇, minibatch | p08-01 pas 5–6 ; p03-02 pas 7 |
-| Descente 2 paramètres | β ∈ R² sur un bol allongé | Aβ − b | même pas, κ = 71 pas nécessaires | w03-01 |
+| Descente 2 paramètres | β ∈ R² sur un bol allongé | Aβ − b | même pas, mais κ = 71 : 114 pas à η = 0,02 pour diviser l'écart par 10 | w03-01 |
 
 Lecture de la table : boosting = descente **dans l'espace des fonctions**, le taux d'apprentissage est ν ; Lloyd = descente **par blocs** où chaque bloc se résout en forme fermée (b06) ; backprop = le calcul du gradient, pas la descente elle-même (p08-01 le dit : ici on calcule, p03-02 on utilise).
 
@@ -53,3 +53,26 @@ Lecture de la table : boosting = descente **dans l'espace des fonctions**, le ta
 ## Ce qui a cassé pour Salah
 - Q12.1 (boosting : gradient de la loss, pas résidus de l'arbre précédent) : la ligne « boosting » de la table est écrite contre ça.
 - Signe du gradient à re-solliciter (bilan 16/09) : la figure 1 montre le pas dans le bon sens, quel que soit l'onglet.
+
+## Questions pour la revue
+
+Tous les chiffres du fil rouge ont été revérifiés par script avant écriture (trajectoires à
+η = 0,25 / 0,9 / 1,1, gradient de la log-loss sur deux observations, boosting à ν = 0,5,
+Lloyd 1D, neurone de p08-01, valeurs propres de A) : un seul écart.
+
+1. **« κ = 71 pas nécessaires » (ligne « Descente 2 paramètres » de la table)** — la formule
+   mélangeait deux nombres. Vérifié : les valeurs propres de A = [[15, 28], [28, 57]] sont
+   1 et 71, donc κ = **71** et η_max = 2/71 = 0,028 ; le nombre de **pas** est celui de w03-01,
+   ln 0,1 / ln 0,98 = 113,97, soit **114 pas** à η = 0,02 pour diviser l'écart par 10.
+   Corrigé ci-dessus et écrit ainsi dans la sheet (pas 2 et pas 7).
+
+2. **Convention sur la loss du boosting** (à trancher en revue, sans conséquence sur le
+   mécanisme). Le dépôt écrit les objectifs sans facteur ½. Avec L = Σ(yᵢ − F(xᵢ))², le
+   pseudo-résidu vaut donc −∂L/∂F(xᵢ) = **2**(yᵢ − F(xᵢ)) et non (yᵢ − F(xᵢ)). La sheet le dit
+   explicitement et range le facteur 2 dans ν, ce qui garde les chiffres du pas 4 lisibles
+   (cible de l'arbre 2 = y − F₁ = (−2 ; 0 ; −1 ; +3)). Si la revue préfère la convention
+   classique du boosting (loss avec ½, résidu nu), c'est une ligne à changer ici et dans p07-03.
+
+3. **Outillage** : `tools/validate_sheet.py` n'acceptait que des parties numériques
+   (`part=(\d+)`). Les ponts vivent dans la partie « B » de `build_index.py` ; le motif est
+   passé à `part=([0-9A-Z]+)`. Aucune autre sheet n'est affectée.

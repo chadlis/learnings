@@ -17,7 +17,8 @@ def fail(m): fails.append(m)
 def warn(m): warns.append(m)
 
 # ---- nommage et méta
-m = re.search(r'<meta name="sheet" content="series=(\w+);part=(\d+);number=(\d+);status=(v\d+)">', t)
+# part : les chaînes et déroulés sont numérotés (00…09), les ponts vivent dans la partie « B ».
+m = re.search(r'<meta name="sheet" content="series=(\w+);part=([0-9A-Z]+);number=(\d+);status=(v\d+)">', t)
 if not m: fail('meta sheet manquante ou mal formée (series=…;part=…;number=…;status=v1)')
 else:
     series, part, number, status = m.groups()
