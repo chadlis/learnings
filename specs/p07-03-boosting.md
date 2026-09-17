@@ -10,7 +10,7 @@ prereq: [p03-02, p07-01, p02-01, p03-01]
 anki: [ml::boosting, ml::gradient-boosting, ml::learning-rate, ml::rf-vs-gb]
 bridges: [b01, b03, b05]
 next: p07-04
-status: built
+status: reviewed
 ---
 
 ## Question de la chaîne
@@ -104,3 +104,11 @@ Pas d'AdaBoost (poids exponentiels) au-delà du nom, pas de hessienne XGBoost (s
   soit visible, la simulation tourne à ν = 0,3, M = 200, sans arrêt anticipé (forêt 8,9 %, boosting
   10,9 %, boosting pire dans 82 tirages sur 100). La légende le dit explicitement. Vaut-il mieux une
   troisième série « boosting arrêté au minimum de validation », au prix d'une figure plus lourde ?
+
+**Arbitrage de revue 5, 17/09 — validé 17/09.** **Validé en l'état.** Le chiffre faux du
+spec reste corrigé : à ν = 1 la RSS ne tombe pas à 0 en trois arbres mais vaut 2,0 / **0,519**
+/ 0,0081 après 1, 3 et 10 arbres — une souche ne produit que deux valeurs, quatre valeurs
+distinctes ne s'atteignent pas en trois pas. p07-02 reste hors de `prereq` mais dans la
+carte des prérequis et les ponts. La recherche linéaire par feuille de Friedman reste
+**hors scope**, et la figure 3 tourne **exprès sans arrêt anticipé**, sa légende le disant.
+Statut `reviewed`.

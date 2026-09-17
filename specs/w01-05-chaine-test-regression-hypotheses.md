@@ -10,7 +10,7 @@ prereq: [p01-03, p01-02, p01-01, p05-01]
 anki: [stats::inference, stats::estimation, ml::regression-lineaire, stats::pvalue, stats::procedure]
 bridges: [b02, b03]
 next: p02-01
-status: built
+status: reviewed
 ---
 
 ## Pourquoi ce déroulé existe
@@ -86,3 +86,14 @@ Pas de test F, pas de X aléatoires au-delà de l'exogénéité nommée, pas de 
 - **Figure 1 du spec.** Le `stepper` sur les huit marches est livré comme `SL.stepper` sur `.chain` + deux badges (« règles » / « hypothèses », non consommées barrées) en marge de chaque marche — pas comme un `div.fig` : une figure doit produire du SVG au clic (`test_walkthroughs.mjs`), ce que le stepper ne fait pas. Les trois `div.fig` sont donc : les trois colonnes en action (nouveau tirage des ε), l'histogramme `repeat` de β̂₁ (figure 2 du spec), et la simulation « hypothèse cassée » (figure 3 du spec, promue de grille statique à simulation : les boutons surlignent les lignes du registre *et* redessinent l'histogramme).
 - **Nuance sur H3, mesurée.** Avec des ε en AR(1) φ = 0,8, la dépendance **rétrécit** la loi de β̂₁ (écart-type 0,278 contre 0,316) pendant que la couverture de l'IC₉₅ tombe à 79 %. « H2–H3 cassent la largeur » est donc à lire « cassent l'égalité Var(β̂₁) = σ²/S_xx », pas « élargissent ». La figure 3 et sa légende le disent ; le registre garde la formulation du spec. Valeurs mesurées (200 000 tirages) : vrai 2,000/0,316/95,0 % · H1 2,500/0,353/82,8 % · H2 (σ = 2 ; 0,5 ; 0,5 ; 0,5 ; 2) 2,000/0,570/87,9 % · H3 2,000/0,279/79,1 % · H4 (Student(3) normalisée) 2,000/0,312/95,5 %.
 - **Un `.card.large` ajouté** (`grid-column:1 / -1`) pour que le registre, à quatre colonnes, prenne toute la largeur du pas au lieu d'être serré dans la colonne de droite (405 px) et de défiler. Même geste que `.step .fig`.
+
+**Arbitrage de revue 5, 17/09 — validé 17/09.** Aucun chiffre du spec n'était faux.
+**Nuance H3 validée** : en AR(1) φ = 0,8 la dépendance **rétrécit** la loi de β̂₁ (0,279
+contre 0,316) pendant que la couverture tombe à 79 % — « H2–H3 cassent la largeur » se lit
+donc « cassent l'égalité Var = σ²/S_xx », **pas « élargissent »**. Classe `.card.large`
+**validée**. Question de format **tranchée hors de ce spec** : le tableau « les deux genres »
+du `CLAUDE.md` dit désormais que les déroulés neufs suivent le standard tableau noir v5
+(celui qu'impose `validate_sheet.py`) et que seuls les quatre anciens, D1–D4, sont en
+`nav.echelle`. Les deux « petits cas 3 » sont maintenant consignés **aussi** dans
+`chain-p01-04` (pas 6) et dans `bridge-02` (lieu 4), comme le spec le demandait.
+Statut `reviewed`.

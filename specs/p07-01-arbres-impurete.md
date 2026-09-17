@@ -10,7 +10,7 @@ prereq: [p03-01, p00-03, p06-01]
 anki: [ml::arbres, ml::gini, ml::profondeur, ml::cart]
 bridges: [b05, b03]
 next: p07-02
-status: built
+status: reviewed
 ---
 
 ## Question de la chaîne
@@ -104,3 +104,12 @@ Pas d'élagage coût-complexité détaillé, pas de surrogate splits au-delà du
   x = 3 *retiré* — c'est la perturbation minimale qui change effectivement la racine
   (2,5 → 4,5, gain 0,167 → 0,276). Un simple déplacement ne change rien tant que l'ordre tient,
   ce qui est justement le pas 3.
+
+**Arbitrage de revue 5, 17/09 — validé 17/09.** Aucun chiffre du spec n'était faux (les
+sept gains Gini et l'égalité à 0,250 en accuracy entre les seuils 2,5 et 4,5 sont exacts).
+**Frontière vraie en coin validée** — avec une diagonale le U est plat (0,008 d'amplitude,
+mesuré) et la figure ne montrerait rien ; le coût de la diagonale est chiffré au pas 4
+(1/(2k)) au lieu d'être dessiné. **Creux du U à la profondeur 2 validé** comme régime
+honnête à n = 40. Reformulations **validées** : « couper jusqu'à ce que chaque feuille soit
+pure » plutôt que « isoler chaque point », et l'instabilité du pas 8 posée sur un point
+**retiré** et non déplacé. Statut `reviewed`.

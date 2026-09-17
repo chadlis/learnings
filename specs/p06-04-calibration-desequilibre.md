@@ -10,7 +10,7 @@ prereq: [p06-03, p02-01, p00-03]
 anki: [ml::calibration, ml::brier, ml::desequilibre, ml::seuil]
 bridges: [b05]
 next: p07-01
-status: built
+status: reviewed
 ---
 
 ## Question de la chaîne
@@ -94,6 +94,15 @@ Trois chiffres du fil rouge ont été corrigés à l'écriture, après vérifica
   modèle calibré *doit* être en dessous. Le 0,25 supposait que B sorte 0,50 sur *tous* les
   négatifs ; ses scores sont étalés, leur moyenne vaut 0,178.
 
-À trancher en revue : le C « sur-confiant » de la figure 1 est construit en étirant les logits
+— validé 17/09 Le C « sur-confiant » de la figure 1 est construit en étirant les logits
 autour du prior (facteur 1,8), faute de définition dans le spec. Son Brier (0,0056) est
 *au-dessus* du trivial — c'est pédagogiquement utile, mais c'est un choix d'auteur.
+
+**Arbitrage de revue 5, 17/09 — validé 17/09.** Corrections de chiffres **validées** :
+Brier **0,0026** pour A et **0,088** pour B (le 0,05 contredisait le plancher trivial
+π(1 − π) = **0,003**, qu'un modèle calibré doit passer par-dessous) ; « scoré 0,50 là où A
+dit **0,003** » ; le seuil équivalent est faux de **×78 en probabilité** et **×332 en cote**,
+les deux lectures écrites côte à côte plutôt qu'un « facteur ~150 » qui ne correspond à
+aucune. Le modèle C sur-confiant **construit par étirement des logits d'un facteur 1,8**
+autour du prior est **validé** comme choix d'auteur, faute de définition dans le spec.
+Statut `reviewed`.

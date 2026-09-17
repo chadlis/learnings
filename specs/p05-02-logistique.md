@@ -10,7 +10,7 @@ prereq: [p02-01, p03-01, p03-02, p05-01]
 anki: [ml::logistique, ml::odds-ratio, ml::effet-marginal, ml::frontiere-lineaire]
 bridges: [b06, b05]
 next: p05-03
-status: built
+status: reviewed
 ---
 
 ## Question de la chaîne
@@ -88,3 +88,11 @@ Pas d'IRLS détaillé, pas de régression multinomiale au-delà du renvoi softma
 - **Linéarisé ≠ exact.** L'effet marginal est une dérivée : sur un pas de 100 $ l'écart réel vaut 13,42 points (et non 13,75) au sommet, et 1,42 point (et non 1,08) à p = 0,02 — la tangente surestime au milieu et sous-estime en bas. La sheet affiche les deux colonnes ; le spec ne mentionnait que le linéarisé. À valider comme contenu voulu.
 - **SE de β̂₁.** La table 4.1 d'ISLR donne SE = 0,0002 et z = 24,9, ce qui est incohérent (0,0055/0,0002 = 27,5) : c'est l'arrondi de la table. La sheet utilise **SE = 0,00022**, qui redonne z = 25,0 et l'IC₉₅ sur l'OR [1,66 ; 1,81]. À confirmer contre une sortie non arrondie.
 - **Ordre des figures.** La sheet numérote les figures dans l'ordre de lecture : F1 = les trois échelles (pas 2), F2 = la table cote → p (pas 5), F3 = sigmoïde et tangente (pas 6). C'est l'inverse de la numérotation du spec pour F1 et F3 ; le contenu exigé est identique.
+
+**Arbitrage de revue 5, 17/09 — validé 17/09.** **+13,75 points** (et non 13,7) **validé**.
+Les **deux colonnes linéarisé / exact** sont **validées** comme contenu voulu : sur un pas
+de 100 $ l'écart réel vaut 13,42 au sommet et 1,42 en bas, contre 13,75 et 1,08 en
+linéarisé. **SE = 0,00022** retenu, cohérent avec le z = 24,9 d'ISLR table 4.1 une fois
+sorti de l'arrondi, et l'IC₉₅ sur l'OR [1,66 ; 1,81] avec lui. **Ordre des figures validé
+tel que produit** (F1 « trois échelles », F2 « la cote est multipliée », F3 « même β, pente
+qui change »), donc F1/F3 inversées par rapport au spec. Statut `reviewed`.

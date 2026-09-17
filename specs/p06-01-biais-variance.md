@@ -10,7 +10,7 @@ prereq: [p01-01, p00-02]
 anki: [ml::biais-variance, ml::overfitting, ml::validation]
 bridges: [b03, b02]
 next: p06-02
-status: built
+status: reviewed
 ---
 
 ## Question de la chaîne
@@ -91,4 +91,11 @@ Pas de double descente au-delà du nom, pas de décomposition pour la log-loss, 
   *exactement* par la matrice chapeau (variance moyenne = σ²·p/n, gap = 2σ²·p/n). La sheet
   fait ce calcul-là : courbes lisses, chiffres reproductibles, et deux identités en prime
   qui portent les pas 5 et 6. Le tirage aléatoire reste là où il se voit — le bouton
-  « nouveau dataset » de la figure 2. À valider.
+  « nouveau dataset » de la figure 2. — validé 17/09
+
+**Arbitrage de revue 5, 17/09 — validé 17/09.** Corrections de chiffres **validées** :
+σ² = **83 %** (5/6) de l'erreur totale de la droite et non la moitié ; arrondis resserrés
+du fil rouge, biais² de la constante **0,102** (variance exacte de la grille) et erreur
+réductible **0,127**, obtenus par **matrice chapeau** et contrôlés par Monte-Carlo.
+Figures 2 et 3 calculées exactement plutôt que simulées **validées** — le tirage reste
+visible là où il se voit, au bouton « nouveau dataset ». Statut `reviewed`.

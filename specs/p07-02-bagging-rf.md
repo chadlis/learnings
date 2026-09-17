@@ -10,7 +10,7 @@ prereq: [p07-01, p01-05, p00-02, p06-01]
 anki: [ml::bagging, ml::random-forest, ml::oob, ml::variance-correlee]
 bridges: [b04, b03, b02]
 next: p07-03
-status: built
+status: reviewed
 ---
 
 ## Question de la chaîne
@@ -85,3 +85,10 @@ Un arbre profond : variance σ² (unité). Moyenne de B arbres corrélés à ρ 
 
 ## Exclusions
 Pas d'extra-trees, pas de proximity, pas d'importance par permutation détaillée, pas de preuve de ρσ² + (1 − ρ)σ²/B (b04).
+
+**Arbitrage de revue 5, 17/09 — validé 17/09.** **Validé en l'état.** Les deux points
+relevés à l'écriture tiennent : la figure 2 tire **un nouveau jeu de 30 points** par
+répétition et non un bootstrap à jeu fixé — ainsi lue, la figure du spec démontrait
+l'inverse de la chaîne (B bootstraps indépendants ⇒ ρ = 0) ; et la figure 3, à n = 20,
+affiche **35,8 %** à côté du 36,8 % asymptotique plutôt que d'arrondir en silence.
+Statut `reviewed`.

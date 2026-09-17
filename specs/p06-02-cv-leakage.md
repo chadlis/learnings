@@ -10,7 +10,7 @@ prereq: [p06-01, p01-04, p01-05]
 anki: [ml::validation, ml::cross-validation, ml::leakage]
 bridges: [b03, b04, b02]
 next: p06-03
-status: built
+status: reviewed
 ---
 
 ## Question de la chaîne
@@ -114,3 +114,11 @@ suit la version corrigée.
 Autre point, sans conséquence sur les chiffres : les figures sont **renumérotées dans
 l'ordre du document** (1 = les plis, pas 3 ; 2 = le compromis de k, pas 4 ; 3 = la fuite,
 pas 6), le spec les listait dans un autre ordre.
+
+**Arbitrage de revue 5, 17/09 — validé 17/09.** Corrections de chiffres **validées** :
+figure 1 à **99,9 %** ((k − 2)/(k − 1) = 998/999, et non 998/1 000) ; figure 2 reparamétrée
+à **2 000 features et sélection de 100** — les paramètres du spec ne fabriquaient pas le
+phénomène (17 % au lieu de ≈ 5 %), le chiffre cible était bon, les paramètres faux.
+Écart-type de l'estimation qui **décroît puis plafonne** vers k = n (et ne remonte jamais)
+**validé**, avec la formulation de b04 : la moyenne cesse de rapporter, la variance ne
+monte pas. Statut `reviewed`.
