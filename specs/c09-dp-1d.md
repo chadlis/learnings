@@ -10,7 +10,7 @@ prereq: [c00]
 anki: [coding::dp, coding::kadane, coding::recurrence]
 bridges: []
 next: 
-status: built
+status: reviewed
 ---
 ## Signal
 Une réponse optimale sur un **préfixe** qui se déduit des réponses sur des préfixes plus courts ; des **choix** (prendre / laisser, couper / continuer) ; le mot « nombre de façons », « maximum sur un sous-tableau », « escalier », « pièces ». Contre-signal : le sous-problème dépend de tout le futur (pas de récurrence sur un préfixe) ; état à deux dimensions (DP 2D, hors périmètre).
@@ -73,6 +73,8 @@ Un dp[i] mal défini (« la réponse jusqu'à i » sans dire si i est inclus, ou
 - Famille t09 : « sous-problème indexé par position, récurrence, ordre de remplissage, roulement O(1), Kadane comme DP » ; la scorie à surveiller est la **définition** de dp[i] laissée vague — chaque variante la dit ici.
 
 ## Questions pour la revue
+
+*Revue 7, 17/09 — **validé 17/09**, les trois points. Arbitrage en fin de fiche.*
 - **Chiffre corrigé (figure 1).** Le spec écrivait `note` = « max(11, 2 + 9) = 11 ». Numériquement
   vrai, mais ne correspond à aucun tour : au tour i = 2 la récurrence est
   max(dp[1], dp[0] + 9) = **max(7, 2 + 9) = 11** (11 est le *résultat*, pas l'opérande gauche) ;

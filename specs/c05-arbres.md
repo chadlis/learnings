@@ -10,7 +10,7 @@ prereq: [c00]
 anki: [coding::arbres, coding::dfs, coding::bfs, coding::bst]
 bridges: []
 next: c06
-status: built
+status: reviewed
 ---
 ## Signal
 Une structure **hiérarchique** sans cycle : chaque nœud a des enfants, un seul parent. Questions : hauteur, diamètre, chemin, somme, validité BST, niveaux. Contre-signal : un graphe avec cycles (c06 : il faut un ensemble de vus).
@@ -75,6 +75,8 @@ Valider un BST en comparant seulement chaque nœud à ses enfants : accepte des 
 - Famille t09 : « DFS récursif pré/in/post, BFS par niveaux, hauteur/diamètre, BST invariant de bornes » ; le contre-exemple du BST est celui qui doit sortir sans hésiter.
 
 ## Questions pour la revue
+
+*Revue 7, 17/09 — **validé 17/09**, les cinq points. Arbitrage en fin de fiche.*
 - **Aucun chiffre du spec n'était faux.** Tout a été revérifié par script avant écriture :
   pré `4, 2, 1, 3, 6, 5, 7` · in `1 … 7` · post `1, 3, 2, 5, 7, 6, 4` ; hauteurs remontées
   `1, 1, 2, 1, 1, 2, 3` ; `pile = [4, 2, 1]` au 3ᵉ pas du pré-ordre ; diamètre 4 arêtes

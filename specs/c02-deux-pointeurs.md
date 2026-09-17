@@ -10,7 +10,7 @@ prereq: [c00]
 anki: [coding::deux-pointeurs, coding::3sum, coding::elimination]
 bridges: []
 next: c03
-status: built
+status: reviewed
 ---
 ## Signal
 Tableau **trié** (ou triable sans perte) et une question sur des **paires** (somme cible, écart, produit) ; ou une quantité min(a[l], a[r]) × (r − l) où bouger le plus petit bord ne peut qu'aider (LC 11). Contre-signal : indices à renvoyer sur un tableau non trié (trier perd les indices : dict, c00) ; paires non monotones.
@@ -74,6 +74,8 @@ Non trié avec somme cible : l'élimination est fausse (a[l'] peut être plus pe
 - Famille du fil rouge (LC 167 → 3Sum → LC 11) ; « élimination d'une classe » et « majorer les deux facteurs » sont les deux justifications qui doivent sortir à l'oral (learnings : coding patterns t09).
 
 ## Questions pour la revue
+
+*Revue 7, 17/09 — **validé 17/09**, les trois points. Arbitrage en fin de fiche.*
 - **Tous les chiffres du spec ont été revérifiés par script, aucun n'était faux** :
   figure 1 (5 images, `(0,5,12) · (0,4,9) · (1,4,11) · (1,3,9) · (2,3,10)` ✓, paire
   unique (2, 3)), figure 2 (8 images, réponse 49 en (1, 8)), 3Sum sur

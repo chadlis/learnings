@@ -10,7 +10,7 @@ prereq: [c00]
 anki: [coding::binary-search, coding::monotone, coding::recherche-sur-reponse]
 bridges: []
 next: c04
-status: built
+status: reviewed
 ---
 ## Signal
 Un espace **ordonné** (tableau trié, entiers de 1 à n, un temps, une capacité) et un prédicat **monotone** dessus : faux…faux vrai…vrai. Y compris quand l'espace est **la réponse elle-même** : « la plus petite vitesse telle que Koko finisse en h heures » (LC 875), « la plus petite capacité qui expédie en d jours ». Contre-signal : prédicat non monotone (un seul minimum local n'est pas un premier vrai).
@@ -75,6 +75,8 @@ Prédicat non monotone (faux vrai faux) : la dichotomie converge vers n'importe 
 - Bornes inclusives/exclusives et « premier vrai » : t09 les listait ; ici un seul squelette pour toute la famille, et la figure 2 pour la recherche sur la réponse.
 
 ## Questions pour la revue
+
+*Revue 7, 17/09 — **validé 17/09**, les quatre points. Arbitrage en fin de fiche.*
 Tous les chiffres du spec ont été revérifiés par script avant écriture : **aucun n'était
 faux**. Trace de la figure 1 : (0, 5, 2, faux) → (3, 5, 4, vrai) → (3, 4, 3, vrai) → lo = hi = 3,
 3 tours = ⌈log₂ 6⌉, confirmée ; invariant « faux sur [0, lo), vrai sur (hi, n) » confronté à une

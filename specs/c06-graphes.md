@@ -10,7 +10,7 @@ prereq: [c00]
 anki: [coding::graphes, coding::bfs, coding::dfs, coding::topo]
 bridges: []
 next: c07
-status: built
+status: reviewed
 ---
 ## Signal
 Des **relations** entre éléments (voisins, arêtes, cases adjacentes), des **cycles possibles**, des questions de connexité, de composantes, de plus court chemin non pondéré, d'ordre de dépendances. Grille = graphe implicite (4 voisins). Contre-signal : arêtes pondérées (Dijkstra, nommer ; hors périmètre).
@@ -85,6 +85,8 @@ de graphes aléatoires). Récursion DFS sur une grille 1 000 × 1 000 : Recursio
 - Famille t09 : « marquer à l'enfilement, deque, RecursionError ~1 000, in-place vs set, distances par niveaux, tri topologique en DFS simple » — la figure 2 (le bug qui ne plante pas) est ce que Q/A ne montrait pas.
 
 ## Questions pour la revue
+
+*Revue 7, 17/09 — **validé 17/09**, les deux points ; le fil rouge corrigé fait désormais foi. Arbitrage en fin de fiche.*
 
 Deux chiffres du spec ont été corrigés après vérification par script (scripts jetables,
 non versionnés ; tous les résultats ci-dessous sont reproductibles en quelques lignes).

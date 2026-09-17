@@ -10,7 +10,7 @@ prereq: [c00]
 anki: [coding::intervals, coding::balayage, coding::tri]
 bridges: []
 next: c09
-status: built
+status: reviewed
 ---
 ## Signal
 Des **segments** [début, fin] (réunions, réservations, plages), des questions de fusion, de chevauchement, de nombre de salles, de couverture. Contre-signal : segments sur un cercle ou en 2D (autre chose).
@@ -74,6 +74,8 @@ Sans tri, ou trié par fin pour la fusion : un intervalle peut chevaucher un fus
 - Famille t09 : « trier par début, fusion, invariant "le dernier fusionné", balayage » — le point à dire est **pourquoi** le dernier suffit (le tri), pas seulement qu'il suffit.
 
 ## Questions pour la revue
+
+*Revue 7, 17/09 — **validé 17/09** pour `[4,9]` (LC 57) et la nuance sur le tri ; **non tranché** pour le fil rouge à deux tris. Arbitrage en fin de fiche.*
 - **Aucun chiffre du spec n'était faux** : la trace de la figure 1, le max de 2 salles
   de LC 253 et la conclusion `[[1,6],[8,12],[15,18]]` sont tous vérifiés par script
   (dont 200 000 tirages croisés fusion / union point par point, 0 désaccord, et

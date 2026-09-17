@@ -10,7 +10,7 @@ prereq: [c00]
 anki: [coding::listes-chainees, coding::lent-rapide, coding::dummy-head]
 bridges: []
 next: c05
-status: built
+status: reviewed
 ---
 ## Signal
 Une structure à **accès séquentiel** (pas d'indice, pas de longueur connue), des opérations « au milieu » ou « à l'envers » demandées **en place**, en O(1) mémoire. Contre-signal : accès aléatoire fréquent (tableau).
@@ -74,6 +74,8 @@ Inverser en écrasant `cur.next` avant d'avoir sauvé `nxt` : le suffixe est per
 - Famille listée en t09 (lent/rapide, inversion, dummy, cycle) ; l'invariant de l'inversion est celui qui doit être dit avec ses deux tranches.
 
 ## Questions pour la revue
+
+*Revue 7, 17/09 — **validé 17/09**, corrections et formulations comprises. Arbitrage en fin de fiche.*
 - **Deux chiffres du spec corrigés après vérification par script** (le script est dans la
   trace de construction, pas versionné) :
   - *Figure 2, partie cycle* : le spec annonçait **6 images** jusqu'à la rencontre. Sur la
