@@ -359,7 +359,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   </div>
   <div class="card casse"><div class="lbl">Quatre limites</div>
     <ul>
-      <li><b>Un seul dataset.</b> On n'observe ni le biais ni la variance, seulement leur somme, via un jeu de validation (<a href="../../map.html#p06-02">p06-02</a>). Les séparer demande de <i>répéter le tirage</i> : simulation quand on connaît <span class="m">f</span>, rééchantillonnage (<a href="chain-p01-05-bootstrap.html">bootstrap</a>) sinon — et le bootstrap ne rejoue pas la population, seulement l'échantillon.</li>
+      <li><b>Un seul dataset.</b> On n'observe ni le biais ni la variance, seulement leur somme, via un jeu de validation (<a href="chain-p06-02-cv-leakage.html">p06-02</a>). Les séparer demande de <i>répéter le tirage</i> : simulation quand on connaît <span class="m">f</span>, rééchantillonnage (<a href="chain-p01-05-bootstrap.html">bootstrap</a>) sinon — et le bootstrap ne rejoue pas la population, seulement l'échantillon.</li>
       <li><b>Hors erreur quadratique.</b> La coupure exacte en trois termes n'existe pas pour la log-loss ni pour la 0/1 : les décompositions proposées sont conventionnelles et non additives. L'intuition rigide / souple survit, la formule non — ne pas l'écrire au tableau pour un classifieur.</li>
       <li><b>Régime moderne.</b> Des réseaux très surparamétrés interpolent les données <i>et</i> généralisent (<b>double descente</b> : au-delà du point d'interpolation le test redescend). Le U reste vrai à taille de données fixée et flexibilité modérée, c'est-à-dire là où on l'utilise ; il ne décrit pas le régime <span class="m">p</span> ≫ <span class="m">n</span>.</li>
       <li><b>Bruit hétérogène.</b> σ² = σ²(<span class="m">x</span>) : le plancher n'est pas le même partout. Une erreur totale plate peut cacher une zone bien modélisée et une zone irréductiblement bruitée — la moyenne sur <span class="m">x</span> mélange les deux.</li>
@@ -414,7 +414,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Chaîne p06-01 · v1 du 17/09/2026 · Prérequis : <a href="chain-p01-01-objet-aleatoire.html">p01-01</a>, <a href="chain-p00-02-esperance-variance-densite.html">p00-02</a>. Suite : <a href="../../map.html#p06-02">p06-02 Estimer l'erreur — validation, CV, fuites</a>.</footer>
+<footer>Chaîne p06-01 · v1 du 17/09/2026 · Prérequis : <a href="chain-p01-01-objet-aleatoire.html">p01-01</a>, <a href="chain-p00-02-esperance-variance-densite.html">p00-02</a>. Suite : <a href="chain-p06-02-cv-leakage.html">p06-02 Estimer l'erreur — validation, CV, fuites</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

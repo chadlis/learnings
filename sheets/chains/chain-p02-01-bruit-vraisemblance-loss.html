@@ -154,8 +154,8 @@ text.mk-asym{fill:var(--green)}
   <ol id="toc"></ol>
   <h4>Prérequis</h4>
   <ol>
-    <li><a href="../../map.html#p00-02">p00-02 · Espérance, variance, densité</a></li>
-    <li><a href="../../map.html#p00-03">p00-03 · Conditionnement et Bayes</a></li>
+    <li><a href="chain-p00-02-esperance-variance-densite.html">p00-02 · Espérance, variance, densité</a></li>
+    <li><a href="chain-p00-03-conditionnement-bayes.html">p00-03 · Conditionnement et Bayes</a></li>
     <li><a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4 · les mêmes exemples, calculés</a></li>
   </ol>
   <h4>Cartes Anki liées</h4>
@@ -172,8 +172,8 @@ text.mk-asym{fill:var(--green)}
   <div class="card" style="--ac:var(--blue)">
     <div class="lbl">Ce que cette chaîne suppose acquis</div>
     <ul>
-      <li><b>Masse contre densité</b> (<a href="../../map.html#p00-02">p00-02</a>). Pour un <span class="m">y</span> continu, <span class="m">p</span>(<span class="m">y</span>) est une <b>densité</b> : on l'<b>évalue</b> en un point, on ne l'intègre pas. Elle peut dépasser 1 et ce n'est pas une probabilité. Pour un <span class="m">y</span> discret, c'est une masse, et là c'en est une.</li>
-      <li><b>Indépendance ⇒ produit</b> (<a href="../../map.html#p00-03">p00-03</a>). Si les observations sont indépendantes sachant <span class="m">x</span> et <span class="m">θ</span>, la probabilité de les voir toutes est le produit de leurs probabilités individuelles. C'est la seule justification du produit du pas 4.</li>
+      <li><b>Masse contre densité</b> (<a href="chain-p00-02-esperance-variance-densite.html">p00-02</a>). Pour un <span class="m">y</span> continu, <span class="m">p</span>(<span class="m">y</span>) est une <b>densité</b> : on l'<b>évalue</b> en un point, on ne l'intègre pas. Elle peut dépasser 1 et ce n'est pas une probabilité. Pour un <span class="m">y</span> discret, c'est une masse, et là c'en est une.</li>
+      <li><b>Indépendance ⇒ produit</b> (<a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>). Si les observations sont indépendantes sachant <span class="m">x</span> et <span class="m">θ</span>, la probabilité de les voir toutes est le produit de leurs probabilités individuelles. C'est la seule justification du produit du pas 4.</li>
       <li><b>Le log ne déplace pas l'argmax.</b> <span class="m">log</span> est strictement croissante, donc <span class="up">argmax</span> <span class="m">L</span> = <span class="up">argmax</span> <span class="m">log L</span> ; et <span class="m">log</span>(<span class="m">ab</span>) = <span class="m">log a</span> + <span class="m">log b</span> transforme le produit en somme.</li>
       <li><b>Les calculs de cette chaîne sont faits ailleurs.</b> Le déroulé <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4</a> refait les six pas ligne à ligne sur les trois mêmes exemples. Ici on garde les règles et les points d'arrêt.</li>
     </ul>
@@ -287,7 +287,7 @@ text.mk-asym{fill:var(--green)}
     <p><b>Régression</b>, <span class="m">n</span> = 3, <span class="m">σ</span> = 1 : RSS(<span class="m">β</span>) = 14 − 28<span class="m">β</span> + 14<span class="m">β</span>² = 14(1 − <span class="m">β</span>)², donc</p>
     <div class="eq"><span class="m">ℓ</span>(<span class="m">β</span>) = −3 <span class="m">log</span>(√(2<span class="m">π</span>)) − 7(1 − <span class="m">β</span>)² = −2,757 − 7(1 − <span class="m">β</span>)²</div>
     <p><span class="m">ℓ</span>(1) = −2,757 ; <span class="m">ℓ</span>(0) = −9,757. <b>La pièce</b> : <span class="m">log L</span>(<span class="m">p</span>) = 3 <span class="m">log p</span>, valant 0 en <span class="m">p</span> = 1 et −2,079 en <span class="m">p</span> = 0,5 — même sommet que <span class="m">p</span>³.</p>
-    <p><b>Le sous-débordement, en un chiffre</b> : mille densités à 0,01 donnent un produit de 10<sup>−2000</sup>, qui vaut exactement 0 en flottant 64 bits ; la somme des logs vaut −4 605 et se calcule sans effort. (Le même réflexe, plus fin, fait écrire <span class="m">log</span>(1 + e<sup>−<span class="m">z</span></sup>) plutôt que <span class="m">log σ</span>(<span class="m">z</span>) — les flottants sont un sujet à part, <a href="../../map.html#p08-02">p08-02</a>.)</p>
+    <p><b>Le sous-débordement, en un chiffre</b> : mille densités à 0,01 donnent un produit de 10<sup>−2000</sup>, qui vaut exactement 0 en flottant 64 bits ; la somme des logs vaut −4 605 et se calcule sans effort. (Le même réflexe, plus fin, fait écrire <span class="m">log</span>(1 + e<sup>−<span class="m">z</span></sup>) plutôt que <span class="m">log σ</span>(<span class="m">z</span>) — les flottants sont un sujet à part, <a href="chain-p08-02-flottants-lse.html">p08-02</a>.)</p>
   </div>
   <div class="fig" id="fig2">
     <div class="lbl">Figure 2 — le log garde le sommet</div>

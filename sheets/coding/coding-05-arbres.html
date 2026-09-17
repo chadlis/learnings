@@ -184,7 +184,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <ol>
     <li><a href="coding-04-listes-chainees.html">c04 · Listes chaînées</a></li>
     <li><a href="coding-03-binary-search.html">c03 · Binary search</a></li>
-    <li><a href="../../map.html#c06">c06 · Graphes</a></li>
+    <li><a href="coding-06-graphes.html">c06 · Graphes</a></li>
     <li><a href="../../map.html">La carte, colonne 9</a></li>
   </ol>
 </aside>
@@ -225,7 +225,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <h3>Le signal, et le contre-signal <span class="tag tronc">tronc</span></h3>
     <p>Une structure <b>hiérarchique sans cycle</b>, et une question qui porte sur un <b>sous-arbre</b> : hauteur, diamètre, chemin, somme, validité BST, niveaux. Toutes ont la même forme — la réponse pour <span class="m">n</span> se fabrique à partir des réponses pour ses enfants.</p>
     <div class="eq">hiérarchie sans cycle &nbsp;+&nbsp; question sur un sous-arbre &nbsp;⇒&nbsp; <b>une fonction récursive, et son contrat</b></div>
-    <p>Le <b>contre-signal</b> est net : un <b>graphe avec cycles</b>. Sans cycle et avec un seul parent, on ne peut pas revenir sur ses pas, <b>donc</b> rien à mémoriser ; dès qu'un cycle existe il faut un ensemble de <b>vus</b>, et c'est <a href="../../map.html#c06">c06</a>.</p>
+    <p>Le <b>contre-signal</b> est net : un <b>graphe avec cycles</b>. Sans cycle et avec un seul parent, on ne peut pas revenir sur ses pas, <b>donc</b> rien à mémoriser ; dès qu'un cycle existe il faut un ensemble de <b>vus</b>, et c'est <a href="coding-06-graphes.html">c06</a>.</p>
     <p class="say">« La question porte sur un sous-arbre et un sous-arbre est un arbre, donc j'écris une fonction qui répond pour un nœud en appelant ses enfants, donc tout ce que j'ai à décider est ce qu'elle promet et quand elle traite le nœud. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — les deux arbres du fil rouge, posés d'avance</div>
@@ -407,7 +407,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <a href="coding-00-tap-invariant-variant.html#s2"><b>c00 · L'invariant</b><small>le même rituel sans boucle : la « tranche » devient le sous-arbre, le « conteneur » la valeur renvoyée, et l'invariant se lit à l'entrée d'un appel au lieu d'un tour</small></a>
     <a href="coding-04-listes-chainees.html#s1"><b>c04 · Listes chaînées</b><small>mêmes flèches, même absence d'indice ; il y a juste deux suites au lieu d'une, donc une pile pour retenir celle qu'on n'a pas prise — et c'est cette pile qui fait l'espace O(h)</small></a>
     <a href="coding-03-binary-search.html#s3"><b>c03 · Binary search</b><small>le BST est la dichotomie faite structure : à chaque nœud on jette une moitié. Même promesse en O(log n), même effondrement en O(n) quand l'arbre n'est plus équilibré</small></a>
-    <a href="../../map.html#c06"><b>c06 · Graphes</b><small>le contre-signal du pas 1 : dès qu'un cycle existe, il faut un ensemble de vus. Un arbre est exactement le cas où l'on peut s'en passer</small></a>
+    <a href="coding-06-graphes.html"><b>c06 · Graphes</b><small>le contre-signal du pas 1 : dès qu'un cycle existe, il faut un ensemble de vus. Un arbre est exactement le cas où l'on peut s'en passer</small></a>
     <a href="../chains/chain-p07-01-arbres-impurete.html#s5"><b>p07 · Arbres d'impureté</b><small>la même récursion, côté ML : construire l'arbre au lieu de le parcourir, et la hauteur y devient le bouton de variance qu'on règle</small></a>
     <a href="../../map.html"><b>La carte, colonne 9</b><small>les neuf familles et leur ordre de dépendance</small></a>
   </div>
@@ -420,7 +420,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>coding c05 · v1 du 17/09/2026 · Prérequis : <a href="coding-00-tap-invariant-variant.html">c00 · Le TAP</a>. Suite : <a href="../../map.html#c06">c06 · Graphes</a>.</footer>
+<footer>coding c05 · v1 du 17/09/2026 · Prérequis : <a href="coding-00-tap-invariant-variant.html">c00 · Le TAP</a>. Suite : <a href="coding-06-graphes.html">c06 · Graphes</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

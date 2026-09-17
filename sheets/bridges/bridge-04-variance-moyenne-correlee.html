@@ -148,15 +148,15 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <li><a href="../chains/chain-p00-02-esperance-variance-densite.html#s5">p00-02 · Variance et covariance</a></li>
     <li><a href="../chains/chain-p00-04-moyenne-lgn-tcl.html#s3">p00-04 · Var(<span class="m">x̄</span>) = <span class="m">σ</span>²/<span class="m">n</span></a></li>
     <li><a href="../chains/chain-p01-05-bootstrap.html#s4">p01-05 · Bootstrap, les 37 %</a></li>
-    <li><a href="../../map.html#p07-02">p07-02 · Bagging et forêts</a></li>
-    <li><a href="../../map.html#p06-02">p06-02 · CV et fuite</a></li>
+    <li><a href="../chains/chain-p07-02-bagging-rf.html">p07-02 · Bagging et forêts</a></li>
+    <li><a href="../chains/chain-p06-02-cv-leakage.html">p06-02 · CV et fuite</a></li>
   </ol>
   <h4>Cartes Anki liées</h4>
   <div class="tags"><code>ml::bagging</code><code>stats::variance</code><code>ml::validation</code><code>stats::bootstrap</code></div>
   <h4>Ponts</h4>
   <ol>
     <li><a href="bridge-03-biais-variance-partout.html">b03 · Biais et variance partout</a></li>
-    <li><a href="../../map.html#b05">b05 · Escalier vs sensible</a></li>
+    <li><a href="bridge-05-escalier-vs-sensible.html">b05 · Escalier vs sensible</a></li>
   </ol>
 </aside>
 
@@ -168,7 +168,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <li><b>La variance d'une somme.</b> Var(<span class="m">X</span> + <span class="m">Y</span>) = Var <span class="m">X</span> + Var <span class="m">Y</span> + 2 Cov(<span class="m">X</span>, <span class="m">Y</span>) : l'additivité n'est vraie qu'à covariance nulle (<a href="../chains/chain-p00-02-esperance-variance-densite.html#s5">p00-02 pas 5</a>), et Cov = <span class="m">ρσ</span><sub><span class="m">X</span></sub><span class="m">σ</span><sub><span class="m">Y</span></sub> (<a href="../chains/chain-p00-02-esperance-variance-densite.html#s6">pas 6</a>). Tout ce pont est cette parenthèse, comptée.</li>
       <li><b>Var(<span class="m">x̄</span>) = <span class="m">σ</span>²/<span class="m">n</span> et le 1/√<span class="m">n</span></b> (<a href="../chains/chain-p00-04-moyenne-lgn-tcl.html#s3">p00-04 pas 3–4</a>). C'est le cas <span class="m">ρ</span> = 0 de la formule d'ici : le cas particulier, pas le cas général.</li>
       <li><b>Le geste du bootstrap</b> : rééchantillonner <span class="m">n</span> lignes avec remise, et les 37 % de lignes laissées dehors (<a href="../chains/chain-p01-05-bootstrap.html#s3">p01-05 pas 3–4</a>).</li>
-      <li><b>Bagging, forêts, <span class="m">k</span>-fold</b> ne sont pas redéfinis : <a href="../../map.html#p07-02">p07-02</a> et <a href="../../map.html#p06-02">p06-02</a> les portent. Ce pont ne fournit qu'un chiffre, le même partout.</li>
+      <li><b>Bagging, forêts, <span class="m">k</span>-fold</b> ne sont pas redéfinis : <a href="../chains/chain-p07-02-bagging-rf.html">p07-02</a> et <a href="../chains/chain-p06-02-cv-leakage.html">p06-02</a> les portent. Ce pont ne fournit qu'un chiffre, le même partout.</li>
     </ul>
   </div>
 </section>
@@ -229,7 +229,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr><td>Bootstrap</td><td><span class="m">B</span> tirages avec remise</td><td>la dépendance des lignes</td><td>par bloc</td></tr>
       <tr><td>Ensemble de modèles</td><td><span class="m">K</span> modèles</td><td>mêmes données, mêmes erreurs</td><td>des modèles variés</td></tr>
     </table>
-    <p><b>Où c'est écrit</b> : <a href="../../map.html#p07-02">p07-02</a> · <a href="../../map.html#p06-02">p06-02</a> · <a href="../chains/chain-p00-04-moyenne-lgn-tcl.html#s8">p00-04 casse</a> et <a href="../chains/chain-p01-01-objet-aleatoire.html#s10">p01-01 casse</a> · <a href="../chains/chain-p01-05-bootstrap.html#s6">p01-05 casse</a> · <a href="bridge-03-biais-variance-partout.html#s6">b03 pas 6</a>.</p>
+    <p><b>Où c'est écrit</b> : <a href="../chains/chain-p07-02-bagging-rf.html">p07-02</a> · <a href="../chains/chain-p06-02-cv-leakage.html">p06-02</a> · <a href="../chains/chain-p00-04-moyenne-lgn-tcl.html#s8">p00-04 casse</a> et <a href="../chains/chain-p01-01-objet-aleatoire.html#s10">p01-01 casse</a> · <a href="../chains/chain-p01-05-bootstrap.html#s6">p01-05 casse</a> · <a href="bridge-03-biais-variance-partout.html#s6">b03 pas 6</a>.</p>
     <p>Les colonnes 2 et 3 sont tout le travail de lecture : nommer les <span class="m">B</span> termes, puis dire ce qu'ils <b>partagent</b>. Un bagging partage 63 % des lignes et les features dominantes ; deux plis d'une <span class="m">k</span>-fold partagent presque tout leur entraînement ; deux lignes d'un même utilisateur partagent l'utilisateur ; un bootstrap de lignes, lui, ne partage rien — et c'est précisément son erreur.</p>
     <p><b>Le chiffre qui tue le réflexe « plus ».</b> Pour descendre à 1 % au-dessus du plancher il faut <span class="m">B</span> = (1 − <span class="m">ρ</span>)/(0,01 <span class="m">ρ</span>) : <b>100</b> termes à <span class="m">ρ</span> = 0,5, <b>900</b> à <span class="m">ρ</span> = 0,1, <b>1 900</b> à <span class="m">ρ</span> = 0,05. Plus <span class="m">ρ</span> est bas, plus <span class="m">B</span> sert — le nombre ne paie que là où la corrélation est déjà basse.</p>
   </div>
@@ -257,7 +257,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr class="hl"><td><b>0,05</b></td><td>0,1450</td><td><b>0,0595</b></td><td>0,05</td><td><b>20,0</b></td></tr>
     </table>
     <p>À <span class="m">B</span> = 100, passer de <span class="m">ρ</span> = 0,5 à <span class="m">ρ</span> = 0,05 fait tomber la variance de 0,505 à 0,0595 — <b>huit fois moins</b>. Aucun nombre d'arbres ne produit ce gain à <span class="m">ρ</span> = 0,5 : le plancher est à 0,50, et mille arbres n'y descendent qu'à 0,5005.</p>
-    <p><b>Le bootstrap entre deux fois dans un bagging</b>, et c'est le même 37 %. Chaque arbre voit 1 − (1 − 1/<span class="m">n</span>)<sup><span class="m">n</span></sup> ≈ <b>63,2 %</b> des lignes : c'est ce recouvrement qui fabrique <span class="m">ρ</span>. Il en laisse <b>36,8 %</b> dehors : ce sont les lignes out-of-bag, sur lesquelles se lit gratuitement l'erreur (<a href="../chains/chain-p01-05-bootstrap.html#s4">p01-05 pas 4</a>, <a href="../../map.html#p07-02">p07-02</a>). Un seul tirage, deux conséquences opposées — une variance qui plafonne, une validation offerte.</p>
+    <p><b>Le bootstrap entre deux fois dans un bagging</b>, et c'est le même 37 %. Chaque arbre voit 1 − (1 − 1/<span class="m">n</span>)<sup><span class="m">n</span></sup> ≈ <b>63,2 %</b> des lignes : c'est ce recouvrement qui fabrique <span class="m">ρ</span>. Il en laisse <b>36,8 %</b> dehors : ce sont les lignes out-of-bag, sur lesquelles se lit gratuitement l'erreur (<a href="../chains/chain-p01-05-bootstrap.html#s4">p01-05 pas 4</a>, <a href="../chains/chain-p07-02-bagging-rf.html">p07-02</a>). Un seul tirage, deux conséquences opposées — une variance qui plafonne, une validation offerte.</p>
     <p><b>Même argument pour un ensemble de modèles hétérogènes</b> : moyenner cinq gradient boostings réglés pareil rapporte presque rien, un GBM plus un modèle linéaire plus un <span class="m">k</span>NN rapporte beaucoup. Ce n'est pas le nombre, c'est <span class="m">ρ</span>.</p>
   </div>
 </div>
@@ -365,7 +365,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <a href="../chains/chain-p00-02-esperance-variance-densite.html#s5"><b>p00-02 pas 5–6 — Additivité et corrélation</b><small>la parenthèse 2 Cov que ce pont ne fait que compter <span class="m">B</span>(<span class="m">B</span> − 1) fois</small></a>
     <a href="../chains/chain-p00-04-moyenne-lgn-tcl.html#s3"><b>p00-04 pas 3–4 — Var(<span class="m">x̄</span>) et le 1/√<span class="m">n</span></b><small>le cas <span class="m">ρ</span> = 0, et pourquoi il est l'exception plutôt que la règle</small></a>
     <a href="../chains/chain-p01-05-bootstrap.html#s4"><b>p01-05 pas 4 et casse — Bootstrap</b><small>les 37 % out-of-bag, et ce qui arrive quand les lignes rééchantillonnées ne sont pas indépendantes</small></a>
-    <a href="../../map.html#p07-02"><b>p07-02 — Bagging et forêts aléatoires</b><small>d'où sortent <span class="m">m</span> et <span class="m">B</span> ; ce pont fournit le chiffre qui dit lequel régler</small></a>
+    <a href="../chains/chain-p07-02-bagging-rf.html"><b>p07-02 — Bagging et forêts aléatoires</b><small>d'où sortent <span class="m">m</span> et <span class="m">B</span> ; ce pont fournit le chiffre qui dit lequel régler</small></a>
   </div>
 </div>
 <div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
@@ -376,7 +376,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Pont b04 · v1 du 17/09/2026 · Prérequis : p00-02, p00-04, p07-02, p06-02, p01-05. Suite : <a href="../../map.html#b05">b05 — Escalier vs sensible</a>.</footer>
+<footer>Pont b04 · v1 du 17/09/2026 · Prérequis : p00-02, p00-04, p07-02, p06-02, p01-05. Suite : <a href="bridge-05-escalier-vs-sensible.html">b05 — Escalier vs sensible</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

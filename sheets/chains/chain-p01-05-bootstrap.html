@@ -283,7 +283,7 @@ line.brk{stroke:#B7791F;stroke-width:1.6}
       <tr><td>1 000</td><td>0,3677</td><td>367,7 sur 1 000</td></tr>
     </table>
     <p>La limite e<sup>−1</sup> est atteinte dès <span class="m">n</span> ≈ 100 ; à <span class="m">n</span> = 10 on est encore à 34,9 %, et le raccourci « 37 % » y est déjà une approximation.</p>
-    <p><b>Le même 37 % que le OOB.</b> Dans le bagging, chaque arbre est entraîné sur un rééchantillon bootstrap des lignes ; les ≈ 37 % de lignes qu'il n'a pas vues forment son <i>out-of-bag</i> et servent de jeu de test gratuit (<a href="../../map.html#p07-02">p07-02</a>). Deux endroits, un seul calcul : (1 − 1/<span class="m">n</span>)<sup><span class="m">n</span></sup> → e<sup>−1</sup>.</p>
+    <p><b>Le même 37 % que le OOB.</b> Dans le bagging, chaque arbre est entraîné sur un rééchantillon bootstrap des lignes ; les ≈ 37 % de lignes qu'il n'a pas vues forment son <i>out-of-bag</i> et servent de jeu de test gratuit (<a href="chain-p07-02-bagging-rf.html">p07-02</a>). Deux endroits, un seul calcul : (1 − 1/<span class="m">n</span>)<sup><span class="m">n</span></sup> → e<sup>−1</sup>.</p>
   </div>
   <div class="fig" id="fig2">
     <div class="lbl">Figure 2 — ce qui change d'un rééchantillon à l'autre</div>
@@ -367,7 +367,7 @@ line.brk{stroke:#B7791F;stroke-width:1.6}
     <a href="../bridges/bridge-04-variance-moyenne-correlee.html"><b>Variance d'une moyenne corrélée</b><small>la limite « lignes dépendantes » du pas 6 : dès que la corrélation apparaît, le tirage ligne à ligne ment, exactement comme la variance cesse de descendre en 1/n</small></a>
     <a href="chain-p01-04-comparer-modeles-multiplicite.html#s5"><b>p01-04 — comparer deux modèles</b><small>le pas 5 y est annoncé : McNemar quand la métrique est une moyenne, bootstrap apparié quand elle ne l'est pas</small></a>
     <a href="../walkthroughs/walkthrough-p01-02-comparer-deux-modeles.html"><b>D2 — comparer deux modèles</b><small>le bootstrap sur la différence, déroulé maillon par maillon sur le même fil rouge</small></a>
-    <a href="../../map.html#p07-02"><b>p07-02 — bagging et OOB</b><small>l'autre visage du 37 % : les lignes absentes d'un rééchantillon deviennent le jeu de test gratuit de chaque arbre</small></a>
+    <a href="chain-p07-02-bagging-rf.html"><b>p07-02 — bagging et OOB</b><small>l'autre visage du 37 % : les lignes absentes d'un rééchantillon deviennent le jeu de test gratuit de chaque arbre</small></a>
   </div>
 </div>
 <div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>

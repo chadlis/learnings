@@ -189,7 +189,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="tags"><code>algebre::spectral</code><code>algebre::svd</code><code>algebre::conditionnement</code><code>algebre::valeurs-singulieres</code></div>
   <h4>Ponts</h4>
   <ol>
-    <li><a href="../../map.html#b06">b06 · Convexité et forme fermée</a></li>
+    <li><a href="../bridges/bridge-06-convexite-forme-fermee.html">b06 · Convexité et forme fermée</a></li>
     <li><a href="../walkthroughs/walkthrough-p03-01-descente-sur-ridge.html">w03-01 · <span class="m">κ</span> = 71 chiffré</a></li>
   </ol>
 </aside>
@@ -330,7 +330,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <h3>Lien avec <span class="m">X</span><sup>⊤</sup><span class="m">X</span> : les <span class="m">σ</span> sont les racines</h3>
     <p>Remplace <span class="m">X</span> par <span class="m">U Σ V</span><sup>⊤</sup> et simplifie par <span class="m">U</span><sup>⊤</sup><span class="m">U</span> = <span class="up">I</span> :</p>
     <div class="eq"><span class="m">X</span><sup>⊤</sup><span class="m">X</span> = <span class="m">V Σ</span><sup>⊤</sup><span class="m">U</span><sup>⊤</sup><span class="m">U Σ V</span><sup>⊤</sup> = <span class="m">V Σ</span>² <span class="m">V</span><sup>⊤</sup> &nbsp;&nbsp;·&nbsp;&nbsp; <span class="m">X X</span><sup>⊤</sup> = <span class="m">U Σ</span>² <span class="m">U</span><sup>⊤</sup></div>
-    <p>C'est le pas 2 appliqué à <span class="m">X</span><sup>⊤</sup><span class="m">X</span>, qui est symétrique : ses valeurs propres sont les <span class="m">σ</span><sub><span class="m">i</span></sub>², ses directions propres sont les colonnes de <span class="m">V</span>. Diagonaliser la covariance et décomposer <span class="m">X</span> sont le <b>même calcul</b> — c'est la PCA (<a href="../../map.html#p04-04">p04-04</a>).</p>
+    <p>C'est le pas 2 appliqué à <span class="m">X</span><sup>⊤</sup><span class="m">X</span>, qui est symétrique : ses valeurs propres sont les <span class="m">σ</span><sub><span class="m">i</span></sub>², ses directions propres sont les colonnes de <span class="m">V</span>. Diagonaliser la covariance et décomposer <span class="m">X</span> sont le <b>même calcul</b> — c'est la PCA (<a href="chain-p04-04-pca.html">p04-04</a>).</p>
     <p class="say">« XᵀX vaut VΣ²Vᵀ, donc ses valeurs propres sont les carrés des valeurs singulières, donc diagonaliser la covariance et décomposer X sont le même calcul. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — D4, rang 1</div>
@@ -468,12 +468,12 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <h2 style="--ac:var(--violet)">Ponts et cartes</h2>
 <div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
   <div class="bridges">
-    <a href="../../map.html#b06"><b>b06 · Convexité et forme fermée</b><small>Le pas 3 en est le critère opérationnel : une forme quadratique est convexe quand ses valeurs propres sont ≥ 0, strictement quand aucune n'est nulle — et c'est alors seulement que la forme fermée existe.</small></a>
+    <a href="../bridges/bridge-06-convexite-forme-fermee.html"><b>b06 · Convexité et forme fermée</b><small>Le pas 3 en est le critère opérationnel : une forme quadratique est convexe quand ses valeurs propres sont ≥ 0, strictement quand aucune n'est nulle — et c'est alors seulement que la forme fermée existe.</small></a>
     <a href="chain-p04-02-valeurs-propres-iteration.html#s8"><b>p04-02 · Valeurs propres, pas 8</b><small>« Symétrique ⇒ directions orthogonales » y est posé ; ici c'est le même fait mis en forme matricielle, <span class="m">Q</span><sup>−1</sup> remplacé par <span class="m">Q</span><sup>⊤</sup>, puis étendu au rectangulaire.</small></a>
     <a href="chain-p03-02-gradient-descente.html#s6"><b>p03-02 · Gradient et descente, pas 6</b><small>Le <span class="m">κ</span> qui fixe le nombre d'itérations y est celui de la hessienne ; le pas 6 dit que c'est le même nombre, lu sur les valeurs singulières de <span class="m">X</span> plutôt que sur les valeurs propres de <span class="m">X</span><sup>⊤</sup><span class="m">X</span>.</small></a>
     <a href="../walkthroughs/walkthrough-p03-01-descente-sur-ridge.html"><b>w03-01 · Descente sur ridge</b><small>Le <span class="m">κ</span> = 71 de cette chaîne, chiffré de bout en bout : pas maximal 2/71, facteur plat 0,98, 114 pas pour un facteur dix, et la forme fermée qui les évite.</small></a>
     <a href="chain-p02-02-prior-penalite.html#s5"><b>p02-02 · Du prior à la pénalité, pas 5</b><small>D'où vient le +<span class="m">λ</span><span class="up">I</span> du pas 3 : une pénalité L2 translate le spectre et relève le <span class="m">λ</span> = 0 de la vallée, sans toucher aux directions.</small></a>
-    <a href="../../map.html#p04-04"><b>p04-04 · PCA</b><small>La suite directe du pas 5 : diagonaliser la covariance centrée, c'est prendre la SVD des données centrées — mêmes directions <span class="m">V</span>, valeurs propres <span class="m">σ</span>²/(<span class="m">n</span> − 1).</small></a>
+    <a href="chain-p04-04-pca.html"><b>p04-04 · PCA</b><small>La suite directe du pas 5 : diagonaliser la covariance centrée, c'est prendre la SVD des données centrées — mêmes directions <span class="m">V</span>, valeurs propres <span class="m">σ</span>²/(<span class="m">n</span> − 1).</small></a>
   </div>
 </div>
 <div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
@@ -484,7 +484,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Chaîne p04-03 · v1 du 16/09/2026 · Prérequis : <a href="chain-p04-02-valeurs-propres-iteration.html">p04-02</a>. Suite : <a href="../../map.html#p04-04">p04-04 PCA</a>.</footer>
+<footer>Chaîne p04-03 · v1 du 16/09/2026 · Prérequis : <a href="chain-p04-02-valeurs-propres-iteration.html">p04-02</a>. Suite : <a href="chain-p04-04-pca.html">p04-04 PCA</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

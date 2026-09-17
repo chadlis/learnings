@@ -173,9 +173,9 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="tags"><code>coding::tap</code><code>coding::invariant</code><code>coding::complexite</code></div>
   <h4>Où le rituel se rejoue</h4>
   <ol>
-    <li><a href="../../map.html#c01">c01 · Fenêtre glissante</a></li>
-    <li><a href="../../map.html#c02">c02 · Deux pointeurs</a></li>
-    <li><a href="../../map.html#c03">c03 · Binary search</a></li>
+    <li><a href="coding-01-fenetre-glissante.html">c01 · Fenêtre glissante</a></li>
+    <li><a href="coding-02-deux-pointeurs.html">c02 · Deux pointeurs</a></li>
+    <li><a href="coding-03-binary-search.html">c03 · Binary search</a></li>
     <li><a href="../../map.html">… et les six autres</a></li>
   </ol>
 </aside>
@@ -356,15 +356,15 @@ pour i, v dans enumerate(nums):
   <div class="card apply full"><div class="lbl">Cartes « signal → pattern »</div>
     <div class="wide"><table>
       <tr><th>signal dans l'énoncé</th><th>pattern</th><th>conteneur de l'invariant</th><th>variant</th></tr>
-      <tr><td>« sous-tableau <b>contigu</b> », « au plus <span class="m">k</span> … »</td><td><a href="../../map.html#c01">c01 · fenêtre glissante</a></td><td>la fenêtre [<span class="m">l</span>:<span class="m">r</span>) et son agrégat</td><td>(<span class="m">n</span>−<span class="m">r</span>) + (<span class="m">n</span>−<span class="m">l</span>)</td></tr>
-      <tr><td>« trié », « une paire », « sans mémoire auxiliaire »</td><td><a href="../../map.html#c02">c02 · deux pointeurs</a></td><td>le segment [<span class="m">l</span>:<span class="m">r</span>] encore possible</td><td><span class="m">r</span> − <span class="m">l</span></td></tr>
-      <tr><td>« trié », « le premier indice tel que »</td><td><a href="../../map.html#c03">c03 · dichotomie</a></td><td>[lo:hi) contient la réponse</td><td>hi − lo</td></tr>
-      <tr><td>« en place », « inverser », « cycle »</td><td><a href="../../map.html#c04">c04 · listes chaînées</a></td><td>le préfixe déjà retourné</td><td>nœuds non visités</td></tr>
-      <tr><td>« sous-arbre », « profondeur », « BST »</td><td><a href="../../map.html#c05">c05 · arbres</a></td><td>le chemin racine → nœud, la pile d'appels</td><td>nœuds non visités</td></tr>
-      <tr><td>« composantes », « plus court en nombre d'arêtes »</td><td><a href="../../map.html#c06">c06 · graphes</a></td><td>l'ensemble des visités</td><td>sommets non visités</td></tr>
-      <tr><td>« les <span class="m">k</span> plus grands », « un flux »</td><td><a href="../../map.html#c07">c07 · tas</a></td><td>le tas des <span class="m">k</span> meilleurs de [0:<span class="m">i</span>)</td><td><span class="m">n</span> − <span class="m">i</span></td></tr>
-      <tr><td>« fusionner », « chevauchement »</td><td><a href="../../map.html#c08">c08 · intervalles</a></td><td>les fusionnés de [0:<span class="m">i</span>), triés</td><td><span class="m">n</span> − <span class="m">i</span></td></tr>
-      <tr><td>« nombre de façons », « maximum sur des choix »</td><td><a href="../../map.html#c09">c09 · DP 1D</a></td><td><code>dp[0:i)</code> = réponse sur chaque préfixe</td><td><span class="m">n</span> − <span class="m">i</span></td></tr>
+      <tr><td>« sous-tableau <b>contigu</b> », « au plus <span class="m">k</span> … »</td><td><a href="coding-01-fenetre-glissante.html">c01 · fenêtre glissante</a></td><td>la fenêtre [<span class="m">l</span>:<span class="m">r</span>) et son agrégat</td><td>(<span class="m">n</span>−<span class="m">r</span>) + (<span class="m">n</span>−<span class="m">l</span>)</td></tr>
+      <tr><td>« trié », « une paire », « sans mémoire auxiliaire »</td><td><a href="coding-02-deux-pointeurs.html">c02 · deux pointeurs</a></td><td>le segment [<span class="m">l</span>:<span class="m">r</span>] encore possible</td><td><span class="m">r</span> − <span class="m">l</span></td></tr>
+      <tr><td>« trié », « le premier indice tel que »</td><td><a href="coding-03-binary-search.html">c03 · dichotomie</a></td><td>[lo:hi) contient la réponse</td><td>hi − lo</td></tr>
+      <tr><td>« en place », « inverser », « cycle »</td><td><a href="coding-04-listes-chainees.html">c04 · listes chaînées</a></td><td>le préfixe déjà retourné</td><td>nœuds non visités</td></tr>
+      <tr><td>« sous-arbre », « profondeur », « BST »</td><td><a href="coding-05-arbres.html">c05 · arbres</a></td><td>le chemin racine → nœud, la pile d'appels</td><td>nœuds non visités</td></tr>
+      <tr><td>« composantes », « plus court en nombre d'arêtes »</td><td><a href="coding-06-graphes.html">c06 · graphes</a></td><td>l'ensemble des visités</td><td>sommets non visités</td></tr>
+      <tr><td>« les <span class="m">k</span> plus grands », « un flux »</td><td><a href="coding-07-heap.html">c07 · tas</a></td><td>le tas des <span class="m">k</span> meilleurs de [0:<span class="m">i</span>)</td><td><span class="m">n</span> − <span class="m">i</span></td></tr>
+      <tr><td>« fusionner », « chevauchement »</td><td><a href="coding-08-intervals.html">c08 · intervalles</a></td><td>les fusionnés de [0:<span class="m">i</span>), triés</td><td><span class="m">n</span> − <span class="m">i</span></td></tr>
+      <tr><td>« nombre de façons », « maximum sur des choix »</td><td><a href="coding-09-dp-1d.html">c09 · DP 1D</a></td><td><code>dp[0:i)</code> = réponse sur chaque préfixe</td><td><span class="m">n</span> − <span class="m">i</span></td></tr>
     </table></div>
     <p>Trois variants sur neuf sont <span class="m">n</span> − <span class="m">i</span> : la boucle simple est la forme par défaut, et les six autres lignes sont exactement les cas où elle ne suffit pas.</p>
   </div>
@@ -406,9 +406,9 @@ pour i, v dans enumerate(nums):
 <h2 style="--ac:var(--violet)">Ponts et cartes</h2>
 <div class="card" style="--ac:var(--violet)"><div class="lbl">Où ce rituel se rejoue</div>
   <div class="bridges">
-    <a href="../../map.html#c01"><b>c01 · Fenêtre glissante</b><small>le conteneur devient la fenêtre [l:r) et son agrégat ; le variant devient (n−r) + (n−l)</small></a>
-    <a href="../../map.html#c02"><b>c02 · Deux pointeurs</b><small>le conteneur est le segment encore possible ; c'est le premier variant qui n'est pas n − i</small></a>
-    <a href="../../map.html#c03"><b>c03 · Binary search</b><small>l'invariant « la réponse est dans [lo:hi) » et le variant hi − lo : le TAP y est le plus court et le plus rentable</small></a>
+    <a href="coding-01-fenetre-glissante.html"><b>c01 · Fenêtre glissante</b><small>le conteneur devient la fenêtre [l:r) et son agrégat ; le variant devient (n−r) + (n−l)</small></a>
+    <a href="coding-02-deux-pointeurs.html"><b>c02 · Deux pointeurs</b><small>le conteneur est le segment encore possible ; c'est le premier variant qui n'est pas n − i</small></a>
+    <a href="coding-03-binary-search.html"><b>c03 · Binary search</b><small>l'invariant « la réponse est dans [lo:hi) » et le variant hi − lo : le TAP y est le plus court et le plus rentable</small></a>
     <a href="../../map.html"><b>La carte, colonne 9</b><small>les neuf familles et leur ordre de dépendance</small></a>
   </div>
 </div>
@@ -420,7 +420,7 @@ pour i, v dans enumerate(nums):
 
 </main>
 </div>
-<footer>coding c00 · v1 du 17/09/2026 · sheet-mère du format <code>coding</code> (c01–c09). Prérequis : aucun. Suite : <a href="../../map.html#c01">c01 · Fenêtre glissante</a>.</footer>
+<footer>coding c00 · v1 du 17/09/2026 · sheet-mère du format <code>coding</code> (c01–c09). Prérequis : aucun. Suite : <a href="coding-01-fenetre-glissante.html">c01 · Fenêtre glissante</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

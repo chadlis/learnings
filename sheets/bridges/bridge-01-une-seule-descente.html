@@ -149,14 +149,14 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <li><a href="../chains/chain-p03-02-gradient-descente.html#s3">p03-02 · Gradient et descente</a></li>
     <li><a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html">p03-01 · La pente est le signal</a></li>
     <li><a href="../chains/chain-p08-01-jacobienne-chain-rule-backprop.html#s5">p08-01 · Jacobienne, VJP, backprop</a></li>
-    <li><a href="../../map.html#p07-03">p07-03 · Gradient boosting</a></li>
-    <li><a href="../../map.html#p07-04">p07-04 · k-means</a></li>
+    <li><a href="../chains/chain-p07-03-boosting.html">p07-03 · Gradient boosting</a></li>
+    <li><a href="../chains/chain-p07-04-kmeans.html">p07-04 · k-means</a></li>
   </ol>
   <h4>Cartes Anki liées</h4>
   <div class="tags"><code>ml::optimisation</code><code>ml::boosting</code><code>ml::kmeans</code><code>dl::backprop</code></div>
   <h4>Ponts</h4>
   <ol>
-    <li><a href="../../map.html#b06">b06 · Convexité et forme fermée</a></li>
+    <li><a href="bridge-06-convexite-forme-fermee.html">b06 · Convexité et forme fermée</a></li>
     <li><a href="../walkthroughs/walkthrough-p03-01-descente-sur-ridge.html">w03-01 · Descente sur un bol allongé</a></li>
   </ol>
 </aside>
@@ -169,7 +169,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <li><b>Le pas et sa condition.</b> −∇<span class="m">L</span> est la direction de plus forte descente ; sur une courbure <span class="m">a</span>, l'écart au minimum est multiplié par (1 − <span class="m">η a</span>) à chaque pas (<a href="../chains/chain-p03-02-gradient-descente.html#s2">p03-02 pas 2</a> et <a href="../chains/chain-p03-02-gradient-descente.html#s3">pas 3</a>).</li>
       <li><b>La pente est le signal.</b> Un critère n'informe l'apprentissage que par sa pente ; là où elle est nulle, rien ne bouge (<a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html">p03-01</a>).</li>
       <li><b>D'où vient ∂<span class="m">L</span>/∂<span class="m">W</span>.</b> La loss est scalaire, donc on transporte un vecteur de la sortie vers l'entrée : c'est le VJP, et backprop n'est que cela (<a href="../chains/chain-p08-01-jacobienne-chain-rule-backprop.html#s5">p08-01 pas 5–6</a>).</li>
-      <li><b>Boosting et k-means</b> ne sont pas redérivés ici : ce pont les range sous le même pas. Leurs chaînes propres sont <a href="../../map.html#p07-03">p07-03</a> et <a href="../../map.html#p07-04">p07-04</a>.</li>
+      <li><b>Boosting et k-means</b> ne sont pas redérivés ici : ce pont les range sous le même pas. Leurs chaînes propres sont <a href="../chains/chain-p07-03-boosting.html">p07-03</a> et <a href="../chains/chain-p07-04-kmeans.html">p07-04</a>.</li>
     </ul>
   </div>
 </section>
@@ -221,7 +221,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="rule">
     <h3>Ce qui change : <span class="m">θ</span>, et où l'on prend le gradient</h3>
     <p>Lire un algorithme de descente, c'est répondre à deux questions seulement : <b>qu'est-ce qui bouge</b>, et <b>par rapport à quoi dérive-t-on <span class="m">L</span></b>. Le reste du pas est déjà écrit au pas 1.</p>
-    <p>Trois lectures utiles : le boosting descend <b>dans l'espace des fonctions</b>, et son taux d'apprentissage s'appelle <span class="m">ν</span> ; Lloyd descend <b>par blocs</b>, chaque bloc se résolvant en forme fermée (<a href="../../map.html#b06">b06</a>) ; backprop est le <b>calcul</b> du gradient, pas la descente.</p>
+    <p>Trois lectures utiles : le boosting descend <b>dans l'espace des fonctions</b>, et son taux d'apprentissage s'appelle <span class="m">ν</span> ; Lloyd descend <b>par blocs</b>, chaque bloc se résolvant en forme fermée (<a href="bridge-06-convexite-forme-fermee.html">b06</a>) ; backprop est le <b>calcul</b> du gradient, pas la descente.</p>
     <p class="say">« Le pas est écrit une fois pour toutes, donc il ne reste qu'à nommer l'objet qui bouge et le point où l'on dérive, donc chaque nouvel algorithme de descente se lit en deux lignes. »</p>
   </div>
   <div class="card apply"><div class="lbl">Une ligne par domaine</div>
@@ -233,7 +233,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr><td>Réseau (backprop)</td><td>tous les poids <span class="m">W</span></td><td>∂<span class="m">L</span>/∂<span class="m">W</span> par VJP depuis la sortie</td><td><span class="m">W</span> ← <span class="m">W</span> − <span class="m">η</span>∇, sur un minibatch</td></tr>
       <tr><td>Bol allongé, 2 paramètres</td><td><span class="m">β</span> ∈ <span class="up">R</span>²</td><td><span class="m">A</span><span class="m">β</span> − <span class="m">b</span></td><td>même pas, mais <span class="m">κ</span> = 71</td></tr>
     </table>
-    <p><b>Où c'est écrit</b>, ligne à ligne : <a href="../chains/chain-p03-02-gradient-descente.html#s2">p03-02 pas 2–3</a> et <a href="../../map.html#p05-02">p05-02</a> · <a href="../../map.html#p07-03">p07-03</a> · <a href="../../map.html#p07-04">p07-04</a> · <a href="../chains/chain-p08-01-jacobienne-chain-rule-backprop.html#s5">p08-01 pas 5–6</a> et <a href="../chains/chain-p03-02-gradient-descente.html#s7">p03-02 pas 7</a> · <a href="../walkthroughs/walkthrough-p03-01-descente-sur-ridge.html">w03-01</a>.</p>
+    <p><b>Où c'est écrit</b>, ligne à ligne : <a href="../chains/chain-p03-02-gradient-descente.html#s2">p03-02 pas 2–3</a> et <a href="../chains/chain-p05-02-logistique.html">p05-02</a> · <a href="../chains/chain-p07-03-boosting.html">p07-03</a> · <a href="../chains/chain-p07-04-kmeans.html">p07-04</a> · <a href="../chains/chain-p08-01-jacobienne-chain-rule-backprop.html#s5">p08-01 pas 5–6</a> et <a href="../chains/chain-p03-02-gradient-descente.html#s7">p03-02 pas 7</a> · <a href="../walkthroughs/walkthrough-p03-01-descente-sur-ridge.html">w03-01</a>.</p>
   </div>
 </div>
 
@@ -384,7 +384,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html"><b>p03-01 — Critère en escalier vs critère sensible</b><small>l'autre moitié du même fait : ici on regarde le pas, là on regarde la pente qui l'alimente</small></a>
     <a href="../chains/chain-p08-01-jacobienne-chain-rule-backprop.html"><b>p08-01 — Jacobienne, chain rule, backprop</b><small>d'où sort le ∇ de l'habit 4, et pourquoi il se calcule depuis la sortie</small></a>
     <a href="../walkthroughs/walkthrough-p03-01-descente-sur-ridge.html"><b>w03-01 — Descente sur un bol allongé</b><small>le même pas chiffré à la main, avec κ = 71 : ce que coûte un mauvais conditionnement</small></a>
-    <a href="../../map.html#b06"><b>b06 — Convexité et forme fermée</b><small>quand annuler le gradient se résout d'un coup, on ne descend pas : les demi-pas de Lloyd sont ce cas-là</small></a>
+    <a href="bridge-06-convexite-forme-fermee.html"><b>b06 — Convexité et forme fermée</b><small>quand annuler le gradient se résout d'un coup, on ne descend pas : les demi-pas de Lloyd sont ce cas-là</small></a>
   </div>
 </div>
 <div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
@@ -395,7 +395,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Pont b01 · v1 du 17/09/2026 · Prérequis : p03-02, p07-03, p07-04, p08-01. Suite : <a href="../../map.html#b02">b02 — Le témoin atteignable</a>.</footer>
+<footer>Pont b01 · v1 du 17/09/2026 · Prérequis : p03-02, p07-03, p07-04, p08-01. Suite : <a href="bridge-02-temoin-atteignable.html">b02 — Le témoin atteignable</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

@@ -154,9 +154,9 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <ol id="toc"></ol>
   <h4>Prérequis</h4>
   <ol>
-    <li><a href="../../map.html#p04-01">p04-01 · Produit scalaire, Cauchy-Schwarz</a></li>
-    <li><a href="../../map.html#p04-02">p04-02 · Valeurs propres d'une symétrique</a></li>
-    <li><a href="../../map.html#p08-01">p08-01 · Gradient et jacobienne</a></li>
+    <li><a href="chain-p04-01-matrice-action.html">p04-01 · Produit scalaire, Cauchy-Schwarz</a></li>
+    <li><a href="chain-p04-02-valeurs-propres-iteration.html">p04-02 · Valeurs propres d'une symétrique</a></li>
+    <li><a href="chain-p08-01-jacobienne-chain-rule-backprop.html">p08-01 · Gradient et jacobienne</a></li>
     <li><a href="chain-p02-02-prior-penalite.html">p02-02 · Du prior à la pénalité</a></li>
   </ol>
   <h4>Cartes Anki liées</h4>
@@ -173,9 +173,9 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="card" style="--ac:var(--blue)">
     <div class="lbl">Ce que cette chaîne suppose acquis</div>
     <ul>
-      <li><b>Produit scalaire et Cauchy-Schwarz</b> (<a href="../../map.html#p04-01">p04-01</a>) : |⟨<span class="m">g</span>, <span class="m">u</span>⟩| ≤ ‖<span class="m">g</span>‖·‖<span class="m">u</span>‖, avec égalité si et seulement si <span class="m">u</span> est colinéaire à <span class="m">g</span>. C'est tout l'argument du pas 2.</li>
-      <li><b>Gradient comme application linéaire locale</b> (<a href="../../map.html#p08-01">p08-01</a>) : <span class="m">L</span>(<span class="m">θ</span> + <span class="m">δ</span>) = <span class="m">L</span>(<span class="m">θ</span>) + ⟨∇<span class="m">L</span>(<span class="m">θ</span>), <span class="m">δ</span>⟩ + <span class="up">o</span>(‖<span class="m">δ</span>‖). Le gradient est la meilleure approximation affine, rien de plus : il ne dit rien à distance.</li>
-      <li><b>Valeurs propres d'une matrice symétrique</b> (<a href="../../map.html#p04-02">p04-02</a>) : base orthonormée de vecteurs propres, <span class="m">Av</span><sub><span class="m">i</span></sub> = <span class="m">λ</span><sub><span class="m">i</span></sub><span class="m">v</span><sub><span class="m">i</span></sub>. Dans cette base un système couplé devient <span class="m">p</span> équations indépendantes — le pas 6 ne fait que ça.</li>
+      <li><b>Produit scalaire et Cauchy-Schwarz</b> (<a href="chain-p04-01-matrice-action.html">p04-01</a>) : |⟨<span class="m">g</span>, <span class="m">u</span>⟩| ≤ ‖<span class="m">g</span>‖·‖<span class="m">u</span>‖, avec égalité si et seulement si <span class="m">u</span> est colinéaire à <span class="m">g</span>. C'est tout l'argument du pas 2.</li>
+      <li><b>Gradient comme application linéaire locale</b> (<a href="chain-p08-01-jacobienne-chain-rule-backprop.html">p08-01</a>) : <span class="m">L</span>(<span class="m">θ</span> + <span class="m">δ</span>) = <span class="m">L</span>(<span class="m">θ</span>) + ⟨∇<span class="m">L</span>(<span class="m">θ</span>), <span class="m">δ</span>⟩ + <span class="up">o</span>(‖<span class="m">δ</span>‖). Le gradient est la meilleure approximation affine, rien de plus : il ne dit rien à distance.</li>
+      <li><b>Valeurs propres d'une matrice symétrique</b> (<a href="chain-p04-02-valeurs-propres-iteration.html">p04-02</a>) : base orthonormée de vecteurs propres, <span class="m">Av</span><sub><span class="m">i</span></sub> = <span class="m">λ</span><sub><span class="m">i</span></sub><span class="m">v</span><sub><span class="m">i</span></sub>. Dans cette base un système couplé devient <span class="m">p</span> équations indépendantes — le pas 6 ne fait que ça.</li>
       <li><b>Le bol du ridge</b> (<a href="chain-p02-02-prior-penalite.html">p02-02</a>) : jeu colinéaire, <span class="m">X</span><sup>⊤</sup><span class="m">X</span> = [[14, 28], [28, 56]] de valeurs propres 0 et 70 ; + <span class="m">λI</span> avec <span class="m">λ</span> = 1 donne [[15, 28], [28, 57]], valeurs propres <b>1</b> et <b>71</b>. Ici on ne le rejustifie pas : on s'en sert comme bol à descendre.</li>
       <li><b>Un critère n'informe que par sa pente</b> (<a href="chain-p03-01-critere-escalier-vs-sensible.html">p03-01</a>, la chaîne sœur) : là où la dérivée est nulle, rien ne bouge. Cette chaîne-ci suppose la pente non nulle et s'occupe de ce qu'on en fait.</li>
     </ul>
@@ -432,7 +432,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Chaîne p03-02 · v1 du 16/09/2026 · Prérequis : p04-01, p04-02, p08-01. Suite : <a href="../../map.html#p04-01">p04-01 La matrice comme action</a>.</footer>
+<footer>Chaîne p03-02 · v1 du 16/09/2026 · Prérequis : p04-01, p04-02, p08-01. Suite : <a href="chain-p04-01-matrice-action.html">p04-01 La matrice comme action</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

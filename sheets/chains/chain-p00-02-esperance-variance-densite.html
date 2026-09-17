@@ -154,9 +154,9 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="tags"><code>stats::esperance</code><code>stats::variance</code><code>stats::densite</code><code>stats::covariance</code></div>
   <h4>Suites</h4>
   <ol>
-    <li><a href="../../map.html#p00-03">p00-03 · Conditionnement et Bayes</a></li>
-    <li><a href="../../map.html#p00-04">p00-04 · Moyenne, LGN, TCL</a></li>
-    <li><a href="../../map.html#b04">b04 · Variance d'une moyenne corrélée</a></li>
+    <li><a href="chain-p00-03-conditionnement-bayes.html">p00-03 · Conditionnement et Bayes</a></li>
+    <li><a href="chain-p00-04-moyenne-lgn-tcl.html">p00-04 · Moyenne, LGN, TCL</a></li>
+    <li><a href="../bridges/bridge-04-variance-moyenne-correlee.html">b04 · Variance d'une moyenne corrélée</a></li>
   </ol>
 </aside>
 
@@ -178,7 +178,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <div class="lbl">Hypothèses posées</div>
     <div class="hyp">
       <b>H1</b><span><span class="m">E</span> et Var <b>existent</b> : la somme Σ|<span class="m">x</span>|<span class="m">P</span>(<span class="m">X</span> = <span class="m">x</span>) et l'intégrale ∫|<span class="m">x</span>|<span class="m">f</span>(<span class="m">x</span>)d<span class="m">x</span> sont finies, et de même pour <span class="m">x</span>². Ce n'est pas automatique : certaines queues lourdes le mettent en défaut, et tout ce qui suit tombe avec (pas 8).</span>
-      <b>H2</b><span>« <b>Indépendant</b> » signifie <span class="m">P</span>(<span class="m">X</span> = <span class="m">x</span>, <span class="m">Y</span> = <span class="m">y</span>) = <span class="m">P</span>(<span class="m">X</span> = <span class="m">x</span>)<span class="m">P</span>(<span class="m">Y</span> = <span class="m">y</span>) pour tous <span class="m">x</span>, <span class="m">y</span>. On s'en sert comme d'une définition ; ce qu'elle veut dire en termes de conditionnement est en <a href="../../map.html#p00-03">p00-03</a>.</span>
+      <b>H2</b><span>« <b>Indépendant</b> » signifie <span class="m">P</span>(<span class="m">X</span> = <span class="m">x</span>, <span class="m">Y</span> = <span class="m">y</span>) = <span class="m">P</span>(<span class="m">X</span> = <span class="m">x</span>)<span class="m">P</span>(<span class="m">Y</span> = <span class="m">y</span>) pour tous <span class="m">x</span>, <span class="m">y</span>. On s'en sert comme d'une définition ; ce qu'elle veut dire en termes de conditionnement est en <a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>.</span>
     </div>
   </div>
 </section>
@@ -248,7 +248,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <h3>Transformation affine : <span class="m">b</span> décale, <span class="m">a</span> étale au carré <span class="tag tronc">tronc</span></h3>
     <div class="eq">Var(<span class="m">aX</span> + <span class="m">b</span>) = <span class="m">a</span>²Var(<span class="m">X</span>) &nbsp;&nbsp;&nbsp; <span class="m">σ</span>(<span class="m">aX</span> + <span class="m">b</span>) = |<span class="m">a</span>|·<span class="m">σ</span>(<span class="m">X</span>)</div>
     <p>Ajouter <span class="m">b</span> déplace la variable <i>et</i> son espérance de la même quantité : les écarts à la moyenne sont inchangés, <span class="m">b</span> disparaît. Multiplier par <span class="m">a</span> multiplie chaque écart par <span class="m">a</span>, donc chaque écart au carré par <span class="m">a</span>².</p>
-    <p><b>C'est l'origine du 1/<span class="m">n</span>² de la moyenne.</b> <span class="m">X̄</span> = (1/<span class="m">n</span>)Σ<span class="m">X</span><sub><span class="m">i</span></sub> est une transformation affine de la somme avec <span class="m">a</span> = 1/<span class="m">n</span>, donc Var(<span class="m">X̄</span>) = (1/<span class="m">n</span>²)·Var(Σ<span class="m">X</span><sub><span class="m">i</span></sub>). Le 1/<span class="m">n</span>² vient d'ici et de nulle part ailleurs ; ce qui reste à trouver est Var(Σ<span class="m">X</span><sub><span class="m">i</span></sub>), et c'est le pas 5 (<a href="../../map.html#p00-04">p00-04</a>, <a href="chain-p01-01-objet-aleatoire.html">p01-01</a>).</p>
+    <p><b>C'est l'origine du 1/<span class="m">n</span>² de la moyenne.</b> <span class="m">X̄</span> = (1/<span class="m">n</span>)Σ<span class="m">X</span><sub><span class="m">i</span></sub> est une transformation affine de la somme avec <span class="m">a</span> = 1/<span class="m">n</span>, donc Var(<span class="m">X̄</span>) = (1/<span class="m">n</span>²)·Var(Σ<span class="m">X</span><sub><span class="m">i</span></sub>). Le 1/<span class="m">n</span>² vient d'ici et de nulle part ailleurs ; ce qui reste à trouver est Var(Σ<span class="m">X</span><sub><span class="m">i</span></sub>), et c'est le pas 5 (<a href="chain-p00-04-moyenne-lgn-tcl.html">p00-04</a>, <a href="chain-p01-01-objet-aleatoire.html">p01-01</a>).</p>
     <p class="say">« Décaler ne change pas les écarts, donc b disparaît, donc multiplier par a multiplie les écarts par a et leur carré par a², donc la variance est multipliée par a² et l'écart-type par la valeur absolue de a. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — le gain 2X + 1</div>
@@ -271,7 +271,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <h3>Additivité seulement à covariance nulle <span class="tag tronc">tronc</span></h3>
     <p>Le carré d'une somme a un double produit ; la variance d'une somme a donc un terme croisé, la covariance.</p>
     <div class="eq">Var(<span class="m">X</span> ± <span class="m">Y</span>) = Var(<span class="m">X</span>) + Var(<span class="m">Y</span>) ± 2 Cov(<span class="m">X</span>, <span class="m">Y</span>) &nbsp;&nbsp;&nbsp; Cov(<span class="m">X</span>, <span class="m">Y</span>) = <span class="m">E</span>[<span class="m">XY</span>] − <span class="m">E</span>[<span class="m">X</span>]<span class="m">E</span>[<span class="m">Y</span>]</div>
-    <p>Sous indépendance <span class="m">E</span>[<span class="m">XY</span>] = <span class="m">E</span>[<span class="m">X</span>]<span class="m">E</span>[<span class="m">Y</span>], donc Cov = 0, donc la variance s'additionne. Pour une <b>différence</b>, le signe du terme croisé s'inverse : Var(<span class="m">X</span> − <span class="m">Y</span>) = Var(<span class="m">X</span>) + Var(<span class="m">Y</span>) − 2Cov — c'est la formule des comparaisons appariées (<a href="chain-p01-04-comparer-modeles-multiplicite.html">p01-04</a>, <a href="../../map.html#b04">b04</a>).</p>
+    <p>Sous indépendance <span class="m">E</span>[<span class="m">XY</span>] = <span class="m">E</span>[<span class="m">X</span>]<span class="m">E</span>[<span class="m">Y</span>], donc Cov = 0, donc la variance s'additionne. Pour une <b>différence</b>, le signe du terme croisé s'inverse : Var(<span class="m">X</span> − <span class="m">Y</span>) = Var(<span class="m">X</span>) + Var(<span class="m">Y</span>) − 2Cov — c'est la formule des comparaisons appariées (<a href="chain-p01-04-comparer-modeles-multiplicite.html">p01-04</a>, <a href="../bridges/bridge-04-variance-moyenne-correlee.html">b04</a>).</p>
     <p>Cas extrême, <span class="m">Y</span> = <span class="m">X</span> : Cov(<span class="m">X</span>, <span class="m">X</span>) = Var(<span class="m">X</span>), donc Var(2<span class="m">X</span>) = 4Var(<span class="m">X</span>), pas 2Var(<span class="m">X</span>).</p>
     <p class="say">« Le carré d'une somme a un terme croisé, donc la variance d'une somme a une covariance, donc elle n'est additive que si la covariance est nulle, donc en particulier sous indépendance — et jamais quand on additionne une variable à elle-même. »</p>
   </div>
@@ -342,9 +342,9 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   </div>
   <div class="card casse"><div class="lbl">Quatre limites</div>
     <ul>
-      <li><b>Queues lourdes : H1 tombe.</b> Une Cauchy n'a pas d'espérance (∫|<span class="m">x</span>|<span class="m">f</span> diverge) ; une Pareto d'indice &lt; 2 n'a pas de variance. Signal empirique : la moyenne ne se stabilise pas quand <span class="m">n</span> grandit, l'écart-type empirique <i>augmente</i> avec <span class="m">n</span>, et un seul point domine la somme. Quand H1 tombe, les pas 2 à 6 tombent avec, et la LGN et le TCL avec eux (<a href="../../map.html#p00-04">p00-04</a>).</li>
+      <li><b>Queues lourdes : H1 tombe.</b> Une Cauchy n'a pas d'espérance (∫|<span class="m">x</span>|<span class="m">f</span> diverge) ; une Pareto d'indice &lt; 2 n'a pas de variance. Signal empirique : la moyenne ne se stabilise pas quand <span class="m">n</span> grandit, l'écart-type empirique <i>augmente</i> avec <span class="m">n</span>, et un seul point domine la somme. Quand H1 tombe, les pas 2 à 6 tombent avec, et la LGN et le TCL avec eux (<a href="chain-p00-04-moyenne-lgn-tcl.html">p00-04</a>).</li>
       <li><b>Cov = 0 pris pour indépendance.</b> <span class="m">ρ</span> ne voit que le linéaire : <span class="m">Y</span> = <span class="m">X</span>² sur {−1, 0, 1} a une corrélation nulle et une dépendance totale. « Décorrélé » autorise à additionner les variances, pas à raisonner comme si les variables ne se parlaient pas.</li>
-      <li><b>Additivité appliquée à des termes dépendants.</b> Mesures répétées sur un même individu, plusieurs lignes d'un même utilisateur, folds qui partagent des données : Cov &gt; 0, donc Var(Σ) est <b>sous-estimée</b> si on l'ignore, donc l'erreur type est trop petite, l'intervalle trop étroit et la <span class="m">p</span>-value trop optimiste (<a href="chain-p01-01-objet-aleatoire.html">p01-01</a>, <a href="../../map.html#b04">b04</a>). Le <span class="m">n</span> qu'on croit avoir n'est pas le <span class="m">n</span> qu'on a.</li>
+      <li><b>Additivité appliquée à des termes dépendants.</b> Mesures répétées sur un même individu, plusieurs lignes d'un même utilisateur, folds qui partagent des données : Cov &gt; 0, donc Var(Σ) est <b>sous-estimée</b> si on l'ignore, donc l'erreur type est trop petite, l'intervalle trop étroit et la <span class="m">p</span>-value trop optimiste (<a href="chain-p01-01-objet-aleatoire.html">p01-01</a>, <a href="../bridges/bridge-04-variance-moyenne-correlee.html">b04</a>). Le <span class="m">n</span> qu'on croit avoir n'est pas le <span class="m">n</span> qu'on a.</li>
       <li><b>Densité lue comme une probabilité.</b> « <span class="m">f</span>(<span class="m">x</span>) = 2,3, donc c'est probable » n'a pas de sens : seule l'aire en a. Et la scorie symétrique coûte autant — intégrer quand on voulait évaluer. Une vraisemblance est une <b>hauteur</b> : dans <span class="m">p</span>(<span class="m">x</span> ; <span class="m">θ</span>) on évalue la densité aux données observées, on n'intègre rien.</li>
     </ul>
   </div>
@@ -385,8 +385,8 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <h2 style="--ac:var(--violet)">Ponts et cartes</h2>
 <div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
   <div class="bridges">
-    <a href="../../map.html#b04"><b>b04 — Variance d'une moyenne corrélée</b><small>le pas 5 poussé jusqu'au bout : quand les termes d'une somme sont corrélés, Var(Σ) grossit du terme croisé et le <span class="m">n</span> effectif s'écroule — même mécanisme, dans les SE, la CV et les tests appariés</small></a>
-    <a href="../../map.html#p00-04"><b>p00-04 — Moyenne, LGN, TCL</b><small>Var(X̄) = σ²/n est exactement le pas 4 (le 1/n²) plus le pas 5 (l'additivité sous iid) ; le √n du dénominateur vient de la racine du pas 3</small></a>
+    <a href="../bridges/bridge-04-variance-moyenne-correlee.html"><b>b04 — Variance d'une moyenne corrélée</b><small>le pas 5 poussé jusqu'au bout : quand les termes d'une somme sont corrélés, Var(Σ) grossit du terme croisé et le <span class="m">n</span> effectif s'écroule — même mécanisme, dans les SE, la CV et les tests appariés</small></a>
+    <a href="chain-p00-04-moyenne-lgn-tcl.html"><b>p00-04 — Moyenne, LGN, TCL</b><small>Var(X̄) = σ²/n est exactement le pas 4 (le 1/n²) plus le pas 5 (l'additivité sous iid) ; le √n du dénominateur vient de la racine du pas 3</small></a>
     <a href="chain-p02-01-bruit-vraisemblance-loss.html"><b>p02-01 — Du bruit à la loss</b><small>la vraisemblance y est une densité <i>évaluée</i> aux données observées : le pas 7 est ce qui autorise d'écrire une loss à partir d'une densité</small></a>
     <a href="chain-p01-04-comparer-modeles-multiplicite.html"><b>p01-04 — Comparer deux modèles</b><small>Var(<span class="m">D</span>) = Var(<span class="m">A</span>) + Var(<span class="m">B</span>) − 2Cov : la ligne « différence » du pas 5, qui fait tout l'intérêt de l'appariement</small></a>
   </div>
@@ -399,7 +399,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Chaîne p00-02 · v1 du 16/09/2026 · Prérequis : <a href="chain-p00-01-lois-quand-laquelle.html">p00-01</a>. Suite : <a href="../../map.html#p00-03">p00-03 Conditionnement et Bayes</a>.</footer>
+<footer>Chaîne p00-02 · v1 du 16/09/2026 · Prérequis : <a href="chain-p00-01-lois-quand-laquelle.html">p00-01</a>. Suite : <a href="chain-p00-03-conditionnement-bayes.html">p00-03 Conditionnement et Bayes</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

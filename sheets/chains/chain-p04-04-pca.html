@@ -183,7 +183,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <h4>Ponts</h4>
   <ol>
     <li><a href="chain-p04-03-spectral-svd-conditionnement.html#s7">p04-03 · ne pas former X<sup>⊤</sup>X</a></li>
-    <li><a href="../../map.html#p06-02">p06-02 · fuite et validation croisée</a></li>
+    <li><a href="chain-p06-02-cv-leakage.html">p06-02 · fuite et validation croisée</a></li>
   </ol>
 </aside>
 
@@ -371,7 +371,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <h3>Piège 3 : ajuster sur le train seulement <span class="tag casse">casse</span></h3>
     <p>Moyenne, écart-type et directions sont des <b>quantités estimées</b>, au même titre que des coefficients. Elles s'estiment sur le train ; le test est seulement <b>transformé</b> avec elles.</p>
     <div class="eq"><span class="hat"><span class="m">μ</span></span>, <span class="hat"><span class="m">σ</span></span>, <span class="m">V</span> ← train &nbsp;·&nbsp; <span class="m">Z</span><sub>test</sub> = ((<span class="m">X</span><sub>test</sub> − <span class="hat"><span class="m">μ</span></span>) ⊘ <span class="hat"><span class="m">σ</span></span>) <span class="m">V</span><sub>k</sub></div>
-    <p>Ajuster sur la réunion train + test, c'est laisser le test entrer dans le modèle : le score mesuré devient optimiste. Dans une validation croisée, tout le pipeline — centrage, standardisation, PCA — se réajuste <b>à l'intérieur de chaque pli</b> (<a href="../../map.html#p06-02">p06-02</a>).</p>
+    <p>Ajuster sur la réunion train + test, c'est laisser le test entrer dans le modèle : le score mesuré devient optimiste. Dans une validation croisée, tout le pipeline — centrage, standardisation, PCA — se réajuste <b>à l'intérieur de chaque pli</b> (<a href="chain-p06-02-cv-leakage.html">p06-02</a>).</p>
     <p class="say">« La moyenne, l'écart-type et les directions sont estimés sur des données, donc les estimer sur le test fait entrer le test dans le modèle, donc le score mesuré est optimiste — c'est une fuite, pas un détail d'implémentation. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — le même point, deux transformations</div>
@@ -462,7 +462,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <a href="chain-p04-03-spectral-svd-conditionnement.html#s3"><b>p04-03, pas 3 — formes quadratiques</b><small>même objet : x<sup>⊤</sup>Ax = Σλ<sub>i</sub>a<sub>i</sub>². Là-bas le signe des λ donne bol / vallée / selle ; ici la taille des λ donne l'axe principal. Une seule identité, deux lectures.</small></a>
     <a href="chain-p04-03-spectral-svd-conditionnement.html#s7"><b>p04-03, pas 7 — ne pas former X<sup>⊤</sup>X</b><small>le pas 8 le rejoue pour la PCA : les composantes se lisent sur V, jamais sur les vecteurs propres d'un produit formé à la main.</small></a>
     <a href="chain-p04-02-valeurs-propres-iteration.html#s5"><b>p04-02, pas 5 — seule la plus grande survit</b><small>la puissance itérée converge vers q<sub>1</sub> : c'est l'algorithme qui trouve PC1 quand p est grand, et la même domination de λ<sub>1</sub>.</small></a>
-    <a href="../../map.html#p06-02"><b>p06-02 — fuite et validation croisée</b><small>le pas 7 est un cas particulier : toute quantité estimée sur les données doit rester à l'intérieur du pli.</small></a>
+    <a href="chain-p06-02-cv-leakage.html"><b>p06-02 — fuite et validation croisée</b><small>le pas 7 est un cas particulier : toute quantité estimée sur les données doit rester à l'intérieur du pli.</small></a>
   </div>
 </div>
 <div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
@@ -473,7 +473,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Chaîne p04-04 · v1 du 16/09/2026 · dernière chaîne de la partie 04. Prérequis : p04-03, p00-02. Suite : <a href="../../map.html#p05-01">p05-01 Régression linéaire — le modèle et OLS</a>.</footer>
+<footer>Chaîne p04-04 · v1 du 16/09/2026 · dernière chaîne de la partie 04. Prérequis : p04-03, p00-02. Suite : <a href="chain-p05-01-regression-modele-ols.html">p05-01 Régression linéaire — le modèle et OLS</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

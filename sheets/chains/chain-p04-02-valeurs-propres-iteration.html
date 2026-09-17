@@ -185,7 +185,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="tags"><code>algebre::eigen</code><code>algebre::power-iteration</code><code>algebre::markov</code><code>algebre::diagonalisation</code></div>
   <h4>Ponts</h4>
   <ol>
-    <li><a href="../../map.html#b06">b06 · Convexité et forme fermée</a></li>
+    <li><a href="../bridges/bridge-06-convexite-forme-fermee.html">b06 · Convexité et forme fermée</a></li>
   </ol>
 </aside>
 
@@ -387,7 +387,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <div class="step" id="s8">
   <div class="rule">
     <h3>Symétrique : le cas propre</h3>
-    <p><span class="m">A</span> = <span class="m">A</span><sup>⊤</sup> apporte trois cadeaux d'un coup : valeurs propres <b>réelles</b>, directions propres <b>orthogonales</b>, et donc une matrice de passage <span class="m">P</span> orthogonale, où <span class="m">P</span><sup>−1</sup> = <span class="m">P</span><sup>⊤</sup>. C'est le <b>théorème spectral</b>, démontré en <a href="../../map.html#p04-03">p04-03</a> ; ici on l'utilise, on ne le prouve pas.</p>
+    <p><span class="m">A</span> = <span class="m">A</span><sup>⊤</sup> apporte trois cadeaux d'un coup : valeurs propres <b>réelles</b>, directions propres <b>orthogonales</b>, et donc une matrice de passage <span class="m">P</span> orthogonale, où <span class="m">P</span><sup>−1</sup> = <span class="m">P</span><sup>⊤</sup>. C'est le <b>théorème spectral</b>, démontré en <a href="chain-p04-03-spectral-svd-conditionnement.html">p04-03</a> ; ici on l'utilise, on ne le prouve pas.</p>
     <p>En ML on y est presque toujours : covariances, <span class="m">X</span><sup>⊤</sup><span class="m">X</span>, hessiennes sont symétriques par construction.</p>
     <p class="say">« Une matrice symétrique a des directions propres orthogonales, donc sa matrice de passage est orthogonale, donc l'inverse est la transposée, donc changer de base ne coûte plus qu'un produit — et les valeurs propres sont réelles, donc ordonnables. »</p>
   </div>
@@ -455,7 +455,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <h2 style="--ac:var(--violet)">Ponts et cartes</h2>
 <div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
   <div class="bridges">
-    <a href="../../map.html#b06"><b>b06 · Convexité et forme fermée</b><small>Même mécanisme au signe près : une forme quadratique est convexe quand ses valeurs propres sont ≥ 0, et la forme fermée existe quand aucune n'est nulle. Le pas 7 est exactement la réparation de ce cas.</small></a>
+    <a href="../bridges/bridge-06-convexite-forme-fermee.html"><b>b06 · Convexité et forme fermée</b><small>Même mécanisme au signe près : une forme quadratique est convexe quand ses valeurs propres sont ≥ 0, et la forme fermée existe quand aucune n'est nulle. Le pas 7 est exactement la réparation de ce cas.</small></a>
     <a href="chain-p02-02-prior-penalite.html#s5"><b>p02-02 · Du prior à la pénalité, pas 5</b><small>« +<span class="m">λ</span><span class="up">I</span> translate, n'annule pas » y est démontré côté ridge ; ici c'est la même égalité lue sur le spectre, et la figure 3 en donne le conditionnement.</small></a>
     <a href="chain-p03-02-gradient-descente.html#s6"><b>p03-02 · Gradient et descente, pas 6</b><small>Le conditionnement <span class="m">λ</span><sub>max</sub>/<span class="m">λ</span><sub>min</sub> qui fixe le nombre d'itérations : ce sont les valeurs propres de la hessienne, et la lenteur de la descente est la power iteration vue de l'autre côté.</small></a>
     <a href="chain-p04-01-matrice-action.html#s5"><b>p04-01 · Une matrice est une action, pas 5</b><small>Le noyau est la direction propre de valeur propre 0 : « det = 0 » et « une valeur propre nulle » sont la même phrase.</small></a>
@@ -469,7 +469,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Chaîne p04-02 · v1 du 16/09/2026 · Prérequis : <a href="chain-p04-01-matrice-action.html">p04-01</a>. Suite : <a href="../../map.html#p04-03">p04-03 Spectral, SVD, conditionnement</a>.</footer>
+<footer>Chaîne p04-02 · v1 du 16/09/2026 · Prérequis : <a href="chain-p04-01-matrice-action.html">p04-01</a>. Suite : <a href="chain-p04-03-spectral-svd-conditionnement.html">p04-03 Spectral, SVD, conditionnement</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

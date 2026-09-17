@@ -152,8 +152,8 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="tags"><code>stats::lois</code><code>stats::binomiale</code><code>stats::poisson</code><code>stats::exponentielle</code><code>stats::normale</code></div>
   <h4>Suites</h4>
   <ol>
-    <li><a href="../../map.html#p00-02">p00-02 · Espérance, variance, densité</a></li>
-    <li><a href="../../map.html#p00-04">p00-04 · Moyenne, LGN, TCL</a></li>
+    <li><a href="chain-p00-02-esperance-variance-densite.html">p00-02 · Espérance, variance, densité</a></li>
+    <li><a href="chain-p00-04-moyenne-lgn-tcl.html">p00-04 · Moyenne, LGN, TCL</a></li>
     <li><a href="chain-p02-03-conjugues-posterior.html">p02-03 · Conjugués (Beta)</a></li>
   </ol>
 </aside>
@@ -164,9 +164,9 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <div class="lbl">Ce que cette chaîne suppose acquis</div>
     <ul>
       <li><b>Variable aléatoire.</b> Un nombre qui dépend du tirage : « ce mail est-il un spam » vaut 0 ou 1 selon le mail tiré. On la note <span class="m">X</span>, <span class="m">T</span>, majuscule ; la valeur observée est en minuscule.</li>
-      <li><b>Loi.</b> La liste des valeurs possibles avec leur probabilité (cas discret : <span class="m">P</span>(<span class="m">X</span> = <span class="m">k</span>)), ou la densité qui s'intègre pour donner une probabilité (cas continu, <a href="../../map.html#p00-02">p00-02</a>). Une densité s'<i>évalue</i> en un point et s'<i>intègre</i> sur un intervalle : <span class="m">f</span>(<span class="m">t</span>) n'est pas une probabilité.</li>
+      <li><b>Loi.</b> La liste des valeurs possibles avec leur probabilité (cas discret : <span class="m">P</span>(<span class="m">X</span> = <span class="m">k</span>)), ou la densité qui s'intègre pour donner une probabilité (cas continu, <a href="chain-p00-02-esperance-variance-densite.html">p00-02</a>). Une densité s'<i>évalue</i> en un point et s'<i>intègre</i> sur un intervalle : <span class="m">f</span>(<span class="m">t</span>) n'est pas une probabilité.</li>
       <li><b>Espérance <span class="m">E</span>.</b> La valeur moyenne sur les tirages, pas la valeur la plus probable. <span class="m">E</span>[<span class="m">X</span>] = Σ <span class="m">k</span>·<span class="m">P</span>(<span class="m">X</span> = <span class="m">k</span>).</li>
-      <li><b>Variance Var.</b> La dispersion autour de <span class="m">E</span> : Var(<span class="m">X</span>) = <span class="m">E</span>[(<span class="m">X</span> − <span class="m">E</span>[<span class="m">X</span>])²]. Son additivité sous indépendance est démontrée en <a href="../../map.html#p00-02">p00-02</a> ; on s'en sert ici sans la redémontrer.</li>
+      <li><b>Variance Var.</b> La dispersion autour de <span class="m">E</span> : Var(<span class="m">X</span>) = <span class="m">E</span>[(<span class="m">X</span> − <span class="m">E</span>[<span class="m">X</span>])²]. Son additivité sous indépendance est démontrée en <a href="chain-p00-02-esperance-variance-densite.html">p00-02</a> ; on s'en sert ici sans la redémontrer.</li>
     </ul>
   </div>
 </section>
@@ -226,7 +226,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <div class="step" id="s3">
   <div class="rule">
     <h3>Binomiale(<span class="m">n</span>, <span class="m">p</span>) — compter les succès de <span class="m">n</span> essais iid <span class="tag tronc">tronc</span></h3>
-    <p><span class="m">X</span> = somme de <span class="m">n</span> Bernoulli(<span class="m">p</span>) indépendantes. L'espérance est toujours additive, la variance l'est <i>sous indépendance</i> (<a href="../../map.html#p00-02">p00-02</a>) :</p>
+    <p><span class="m">X</span> = somme de <span class="m">n</span> Bernoulli(<span class="m">p</span>) indépendantes. L'espérance est toujours additive, la variance l'est <i>sous indépendance</i> (<a href="chain-p00-02-esperance-variance-densite.html">p00-02</a>) :</p>
     <div class="eq"><span class="m">E</span> = <span class="m">np</span> &nbsp;&nbsp;&nbsp; Var = <span class="m">np</span>(1 − <span class="m">p</span>) &nbsp;&nbsp;&nbsp; <span class="m">P</span>(<span class="m">X</span> = <span class="m">k</span>) = C(<span class="m">n</span>,<span class="m">k</span>) <span class="m">p</span><sup><span class="m">k</span></sup>(1 − <span class="m">p</span>)<sup><span class="m">n</span>−<span class="m">k</span></sup></div>
     <p>Lecture de la formule : C(<span class="m">n</span>,<span class="m">k</span>) compte les <b>placements</b> des <span class="m">k</span> succès, et chaque placement a la probabilité <span class="m">p</span><sup><span class="m">k</span></sup>(1 − <span class="m">p</span>)<sup><span class="m">n</span>−<span class="m">k</span></sup> parce que l'indépendance transforme la conjonction en <b>produit</b> — la même hypothèse que celle qui fabrique la vraisemblance au fil B (<a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>).</p>
     <p class="say">« n essais indépendants de même p, donc la somme de n Bernoulli, donc espérance np et variance np(1 − p), et l'indépendance fait le produit, donc la probabilité de k succès compte les placements. »</p>
@@ -300,7 +300,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <div class="step" id="s6">
   <div class="rule">
     <h3>Normale(<span class="m">μ</span>, <span class="m">σ</span>²) — une somme de beaucoup de petits effets</h3>
-    <p>Le théorème central limite (<a href="../../map.html#p00-04">p00-04</a>) la fait apparaître dès qu'on additionne ou qu'on moyenne beaucoup de termes indépendants de variance finie, <b>quelle que soit leur loi</b>. Il n'est pas redémontré ici.</p>
+    <p>Le théorème central limite (<a href="chain-p00-04-moyenne-lgn-tcl.html">p00-04</a>) la fait apparaître dès qu'on additionne ou qu'on moyenne beaucoup de termes indépendants de variance finie, <b>quelle que soit leur loi</b>. Il n'est pas redémontré ici.</p>
     <div class="eq"><span class="m">μ</span> ± 1<span class="m">σ</span> : 68,3 % &nbsp;&nbsp; <span class="m">μ</span> ± 2<span class="m">σ</span> : 95,4 % &nbsp;&nbsp; <span class="m">μ</span> ± 3<span class="m">σ</span> : 99,7 %</div>
     <p>Deux paramètres, et c'est tout : la position <span class="m">μ</span> et l'échelle <span class="m">σ</span>. Ce n'est <b>pas</b> la loi par défaut : c'est la loi des <b>sommes</b>. Sans mécanisme d'addition, rien ne la justifie.</p>
     <p class="say">« Le temps de réponse est une somme de beaucoup de petits délais indépendants, donc le TCL s'applique, donc la loi est normale, et les 68 / 95 / 99,7 se lisent directement en écarts-types. »</p>
@@ -356,7 +356,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <li><b>Dépendance.</b> Des spams par rafales (un attaquant envoie par vagues) : les arrivées ne sont plus indépendantes, les comptes ne sont plus Poisson et <b>Var &gt; <span class="m">E</span></b> — c'est la <b>surdispersion</b>. Moyenne 4 et variance 9 sur un comptage : le rapport 2,25 dit « pas Poisson » avant tout autre calcul. La loi qui l'absorbe s'appelle la binomiale négative ; on la nomme, on ne s'en sert pas ici.</li>
       <li><b><span class="m">p</span> qui varie d'un essai à l'autre.</b> Deux sources de mails avec deux taux de spam différents : le total est un <b>mélange</b>, pas une Binomiale. La Binomiale à <span class="m">p</span> moyen <i>sous-estime</i> la variance, donc les intervalles calculés avec elle sont trop étroits.</li>
       <li><b>Queues lourdes.</b> Latences, revenus, tailles de fichiers ne sont pas normaux (log-normale, Pareto). Une moyenne ± 2<span class="m">σ</span> y est un mensonge : la moyenne est tirée par la queue et l'écart-type peut même ne pas exister. La médiane et les quantiles (p95, p99) disent vrai.</li>
-      <li><b>La normale « par défaut ».</b> Sans mécanisme de somme, rien ne la justifie. C'est le TCL qui la fabrique, et il demande un <span class="m">n</span> suffisant, d'autant plus grand que la loi de départ est asymétrique (<a href="../../map.html#p00-04">p00-04</a>). Une seule mesure n'est pas une somme.</li>
+      <li><b>La normale « par défaut ».</b> Sans mécanisme de somme, rien ne la justifie. C'est le TCL qui la fabrique, et il demande un <span class="m">n</span> suffisant, d'autant plus grand que la loi de départ est asymétrique (<a href="chain-p00-04-moyenne-lgn-tcl.html">p00-04</a>). Une seule mesure n'est pas une somme.</li>
     </ul>
   </div>
 </div>
@@ -396,8 +396,8 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <h2 style="--ac:var(--violet)">Ponts et cartes</h2>
 <div class="card" style="--ac:var(--violet)"><div class="lbl">Suites et ponts</div>
   <div class="bridges">
-    <a href="../../map.html#p00-02"><b>p00-02 — Espérance, variance, densité</b><small>l'additivité de la variance sous indépendance, utilisée telle quelle au pas 3 ; et ce que veut dire une densité, utilisée aux pas 5 et 6</small></a>
-    <a href="../../map.html#p00-04"><b>p00-04 — Moyenne, LGN, TCL</b><small>le mécanisme qui fabrique la normale du pas 6, et la condition sur n qui la fait casser</small></a>
+    <a href="chain-p00-02-esperance-variance-densite.html"><b>p00-02 — Espérance, variance, densité</b><small>l'additivité de la variance sous indépendance, utilisée telle quelle au pas 3 ; et ce que veut dire une densité, utilisée aux pas 5 et 6</small></a>
+    <a href="chain-p00-04-moyenne-lgn-tcl.html"><b>p00-04 — Moyenne, LGN, TCL</b><small>le mécanisme qui fabrique la normale du pas 6, et la condition sur n qui la fait casser</small></a>
     <a href="chain-p02-01-bruit-vraisemblance-loss.html"><b>p02-01 — Du bruit à la loss (fil B)</b><small>même hypothèse d'indépendance qu'au pas 3 : la conjonction devient un produit, et le produit devient une vraisemblance</small></a>
     <a href="chain-p02-03-conjugues-posterior.html"><b>p02-03 — Conjugués et posterior</b><small>la Beta de la dernière ligne de la table : une loi sur une probabilité inconnue</small></a>
     <a href="chain-p01-01-objet-aleatoire.html"><b>p01-01 — L'objet aléatoire (fil A)</b><small>une statistique calculée sur un échantillon a elle aussi une loi ; c'est le pas suivant du même geste</small></a>
@@ -411,7 +411,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Chaîne p00-01 · v1 du 16/09/2026 · Prérequis : aucun (vocabulaire rappelé en tête). Suite : <a href="../../map.html#p00-02">p00-02 Espérance, variance, densité</a>.</footer>
+<footer>Chaîne p00-01 · v1 du 16/09/2026 · Prérequis : aucun (vocabulaire rappelé en tête). Suite : <a href="chain-p00-02-esperance-variance-densite.html">p00-02 Espérance, variance, densité</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

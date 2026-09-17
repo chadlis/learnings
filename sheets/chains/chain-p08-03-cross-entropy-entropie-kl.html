@@ -154,9 +154,9 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="tags"><code>dl::cross-entropy</code><code>stats::entropie</code><code>stats::kl</code><code>dl::perplexite</code></div>
   <h4>Ponts et suites</h4>
   <ol>
-    <li><a href="../../map.html#b05">b05 · Escalier vs sensible</a></li>
+    <li><a href="../bridges/bridge-05-escalier-vs-sensible.html">b05 · Escalier vs sensible</a></li>
     <li><a href="chain-p03-01-critere-escalier-vs-sensible.html#s4">p03-01 · l'entropie d'un nœud</a></li>
-    <li><a href="../../map.html#p08-04">p08-04 · Tenseurs, ruban, strides</a></li>
+    <li><a href="chain-p08-04-tenseurs-ruban-strides-broadcasting.html">p08-04 · Tenseurs, ruban, strides</a></li>
   </ol>
 </aside>
 
@@ -370,7 +370,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="card casse"><div class="lbl">Quatre limites</div>
     <ul>
       <li><b>Labels bruités.</b> Un label faux impose une surprise que rien ne borne : si le modèle a raison contre l'étiquette et donne 10<sup>−4</sup> à la classe annoncée, il paie 9,2 et son gradient sature à ±1. Il apprend le bruit. Le <b>label smoothing</b> remplace le one-hot par <span class="m">p</span> = (1−<span class="m">ε</span>)·onehot + <span class="m">ε</span>/<span class="m">V</span> : avec <span class="m">ε</span> = 0,1 et <span class="m">V</span> = 3, <span class="m">p</span> = (0,933 ; 0,033 ; 0,033), la surprise maximale tombe à 3,40 et le plancher <span class="m">H</span>(<span class="m">p</span>) = 0,291 nat — la loss ne descend plus jamais à 0, c'est le prix.</li>
-      <li><b>Calibration.</b> Minimiser la CE pousse <span class="m">q</span> vers des probabilités calibrées <b>sur la distribution d'entraînement</b>, et seulement là. Hors distribution, un modèle reste confiant sans raison : la CE n'a jamais vu ces exemples, donc elle ne les a pas punis (<a href="../../map.html#p06-04">p06-04</a>).</li>
+      <li><b>Calibration.</b> Minimiser la CE pousse <span class="m">q</span> vers des probabilités calibrées <b>sur la distribution d'entraînement</b>, et seulement là. Hors distribution, un modèle reste confiant sans raison : la CE n'a jamais vu ces exemples, donc elle ne les a pas punis (<a href="chain-p06-04-calibration-desequilibre.html">p06-04</a>).</li>
       <li><b>Comparer deux perplexités.</b> exp(loss) compte des candidats <i>du vocabulaire courant</i>. Une loss de 3,30 par caractère (27 hésitations sur des lettres) et une loss de 3,30 par token (27 hésitations sur des mots) décrivent des modèles incomparables. Changer de tokenizer change le nombre de tokens du même texte, donc la loss <i>par token</i> : une perplexité ne se compare qu'à découpage identique.</li>
       <li><b>KL infinie.</b> KL(<span class="m">p</span> ‖ <span class="m">q</span>) exige <span class="m">q</span><sub><span class="m">i</span></sub> &gt; 0 partout où <span class="m">p</span><sub><span class="m">i</span></sub> &gt; 0 ; un seul zéro mal placé et la somme vaut +∞. C'est ce qui rend le <b>lissage</b> obligatoire dès qu'on estime <span class="m">q</span> par comptage (<a href="chain-p02-03-conjugues-posterior.html">p02-03</a>). Un softmax ne produit jamais de zéro exact en mathématiques — mais il en produit en float32, dès que l'écart de logits dépasse 88 (<a href="chain-p08-02-flottants-lse.html#s5">p08-02, pas 5</a>).</li>
     </ul>
@@ -414,11 +414,11 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <h2 style="--ac:var(--violet)">Ponts et cartes</h2>
 <div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
   <div class="bridges">
-    <a href="../../map.html#b05"><b>b05 — Escalier vs sensible</b><small>l'entropie est le dôme du critère de split et le plancher de la loss : même fonction, deux emplois — un critère strictement concave voit tout écart, un critère en marches n'en voit aucun</small></a>
+    <a href="../bridges/bridge-05-escalier-vs-sensible.html"><b>b05 — Escalier vs sensible</b><small>l'entropie est le dôme du critère de split et le plancher de la loss : même fonction, deux emplois — un critère strictement concave voit tout écart, un critère en marches n'en voit aucun</small></a>
     <a href="chain-p02-01-bruit-vraisemblance-loss.html#s6"><b>p02-01, pas 6 — le négatif</b><small>la même formule atteinte par l'autre bout : bruit catégoriel, vraisemblance, log, signe. « Cross-entropy » et « NLL » nomment le même objet</small></a>
     <a href="chain-p03-01-critere-escalier-vs-sensible.html#s4"><b>p03-01, pas 4 — Gini et entropie</b><small>l'entropie d'un nœud est la log-loss de la prédiction « proportions du nœud » : le pas 4 d'ici, lu au niveau d'un arbre</small></a>
     <a href="chain-p08-02-flottants-lse.html#s7"><b>p08-02, pas 7 — log_softmax</b><small>pourquoi on ne forme jamais <span class="m">q</span> avant d'en prendre le log ; le pas 8 d'ici en est la conséquence côté API</small></a>
-    <a href="../../map.html#p08-04"><b>p08-04 — Tenseurs, ruban, strides</b><small>la suite : la forme des tenseurs que <code>F.cross_entropy</code> attend, et ce que <code>targets</code> comme indices veut dire en mémoire</small></a>
+    <a href="chain-p08-04-tenseurs-ruban-strides-broadcasting.html"><b>p08-04 — Tenseurs, ruban, strides</b><small>la suite : la forme des tenseurs que <code>F.cross_entropy</code> attend, et ce que <code>targets</code> comme indices veut dire en mémoire</small></a>
   </div>
 </div>
 <div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
@@ -429,7 +429,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Chaîne p08-03 · v1 du 16/09/2026 · Prérequis : p02-01, p08-02, p00-02. Suite : <a href="../../map.html#p08-04">p08-04 Tenseurs, ruban, strides</a>.</footer>
+<footer>Chaîne p08-03 · v1 du 16/09/2026 · Prérequis : p02-01, p08-02, p00-02. Suite : <a href="chain-p08-04-tenseurs-ruban-strides-broadcasting.html">p08-04 Tenseurs, ruban, strides</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

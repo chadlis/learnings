@@ -154,8 +154,8 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <h4>Ponts et suites</h4>
   <ol>
     <li><a href="chain-p08-01-jacobienne-chain-rule-backprop.html#s9">p08-01 · produits de jacobiennes</a></li>
-    <li><a href="../../map.html#p08-03">p08-03 · Cross-entropy, entropie, KL</a></li>
-    <li><a href="../../map.html#p08-04">p08-04 · Tenseurs, ruban, strides</a></li>
+    <li><a href="chain-p08-03-cross-entropy-entropie-kl.html">p08-03 · Cross-entropy, entropie, KL</a></li>
+    <li><a href="chain-p08-04-tenseurs-ruban-strides-broadcasting.html">p08-04 · Tenseurs, ruban, strides</a></li>
   </ol>
 </aside>
 
@@ -336,7 +336,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <h3>Composer log et softmax est un piège</h3>
     <p>Écrire <code>log(softmax(z))</code> forme d'abord une probabilité minuscule, qui <i>underflow</i> à 0, puis prend son log : −inf. Or la quantité cherchée est parfaitement représentable — c'est un nombre de l'ordre de la dizaine.</p>
     <div class="eq">log_softmax(<span class="m">z</span>)<sub><span class="m">i</span></sub> = <span class="m">z</span><sub><span class="m">i</span></sub> − LSE(<span class="m">z</span>)</div>
-    <p>Cette forme ne construit <b>jamais</b> <span class="m">p</span> : une soustraction, pas un quotient d'exponentielles. C'est pourquoi <code>F.cross_entropy</code> prend des <b>logits</b> et fait le log-sum-exp elle-même — lui passer des probabilités, c'est lui retirer précisément ce qu'elle sait faire (<a href="../../map.html#p08-03">p08-03</a>).</p>
+    <p>Cette forme ne construit <b>jamais</b> <span class="m">p</span> : une soustraction, pas un quotient d'exponentielles. C'est pourquoi <code>F.cross_entropy</code> prend des <b>logits</b> et fait le log-sum-exp elle-même — lui passer des probabilités, c'est lui retirer précisément ce qu'elle sait faire (<a href="chain-p08-03-cross-entropy-entropie-kl.html">p08-03</a>).</p>
     <p class="say">« log de softmax forme d'abord une probabilité minuscule, donc elle tombe à zéro par underflow, donc son log vaut moins l'infini, donc on écrit log_softmax = z moins LSE, qui ne forme jamais la probabilité. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — <span class="m">z</span> = (0 ; −120), classe cible = 2</div>
@@ -424,8 +424,8 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="bridges">
     <a href="chain-p08-01-jacobienne-chain-rule-backprop.html#s4"><b>p08-01, pas 4 — les trois facteurs du neurone</b><small>le −1/p qui compense p(1−p) y est une affaire de calcul ; ici c'est une affaire de flottants : on ne forme jamais p, donc on ne prend jamais son log</small></a>
     <a href="chain-p08-01-jacobienne-chain-rule-backprop.html#s9"><b>p08-01, pas 9 — produits de jacobiennes</b><small>même mécanisme d'échelle : un produit long s'écroule ou diverge, et ce sont les mêmes inf et les mêmes nan qui apparaissent au bout</small></a>
-    <a href="../../map.html#p08-03"><b>p08-03 — Cross-entropy, entropie, KL</b><small>la suite directe du pas 7 : pourquoi la loss prend des logits, et ce que −log p mesure une fois qu'on sait le calculer</small></a>
-    <a href="../../map.html#p08-04"><b>p08-04 — Tenseurs, ruban, strides</b><small>l'autre moitié de « ce qu'est vraiment un tenseur » : ici le contenu d'une case, là sa place en mémoire</small></a>
+    <a href="chain-p08-03-cross-entropy-entropie-kl.html"><b>p08-03 — Cross-entropy, entropie, KL</b><small>la suite directe du pas 7 : pourquoi la loss prend des logits, et ce que −log p mesure une fois qu'on sait le calculer</small></a>
+    <a href="chain-p08-04-tenseurs-ruban-strides-broadcasting.html"><b>p08-04 — Tenseurs, ruban, strides</b><small>l'autre moitié de « ce qu'est vraiment un tenseur » : ici le contenu d'une case, là sa place en mémoire</small></a>
   </div>
 </div>
 <div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
@@ -436,7 +436,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Chaîne p08-02 · v1 du 16/09/2026 · Prérequis : aucun (notation scientifique <span class="m">x</span> = ±<span class="m">m</span> × 2<sup>e</sup>). Suite : <a href="../../map.html#p08-03">p08-03 Cross-entropy, entropie, KL</a>.</footer>
+<footer>Chaîne p08-02 · v1 du 16/09/2026 · Prérequis : aucun (notation scientifique <span class="m">x</span> = ±<span class="m">m</span> × 2<sup>e</sup>). Suite : <a href="chain-p08-03-cross-entropy-entropie-kl.html">p08-03 Cross-entropy, entropie, KL</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

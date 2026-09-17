@@ -155,8 +155,8 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="tags"><code>stats::bayes</code><code>stats::conditionnement</code><code>stats::base-rate</code><code>ml::metriques</code></div>
   <h4>Suites et voisines</h4>
   <ol>
-    <li><a href="../../map.html#p00-04">p00-04 · Moyenne, LGN, TCL</a></li>
-    <li><a href="../../map.html#p06-03">p06-03 · Seuil, ROC, PR</a></li>
+    <li><a href="chain-p00-04-moyenne-lgn-tcl.html">p00-04 · Moyenne, LGN, TCL</a></li>
+    <li><a href="chain-p06-03-seuil-roc-pr.html">p06-03 · Seuil, ROC, PR</a></li>
     <li><a href="chain-p01-02-ic-test-procedure.html">p01-02 · IC et test</a></li>
   </ol>
 </aside>
@@ -345,7 +345,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr><td>VPN</td><td>TN/(TN+FN)</td><td>0,999</td><td>0,988</td></tr>
       <tr><td>accuracy</td><td>(TP+TN)/<span class="m">N</span></td><td>0,950</td><td>0,945</td></tr>
     </table>
-    <p>Les deux premières lignes ne bougent pas d'un chiffre ; les quatre autres bougent. La courbe <b>ROC</b> (TPR contre FPR) est donc insensible à la prévalence, la courbe <b>PR</b> ne l'est pas — c'est pourquoi on préfère la PR en fort déséquilibre (<a href="../../map.html#p06-03">p06-03</a>).</p>
+    <p>Les deux premières lignes ne bougent pas d'un chiffre ; les quatre autres bougent. La courbe <b>ROC</b> (TPR contre FPR) est donc insensible à la prévalence, la courbe <b>PR</b> ne l'est pas — c'est pourquoi on préfère la PR en fort déséquilibre (<a href="chain-p06-03-seuil-roc-pr.html">p06-03</a>).</p>
     <p>L'accuracy, elle, ment doucement : 0,950 ici, alors que prédire « tout le monde est sain » en ferait 0,990.</p>
   </div>
 </div>
@@ -402,7 +402,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <h2 style="--ac:var(--violet)">Ponts et cartes</h2>
 <div class="card" style="--ac:var(--violet)"><div class="lbl">Voisines</div>
   <div class="bridges">
-    <a href="../../map.html#p06-03"><b>p06-03 — Seuil, ROC, PR</b><small>le pas 8 poussé jusqu'au bout : la ROC trace TPR contre FPR, deux quantités qui vivent chacune dans une ligne du tableau, donc insensibles à la prévalence ; la courbe PR contient la précision, donc elle bouge avec le base rate</small></a>
+    <a href="chain-p06-03-seuil-roc-pr.html"><b>p06-03 — Seuil, ROC, PR</b><small>le pas 8 poussé jusqu'au bout : la ROC trace TPR contre FPR, deux quantités qui vivent chacune dans une ligne du tableau, donc insensibles à la prévalence ; la courbe PR contient la précision, donc elle bouge avec le base rate</small></a>
     <a href="chain-p01-02-ic-test-procedure.html"><b>p01-02 — IC et test comme procédures</b><small>« p-value = P(H₀) » est le sophisme du procureur du pas 9 : conditionner sur les données au lieu de conditionner sur l'hypothèse, exactement l'inversion que le pas 2 interdit</small></a>
     <a href="chain-p02-01-bruit-vraisemblance-loss.html"><b>p02-01 — Du bruit à la loss</b><small>la vraisemblance du numérateur de Bayes y devient une loss ; et le produit sur les observations n'est licite que par l'indépendance du pas 3</small></a>
     <a href="chain-p02-02-prior-penalite.html"><b>p02-02 — Prior et pénalité</b><small>posterior ∝ vraisemblance × prior lu en logarithme : le prior devient une pénalité et le dénominateur de Bayes, une constante qu'on peut ignorer</small></a>
@@ -416,7 +416,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Chaîne p00-03 · v1 du 16/09/2026 · Prérequis : <a href="chain-p00-02-esperance-variance-densite.html">p00-02</a>. Suite : <a href="../../map.html#p00-04">p00-04 Moyenne, LGN, TCL</a>.</footer>
+<footer>Chaîne p00-03 · v1 du 16/09/2026 · Prérequis : <a href="chain-p00-02-esperance-variance-densite.html">p00-02</a>. Suite : <a href="chain-p00-04-moyenne-lgn-tcl.html">p00-04 Moyenne, LGN, TCL</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

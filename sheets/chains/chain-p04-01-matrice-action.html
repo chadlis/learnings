@@ -177,7 +177,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="tags"><code>algebre::matrice-action</code><code>algebre::noyau</code><code>algebre::affine</code><code>algebre::temoin</code></div>
   <h4>Ponts</h4>
   <ol>
-    <li><a href="../../map.html#b02">b02 · Le témoin atteignable</a></li>
+    <li><a href="../bridges/bridge-02-temoin-atteignable.html">b02 · Le témoin atteignable</a></li>
   </ol>
 </aside>
 
@@ -189,7 +189,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <li><b>Vecteur.</b> Une flèche partant de l'origine, ou la liste de ses coordonnées : <span class="m">v</span> = (<span class="m">v</span><sub>1</sub>, <span class="m">v</span><sub>2</sub>). Les deux lectures servent, la flèche pour voir, la liste pour calculer.</li>
       <li><b>Somme et multiple.</b> <span class="m">u</span> + <span class="m">v</span> coordonnée par coordonnée, <span class="m">λv</span> allonge la flèche sans la tourner (elle se retourne si <span class="m">λ</span> &lt; 0).</li>
       <li><b>Produit scalaire et norme.</b> ⟨<span class="m">u</span>, <span class="m">v</span>⟩ = Σ <span class="m">u</span><sub><span class="m">i</span></sub><span class="m">v</span><sub><span class="m">i</span></sub> et ‖<span class="m">v</span>‖ = √⟨<span class="m">v</span>, <span class="m">v</span>⟩. Ils n'interviennent qu'au pas 8, pour parler de distance à une image.</li>
-      <li><b>Aucune fiche préalable.</b> Cette chaîne ouvre la partie 4 ; elle est le prérequis des suivantes, pas leur conséquence (<a href="../../map.html#p04-02">la carte</a>).</li>
+      <li><b>Aucune fiche préalable.</b> Cette chaîne ouvre la partie 4 ; elle est le prérequis des suivantes, pas leur conséquence (<a href="chain-p04-02-valeurs-propres-iteration.html">la carte</a>).</li>
     </ul>
   </div>
 </section>
@@ -386,7 +386,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr><td><b>témoin</b> : <span class="m">β</span><sub><span class="m">z</span></sub> = 0</td><td>1,3 + 0,9 <span class="m">x</span></td><td><b>19/10</b> = 1,9</td><td>0,81</td></tr>
     </table></div>
     <p>TSS = 10 dans les deux cas. La troisième ligne est le témoin : elle vit dans le grand espace et y vaut exactement l'ancien RSS, donc le minimum du grand espace lui est inférieur ou égal. Le calcul confirme (1,067 &lt; 1,9), mais il n'était pas nécessaire : <b>l'argument précède le chiffre</b>.</p>
-    <p>Même geste pour le biais du max, pour un tuning évalué sur son propre test, pour l'OOB face au test — c'est le pont <a href="../../map.html#b02">b02</a>.</p>
+    <p>Même geste pour le biais du max, pour un tuning évalué sur son propre test, pour l'OOB face au test — c'est le pont <a href="../bridges/bridge-02-temoin-atteignable.html">b02</a>.</p>
   </div>
 </div>
 
@@ -399,7 +399,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="card casse"><div class="lbl">Quatre limites</div>
     <ul>
       <li><b>Lire par lignes.</b> <span class="m">Ax</span> ligne par ligne, c'est deux produits scalaires : correct pour <i>calculer</i>, muet pour <i>voir</i>. Aucune ligne ne dit où part la base. Pour l'intuition, toujours les colonnes ; pour le calcul à la main, les lignes.</li>
-      <li><b>det = 0 en flottant.</b> En machine, un déterminant vaut 10<sup>−15</sup> et non 0 — et un det minuscule peut venir d'une simple mise à l'échelle. Le bon diagnostic n'est pas det mais le <b>conditionnement</b> (<a href="../../map.html#p04-03">p04-03</a>) : de combien une petite erreur sur <span class="m">b</span> se propage sur <span class="m">x</span>.</li>
+      <li><b>det = 0 en flottant.</b> En machine, un déterminant vaut 10<sup>−15</sup> et non 0 — et un det minuscule peut venir d'une simple mise à l'échelle. Le bon diagnostic n'est pas det mais le <b>conditionnement</b> (<a href="chain-p04-03-spectral-svd-conditionnement.html">p04-03</a>) : de combien une petite erreur sur <span class="m">b</span> se propage sur <span class="m">x</span>.</li>
       <li><b>Confondre « pas de solution » et « solution non unique ».</b> La première vient de l'<b>image</b> (la cible n'est pas atteignable), la seconde du <b>noyau</b> (plusieurs entrées, même sortie). Les deux arrivent en même temps sur une matrice de rang 1 et n'ont pas le même remède : projeter d'un côté, choisir de l'autre.</li>
       <li><b>Un réseau sans biais.</b> Toutes les frontières passent alors par l'origine : le modèle ne peut pas décaler son seuil. Standardiser les entrées recentre les données autour de 0 et <i>masque</i> le symptôme sans rendre au modèle le degré de liberté qui lui manque.</li>
     </ul>
@@ -443,7 +443,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <h2 style="--ac:var(--violet)">Ponts et cartes</h2>
 <div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
   <div class="bridges">
-    <a href="../../map.html#b02"><b>b02 · Le témoin atteignable</b><small>Le pas 8 en entier : majorer un minimum en exhibant un point du nouvel espace qui reproduit l'ancien. Même argument pour le biais du max, pour un tuning évalué sur son test, pour l'OOB.</small></a>
+    <a href="../bridges/bridge-02-temoin-atteignable.html"><b>b02 · Le témoin atteignable</b><small>Le pas 8 en entier : majorer un minimum en exhibant un point du nouvel espace qui reproduit l'ancien. Même argument pour le biais du max, pour un tuning évalué sur son test, pour l'OOB.</small></a>
     <a href="chain-p02-02-prior-penalite.html"><b>p02-02 · Du prior à la pénalité</b><small>La droite de solutions du pas 6 : quand le noyau n'est pas trivial, c'est la pénalité qui choisit un point dessus — <span class="m">λ</span>I rend le problème inversible.</small></a>
   </div>
 </div>
@@ -455,7 +455,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Chaîne p04-01 · v1 du 16/09/2026 · Prérequis : aucun. Suite : <a href="../../map.html#p04-02">p04-02 Valeurs propres et itération</a>.</footer>
+<footer>Chaîne p04-01 · v1 du 16/09/2026 · Prérequis : aucun. Suite : <a href="chain-p04-02-valeurs-propres-iteration.html">p04-02 Valeurs propres et itération</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

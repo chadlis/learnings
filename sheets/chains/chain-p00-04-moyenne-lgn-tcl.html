@@ -164,8 +164,8 @@ text.mk-mu{fill:var(--pen)}text.mk-band{fill:var(--green)}
   <div class="tags"><code>stats::tcl</code><code>stats::lgn</code><code>stats::se</code><code>stats::normale</code></div>
   <h4>Ponts et suites</h4>
   <ol>
-    <li><a href="../../map.html#b03">b03 · Biais et variance partout</a></li>
-    <li><a href="../../map.html#b04">b04 · Variance d'une moyenne corrélée</a></li>
+    <li><a href="../bridges/bridge-03-biais-variance-partout.html">b03 · Biais et variance partout</a></li>
+    <li><a href="../bridges/bridge-04-variance-moyenne-correlee.html">b04 · Variance d'une moyenne corrélée</a></li>
     <li><a href="chain-p01-01-objet-aleatoire.html">p01-01 · L'objet aléatoire</a></li>
   </ol>
 </aside>
@@ -352,7 +352,7 @@ text.mk-mu{fill:var(--pen)}text.mk-band{fill:var(--green)}
     <h3>Standardiser : la brique de tout intervalle</h3>
     <p>Une fois la forme connue, on ramène <span class="m">X̄</span> à une échelle universelle en soustrayant le centre et en divisant par la largeur.</p>
     <div class="eq"><span class="m">Z</span> = (<span class="m">X̄</span> − μ)/(σ/√<span class="m">n</span>) ≈ <span class="up">N</span>(0, 1) &nbsp;&nbsp; <span class="m">P</span>(|<span class="m">Z</span>| &lt; 1,96) = 0,95</div>
-    <p>Réécrite en <span class="m">X̄</span>, cette ligne est l'intervalle de confiance : <span class="m">X̄</span> ± 1,96 σ/√<span class="m">n</span>. Deux amendements l'attendent et ne sont pas ici : σ est inconnu et se remplace par son estimation (<a href="chain-p01-01-objet-aleatoire.html#s6">p01-01</a>), et à petit <span class="m">n</span> ce remplacement élargit l'intervalle — c'est Student (<a href="../../map.html#p01-03">p01-03</a>).</p>
+    <p>Réécrite en <span class="m">X̄</span>, cette ligne est l'intervalle de confiance : <span class="m">X̄</span> ± 1,96 σ/√<span class="m">n</span>. Deux amendements l'attendent et ne sont pas ici : σ est inconnu et se remplace par son estimation (<a href="chain-p01-01-objet-aleatoire.html#s6">p01-01</a>), et à petit <span class="m">n</span> ce remplacement élargit l'intervalle — c'est Student (<a href="chain-p01-03-inference-regression.html">p01-03</a>).</p>
     <p class="say">« La moyenne est approximativement normale de centre μ et de largeur σ sur racine de n, donc sa version standardisée est une normale standard, donc 95 % de sa masse est dans plus ou moins 1,96, donc l'intervalle est X barre plus ou moins 1,96 σ sur racine de n. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application</div>
@@ -371,7 +371,7 @@ text.mk-mu{fill:var(--pen)}text.mk-band{fill:var(--green)}
   </div>
   <div class="card casse"><div class="lbl">Quatre limites</div>
     <ul>
-      <li><b>Dépendance — la largeur ne tend plus vers zéro.</b> Avec une corrélation commune ρ entre les termes, Var(<span class="m">X̄</span>) = ρσ² + (1 − ρ)σ²/<span class="m">n</span> : le second terme s'efface, le premier <b>reste</b>. Avec ρ = 0,05 sur le dé, le SE plafonne à 0,382 quel que soit <span class="m">n</span> — contre 0,017 à <span class="m">n</span> = 10 000 sous indépendance, soit 22 fois trop optimiste. Plusieurs lignes d'un même utilisateur, points successifs d'une série temporelle : c'est le cas courant, pas le cas rare. Le pont <a href="../../map.html#b04">b04</a> dérive la formule.</li>
+      <li><b>Dépendance — la largeur ne tend plus vers zéro.</b> Avec une corrélation commune ρ entre les termes, Var(<span class="m">X̄</span>) = ρσ² + (1 − ρ)σ²/<span class="m">n</span> : le second terme s'efface, le premier <b>reste</b>. Avec ρ = 0,05 sur le dé, le SE plafonne à 0,382 quel que soit <span class="m">n</span> — contre 0,017 à <span class="m">n</span> = 10 000 sous indépendance, soit 22 fois trop optimiste. Plusieurs lignes d'un même utilisateur, points successifs d'une série temporelle : c'est le cas courant, pas le cas rare. Le pont <a href="../bridges/bridge-04-variance-moyenne-correlee.html">b04</a> dérive la formule.</li>
       <li><b>Variance infinie — ni LGN utile, ni TCL.</b> Cauchy, Pareto d'indice ≤ 2 : σ² n'existe pas, σ/√<span class="m">n</span> n'a pas de sens. La moyenne de <span class="m">n</span> Cauchy suit <i>exactement</i> la même loi qu'une seule : moyenner n'apporte strictement rien. Signe clinique : une moyenne empirique qui ne se stabilise pas et saute à chaque gros tirage.</li>
       <li><b>Événements rares — <span class="m">n</span> n'est pas la bonne échelle.</b> Le TCL demande que chaque terme pèse peu ; avec <span class="m">p</span> = 0,02, un échantillon de 100 lignes contient deux succès et la loi reste un peigne (figure 4). La règle est <span class="m">np</span> ≥ 10 <i>et</i> <span class="m">n</span>(1 − <span class="m">p</span>) ≥ 10 : c'est le <b>nombre de succès</b>, pas la prévalence ni la taille d'échantillon, qui décide. C'est la même chose que le 28/30 de <a href="chain-p01-01-objet-aleatoire.html#s8">p01-01</a>, vu ici depuis le TCL.</li>
       <li><b>« <span class="m">n</span> ≥ 30 » n'est pas un théorème.</b> C'est un ordre de grandeur pour des lois symétriques à queue courte. Faux vers le bas pour une exponentielle (≈ 100), très faux pour une Bernoulli rare (≥ 500). La question utile n'est jamais « <span class="m">n</span> est-il assez grand » mais « <b>à quelle vitesse cette loi-là oublie-t-elle sa forme</b> ».</li>
@@ -415,8 +415,8 @@ text.mk-mu{fill:var(--pen)}text.mk-band{fill:var(--green)}
 <h2 style="--ac:var(--violet)">Ponts et cartes</h2>
 <div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts et voisines</div>
   <div class="bridges">
-    <a href="../../map.html#b04"><b>b04 — Variance d'une moyenne corrélée</b><small>la première limite du pas 8 dérivée jusqu'au bout : d'où sort ρσ² + (1 − ρ)σ²/n, et pourquoi c'est la même formule qui explique le nombre effectif d'observations, les comparaisons appariées et le bagging d'arbres corrélés</small></a>
-    <a href="../../map.html#b03"><b>b03 — Biais et variance partout</b><small>le pas 2 donne le biais nul, le pas 3 la variance : le même couple centre / largeur se rejoue sur un estimateur, sur une prédiction et sur une erreur de test</small></a>
+    <a href="../bridges/bridge-04-variance-moyenne-correlee.html"><b>b04 — Variance d'une moyenne corrélée</b><small>la première limite du pas 8 dérivée jusqu'au bout : d'où sort ρσ² + (1 − ρ)σ²/n, et pourquoi c'est la même formule qui explique le nombre effectif d'observations, les comparaisons appariées et le bagging d'arbres corrélés</small></a>
+    <a href="../bridges/bridge-03-biais-variance-partout.html"><b>b03 — Biais et variance partout</b><small>le pas 2 donne le biais nul, le pas 3 la variance : le même couple centre / largeur se rejoue sur un estimateur, sur une prédiction et sur une erreur de test</small></a>
     <a href="chain-p01-01-objet-aleatoire.html"><b>p01-01 — L'objet aléatoire</b><small>la suite immédiate : X̄ devient un estimateur, σ/√n devient le SE d'une proportion, et le np ≥ 10 du pas 8 réapparaît sur un rappel de 28/30</small></a>
     <a href="chain-p00-02-esperance-variance-densite.html#s5"><b>p00-02 — Additivité et covariance</b><small>la source du n du haut ; c'est exactement le terme croisé qu'on y annule sous indépendance qui revient en ρσ² quand elle tombe</small></a>
   </div>

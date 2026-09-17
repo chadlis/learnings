@@ -153,7 +153,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <ol>
     <li><a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01 · Du bruit à la loss</a></li>
     <li><a href="chain-p02-02-prior-penalite.html">p02-02 · Du prior à la pénalité</a></li>
-    <li><a href="../../map.html#p00-03">p00-03 · Conditionnement et Bayes</a></li>
+    <li><a href="chain-p00-03-conditionnement-bayes.html">p00-03 · Conditionnement et Bayes</a></li>
   </ol>
   <h4>Cartes Anki liées</h4>
   <div class="tags"><code>stats::beta</code><code>stats::bayes</code><code>stats::map</code><code>stats::mle-map</code></div>
@@ -169,7 +169,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <div class="lbl">Ce que cette chaîne suppose acquis</div>
     <ul>
       <li><b>La vraisemblance d'un Bernoulli</b> (<a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>) : pour <span class="m">k</span> succès sur <span class="m">n</span> tirages indépendants, <span class="m">L</span>(<span class="m">p</span>) = <span class="m">p</span><sup><span class="m">k</span></sup>(1 − <span class="m">p</span>)<sup><span class="m">n</span>−<span class="m">k</span></sup>. On ne la redérive pas.</li>
-      <li><b>Bayes</b> (<a href="../../map.html#p00-03">p00-03</a>) : <span class="m">π</span>(<span class="m">p</span> | <span class="m">D</span>) = <span class="m">L</span>(<span class="m">p</span>) <span class="m">π</span>(<span class="m">p</span>) / <span class="m">P</span>(<span class="m">D</span>), donc <span class="m">π</span>(<span class="m">p</span> | <span class="m">D</span>) ∝ <span class="m">L</span>(<span class="m">p</span>) <span class="m">π</span>(<span class="m">p</span>) à données fixées. <span class="m">P</span>(<span class="m">D</span>) = ∫ <span class="m">L</span> <span class="m">π</span> ne dépend pas de <span class="m">p</span> : il normalise, il ne déplace aucun maximum.</li>
+      <li><b>Bayes</b> (<a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>) : <span class="m">π</span>(<span class="m">p</span> | <span class="m">D</span>) = <span class="m">L</span>(<span class="m">p</span>) <span class="m">π</span>(<span class="m">p</span>) / <span class="m">P</span>(<span class="m">D</span>), donc <span class="m">π</span>(<span class="m">p</span> | <span class="m">D</span>) ∝ <span class="m">L</span>(<span class="m">p</span>) <span class="m">π</span>(<span class="m">p</span>) à données fixées. <span class="m">P</span>(<span class="m">D</span>) = ∫ <span class="m">L</span> <span class="m">π</span> ne dépend pas de <span class="m">p</span> : il normalise, il ne déplace aucun maximum.</li>
       <li><b>Le MAP est un point</b> (<a href="chain-p02-02-prior-penalite.html">p02-02</a>) : minimiser NLL + (−<span class="m">log</span> prior), gaussien → Ridge, Laplace → Lasso, prior plat → MLE. C'est exactement ce que cette chaîne <i>ne refait pas</i> : elle reprend au point où p02-02 jette <span class="m">P</span>(<span class="m">D</span>).</li>
       <li><b>Notation, et elle compte ici.</b> En fréquentiste <span class="m">p</span>(<span class="m">D</span> ; <span class="m">p</span>) — point-virgule, le paramètre est un réglage fixe, il n'y a rien à conditionner. En bayésien <span class="m">π</span>(<span class="m">p</span> | <span class="m">D</span>) — barre, le paramètre est une variable aléatoire. On réserve <span class="m">π</span> aux lois <b>sur</b> le paramètre, pour ne pas confondre la densité et le paramètre, qui s'appellent tous deux <span class="m">p</span>.</li>
     </ul>
@@ -382,7 +382,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Chaîne p02-03 · v1 du 16/09/2026 · fil B, 3/3. Prérequis : <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, <a href="chain-p02-02-prior-penalite.html">p02-02</a>, <a href="../../map.html#p00-03">p00-03</a>. Suite : <a href="chain-p03-01-critere-escalier-vs-sensible.html">p03-01 Critère en escalier vs critère sensible</a>.</footer>
+<footer>Chaîne p02-03 · v1 du 16/09/2026 · fil B, 3/3. Prérequis : <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, <a href="chain-p02-02-prior-penalite.html">p02-02</a>, <a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>. Suite : <a href="chain-p03-01-critere-escalier-vs-sensible.html">p03-01 Critère en escalier vs critère sensible</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

@@ -147,15 +147,15 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <ol>
     <li><a href="../chains/chain-p04-01-matrice-action.html#s8">p04-01 · Le témoin atteignable</a></li>
     <li><a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html#s6">p01-04 · Le max ment</a></li>
-    <li><a href="../../map.html#p05-01">p05-01 · Régression, modèle et OLS</a></li>
-    <li><a href="../../map.html#p07-02">p07-02 · Bagging et forêts</a></li>
+    <li><a href="../chains/chain-p05-01-regression-modele-ols.html">p05-01 · Régression, modèle et OLS</a></li>
+    <li><a href="../chains/chain-p07-02-bagging-rf.html">p07-02 · Bagging et forêts</a></li>
     <li><a href="../walkthroughs/walkthrough-p01-03-biais-du-max.html">w01-03 · Le biais du max</a></li>
   </ol>
   <h4>Cartes Anki liées</h4>
   <div class="tags"><code>algebre::temoin</code><code>stats::multiplicite</code><code>ml::validation</code></div>
   <h4>Ponts</h4>
   <ol>
-    <li><a href="../../map.html#b03">b03 · Biais-variance partout</a></li>
+    <li><a href="bridge-03-biais-variance-partout.html">b03 · Biais-variance partout</a></li>
     <li><a href="bridge-01-une-seule-descente.html">b01 · Une seule descente</a></li>
   </ol>
 </aside>
@@ -167,7 +167,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <ul>
       <li><b>Le témoin, côté algèbre.</b> Ajouter une colonne à <span class="m">X</span> agrandit l'image ; la projection de <span class="m">y</span> ne peut que s'en rapprocher (<a href="../chains/chain-p04-01-matrice-action.html#s8">p04-01 pas 8</a>).</li>
       <li><b>Le max ment.</b> Le meilleur de <span class="m">k</span> scores bruités est un maximum de variables aléatoires, donc son espérance dépasse la valeur commune (<a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html#s6">p01-04 pas 6</a>), et le remède est le protocole (<a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html#s7">pas 7</a>).</li>
-      <li><b>RSS, TSS, <span class="m">R</span>²</b> et <b>bagging, OOB</b> ne sont pas redéfinis ici : leurs chaînes propres sont <a href="../../map.html#p05-01">p05-01</a> et <a href="../../map.html#p07-02">p07-02</a>.</li>
+      <li><b>RSS, TSS, <span class="m">R</span>²</b> et <b>bagging, OOB</b> ne sont pas redéfinis ici : leurs chaînes propres sont <a href="../chains/chain-p05-01-regression-modele-ols.html">p05-01</a> et <a href="../chains/chain-p07-02-bagging-rf.html">p07-02</a>.</li>
       <li><b><span class="up">E</span>[max de <span class="m">k</span> normales] n'est pas redérivée.</b> Le passage par <span class="up">P</span>(max ≤ <span class="m">t</span>) = Φ(<span class="m">t</span>/SE)<sup><span class="m">k</span></sup> vit dans <a href="../walkthroughs/walkthrough-p01-03-biais-du-max.html">w01-03</a> ; ce pont prend le tableau de valeurs tel quel et s'en sert.</li>
     </ul>
   </div>
@@ -224,7 +224,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr><td>Tuning sur le test</td><td>le test set utilisé pour choisir</td><td>même chose</td><td>le test ne mesure plus</td></tr>
       <tr><td>OOB vs test</td><td>les arbres qui n'ont pas vu la ligne</td><td>rien à racheter : aucun choix</td><td>OOB un peu pessimiste, mais valide</td></tr>
     </table>
-    <p><b>Où c'est écrit</b>, ligne à ligne : <a href="../chains/chain-p04-01-matrice-action.html#s8">p04-01 pas 8</a> et <a href="../../map.html#p05-01">p05-01</a> · <a href="../../map.html#p06-01">p06-01</a> · <a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html#s6">p01-04 pas 6</a> et <a href="../walkthroughs/walkthrough-p01-03-biais-du-max.html">w01-03</a> · <a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html#s7">p01-04 pas 7</a> · <a href="../../map.html#p07-02">p07-02</a> et <a href="../chains/chain-p01-05-bootstrap.html#s4">p01-05 pas 4</a>.</p>
+    <p><b>Où c'est écrit</b>, ligne à ligne : <a href="../chains/chain-p04-01-matrice-action.html#s8">p04-01 pas 8</a> et <a href="../chains/chain-p05-01-regression-modele-ols.html">p05-01</a> · <a href="../chains/chain-p06-01-biais-variance.html">p06-01</a> · <a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html#s6">p01-04 pas 6</a> et <a href="../walkthroughs/walkthrough-p01-03-biais-du-max.html">w01-03</a> · <a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html#s7">p01-04 pas 7</a> · <a href="../chains/chain-p07-02-bagging-rf.html">p07-02</a> et <a href="../chains/chain-p01-05-bootstrap.html#s4">p01-05 pas 4</a>.</p>
   </div>
 </div>
 
@@ -329,7 +329,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr><td><span class="m">m</span> = 500 (la forêt entière)</td><td>0,3014</td></tr>
       <tr><td><span class="m">m</span> = 184 (ce que voit l'OOB)</td><td>0,3038</td></tr>
     </table>
-    <p>Soit +0,8 % de variance, +0,4 % d'écart-type : c'est tout le pessimisme de l'OOB, et il fond quand <span class="m">B</span> grandit. À comparer aux <b>2,3 points</b> d'optimisme d'un test tuné — les deux biais existent, ils ne sont ni du même ordre ni du même signe. La <span class="m">ρ</span> = 0,3 est une hypothèse de lecture, pas une mesure (<a href="../../map.html#p07-02">p07-02</a>).</p>
+    <p>Soit +0,8 % de variance, +0,4 % d'écart-type : c'est tout le pessimisme de l'OOB, et il fond quand <span class="m">B</span> grandit. À comparer aux <b>2,3 points</b> d'optimisme d'un test tuné — les deux biais existent, ils ne sont ni du même ordre ni du même signe. La <span class="m">ρ</span> = 0,3 est une hypothèse de lecture, pas une mesure (<a href="../chains/chain-p07-02-bagging-rf.html">p07-02</a>).</p>
   </div>
 </div>
 
@@ -383,7 +383,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html#s6"><b>p01-04 pas 6–7 — Le max ment, puis le remède</b><small>le même témoin sous bruit, et pourquoi la séparation train / validation / test en découle</small></a>
     <a href="../walkthroughs/walkthrough-p01-03-biais-du-max.html"><b>w01-03 — Le biais du max</b><small>d'où sort E[max de k] : P(max ≤ t) = Φ(t/SE)ᵏ, dérivée pas à pas — ce pont s'en sert sans la refaire</small></a>
     <a href="../chains/chain-p01-05-bootstrap.html#s4"><b>p01-05 pas 4 — Pourquoi avec remise</b><small>d'où sortent les 37 % : la fraction de lignes qu'un bootstrap laisse dehors, et donc l'OOB</small></a>
-    <a href="../../map.html#b03"><b>b03 — Biais-variance partout</b><small>l'autre moitié du même sujet : ici on regarde ce qui ne peut que baisser, là ce qui se décompose</small></a>
+    <a href="bridge-03-biais-variance-partout.html"><b>b03 — Biais-variance partout</b><small>l'autre moitié du même sujet : ici on regarde ce qui ne peut que baisser, là ce qui se décompose</small></a>
   </div>
 </div>
 <div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
@@ -394,7 +394,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Pont b02 · v1 du 17/09/2026 · Prérequis : p04-01, p01-04, p05-01, p07-02. Suite : <a href="../../map.html#b03">b03 — Biais-variance partout</a>.</footer>
+<footer>Pont b02 · v1 du 17/09/2026 · Prérequis : p04-01, p01-04, p05-01, p07-02. Suite : <a href="bridge-03-biais-variance-partout.html">b03 — Biais-variance partout</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

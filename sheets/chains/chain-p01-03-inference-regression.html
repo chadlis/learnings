@@ -158,7 +158,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <ol id="toc"></ol>
   <h4>Prérequis</h4>
   <ol>
-    <li><a href="../../map.html#p05-01">p05-01 · Le modèle de régression</a></li>
+    <li><a href="chain-p05-01-regression-modele-ols.html">p05-01 · Le modèle de régression</a></li>
     <li><a href="chain-p01-01-objet-aleatoire.html#s5">p01-01 · L'objet aléatoire, le SE</a></li>
     <li><a href="chain-p01-02-ic-test-procedure.html#s6">p01-02 · IC, test, dualité</a></li>
   </ol>
@@ -176,7 +176,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="card" style="--ac:var(--blue)">
     <div class="lbl">Ce que cette chaîne suppose acquis</div>
     <ul>
-      <li><b>Le modèle et les deux formules fermées.</b> <span class="m">Y</span> = <span class="m">β</span><sub>0</sub> + <span class="m">β</span><sub>1</sub><span class="m">X</span> + <span class="m">ε</span> ; les moindres carrés donnent <span class="hat"><span class="m">β</span></span><sub>1</sub> = <span class="up">Ĉov</span>(<span class="m">x</span>,<span class="m">y</span>) / <span class="up">V̂ar</span>(<span class="m">x</span>) et <span class="hat"><span class="m">β</span></span><sub>0</sub> = <span class="m">ȳ</span> − <span class="hat"><span class="m">β</span></span><sub>1</sub><span class="m">x̄</span> — jamais <span class="m">ȳ</span> tout seul : la droite passe par (<span class="m">x̄</span>, <span class="m">ȳ</span>), pas par (0, <span class="m">ȳ</span>) (<a href="../../map.html#p05-01">p05-01</a>).</li>
+      <li><b>Le modèle et les deux formules fermées.</b> <span class="m">Y</span> = <span class="m">β</span><sub>0</sub> + <span class="m">β</span><sub>1</sub><span class="m">X</span> + <span class="m">ε</span> ; les moindres carrés donnent <span class="hat"><span class="m">β</span></span><sub>1</sub> = <span class="up">Ĉov</span>(<span class="m">x</span>,<span class="m">y</span>) / <span class="up">V̂ar</span>(<span class="m">x</span>) et <span class="hat"><span class="m">β</span></span><sub>0</sub> = <span class="m">ȳ</span> − <span class="hat"><span class="m">β</span></span><sub>1</sub><span class="m">x̄</span> — jamais <span class="m">ȳ</span> tout seul : la droite passe par (<span class="m">x̄</span>, <span class="m">ȳ</span>), pas par (0, <span class="m">ȳ</span>) (<a href="chain-p05-01-regression-modele-ols.html">p05-01</a>).</li>
       <li><b>Les trois colonnes et le SE.</b> Fixe (le paramètre) · aléatoire (ce qui est tiré, et l'estimateur qui en descend) · procédure (la recette). Le SE est la largeur de la distribution d'échantillonnage, donc une propriété de la procédure (<a href="chain-p01-01-objet-aleatoire.html#s5">p01-01, pas 5</a>).</li>
       <li><b>Le plug-in.</b> Quand une formule de SE contient le paramètre inconnu, on y substitue son estimateur ; l'erreur commise est d'un ordre en dessous (<a href="chain-p01-01-objet-aleatoire.html#s6">p01-01, pas 6</a>). Ici le paramètre à remplacer n'est pas la pente, c'est <span class="m">σ</span>.</li>
       <li><b>H₀, la p-value, l'IC.</b> H₀ fixe le centre de la distribution de l'estimateur, le SE en fixe la largeur ; 0 ∉ IC95 ⟺ |<span class="m">t</span>| &gt; seuil ⟺ <span class="m">p</span> &lt; 0,05 (<a href="chain-p01-02-ic-test-procedure.html#s6">p01-02, pas 6</a>). Cette chaîne ne refait pas ce raisonnement : elle lui fournit le SE et le quantile.</li>
@@ -403,7 +403,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <a href="../bridges/bridge-03-biais-variance-partout.html"><b>Biais et variance partout</b><small>ici : le non-biais tient à E[ε|x] = 0, la variance à H1 et à l'étalement des x — deux hypothèses différentes pour deux propriétés différentes, et casser l'une ne casse pas l'autre</small></a>
     <a href="../bridges/bridge-04-variance-moyenne-correlee.html"><b>Variance d'une moyenne corrélée</b><small>le pas 2 additionne les variances des εᵢ ; dès que les bruits sont corrélés (série temporelle, mesures répétées), le Σwᵢ² oublie les covariances et le SE devient trop petit</small></a>
     <a href="chain-p01-02-ic-test-procedure.html#s6"><b>p01-02 — IC, test, dualité</b><small>le pas 6 de cette page est le pas 6 de celle-là, au quantile près : remplacer 1,96 par le quantile de Student(n − p)</small></a>
-    <a href="../../map.html#p05-01"><b>p05-01 — le modèle de régression</b><small>d'où sortent β̂₁ = Ĉov/V̂ar et β̂₀ = ȳ − β̂₁x̄ ; cette chaîne part de ces deux formules sans les redémontrer</small></a>
+    <a href="chain-p05-01-regression-modele-ols.html"><b>p05-01 — le modèle de régression</b><small>d'où sortent β̂₁ = Ĉov/V̂ar et β̂₀ = ȳ − β̂₁x̄ ; cette chaîne part de ces deux formules sans les redémontrer</small></a>
   </div>
 </div>
 <div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>

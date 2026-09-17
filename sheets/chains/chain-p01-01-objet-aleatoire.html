@@ -158,8 +158,8 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <ol id="toc"></ol>
   <h4>Prérequis</h4>
   <ol>
-    <li><a href="../../map.html#p00-02">p00-02 · Espérance, variance, densité</a></li>
-    <li><a href="../../map.html#p00-04">p00-04 · Moyenne, LGN, TCL</a></li>
+    <li><a href="chain-p00-02-esperance-variance-densite.html">p00-02 · Espérance, variance, densité</a></li>
+    <li><a href="chain-p00-04-moyenne-lgn-tcl.html">p00-04 · Moyenne, LGN, TCL</a></li>
   </ol>
   <h4>Cartes Anki liées</h4>
   <div class="tags"><code>stats::estimation</code><code>stats::inference</code><code>stats::binomiale</code><code>stats::tcl</code></div>
@@ -175,10 +175,10 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="card" style="--ac:var(--blue)">
     <div class="lbl">Ce que cette chaîne suppose acquis</div>
     <ul>
-      <li><b>Espérance et variance d'une transformation affine.</b> <span class="m">E</span>[<span class="m">aX</span> + <span class="m">b</span>] = <span class="m">a</span><span class="m">E</span>[<span class="m">X</span>] + <span class="m">b</span> et <span class="up">Var</span>(<span class="m">aX</span> + <span class="m">b</span>) = <span class="m">a</span>²<span class="up">Var</span>(<span class="m">X</span>) — c'est le <span class="m">a</span>² qui fabriquera le 1/<span class="m">n</span>² (<a href="../../map.html#p00-02">p00-02</a>).</li>
-      <li><b>Additivité des variances sous indépendance.</b> <span class="up">Var</span>(Σ<span class="m">X</span><sub><span class="m">i</span></sub>) = Σ<span class="up">Var</span>(<span class="m">X</span><sub><span class="m">i</span></sub>) <i>seulement</i> si les <span class="m">X</span><sub><span class="m">i</span></sub> sont indépendantes (<a href="../../map.html#p00-02">p00-02</a>).</li>
-      <li><b>Moyenne de <span class="m">n</span> v.a. iid et TCL.</b> Sa variance est <span class="m">σ</span>²/<span class="m">n</span>, et sa loi tend vers une normale quand <span class="m">n</span> grandit (<a href="../../map.html#p00-04">p00-04</a>).</li>
-      <li><b>Binomiale(<span class="m">n</span>, <span class="m">p</span>).</b> Somme de <span class="m">n</span> Bernoulli(<span class="m">p</span>) indépendantes : <span class="m">E</span> = <span class="m">np</span>, <span class="up">Var</span> = <span class="m">np</span>(1−<span class="m">p</span>) (<a href="../../map.html#p00-01">p00-01</a>).</li>
+      <li><b>Espérance et variance d'une transformation affine.</b> <span class="m">E</span>[<span class="m">aX</span> + <span class="m">b</span>] = <span class="m">a</span><span class="m">E</span>[<span class="m">X</span>] + <span class="m">b</span> et <span class="up">Var</span>(<span class="m">aX</span> + <span class="m">b</span>) = <span class="m">a</span>²<span class="up">Var</span>(<span class="m">X</span>) — c'est le <span class="m">a</span>² qui fabriquera le 1/<span class="m">n</span>² (<a href="chain-p00-02-esperance-variance-densite.html">p00-02</a>).</li>
+      <li><b>Additivité des variances sous indépendance.</b> <span class="up">Var</span>(Σ<span class="m">X</span><sub><span class="m">i</span></sub>) = Σ<span class="up">Var</span>(<span class="m">X</span><sub><span class="m">i</span></sub>) <i>seulement</i> si les <span class="m">X</span><sub><span class="m">i</span></sub> sont indépendantes (<a href="chain-p00-02-esperance-variance-densite.html">p00-02</a>).</li>
+      <li><b>Moyenne de <span class="m">n</span> v.a. iid et TCL.</b> Sa variance est <span class="m">σ</span>²/<span class="m">n</span>, et sa loi tend vers une normale quand <span class="m">n</span> grandit (<a href="chain-p00-04-moyenne-lgn-tcl.html">p00-04</a>).</li>
+      <li><b>Binomiale(<span class="m">n</span>, <span class="m">p</span>).</b> Somme de <span class="m">n</span> Bernoulli(<span class="m">p</span>) indépendantes : <span class="m">E</span> = <span class="m">np</span>, <span class="up">Var</span> = <span class="m">np</span>(1−<span class="m">p</span>) (<a href="chain-p00-01-lois-quand-laquelle.html">p00-01</a>).</li>
       <li><b>Notation.</b> L'estimateur porte toujours son chapeau : <span class="m">p̂</span> est calculé sur les données, <span class="m">π</span> ne l'est pas. En fréquentiste on écrit <span class="m">p</span>(<span class="m">x</span> ; <span class="m">π</span>) et non <span class="m">p</span>(<span class="m">x</span> | <span class="m">π</span>) : <span class="m">π</span> est un paramètre fixe, pas une variable aléatoire sur laquelle on conditionne.</li>
     </ul>
   </div>

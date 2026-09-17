@@ -153,7 +153,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <h4>Ponts</h4>
   <ol>
     <li><a href="bridge-01-une-seule-descente.html">b01 · Une seule descente</a></li>
-    <li><a href="../../map.html#b06">b06 · Convexité et forme fermée</a></li>
+    <li><a href="bridge-06-convexite-forme-fermee.html">b06 · Convexité et forme fermée</a></li>
   </ol>
 </aside>
 
@@ -165,7 +165,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <li><b>Toute la chaîne p03-01.</b> L'argument y est dérivé, chiffré et illustré : la tente de l'accuracy, la concavité stricte de Gini, la pente de la log-loss, le coude de L1, la platitude de la hinge (<a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html">p03-01</a>). Ce pont ne le redérive pas ; il l'indexe.</li>
       <li><b>Gradient = signal.</b> Un paramètre bouge de −<span class="m">η</span>·∂<span class="m">L</span>/∂<span class="m">θ</span> ; là où la dérivée est nulle, il ne bouge pas (<a href="../chains/chain-p03-02-gradient-descente.html#s2">p03-02 pas 2</a>). C'est la seule mécanique dont ce pont se sert.</li>
       <li><b>Jensen strict.</b> Une fonction strictement concave passe au-dessus de ses cordes ; l'écart corde-courbe est le gain d'un split (<a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s4">p03-01 pas 4</a>). Pas redémontré ici.</li>
-      <li><b>Les quatre lieux ne sont pas redéfinis</b> : arbres (<a href="../../map.html#p07-01">p07-01</a>), logistique (<a href="../../map.html#p05-02">p05-02</a>), régularisation (<a href="../chains/chain-p02-02-prior-penalite.html">p02-02</a>), seuils et métriques (<a href="../../map.html#p06-03">p06-03</a>). Ce pont ne fournit que la lecture commune.</li>
+      <li><b>Les quatre lieux ne sont pas redéfinis</b> : arbres (<a href="../chains/chain-p07-01-arbres-impurete.html">p07-01</a>), logistique (<a href="../chains/chain-p05-02-logistique.html">p05-02</a>), régularisation (<a href="../chains/chain-p02-02-prior-penalite.html">p02-02</a>), seuils et métriques (<a href="../chains/chain-p06-03-seuil-roc-pr.html">p06-03</a>). Ce pont ne fournit que la lecture commune.</li>
     </ul>
   </div>
 </section>
@@ -204,11 +204,11 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     </table>
     <p><b>Ce que chaque ligne explique — et où c'est écrit :</b></p>
     <ul>
-      <li><b>Split</b> — CART ne coupe pas à l'accuracy ; l'impureté est un surrogate. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s2">p03-01 pas 2–5</a> · <a href="../../map.html#p07-01">p07-01</a></li>
-      <li><b>Loss</b> — gradient (<span class="m">p</span> − <span class="m">y</span>)<span class="m">x</span> jamais nul ; séparation parfaite. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s7">p03-01 pas 7</a> · <a href="../../map.html#p05-02">p05-02</a> · <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a></li>
+      <li><b>Split</b> — CART ne coupe pas à l'accuracy ; l'impureté est un surrogate. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s2">p03-01 pas 2–5</a> · <a href="../chains/chain-p07-01-arbres-impurete.html">p07-01</a></li>
+      <li><b>Loss</b> — gradient (<span class="m">p</span> − <span class="m">y</span>)<span class="m">x</span> jamais nul ; séparation parfaite. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s7">p03-01 pas 7</a> · <a href="../chains/chain-p05-02-logistique.html">p05-02</a> · <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a></li>
       <li><b>Pénalité</b> — zéros exacts du Lasso ; coude = mur. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s8">p03-01 pas 8</a> · <a href="../chains/chain-p02-02-prior-penalite.html#s6">p02-02 pas 6</a></li>
       <li><b>SVM</b> — vecteurs de support. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s9">p03-01 pas 9</a></li>
-      <li><b>Évaluation</b> — on <b>évalue</b> en marches, on n'<b>apprend</b> pas avec. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s10">p03-01 casse</a> · <a href="../../map.html#p06-03">p06-03</a></li>
+      <li><b>Évaluation</b> — on <b>évalue</b> en marches, on n'<b>apprend</b> pas avec. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s10">p03-01 casse</a> · <a href="../chains/chain-p06-03-seuil-roc-pr.html">p06-03</a></li>
     </ul>
     <p>Les colonnes 2 et 3 sont tout le travail de lecture. <b>Nommer ce qui bouge</b> vient en premier : tant qu'on ne l'a pas nommé, il n'y a pas de pente à regarder, et la table ne s'applique pas.</p>
   </div>
@@ -238,7 +238,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr><td>entropie (bits)</td><td>1,0</td><td>0,189</td><td><b>0,311</b></td><td>oui, S2</td></tr>
     </table>
     <p><b>Le cas qui le montre encore mieux</b> : parent 7+/3−, split (4+/2−) et (3+/1−), aucune majorité ne bascule. Accuracy : 3 erreurs avant, 2 + 1 = 3 après, <b>gain 0</b>. Gini : 0,4200 → 0,4167, gain <b>0,0033</b>. Entropie : 0,8813 → 0,8755, gain <b>0,0058</b>. Petit, mais non nul : l'arbre peut le ranger.</p>
-    <p><b>Où c'est écrit</b> : <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s2">p03-01 pas 2–5</a> — dont le pas 5, qui dit pourquoi l'impureté est un <b>surrogate</b> légitime : l'entropie d'un nœud est la log-loss de la prédiction « proportions du nœud », Gini son score de Brier. Le domaine : <a href="../../map.html#p07-01">p07-01</a>.</p>
+    <p><b>Où c'est écrit</b> : <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s2">p03-01 pas 2–5</a> — dont le pas 5, qui dit pourquoi l'impureté est un <b>surrogate</b> légitime : l'entropie d'un nœud est la log-loss de la prédiction « proportions du nœud », Gini son score de Brier. Le domaine : <a href="../chains/chain-p07-01-arbres-impurete.html">p07-01</a>.</p>
   </div>
 </div>
 
@@ -259,7 +259,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     </table>
     <p>Colonne 3 : rien, jamais. Colonne 5 : quelque chose, toujours. C'est la ligne entière de la table, en deux colonnes.</p>
     <p>La pente est négative en <span class="m">m</span> : descendre la loss, c'est <b>monter la marge</b>. Et comme elle ne s'annule jamais, un jeu séparable n'a pas de minimum atteignable — la pénalité le rend existant.</p>
-    <p><b>Où c'est écrit</b> : <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s7">p03-01 pas 7</a> (les deux étages de la chain rule, et pourquoi la MSE échoue là où la log-loss réussit) · <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a> et <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4 exemple 2</a> pour la séparation parfaite · <a href="../../map.html#p05-02">p05-02</a>.</p>
+    <p><b>Où c'est écrit</b> : <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s7">p03-01 pas 7</a> (les deux étages de la chain rule, et pourquoi la MSE échoue là où la log-loss réussit) · <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a> et <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4 exemple 2</a> pour la séparation parfaite · <a href="../chains/chain-p05-02-logistique.html">p05-02</a>.</p>
   </div>
 </div>
 
@@ -316,7 +316,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="card casse"><div class="lbl">Quatre limites</div>
     <ul>
       <li><b>Sensible partout ⇒ sensible aux outliers.</b> La log-loss n'est pas bornée : un point à <span class="m">m</span> = −10 coûte 10,00 et tire à pente −0,99995. Un seul label bruité déplace la frontière. La hinge (pente bornée à −1) et Huber bornent l'influence d'un point : c'est le prix payé pour la robustesse, et c'est un choix, pas un défaut.</li>
-      <li><b>Le surrogate n'est pas la métrique.</b> Minimiser la log-loss ne maximise ni l'accuracy, ni le F1, ni le rappel à un seuil donné. Le seuil se règle <i>après</i>, sur la métrique voulue (<a href="../../map.html#p06-03">p06-03</a>). Confondre les deux, c'est optimiser une chose et se juger sur une autre.</li>
+      <li><b>Le surrogate n'est pas la métrique.</b> Minimiser la log-loss ne maximise ni l'accuracy, ni le F1, ni le rappel à un seuil donné. Le seuil se règle <i>après</i>, sur la métrique voulue (<a href="../chains/chain-p06-03-seuil-roc-pr.html">p06-03</a>). Confondre les deux, c'est optimiser une chose et se juger sur une autre.</li>
       <li><b>Une pente nulle est parfois exactement ce qu'on veut.</b> Le plat de la hinge donne la parcimonie des supports, le coude de L1 donne les zéros exacts. La règle ne dit pas « fuis les zones plates » : elle dit « nomme-les », parce que chacune produit un comportement précis et souvent souhaité.</li>
       <li><b>Sans nommer ce qui bouge, la table ne s'applique pas.</b> C'est la moitié du travail, et la moitié qu'on saute : dire <span class="m">p</span>, <span class="m">β</span>, <span class="m">θ</span>, la marge — puis seulement regarder la pente. Le test inverse marche aussi : Gini contre entropie n'est pas une question de pente (même concavité, même ordre des splits presque toujours), c'est un détail d'implémentation. Une question qui ne se traduit pas en « ce qui bouge / où la pente s'annule » n'est pas une question pour ce pont.</li>
     </ul>
@@ -359,7 +359,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="bridges">
     <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html"><b>p03-01 — Critère en escalier vs critère sensible</b><small>la chaîne dont ce pont est la table d'entrée : tout y est dérivé et chiffré, pas 1 à 10</small></a>
     <a href="bridge-01-une-seule-descente.html"><b>b01 — Une seule descente</b><small>l'autre moitié du geste : ici la forme du critère, là le pas qui l'utilise — et le même « pente nulle, rien ne bouge »</small></a>
-    <a href="../../map.html#b06"><b>b06 — Convexité et forme fermée</b><small>quand la pente s'annule en un point unique on résout, sinon on itère : la suite naturelle de cette table</small></a>
+    <a href="bridge-06-convexite-forme-fermee.html"><b>b06 — Convexité et forme fermée</b><small>quand la pente s'annule en un point unique on résout, sinon on itère : la suite naturelle de cette table</small></a>
     <a href="../chains/chain-p02-02-prior-penalite.html#s6"><b>p02-02 pas 6 — L1 tranche ailleurs</b><small>le coude de L1 vu depuis le prior de Laplace : même mur, autre récit</small></a>
     <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html"><b>D4 — Une chaîne, trois exemples</b><small>d'où viennent la log-loss et la MSE, et l'exemple 2 (séparation parfaite) que la ligne « loss » de la table appelle</small></a>
   </div>
@@ -372,7 +372,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Pont b05 · v1 du 17/09/2026 · Prérequis : p03-01. Suite : <a href="../../map.html#b06">b06 — Convexité et forme fermée</a>.</footer>
+<footer>Pont b05 · v1 du 17/09/2026 · Prérequis : p03-01. Suite : <a href="bridge-06-convexite-forme-fermee.html">b06 — Convexité et forme fermée</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

@@ -145,18 +145,18 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <ol id="toc"></ol>
   <h4>Prérequis</h4>
   <ol>
-    <li><a href="../../map.html#p06-01">p06-01 · Biais-variance</a></li>
+    <li><a href="../chains/chain-p06-01-biais-variance.html">p06-01 · Biais-variance</a></li>
     <li><a href="../chains/chain-p01-01-objet-aleatoire.html#s3">p01-01 · L'objet aléatoire</a></li>
-    <li><a href="../../map.html#p06-02">p06-02 · CV et fuite</a></li>
-    <li><a href="../../map.html#p07-02">p07-02 · Bagging et forêts</a></li>
-    <li><a href="../../map.html#p05-03">p05-03 · Régularisation</a></li>
+    <li><a href="../chains/chain-p06-02-cv-leakage.html">p06-02 · CV et fuite</a></li>
+    <li><a href="../chains/chain-p07-02-bagging-rf.html">p07-02 · Bagging et forêts</a></li>
+    <li><a href="../chains/chain-p05-03-regularisation-biais-variance.html">p05-03 · Régularisation</a></li>
     <li><a href="../chains/chain-p02-03-conjugues-posterior.html#s5">p02-03 · Conjugués, posterior</a></li>
   </ol>
   <h4>Cartes Anki liées</h4>
   <div class="tags"><code>ml::biais-variance</code><code>stats::estimation</code><code>ml::validation</code><code>ml::regularisation</code></div>
   <h4>Ponts</h4>
   <ol>
-    <li><a href="../../map.html#b04">b04 · La variance d'une moyenne corrélée</a></li>
+    <li><a href="bridge-04-variance-moyenne-correlee.html">b04 · La variance d'une moyenne corrélée</a></li>
     <li><a href="bridge-02-temoin-atteignable.html">b02 · Le témoin atteignable</a></li>
   </ol>
 </aside>
@@ -168,8 +168,8 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <ul>
       <li><b>La distribution d'échantillonnage.</b> Un estimateur est une variable aléatoire : refaire le tirage donne un autre chiffre, et c'est l'histogramme de ces chiffres qu'on décrit — centre et largeur (<a href="../chains/chain-p01-01-objet-aleatoire.html#s3">p01-01 pas 3</a>, <a href="../chains/chain-p01-01-objet-aleatoire.html#s9">pas 9</a>).</li>
       <li><b>Biais et SE d'une moyenne</b> : <span class="up">E</span>[<span class="hat"><span class="m">p</span></span>] = <span class="m">π</span>, SE = <span class="m">σ</span>/√<span class="m">n</span> (<a href="../chains/chain-p01-01-objet-aleatoire.html#s4">p01-01 pas 4–5</a>). Ce pont ne les redérive pas, il les relit.</li>
-      <li><b>La décomposition elle-même</b> n'est pas démontrée ici : elle vit dans <a href="../../map.html#p06-01">p06-01</a>. Ce pont prend l'égalité et la promène.</li>
-      <li><b>CV, bagging, ridge, prior conjugué</b> ne sont pas redéfinis : <a href="../../map.html#p06-02">p06-02</a>, <a href="../../map.html#p07-02">p07-02</a>, <a href="../../map.html#p05-03">p05-03</a> et <a href="../chains/chain-p02-03-conjugues-posterior.html#s5">p02-03 pas 5</a> les portent.</li>
+      <li><b>La décomposition elle-même</b> n'est pas démontrée ici : elle vit dans <a href="../chains/chain-p06-01-biais-variance.html">p06-01</a>. Ce pont prend l'égalité et la promène.</li>
+      <li><b>CV, bagging, ridge, prior conjugué</b> ne sont pas redéfinis : <a href="../chains/chain-p06-02-cv-leakage.html">p06-02</a>, <a href="../chains/chain-p07-02-bagging-rf.html">p07-02</a>, <a href="../chains/chain-p05-03-regularisation-biais-variance.html">p05-03</a> et <a href="../chains/chain-p02-03-conjugues-posterior.html#s5">p02-03 pas 5</a> les portent.</li>
     </ul>
   </div>
 </section>
@@ -230,7 +230,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr><td>Prior</td><td>posterior</td><td><span class="m">τ</span>²</td><td><span class="m">τ</span>² étroit ↔ <span class="m">τ</span>² plat</td></tr>
       <tr><td>Boosting</td><td><span class="m">F</span></td><td><span class="m">ν</span> ; arbres</td><td>souches ↔ trop d'arbres</td></tr>
     </table>
-    <p><b>Où c'est écrit</b>, ligne à ligne : <a href="../chains/chain-p01-01-objet-aleatoire.html#s4">p01-01 pas 4–5</a> et <a href="../chains/chain-p01-03-inference-regression.html#s3">p01-03 pas 3</a> · <a href="../../map.html#p06-01">p06-01</a> · <a href="../../map.html#p06-02">p06-02</a> · <a href="../../map.html#p07-02">p07-02</a> · <a href="../chains/chain-p02-02-prior-penalite.html#s7">p02-02 pas 7</a> et <a href="../../map.html#p05-03">p05-03</a> · <a href="../chains/chain-p02-03-conjugues-posterior.html#s5">p02-03 pas 5</a> · <a href="../../map.html#p07-03">p07-03</a>.</p>
+    <p><b>Où c'est écrit</b>, ligne à ligne : <a href="../chains/chain-p01-01-objet-aleatoire.html#s4">p01-01 pas 4–5</a> et <a href="../chains/chain-p01-03-inference-regression.html#s3">p01-03 pas 3</a> · <a href="../chains/chain-p06-01-biais-variance.html">p06-01</a> · <a href="../chains/chain-p06-02-cv-leakage.html">p06-02</a> · <a href="../chains/chain-p07-02-bagging-rf.html">p07-02</a> · <a href="../chains/chain-p02-02-prior-penalite.html#s7">p02-02 pas 7</a> et <a href="../chains/chain-p05-03-regularisation-biais-variance.html">p05-03</a> · <a href="../chains/chain-p02-03-conjugues-posterior.html#s5">p02-03 pas 5</a> · <a href="../chains/chain-p07-03-boosting.html">p07-03</a>.</p>
     <p><b>Deux intrus utiles.</b> <span class="m">n</span> et <span class="m">B</span> ne sont pas des boutons d'arbitrage : ils font baisser la variance <i>sans</i> monter le biais. Pas de U, donc pas de réglage — on les monte tant que le budget suit.</p>
   </div>
   <div class="fig" id="fig1">
@@ -297,7 +297,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="rule">
     <h3>Échelle 3 — l'estimation de l'erreur : <span class="m">k</span> dans la <span class="m">k</span>-fold</h3>
     <p>Ce qui est estimé n'est plus un modèle, c'est <b>l'erreur test</b> d'une procédure. Le bouton est <span class="m">k</span>.</p>
-    <p><span class="m">k</span> petit : chaque modèle est entraîné sur <span class="m">n</span>(1 − 1/<span class="m">k</span>) lignes, donc moins bon que celui qu'on livrera — l'erreur est <b>surestimée</b>. <span class="m">k</span> grand : les <span class="m">k</span> modèles diffèrent d'une ligne, leurs erreurs sont fortement corrélées, et moyenner des termes corrélés ne resserre plus rien (<a href="../../map.html#b04">b04</a>).</p>
+    <p><span class="m">k</span> petit : chaque modèle est entraîné sur <span class="m">n</span>(1 − 1/<span class="m">k</span>) lignes, donc moins bon que celui qu'on livrera — l'erreur est <b>surestimée</b>. <span class="m">k</span> grand : les <span class="m">k</span> modèles diffèrent d'une ligne, leurs erreurs sont fortement corrélées, et moyenner des termes corrélés ne resserre plus rien (<a href="bridge-04-variance-moyenne-correlee.html">b04</a>).</p>
     <p class="say">« <span class="m">k</span> petit entraîne sur moins de données, donc l'erreur estimée est trop haute, donc on monte <span class="m">k</span>, donc les modèles deviennent quasi identiques et la moyenne de leurs erreurs cesse de se resserrer. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — <span class="m">n</span> = 1 000, OLS à <span class="m">p</span> = 20 paramètres, <span class="m">σ</span>² = 1</div>
@@ -309,7 +309,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr><td>10</td><td>900</td><td>1,0222</td><td>+0,22 %</td></tr>
       <tr><td>1 000 (LOOCV)</td><td>999</td><td>1,0200</td><td>+0,002 %</td></tr>
     </table>
-    <p>Côté largeur, avec <span class="m">ρ</span> la corrélation entre les erreurs de deux plis, la variance de leur moyenne vaut <span class="m">ρ</span> + (1 − <span class="m">ρ</span>)/<span class="m">k</span> en unités de la variance d'un pli : à <span class="m">k</span> = 10 et <span class="m">ρ</span> = 0,4, <b>0,46</b> ; en LOOCV avec <span class="m">ρ</span> = 0,9, <b>0,9001</b> — mille plis pour presque rien. Les <span class="m">ρ</span> sont des hypothèses de lecture, pas des mesures (<a href="../../map.html#b04">b04</a>). D'où <span class="m">k</span> = 5 ou 10 : le biais est déjà sous 0,5 % et la corrélation reste modérée.</p>
+    <p>Côté largeur, avec <span class="m">ρ</span> la corrélation entre les erreurs de deux plis, la variance de leur moyenne vaut <span class="m">ρ</span> + (1 − <span class="m">ρ</span>)/<span class="m">k</span> en unités de la variance d'un pli : à <span class="m">k</span> = 10 et <span class="m">ρ</span> = 0,4, <b>0,46</b> ; en LOOCV avec <span class="m">ρ</span> = 0,9, <b>0,9001</b> — mille plis pour presque rien. Les <span class="m">ρ</span> sont des hypothèses de lecture, pas des mesures (<a href="bridge-04-variance-moyenne-correlee.html">b04</a>). D'où <span class="m">k</span> = 5 ou 10 : le biais est déjà sous 0,5 % et la corrélation reste modérée.</p>
   </div>
 </div>
 
@@ -362,8 +362,8 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="card casse"><div class="lbl">Quatre limites</div>
     <ul>
       <li><b>On ne voit qu'un tirage.</b> Biais et variance sont des propriétés de la distribution d'échantillonnage (<a href="../chains/chain-p01-01-objet-aleatoire.html#s3">p01-01 pas 3</a> et <a href="../chains/chain-p01-01-objet-aleatoire.html#s9">pas 9</a>) : sur un seul jeu on n'observe que leur <b>somme</b>. Les séparer demande de répéter — bootstrap, ou simulation où l'on connaît la vérité (figure 2). Conséquence pratique : « ce modèle a trop de variance » ne se lit pas sur un résidu, ça se lit sur l'écart entre l'erreur train et l'erreur de validation.</li>
-      <li><b>Moyenner ne réduit la variance que si les termes sont peu corrélés.</b> <span class="m">ρσ</span>² + (1 − <span class="m">ρ</span>)<span class="m">σ</span>²/<span class="m">B</span> : le premier terme ignore <span class="m">B</span>. Même panne en LOOCV (mille plis, <span class="m">ρ</span> ≈ 0,9) et en bagging d'arbres profonds très semblables. C'est le pont <a href="../../map.html#b04">b04</a> en entier.</li>
-      <li><b>Le plancher <span class="m">σ</span>² ne se voit pas dans les résidus.</b> Les résidus d'entraînement, c'est <span class="m">σ</span>² <i>moins</i> ce que le modèle a déjà absorbé du bruit : un modèle assez souple les met à zéro sans avoir fait baisser <span class="m">σ</span>² d'un pouce (<a href="../../map.html#p06-01">p06-01</a>). Le plancher se lit sur un jeu neuf, ou pas du tout — et il fixe la performance maximale atteignable, pas le réglage.</li>
+      <li><b>Moyenner ne réduit la variance que si les termes sont peu corrélés.</b> <span class="m">ρσ</span>² + (1 − <span class="m">ρ</span>)<span class="m">σ</span>²/<span class="m">B</span> : le premier terme ignore <span class="m">B</span>. Même panne en LOOCV (mille plis, <span class="m">ρ</span> ≈ 0,9) et en bagging d'arbres profonds très semblables. C'est le pont <a href="bridge-04-variance-moyenne-correlee.html">b04</a> en entier.</li>
+      <li><b>Le plancher <span class="m">σ</span>² ne se voit pas dans les résidus.</b> Les résidus d'entraînement, c'est <span class="m">σ</span>² <i>moins</i> ce que le modèle a déjà absorbé du bruit : un modèle assez souple les met à zéro sans avoir fait baisser <span class="m">σ</span>² d'un pouce (<a href="../chains/chain-p06-01-biais-variance.html">p06-01</a>). Le plancher se lit sur un jeu neuf, ou pas du tout — et il fixe la performance maximale atteignable, pas le réglage.</li>
       <li><b>La décomposition est quadratique.</b> biais² + variance est une identité pour le coût carré. Pour la 0/1 loss il n'existe pas de découpage additif de cette forme : plus de flexibilité peut même y <i>réduire</i> l'erreur des deux côtés. L'intuition du U survit, l'égalité non (H1).</li>
     </ul>
   </div>
@@ -401,11 +401,11 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <h2 style="--ac:var(--violet)">Ponts et cartes</h2>
 <div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
   <div class="bridges">
-    <a href="../../map.html#b04"><b>b04 — La variance d'une moyenne corrélée</b><small>le terme <span class="m">ρσ</span>² isolé : pourquoi moyenner cesse d'aider, en bagging comme en LOOCV</small></a>
+    <a href="bridge-04-variance-moyenne-correlee.html"><b>b04 — La variance d'une moyenne corrélée</b><small>le terme <span class="m">ρσ</span>² isolé : pourquoi moyenner cesse d'aider, en bagging comme en LOOCV</small></a>
     <a href="bridge-02-temoin-atteignable.html"><b>b02 — Le témoin atteignable</b><small>l'autre moitié du même sujet : là ce qui ne peut que baisser, ici ce qui se décompose</small></a>
     <a href="../chains/chain-p01-01-objet-aleatoire.html#s3"><b>p01-01 pas 3 et 9 — L'objet aléatoire</b><small>la distribution d'échantillonnage, et pourquoi un SE décrit une procédure et pas un nombre</small></a>
     <a href="../chains/chain-p02-02-prior-penalite.html#s7"><b>p02-02 pas 7 — Le <span class="m">λ</span> réel, celui qu'on règle</b><small>d'où sort l'équivalence pénalité ↔ prior, et comment <span class="m">λ</span> se choisit en pratique</small></a>
-    <a href="../../map.html#p06-01"><b>p06-01 — Biais-variance</b><small>la chaîne qui démontre la décomposition ; ce pont ne fait que la promener</small></a>
+    <a href="../chains/chain-p06-01-biais-variance.html"><b>p06-01 — Biais-variance</b><small>la chaîne qui démontre la décomposition ; ce pont ne fait que la promener</small></a>
   </div>
 </div>
 <div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
@@ -416,7 +416,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Pont b03 · v1 du 17/09/2026 · Prérequis : p06-01, p01-01, p06-02, p07-02, p05-03, p02-03. Suite : <a href="../../map.html#b04">b04 — La variance d'une moyenne corrélée</a>.</footer>
+<footer>Pont b03 · v1 du 17/09/2026 · Prérequis : p06-01, p01-01, p06-02, p07-02, p05-03, p02-03. Suite : <a href="bridge-04-variance-moyenne-correlee.html">b04 — La variance d'une moyenne corrélée</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>
