@@ -10,7 +10,7 @@ prereq: [c00]
 anki: [coding::graphes, coding::bfs, coding::dfs, coding::topo]
 bridges: []
 next: c07
-status: ready
+status: built
 ---
 ## Signal
 Des **relations** entre éléments (voisins, arêtes, cases adjacentes), des **cycles possibles**, des questions de connexité, de composantes, de plus court chemin non pondéré, d'ordre de dépendances. Grille = graphe implicite (4 voisins). Contre-signal : arêtes pondérées (Dijkstra, nommer ; hors périmètre).
@@ -36,7 +36,11 @@ pour chaque case (r, c) non vue et à 1 :
 - **Complexité** : chaque case entre au plus une fois, chaque arête examinée deux fois ⇒ O(V + E) = O(R·C) sur une grille. Espace O(R·C) pour vu (ou O(1) en marquant **in-place** dans la grille, si on a le droit de la modifier — le dire).
 
 ## Trace (figure 1)
-Grille 3 × 4 : [1100 / 0100 / 0011]. Depuis (0,0) : ordre de défilement (0,0), (0,1), (1,1) ; vu = {ces trois} ; île 1 = cases 0, 1, 5 (indices aplatis). Deuxième lancement depuis (2,2) : île 2 = cases 10, 11. Réponse 2. `inv` = « vu = découvertes ; file = frontière ».
+Grille 3 × 4 : **[1100 / 1100 / 0011]** (corrigé, voir « Questions pour la revue »).
+Voisins dans l'ordre haut, bas, gauche, droite. Depuis (0,0) : ordre de défilement
+(0,0), (1,0), (0,1), (1,1) ; île 1 = cases **0, 4, 1, 5** (indices aplatis, dans l'ordre
+de défilement). Deuxième lancement depuis (2,2) : île 2 = cases 10, 11. Réponse 2.
+`inv` = « vu = découvertes ; file = frontière ».
 
 ## Les variantes, une ligne chacune
 - **Distances non pondérées** : BFS ; dist[v] = dist[u] + 1 à l'enfilement ; le premier défilement d'une cible est optimal.
@@ -46,11 +50,14 @@ Grille 3 × 4 : [1100 / 0100 / 0011]. Depuis (0,0) : ordre de défilement (0,0),
 - **Bipartition** : BFS en alternant les couleurs ; conflit = pas bipartite.
 
 ## Figures exigées
-- **Figure 1 — `SL.trace`** : arr = les 12 cases aplaties [1,1,0,0,0,1,0,0,0,0,1,1] (afficher la grille 3×4 en CSS grid si possible, sinon la ligne), `mark` = vu, `win` = la file (frontière), `ptr` = {cur}, 6 images pour l'île 1 puis 3 pour l'île 2, `inv`. Légende : une case entre dans la file une fois, parce qu'elle est marquée en entrant.
+- **Figure 1 — `SL.trace`** : arr = les 12 cases aplaties [1,1,0,0,1,1,0,0,0,0,1,1] (afficher la grille 3×4 en CSS grid si possible, sinon la ligne), `mark` = vu, `win` = la file (frontière), `ptr` = {cur}, 6 images pour l'île 1 puis 3 pour l'île 2, `inv`. Légende : une case entre dans la file une fois, parce qu'elle est marquée en entrant.
 - **Figure 2 — `SL.trace`** : le même parcours avec **marquage au défilement** : la file contient (1,1) deux fois ; `note` le montre. Légende : le bug qui ne plante pas.
 
 ## Où ça casse
-Marquer au défilement : doublons dans la file (quadratique dans le pire cas), et en BFS des distances fausses. Récursion DFS sur une grille 1 000 × 1 000 : RecursionError vers 1 000 niveaux ⇒ pile explicite ou BFS.
+Marquer au défilement : doublons dans la file — la file grossit comme **E** et non comme
+**V**, donc ×2 sur une grille mais ×250 sur K₅₀₀ ; « quadratique » ne vaut que sur un
+graphe dense (voir « Questions pour la revue »). Et en BFS des distances fausses (39,4 %
+de graphes aléatoires). Récursion DFS sur une grille 1 000 × 1 000 : RecursionError vers 1 000 niveaux ⇒ pile explicite ou BFS.
 
 ## Pièges Python
 - `deque` avec `popleft()`, jamais `list.pop(0)` (O(n)).
@@ -76,3 +83,36 @@ Marquer au défilement : doublons dans la file (quadratique dans le pire cas), e
 
 ## Ce qui a cassé pour Salah
 - Famille t09 : « marquer à l'enfilement, deque, RecursionError ~1 000, in-place vs set, distances par niveaux, tri topologique en DFS simple » — la figure 2 (le bug qui ne plante pas) est ce que Q/A ne montrait pas.
+
+## Questions pour la revue
+
+Deux chiffres du spec ont été corrigés après vérification par script (scripts jetables,
+non versionnés ; tous les résultats ci-dessous sont reproductibles en quelques lignes).
+
+1. **La grille du fil rouge rendait la figure 2 impossible.** Avec `[1100 / 0100 / 0011]`,
+   l'île 1 est un **chemin** — 0 – 1 – 5 — et aucune case n'a deux voisins simultanément
+   dans la frontière. Le marquage au défilement y produit alors **zéro doublon** : la
+   version fautive trace exactement la même course que la bonne, et la figure 2 (« la file
+   contient (1,1) deux fois ») n'a pas d'objet. Corrigé en `[1100 / 1100 / 0011]` : l'île 1
+   devient le carré `{0, 1, 4, 5}`, la case 5 a bien deux voisins découverts (1 et 4), et
+   la file passe par `[5, 5]`. Bonus : le compte d'images du spec tombe alors juste au
+   premier coup — **6** images pour l'île 1 (init + 4 défilements + bilan) et **3** pour
+   l'île 2, exactement ce que le spec exigeait. C'est ce qui fait penser à une coquille de
+   saisie plutôt qu'à un choix.
+   *À valider* : la grille corrigée reste un 3 × 4 à 2 îles, mais l'île 1 a 4 cases au lieu
+   de 3 — si le fil rouge a été partagé ailleurs (Anki), il faut le resynchroniser.
+
+2. **« Quadratique dans le pire cas » est vrai, mais pas sur une grille.** Le marquage au
+   défilement fait entrer un sommet une fois **par arête entrante** : la file suit E, pas V.
+   Sur une grille E ≈ 2V, donc le surcoût n'est que d'un facteur 2 (mesuré : grille pleine
+   300 × 300, 179 400 enfilements au lieu de 90 000, file max 599 au lieu de 300). C'est sur
+   un graphe **dense** que c'est quadratique (mesuré : K₅₀₀, 124 751 enfilements au lieu de
+   500 — ×250, file max 124 252). La sheet dit les deux chiffres plutôt que le seul mot.
+
+Chiffres mesurés et repris dans la sheet, pour mémoire : distances fausses avec marquage au
+défilement **39,4 %** de 20 000 graphes aléatoires, plus petit témoin = le **triangle** ;
+ordre topologique par pré-ordre faux dans **80,5 %** de 50 000 DAG (0 par post-ordre
+inversé), plus petit témoin A→B, A→C, C→B ; trois couleurs contre Kahn **0 désaccord** sur
+50 000 graphes orientés ; `RecursionError` à **998** appels avec la limite par défaut 1 000
+(dernier passage à 997) — cohérent avec c05 ; `list.pop(0)` contre `deque.popleft()` sur
+200 000 éléments, **3,5 s contre 0,011 s**, facteur **334**.

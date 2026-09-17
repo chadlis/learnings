@@ -1,0 +1,577 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Graphes — marquer à l'enfilement — coding</title>
+<meta name="sheet" content="series=coding;part=09;number=06;status=v1">
+<meta name="part" content="09 · Coding">
+<meta name="subtitle" content="coding — parcours = frontière + ensemble de vus ; le seul bug qui compte est de marquer trop tard">
+<meta name="prereq" content="c00">
+<meta name="anki" content="coding::graphes,coding::bfs,coding::dfs,coding::topo">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- série `coding` : squelette annoté et ruban de SL.trace (inerte hors coding) ---- */
+.skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.skel b{color:var(--pen);font-weight:600}
+.step .card.full,.step .card.casse{grid-column:1 / -1}
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .wide table{min-width:520px}
+.card .wide th:nth-child(2),.card .wide td:nth-child(2),
+.card .wide th:nth-child(3),.card .wide td:nth-child(3){text-align:left}
+.readouts .c1 b{color:var(--pen)}.readouts .c3 b{color:var(--red)}
+.sl-trace{--cw:58px;--cgap:8px;margin:4px 0 2px}
+.sl-cells{display:flex;gap:var(--cgap)}
+.sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
+.sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
+.sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
+.sl-cell.win{border-color:var(--green);border-width:2.5px}
+.sl-ptrs{position:relative;height:20px;margin-top:5px}
+.sl-ptr{position:absolute;top:0;left:calc(var(--i) * (var(--cw) + var(--cgap)));width:var(--cw);text-align:center;font:600 12px var(--sans);color:var(--pen)}
+.sl-note{font-size:14px;color:var(--cardink);margin-top:10px}
+.sl-inv{font:12.5px/1.55 var(--mono);color:var(--cardmuted);margin-top:6px;border-left:2px solid #B7791F;padding-left:10px}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ---- marques propres à cette chaîne ---- */
+/* 12 cases au lieu des 6 à 9 habituelles : on resserre pour rester sous la largeur du pas. */
+#fig1 .sl-trace,#fig2 .sl-trace{--cw:54px}
+/* la grille 3 × 4 du fil rouge, statique : elle dit ce que l'aplatissement recolle */
+.gr{display:grid;grid-template-columns:repeat(4,40px);gap:5px;margin:10px 0 4px}
+.gr span{height:40px;display:grid;place-items:center;border:1.5px solid var(--cardline);border-radius:3px;font:600 12.5px var(--mono);color:var(--cardmuted);background:var(--cardsoft)}
+.gr span.on{background:rgba(240,209,120,.45);border-color:#B7791F;color:var(--cardink)}
+.gr span.on2{background:rgba(31,122,68,.22);border-color:var(--green);color:var(--cardink)}
+.grleg{font:12.5px var(--mono);color:var(--cardmuted);margin-top:2px}
+/* le DAG dessiné dans un SL.plot (aucune primitive ne dessine un graphe) */
+.sl-plot text.nodeval{font:600 15px var(--mono);fill:var(--cardink)}
+.sl-plot text.badge{font:600 13px var(--mono)}
+.sl-plot .sl-seg.edge{stroke:rgba(34,48,43,.45);stroke-width:2}
+.sl-plot .sl-seg.bad{stroke:var(--red);stroke-width:2.8;stroke-dasharray:6 4}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 09 · Coding › coding 06</div>
+  <h1>Graphes — marquer à l'<span>enfilement</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Des <b>relations</b> au lieu d'un ordre — voisins, arêtes, cases adjacentes — et des <b>cycles</b>, donc un chemin peut revenir sur ses pas. D'où une seule mécanique, la même pour BFS et pour DFS : un ensemble de <b>vus</b> et une <b>frontière</b>. Et une seule règle qui décide tout le reste — <b>marquer vu à l'enfilement, pas au défilement</b> ; la descendre d'une ligne ne lève aucune erreur et ne change pas la réponse du test qu'on fait à la main. Fil rouge : la grille 3 × 4 <code>1100 / 1100 / 0011</code>, qui a <b>2</b> îles, la première étant <code>{0, 1, 4, 5}</code> en indices aplatis ; marquée au défilement, la même course met la case <b>5 deux fois</b> dans la file. Jamais la solution complète : le squelette, la trace, les phrases.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="coding-00-tap-invariant-variant.html#s2">c00 · l'invariant</a> — conteneur, tranche, « exactement »</li>
+    <li><a href="coding-00-tap-invariant-variant.html#s3">c00 · le variant</a> — l'entier ≥ 0 qui décroît</li>
+    <li><a href="coding-00-tap-invariant-variant.html#s5">c00 · la complexité</a> — composée, jamais devinée</li>
+    <li><a href="coding-05-arbres.html#s1">c05 · arbres</a> — le cas sans cycle, celui où l'on peut se passer des vus</li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>coding::graphes</code><code>coding::bfs</code><code>coding::dfs</code><code>coding::topo</code></div>
+  <h4>Où le pattern voisine</h4>
+  <ol>
+    <li><a href="coding-05-arbres.html">c05 · Arbres</a></li>
+    <li><a href="coding-00-tap-invariant-variant.html">c00 · Le TAP</a></li>
+    <li><a href="../../map.html#c07">c07 · Heap</a></li>
+    <li><a href="../../map.html">La carte, colonne 9</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette sheet suppose acquis</div>
+    <ul>
+      <li><b>Le rituel TAP.</b> Invariant, variant, conclusion, complexité — <a href="coding-00-tap-invariant-variant.html#s1">c00, pas 1</a>. Ici la boucle est <code>tant que la file n'est pas vide</code> : elle existe, donc l'invariant se récite bien à l'entrée d'un tour, contrairement aux arbres.</li>
+      <li><b>Invariant = conteneur + tranche + « exactement ».</b> <a href="coding-00-tap-invariant-variant.html#s2">c00, pas 2</a>. Ici il y a <b>deux</b> conteneurs, <code>vu</code> et <code>file</code>, et tout le pattern tient dans la phrase qui les relie — pas 3.</li>
+      <li><b>Variant = entier ≥ 0 strictement décroissant.</b> <a href="coding-00-tap-invariant-variant.html#s3">c00, pas 3</a>. Ce n'est ni un indice ni la taille de la file (qui monte et descend) : c'est le <b>nombre de sommets non vus</b>.</li>
+      <li><b>Complexité composée.</b> <a href="coding-00-tap-invariant-variant.html#s5">c00, pas 5</a>. O(<span class="m">V</span> + <span class="m">E</span>) est une <b>somme</b>, pas un produit : deux comptages séparés, l'un sur les sommets, l'autre sur les arêtes — pas 4.</li>
+      <li><b>Les arbres de <a href="coding-05-arbres.html#s1">c05</a>.</b> Un arbre est le graphe <b>sans cycle et à parent unique</b> : on ne peut pas revenir sur ses pas, <b>donc</b> rien à mémoriser. Toute cette sheet est ce qu'il faut ajouter dès que le cycle redevient possible — c'est-à-dire l'ensemble <code>vu</code>, et rien d'autre.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>Graphe <b>non pondéré</b> : toutes les arêtes coûtent 1, ou ne coûtent rien. Des poids quelconques changent le problème, pas l'algorithme : c'est <b>Dijkstra</b>, et on le <b>nomme</b> au lieu de le dérouler — hors périmètre de cette sheet, et le pas 7 dit ce que BFS répond quand on oublie de le nommer.</span>
+      <b>H2</b><span>Les voisins d'un sommet s'énumèrent en O(deg) : <b>liste d'adjacence</b>, ou les 4 voisins d'une case. Une <b>matrice</b> d'adjacence coûte O(<span class="m">V</span>) par sommet, donc O(<span class="m">V</span><sup>2</sup>) au total — même parcours, autre facture.</span>
+      <b>H3</b><span>Une grille est un graphe <b>implicite</b> : on ne construit aucune liste, les voisins se calculent. <span class="m">V</span> = <span class="m">R</span>·<span class="m">C</span> et <span class="m">E</span> = <span class="m">R</span>(<span class="m">C</span>−1) + <span class="m">C</span>(<span class="m">R</span>−1) ; pour 3 × 4, <b>12</b> sommets et <b>17</b> arêtes.</span>
+      <b>H4</b><span>Ordre des voisins <b>fixé et annoncé</b> : haut, bas, gauche, droite. Il ne change ni les composantes ni les distances, il change <b>l'ordre de la trace</b> — donc il se dit avant de tracer, sinon la trace au tableau ne tombe pas juste.</span>
+      <b>H5</b><span>On énonce le <b>squelette</b> et les phrases. Le corps se remplit devant l'interlocuteur : une sheet de coding ne contient jamais la solution complète.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le signal, et le contre-signal <span class="tag tronc">tronc</span></h3>
+    <p>Des <b>relations</b> entre éléments — voisins, arêtes, cases adjacentes, dépendances — et la possibilité d'un <b>cycle</b>. Les questions qui suivent sont toujours les mêmes : connexité, composantes, plus court chemin non pondéré, ordre de dépendances.</p>
+    <div class="eq">relations &nbsp;+&nbsp; cycles possibles &nbsp;⇒&nbsp; <b>un ensemble de vus, et une frontière</b></div>
+    <p>Deux contre-signaux. <b>Arêtes pondérées</b> : ce n'est plus un parcours mais Dijkstra — on le <b>nomme</b>, on ne l'improvise pas. <b>Aucun cycle et un seul parent</b> : c'est un arbre, et l'ensemble <code>vu</code> devient inutile — <a href="coding-05-arbres.html#s1">c05</a>.</p>
+    <p class="say">« Le sujet me donne des relations et pas un ordre, et un chemin peut boucler, donc je ne peux pas me contenter d'avancer, donc il me faut retenir ce que j'ai déjà rencontré, donc le pattern est un ensemble de vus doublé d'une frontière. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le fil rouge : une grille, deux îles</div>
+    <p><b>La grille 3 × 4</b> <code>1100 / 1100 / 0011</code>. Une case à 1 est de la terre, une case à 0 de l'eau, deux cases de terre sont voisines si elles se touchent par un côté. Question : combien d'îles ?</p>
+    <div class="gr">
+      <span class="on">0</span><span class="on">1</span><span>2</span><span>3</span>
+      <span class="on">4</span><span class="on">5</span><span>6</span><span>7</span>
+      <span>8</span><span>9</span><span class="on2">10</span><span class="on2">11</span>
+    </div>
+    <p class="grleg">indice aplati = <span class="m">r</span> × 4 + <span class="m">c</span> · ambre = île 1 · vert = île 2</p>
+    <p><b>Le graphe est implicite.</b> <span class="m">V</span> = 12, <span class="m">E</span> = 3 × 3 + 4 × 2 = <b>17</b> paires de cases voisines — et aucune de ces 17 arêtes n'est écrite nulle part : <code>(r±1, c)</code> et <code>(r, c±1)</code> les fabriquent. C'est le cas le plus fréquent en entretien, et celui où l'on oublie le plus souvent de vérifier les bornes avant d'indexer.</p>
+    <p><b>Réponse : 2.</b> Île 1 = <code>{0, 1, 4, 5}</code>, île 2 = <code>{10, 11}</code>. La case 5 est le nœud qui compte : elle a <b>deux</b> voisins déjà découverts — 1 et 4 — donc deux occasions d'entrer dans la file. C'est sur elle que tout le pas 5 se joue.</p>
+    <p><b>Cinq questions, un seul parcours.</b> « Combien d'îles », « la plus grande île », « le plus court chemin de A à B », « ces cours peuvent-ils s'ordonner », « ce graphe est-il bipartite » — même boucle, même paire de conteneurs, seul change ce qu'on compte au passage (pas 6).</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Le pattern : vus + frontière, et la ligne qui ne se coupe pas <span class="tag tronc">tronc</span></h3>
+    <p>Un ensemble <code>vu</code> et une <b>frontière</b> : une <b>file</b> pour BFS, une <b>pile</b> — explicite ou la récursion — pour DFS. Changer de conteneur change l'ordre de visite et rien d'autre : la charpente est identique.</p>
+    <div class="eq"><code>vu.add(v)</code> &nbsp;;&nbsp; <code>file.append(v)</code> &nbsp;—&nbsp; <b>la même ligne, toujours</b></div>
+    <p>C'est <b>la</b> règle : on marque au moment où l'on enfile, jamais au moment où l'on défile. Un sommet marqué ne peut plus être enfilé par personne, <b>donc</b> il entre dans la frontière exactement une fois.</p>
+    <p class="say">« Marquer et enfiler sont deux effets d'un même événement, la découverte, donc je les écris sur la même ligne, donc entre l'entrée d'un sommet dans la file et sa sortie il est déjà vu, donc aucun autre voisin ne peut l'enfiler une seconde fois. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le squelette, et ce qu'on y branche</div>
+    <div class="skel">pour chaque case (r, c) non vue et à 1 :
+    îles += 1 ; file = deque([(r,c)]) ; <b>vu.add((r,c))</b>
+    <b>tant que</b> file :
+        (x, y) = file.<b>popleft</b>()
+        <b>pour</b> (nx, ny) dans les 4 voisins :
+            <b>si</b> dans la grille <b>et</b> grille[nx][ny] == 1 <b>et</b> (nx,ny) <b>pas dans</b> vu :
+                <b>vu.add((nx,ny))</b> ; file.append((nx,ny))</div>
+    <p><b>Sept lignes, et trois d'entre elles sont le pattern.</b> La boucle extérieure compte les <b>lancements</b> ; la boucle <code>tant que</code> vide une composante ; la ligne double <code>vu.add … ; file.append …</code> est celle qu'on ne coupe pas.</p>
+    <p><b>Le même squelette en DFS</b> : remplacer <code>deque</code> par une liste et <code>popleft()</code> par <code>pop()</code>. Deux caractères. L'ordre de visite change, les <b>composantes</b> sont identiques — mais les <b>distances</b>, elles, ne le sont plus (pas 6).</p>
+    <p><b>Ce que la sheet n'aborde pas.</b> Les arêtes <b>pondérées</b> (Dijkstra, A*), les flots, les composantes fortement connexes. Autre sujet, autre sheet : ici, toutes les arêtes valent 1.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — la course correcte : chaque case entre dans la file une fois</div>
+    <div id="f1trace" class="wide"></div>
+    <p class="cap">Les douze cases de la grille, <b>aplaties</b> : la case d'indice <span class="m">i</span> est la case (<span class="m">i</span> ÷ 4, <span class="m">i</span> mod 4), le grand chiffre est sa valeur, le petit son indice. <b>Ambre = vu</b>, cadre <b>vert</b> = la case qu'on est en train de défiler, et la ligne du bas donne la file <i>réelle</i> — elle n'est pas contiguë dans cette bande, c'est normal, la file suit le graphe et non l'aplatissement. Fais « pas › » et arrête-toi à l'image <b>4</b> : on défile la case 1, son voisin du bas est la case <b>5</b>, elle est <b>déjà vue</b> — parce qu'elle a été marquée quand la case 4 l'a enfilée — <b>donc on ne l'enfile pas</b>. C'est le seul instant de toute la course où la règle sert à quelque chose, et c'est l'instant que la figure 2 supprime. Bilan : <b>6</b> enfilements pour <b>6</b> cases de terre, <b>0</b> doublon, <b>2</b> îles.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>L'invariant, le variant, la conclusion <span class="tag tronc">tronc</span></h3>
+    <p>L'invariant porte sur les <b>deux</b> conteneurs à la fois, et c'est leur relation qui est l'idée :</p>
+    <div class="eq"><b>vu</b> = les sommets <b>découverts</b> &nbsp;·&nbsp; <b>file</b> ⊆ vu = ceux dont les voisins <b>n'ont pas encore été examinés</b></div>
+    <p>La file est donc la <b>frontière</b> de vu : ce qui est vu et pas encore exploité. <b>Variant</b> : le nombre de sommets non vus, entier ≥ 0, qui décroît strictement à chaque enfilement — la file ne reçoit que des sommets non vus, et ils deviennent vus dans le même souffle.</p>
+    <p class="say">« La file ne contient que des sommets déjà vus, donc chaque enfilement fait décroître d'une unité le nombre de non-vus, donc la boucle s'arrête, donc à file vide plus aucun voisin d'un sommet vu n'est non vu, donc vu est exactement la composante du départ. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — l'invariant récité sur les six images du fil rouge</div>
+    <ul>
+      <li><b>Départ.</b> <code>vu = {0}</code>, <code>file = [0]</code>. Découvert : 1 sommet ; frontière : 1. Non vus : 5 cases de terre.</li>
+      <li><b>Défile 0.</b> Voisins neufs 4 et 1 → <code>vu = {0, 1, 4}</code>, <code>file = [4, 1]</code>. La case 0 est vue et <b>hors</b> de la frontière : elle est épuisée.</li>
+      <li><b>Défile 4.</b> Voisin neuf 5 → <code>vu = {0, 1, 4, 5}</code>, <code>file = [1, 5]</code>.</li>
+      <li><b>Défile 1.</b> Son voisin 5 est <b>dans vu</b> → rien n'entre. <code>file = [5]</code>. L'invariant vient de payer.</li>
+      <li><b>Défile 5.</b> Rien de neuf. <code>file = []</code>.</li>
+      <li><b>Conclusion.</b> File vide <b>donc</b> <code>vu = {0, 1, 4, 5}</code> est exactement la composante de 0 : un lancement, une composante. Deux lancements <b>donc</b> deux îles.</li>
+    </ul>
+    <p><b>Le variant, chiffré.</b> 6 cases de terre, 6 enfilements, jamais un de plus. La <b>taille de la file</b> n'est pas le variant : elle vaut 1, 2, 2, 1, 0 — elle remonte, donc elle ne prouve rien.</p>
+    <p><b>Vérifié à l'exécution.</b> Le squelette confronté à une union-find indépendante sur des grilles aléatoires : <b>0 désaccord</b> sur le nombre de composantes.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Le coût : une somme, pas un produit</h3>
+    <p>Deux comptages séparés. Chaque sommet entre dans la file <b>une</b> fois et en sort une fois : O(<span class="m">V</span>). En sortant, on parcourt sa liste de voisins ; la somme des degrés vaut <b>2<span class="m">E</span></b> sur un graphe non orienté, donc toutes les listes réunies coûtent O(<span class="m">E</span>).</p>
+    <div class="eq">Σ<sub><span class="m">v</span></sub> deg(<span class="m">v</span>) = 2<span class="m">E</span> &nbsp;⇒&nbsp; <b>O(<span class="m">V</span> + <span class="m">E</span>)</b> &nbsp;·&nbsp; espace : <b>O(<span class="m">V</span>)</b> pour <code>vu</code> et pour la file</div>
+    <p>Sur une grille, <span class="m">E</span> &lt; 2<span class="m">V</span> puisque chaque case a au plus 4 voisins, <b>donc</b> O(<span class="m">V</span> + <span class="m">E</span>) se replie en O(<span class="m">R</span>·<span class="m">C</span>). Sur un graphe dense, au contraire, <span class="m">E</span> vaut jusqu'à <span class="m">V</span><sup>2</sup>/2 et c'est <span class="m">E</span> qui domine : la somme n'est pas un ornement.</p>
+    <p class="say">« Chaque sommet est enfilé une fois et j'examine sa liste de voisins à sa sortie, donc le total des examens est la somme des degrés, donc deux fois le nombre d'arêtes, donc le coût est V plus E — une somme, et sur une grille elle se replie en nombre de cases. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les chiffres du fil rouge, et l'espace qu'on peut supprimer</div>
+    <p><b>Sur la grille 3 × 4.</b> <span class="m">V</span> = 12, <span class="m">E</span> = 17, donc au plus <b>34</b> examens de voisin sur l'ensemble de la course — pour <b>6</b> enfilements seulement, puisque les 6 cases d'eau ne sont jamais enfilées. Le balayage extérieur, lui, coûte 12 : c'est le terme en <span class="m">V</span>, et il existe même si tout est à 0.</p>
+    <p><b>Mesuré, à l'échelle.</b> Grille pleine 300 × 300, soit <span class="m">V</span> = <b>90 000</b> : la course correcte fait exactement <b>90 000</b> enfilements et la file ne dépasse jamais <b>300</b> cases. Le nombre d'enfilements est <span class="m">V</span> au sommet près — c'est l'invariant, vu de l'extérieur.</p>
+    <p><b>L'espace, et comment l'annuler.</b> <code>vu</code> coûte O(<span class="m">V</span>). Si l'énoncé autorise à <b>modifier la grille</b>, écrire 0 sur une case visitée remplace l'ensemble : O(1) d'espace auxiliaire. C'est légitime et c'est un bon point en entretien — <b>à condition de le dire</b>, parce que l'appelant récupère sa grille effacée.</p>
+    <p><b>Le piège du conteneur.</b> <code>vu</code> en <b>set</b> de tuples : test en O(1). En <b>liste</b>, <code>in</code> est O(<span class="m">V</span>), donc le parcours passe de O(<span class="m">V</span> + <span class="m">E</span>) à O(<span class="m">V</span>·<span class="m">E</span>) — une seule structure de données mal choisie, et la complexité annoncée devient fausse.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>Le bug qui ne plante pas : marquer au défilement <span class="tag casse">casse</span></h3>
+    <p>On descend <code>vu.add()</code> d'une ligne, sous le <code>popleft()</code>, et on ajoute un garde-fou <code>si déjà vu : continuer</code>. Le code reste lisible, la réponse reste juste sur les petits cas. Mais entre l'enfilement d'un sommet et son défilement, il n'est marqué <b>nulle part</b>.</p>
+    <div class="eq">frontière ⊆ <b>sommets</b> (enfilement) &nbsp;→&nbsp; frontière ⊆ <b>arêtes</b> (défilement)</div>
+    <p>Donc tout voisin encore à traiter peut l'enfiler à son tour. Un sommet entre alors une fois <b>par arête entrante</b> : la file compte jusqu'à O(<span class="m">E</span>) éléments au lieu de O(<span class="m">V</span>).</p>
+    <p class="say">« Un sommet enfilé n'est pas marqué avant de sortir, donc chacun de ses voisins encore dans la file peut l'enfiler à nouveau, donc il entre une fois par arête entrante au lieu d'une fois en tout, donc la file grossit comme E et non comme V — sans qu'aucune exception ne soit levée. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — la case 5, deux fois ; et ce que ça coûte vraiment</div>
+    <p><b>Sur le fil rouge.</b> La case 4 enfile 5. La case 1 défile ensuite, regarde son voisin du bas : 5 n'est <b>pas dans vu</b> — il n'est que dans la file — <b>donc</b> elle l'enfile une seconde fois. <code>file = [5, 5]</code>. Le second 5 sortira, se trouvera déjà vu et sera jeté. <b>5 enfilements pour 4 cases</b>, et la réponse reste <b>2</b> îles.</p>
+    <p><b>Le surcoût, mesuré.</b> Sur une <b>grille</b> il est modeste, parce que <span class="m">E</span> ≈ 2<span class="m">V</span> : grille pleine 300 × 300, <b>179 400</b> enfilements au lieu de <b>90 000</b> (×2), file maximale <b>599</b> au lieu de <b>300</b>. Sur un graphe <b>dense</b> il explose : sur <span class="up">K</span><sub>500</sub> (500 sommets, 124 750 arêtes), <b>124 751</b> enfilements au lieu de <b>500</b> — <b>×250</b> — et la file monte à <b>124 252</b> éléments. C'est le sens exact de « quadratique » : le coût suit <span class="m">E</span>, qui vaut <span class="m">V</span><sup>2</sup>/2.</p>
+    <p><b>Pourquoi c'est indétectable à la main.</b> Il faut un sommet ayant <b>deux</b> voisins simultanément dans la frontière. Sur un chemin — une grille en serpentin, une liste — cela n'arrive <b>jamais</b> : la version fautive produit alors trace pour trace la même course que la bonne. Le fil rouge a été choisi carré, pas en L, précisément pour que le doublon existe.</p>
+    <p><b>Et les distances, elles, deviennent fausses.</b> Version qui écrit <code>dist[u] = k</code> au défilement sans garde-fou : <b>39,4 %</b> de 20 000 graphes aléatoires donnent des distances fausses. Le plus petit témoin est un <b>triangle</b> — arêtes 0–1, 0–2, 1–2 : les vraies distances depuis 0 sont <code>{1 : 1, 2 : 1}</code>, la version fautive renvoie <code>{1 : 1, 2 : <b>2</b>}</code>, parce que le second exemplaire du sommet 2, enfilé par 1, écrase le premier.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — la même course, <code>vu.add()</code> descendu d'une ligne</div>
+    <div id="f2trace" class="wide"></div>
+    <p class="cap">Même grille, même ordre de voisins, une seule ligne déplacée. Compare image par image avec la figure 1 : les trois premières sont <b>identiques</b>. Arrête-toi à l'image <b>4</b>. En figure 1 la case 5 était ambre — vue — et la case 1 passait son chemin ; ici elle est <b>blanche</b>, parce que personne ne l'a marquée : elle n'est <i>que</i> dans la file. Donc la case 1 l'enfile, et la ligne <code>inv</code> affiche <code>file = [5, 5]</code>. Aux images 5 et 6 les deux exemplaires sortent l'un après l'autre, le second est jeté, et <b>la réponse finale est la même — 2 îles</b>. C'est tout le sujet : rien ne plante, rien ne change, sauf le nombre d'enfilements (5 au lieu de 4) et, dès qu'on demande des distances, la réponse elle-même.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Les variantes : même boucle, autre chose à compter</h3>
+    <p>Une fois la charpente posée, chaque question classique tient en une ligne. <b>Distances non pondérées</b> : BFS, <code>dist[v] = dist[u] + 1</code> posé <b>à l'enfilement</b> ; le premier défilement d'une cible est optimal. <b>Composantes</b> : compter les lancements de la boucle extérieure. <b>Bipartition</b> : BFS en alternant deux couleurs, un conflit sur une arête et c'est non.</p>
+    <div class="eq">cycle orienté : arête vers un <b>gris</b> &nbsp;·&nbsp; ordre topologique : empiler à la <b>sortie</b>, puis inverser</div>
+    <p>Les deux dernières sont du DFS et se trompent au même endroit : elles se lisent <b>à la sortie</b> de l'appel, pas à l'entrée. Blanc / gris / noir — gris = en cours, noir = fini ; une arête vers un <b>noir</b> n'est <b>pas</b> un cycle.</p>
+    <p class="say">« Le blanc n'est pas encore vu, le gris est en cours dans la pile d'appels courante et le noir est fini, donc une arête vers un gris boucle sur un ancêtre, donc c'est un cycle, donc une arête vers un noir ne prouve rien — elle rejoint seulement un sous-graphe déjà terminé. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les trois variantes qui se ratent, chiffrées</div>
+    <p><b>L'ordre topologique.</b> Empiler <b>à la sortie</b> puis inverser : <b>0</b> ordre faux sur 50 000 DAG aléatoires. Empiler <b>à l'entrée</b> (un simple pré-ordre) : <b>80,5 %</b> d'ordres faux. Le plus petit témoin a <b>trois</b> sommets — A→B, A→C, C→B : le pré-ordre sort <code>A, B, C</code> et place B avant C, alors que C→B l'exige après.</p>
+    <p><b>Le cycle à trois couleurs.</b> Confronté à Kahn (degrés entrants, file des 0) sur 50 000 graphes orientés aléatoires : <b>0 désaccord</b>. Le contre-exemple à connaître pour le <b>faux positif</b> : le DAG A→B, A→C, B→D, C→D. En visitant C on trouve D <b>déjà noir</b> ; le prendre pour un cycle donne « cycle » sur un graphe qui n'en a aucun. Un ensemble <code>vu</code> à deux états ne suffit donc pas ici — il en faut <b>trois</b>.</p>
+    <p><b>Kahn, la version sans récursion.</b> Degrés entrants, file des sommets de degré 0, et on décrémente. Même O(<span class="m">V</span> + <span class="m">E</span>), et elle <b>détecte le cycle gratuitement</b> : si moins de <span class="m">V</span> sommets sortent de la file, il reste un cycle. À préférer dès que le graphe est gros, puisqu'il n'y a plus de pile d'appels.</p>
+    <p><b>DFS ou BFS ?</b> Pour les <b>composantes</b> et le <b>cycle</b>, indifférent. Pour les <b>distances</b>, BFS obligatoire : un DFS atteint les sommets dans un ordre quelconque et le premier chemin trouvé n'a aucune raison d'être le plus court.</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — ordre topologique : empiler à la sortie, ou à l'entrée</div>
+    <div id="f3ctl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Le DAG <b>A→B, A→C, C→B, C→E, B→D, E→D</b> : cinq tâches, six dépendances, une flèche se lit « doit passer avant ». Le badge sur chaque sommet est son <b>rang dans l'ordre produit</b>. Clique <b>post-ordre inversé</b> : l'ordre est <code>A, C, E, B, D</code> et les six flèches pointent toutes vers un rang plus grand — <b>0 violation</b>. Clique <b>pré-ordre</b> : le DFS écrit chaque sommet <i>en y entrant</i>, donc il sort <code>A, B, D, C, E</code> ; deux flèches passent au <b>rouge pointillé</b>, <b>C→B</b> et <b>E→D</b>, parce que le parcours a plongé dans B avant d'avoir même découvert C. <b>Ce que la figure fait voir</b> : on ne peut pas placer un sommet tant qu'on n'a pas fini <i>tous</i> ses descendants — et « avoir fini » est exactement ce que le post-ordre attend et ce que le pré-ordre ne sait pas.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Le cas fatal est silencieux : <b>lancer un BFS sur un graphe dont les arêtes ont des poids</b>. La fonction ne lève rien, ne ralentit pas, et rend un chemin — celui qui a le <b>moins d'arêtes</b>. Ce n'est pas le moins cher, et rien dans la sortie ne le signale.</p>
+    <p>Le mécanisme : le BFS ne compare jamais deux coûts, il compte des tours de boucle. Il est optimal <b>exactement</b> quand toutes les arêtes valent 1, parce qu'alors « le moins d'arêtes » et « le moins cher » sont la même phrase.</p>
+    <p class="say">« Le BFS visite par nombre d'arêtes et ne regarde aucun poids, donc il rend le chemin le plus court en arêtes, donc dès qu'un poids diffère de 1 ce chemin n'est plus le moins cher, donc il renvoie un nombre parfaitement faux sans lever la moindre erreur. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Le contre-exemple minimal, à sortir de mémoire</div>
+    <p><b>Trois sommets suffisent.</b> A→B de poids <b>5</b>, A→C de poids <b>1</b>, C→B de poids <b>1</b>. Le BFS atteint B en <b>1</b> arête et annonce ce chemin ; son coût réel est <b>5</b>. Le chemin A→C→B coûte <b>2</b>. La bonne réponse est 2, le BFS dit 5 — ou, pire, dit « 1 » si l'on compte les arêtes en croyant compter le coût.</p>
+    <p><b>La phrase qui tue.</b> « Le BFS compte des arêtes, pas des poids — donc il est optimal si et seulement si toutes les arêtes valent 1. Sinon, Dijkstra. » Elle se dit sans dessiner, et elle <b>nomme</b> ce qu'on ne va pas dérouler.</p>
+    <p><b>Le second silence, même famille.</b> Le marquage au <b>défilement</b> sur un BFS de distances : <b>39,4 %</b> de graphes aléatoires donnent des distances fausses, et le plus petit témoin est un triangle — voir le pas 5. Là encore : un nombre, poliment, et il est faux.</p>
+    <p><b>Le troisième.</b> Prendre une arête vers un sommet <b>noir</b> pour un cycle : sur le DAG A→B, A→C, B→D, C→D, la détection à deux états annonce un cycle qui n'existe pas. Un faux positif, pas une exception.</p>
+  </div>
+  <div class="card casse"><div class="lbl">Pièges Python — quatre lignes qui ont l'air justes</div>
+    <ul>
+      <li><b><code>list.pop(0)</code> au lieu de <code>deque.popleft()</code>.</b> Un <code>pop(0)</code> décale toute la liste : O(<span class="m">n</span>) par défilement, donc O(<span class="m">n</span><sup>2</sup>) pour vider la file. Mesuré sur 200 000 éléments : <b>3,5 s</b> contre <b>0,011 s</b> — un facteur <b>334</b>. Et rien ne plante : le code passe les petits tests et meurt sur le grand.</li>
+      <li><b>Indexer avant de tester les bornes.</b> <code>grille[nx][ny] == 1 and 0 &lt;= nx &lt; R</code> lit hors grille — et en Python <code>grille[-1]</code> ne lève <b>rien</b> : il rend la dernière ligne. Une grille devient un tore, les composantes fusionnent, aucune erreur. Les bornes <b>d'abord</b>, toujours.</li>
+      <li><b><code>vu</code> en liste.</b> <code>(nx,ny) not in vu</code> est O(<span class="m">V</span>) sur une liste et O(1) sur un <b>set</b> de tuples : le parcours passe de O(<span class="m">V</span> + <span class="m">E</span>) à O(<span class="m">V</span>·<span class="m">E</span>). Même réponse, autre complexité — donc autre verdict en entretien.</li>
+      <li><b><code>RecursionError</code> vers 1 000 niveaux.</b> Un DFS <b>récursif</b> sur une grille 1 000 × 1 000 descend jusqu'à un million d'appels. Mesuré avec <code>sys.getrecursionlimit() = 1000</code> : la chaîne passe à <b>997</b> appels et lève à <b>998</b>. Réponse : <b>pile explicite</b> ou BFS ; <code>sys.setrecursionlimit</code> marche aussi, à condition de <b>le dire</b> — on déplace la limite, on ne la retire pas, et le segfault remplace l'exception.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li><b>Signal</b> : des relations et des cycles possibles ⇒ un ensemble de <b>vus</b> et une <b>frontière</b>. File = BFS, pile = DFS, le reste est identique.</li>
+    <li><b>La règle</b> : <code>vu.add(v)</code> et <code>file.append(v)</code> sur la <b>même ligne</b>. Marquer à l'enfilement, jamais au défilement.</li>
+    <li><b>Invariant</b> : vu = découverts, file = frontière de vu. <b>Variant</b> : le nombre de non-vus, jamais la taille de la file.</li>
+    <li><b>Coût</b> : O(<span class="m">V</span> + <span class="m">E</span>) — une somme. Espace O(<span class="m">V</span>), ou O(1) en marquant in-place <i>si on le dit</i>.</li>
+    <li><b>BFS</b> pour les distances par niveaux ; <b>DFS</b> pour composantes, cycle (trois couleurs, arête vers un <b>gris</b>) et topo (empiler à la <b>sortie</b>, inverser).</li>
+    <li><b>Pondéré ⇒ Dijkstra</b>, et on le nomme : le BFS rend le chemin le plus court <i>en arêtes</i>, poliment faux. A→B poids 5 contre A→C→B poids 2.</li>
+    <li><b>Récursion</b> : lève vers 1 000 niveaux (mesuré : 998). Pile explicite, ou BFS.</li>
+  </ol>
+</div>
+<div class="phrase">« Un parcours de graphe, c'est un ensemble de vus et une frontière ; je marque à l'enfilement pour que chaque sommet entre une fois, ce qui donne V plus E. BFS me donne les distances par niveaux, DFS suffit pour les composantes, la détection de cycle à trois couleurs et l'ordre topologique en empilant à la sortie. Sur une grille, la récursion casse vers mille niveaux : pile explicite. Et si les arêtes sont pondérées, ce n'est plus un parcours, c'est Dijkstra. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Quel est l'invariant d'un BFS ?</div><div class="a hid">vu = les sommets découverts ; la file = la frontière de vu, c'est-à-dire ceux dont les voisins n'ont pas encore été examinés. Conséquence : chaque sommet entre dans la file exactement une fois. Le variant est le nombre de non-vus, pas la taille de la file — elle remonte.</div></li>
+    <li><div class="q">Pourquoi marquer à l'enfilement et pas au défilement ?</div><div class="a hid">Parce qu'entre l'enfilement et le défilement, un sommet non marqué peut être enfilé par chacun de ses autres voisins. La file grossit alors comme E au lieu de V — ×250 sur un graphe complet à 500 sommets — et en BFS de distances, la réponse elle-même devient fausse : 39 % des graphes aléatoires. Rien ne plante.</div></li>
+    <li><div class="q">Complexité, et pourquoi cette forme ?</div><div class="a hid">O(V + E), une somme : O(V) parce que chaque sommet est enfilé une fois, O(E) parce que la somme des degrés vaut 2E. Espace O(V) pour vu et la file, ou O(1) si on a le droit de marquer in-place dans la grille — à annoncer, l'appelant récupère sa grille effacée.</div></li>
+    <li><div class="q">Ordre topologique par DFS, et où il se rate ?</div><div class="a hid">Empiler à la sortie de l'appel — le post-ordre — puis inverser. Empiler à l'entrée donne un ordre faux 4 fois sur 5 ; témoin à trois sommets : A→B, A→C, C→B, dont le pré-ordre sort A, B, C. Sans récursion : Kahn, degrés entrants et file des zéros, qui détecte le cycle en prime.</div></li>
+    <li><div class="q">Cycle dans un graphe orienté ?</div><div class="a hid">Trois couleurs : blanc non vu, gris en cours dans la pile courante, noir terminé. Une arête vers un gris est un cycle ; une arête vers un noir n'est rien du tout — sur le DAG A→B, A→C, B→D, C→D on retombe sur un D noir sans qu'aucun cycle existe. Deux états ne suffisent pas.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Où ce mécanisme se rejoue</div>
+  <div class="bridges">
+    <a href="coding-05-arbres.html#s1"><b>c05 · Arbres</b><small>le cas sans cycle et à parent unique : on ne peut pas revenir sur ses pas, donc l'ensemble vu disparaît. Toute cette sheet est ce qu'il faut rajouter quand il revient</small></a>
+    <a href="coding-05-arbres.html#s5"><b>c05 · BFS par niveaux</b><small>la même file, un cran plus loin : capturer len(q) au début du niveau pour que les niveaux ne fusionnent pas — c'est ce qui transforme un parcours en distances</small></a>
+    <a href="coding-00-tap-invariant-variant.html#s2"><b>c00 · L'invariant</b><small>le même rituel avec deux conteneurs au lieu d'un : « vu = découverts, file = frontière de vu » est un invariant de boucle ordinaire, énoncé sur une paire</small></a>
+    <a href="coding-00-tap-invariant-variant.html#s5"><b>c00 · La complexité composée</b><small>O(V + E) est l'exemple canonique de la somme qu'on ne devine pas : deux comptages séparés, l'un sur les sommets, l'autre sur les arêtes</small></a>
+    <a href="../../map.html#c07"><b>c07 · Heap</b><small>la suite exacte du contre-signal du pas 1 : remplacer la file par un tas à priorité, et le parcours devient Dijkstra — même charpente, autre frontière</small></a>
+    <a href="../../map.html"><b>La carte, colonne 9</b><small>les neuf familles et leur ordre de dépendance</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>coding::graphes</code> (le signal, les deux conteneurs, le variant, O(<span class="m">V</span> + <span class="m">E</span>), l'in-place) · <code>coding::bfs</code> (la file, les distances par niveaux, le contre-signal pondéré) · <code>coding::dfs</code> (pile ou récursion, la limite à 1 000, les trois couleurs et le noir qui ne prouve rien) · <code>coding::topo</code> (empiler à la sortie puis inverser, et Kahn).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>coding c06 · v1 du 17/09/2026 · Prérequis : <a href="coding-00-tap-invariant-variant.html">c00 · Le TAP</a>, <a href="coding-05-arbres.html">c05 · Arbres</a>. Suite : <a href="../../map.html#c07">c07 · Heap</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== Figures 1 et 2 : la grille 3 × 4 aplatie =====
+   arr = [1,1,0,0, 1,1,0,0, 0,0,1,1], indice i ↔ case (i÷4, i mod 4).
+   mark = vu (ambre) · win = la case en cours de défilement (cadre vert) ·
+   inv  = l'état réel des deux conteneurs — la file n'est PAS contiguë dans cette
+   bande, elle suit le graphe et non l'aplatissement, donc elle s'écrit au lieu
+   de se surligner. Les images sont celles produites par le script de vérification. */
+const GRID=[1,1,0,0,1,1,0,0,0,0,1,1];
+
+SL.trace(document.getElementById('f1trace'),{arr:GRID,ms:1500,frames:[
+  {"ptr":{"▲ départ":0},"win":[0,1],"mark":[0],
+   "note":"Île 1. Le balayage tombe sur la case 0, à 1 et non vue : on la marque vue AVANT de l'enfiler.",
+   "inv":"vu = {0}  ·  file = [0]  ·  îles = 1"},
+  {"ptr":{"▲ défile":0},"win":[0,1],"mark":[0,1,4],
+   "note":"Défiler 0. Voisins dans l'ordre haut, bas, gauche, droite : 4 et 1 sont à 1 et neufs — marqués et enfilés dans la foulée.",
+   "inv":"vu = {0, 1, 4}  ·  file = [4, 1]  ·  3 enfilements"},
+  {"ptr":{"▲ défile":4},"win":[4,5],"mark":[0,1,4,5],
+   "note":"Défiler 4. Seul voisin neuf : la case 5. Elle est marquée à l'entrée, donc plus personne ne pourra l'enfiler.",
+   "inv":"vu = {0, 1, 4, 5}  ·  file = [1, 5]  ·  4 enfilements"},
+  {"ptr":{"▲ défile":1},"win":[1,2],"mark":[0,1,4,5],
+   "note":"Défiler 1. Son voisin du bas est la case 5 — DÉJÀ vue : on ne l'enfile pas. C'est le seul instant où la règle sert, et c'est celui que la figure 2 supprime.",
+   "inv":"vu = {0, 1, 4, 5}  ·  file = [5]  ·  0 doublon"},
+  {"ptr":{"▲ défile":5},"win":[5,6],"mark":[0,1,4,5],
+   "note":"Défiler 5. Tous ses voisins sont vus ou à 0 : rien n'entre.",
+   "inv":"vu = {0, 1, 4, 5}  ·  file = []  ·  4 enfilements pour 4 cases"},
+  {"mark":[0,1,4,5],
+   "note":"File vide, donc vu est exactement la composante de la case 0. Île 1 = {0, 1, 4, 5}. Le balayage reprend là où il s'était arrêté.",
+   "inv":"îles = 1  ·  il reste les cases 10 et 11"},
+  {"ptr":{"▲ départ":10},"win":[10,11],"mark":[0,1,4,5,10],
+   "note":"Deuxième lancement : la case 10 est à 1 et non vue. Un lancement, une composante — donc le compteur passe à 2.",
+   "inv":"vu = {0, 1, 4, 5, 10}  ·  file = [10]  ·  îles = 2"},
+  {"ptr":{"▲ défile":10},"win":[10,11],"mark":[0,1,4,5,10,11],
+   "note":"Défiler 10 : son voisin de droite, la case 11, est à 1 et neuve. Marquée, enfilée.",
+   "inv":"vu = {…, 10, 11}  ·  file = [11]  ·  6 enfilements"},
+  {"ptr":{"▲ défile":11},"mark":[0,1,4,5,10,11],
+   "note":"Défiler 11, rien de neuf, file vide. Le balayage finit les 12 cases sans retrouver de terre non vue : réponse 2 îles.",
+   "inv":"12 cases balayées  ·  6 enfilements  ·  0 doublon  ·  réponse = 2"}
+]});
+
+SL.trace(document.getElementById('f2trace'),{arr:GRID,ms:1500,frames:[
+  {"ptr":{"▲ départ":0},"win":[0,1],"mark":[],
+   "note":"Une seule ligne déplacée : vu.add() est passé SOUS le popleft. On enfile la case 0 sans la marquer.",
+   "inv":"vu = {}  ·  file = [0]  ·  1 enfilement"},
+  {"ptr":{"▲ défile":0},"win":[0,1],"mark":[0],
+   "note":"Défiler 0, et la marquer maintenant. Voisins neufs 4 et 1 : enfilés — et toujours pas marqués.",
+   "inv":"vu = {0}  ·  file = [4, 1]  ·  3 enfilements"},
+  {"ptr":{"▲ défile":4},"win":[4,5],"mark":[0,4],
+   "note":"Défiler 4, la marquer. La case 5 n'est pas dans vu : personne ne l'y a mise. Enfilée.",
+   "inv":"vu = {0, 4}  ·  file = [1, 5]  ·  4 enfilements"},
+  {"ptr":{"▲ défile":1,"▲ 2 fois":5},"win":[1,2],"mark":[0,1,4],
+   "note":"Défiler 1, la marquer. Son voisin du bas, la case 5, n'est toujours pas marqué — il est seulement dans la file. Donc 1 l'enfile une SECONDE fois.",
+   "inv":"vu = {0, 1, 4}  ·  file = [5, 5]  ←  le doublon"},
+  {"ptr":{"▲ défile":5},"win":[5,6],"mark":[0,1,4,5],
+   "note":"Le premier exemplaire de 5 défile et se marque. Résultat juste jusqu'ici — et c'est tout le problème.",
+   "inv":"vu = {0, 1, 4, 5}  ·  file = [5]  ←  il en reste un"},
+  {"ptr":{"▲ défile":5},"win":[5,6],"mark":[0,1,4,5],
+   "note":"Le second exemplaire défile, se trouve déjà vu, et est jeté. 5 enfilements pour 4 cases, aucune erreur levée, et la réponse finale est la même : 2 îles.",
+   "inv":"5 enfilements au lieu de 4  ·  file = []  ·  réponse identique ⇒ invisible au test"}
+]});
+
+/* ===== Figure 3 : le DAG, post-ordre inversé contre pré-ordre =====
+   Aucune primitive ne dessine un graphe : on compose dans un SL.plot (P.dyn, P.sx/P.sy),
+   comme c05 le fait pour un arbre. Les deux ordres ne sont PAS saisis à la main —
+   topo() les produit, et viole() trouve les arêtes fautives. */
+const NOM='ABCDE';
+const N=[{v:'A',x:3.0,y:4.0},{v:'B',x:4.1,y:2.0},{v:'C',x:2.1,y:3.0},{v:'D',x:3.0,y:1.0},{v:'E',x:1.3,y:2.0}];
+const ADJ={0:[1,2],1:[3],2:[1,4],3:[],4:[3]};
+const ARCS=[];Object.keys(ADJ).forEach(u=>ADJ[u].forEach(v=>ARCS.push([+u,v])));
+function topo(pre){const vu={},out=[];
+  (function go(u){vu[u]=1;if(pre)out.push(u);ADJ[u].forEach(v=>{if(!vu[v])go(v);});if(!pre)out.push(u);})(0);
+  for(let u=0;u<5;u++)if(!vu[u])(function go(w){vu[w]=1;if(pre)out.push(w);ADJ[w].forEach(v=>{if(!vu[v])go(v);});if(!pre)out.push(w);})(u);
+  return pre?out:out.slice().reverse();}
+function viole(ordre){const pos={};ordre.forEach((u,i)=>pos[u]=i);
+  return ARCS.filter(a=>pos[a[0]]>pos[a[1]]);}
+const ORD={post:topo(false),pre:topo(true)};
+
+const P3=SL.plot(document.getElementById('f3plot'),{x:[0.9,4.6],y:[0.25,4.45],w:600,h:300,xt:[],yt:[]});
+/* ce plot n'est pas un graphe de fonction : ses deux axes n'ont aucun sens, et le cadre
+   en L qu'ils dessinent se lit à tort comme un repère. On les retire de ce plot-ci seul. */
+P3.svg.querySelectorAll('.sl-axis').forEach(e=>e.parentNode.removeChild(e));
+/* la pointe de flèche doit s'arrêter sur le cercle, pas en son centre : on raccourcit
+   le segment de (r + 8) pixels aux deux bouts, en repassant par l'échelle du plot. */
+function fleche(a,b,cls){
+  const A=N[a],B=N[b];
+  const px=P3.sx(B.x)-P3.sx(A.x),py=P3.sy(B.y)-P3.sy(A.y),L=Math.hypot(px,py);
+  const t=23/L,ux=(B.x-A.x)*t,uy=(B.y-A.y)*t;
+  P3.arrow(A.x+ux,A.y+uy,B.x-ux,B.y-uy,cls);
+}
+const out3=document.getElementById('f3out');
+let mode3='post';
+function draw3(){
+  P3.clear();
+  const ordre=ORD[mode3],mauvaises=viole(ordre),rang={};
+  ordre.forEach((u,i)=>rang[u]=i+1);
+  const setBad={};mauvaises.forEach(a=>setBad[a[0]+'-'+a[1]]=1);
+  ARCS.forEach(a=>fleche(a[0],a[1],setBad[a[0]+'-'+a[1]]?'bad':'edge'));
+  /* seules les ARÊTES virent au rouge : colorer aussi les sommets en peignait quatre sur
+     cinq et noyait le message. Le badge se pose SOUS le sommet — au-dessus il retombait
+     sur la lettre, et le dessous est vide puisque toutes les flèches descendent. */
+  N.forEach((n,i)=>{
+    P3.dot(n.x,n.y,'hollow sl-c1',15);
+    P3.text(n.x,n.y,n.v,'nodeval','middle').setAttribute('dy','0.36em');
+    P3.text(n.x,n.y-0.50,'#'+rang[i],'badge sl-c1','middle');
+  });
+  const lu=ordre.map(u=>NOM[u]).join(', ');
+  const lv=mauvaises.length?mauvaises.map(a=>NOM[a[0]]+'→'+NOM[a[1]]).join(', '):'aucune';
+  out3.innerHTML='<div>ordre produit<b>'+lu+'</b></div>'
+    +'<div class="'+(mauvaises.length?'zero':'pos')+'">arêtes violées<b>'+mauvaises.length+' sur 6</b></div>'
+    +'<div class="'+(mauvaises.length?'c3':'pos')+'">lesquelles<b>'+lv+'</b></div>'
+    +'<div class="'+(mauvaises.length?'zero':'pos')+'">sur 50 000 DAG<b>'+(mode3==='post'?'0 ordre faux':'80,5 % faux')+'</b></div>';
+}
+const C3=SL.h('div','sl-ctl',document.getElementById('f3ctl')),B3={};
+function maj3(){Object.keys(B3).forEach(m=>B3[m].setAttribute('aria-pressed',String(m===mode3)));}
+[['post','post-ordre inversé'],['pre','pré-ordre']].forEach(function(p){
+  const b=SL.h('button','tb',C3,p[1]);B3[p[0]]=b;
+  b.onclick=()=>{mode3=p[0];maj3();draw3();};
+});
+maj3();draw3();
+})();
+</script>
+</body>
+</html>
