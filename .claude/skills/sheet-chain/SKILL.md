@@ -75,9 +75,11 @@ pièges Python).
 ## Vérification (obligatoire avant tout commit)
 
 ```
-python3 tools/validate_sheet.py sheets/…/fichier.html --render
+.venv/bin/python tools/validate_sheet.py sheets/…/fichier.html --render
 ```
-0 FAIL exigé ; lire chaque WARN. Puis ouvrir les captures `sheets/_render/<nom>-dark.png` et `-light.png` et **regarder** : labels qui se chevauchent, texte qui déborde d'un SVG, figure vide, slider sans effet. Corriger, revalider. Puis `python3 tools/build_index.py`.
+`.venv/bin/python`, pas `python3` : le playwright de `--render` vit dans le venv,
+et `python3` seul dégrade le rendu en `WARN rendu impossible` — un 0 FAIL qui n'a
+rien regardé. 0 FAIL exigé ; lire chaque WARN. Puis ouvrir les captures `sheets/_render/<nom>-dark.png` et `-light.png` et **regarder** : labels qui se chevauchent, texte qui déborde d'un SVG, figure vide, slider sans effet. Corriger, revalider. Puis `python3 tools/build_index.py`.
 
 Commit : `feat(sheet): <id> <titre>` ; mettre le spec au statut `built`. Un spec = une sheet = un commit.
 

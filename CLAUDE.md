@@ -89,6 +89,20 @@ uniformiser. Le premier déroulé v5 est D5 (`walkthrough-p01-05`).
 make index     # régénère index.html, le bloc PWA, la version du cache
 make check     # échoue si index.html ou sw.js sont en retard
 make test      # playwright headless : notes, service worker, déroulés
+
+# une sheet (chain, walkthrough, bridge, coding) : structure + rendu sombre/clair
+.venv/bin/python tools/validate_sheet.py sheets/coding/coding-01-fenetre-glissante.html --render
+```
+
+`--render` passe par le **playwright Python de `.venv/`**, pas par celui de `make
+test` (qui est en Node, sous `~/.npm/_npx/`). Ce sont deux installations
+distinctes ; `.venv/bin/python` est obligatoire, `python3` seul n'a pas le
+module et le validateur se contente alors d'un `WARN rendu impossible` — un
+0 FAIL qui n'a rien rendu. Le venv est auto-ignoré (`.venv/.gitignore`) ; le
+reconstruire :
+
+```sh
+python3 -m venv .venv && .venv/bin/pip install playwright && .venv/bin/playwright install chromium
 ```
 
 Et à l'œil :
