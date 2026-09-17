@@ -10,7 +10,7 @@ prereq: [c00]
 anki: [coding::deux-pointeurs, coding::3sum, coding::elimination]
 bridges: []
 next: c03
-status: ready
+status: built
 ---
 ## Signal
 Tableau **trié** (ou triable sans perte) et une question sur des **paires** (somme cible, écart, produit) ; ou une quantité min(a[l], a[r]) × (r − l) où bouger le plus petit bord ne peut qu'aider (LC 11). Contre-signal : indices à renvoyer sur un tableau non trié (trier perd les indices : dict, c00) ; paires non monotones.
@@ -72,3 +72,19 @@ Non trié avec somme cible : l'élimination est fausse (a[l'] peut être plus pe
 
 ## Ce qui a cassé pour Salah
 - Famille du fil rouge (LC 167 → 3Sum → LC 11) ; « élimination d'une classe » et « majorer les deux facteurs » sont les deux justifications qui doivent sortir à l'oral (learnings : coding patterns t09).
+
+## Questions pour la revue
+- **Tous les chiffres du spec ont été revérifiés par script, aucun n'était faux** :
+  figure 1 (5 images, `(0,5,12) · (0,4,9) · (1,4,11) · (1,3,9) · (2,3,10)` ✓, paire
+  unique (2, 3)), figure 2 (8 images, réponse 49 en (1, 8)), 3Sum sur
+  `[-1,0,1,2,-1,-4]` → 2 triplets. Fuzz contre force brute : 0 désaccord sur
+  20 000 (LC 167), 5 000 (3Sum), 20 000 (LC 11).
+- **« Grisés » n'existe pas dans `SL.trace`.** Le spec demande `mark` = indices
+  éliminés *grisés* ; la seule classe disponible est `.sl-cell.on`, au fond
+  **ambré** (c01 s'en sert pour la fenêtre témoin). La sheet garde l'ambré et le
+  nomme dans la légende (« le fond ambré marque les cases éliminées »). À
+  trancher : ajouter une classe `.sl-cell.out` grisée à `sheetlib.js` — ce serait
+  un correctif de rendu à propager, donc hors du périmètre d'une sheet.
+- **Ajout non demandé par le spec** : le comptage 5 + 4 + 3 + 2 + 1 = 15 = C(6, 2)
+  au pas 3, qui rend l'« élimination d'une classe » vérifiable à la main. À garder
+  ou à couper si le tableau alourdit le pas.

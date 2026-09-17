@@ -1,0 +1,471 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Deux pointeurs — éliminer une classe à chaque pas — coding</title>
+<meta name="sheet" content="series=coding;part=09;number=02;status=v1">
+<meta name="part" content="09 · Coding">
+<meta name="subtitle" content="coding — sur un tableau trié, chaque comparaison écarte tout un bloc de paires ; sans tri, on majore les deux facteurs">
+<meta name="prereq" content="c00">
+<meta name="anki" content="coding::deux-pointeurs,coding::3sum,coding::elimination">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- série `coding` : squelette annoté et ruban de SL.trace (inerte hors coding) ---- */
+.skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.skel b{color:var(--pen);font-weight:600}
+.step .card.full,.step .card.casse{grid-column:1 / -1}
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .wide table{min-width:520px}
+.card .wide th:nth-child(2),.card .wide td:nth-child(2),
+.card .wide th:nth-child(3),.card .wide td:nth-child(3){text-align:left}
+.readouts .c1 b{color:var(--pen)}.readouts .c3 b{color:var(--red)}
+.sl-trace{--cw:58px;--cgap:8px;margin:4px 0 2px}
+.sl-cells{display:flex;gap:var(--cgap)}
+.sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
+.sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
+.sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
+.sl-cell.win{border-color:var(--green);border-width:2.5px}
+.sl-ptrs{position:relative;height:20px;margin-top:5px}
+.sl-ptr{position:absolute;top:0;left:calc(var(--i) * (var(--cw) + var(--cgap)));width:var(--cw);text-align:center;font:600 12px var(--sans);color:var(--pen)}
+.sl-note{font-size:14px;color:var(--cardink);margin-top:10px}
+.sl-inv{font:12.5px/1.55 var(--mono);color:var(--cardmuted);margin-top:6px;border-left:2px solid #B7791F;padding-left:10px}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › Partie 09 · Coding › coding 02</div>
+  <h1>Deux <span>pointeurs</span> — éliminer une classe à chaque pas</h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Sur un tableau <b>trié</b>, une seule comparaison aux deux bords écarte <b>tout un bloc de paires</b> d'un coup : c'est le tri, et rien d'autre, qui rend cette élimination valide. Fil rouge : LC 167, <code>a = [1, 3, 4, 6, 8, 11]</code>, <code>t = 10</code>, réponse <b>(2, 3)</b> — <b>5</b> comparaisons pour couvrir les <b>15</b> paires. Puis la famille : 3Sum, où l'on fixe un indice et où les doublons se sautent au <code>while</code> ; et le container (LC 11), <b>sans tri</b>, où l'élimination se rachète en majorant les deux facteurs. Jamais la solution complète : le squelette, la trace, les quatre phrases.</p>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La chaîne</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="coding-00-tap-invariant-variant.html#s2">c00 · l'invariant</a> — conteneur, tranche, « exactement »</li>
+    <li><a href="coding-00-tap-invariant-variant.html#s3">c00 · le variant</a> — l'entier ≥ 0 qui décroît</li>
+    <li><a href="coding-00-tap-invariant-variant.html#s5">c00 · la complexité</a> — composée, jamais devinée</li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>coding::deux-pointeurs</code><code>coding::3sum</code><code>coding::elimination</code></div>
+  <h4>Où le pattern voisine</h4>
+  <ol>
+    <li><a href="coding-01-fenetre-glissante.html">c01 · Fenêtre glissante</a></li>
+    <li><a href="../../map.html#c03">c03 · Binary search</a></li>
+    <li><a href="../../map.html#c08">c08 · Intervalles</a></li>
+    <li><a href="../../map.html">La carte, colonne 9</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette sheet suppose acquis</div>
+    <ul>
+      <li><b>Le rituel TAP.</b> Invariant, variant, conclusion, complexité — <a href="coding-00-tap-invariant-variant.html#s1">c00, pas 1</a>. Cette sheet ne le redémontre pas, elle l'instancie une fois au pas 4.</li>
+      <li><b>Invariant = conteneur + tranche + « exactement ».</b> <a href="coding-00-tap-invariant-variant.html#s2">c00, pas 2</a>. Ici il n'y a pas d'accumulateur : le conteneur est la <i>zone encore possible</i> [<span class="m">l</span>, <span class="m">r</span>], et « exactement » devient « <b>et rien en dehors</b> ».</li>
+      <li><b>Variant = entier ≥ 0 strictement décroissant.</b> <a href="coding-00-tap-invariant-variant.html#s3">c00, pas 3</a>. Celui-ci est le plus simple de toute la partie : <span class="m">r</span> − <span class="m">l</span>.</li>
+      <li><b>Le dictionnaire en O(1) amorti.</b> <a href="coding-00-tap-invariant-variant.html#s5">c00, pas 5</a>. C'est le remède du pas 7 quand le tableau n'est pas trié et que l'énoncé veut les <i>indices</i>.</li>
+      <li><b>Trier coûte O(<span class="m">n</span> log <span class="m">n</span>)</b> et <b>détruit les indices d'origine</b>. Les deux faits servent : le premier dans la complexité composée, le second dans le contre-signal.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="hyp">
+  <div class="card hyp-card">
+    <div class="lbl">Hypothèses posées</div>
+    <div class="hyp">
+      <b>H1</b><span>Le tableau est <b>trié</b> par ordre croissant, ou le devient <b>sans perte</b> — c'est-à-dire que l'énoncé demande des <i>valeurs</i>, pas des <i>indices d'origine</i>. C'est cette hypothèse, et elle seule, qui rend l'élimination du pas 3 valide ; elle tombe au pas 7.</span>
+      <b>H2</b><span>La quantité cherchée porte sur une <b>paire</b> d'indices (<span class="m">l</span>, <span class="m">r</span>), et la comparaison en (<span class="m">l</span>, <span class="m">r</span>) <b>tranche</b> : elle désigne celui des deux bords qui ne peut plus servir. Une quantité qui ne serait monotone en aucun des deux bords sort du pattern.</span>
+      <b>H3</b><span>Au pas 6, H1 est <b>levée</b> et remplacée : la quantité s'écrit comme un <b>produit de deux facteurs</b> qu'on sait majorer séparément. C'est la seconde justification de l'élimination, et la seule qui survive sans tri.</span>
+      <b>H4</b><span>On énonce le <b>squelette</b> — les lignes de contrôle — et les quatre phrases. Le corps se remplit devant l'interlocuteur : une sheet de coding ne contient jamais la solution complète.</span>
+    </div>
+  </div>
+</section>
+
+<section class="blk" id="chain-blk">
+<h2 style="--ac:var(--teal)">La chaîne</h2>
+<div class="chain" id="chain">
+
+<div class="step" id="s1">
+  <div class="rule">
+    <h3>Le signal, et le contre-signal <span class="tag tronc">tronc</span></h3>
+    <p>Deux marques suffisent : un tableau <b>trié</b> (ou triable sans perte) et une question sur des <b>paires</b> — somme cible, écart, produit. Une troisième porte ouverte, sans tri : une quantité en <b>deux facteurs</b>, du type min(<span class="m">h</span>[<span class="m">l</span>], <span class="m">h</span>[<span class="m">r</span>]) × (<span class="m">r</span> − <span class="m">l</span>).</p>
+    <div class="eq">trié &nbsp;+&nbsp; question sur des <b>paires</b> &nbsp;&nbsp;|&nbsp;&nbsp; ou deux facteurs <b>majorables</b> séparément</div>
+    <p>Le <b>contre-signal</b> est net et double : des <b>indices d'origine</b> à renvoyer sur un tableau non trié — trier les détruit, c'est le dictionnaire qu'il faut (<a href="coding-00-tap-invariant-variant.html#s5">c00</a>) ; et une quantité qui ne se majore par aucun bord, où plus rien ne s'élimine.</p>
+    <p class="say">« Le tableau est trié et la question porte sur une paire, donc une comparaison aux deux bords désigne un bord qui ne peut plus servir, donc deux indices qui se rapprochent suffisent. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — lire LC 167</div>
+    <p><b>Énoncé.</b> « Un tableau <i>trié croissant</i>, une cible ; renvoyer les deux positions dont la somme vaut la cible. »</p>
+    <p><b>Les deux marques.</b> « trié croissant » → H1 est donnée par l'énoncé, gratuitement ; « les deux positions dont la somme vaut » → une question sur des <b>paires</b>.</p>
+    <p><b>Fil rouge.</b> <code>a = [1, 3, 4, 6, 8, 11]</code>, <code>t = 10</code>. Réponse : <b>(2, 3)</b>, soit 4 + 6 — l'unique paire, vérifiée contre les <b>15</b> paires de la force brute.</p>
+    <p><b>Ce qui n'est pas le signal.</b> LC 1 « Two Sum », non trié, <i>indices</i> demandés : dictionnaire. Un <i>sous-tableau contigu</i> : fenêtre glissante, <a href="coding-01-fenetre-glissante.html">c01</a>. Une somme <i>exactement</i> égale avec des négatifs, sur un segment : préfixes, <a href="../../map.html#c10">c10</a>.</p>
+  </div>
+</div>
+
+<div class="step" id="s2">
+  <div class="rule">
+    <h3>Le pattern : ils se rapprochent, la comparaison décide <span class="tag tronc">tronc</span></h3>
+    <p><span class="m">l</span> part de 0, <span class="m">r</span> de <span class="m">n</span> − 1, et ils se <b>rapprochent</b>. Une seule comparaison par tour, en (<span class="m">l</span>, <span class="m">r</span>), et elle fait une seule chose : désigner celui des deux bords qui <b>sort</b>. Aucun des deux ne recule jamais.</p>
+    <div class="eq"><span class="m">s</span> &gt; <span class="m">t</span> ⇒ <span class="m">r</span> −= 1 &nbsp;·&nbsp; <span class="m">s</span> &lt; <span class="m">t</span> ⇒ <span class="m">l</span> += 1 &nbsp;·&nbsp; <span class="m">s</span> = <span class="m">t</span> ⇒ fini</div>
+    <p>La boucle est <code>l &lt; r</code>, <b>strict</b>. Avec <code>l &lt;= r</code> on autorise la paire (<span class="m">i</span>, <span class="m">i</span>) : un élément apparié à lui-même, qui n'est pas une paire. C'est le premier piège, et il ne lève aucune exception.</p>
+    <p class="say">« Une seule comparaison par tour désigne le bord qui sort, donc un pointeur bouge exactement une fois par tour, donc la zone encore possible rétrécit à chaque pas. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le squelette de LC 167</div>
+    <div class="skel">l, r = 0, n − 1
+<b>tant que</b> l &lt; r :                 # STRICT, jamais l &lt;= r
+    s = a[l] + a[r]
+    <b>si</b> s == t : <b>retour</b> (l, r)
+    <b>si</b> s &gt; t  : r −= 1            # r ne sert plus à aucun l′ ≥ l
+    <b>sinon</b>     : l += 1            # l ne sert plus à aucun r′ ≤ r</div>
+    <p><b>retour</b> aucune paire.</p>
+    <p><b>Les deux commentaires sont la preuve</b>, pas de la décoration : chacun dit quelle <i>classe</i> de paires le pas vient d'écarter. Les effacer, c'est réduire le pattern à une recette qu'on ne sait plus justifier — et la justification est exactement ce qu'on demande à l'oral.</p>
+    <p><b>Trois branches, jamais deux.</b> L'égalité a sa branche propre, avant les deux inégalités. Fondre <code>s == t</code> dans l'un des deux tests fait sortir la paire cherchée de la zone avant qu'on l'ait lue.</p>
+  </div>
+</div>
+
+<div class="step" id="s3">
+  <div class="rule">
+    <h3>L'élimination : ce que le tri autorise <span class="tag tronc">tronc</span></h3>
+    <p>Le cœur tient en une ligne. Si <span class="m">a</span>[<span class="m">l</span>] + <span class="m">a</span>[<span class="m">r</span>] &gt; <span class="m">t</span>, alors pour tout <span class="m">l</span>′ ≥ <span class="m">l</span> le tri donne <span class="m">a</span>[<span class="m">l</span>′] ≥ <span class="m">a</span>[<span class="m">l</span>], donc la somme ne peut que monter : <b>aucune</b> paire de bord droit <span class="m">r</span> ne vaut <span class="m">t</span>. <span class="m">r</span> est fini — et avec lui toute une colonne de paires.</p>
+    <div class="eq"><span class="m">l</span>′ ≥ <span class="m">l</span> &nbsp;<b>⇒</b>&nbsp; <span class="m">a</span>[<span class="m">l</span>′] ≥ <span class="m">a</span>[<span class="m">l</span>] &nbsp;<b>⇒</b>&nbsp; <span class="m">a</span>[<span class="m">l</span>′] + <span class="m">a</span>[<span class="m">r</span>] ≥ <span class="m">a</span>[<span class="m">l</span>] + <span class="m">a</span>[<span class="m">r</span>] &gt; <span class="m">t</span></div>
+    <p>La flèche du milieu est le tri, et c'est la seule chose qu'on lui demande. Symétriquement, <span class="m">s</span> &lt; <span class="m">t</span> écarte la <b>ligne</b> du bord gauche <span class="m">l</span>. Une comparaison, une classe entière.</p>
+    <p class="say">« Le tri donne a[l′] ≥ a[l] pour tout l′ à droite de l, donc toutes ces paires dépassent déjà la cible, donc le bord droit r est éliminé avec toute sa colonne — et non pas un candidat à la fois. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les 15 paires du fil rouge, en 5 comparaisons</div>
+    <p><code>a = [1, 3, 4, 6, 8, 11]</code>, <code>t = 10</code> : <span class="m">n</span> = 6, donc <b>15</b> paires à couvrir. Chaque pas en écarte un bloc, la paire testée comprise :</p>
+    <table>
+      <tr><th>pas</th><th>(<span class="m">l</span>, <span class="m">r</span>) · <span class="m">s</span></th><th>la classe écartée</th><th>paires</th></tr>
+      <tr><td>1</td><td>(0, 5) · 12 &gt; 10</td><td>(<span class="m">l</span>′, 5), <span class="m">l</span>′ = 0…4</td><td>5</td></tr>
+      <tr><td>2</td><td>(0, 4) · 9 &lt; 10</td><td>(0, <span class="m">r</span>′), <span class="m">r</span>′ = 1…4</td><td>4</td></tr>
+      <tr><td>3</td><td>(1, 4) · 11 &gt; 10</td><td>(<span class="m">l</span>′, 4), <span class="m">l</span>′ = 1…3</td><td>3</td></tr>
+      <tr><td>4</td><td>(1, 3) · 9 &lt; 10</td><td>(1, <span class="m">r</span>′), <span class="m">r</span>′ = 2…3</td><td>2</td></tr>
+      <tr class="hl"><td>5</td><td>(2, 3) · 10 = 10 ✓</td><td>trouvée : 4 + 6</td><td>1</td></tr>
+    </table>
+    <p><b>5 + 4 + 3 + 2 + 1 = 15.</b> La partition est <b>exacte</b> : les cinq classes recouvrent les 15 paires sans recouvrement et sans trou. C'est ça, « couvrir sans énumérer », et c'est la phrase qui vaut le point à l'oral.</p>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — les 5 comparaisons de LC 167, l'invariant à chaque image</div>
+    <div id="f1trace" class="wide"></div>
+    <p class="cap"><code>a = [1, 3, 4, 6, 8, 11]</code>, <code>t = 10</code>. Le cadre <b>vert</b> est la zone encore possible [<span class="m">l</span>, <span class="m">r</span>] ; le fond <b>ambré</b> marque les cases <b>éliminées</b>, sorties de la zone avec preuve. Fais « pas › » et regarde combien de paires meurent à chaque image : <b>5, puis 4, puis 3, puis 2</b> — jamais une seule. La ligne du bas est l'invariant, réécrit à chaque image ; dis-le avant de le lire.</p>
+  </div>
+</div>
+
+<div class="step" id="s4">
+  <div class="rule">
+    <h3>Invariant, variant, conclusion, complexité</h3>
+    <p>L'invariant n'est pas « la paire est dans [<span class="m">l</span>, <span class="m">r</span>] » tout court : c'est <b>si</b> une paire de somme <span class="m">t</span> existe, <b>alors</b> ses deux indices sont dans [<span class="m">l</span>, <span class="m">r</span>]. Le conditionnel porte la conclusion. Le variant est <span class="m">r</span> − <span class="m">l</span>.</p>
+    <div class="eq"><b>I</b> : ∃ paire de somme <span class="m">t</span> ⇒ ses deux indices ∈ [<span class="m">l</span>, <span class="m">r</span>] &nbsp;·&nbsp; <b>V</b> : <span class="m">r</span> − <span class="m">l</span></div>
+    <p><b>Préservation</b> : le pas 3 montre qu'on ne retire jamais un bord sans avoir prouvé qu'aucun partenaire restant ne lui convient. <b>Conclusion</b> : à <span class="m">l</span> = <span class="m">r</span>, la zone n'a plus de paire ; I, contraposée, dit qu'il n'en existait aucune.</p>
+    <p class="say">« Le variant r − l est entier, positif et décroît strictement à chaque tour, donc la boucle s'arrête en au plus n − 1 pas, donc le coût est linéaire une fois le tri payé. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — les quatre cases, sur le fil rouge</div>
+    <p><b>I.</b> Si une paire de somme 10 existe, ses deux indices sont dans [<span class="m">l</span>, <span class="m">r</span>]. <b>Initialisation</b> : [0, 5] est tout le tableau, I tient trivialement.</p>
+    <p><b>V.</b> <span class="m">r</span> − <span class="m">l</span> : part de 5, vaut 1 au dernier pas, décroît de 1 à chaque tour — entier, ≥ 0, strictement décroissant. <b>Donc</b> au plus <span class="m">n</span> − 1 = <b>5</b> tours, et il y en a eu exactement 5.</p>
+    <p><b>Conclusion, les deux sorties.</b> Retour anticipé : <span class="m">s</span> = <span class="m">t</span> a été <i>lue</i>, la paire est vraie. Sortie par <span class="m">l</span> = <span class="m">r</span> : plus aucune paire dans la zone, et I dit qu'il n'en existe nulle part — <b>donc</b> « aucune », et c'est une conclusion, pas un aveu.</p>
+    <p><b>Complexité.</b> ≤ <span class="m">n</span> − 1 tours × O(1) (une addition, deux comparaisons) ⇒ <b>O(<span class="m">n</span>)</b> sur un tableau déjà trié, <b>O(<span class="m">n</span> log <span class="m">n</span>)</b> s'il faut trier — le tri domine, et il faut le dire dans cet ordre. Espace <b>O(1)</b> : deux entiers.</p>
+    <p><b>Vérifié à l'exécution</b> : <b>0 désaccord sur 20 000</b> tableaux triés aléatoires (longueurs 0 à 7, valeurs −9 à 9, cibles −18 à 18) face à la force brute, et toute paire renvoyée somme bien à la cible.</p>
+  </div>
+</div>
+
+<div class="step" id="s5">
+  <div class="rule">
+    <h3>3Sum : fixer un indice, deux pointeurs dessous</h3>
+    <p>Trois indices, mais un seul degré de liberté en trop : on <b>fixe</b> <span class="m">i</span>, et chercher <span class="m">a</span>[<span class="m">i</span>] + <span class="m">a</span>[<span class="m">l</span>] + <span class="m">a</span>[<span class="m">r</span>] = 0 redevient exactement le pas 2, avec la cible −<span class="m">a</span>[<span class="m">i</span>] sur [<span class="m">i</span>+1, <span class="m">n</span>−1].</p>
+    <div class="eq"><span class="m">a</span>[<span class="m">i</span>] + <span class="m">a</span>[<span class="m">l</span>] + <span class="m">a</span>[<span class="m">r</span>] = 0 &nbsp;⇔&nbsp; <span class="m">a</span>[<span class="m">l</span>] + <span class="m">a</span>[<span class="m">r</span>] = −<span class="m">a</span>[<span class="m">i</span>] &nbsp;·&nbsp; <span class="m">n</span> × O(<span class="m">n</span>) = O(<span class="m">n</span><sup>2</sup>)</div>
+    <p>Le tri sert ici <b>deux fois</b> : il valide l'élimination, et il met les valeurs égales <b>côte à côte</b> — donc les doublons se sautent par un <code>while</code>, en O(1) amorti, jamais par un ensemble de triplets.</p>
+    <p class="say">« i fixé ramène le problème à une somme cible sur un tableau trié, donc le pas 2 s'applique tel quel, donc n balayages linéaires, donc O(n²) — et les égaux étant voisins après tri, les doublons se sautent sans mémoire. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — le squelette, et les doublons chiffrés</div>
+    <div class="skel">a.sort()
+<b>pour</b> i <b>dans</b> range(n − 2) :
+    <b>si</b> i &gt; 0 <b>et</b> a[i] == a[i−1] : <b>continue</b>        # doublon sur i
+    l, r = i + 1, n − 1
+    <b>tant que</b> l &lt; r :
+        s = a[i] + a[l] + a[r]
+        <b>si</b> s &lt; 0 : l += 1
+        <b>sinon si</b> s &gt; 0 : r −= 1
+        <b>sinon</b> :
+            enregistrer (a[i], a[l], a[r])
+            <b>tant que</b> l &lt; r <b>et</b> a[l] == a[l+1] : l += 1   # doublon sur l
+            <b>tant que</b> l &lt; r <b>et</b> a[r] == a[r−1] : r −= 1   # doublon sur r
+            l += 1 ; r −= 1</div>
+    <p><b>Les trois <code>while</code> ne sont pas optionnels.</b> Sans eux, sur <code>[−1, 0, 1, 2, −1, −4]</code> le balayage rend <code>(−1, −1, 2)</code>, <code>(−1, 0, 1)</code> et <b>encore</b> <code>(−1, 0, 1)</code> : <b>3</b> triplets au lieu de <b>2</b>. Sur <code>[−2, 0, 0, 2, 2]</code>, <code>(−2, 0, 2)</code> sort <b>deux fois</b>.</p>
+    <p><b>Pourquoi pas un <code>set</code>.</b> Il donne la bonne réponse, et coûte O(<span class="m">n</span><sup>2</sup>) de <i>mémoire</i> dans le pire cas — l'espace annoncé passe de O(1) à O(<span class="m">n</span><sup>2</sup>). C'est la complexité qui est fausse, pas le résultat : la faute typique qui ne se voit pas aux tests.</p>
+    <p><b>Chiffré.</b> <span class="m">n</span> = 1 000 : O(<span class="m">n</span><sup>2</sup>) = 10<sup>6</sup> contre 10<sup>9</sup> pour le triple balayage naïf. <b>Vérifié</b> : 0 désaccord sur 5 000 tableaux aléatoires face à l'énumération des triplets.</p>
+  </div>
+</div>
+
+<div class="step" id="s6">
+  <div class="rule">
+    <h3>Sans tri : majorer les deux facteurs</h3>
+    <p>LC 11 n'est pas trié, et pourtant l'élimination tient. L'aire vaut min(<span class="m">h</span>[<span class="m">l</span>], <span class="m">h</span>[<span class="m">r</span>]) × (<span class="m">r</span> − <span class="m">l</span>). Si <span class="m">h</span>[<span class="m">l</span>] est le plus bas, toute paire (<span class="m">l</span>, <span class="m">r</span>′) avec <span class="m">r</span>′ &lt; <span class="m">r</span> perd sur la <b>largeur</b> et ne gagne rien sur la <b>hauteur</b>, plafonnée par <span class="m">h</span>[<span class="m">l</span>].</p>
+    <div class="eq">aire(<span class="m">l</span>, <span class="m">r</span>′) ≤ <span class="m">h</span>[<span class="m">l</span>] × (<span class="m">r</span>′ − <span class="m">l</span>) &lt; <span class="m">h</span>[<span class="m">l</span>] × (<span class="m">r</span> − <span class="m">l</span>) = aire(<span class="m">l</span>, <span class="m">r</span>)</div>
+    <p>On majore <b>chaque facteur séparément</b> : c'est la seconde justification de l'élimination, et la seule qui ne demande pas de tri. Elle désigne toujours le <b>plus bas</b> : garder le plus bas, c'est garder le plafond.</p>
+    <p class="say">« Le bord le plus bas plafonne la hauteur et la largeur ne fera que baisser, donc toutes les paires qui le gardent sont majorées par l'aire courante, donc ce bord sort — sans tri, en majorant les deux facteurs. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — LC 11 sur le fil rouge à neuf barres</div>
+    <div class="skel">l, r = 0, n − 1 ; best = 0
+<b>tant que</b> l &lt; r :
+    best = max(best, min(h[l], h[r]) * (r − l))
+    <b>si</b> h[l] &lt; h[r] : l += 1      # on bouge LE PLUS BAS
+    <b>sinon</b> : r −= 1</div>
+    <p><code>h = [1, 8, 6, 2, 5, 4, 8, 3, 7]</code> : réponse <b>49</b>, atteinte en (<span class="m">l</span>, <span class="m">r</span>) = (1, 8), soit min(8, 7) × 7 = 7 × 7. <b>8</b> comparaisons contre <b>36</b> paires en force brute.</p>
+    <p><b>Bouger le plus haut « pour voir » coûte la correction</b>, pas seulement du temps : la même boucle avec la comparaison inversée rend <b>8</b> au lieu de <b>49</b>, en exactement autant de pas. Le pattern ne plante pas, il ment.</p>
+    <p><b>L'invariant change de forme.</b> Il ne dit plus « la solution est dans [<span class="m">l</span>, <span class="m">r</span>] » mais « <code>best</code> ≥ l'aire de toute paire déjà sortie de [<span class="m">l</span>, <span class="m">r</span>] ». Conclusion à <span class="m">l</span> = <span class="m">r</span> : toutes les paires sont sorties, <b>donc</b> <code>best</code> est le maximum. <b>0 désaccord sur 20 000</b> tableaux aléatoires face à la force brute.</p>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — LC 11 : le plus bas est le seul qui puisse faire mieux en bougeant</div>
+    <div id="f2trace" class="wide"></div>
+    <p class="cap"><code>h = [1, 8, 6, 2, 5, 4, 8, 3, 7]</code>, sans tri. Le cadre <b>vert</b> est l'écart courant [<span class="m">l</span>, <span class="m">r</span>], le fond <b>ambré</b> les deux bords du record. Le record tombe à l'<b>image 2</b> — 49 — et les six images suivantes ne font que le confirmer : la largeur ne fait que baisser tandis que la hauteur reste plafonnée par le 8 de gauche. Regarde qui bouge : <b>toujours le plus bas</b>, et <span class="m">l</span> ne bouge qu'une fois en tout.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
+    <h3>Où ça casse <span class="tag casse">casse</span></h3>
+    <p>Un seul cas fatal, et il ne lève aucune exception : <b>somme cible sur un tableau non trié</b>. L'implication du pas 3 devient fausse — <span class="m">a</span>[<span class="m">l</span>′] peut être <b>plus petit</b> que <span class="m">a</span>[<span class="m">l</span>] pour <span class="m">l</span>′ &gt; <span class="m">l</span> — donc on élimine des paires qu'on n'a pas le droit d'éliminer.</p>
+    <p>La boucle tourne, termine, et rend « aucune paire ». C'est une réponse, elle est <b>fausse</b>, et rien dans la trace ne le signale.</p>
+    <p class="say">« Sans tri, a[l′] ≥ a[l] tombe, donc l'élimination retire des paires jamais examinées, donc le résultat est faux sans erreur — il faut un dictionnaire, ou trier des couples (valeur, indice). »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Le contre-exemple minimal, à sortir de mémoire</div>
+    <p><code>a = [3, 1, 4]</code>, <code>t = 5</code>. La bonne réponse est <b>(1, 2)</b> : 1 + 4 = 5. Le squelette du pas 2 renvoie <b>« aucune paire »</b>.</p>
+    <p><b>Pourquoi.</b> Premier tour : 3 + 4 = 7 &gt; 5, donc <span class="m">r</span> sort — au motif que tout <span class="m">a</span>[<span class="m">l</span>′] à droite serait ≥ 3. Or <span class="m">a</span>[1] = 1. La paire (1, 2) meurt dans cette élimination <b>sans avoir été lue</b>. Second tour : 3 + 1 = 4 &lt; 5, <span class="m">l</span> sort, <span class="m">l</span> = <span class="m">r</span>, fini.</p>
+    <p><b>Le remède dépend de ce qu'on rend.</b> Les <i>indices d'origine</i> (LC 1) : dictionnaire valeur → indice, O(<span class="m">n</span>), <a href="coding-00-tap-invariant-variant.html#s5">c00</a>. Les <i>valeurs</i> : trier, puis deux pointeurs, O(<span class="m">n</span> log <span class="m">n</span>). Les indices <b>et</b> le tri : trier des couples <code>(valeur, indice)</code>, et ne jamais oublier de rendre la seconde composante.</p>
+    <p><b>Le test de trente secondes.</b> Avant d'écrire la première ligne : « quand je retire ce bord, sur quoi repose ma preuve que rien d'utile ne part avec ? » Si la réponse n'est ni « le tri », ni « je majore les deux facteurs », ce n'est pas deux pointeurs.</p>
+  </div>
+  <div class="card casse"><div class="lbl">Pièges Python — cinq lignes qui ont l'air justes</div>
+    <ul>
+      <li><b><code>while l &lt;= r</code> au lieu de <code>&lt;</code>.</b> Sur <code>[1, 3, 4, 6, 8, 11]</code> et <code>t = 8</code>, la version large renvoie <b>(2, 2)</b> — l'élément 4 apparié à lui-même — alors qu'aucune paire ne somme à 8. La version stricte renvoie « aucune », qui est la bonne réponse.</li>
+      <li><b>Dédoublonner 3Sum par un <code>set</code> de triplets.</b> Le résultat est juste, l'espace annoncé devient faux : O(<span class="m">n</span><sup>2</sup>) au lieu de O(1) hors sortie. Les valeurs égales sont voisines après tri — c'est un <code>while</code>, pas une table.</li>
+      <li><b>Oublier que <code>sort()</code> détruit les indices.</b> LC 1 demande les positions <i>d'origine</i> : après un tri en place elles n'existent plus. Soit dictionnaire, soit tri de couples <code>(valeur, indice)</code> — jamais un tri nu suivi d'un retour de <code>l</code> et <code>r</code>.</li>
+      <li><b>LC 11 : bouger le plus haut « pour voir ».</b> Prouvablement inutile, et la boucle inversée rend <b>8</b> au lieu de <b>49</b> sur le fil rouge. Un pattern qui ment ne se rattrape pas au débogage : c'est la preuve qu'il faut relire.</li>
+      <li><b>Sauter les doublons <i>avant</i> d'enregistrer le triplet.</b> Dans 3Sum, l'ordre est : enregistrer, <i>puis</i> avancer sur les égaux, <i>puis</i> <code>l += 1 ; r −= 1</code>. Inversé, on saute la première occurrence et le triplet disparaît de la sortie.</li>
+    </ul>
+  </div>
+</div>
+
+</div><!-- /chain -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li><b>Signal</b> : trié + question sur des <b>paires</b> ; ou, sans tri, deux facteurs qu'on sait majorer séparément (LC 11).</li>
+    <li><b>Pattern</b> : <span class="m">l</span> = 0, <span class="m">r</span> = <span class="m">n</span> − 1, ils se rapprochent ; une comparaison par tour désigne le bord qui sort. Boucle <code>l &lt; r</code>, strict.</li>
+    <li><b>Élimination</b> : <span class="m">s</span> &gt; <span class="m">t</span> tue toute la <i>colonne</i> du bord droit, <span class="m">s</span> &lt; <span class="m">t</span> toute la <i>ligne</i> du bord gauche. Sur le fil rouge, 5 + 4 + 3 + 2 + 1 = <b>15</b> paires en 5 comparaisons.</li>
+    <li><b>Invariant</b> conditionnel : <i>si</i> une paire de somme <span class="m">t</span> existe, <i>alors</i> ses indices sont dans [<span class="m">l</span>, <span class="m">r</span>]. <b>Variant</b> <span class="m">r</span> − <span class="m">l</span>. O(<span class="m">n</span>) après tri, O(1) espace.</li>
+    <li><b>3Sum</b> : trier, fixer <span class="m">i</span>, deux pointeurs pour −<span class="m">a</span>[<span class="m">i</span>] ⇒ O(<span class="m">n</span><sup>2</sup>). Doublons par <code>while</code> sur <span class="m">i</span>, <span class="m">l</span> et <span class="m">r</span> — jamais par un <code>set</code>.</li>
+    <li><b>LC 11</b> : bouger <b>le plus bas</b>, parce qu'il plafonne la hauteur et que la largeur ne fera que baisser. L'inverse rend 8 au lieu de 49.</li>
+    <li><b>Non trié + somme cible ⇒ faux sans erreur</b> : <code>[3, 1, 4]</code>, <code>t = 5</code> renvoie « aucune » alors que 1 + 4 = 5.</li>
+  </ol>
+</div>
+<div class="phrase">« Trié et une question sur des paires, donc deux pointeurs qui se rapprochent : chaque comparaison élimine un bord et tout un bloc de paires avec lui, c'est le tri qui rend l'élimination valide. Le variant est r moins l, donc linéaire ; sans tri, il faut pouvoir majorer les deux facteurs, comme dans le container. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">4 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Pourquoi peut-on abandonner <span class="m">r</span> quand <span class="m">a</span>[<span class="m">l</span>] + <span class="m">a</span>[<span class="m">r</span>] &gt; <span class="m">t</span> ?</div><div class="a hid">Parce que le tableau est trié : pour tout l′ ≥ l, a[l′] ≥ a[l], donc toutes les paires (l′, r) ont une somme ≥ a[l] + a[r] &gt; t. Toute la colonne du bord droit r est écartée d'un coup.</div></li>
+    <li><div class="q">Énonce l'invariant et le variant.</div><div class="a hid">Invariant conditionnel : si une paire de somme t existe, ses deux indices sont dans [l, r] — les indices sortis l'ont été avec preuve. Variant : r − l, entier ≥ 0, strictement décroissant, donc au plus n − 1 tours.</div></li>
+    <li><div class="q">3Sum : comment gérer les doublons ?</div><div class="a hid">Par des while sur les valeurs égales, pour i, pour l et pour r — les égaux sont voisins après tri. Jamais par un set de triplets : le résultat serait juste mais l'espace passerait à O(n²).</div></li>
+    <li><div class="q">LC 11 : lequel bouger, et pourquoi ?</div><div class="a hid">Le plus bas. Le garder plafonne la hauteur à sa valeur pendant que la largeur ne fait que baisser, donc toute paire qui le garde est majorée par l'aire courante. Bouger le plus haut rend 8 au lieu de 49 sur [1, 8, 6, 2, 5, 4, 8, 3, 7].</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Ponts et cartes</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Où ce mécanisme se rejoue</div>
+  <div class="bridges">
+    <a href="coding-01-fenetre-glissante.html#s4"><b>c01 · Fenêtre glissante</b><small>mêmes deux indices, même sens : le variant devient (n−r) + (n−l) et il faut un argument d'amortissement ; ici ils vont l'un vers l'autre, le variant est r − l et le comptage est direct</small></a>
+    <a href="coding-00-tap-invariant-variant.html#s2"><b>c00 · L'invariant</b><small>l'invariant conditionnel « si une solution existe, alors elle est dans la zone » est la forme que prend le conteneur quand il n'y a pas d'accumulateur à maintenir</small></a>
+    <a href="../../map.html#c03"><b>c03 · Binary search</b><small>la même élimination, poussée d'un cran : une comparaison ne tue plus une colonne mais la moitié de l'espace, et le variant passe de n à log n</small></a>
+    <a href="../../map.html#c08"><b>c08 · Intervalles</b><small>l'autre famille où trier est l'étape qui autorise tout le reste : le tri par borne gauche rend le balayage local, comme le tri rend ici l'élimination valide</small></a>
+    <a href="../../map.html"><b>La carte, colonne 9</b><small>les neuf familles et leur ordre de dépendance</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>coding::deux-pointeurs</code> (le signal, la boucle stricte, le variant r − l) · <code>coding::3sum</code> (i fixé, O(<span class="m">n</span><sup>2</sup>), doublons par <code>while</code>) · <code>coding::elimination</code> (la classe écartée à chaque comparaison, et les deux justifications : le tri, ou la majoration des deux facteurs).</p>
+  <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>coding c02 · v1 du 17/09/2026 · Prérequis : <a href="coding-00-tap-invariant-variant.html">c00 · Le TAP</a>. Suite : <a href="../../map.html#c03">c03 · Binary search</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.step').forEach(s=>io.observe(s));
+/* stepper */
+SL.stepper(document.getElementById('chain'));
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== Figure 1 : LC 167, a = [1, 3, 4, 6, 8, 11], t = 10 =====
+   Cinq images = les cinq comparaisons, produites par le squelette instrumenté du pas 2
+   (aucun chiffre saisi à la main). `win` = la zone encore possible [l, r] ; `mark` = les
+   cases déjà éliminées. Les tailles de classes 5, 4, 3, 2, 1 somment à 15 = C(6, 2). */
+SL.trace(document.getElementById('f1trace'),{arr:[1, 3, 4, 6, 8, 11],ms:1200,frames:[
+  {"ptr": {"▲ l": 0, "▲ r": 5}, "win": [0, 6], "note": "s = 1 + 11 = 12 > 10 ⇒ r sort, avec les 5 paires (l′, 5), l′ = 0…4.", "inv": "paire ⊂ [0, 5] ; éliminés : aucun"},
+  {"ptr": {"▲ l": 0, "▲ r": 4}, "win": [0, 5], "mark": [5], "note": "s = 1 + 8 = 9 < 10 ⇒ l sort, avec les 4 paires (0, r′), r′ = 1…4.", "inv": "paire ⊂ [0, 4] ; éliminés : 5"},
+  {"ptr": {"▲ l": 1, "▲ r": 4}, "win": [1, 5], "mark": [0, 5], "note": "s = 3 + 8 = 11 > 10 ⇒ r sort, avec les 3 paires (l′, 4), l′ = 1…3.", "inv": "paire ⊂ [1, 4] ; éliminés : 0, 5"},
+  {"ptr": {"▲ l": 1, "▲ r": 3}, "win": [1, 4], "mark": [0, 4, 5], "note": "s = 3 + 6 = 9 < 10 ⇒ l sort, avec les 2 paires (1, r′), r′ = 2…3.", "inv": "paire ⊂ [1, 3] ; éliminés : 0, 4, 5"},
+  {"ptr": {"▲ l": 2, "▲ r": 3}, "win": [2, 4], "mark": [0, 1, 4, 5], "note": "s = 4 + 6 = 10 ✓ — retour (2, 3). 5 + 4 + 3 + 2 + 1 = 15 paires couvertes.", "inv": "paire ⊂ [2, 3] ; éliminés : 0, 1, 4, 5"}
+]});
+
+/* ===== Figure 2 : LC 11, h = [1, 8, 6, 2, 5, 4, 8, 3, 7], sans tri =====
+   Huit images = les huit tours. `mark` = les deux bords du record courant, `win` = l'écart
+   courant. Le record 49 tombe à l'image 2 et ne bouge plus. */
+SL.trace(document.getElementById('f2trace'),{arr:[1, 8, 6, 2, 5, 4, 8, 3, 7],ms:1100,frames:[
+  {"ptr": {"▲ l": 0, "▲ r": 8}, "win": [0, 9], "mark": [0, 8], "note": "aire = min(1, 7) × 8 = 8 ; record 8. Le plus bas est à gauche ⇒ l avance.", "inv": "best = 8 ≥ l'aire de toute paire déjà sortie de [0, 8]"},
+  {"ptr": {"▲ l": 1, "▲ r": 8}, "win": [1, 9], "mark": [1, 8], "note": "aire = min(8, 7) × 7 = 49 ; record 49. Le plus bas est à droite ⇒ r recule.", "inv": "best = 49 ≥ l'aire de toute paire déjà sortie de [1, 8]"},
+  {"ptr": {"▲ l": 1, "▲ r": 7}, "win": [1, 8], "mark": [1, 8], "note": "aire = min(8, 3) × 6 = 18 ; record 49. Le plus bas est à droite ⇒ r recule.", "inv": "best = 49 ≥ l'aire de toute paire déjà sortie de [1, 7]"},
+  {"ptr": {"▲ l": 1, "▲ r": 6}, "win": [1, 7], "mark": [1, 8], "note": "aire = min(8, 8) × 5 = 40 ; record 49. Égalité : on recule r, le choix est indifférent.", "inv": "best = 49 ≥ l'aire de toute paire déjà sortie de [1, 6]"},
+  {"ptr": {"▲ l": 1, "▲ r": 5}, "win": [1, 6], "mark": [1, 8], "note": "aire = min(8, 4) × 4 = 16 ; record 49. Le plus bas est à droite ⇒ r recule.", "inv": "best = 49 ≥ l'aire de toute paire déjà sortie de [1, 5]"},
+  {"ptr": {"▲ l": 1, "▲ r": 4}, "win": [1, 5], "mark": [1, 8], "note": "aire = min(8, 5) × 3 = 15 ; record 49. Le plus bas est à droite ⇒ r recule.", "inv": "best = 49 ≥ l'aire de toute paire déjà sortie de [1, 4]"},
+  {"ptr": {"▲ l": 1, "▲ r": 3}, "win": [1, 4], "mark": [1, 8], "note": "aire = min(8, 2) × 2 = 4 ; record 49. Le plus bas est à droite ⇒ r recule.", "inv": "best = 49 ≥ l'aire de toute paire déjà sortie de [1, 3]"},
+  {"ptr": {"▲ l": 1, "▲ r": 2}, "win": [1, 3], "mark": [1, 8], "note": "aire = min(8, 6) × 1 = 6 ; record 49. r recule, l = r : fini, réponse 49.", "inv": "toutes les paires sont sorties ⇒ best = 49 est le maximum"}
+]});
+})();
+</script>
+</body>
+</html>
