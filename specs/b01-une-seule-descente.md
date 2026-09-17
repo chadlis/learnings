@@ -66,12 +66,12 @@ Lloyd 1D, neurone de p08-01, valeurs propres de A) : un seul écart.
    ln 0,1 / ln 0,98 = 113,97, soit **114 pas** à η = 0,02 pour diviser l'écart par 10.
    Corrigé ci-dessus et écrit ainsi dans la sheet (pas 2 et pas 7).
 
-2. **Convention sur la loss du boosting** (à trancher en revue, sans conséquence sur le
-   mécanisme). Le dépôt écrit les objectifs sans facteur ½. Avec L = Σ(yᵢ − F(xᵢ))², le
-   pseudo-résidu vaut donc −∂L/∂F(xᵢ) = **2**(yᵢ − F(xᵢ)) et non (yᵢ − F(xᵢ)). La sheet le dit
-   explicitement et range le facteur 2 dans ν, ce qui garde les chiffres du pas 4 lisibles
-   (cible de l'arbre 2 = y − F₁ = (−2 ; 0 ; −1 ; +3)). Si la revue préfère la convention
-   classique du boosting (loss avec ½, résidu nu), c'est une ligne à changer ici et dans p07-03.
+2. **Convention sur la loss du boosting — tranchée en revue 4** : la loss du boosting
+   s'écrit **avec le ½**, pour que le pseudo-résidu soit le résidu. Ligne posée au pas 4 de
+   la sheet et reportée dans `specs/p07-03` sous « Convention » : « ici le ½ est gardé pour
+   que le pseudo-résidu soit le résidu ; le facteur est absorbé par ν sinon ». Les cibles du
+   pas 4 sont inchangées (arbre 2 : y − F₁ = (−2 ; 0 ; −1 ; +3)) ; seule la valeur affichée
+   de L suit la convention, 13 → 7 au lieu de 26 → 14.
 
 3. **Outillage** : `tools/validate_sheet.py` n'acceptait que des parties numériques
    (`part=(\d+)`). Les ponts vivent dans la partie « B » de `build_index.py` ; le motif est

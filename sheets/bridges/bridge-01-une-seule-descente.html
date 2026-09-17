@@ -266,7 +266,8 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <p class="say">« L'objet qui bouge est la fonction <span class="m">F</span>, donc on dérive <span class="m">L</span> par rapport à sa valeur en chaque point d'entraînement, donc la cible de l'arbre suivant est le gradient négatif pris au modèle cumulé, donc ce n'est pas le résidu du dernier arbre. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — quatre points, <span class="m">ν</span> = 0,5</div>
-    <p><span class="m">y</span> = (1 ; 3 ; 4 ; 8) sur <span class="m">x</span> = 1, 2, 3, 4. <span class="m">L</span> = Σ(<span class="m">y</span> − <span class="m">F</span>)², donc <span class="m">r</span><sub><span class="m">i</span></sub> = 2(<span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">F</span><sub><span class="m">i</span></sub>) : le résidu, au facteur 2 près que <span class="m">ν</span> absorbe.</p>
+    <p><span class="m">y</span> = (1 ; 3 ; 4 ; 8) sur <span class="m">x</span> = 1, 2, 3, 4. <span class="m">L</span> = ½Σ(<span class="m">y</span> − <span class="m">F</span>)², donc <span class="m">r</span><sub><span class="m">i</span></sub> = <span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">F</span><sub><span class="m">i</span></sub> exactement.</p>
+    <p><b>Convention</b> : ici le ½ est gardé pour que le pseudo-résidu soit le résidu ; le facteur est absorbé par <span class="m">ν</span> sinon.</p>
     <table>
       <tr><th></th><th><span class="m">x</span>=1</th><th><span class="m">x</span>=2</th><th><span class="m">x</span>=3</th><th><span class="m">x</span>=4</th></tr>
       <tr><td><span class="m">F</span><sub>0</sub> = moyenne</td><td>4</td><td>4</td><td>4</td><td>4</td></tr>
@@ -276,7 +277,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr class="hl"><td><b>cible de l'arbre 2</b> : <span class="m">y</span> − <span class="m">F</span><sub>1</sub></td><td><b>−2</b></td><td><b>0</b></td><td><b>−1</b></td><td><b>+3</b></td></tr>
       <tr><td><i>le piège</i> : <span class="m">r</span><sub>0</sub> − <span class="m">h</span><sub>1</sub></td><td>−1</td><td>+1</td><td>−2</td><td>+2</td></tr>
     </table>
-    <p><span class="m">L</span> : 26 → <b>14</b>. Les deux dernières lignes diffèrent point par point, et diffèrent <i>parce que</i> <span class="m">ν</span> = 0,5 : l'arbre 1 n'a été appliqué qu'à moitié, donc il reste du gradient là où le piège n'en voit plus. À <span class="m">ν</span> = 1 elles coïncideraient — c'est ce qui rend la confusion durable.</p>
+    <p><span class="m">L</span> : 13 → <b>7</b>. Les deux dernières lignes diffèrent point par point, et diffèrent <i>parce que</i> <span class="m">ν</span> = 0,5 : l'arbre 1 n'a été appliqué qu'à moitié, donc il reste du gradient là où le piège n'en voit plus. À <span class="m">ν</span> = 1 elles coïncideraient — c'est ce qui rend la confusion durable.</p>
   </div>
 </div>
 
