@@ -76,7 +76,7 @@ Le cas vraiment silencieux, celui qui rend la réponse **fausse** : une clé com
 
 ## Questions pour la revue
 
-*Revue 7, 17/09 — **non tranché** : la revue ne s'est pas prononcée, la sheet reste en l'état. Arbitrage en fin de fiche.*
+*Revue 7, 17/09 — **non tranché**. Repris en **revue 8, 18/09 — validé 18/09** : les trois points sont tranchés, arbitrage en fin de fiche.*
 - **`## Où ça casse` corrigé (chiffre faux dans le spec `ready`).** Il disait : « Max-heap pour les k plus grands : il faut retirer n − k fois, O(n log n) ». Les deux moitiés ne vont pas ensemble. Avec un **max**-heap de tous les n on retire **k** fois, pas n − k : O(n + k log n), mesuré 0,053 s à n = 10⁶ / k = 10 contre 0,022 s pour le min-heap de taille k — 2,4×, pas un ordre de grandeur, et certainement pas O(n log n). Les « n − k retraits en O(n log n) », ce sont ceux d'un **min**-heap de tous les n : 0,628 s, 29×, 293 204 comparaisons contre 20 329. Le spec et la sheet disent maintenant que le piège est la **taille** du tas (n au lieu de k), et séparent les deux variantes chiffrées. **À confirmer** : est-ce bien cette confusion-là qu'il fallait viser, ou le spec pensait-il uniquement au min-heap drainé ?
 - **Le bucket ne bat le heap que sur le papier quand les clés distinctes sont rares.** Mesuré sur n = 10⁶, k = 3 plus fréquents : avec **50** valeurs distinctes le bucket est **100× plus lent** (2,9 ms contre 0,03 ms), parce qu'allouer le tableau de listes coûte O(n) alors que le tas ne voit que m = 50 items. Avec 50 000 et 600 000 distinctes il repasse devant, mais de **1,24×** seulement. La sheet dit « asymptotiquement O(n), et en pratique 1,24× » plutôt que « bat tout log » ; l'affirmation du spec (« un tableau de listes bat tout log ») est vraie en complexité, trompeuse en constante. **À confirmer** : garder cette nuance chiffrée, ou la couper pour ne pas brouiller le message du contre-signal ?
 - **Nombre de comparaisons vs borne.** Le O(n log k) est une borne très lâche : à n = 20 000, k = 10, le min-heap de taille k fait **20 329** comparaisons dont **19 990** sont le seul test de seuil `v > h[0]`, pour **84** remplacements — soit **30 %** de n log₂ k. La sheet s'en sert pour dire que le log ne se paie que sur les remplacements, et que le tas est surtout un **filtre en O(1)**. Rien de faux dans le spec ici, c'est un ajout.
@@ -86,3 +86,12 @@ sur les trois points ci-dessus. La sheet reste donc **en l'état** — piège re
 **taille** du tas, nuance chiffrée du bucket (100× plus lent à 50 distinctes, 1,24× plus
 rapide quand les distinctes abondent) conservée, et la lecture « le tas est surtout un
 filtre en O(1) » conservée. À reprendre à la prochaine revue si l'un des trois te gêne.
+
+**Arbitrage de revue 8, 18/09 — validé 18/09.** La **confusion visée est nommée** :
+« pour les *k* plus grands, un **max-heap**, et je retire **n − k** fois » —
+O(*n* log *n*), et la même réponse au bout. Le pas 7 la cite désormais telle quelle,
+en tête du « Où ça casse », et dit ce qu'elle mêle : un max-heap des *n* ne demande
+que *k* retraits, les *n* − *k* retraits sont ceux du **min**-heap des *n*. Le reste du
+pas est **gardé tel quel** — recentrage sur la **taille** du tas compris. La **nuance
+chiffrée du bucket est gardée** : 100× plus lent à 50 valeurs distinctes, 1,24× plus
+rapide quand les distinctes abondent. Statut `reviewed`.

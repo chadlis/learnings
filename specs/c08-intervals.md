@@ -41,6 +41,7 @@ intervals = [[1,3],[2,6],[8,10],[9,12],[15,18]] (déjà triés) : merged = [[1,3
 - **Insérer un intervalle** (LC 57) : trois phases : avant (fin < nouveau.début), chevauchement (fusion en un seul), après.
 - **Salles de réunion** (LC 253) : trier les débuts et les fins séparément, deux pointeurs ; ou min-heap des fins (c07) ; le maximum de réunions simultanées.
 - **Intervalles non chevauchants à retirer** (LC 435) : trier par **fin**, glouton : garder celui qui finit le plus tôt.
+  Contre-exemple du fil rouge, qui **sépare les deux tris** (revue 8) : `[[1,100],[2,3],[4,5]]` — trié par **début** le glouton garde `[1,100]` et retire **2** ; trié par **fin** il garde `[2,3]` et `[4,5]` et n'en retire qu'**1**, l'optimum. C'est le plus petit cas où le tri change la réponse ; le fil rouge de la fusion, lui, ne les distingue pas.
 - **Balayage d'événements** : +1 à chaque début, −1 à chaque fin, trier les événements (fin avant début à égalité), le maximum du compteur.
 
 ## Figures exigées
@@ -75,7 +76,7 @@ Sans tri, ou trié par fin pour la fusion : un intervalle peut chevaucher un fus
 
 ## Questions pour la revue
 
-*Revue 7, 17/09 — **validé 17/09** pour `[4,9]` (LC 57) et la nuance sur le tri ; **non tranché** pour le fil rouge à deux tris. Arbitrage en fin de fiche.*
+*Revue 7, 17/09 — **validé 17/09** pour `[4,9]` (LC 57) et la nuance sur le tri. Le fil rouge à deux tris est repris en **revue 8, 18/09 — validé 18/09**. Arbitrage en fin de fiche.*
 - **Aucun chiffre du spec n'était faux** : la trace de la figure 1, le max de 2 salles
   de LC 253 et la conclusion `[[1,6],[8,12],[15,18]]` sont tous vérifiés par script
   (dont 200 000 tirages croisés fusion / union point par point, 0 désaccord, et
@@ -100,3 +101,14 @@ comparaisons) et à peine en pratique (1,20 s contre 0,81 s à n = 10⁶, `sorte
 contre une boucle Python) ne brouille pas le message asymptotique, ça le date.
 Non tranché en revue 7 : le fil rouge ne distingue toujours pas les deux tris, et le
 « Où ça casse » garde son exemple propre `[[1,10],[2,3],[4,5]]`.
+
+**Arbitrage de revue 8, 18/09 — validé 18/09.** Le fil rouge de la fusion ne
+distinguant pas les deux tris, **LC 435 reçoit son propre contre-exemple** :
+`[[1,100],[2,3],[4,5]]` → par début 2 retraits, par fin 1 — reporté ci-dessus dans
+« Les variantes ». Il **remplace** `[[1,100],[2,3],[4,5],[6,7]]`, que la sheet portait
+depuis sa production : même forme, un petit intervalle de plus, donc deux
+contre-exemples pour un seul enseignement. Le plus petit des deux fait foi. Ajouté et
+vérifié par force brute sur 50 000 tirages : le glouton par **fin** est faux **0** fois,
+celui par **début** **6 182** fois (12,4 %). **Pas d'image de plus** : la figure 2 est le
+compteur d'événements de LC 253, une image LC 435 y mêlerait deux problèmes. Statut
+`reviewed`.
