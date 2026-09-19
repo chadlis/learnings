@@ -171,15 +171,22 @@ def site_files():
 def update_service_worker():
     sw = f'{ROOT}/sw.js'
     if not os.path.exists(sw): return
-    h = hashlib.sha256()
-    for f in site_files():
-        h.update(os.path.relpath(f, ROOT).replace(os.sep, '/').encode())
-        h.update(open(f, 'rb').read())
-    fp = h.hexdigest()[:16]
     t = open(sw, encoding='utf-8').read()
     m = re.search(r"const CACHE = 'sheets-v(\d+)-([0-9a-f]+)';", t)
     if not m:
         print("  ! sw.js : ligne 'const CACHE' introuvable"); return
+    h = hashlib.sha256()
+    for f in site_files():
+        h.update(os.path.relpath(f, ROOT).replace(os.sep, '/').encode())
+        h.update(open(f, 'rb').read())
+    # La logique du service worker compte dans l'empreinte : corriger sw.js doit
+    # purger les caches déjà posés, sinon la correction n'atteint jamais le
+    # navigateur qui garde l'ancienne entrée. Sa propre ligne `const CACHE` est
+    # retirée du calcul — sans quoi l'empreinte dépendrait d'elle-même et
+    # `make index` ne serait plus idempotent.
+    h.update(b'sw.js')
+    h.update((t[:m.start()] + t[m.end():]).encode())
+    fp = h.hexdigest()[:16]
     if m.group(2) == fp: return
     v = int(m.group(1)) + 1
     open(sw, 'w', encoding='utf-8').write(t[:m.start()] + f"const CACHE = 'sheets-v{v}-{fp}';" + t[m.end():])
