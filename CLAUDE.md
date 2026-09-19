@@ -83,6 +83,45 @@ uniformiser. Le premier déroulé v5 est D5 (`walkthrough-p01-05`).
 7. **`make index`**, puis les vérifications ci-dessous, puis commit et push.
 8. **Vider `inbox/`** : le fichier d'origine a été déplacé, pas copié.
 
+## Réviser une sheet publiée
+
+Une sheet publiée ne se réécrit pas, elle reçoit un **delta**. La procédure
+ci-dessous est celle qui a tourné le 18/09/2026 sur cinq sheets ; elle est ici
+pour que le dépôt n'en dépende plus d'un prompt de chat.
+
+1. **Le delta s'écrit dans le chat, jamais ici.** Il arrive rédigé et se colle
+   **tel quel** en fin de `specs/<id>-*.md`, sous un titre
+   `## Révision vN (JJ/MM/AAAA)`, après `## Questions pour la revue`. Claude Code
+   ne rédige jamais ce contenu — même règle que pour le corps d'un spec
+   (`specs/README.md`). Un chiffre du delta qui se révèle faux à la vérification
+   se corrige dans le spec **et** se note sous `## Questions pour la revue`.
+2. **Statut `reviewed` ou `built` → `ready`**, puis `/sheet <id>`.
+3. **Mode mise à jour** = un fichier existe déjà au chemin déduit du spec. Le
+   **lire d'abord**, puis n'écrire que le delta : aucun pas existant n'est
+   reformulé ni réorganisé, le CSS et le JS commun restent ceux du gold standard,
+   intacts.
+4. **Un pas inséré est renuméroté dans la suite `s1`…`sN`**, jamais suffixé en
+   `s4b` — le numéro affiché vient d'un compteur CSS, et le validateur refuse une
+   suite non consécutive. Renuméroter impose de reprendre **tous** les liens
+   entrants, ancre *et* libellé « pas N » :
+
+   ```sh
+   grep -rn 'chain-<id>[^"]*#s' sheets/ specs/ anki/ map.html
+   ```
+
+   Puis `make anki`, qui régénère les ancres de `anki/ancres.csv`.
+5. **Bump de version, aux trois endroits** : `<title>` suffixé « · vN », meta
+   `sheet` en `status=vN`, footer « vN du JJ/MM/AAAA ». Le **nom de fichier ne
+   change jamais** — l'URL, les favoris et le cache hors ligne en dépendent.
+   L'index lit la version dans la meta, il n'y a rien à y écrire.
+6. **Vérifier** : `validate_sheet.py <chemin> --render` jusqu'à 0 FAIL, chaque
+   WARN lu, et les captures `sheets/_render/<nom>-{dark,light}.png` **regardées**
+   — chevauchement, débordement, figure vide, curseur sans effet. Puis
+   `make index` et `make links`.
+7. **Statut du spec → `built`**, un commit par sheet :
+   `feat(sheet): <id> révision vN — <trois mots>`, le corps disant ce que la
+   re-mesure a montré et ce que le delta adresse.
+
 ## Vérifier avant de commiter
 
 ```sh

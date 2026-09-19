@@ -9,7 +9,7 @@ Une sheet est une **chaîne d'enchaînements** que Salah relit de temps en temps
 
 ## Étape 0 — lire, toujours, dans cet ordre
 
-1. `specs/<id>-<slug>.md` — le spec. **Statut `ready` obligatoire.** `stub` ⇒ s'arrêter et le dire ; `built` ⇒ c'est une mise à jour, lire la sheet existante d'abord.
+1. `specs/<id>-<slug>.md` — le spec. **Statut `ready` obligatoire.** `stub` ⇒ s'arrêter et le dire ; **la sheet existe déjà** au chemin déduit ⇒ c'est une mise à jour, lire la sheet existante d'abord et suivre « Réviser une sheet publiée » dans `CLAUDE.md`.
 2. `sheets/chains/chain-p03-01-critere-escalier-vs-sensible.html` — le **gold standard**. Repartir de son CSS et de son JS commun tels quels.
 3. `.claude/skills/sheet-chain/template.html` — le squelette avec les placeholders `{{…}}`.
 4. `assets/sheetlib.js` — les primitives (`SL.plot`, `SL.slider`, `SL.repeat`, `SL.descent`, `SL.trace`, `SL.plane`, `SL.stepper`). Composer avec elles ; n'écrire du SVG custom que si aucune primitive ne convient, et alors à l'intérieur d'un `SL.plot` (`P.dyn`, `P.sx/sy`).
