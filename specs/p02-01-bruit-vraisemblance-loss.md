@@ -94,6 +94,9 @@ Pas de prior ici (p02-02). Pas de Huber au-delà du nom. Pas de KL (p08-03).
 - **Somme ou moyenne ?** — validé 16/09 La sheet écrit la cross-entropy en somme (−Σ log p_yᵢ), conformément au geste du MLE ; les frameworks moyennent par défaut. Faut-il le dire ici, ou est-ce le sujet d'une autre sheet ?
 - **`ml::regression-lineaire`** — validé 16/09 est repris tel quel du frontmatter ; vérifier que le tag existe bien sous cette forme dans Anki (les autres tags de la liste sont déjà utilisés par p01-03 et p03-01).
 
+- **Le 7e maillon verbalisé a demandé de relever une borne** — 19/09 Le delta du 18/09 ajoute un 7e maillon à la chaîne verbalisée, alors que `tools/validate_sheet.py` et `specs/README.md` bornaient à 4–6 (calibrage de première écriture, pas de sheet révisée). Borne portée à 4–7, et le résumé à ≤ 8, dans un commit d'outillage séparé. Aucun maillon existant n'a été retiré ni reformulé. À confirmer en revue.
+- **Chiffres du delta : tous vérifiés, aucun faux** — 19/09 Pour y = 0 : ∂log-loss/∂z = p et ∂MSE/∂z = 2p²(1 − p). z = 0 → 0,500 / 0,250, rapport 2 ; z = 2 → 0,8808 / 0,18496, rapport 4,76 ; z = 5 → 0,99331 / 0,013207, rapport 75,2 ; z = 10 → 0,999955 / 9,079·10⁻⁵, rapport 11 014. Le tableau et la légende du delta sont repris tels quels.
+
 ## Révision v2 (18/09/2026)
 
 ### Pas ajouté — « Le gradient, pas la valeur » [tronc]
