@@ -9,17 +9,38 @@ Remplace l'ancien build_index.py (index par deck Anki). Ne pas éditer index.htm
 import os, re, glob, html, datetime, hashlib
 
 ROOT = os.path.dirname(os.path.abspath(__file__)) + '/..'
+# (code, titre, couleur, phrase de tenue). La phrase est la chaîne du fil
+# compressée en une ligne : l'index la rend floutée, elle se révèle au tap.
+# Phrase vide ⇒ rien n'est rendu (les parties encore vides des phases 2 à 4).
 PARTS = [
-    ('00', '0 · Socle probabiliste', 'teal'), ('01', '1 · L\'objet aléatoire (fil A)', 'sky'),
-    ('02', '2 · Le bruit décide (fil B)', 'violet'), ('03', '3 · Critère et descente (fil C, optim)', 'yellow'),
-    ('04', '4 · Matrice = action', 'mint'), ('05', '5 · Modèles linéaires', 'sky'),
-    ('06', '6 · Évaluer', 'coral'), ('07', '7 · Arbres, ensembles, k-means', 'violet'),
-    ('08', '8 · Calcul, numérique, tenseurs', 'teal'), ('09', '9 · Coding', 'mint'),
-    ('B', 'Ponts', 'amber'),
-    ('10', 'Phase 2 · micrograd', 'faint'), ('11', 'Phase 2 · makemore', 'faint'), ('12', 'Phase 2 · transformer', 'faint'),
-    ('13', 'Phase 2 · tokenizer', 'faint'), ('14', 'Phase 2 · mech interp', 'faint'),
-    ('20', 'Phase 3 · evals', 'faint'), ('21', 'Phase 3 · fine-tuning', 'faint'), ('22', 'Phase 3 · inference', 'faint'),
-    ('30', 'Phase 4 · system design', 'faint'),
+    ('00', '0 · Socle probabiliste', 'teal',
+     "Une loi est une hypothèse sur le mécanisme ; une densité s'évalue, elle ne se lit pas."),
+    ('01', "1 · L'objet aléatoire (fil A)", 'sky',
+     "Qu'est-ce qui varierait si je refaisais l'expérience ? Le 95 % porte sur la procédure."),
+    ('02', '2 · Le bruit décide (fil B)', 'violet',
+     "Une loss est une hypothèse de bruit, une pénalité un prior, +λI translate le spectre."),
+    ('03', '3 · Critère et descente (fil C, optim)', 'yellow',
+     "Un critère n'apprend que là où sa pente n'est pas nulle : l'escalier ne voit rien dans une marche."),
+    ('04', '4 · Matrice = action', 'mint',
+     "Ax est un geste, pas un tableau : un étirement entre deux rotations, et les directions fixes gouvernent."),
+    ('05', '5 · Modèles linéaires', 'sky',
+     "Une hypothèse sur y sachant x : des carrés parce que gaussien, une log-cote parce que Bernoulli."),
+    ('06', '6 · Évaluer', 'coral',
+     "Le tirage est le dataset entier ; l'erreur se coupe en trois ; un seuil fait la décision."),
+    ('07', '7 · Arbres, ensembles, k-means', 'violet',
+     "Un arbre coupe où l'impureté baisse ; moyenner réduit la variance ; boosting ajuste le gradient de la loss."),
+    ('08', '8 · Calcul, numérique, tenseurs', 'teal',
+     "Une dérivée est une matrice, un tenseur un ruban de mémoire, CE = H + KL."),
+    ('09', '9 · Coding', 'mint',
+     "Signal → pattern → invariant → complexité ; jamais le code d'abord, toujours la preuve."),
+    ('B', 'Ponts', 'amber',
+     "Le même mécanisme dans plusieurs domaines : −η·gradient partout, biais-variance à sept échelles."),
+    ('10', 'Phase 2 · micrograd', 'faint', ''), ('11', 'Phase 2 · makemore', 'faint', ''),
+    ('12', 'Phase 2 · transformer', 'faint', ''), ('13', 'Phase 2 · tokenizer', 'faint', ''),
+    ('14', 'Phase 2 · mech interp', 'faint', ''),
+    ('20', 'Phase 3 · evals', 'faint', ''), ('21', 'Phase 3 · fine-tuning', 'faint', ''),
+    ('22', 'Phase 3 · inference', 'faint', ''),
+    ('30', 'Phase 4 · system design', 'faint', ''),
 ]
 DIR = {'chain': 'chains', 'walkthrough': 'walkthroughs', 'bridge': 'bridges', 'coding': 'coding'}
 LABEL = {'chain': 'chaîne', 'walkthrough': 'déroulé', 'bridge': 'pont', 'coding': 'coding'}
@@ -87,6 +108,16 @@ footer{margin-top:36px;color:var(--faint);font-size:13px;border-top:1.5px solid 
 .map text{font:12px "Avenir Next",Avenir,"Segoe UI",sans-serif;fill:var(--chalk)}.map .todo text{fill:var(--faint)}.map .part{font:600 11px sans-serif;letter-spacing:.08em;fill:var(--faint)}
 .map rect{fill:#1A2925;stroke:var(--ac,var(--yellow));stroke-width:1.5}.map .todo rect{stroke-dasharray:4 3;opacity:.6}.map .edge{fill:none;stroke:rgba(237,232,218,.35);stroke-width:1.2;marker-end:url(#ah)}.map .bridge rect{stroke:var(--amber)}
 """
+# Propre à index.html : la carte partage la constante CSS et n'a pas de phrase
+# de tenue — lui servir ces règles ferait bouger map.html pour rien.
+# Floutage repris des sheets (`.verb .a.hid`), repli sans flou si l'on demande
+# moins d'animation : un flou plein écran n'est pas confortable pour tout le monde.
+CSS_INDEX = """
+p.tenue{color:var(--muted);font-size:15px;line-height:1.45;margin:-2px 0 14px;max-width:72ch;cursor:pointer;user-select:none;-webkit-user-select:none}
+p.tenue.hid{filter:blur(6px)}
+@media(prefers-reduced-motion:reduce){p.tenue.hid{filter:none;opacity:.35}}
+"""
+
 # Bloc PWA : index.html et map.html sont à la racine, donc tous les chemins sont
 # nus. Le service worker ne s'enregistre que sur http(s) — en file:// l'API
 # n'existe pas, on ne tente rien et rien n'échoue.
@@ -104,14 +135,15 @@ PWA = ('<link rel="manifest" href="manifest.webmanifest">'
 today = datetime.date.today().strftime('%d/%m/%Y')
 
 # ---------- index.html
-out = [f'<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fiches — formation ML/LLM</title><style>{CSS}</style>{PWA}</head><body>',
+out = [f'<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fiches — formation ML/LLM</title><style>{CSS}{CSS_INDEX}</style>{PWA}</head><body>',
        '<h1>Formation ML/LLM — <span>fiches</span></h1>',
        '<p class="sub">Rangées par dépendance, pas par deck : chaque chaîne suppose les précédentes. Une chaîne = hypothèses → mécanisme → où ça casse → résumé ; un déroulé = la même chaîne sur des exemples chiffrés ; un pont = un mécanisme vu dans plusieurs domaines. Anki teste l\'atome ; ici on relit l\'enchaînement.</p>',
        '<div class="nav"><a href="map.html">Carte des prérequis</a> · <a href="timeline.html">Timeline</a></div>']
-for part, title, ac in PARTS:
+for part, title, ac, tenue in PARTS:
     items = [s for s in specs if s['part'] == part and not s['id'].endswith('-00')]
     if not items and part not in ('10','11','12','13','14','20','21','22','30'): continue
-    out.append(f'<div style="--ac:var(--{ac})"><h2>{html.escape(title)}</h2>')
+    say = f'<p class="tenue hid">{html.escape(tenue)}</p>' if tenue else ''
+    out.append(f'<div style="--ac:var(--{ac})"><h2>{html.escape(title)}</h2>{say}')
     if not items: out.append('<div class="it todo"><span class="k">·</span><span class="t">partie vide<small>la sheet du bloc arrive avec la revue du vendredi</small></span><span class="n">Phase à venir</span></div>')
     order = {'chain': 0, 'walkthrough': 1, 'bridge': 0, 'coding': 0}
     for s in sorted(items, key=lambda s: (order[s['series']], s['number'])): out.append(item(s))
@@ -123,7 +155,11 @@ if arch:
         t = re.search(r'<title>(.*?)</title>', open(a, encoding='utf-8').read()); t = html.unescape(t.group(1)) if t else os.path.basename(a)
         out.append(f'<a class="it" href="sheets/archive/{os.path.basename(a)}" style="opacity:.7"><span class="k">A</span><span class="t">{html.escape(t)}</span><span class="n">archive</span></a>')
     out.append('</div>')
-out.append(f'<footer>Un HTML par entrée, <code>assets/sheetlib.js</code> partagé, ouvrable hors ligne. Convention : <code>sheets/chains/chain-pPP-NN-&lt;slug&gt;.html</code> · <code>sheets/walkthroughs/walkthrough-pPP-NN-…</code> · <code>sheets/bridges/bridge-NN-…</code> · <code>sheets/coding/coding-NN-…</code> · <code>sheets/archive/</code>. Index et carte générés par <code>tools/build_index.py</code> le {today} — ne pas éditer à la main.</footer></body></html>')
+out.append(f'<footer>Un HTML par entrée, <code>assets/sheetlib.js</code> partagé, ouvrable hors ligne. Convention : <code>sheets/chains/chain-pPP-NN-&lt;slug&gt;.html</code> · <code>sheets/walkthroughs/walkthrough-pPP-NN-…</code> · <code>sheets/bridges/bridge-NN-…</code> · <code>sheets/coding/coding-NN-…</code> · <code>sheets/archive/</code>. Index et carte générés par <code>tools/build_index.py</code> le {today} — ne pas éditer à la main.</footer>'
+           '<script>document.addEventListener("click",function(e){'
+           'var t=e.target&&e.target.closest?e.target.closest(".tenue"):null;'
+           'if(t)t.classList.toggle("hid");});</script>'
+           '</body></html>')
 open(f'{ROOT}/index.html', 'w', encoding='utf-8').write('\n'.join(out))
 
 # ---------- map.html : colonnes = parties 0–9 + ponts ; arêtes = prereq
@@ -131,7 +167,7 @@ cols = [p for p in PARTS if p[0] in ('00','01','02','03','04','05','06','07','08
 colw, rowh, x0, y0, bw, bh = 200, 58, 20, 56, 182, 42
 pos = {}
 svg = []
-for ci, (part, title, ac) in enumerate(cols):
+for ci, (part, title, ac, _tenue) in enumerate(cols):
     items = [s for s in specs if s['part'] == part and s['series'] in ('chain', 'bridge', 'coding') and not s['id'].endswith('-00')]
     items.sort(key=lambda s: s['number'])
     x = x0 + ci * colw
