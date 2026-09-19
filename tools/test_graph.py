@@ -11,6 +11,7 @@ Ce que la carte promet, et que rien d'autre ne vérifie :
 - map.html liste chaque nœud une fois, et le total des « ← suppose » égale len(R).
 """
 import os, re, sys
+sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_index as b
 
@@ -45,7 +46,14 @@ sup = sum(len(re.findall(r'<a ', m)) for m in re.findall(r'<div class="dep pre">
 check(sup == len(R), f'{sup} liens « ← suppose » pour {len(R)} arêtes de R')
 post = sum(len(re.findall(r'<a ', m)) for m in re.findall(r'<div class="dep post">(.*?)</div>', body))
 check(post == len(R), f'{post} liens « → débloque » pour {len(R)} arêtes de R')
-check(len(re.findall(r'<g data-id="', body)) == len(ids), 'le dessin n\'a pas un <g> par nœud')
+gs = dict(re.findall(r'<g class="node[^"]*" data-id="([^"]+)"([^>]*)>', body))
+check(sorted(gs) == sorted(ids), 'le dessin n\'a pas un <g> par nœud')
+for i, attrs in gs.items():
+    up = re.search(r'data-up="([^"]*)"', attrs).group(1).split()
+    down = re.search(r'data-down="([^"]*)"', attrs).group(1).split()
+    check(up == g['up_t'][i] and down == g['down_t'][i], f'data-up/data-down de {i} ne suivent pas le graphe')
+drawn = re.findall(r'<path class="edge" data-from="([^"]+)" data-to="([^"]+)"', body)
+check(sorted(drawn) == R, f'{len(drawn)} arêtes tracées pour {len(R)} dans R')
 
 for f in fails: print('FAIL', f)
 print(f'graphe : {len(ids)} nœuds, {len(E)} arêtes, {len(R)} après réduction ({len(E) - len(R)} retirées) · '

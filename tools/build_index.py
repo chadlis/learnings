@@ -140,7 +140,28 @@ ol.hubs .k{font-family:Georgia,serif;color:var(--yellow)}ol.hubs a{text-decorati
 .node:target{outline:2px solid var(--ac,var(--yellow));outline-offset:2px}
 details.draw{margin-top:36px}details.draw summary{cursor:pointer;color:var(--muted);font-size:14px}
 @media(min-width:900px){details.draw{width:min(1500px,calc(100vw - 2*clamp(14px,4vw,48px)));position:relative;left:50%;transform:translateX(-50%)}}
+.map .edge{stroke:var(--ac)}.map g.node{cursor:pointer;outline:none}.map g.node:focus-visible rect{stroke-width:2}
+.map svg.focus g.node:not(.on),.map svg.focus .edge:not(.on){opacity:.15}.map svg.focus g.node.me rect{stroke-width:2;filter:drop-shadow(0 0 4px var(--ac))}
+p.help{color:var(--faint);font-size:13px;margin-top:10px}
 """
+# Focus au tap dans le dessin : amont et aval transitifs viennent de data-up /
+# data-down, calculés en Python ; le JS ne fait que montrer et cacher.
+MAP_JS = """<script>(function(){
+var svg=document.querySelector('.map svg');if(!svg)return;
+var nodes=svg.querySelectorAll('g.node'),edges=svg.querySelectorAll('.edge'),cur=null;
+function reset(){cur=null;svg.classList.remove('focus');
+  nodes.forEach(function(n){n.classList.remove('on','me');});edges.forEach(function(e){e.classList.remove('on');});}
+function focus(g){cur=g;var keep={};
+  [g.dataset.id].concat(g.dataset.up.split(' '),g.dataset.down.split(' ')).forEach(function(i){if(i)keep[i]=1;});
+  svg.classList.add('focus');
+  nodes.forEach(function(n){n.classList.toggle('on',!!keep[n.dataset.id]);n.classList.toggle('me',n===g);});
+  edges.forEach(function(e){e.classList.toggle('on',!!(keep[e.dataset.from]&&keep[e.dataset.to]));});}
+function tap(g){if(g===cur){if(g.dataset.href)location.href=g.dataset.href;return;}focus(g);}
+svg.addEventListener('click',function(e){var g=e.target.closest('g.node');if(g)tap(g);else reset();});
+svg.addEventListener('keydown',function(e){var g=e.target.closest('g.node');
+  if(g&&(e.key==='Enter'||e.key===' ')){e.preventDefault();tap(g);}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')reset();});
+})();</script>"""
 
 # Bloc PWA : index.html et map.html sont à la racine, donc tous les chemins sont
 # nus. Le service worker ne s'enregistre que sur http(s) — en file:// l'API
@@ -282,30 +303,38 @@ def build_map(specs, g, today):
             if g['down'][i]: card += f'<div class="dep post"><b>→ débloque</b> {", ".join(ref(byid[n]) for n in g["down"][i])}</div>'
             out.append(card + '</div>')
         out.append('</div>')
-    # Le dessin : colonnes = parties 0–9 + ponts, ligne = numéro ; arêtes = prereq (colonne source ≤ colonne cible).
+    # Le dessin : colonnes = parties 0–9 + ponts, ligne = numéro (jamais réordonné).
+    # Seules les arêtes de R sont tracées, à la couleur de la partie source,
+    # plus pâles quand elles sautent des colonnes ; les longues passent dessous.
     colw, rowh, x0, y0, bw, bh = 200, 58, 20, 56, 182, 42
-    pos, svg = {}, []
+    pos, col, acc, svg = {}, {}, {}, []
     for ci, (part, title, ac, _tenue) in enumerate(cols):
         items = sorted((s for s in g['nodes'] if s['part'] == part), key=lambda s: s['number'])
         x = x0 + ci * colw
         svg.append(f'<text class="part" x="{x}" y="{y0 - 22}">{html.escape(title.split("·")[0].strip() if part != "B" else "PONTS")}</text>')
         for ri, s in enumerate(items):
-            y = y0 + ri * rowh; pos[s['id']] = (x, y)
-            cls = ('' if s['exists'] else 'todo ') + ('bridge' if s['series'] == 'bridge' else '')
-            label = s['title'][:27] + ('…' if len(s['title']) > 27 else '')
-            node = f'<g data-id="{s["id"]}" class="{cls}" style="--ac:var(--{ac})"><rect x="{x}" y="{y}" width="{bw}" height="{bh}" rx="3"/><text x="{x + 8}" y="{y + 16}" style="font-weight:600">{html.escape(s["id"])}</text><text x="{x + 8}" y="{y + 32}" style="font-size:11.5px">{html.escape(label)}</text></g>'
-            svg.append(f'<a href="{s["href"]}">{node}</a>' if s['exists'] else node)
+            i = s['id']; y = y0 + ri * rowh; pos[i] = (x, y); col[i] = ci; acc[i] = ac
+            cls = 'node' + ('' if s['exists'] else ' todo') + (' bridge' if s['series'] == 'bridge' else '')
+            href = f' data-href="{s["href"]}"' if s['exists'] else ''
+            svg.append(f'<g class="{cls}" data-id="{i}"{href} data-up="{" ".join(g["up_t"][i])}" data-down="{" ".join(g["down_t"][i])}" tabindex="0" style="--ac:var(--{ac})">'
+                       f'<rect x="{x}" y="{y}" width="{bw}" height="{bh}" rx="3"/><text x="{x + 8}" y="{y + 16}" style="font-weight:600">{html.escape(i)}</text>'
+                       f'<text x="{x + 8}" y="{y + 32}" style="font-size:11.5px">{html.escape(short_title(s["title"], 27) if len(s["title"]) > 27 else s["title"])}</text></g>')
     edges = []
-    for a, b in g['E']:
-        if pos[a][0] <= pos[b][0]:
-            (xa, ya), (xb, yb) = pos[a], pos[b]
-            edges.append(f'<path class="edge" d="M{xa + bw} {ya + bh / 2} C{xa + bw + 40} {ya + bh / 2},{xb - 40} {yb + bh / 2},{xb} {yb + bh / 2}"/>')
+    for a, b in sorted(g['R'], key=lambda e: -abs(col[e[0]] - col[e[1]])):
+        (xa, ya), (xb, yb) = pos[a], pos[b]
+        ya, yb = ya + bh / 2, yb + bh / 2
+        if xa <= xb: d = f'M{xa + bw} {ya} C{xa + bw + 40} {ya},{xb - 40} {yb},{xb} {yb}'
+        else: d = f'M{xa} {ya} C{xa - 40} {ya},{xb + bw + 40} {yb},{xb + bw} {yb}'  # arête vers la gauche
+        op = '.6' if abs(col[a] - col[b]) <= 1 else '.3'
+        edges.append(f'<path class="edge" data-from="{a}" data-to="{b}" stroke-opacity="{op}" style="--ac:var(--{acc[a]})" d="{d}"/>')
     H = y0 + rowh * max([len([s for s in g['nodes'] if s['part'] == p[0]]) for p in cols] + [1]) + 30
     W = x0 + colw * len(cols)
     out += ['<details class="draw"><summary>Voir le dessin (grand écran)</summary>',
             f'<div class="map"><svg viewBox="0 0 {W} {H}" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="rgba(237,232,218,.5)"/></marker></defs>',
-            *edges, *svg, '</svg></div></details>',
-            f'<footer>Générée par <code>tools/build_index.py</code> le {today}. Les ancres <code>#pNN-MM</code> de cette page sont les cibles des liens « prérequis » des sheets.</footer></body></html>']
+            *edges, *svg, '</svg></div>',
+            '<p class="help">Tape une chaîne : son amont et son aval restent, le reste s\'efface. Tape-la encore pour l\'ouvrir.</p></details>',
+            f'<footer>Générée par <code>tools/build_index.py</code> le {today}. Les ancres <code>#pNN-MM</code> de cette page sont les cibles des liens « prérequis » des sheets.</footer>',
+            MAP_JS, '</body></html>']
     open(f'{ROOT}/map.html', 'w', encoding='utf-8').write('\n'.join(out))
     return len(edges)
 

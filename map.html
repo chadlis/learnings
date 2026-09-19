@@ -23,6 +23,9 @@ ol.hubs .k{font-family:Georgia,serif;color:var(--yellow)}ol.hubs a{text-decorati
 .node:target{outline:2px solid var(--ac,var(--yellow));outline-offset:2px}
 details.draw{margin-top:36px}details.draw summary{cursor:pointer;color:var(--muted);font-size:14px}
 @media(min-width:900px){details.draw{width:min(1500px,calc(100vw - 2*clamp(14px,4vw,48px)));position:relative;left:50%;transform:translateX(-50%)}}
+.map .edge{stroke:var(--ac)}.map g.node{cursor:pointer;outline:none}.map g.node:focus-visible rect{stroke-width:2}
+.map svg.focus g.node:not(.on),.map svg.focus .edge:not(.on){opacity:.15}.map svg.focus g.node.me rect{stroke-width:2;filter:drop-shadow(0 0 4px var(--ac))}
+p.help{color:var(--faint);font-size:13px;margin-top:10px}
 </style><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/svg+xml" href="icone-fiches.svg"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="theme-color" content="#20312C"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Fiches"><script>if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(){});});}</script></head><body>
 <h1>Carte des <span>prérequis</span></h1>
 <p class="sub">Chaque chaîne dit ce qu'elle suppose et ce qu'elle débloque — prérequis directs seulement : ce qu'une chaîne suppose déjà à travers une autre n'est pas répété. Grisé = pas encore écrit. Le dessin complet est replié en bas, pour grand écran.</p>
@@ -111,166 +114,156 @@ details.draw{margin-top:36px}details.draw summary{cursor:pointer;color:var(--mut
 </div>
 <details class="draw"><summary>Voir le dessin (grand écran)</summary>
 <div class="map"><svg viewBox="0 0 2220 724" xmlns="http://www.w3.org/2000/svg"><defs><marker id="ah" viewBox="0 0 10 10" refX="9" refY="5" markerWidth="6" markerHeight="6" orient="auto"><path d="M0 0L10 5L0 10z" fill="rgba(237,232,218,.5)"/></marker></defs>
-<path class="edge" d="M2002 77.0 C2042 77.0,1780 135.0,1820 135.0"/>
-<path class="edge" d="M2002 77.0 C2042 77.0,1780 193.0,1820 193.0"/>
-<path class="edge" d="M2002 77.0 C2042 77.0,1780 251.0,1820 251.0"/>
-<path class="edge" d="M2002 77.0 C2042 77.0,1780 309.0,1820 309.0"/>
-<path class="edge" d="M2002 77.0 C2042 77.0,1780 367.0,1820 367.0"/>
-<path class="edge" d="M2002 77.0 C2042 77.0,1780 425.0,1820 425.0"/>
-<path class="edge" d="M2002 77.0 C2042 77.0,1780 483.0,1820 483.0"/>
-<path class="edge" d="M2002 77.0 C2042 77.0,1780 541.0,1820 541.0"/>
-<path class="edge" d="M2002 77.0 C2042 77.0,1780 599.0,1820 599.0"/>
-<path class="edge" d="M2002 77.0 C2042 77.0,1780 657.0,1820 657.0"/>
-<path class="edge" d="M2002 135.0 C2042 135.0,1780 657.0,1820 657.0"/>
-<path class="edge" d="M202 77.0 C242 77.0,-20 135.0,20 135.0"/>
-<path class="edge" d="M202 77.0 C242 77.0,-20 251.0,20 251.0"/>
-<path class="edge" d="M202 135.0 C242 135.0,1980 251.0,2020 251.0"/>
-<path class="edge" d="M202 135.0 C242 135.0,-20 193.0,20 193.0"/>
-<path class="edge" d="M202 135.0 C242 135.0,-20 251.0,20 251.0"/>
-<path class="edge" d="M202 135.0 C242 135.0,180 77.0,220 77.0"/>
-<path class="edge" d="M202 135.0 C242 135.0,380 77.0,420 77.0"/>
-<path class="edge" d="M202 135.0 C242 135.0,780 251.0,820 251.0"/>
-<path class="edge" d="M202 135.0 C242 135.0,980 77.0,1020 77.0"/>
-<path class="edge" d="M202 135.0 C242 135.0,1180 77.0,1220 77.0"/>
-<path class="edge" d="M202 135.0 C242 135.0,1380 135.0,1420 135.0"/>
-<path class="edge" d="M202 135.0 C242 135.0,1380 251.0,1420 251.0"/>
-<path class="edge" d="M202 193.0 C242 193.0,380 77.0,420 77.0"/>
-<path class="edge" d="M202 193.0 C242 193.0,380 193.0,420 193.0"/>
-<path class="edge" d="M202 193.0 C242 193.0,1180 193.0,1220 193.0"/>
-<path class="edge" d="M202 193.0 C242 193.0,1180 251.0,1220 251.0"/>
-<path class="edge" d="M202 193.0 C242 193.0,1380 77.0,1420 77.0"/>
-<path class="edge" d="M202 251.0 C242 251.0,1980 251.0,2020 251.0"/>
-<path class="edge" d="M202 251.0 C242 251.0,180 77.0,220 77.0"/>
-<path class="edge" d="M202 251.0 C242 251.0,580 77.0,620 77.0"/>
-<path class="edge" d="M402 77.0 C442 77.0,1980 193.0,2020 193.0"/>
-<path class="edge" d="M402 77.0 C442 77.0,180 135.0,220 135.0"/>
-<path class="edge" d="M402 77.0 C442 77.0,180 193.0,220 193.0"/>
-<path class="edge" d="M402 77.0 C442 77.0,180 251.0,220 251.0"/>
-<path class="edge" d="M402 77.0 C442 77.0,180 309.0,220 309.0"/>
-<path class="edge" d="M402 77.0 C442 77.0,1180 77.0,1220 77.0"/>
-<path class="edge" d="M402 77.0 C442 77.0,1180 193.0,1220 193.0"/>
-<path class="edge" d="M402 135.0 C442 135.0,180 193.0,220 193.0"/>
-<path class="edge" d="M402 135.0 C442 135.0,180 251.0,220 251.0"/>
-<path class="edge" d="M402 251.0 C442 251.0,1980 135.0,2020 135.0"/>
-<path class="edge" d="M402 251.0 C442 251.0,1180 135.0,1220 135.0"/>
-<path class="edge" d="M402 309.0 C442 309.0,1980 251.0,2020 251.0"/>
-<path class="edge" d="M402 309.0 C442 309.0,1180 135.0,1220 135.0"/>
-<path class="edge" d="M402 309.0 C442 309.0,1380 135.0,1420 135.0"/>
-<path class="edge" d="M602 77.0 C642 77.0,380 135.0,420 135.0"/>
-<path class="edge" d="M602 77.0 C642 77.0,380 193.0,420 193.0"/>
-<path class="edge" d="M602 77.0 C642 77.0,580 77.0,620 77.0"/>
-<path class="edge" d="M602 77.0 C642 77.0,980 77.0,1020 77.0"/>
-<path class="edge" d="M602 77.0 C642 77.0,980 135.0,1020 135.0"/>
-<path class="edge" d="M602 77.0 C642 77.0,1180 251.0,1220 251.0"/>
-<path class="edge" d="M602 77.0 C642 77.0,1380 193.0,1420 193.0"/>
-<path class="edge" d="M602 77.0 C642 77.0,1580 193.0,1620 193.0"/>
-<path class="edge" d="M602 135.0 C642 135.0,1980 367.0,2020 367.0"/>
-<path class="edge" d="M602 135.0 C642 135.0,380 193.0,420 193.0"/>
-<path class="edge" d="M602 135.0 C642 135.0,980 193.0,1020 193.0"/>
-<path class="edge" d="M602 193.0 C642 193.0,1980 193.0,2020 193.0"/>
-<path class="edge" d="M802 77.0 C842 77.0,1980 309.0,2020 309.0"/>
-<path class="edge" d="M802 77.0 C842 77.0,980 135.0,1020 135.0"/>
-<path class="edge" d="M802 77.0 C842 77.0,980 193.0,1020 193.0"/>
-<path class="edge" d="M802 77.0 C842 77.0,1380 77.0,1420 77.0"/>
-<path class="edge" d="M802 77.0 C842 77.0,1380 193.0,1420 193.0"/>
-<path class="edge" d="M802 135.0 C842 135.0,1980 77.0,2020 77.0"/>
-<path class="edge" d="M802 135.0 C842 135.0,1980 367.0,2020 367.0"/>
-<path class="edge" d="M802 135.0 C842 135.0,580 77.0,620 77.0"/>
-<path class="edge" d="M802 135.0 C842 135.0,980 135.0,1020 135.0"/>
-<path class="edge" d="M802 135.0 C842 135.0,1380 193.0,1420 193.0"/>
-<path class="edge" d="M802 135.0 C842 135.0,1380 251.0,1420 251.0"/>
-<path class="edge" d="M802 135.0 C842 135.0,1580 77.0,1620 77.0"/>
-<path class="edge" d="M1002 77.0 C1042 77.0,1980 135.0,2020 135.0"/>
-<path class="edge" d="M1002 77.0 C1042 77.0,780 135.0,820 135.0"/>
-<path class="edge" d="M1002 77.0 C1042 77.0,980 77.0,1020 77.0"/>
-<path class="edge" d="M1002 77.0 C1042 77.0,1580 77.0,1620 77.0"/>
-<path class="edge" d="M1002 135.0 C1042 135.0,780 193.0,820 193.0"/>
-<path class="edge" d="M1002 193.0 C1042 193.0,1980 367.0,2020 367.0"/>
-<path class="edge" d="M1002 193.0 C1042 193.0,780 251.0,820 251.0"/>
-<path class="edge" d="M1002 251.0 C1042 251.0,1380 251.0,1420 251.0"/>
-<path class="edge" d="M1202 77.0 C1242 77.0,1980 135.0,2020 135.0"/>
-<path class="edge" d="M1202 77.0 C1242 77.0,1980 367.0,2020 367.0"/>
-<path class="edge" d="M1202 77.0 C1242 77.0,980 135.0,1020 135.0"/>
-<path class="edge" d="M1202 135.0 C1242 135.0,1980 367.0,2020 367.0"/>
-<path class="edge" d="M1202 193.0 C1242 193.0,1980 193.0,2020 193.0"/>
-<path class="edge" d="M1402 77.0 C1442 77.0,1980 193.0,2020 193.0"/>
-<path class="edge" d="M1402 77.0 C1442 77.0,1180 135.0,1220 135.0"/>
-<path class="edge" d="M1402 77.0 C1442 77.0,1380 77.0,1420 77.0"/>
-<path class="edge" d="M1402 77.0 C1442 77.0,1380 135.0,1420 135.0"/>
-<path class="edge" d="M1402 135.0 C1442 135.0,1980 193.0,2020 193.0"/>
-<path class="edge" d="M1402 135.0 C1442 135.0,1980 251.0,2020 251.0"/>
-<path class="edge" d="M1402 193.0 C1442 193.0,1180 251.0,1220 251.0"/>
-<path class="edge" d="M1602 77.0 C1642 77.0,1380 135.0,1420 135.0"/>
-<path class="edge" d="M1602 77.0 C1642 77.0,1380 193.0,1420 193.0"/>
-<path class="edge" d="M1602 135.0 C1642 135.0,1980 135.0,2020 135.0"/>
-<path class="edge" d="M1602 135.0 C1642 135.0,1980 193.0,2020 193.0"/>
-<path class="edge" d="M1602 135.0 C1642 135.0,1980 251.0,2020 251.0"/>
-<path class="edge" d="M1602 193.0 C1642 193.0,1980 77.0,2020 77.0"/>
-<path class="edge" d="M1602 251.0 C1642 251.0,1980 77.0,2020 77.0"/>
-<path class="edge" d="M1602 251.0 C1642 251.0,1980 367.0,2020 367.0"/>
-<path class="edge" d="M1802 77.0 C1842 77.0,1980 77.0,2020 77.0"/>
-<path class="edge" d="M1802 135.0 C1842 135.0,1580 193.0,1620 193.0"/>
-<path class="edge" d="M1802 135.0 C1842 135.0,1580 251.0,1620 251.0"/>
+<path class="edge" data-from="p01-04" data-to="b02" stroke-opacity=".3" style="--ac:var(--sky)" d="M402 251.0 C442 251.0,1980 135.0,2020 135.0"/>
+<path class="edge" data-from="p02-02" data-to="b06" stroke-opacity=".3" style="--ac:var(--violet)" d="M602 135.0 C642 135.0,1980 367.0,2020 367.0"/>
+<path class="edge" data-from="p02-03" data-to="b03" stroke-opacity=".3" style="--ac:var(--violet)" d="M602 193.0 C642 193.0,1980 193.0,2020 193.0"/>
+<path class="edge" data-from="p03-01" data-to="b05" stroke-opacity=".3" style="--ac:var(--yellow)" d="M802 77.0 C842 77.0,1980 309.0,2020 309.0"/>
+<path class="edge" data-from="p00-03" data-to="p06-03" stroke-opacity=".3" style="--ac:var(--teal)" d="M202 193.0 C242 193.0,1180 193.0,1220 193.0"/>
+<path class="edge" data-from="p01-05" data-to="p07-02" stroke-opacity=".3" style="--ac:var(--sky)" d="M402 309.0 C442 309.0,1380 135.0,1420 135.0"/>
+<path class="edge" data-from="p02-01" data-to="p08-03" stroke-opacity=".3" style="--ac:var(--violet)" d="M602 77.0 C642 77.0,1580 193.0,1620 193.0"/>
+<path class="edge" data-from="p01-01" data-to="p06-01" stroke-opacity=".3" style="--ac:var(--sky)" d="M402 77.0 C442 77.0,1180 77.0,1220 77.0"/>
+<path class="edge" data-from="p01-01" data-to="p06-03" stroke-opacity=".3" style="--ac:var(--sky)" d="M402 77.0 C442 77.0,1180 193.0,1220 193.0"/>
+<path class="edge" data-from="p01-04" data-to="p06-02" stroke-opacity=".3" style="--ac:var(--sky)" d="M402 251.0 C442 251.0,1180 135.0,1220 135.0"/>
+<path class="edge" data-from="p01-05" data-to="p06-02" stroke-opacity=".3" style="--ac:var(--sky)" d="M402 309.0 C442 309.0,1180 135.0,1220 135.0"/>
+<path class="edge" data-from="p03-02" data-to="p08-01" stroke-opacity=".3" style="--ac:var(--yellow)" d="M802 135.0 C842 135.0,1580 77.0,1620 77.0"/>
+<path class="edge" data-from="p05-01" data-to="b02" stroke-opacity=".3" style="--ac:var(--sky)" d="M1202 77.0 C1242 77.0,1980 135.0,2020 135.0"/>
+<path class="edge" data-from="p05-02" data-to="b06" stroke-opacity=".3" style="--ac:var(--sky)" d="M1202 135.0 C1242 135.0,1980 367.0,2020 367.0"/>
+<path class="edge" data-from="p05-03" data-to="b03" stroke-opacity=".3" style="--ac:var(--sky)" d="M1202 193.0 C1242 193.0,1980 193.0,2020 193.0"/>
+<path class="edge" data-from="p08-01" data-to="p03-02" stroke-opacity=".3" style="--ac:var(--teal)" d="M1620 77.0 C1580 77.0,842 135.0,802 135.0"/>
+<path class="edge" data-from="p00-02" data-to="p04-04" stroke-opacity=".3" style="--ac:var(--teal)" d="M202 135.0 C242 135.0,780 251.0,820 251.0"/>
+<path class="edge" data-from="p02-01" data-to="p06-04" stroke-opacity=".3" style="--ac:var(--violet)" d="M602 77.0 C642 77.0,1180 251.0,1220 251.0"/>
+<path class="edge" data-from="p03-01" data-to="p07-01" stroke-opacity=".3" style="--ac:var(--yellow)" d="M802 77.0 C842 77.0,1380 77.0,1420 77.0"/>
+<path class="edge" data-from="p03-02" data-to="p07-04" stroke-opacity=".3" style="--ac:var(--yellow)" d="M802 135.0 C842 135.0,1380 251.0,1420 251.0"/>
+<path class="edge" data-from="p05-01" data-to="p01-03" stroke-opacity=".3" style="--ac:var(--sky)" d="M1020 77.0 C980 77.0,442 193.0,402 193.0"/>
+<path class="edge" data-from="p06-02" data-to="b04" stroke-opacity=".3" style="--ac:var(--coral)" d="M1402 135.0 C1442 135.0,1980 251.0,2020 251.0"/>
+<path class="edge" data-from="p00-04" data-to="p03-01" stroke-opacity=".3" style="--ac:var(--teal)" d="M202 251.0 C242 251.0,580 77.0,620 77.0"/>
+<path class="edge" data-from="p02-01" data-to="p05-01" stroke-opacity=".3" style="--ac:var(--violet)" d="M602 77.0 C642 77.0,980 77.0,1020 77.0"/>
+<path class="edge" data-from="p02-02" data-to="p05-03" stroke-opacity=".3" style="--ac:var(--violet)" d="M602 135.0 C642 135.0,980 193.0,1020 193.0"/>
+<path class="edge" data-from="p04-04" data-to="p07-04" stroke-opacity=".3" style="--ac:var(--mint)" d="M1002 251.0 C1042 251.0,1380 251.0,1420 251.0"/>
+<path class="edge" data-from="p07-02" data-to="b02" stroke-opacity=".3" style="--ac:var(--violet)" d="M1602 135.0 C1642 135.0,1980 135.0,2020 135.0"/>
+<path class="edge" data-from="p07-02" data-to="b03" stroke-opacity=".3" style="--ac:var(--violet)" d="M1602 135.0 C1642 135.0,1980 193.0,2020 193.0"/>
+<path class="edge" data-from="p07-02" data-to="b04" stroke-opacity=".3" style="--ac:var(--violet)" d="M1602 135.0 C1642 135.0,1980 251.0,2020 251.0"/>
+<path class="edge" data-from="p07-03" data-to="b01" stroke-opacity=".3" style="--ac:var(--violet)" d="M1602 193.0 C1642 193.0,1980 77.0,2020 77.0"/>
+<path class="edge" data-from="p07-04" data-to="b01" stroke-opacity=".3" style="--ac:var(--violet)" d="M1602 251.0 C1642 251.0,1980 77.0,2020 77.0"/>
+<path class="edge" data-from="p07-04" data-to="b06" stroke-opacity=".3" style="--ac:var(--violet)" d="M1602 251.0 C1642 251.0,1980 367.0,2020 367.0"/>
+<path class="edge" data-from="p00-03" data-to="p02-01" stroke-opacity=".3" style="--ac:var(--teal)" d="M202 193.0 C242 193.0,380 77.0,420 77.0"/>
+<path class="edge" data-from="p03-01" data-to="p05-02" stroke-opacity=".3" style="--ac:var(--yellow)" d="M802 77.0 C842 77.0,980 135.0,1020 135.0"/>
+<path class="edge" data-from="p03-01" data-to="p05-03" stroke-opacity=".3" style="--ac:var(--yellow)" d="M802 77.0 C842 77.0,980 193.0,1020 193.0"/>
+<path class="edge" data-from="p04-02" data-to="p02-02" stroke-opacity=".3" style="--ac:var(--mint)" d="M820 135.0 C780 135.0,642 135.0,602 135.0"/>
+<path class="edge" data-from="p00-04" data-to="p01-01" stroke-opacity=".6" style="--ac:var(--teal)" d="M202 251.0 C242 251.0,180 77.0,220 77.0"/>
+<path class="edge" data-from="p02-01" data-to="p03-01" stroke-opacity=".6" style="--ac:var(--violet)" d="M602 77.0 C642 77.0,580 77.0,620 77.0"/>
+<path class="edge" data-from="p04-01" data-to="p05-01" stroke-opacity=".6" style="--ac:var(--mint)" d="M1002 77.0 C1042 77.0,980 77.0,1020 77.0"/>
+<path class="edge" data-from="p04-02" data-to="p03-02" stroke-opacity=".6" style="--ac:var(--mint)" d="M820 135.0 C780 135.0,842 135.0,802 135.0"/>
+<path class="edge" data-from="p06-01" data-to="p07-01" stroke-opacity=".6" style="--ac:var(--coral)" d="M1402 77.0 C1442 77.0,1380 77.0,1420 77.0"/>
+<path class="edge" data-from="p06-02" data-to="p05-03" stroke-opacity=".6" style="--ac:var(--coral)" d="M1220 135.0 C1180 135.0,1242 193.0,1202 193.0"/>
+<path class="edge" data-from="c00" data-to="c01" stroke-opacity=".6" style="--ac:var(--mint)" d="M2002 77.0 C2042 77.0,1780 135.0,1820 135.0"/>
+<path class="edge" data-from="c00" data-to="c02" stroke-opacity=".6" style="--ac:var(--mint)" d="M2002 77.0 C2042 77.0,1780 193.0,1820 193.0"/>
+<path class="edge" data-from="c00" data-to="c03" stroke-opacity=".6" style="--ac:var(--mint)" d="M2002 77.0 C2042 77.0,1780 251.0,1820 251.0"/>
+<path class="edge" data-from="c00" data-to="c04" stroke-opacity=".6" style="--ac:var(--mint)" d="M2002 77.0 C2042 77.0,1780 309.0,1820 309.0"/>
+<path class="edge" data-from="c00" data-to="c05" stroke-opacity=".6" style="--ac:var(--mint)" d="M2002 77.0 C2042 77.0,1780 367.0,1820 367.0"/>
+<path class="edge" data-from="c00" data-to="c06" stroke-opacity=".6" style="--ac:var(--mint)" d="M2002 77.0 C2042 77.0,1780 425.0,1820 425.0"/>
+<path class="edge" data-from="c00" data-to="c07" stroke-opacity=".6" style="--ac:var(--mint)" d="M2002 77.0 C2042 77.0,1780 483.0,1820 483.0"/>
+<path class="edge" data-from="c00" data-to="c08" stroke-opacity=".6" style="--ac:var(--mint)" d="M2002 77.0 C2042 77.0,1780 541.0,1820 541.0"/>
+<path class="edge" data-from="c00" data-to="c09" stroke-opacity=".6" style="--ac:var(--mint)" d="M2002 77.0 C2042 77.0,1780 599.0,1820 599.0"/>
+<path class="edge" data-from="c01" data-to="c10" stroke-opacity=".6" style="--ac:var(--mint)" d="M2002 135.0 C2042 135.0,1780 657.0,1820 657.0"/>
+<path class="edge" data-from="p00-01" data-to="p00-02" stroke-opacity=".6" style="--ac:var(--teal)" d="M202 77.0 C242 77.0,-20 135.0,20 135.0"/>
+<path class="edge" data-from="p00-02" data-to="p00-03" stroke-opacity=".6" style="--ac:var(--teal)" d="M202 135.0 C242 135.0,-20 193.0,20 193.0"/>
+<path class="edge" data-from="p00-02" data-to="p00-04" stroke-opacity=".6" style="--ac:var(--teal)" d="M202 135.0 C242 135.0,-20 251.0,20 251.0"/>
+<path class="edge" data-from="p01-01" data-to="p01-02" stroke-opacity=".6" style="--ac:var(--sky)" d="M402 77.0 C442 77.0,180 135.0,220 135.0"/>
+<path class="edge" data-from="p01-01" data-to="p01-05" stroke-opacity=".6" style="--ac:var(--sky)" d="M402 77.0 C442 77.0,180 309.0,220 309.0"/>
+<path class="edge" data-from="p01-02" data-to="p01-03" stroke-opacity=".6" style="--ac:var(--sky)" d="M402 135.0 C442 135.0,180 193.0,220 193.0"/>
+<path class="edge" data-from="p01-02" data-to="p01-04" stroke-opacity=".6" style="--ac:var(--sky)" d="M402 135.0 C442 135.0,180 251.0,220 251.0"/>
+<path class="edge" data-from="p02-01" data-to="p02-02" stroke-opacity=".6" style="--ac:var(--violet)" d="M602 77.0 C642 77.0,380 135.0,420 135.0"/>
+<path class="edge" data-from="p02-02" data-to="p02-03" stroke-opacity=".6" style="--ac:var(--violet)" d="M602 135.0 C642 135.0,380 193.0,420 193.0"/>
+<path class="edge" data-from="p03-02" data-to="p03-01" stroke-opacity=".6" style="--ac:var(--yellow)" d="M802 135.0 C842 135.0,580 77.0,620 77.0"/>
+<path class="edge" data-from="p04-01" data-to="p04-02" stroke-opacity=".6" style="--ac:var(--mint)" d="M1002 77.0 C1042 77.0,780 135.0,820 135.0"/>
+<path class="edge" data-from="p04-02" data-to="p04-03" stroke-opacity=".6" style="--ac:var(--mint)" d="M1002 135.0 C1042 135.0,780 193.0,820 193.0"/>
+<path class="edge" data-from="p04-03" data-to="p04-04" stroke-opacity=".6" style="--ac:var(--mint)" d="M1002 193.0 C1042 193.0,780 251.0,820 251.0"/>
+<path class="edge" data-from="p05-01" data-to="p05-02" stroke-opacity=".6" style="--ac:var(--sky)" d="M1202 77.0 C1242 77.0,980 135.0,1020 135.0"/>
+<path class="edge" data-from="p06-01" data-to="p06-02" stroke-opacity=".6" style="--ac:var(--coral)" d="M1402 77.0 C1442 77.0,1180 135.0,1220 135.0"/>
+<path class="edge" data-from="p06-03" data-to="p06-04" stroke-opacity=".6" style="--ac:var(--coral)" d="M1402 193.0 C1442 193.0,1180 251.0,1220 251.0"/>
+<path class="edge" data-from="p07-01" data-to="p07-02" stroke-opacity=".6" style="--ac:var(--violet)" d="M1602 77.0 C1642 77.0,1380 135.0,1420 135.0"/>
+<path class="edge" data-from="p07-01" data-to="p07-03" stroke-opacity=".6" style="--ac:var(--violet)" d="M1602 77.0 C1642 77.0,1380 193.0,1420 193.0"/>
+<path class="edge" data-from="p08-02" data-to="p08-03" stroke-opacity=".6" style="--ac:var(--teal)" d="M1802 135.0 C1842 135.0,1580 193.0,1620 193.0"/>
+<path class="edge" data-from="p08-02" data-to="p08-04" stroke-opacity=".6" style="--ac:var(--teal)" d="M1802 135.0 C1842 135.0,1580 251.0,1620 251.0"/>
 <text class="part" x="20" y="34">0</text>
-<a href="sheets/chains/chain-p00-01-lois-quand-laquelle.html"><g data-id="p00-01" class="" style="--ac:var(--teal)"><rect x="20" y="56" width="182" height="42" rx="3"/><text x="28" y="72" style="font-weight:600">p00-01</text><text x="28" y="88" style="font-size:11.5px">Lois usuelles — quelle situ…</text></g></a>
-<a href="sheets/chains/chain-p00-02-esperance-variance-densite.html"><g data-id="p00-02" class="" style="--ac:var(--teal)"><rect x="20" y="114" width="182" height="42" rx="3"/><text x="28" y="130" style="font-weight:600">p00-02</text><text x="28" y="146" style="font-size:11.5px">Espérance, variance, masse …</text></g></a>
-<a href="sheets/chains/chain-p00-03-conditionnement-bayes.html"><g data-id="p00-03" class="" style="--ac:var(--teal)"><rect x="20" y="172" width="182" height="42" rx="3"/><text x="28" y="188" style="font-weight:600">p00-03</text><text x="28" y="204" style="font-size:11.5px">Conditionnement et Bayes — …</text></g></a>
-<a href="sheets/chains/chain-p00-04-moyenne-lgn-tcl.html"><g data-id="p00-04" class="" style="--ac:var(--teal)"><rect x="20" y="230" width="182" height="42" rx="3"/><text x="28" y="246" style="font-weight:600">p00-04</text><text x="28" y="262" style="font-size:11.5px">Moyenne, loi des grands nom…</text></g></a>
+<g class="node" data-id="p00-01" data-href="sheets/chains/chain-p00-01-lois-quand-laquelle.html" data-up="" data-down="b01 b02 b03 b04 b05 b06 p00-02 p00-03 p00-04 p01-01 p01-02 p01-03 p01-04 p01-05 p02-01 p02-02 p02-03 p03-01 p04-04 p05-01 p05-02 p05-03 p06-01 p06-02 p06-03 p06-04 p07-01 p07-02 p07-03 p07-04 p08-03" tabindex="0" style="--ac:var(--teal)"><rect x="20" y="56" width="182" height="42" rx="3"/><text x="28" y="72" style="font-weight:600">p00-01</text><text x="28" y="88" style="font-size:11.5px">Lois usuelles</text></g>
+<g class="node" data-id="p00-02" data-href="sheets/chains/chain-p00-02-esperance-variance-densite.html" data-up="p00-01" data-down="b01 b02 b03 b04 b05 b06 p00-03 p00-04 p01-01 p01-02 p01-03 p01-04 p01-05 p02-01 p02-02 p02-03 p03-01 p04-04 p05-01 p05-02 p05-03 p06-01 p06-02 p06-03 p06-04 p07-01 p07-02 p07-03 p07-04 p08-03" tabindex="0" style="--ac:var(--teal)"><rect x="20" y="114" width="182" height="42" rx="3"/><text x="28" y="130" style="font-weight:600">p00-02</text><text x="28" y="146" style="font-size:11.5px">Espérance, variance, masse…</text></g>
+<g class="node" data-id="p00-03" data-href="sheets/chains/chain-p00-03-conditionnement-bayes.html" data-up="p00-01 p00-02" data-down="b01 b02 b03 b04 b05 b06 p01-03 p02-01 p02-02 p02-03 p03-01 p05-01 p05-02 p05-03 p06-03 p06-04 p07-01 p07-02 p07-03 p08-03" tabindex="0" style="--ac:var(--teal)"><rect x="20" y="172" width="182" height="42" rx="3"/><text x="28" y="188" style="font-weight:600">p00-03</text><text x="28" y="204" style="font-size:11.5px">Conditionnement et Bayes</text></g>
+<g class="node" data-id="p00-04" data-href="sheets/chains/chain-p00-04-moyenne-lgn-tcl.html" data-up="p00-01 p00-02" data-down="b01 b02 b03 b04 b05 b06 p01-01 p01-02 p01-03 p01-04 p01-05 p03-01 p05-02 p05-03 p06-01 p06-02 p06-03 p06-04 p07-01 p07-02 p07-03" tabindex="0" style="--ac:var(--teal)"><rect x="20" y="230" width="182" height="42" rx="3"/><text x="28" y="246" style="font-weight:600">p00-04</text><text x="28" y="262" style="font-size:11.5px">Moyenne, loi des grands…</text></g>
 <text class="part" x="220" y="34">1</text>
-<a href="sheets/chains/chain-p01-01-objet-aleatoire.html"><g data-id="p01-01" class="" style="--ac:var(--sky)"><rect x="220" y="56" width="182" height="42" rx="3"/><text x="228" y="72" style="font-weight:600">p01-01</text><text x="228" y="88" style="font-size:11.5px">L&#x27;objet aléatoire — échanti…</text></g></a>
-<a href="sheets/chains/chain-p01-02-ic-test-procedure.html"><g data-id="p01-02" class="" style="--ac:var(--sky)"><rect x="220" y="114" width="182" height="42" rx="3"/><text x="228" y="130" style="font-weight:600">p01-02</text><text x="228" y="146" style="font-size:11.5px">IC et test — centre, largeu…</text></g></a>
-<a href="sheets/chains/chain-p01-03-inference-regression.html"><g data-id="p01-03" class="" style="--ac:var(--sky)"><rect x="220" y="172" width="182" height="42" rx="3"/><text x="228" y="188" style="font-weight:600">p01-03</text><text x="228" y="204" style="font-size:11.5px">Inférence en régression — σ…</text></g></a>
-<a href="sheets/chains/chain-p01-04-comparer-modeles-multiplicite.html"><g data-id="p01-04" class="" style="--ac:var(--sky)"><rect x="220" y="230" width="182" height="42" rx="3"/><text x="228" y="246" style="font-weight:600">p01-04</text><text x="228" y="262" style="font-size:11.5px">Comparer deux modèles, et p…</text></g></a>
-<a href="sheets/chains/chain-p01-05-bootstrap.html"><g data-id="p01-05" class="" style="--ac:var(--sky)"><rect x="220" y="288" width="182" height="42" rx="3"/><text x="228" y="304" style="font-weight:600">p01-05</text><text x="228" y="320" style="font-size:11.5px">Bootstrap — la distribution…</text></g></a>
+<g class="node" data-id="p01-01" data-href="sheets/chains/chain-p01-01-objet-aleatoire.html" data-up="p00-01 p00-02 p00-04" data-down="b01 b02 b03 b04 p01-02 p01-03 p01-04 p01-05 p05-03 p06-01 p06-02 p06-03 p06-04 p07-01 p07-02 p07-03" tabindex="0" style="--ac:var(--sky)"><rect x="220" y="56" width="182" height="42" rx="3"/><text x="228" y="72" style="font-weight:600">p01-01</text><text x="228" y="88" style="font-size:11.5px">L&#x27;objet aléatoire</text></g>
+<g class="node" data-id="p01-02" data-href="sheets/chains/chain-p01-02-ic-test-procedure.html" data-up="p00-01 p00-02 p00-04 p01-01" data-down="b02 b03 b04 p01-03 p01-04 p05-03 p06-02" tabindex="0" style="--ac:var(--sky)"><rect x="220" y="114" width="182" height="42" rx="3"/><text x="228" y="130" style="font-weight:600">p01-02</text><text x="228" y="146" style="font-size:11.5px">IC et test</text></g>
+<g class="node" data-id="p01-03" data-href="sheets/chains/chain-p01-03-inference-regression.html" data-up="p00-01 p00-02 p00-03 p00-04 p01-01 p01-02 p02-01 p04-01 p05-01" data-down="" tabindex="0" style="--ac:var(--sky)"><rect x="220" y="172" width="182" height="42" rx="3"/><text x="228" y="188" style="font-weight:600">p01-03</text><text x="228" y="204" style="font-size:11.5px">Inférence en régression</text></g>
+<g class="node" data-id="p01-04" data-href="sheets/chains/chain-p01-04-comparer-modeles-multiplicite.html" data-up="p00-01 p00-02 p00-04 p01-01 p01-02" data-down="b02 b03 b04 p05-03 p06-02" tabindex="0" style="--ac:var(--sky)"><rect x="220" y="230" width="182" height="42" rx="3"/><text x="228" y="246" style="font-weight:600">p01-04</text><text x="228" y="262" style="font-size:11.5px">Comparer deux modèles, et…</text></g>
+<g class="node" data-id="p01-05" data-href="sheets/chains/chain-p01-05-bootstrap.html" data-up="p00-01 p00-02 p00-04 p01-01" data-down="b02 b03 b04 p05-03 p06-02 p07-02" tabindex="0" style="--ac:var(--sky)"><rect x="220" y="288" width="182" height="42" rx="3"/><text x="228" y="304" style="font-weight:600">p01-05</text><text x="228" y="320" style="font-size:11.5px">Bootstrap</text></g>
 <text class="part" x="420" y="34">2</text>
-<a href="sheets/chains/chain-p02-01-bruit-vraisemblance-loss.html"><g data-id="p02-01" class="" style="--ac:var(--violet)"><rect x="420" y="56" width="182" height="42" rx="3"/><text x="428" y="72" style="font-weight:600">p02-01</text><text x="428" y="88" style="font-size:11.5px">Du bruit à la loss — le ges…</text></g></a>
-<a href="sheets/chains/chain-p02-02-prior-penalite.html"><g data-id="p02-02" class="" style="--ac:var(--violet)"><rect x="420" y="114" width="182" height="42" rx="3"/><text x="428" y="130" style="font-weight:600">p02-02</text><text x="428" y="146" style="font-size:11.5px">Du prior à la pénalité — ce…</text></g></a>
-<a href="sheets/chains/chain-p02-03-conjugues-posterior.html"><g data-id="p02-03" class="" style="--ac:var(--violet)"><rect x="420" y="172" width="182" height="42" rx="3"/><text x="428" y="188" style="font-weight:600">p02-03</text><text x="428" y="204" style="font-size:11.5px">Le posterior entier — conju…</text></g></a>
+<g class="node" data-id="p02-01" data-href="sheets/chains/chain-p02-01-bruit-vraisemblance-loss.html" data-up="p00-01 p00-02 p00-03" data-down="b01 b02 b03 b04 b05 b06 p01-03 p02-02 p02-03 p03-01 p05-01 p05-02 p05-03 p06-04 p07-01 p07-02 p07-03 p08-03" tabindex="0" style="--ac:var(--violet)"><rect x="420" y="56" width="182" height="42" rx="3"/><text x="428" y="72" style="font-weight:600">p02-01</text><text x="428" y="88" style="font-size:11.5px">Du bruit à la loss</text></g>
+<g class="node" data-id="p02-02" data-href="sheets/chains/chain-p02-02-prior-penalite.html" data-up="p00-01 p00-02 p00-03 p02-01 p04-01 p04-02" data-down="b03 b06 p02-03 p05-03" tabindex="0" style="--ac:var(--violet)"><rect x="420" y="114" width="182" height="42" rx="3"/><text x="428" y="130" style="font-weight:600">p02-02</text><text x="428" y="146" style="font-size:11.5px">Du prior à la pénalité</text></g>
+<g class="node" data-id="p02-03" data-href="sheets/chains/chain-p02-03-conjugues-posterior.html" data-up="p00-01 p00-02 p00-03 p02-01 p02-02 p04-01 p04-02" data-down="b03" tabindex="0" style="--ac:var(--violet)"><rect x="420" y="172" width="182" height="42" rx="3"/><text x="428" y="188" style="font-weight:600">p02-03</text><text x="428" y="204" style="font-size:11.5px">Le posterior entier</text></g>
 <text class="part" x="620" y="34">3</text>
-<a href="sheets/chains/chain-p03-01-critere-escalier-vs-sensible.html"><g data-id="p03-01" class="" style="--ac:var(--yellow)"><rect x="620" y="56" width="182" height="42" rx="3"/><text x="628" y="72" style="font-weight:600">p03-01</text><text x="628" y="88" style="font-size:11.5px">Critère en escalier vs crit…</text></g></a>
-<a href="sheets/chains/chain-p03-02-gradient-descente.html"><g data-id="p03-02" class="" style="--ac:var(--yellow)"><rect x="620" y="114" width="182" height="42" rx="3"/><text x="628" y="130" style="font-weight:600">p03-02</text><text x="628" y="146" style="font-size:11.5px">Gradient et descente — pent…</text></g></a>
+<g class="node" data-id="p03-01" data-href="sheets/chains/chain-p03-01-critere-escalier-vs-sensible.html" data-up="p00-01 p00-02 p00-03 p00-04 p02-01 p03-02 p04-01 p04-02 p08-01" data-down="b01 b02 b03 b04 b05 b06 p05-02 p05-03 p07-01 p07-02 p07-03" tabindex="0" style="--ac:var(--yellow)"><rect x="620" y="56" width="182" height="42" rx="3"/><text x="628" y="72" style="font-weight:600">p03-01</text><text x="628" y="88" style="font-size:11.5px">Critère en escalier vs…</text></g>
+<g class="node" data-id="p03-02" data-href="sheets/chains/chain-p03-02-gradient-descente.html" data-up="p04-01 p04-02 p08-01" data-down="b01 b02 b03 b04 b05 b06 p03-01 p05-02 p05-03 p07-01 p07-02 p07-03 p07-04 p08-01" tabindex="0" style="--ac:var(--yellow)"><rect x="620" y="114" width="182" height="42" rx="3"/><text x="628" y="130" style="font-weight:600">p03-02</text><text x="628" y="146" style="font-size:11.5px">Gradient et descente</text></g>
 <text class="part" x="820" y="34">4</text>
-<a href="sheets/chains/chain-p04-01-matrice-action.html"><g data-id="p04-01" class="" style="--ac:var(--mint)"><rect x="820" y="56" width="182" height="42" rx="3"/><text x="828" y="72" style="font-weight:600">p04-01</text><text x="828" y="88" style="font-size:11.5px">Une matrice est une action …</text></g></a>
-<a href="sheets/chains/chain-p04-02-valeurs-propres-iteration.html"><g data-id="p04-02" class="" style="--ac:var(--mint)"><rect x="820" y="114" width="182" height="42" rx="3"/><text x="828" y="130" style="font-weight:600">p04-02</text><text x="828" y="146" style="font-size:11.5px">Valeurs propres et itératio…</text></g></a>
-<a href="sheets/chains/chain-p04-03-spectral-svd-conditionnement.html"><g data-id="p04-03" class="" style="--ac:var(--mint)"><rect x="820" y="172" width="182" height="42" rx="3"/><text x="828" y="188" style="font-weight:600">p04-03</text><text x="828" y="204" style="font-size:11.5px">Spectral, SVD, conditionnem…</text></g></a>
-<a href="sheets/chains/chain-p04-04-pca.html"><g data-id="p04-04" class="" style="--ac:var(--mint)"><rect x="820" y="230" width="182" height="42" rx="3"/><text x="828" y="246" style="font-weight:600">p04-04</text><text x="828" y="262" style="font-size:11.5px">PCA — diagonaliser la covar…</text></g></a>
+<g class="node" data-id="p04-01" data-href="sheets/chains/chain-p04-01-matrice-action.html" data-up="" data-down="b01 b02 b03 b04 b05 b06 p01-03 p02-02 p02-03 p03-01 p03-02 p04-02 p04-03 p04-04 p05-01 p05-02 p05-03 p07-01 p07-02 p07-03 p07-04 p08-01" tabindex="0" style="--ac:var(--mint)"><rect x="820" y="56" width="182" height="42" rx="3"/><text x="828" y="72" style="font-weight:600">p04-01</text><text x="828" y="88" style="font-size:11.5px">Une matrice est une action</text></g>
+<g class="node" data-id="p04-02" data-href="sheets/chains/chain-p04-02-valeurs-propres-iteration.html" data-up="p04-01" data-down="b01 b02 b03 b04 b05 b06 p02-02 p02-03 p03-01 p03-02 p04-03 p04-04 p05-02 p05-03 p07-01 p07-02 p07-03 p07-04 p08-01" tabindex="0" style="--ac:var(--mint)"><rect x="820" y="114" width="182" height="42" rx="3"/><text x="828" y="130" style="font-weight:600">p04-02</text><text x="828" y="146" style="font-size:11.5px">Valeurs propres et itération</text></g>
+<g class="node" data-id="p04-03" data-href="sheets/chains/chain-p04-03-spectral-svd-conditionnement.html" data-up="p04-01 p04-02" data-down="b01 b06 p04-04 p07-04" tabindex="0" style="--ac:var(--mint)"><rect x="820" y="172" width="182" height="42" rx="3"/><text x="828" y="188" style="font-weight:600">p04-03</text><text x="828" y="204" style="font-size:11.5px">Spectral, SVD, conditionnement</text></g>
+<g class="node" data-id="p04-04" data-href="sheets/chains/chain-p04-04-pca.html" data-up="p00-01 p00-02 p04-01 p04-02 p04-03" data-down="b01 b06 p07-04" tabindex="0" style="--ac:var(--mint)"><rect x="820" y="230" width="182" height="42" rx="3"/><text x="828" y="246" style="font-weight:600">p04-04</text><text x="828" y="262" style="font-size:11.5px">PCA</text></g>
 <text class="part" x="1020" y="34">5</text>
-<a href="sheets/chains/chain-p05-01-regression-modele-ols.html"><g data-id="p05-01" class="" style="--ac:var(--sky)"><rect x="1020" y="56" width="182" height="42" rx="3"/><text x="1028" y="72" style="font-weight:600">p05-01</text><text x="1028" y="88" style="font-size:11.5px">Régression linéaire — le mo…</text></g></a>
-<a href="sheets/chains/chain-p05-02-logistique.html"><g data-id="p05-02" class="" style="--ac:var(--sky)"><rect x="1020" y="114" width="182" height="42" rx="3"/><text x="1028" y="130" style="font-weight:600">p05-02</text><text x="1028" y="146" style="font-size:11.5px">Régression logistique — log…</text></g></a>
-<a href="sheets/chains/chain-p05-03-regularisation-biais-variance.html"><g data-id="p05-03" class="" style="--ac:var(--sky)"><rect x="1020" y="172" width="182" height="42" rx="3"/><text x="1028" y="188" style="font-weight:600">p05-03</text><text x="1028" y="204" style="font-size:11.5px">Régularisation vue en biais…</text></g></a>
+<g class="node" data-id="p05-01" data-href="sheets/chains/chain-p05-01-regression-modele-ols.html" data-up="p00-01 p00-02 p00-03 p02-01 p04-01" data-down="b02 b06 p01-03 p05-02" tabindex="0" style="--ac:var(--sky)"><rect x="1020" y="56" width="182" height="42" rx="3"/><text x="1028" y="72" style="font-weight:600">p05-01</text><text x="1028" y="88" style="font-size:11.5px">Régression linéaire</text></g>
+<g class="node" data-id="p05-02" data-href="sheets/chains/chain-p05-02-logistique.html" data-up="p00-01 p00-02 p00-03 p00-04 p02-01 p03-01 p03-02 p04-01 p04-02 p05-01 p08-01" data-down="b06" tabindex="0" style="--ac:var(--sky)"><rect x="1020" y="114" width="182" height="42" rx="3"/><text x="1028" y="130" style="font-weight:600">p05-02</text><text x="1028" y="146" style="font-size:11.5px">Régression logistique</text></g>
+<g class="node" data-id="p05-03" data-href="sheets/chains/chain-p05-03-regularisation-biais-variance.html" data-up="p00-01 p00-02 p00-03 p00-04 p01-01 p01-02 p01-04 p01-05 p02-01 p02-02 p03-01 p03-02 p04-01 p04-02 p06-01 p06-02 p08-01" data-down="b03" tabindex="0" style="--ac:var(--sky)"><rect x="1020" y="172" width="182" height="42" rx="3"/><text x="1028" y="188" style="font-weight:600">p05-03</text><text x="1028" y="204" style="font-size:11.5px">Régularisation vue en biais-variance</text></g>
 <text class="part" x="1220" y="34">6</text>
-<a href="sheets/chains/chain-p06-01-biais-variance.html"><g data-id="p06-01" class="" style="--ac:var(--coral)"><rect x="1220" y="56" width="182" height="42" rx="3"/><text x="1228" y="72" style="font-weight:600">p06-01</text><text x="1228" y="88" style="font-size:11.5px">Biais, variance, bruit — la…</text></g></a>
-<a href="sheets/chains/chain-p06-02-cv-leakage.html"><g data-id="p06-02" class="" style="--ac:var(--coral)"><rect x="1220" y="114" width="182" height="42" rx="3"/><text x="1228" y="130" style="font-weight:600">p06-02</text><text x="1228" y="146" style="font-size:11.5px">Estimer l&#x27;erreur — validati…</text></g></a>
-<a href="sheets/chains/chain-p06-03-seuil-roc-pr.html"><g data-id="p06-03" class="" style="--ac:var(--coral)"><rect x="1220" y="172" width="182" height="42" rx="3"/><text x="1228" y="188" style="font-weight:600">p06-03</text><text x="1228" y="204" style="font-size:11.5px">Seuil, matrice de confusion…</text></g></a>
-<a href="sheets/chains/chain-p06-04-calibration-desequilibre.html"><g data-id="p06-04" class="" style="--ac:var(--coral)"><rect x="1220" y="230" width="182" height="42" rx="3"/><text x="1228" y="246" style="font-weight:600">p06-04</text><text x="1228" y="262" style="font-size:11.5px">Scores, calibration, déséqu…</text></g></a>
+<g class="node" data-id="p06-01" data-href="sheets/chains/chain-p06-01-biais-variance.html" data-up="p00-01 p00-02 p00-04 p01-01" data-down="b01 b02 b03 b04 p05-03 p06-02 p07-01 p07-02 p07-03" tabindex="0" style="--ac:var(--coral)"><rect x="1220" y="56" width="182" height="42" rx="3"/><text x="1228" y="72" style="font-weight:600">p06-01</text><text x="1228" y="88" style="font-size:11.5px">Biais, variance, bruit</text></g>
+<g class="node" data-id="p06-02" data-href="sheets/chains/chain-p06-02-cv-leakage.html" data-up="p00-01 p00-02 p00-04 p01-01 p01-02 p01-04 p01-05 p06-01" data-down="b03 b04 p05-03" tabindex="0" style="--ac:var(--coral)"><rect x="1220" y="114" width="182" height="42" rx="3"/><text x="1228" y="130" style="font-weight:600">p06-02</text><text x="1228" y="146" style="font-size:11.5px">Estimer l&#x27;erreur</text></g>
+<g class="node" data-id="p06-03" data-href="sheets/chains/chain-p06-03-seuil-roc-pr.html" data-up="p00-01 p00-02 p00-03 p00-04 p01-01" data-down="p06-04" tabindex="0" style="--ac:var(--coral)"><rect x="1220" y="172" width="182" height="42" rx="3"/><text x="1228" y="188" style="font-weight:600">p06-03</text><text x="1228" y="204" style="font-size:11.5px">Seuil, matrice de…</text></g>
+<g class="node" data-id="p06-04" data-href="sheets/chains/chain-p06-04-calibration-desequilibre.html" data-up="p00-01 p00-02 p00-03 p00-04 p01-01 p02-01 p06-03" data-down="" tabindex="0" style="--ac:var(--coral)"><rect x="1220" y="230" width="182" height="42" rx="3"/><text x="1228" y="246" style="font-weight:600">p06-04</text><text x="1228" y="262" style="font-size:11.5px">Scores, calibration, déséquilibre</text></g>
 <text class="part" x="1420" y="34">7</text>
-<a href="sheets/chains/chain-p07-01-arbres-impurete.html"><g data-id="p07-01" class="" style="--ac:var(--violet)"><rect x="1420" y="56" width="182" height="42" rx="3"/><text x="1428" y="72" style="font-weight:600">p07-01</text><text x="1428" y="88" style="font-size:11.5px">Arbres — impureté, split, p…</text></g></a>
-<a href="sheets/chains/chain-p07-02-bagging-rf.html"><g data-id="p07-02" class="" style="--ac:var(--violet)"><rect x="1420" y="114" width="182" height="42" rx="3"/><text x="1428" y="130" style="font-weight:600">p07-02</text><text x="1428" y="146" style="font-size:11.5px">Bagging et forêt aléatoire …</text></g></a>
-<a href="sheets/chains/chain-p07-03-boosting.html"><g data-id="p07-03" class="" style="--ac:var(--violet)"><rect x="1420" y="172" width="182" height="42" rx="3"/><text x="1428" y="188" style="font-weight:600">p07-03</text><text x="1428" y="204" style="font-size:11.5px">Gradient boosting — une des…</text></g></a>
-<a href="sheets/chains/chain-p07-04-kmeans.html"><g data-id="p07-04" class="" style="--ac:var(--violet)"><rect x="1420" y="230" width="182" height="42" rx="3"/><text x="1428" y="246" style="font-weight:600">p07-04</text><text x="1428" y="262" style="font-size:11.5px">k-means — une descente alte…</text></g></a>
+<g class="node" data-id="p07-01" data-href="sheets/chains/chain-p07-01-arbres-impurete.html" data-up="p00-01 p00-02 p00-03 p00-04 p01-01 p02-01 p03-01 p03-02 p04-01 p04-02 p06-01 p08-01" data-down="b01 b02 b03 b04 p07-02 p07-03" tabindex="0" style="--ac:var(--violet)"><rect x="1420" y="56" width="182" height="42" rx="3"/><text x="1428" y="72" style="font-weight:600">p07-01</text><text x="1428" y="88" style="font-size:11.5px">Arbres</text></g>
+<g class="node" data-id="p07-02" data-href="sheets/chains/chain-p07-02-bagging-rf.html" data-up="p00-01 p00-02 p00-03 p00-04 p01-01 p01-05 p02-01 p03-01 p03-02 p04-01 p04-02 p06-01 p07-01 p08-01" data-down="b02 b03 b04" tabindex="0" style="--ac:var(--violet)"><rect x="1420" y="114" width="182" height="42" rx="3"/><text x="1428" y="130" style="font-weight:600">p07-02</text><text x="1428" y="146" style="font-size:11.5px">Bagging et forêt aléatoire</text></g>
+<g class="node" data-id="p07-03" data-href="sheets/chains/chain-p07-03-boosting.html" data-up="p00-01 p00-02 p00-03 p00-04 p01-01 p02-01 p03-01 p03-02 p04-01 p04-02 p06-01 p07-01 p08-01" data-down="b01" tabindex="0" style="--ac:var(--violet)"><rect x="1420" y="172" width="182" height="42" rx="3"/><text x="1428" y="188" style="font-weight:600">p07-03</text><text x="1428" y="204" style="font-size:11.5px">Gradient boosting</text></g>
+<g class="node" data-id="p07-04" data-href="sheets/chains/chain-p07-04-kmeans.html" data-up="p00-01 p00-02 p03-02 p04-01 p04-02 p04-03 p04-04 p08-01" data-down="b01 b06" tabindex="0" style="--ac:var(--violet)"><rect x="1420" y="230" width="182" height="42" rx="3"/><text x="1428" y="246" style="font-weight:600">p07-04</text><text x="1428" y="262" style="font-size:11.5px">k-means</text></g>
 <text class="part" x="1620" y="34">8</text>
-<a href="sheets/chains/chain-p08-01-jacobienne-chain-rule-backprop.html"><g data-id="p08-01" class="" style="--ac:var(--teal)"><rect x="1620" y="56" width="182" height="42" rx="3"/><text x="1628" y="72" style="font-weight:600">p08-01</text><text x="1628" y="88" style="font-size:11.5px">Jacobienne, chain rule, bac…</text></g></a>
-<a href="sheets/chains/chain-p08-02-flottants-lse.html"><g data-id="p08-02" class="" style="--ac:var(--teal)"><rect x="1620" y="114" width="182" height="42" rx="3"/><text x="1628" y="130" style="font-weight:600">p08-02</text><text x="1628" y="146" style="font-size:11.5px">Flottants et log-sum-exp — …</text></g></a>
-<a href="sheets/chains/chain-p08-03-cross-entropy-entropie-kl.html"><g data-id="p08-03" class="" style="--ac:var(--teal)"><rect x="1620" y="172" width="182" height="42" rx="3"/><text x="1628" y="188" style="font-weight:600">p08-03</text><text x="1628" y="204" style="font-size:11.5px">Cross-entropy, entropie, KL…</text></g></a>
-<a href="sheets/chains/chain-p08-04-tenseurs-ruban-strides-broadcasting.html"><g data-id="p08-04" class="" style="--ac:var(--teal)"><rect x="1620" y="230" width="182" height="42" rx="3"/><text x="1628" y="246" style="font-weight:600">p08-04</text><text x="1628" y="262" style="font-size:11.5px">Tenseurs — ruban, strides, …</text></g></a>
+<g class="node" data-id="p08-01" data-href="sheets/chains/chain-p08-01-jacobienne-chain-rule-backprop.html" data-up="p03-02 p04-01 p04-02" data-down="b01 b02 b03 b04 b05 b06 p03-01 p03-02 p05-02 p05-03 p07-01 p07-02 p07-03 p07-04" tabindex="0" style="--ac:var(--teal)"><rect x="1620" y="56" width="182" height="42" rx="3"/><text x="1628" y="72" style="font-weight:600">p08-01</text><text x="1628" y="88" style="font-size:11.5px">Jacobienne, chain rule, backprop</text></g>
+<g class="node" data-id="p08-02" data-href="sheets/chains/chain-p08-02-flottants-lse.html" data-up="" data-down="p08-03 p08-04" tabindex="0" style="--ac:var(--teal)"><rect x="1620" y="114" width="182" height="42" rx="3"/><text x="1628" y="130" style="font-weight:600">p08-02</text><text x="1628" y="146" style="font-size:11.5px">Flottants et log-sum-exp</text></g>
+<g class="node" data-id="p08-03" data-href="sheets/chains/chain-p08-03-cross-entropy-entropie-kl.html" data-up="p00-01 p00-02 p00-03 p02-01 p08-02" data-down="" tabindex="0" style="--ac:var(--teal)"><rect x="1620" y="172" width="182" height="42" rx="3"/><text x="1628" y="188" style="font-weight:600">p08-03</text><text x="1628" y="204" style="font-size:11.5px">Cross-entropy, entropie, KL</text></g>
+<g class="node" data-id="p08-04" data-href="sheets/chains/chain-p08-04-tenseurs-ruban-strides-broadcasting.html" data-up="p08-02" data-down="" tabindex="0" style="--ac:var(--teal)"><rect x="1620" y="230" width="182" height="42" rx="3"/><text x="1628" y="246" style="font-weight:600">p08-04</text><text x="1628" y="262" style="font-size:11.5px">Tenseurs</text></g>
 <text class="part" x="1820" y="34">9</text>
-<a href="sheets/coding/coding-00-tap-invariant-variant.html"><g data-id="c00" class="" style="--ac:var(--mint)"><rect x="1820" y="56" width="182" height="42" rx="3"/><text x="1828" y="72" style="font-weight:600">c00</text><text x="1828" y="88" style="font-size:11.5px">TAP — invariant, variant, c…</text></g></a>
-<a href="sheets/coding/coding-01-fenetre-glissante.html"><g data-id="c01" class="" style="--ac:var(--mint)"><rect x="1820" y="114" width="182" height="42" rx="3"/><text x="1828" y="130" style="font-weight:600">c01</text><text x="1828" y="146" style="font-size:11.5px">Fenêtre glissante — fixe, v…</text></g></a>
-<a href="sheets/coding/coding-02-deux-pointeurs.html"><g data-id="c02" class="" style="--ac:var(--mint)"><rect x="1820" y="172" width="182" height="42" rx="3"/><text x="1828" y="188" style="font-weight:600">c02</text><text x="1828" y="204" style="font-size:11.5px">Deux pointeurs — éliminer u…</text></g></a>
-<a href="sheets/coding/coding-03-binary-search.html"><g data-id="c03" class="" style="--ac:var(--mint)"><rect x="1820" y="230" width="182" height="42" rx="3"/><text x="1828" y="246" style="font-weight:600">c03</text><text x="1828" y="262" style="font-size:11.5px">Binary search — le premier …</text></g></a>
-<a href="sheets/coding/coding-04-listes-chainees.html"><g data-id="c04" class="" style="--ac:var(--mint)"><rect x="1820" y="288" width="182" height="42" rx="3"/><text x="1828" y="304" style="font-weight:600">c04</text><text x="1828" y="320" style="font-size:11.5px">Listes chaînées — pointeurs…</text></g></a>
-<a href="sheets/coding/coding-05-arbres.html"><g data-id="c05" class="" style="--ac:var(--mint)"><rect x="1820" y="346" width="182" height="42" rx="3"/><text x="1828" y="362" style="font-weight:600">c05</text><text x="1828" y="378" style="font-size:11.5px">Arbres — récursion, parcour…</text></g></a>
-<a href="sheets/coding/coding-06-graphes.html"><g data-id="c06" class="" style="--ac:var(--mint)"><rect x="1820" y="404" width="182" height="42" rx="3"/><text x="1828" y="420" style="font-weight:600">c06</text><text x="1828" y="436" style="font-size:11.5px">Graphes — marquer à l&#x27;enfil…</text></g></a>
-<a href="sheets/coding/coding-07-heap.html"><g data-id="c07" class="" style="--ac:var(--mint)"><rect x="1820" y="462" width="182" height="42" rx="3"/><text x="1828" y="478" style="font-weight:600">c07</text><text x="1828" y="494" style="font-size:11.5px">Heap — le top-k par un min-…</text></g></a>
-<a href="sheets/coding/coding-08-intervals.html"><g data-id="c08" class="" style="--ac:var(--mint)"><rect x="1820" y="520" width="182" height="42" rx="3"/><text x="1828" y="536" style="font-weight:600">c08</text><text x="1828" y="552" style="font-size:11.5px">Intervals — trier par début…</text></g></a>
-<a href="sheets/coding/coding-09-dp-1d.html"><g data-id="c09" class="" style="--ac:var(--mint)"><rect x="1820" y="578" width="182" height="42" rx="3"/><text x="1828" y="594" style="font-weight:600">c09</text><text x="1828" y="610" style="font-size:11.5px">DP 1D — un sous-problème pa…</text></g></a>
-<g data-id="c10" class="todo " style="--ac:var(--mint)"><rect x="1820" y="636" width="182" height="42" rx="3"/><text x="1828" y="652" style="font-weight:600">c10</text><text x="1828" y="668" style="font-size:11.5px">Préfixes et deque monotone</text></g>
+<g class="node" data-id="c00" data-href="sheets/coding/coding-00-tap-invariant-variant.html" data-up="" data-down="c01 c02 c03 c04 c05 c06 c07 c08 c09 c10" tabindex="0" style="--ac:var(--mint)"><rect x="1820" y="56" width="182" height="42" rx="3"/><text x="1828" y="72" style="font-weight:600">c00</text><text x="1828" y="88" style="font-size:11.5px">TAP</text></g>
+<g class="node" data-id="c01" data-href="sheets/coding/coding-01-fenetre-glissante.html" data-up="c00" data-down="c10" tabindex="0" style="--ac:var(--mint)"><rect x="1820" y="114" width="182" height="42" rx="3"/><text x="1828" y="130" style="font-weight:600">c01</text><text x="1828" y="146" style="font-size:11.5px">Fenêtre glissante</text></g>
+<g class="node" data-id="c02" data-href="sheets/coding/coding-02-deux-pointeurs.html" data-up="c00" data-down="" tabindex="0" style="--ac:var(--mint)"><rect x="1820" y="172" width="182" height="42" rx="3"/><text x="1828" y="188" style="font-weight:600">c02</text><text x="1828" y="204" style="font-size:11.5px">Deux pointeurs</text></g>
+<g class="node" data-id="c03" data-href="sheets/coding/coding-03-binary-search.html" data-up="c00" data-down="" tabindex="0" style="--ac:var(--mint)"><rect x="1820" y="230" width="182" height="42" rx="3"/><text x="1828" y="246" style="font-weight:600">c03</text><text x="1828" y="262" style="font-size:11.5px">Binary search</text></g>
+<g class="node" data-id="c04" data-href="sheets/coding/coding-04-listes-chainees.html" data-up="c00" data-down="" tabindex="0" style="--ac:var(--mint)"><rect x="1820" y="288" width="182" height="42" rx="3"/><text x="1828" y="304" style="font-weight:600">c04</text><text x="1828" y="320" style="font-size:11.5px">Listes chaînées</text></g>
+<g class="node" data-id="c05" data-href="sheets/coding/coding-05-arbres.html" data-up="c00" data-down="" tabindex="0" style="--ac:var(--mint)"><rect x="1820" y="346" width="182" height="42" rx="3"/><text x="1828" y="362" style="font-weight:600">c05</text><text x="1828" y="378" style="font-size:11.5px">Arbres</text></g>
+<g class="node" data-id="c06" data-href="sheets/coding/coding-06-graphes.html" data-up="c00" data-down="" tabindex="0" style="--ac:var(--mint)"><rect x="1820" y="404" width="182" height="42" rx="3"/><text x="1828" y="420" style="font-weight:600">c06</text><text x="1828" y="436" style="font-size:11.5px">Graphes</text></g>
+<g class="node" data-id="c07" data-href="sheets/coding/coding-07-heap.html" data-up="c00" data-down="" tabindex="0" style="--ac:var(--mint)"><rect x="1820" y="462" width="182" height="42" rx="3"/><text x="1828" y="478" style="font-weight:600">c07</text><text x="1828" y="494" style="font-size:11.5px">Heap</text></g>
+<g class="node" data-id="c08" data-href="sheets/coding/coding-08-intervals.html" data-up="c00" data-down="" tabindex="0" style="--ac:var(--mint)"><rect x="1820" y="520" width="182" height="42" rx="3"/><text x="1828" y="536" style="font-weight:600">c08</text><text x="1828" y="552" style="font-size:11.5px">Intervals</text></g>
+<g class="node" data-id="c09" data-href="sheets/coding/coding-09-dp-1d.html" data-up="c00" data-down="" tabindex="0" style="--ac:var(--mint)"><rect x="1820" y="578" width="182" height="42" rx="3"/><text x="1828" y="594" style="font-weight:600">c09</text><text x="1828" y="610" style="font-size:11.5px">DP 1D</text></g>
+<g class="node todo" data-id="c10" data-up="c00 c01" data-down="" tabindex="0" style="--ac:var(--mint)"><rect x="1820" y="636" width="182" height="42" rx="3"/><text x="1828" y="652" style="font-weight:600">c10</text><text x="1828" y="668" style="font-size:11.5px">Préfixes et deque monotone</text></g>
 <text class="part" x="2020" y="34">PONTS</text>
-<a href="sheets/bridges/bridge-01-une-seule-descente.html"><g data-id="b01" class="bridge" style="--ac:var(--amber)"><rect x="2020" y="56" width="182" height="42" rx="3"/><text x="2028" y="72" style="font-weight:600">b01</text><text x="2028" y="88" style="font-size:11.5px">Une seule descente</text></g></a>
-<a href="sheets/bridges/bridge-02-temoin-atteignable.html"><g data-id="b02" class="bridge" style="--ac:var(--amber)"><rect x="2020" y="114" width="182" height="42" rx="3"/><text x="2028" y="130" style="font-weight:600">b02</text><text x="2028" y="146" style="font-size:11.5px">Le témoin atteignable</text></g></a>
-<a href="sheets/bridges/bridge-03-biais-variance-partout.html"><g data-id="b03" class="bridge" style="--ac:var(--amber)"><rect x="2020" y="172" width="182" height="42" rx="3"/><text x="2028" y="188" style="font-weight:600">b03</text><text x="2028" y="204" style="font-size:11.5px">Biais et variance partout</text></g></a>
-<a href="sheets/bridges/bridge-04-variance-moyenne-correlee.html"><g data-id="b04" class="bridge" style="--ac:var(--amber)"><rect x="2020" y="230" width="182" height="42" rx="3"/><text x="2028" y="246" style="font-weight:600">b04</text><text x="2028" y="262" style="font-size:11.5px">La variance d&#x27;une moyenne c…</text></g></a>
-<a href="sheets/bridges/bridge-05-escalier-vs-sensible.html"><g data-id="b05" class="bridge" style="--ac:var(--amber)"><rect x="2020" y="288" width="182" height="42" rx="3"/><text x="2028" y="304" style="font-weight:600">b05</text><text x="2028" y="320" style="font-size:11.5px">Escalier vs sensible</text></g></a>
-<a href="sheets/bridges/bridge-06-convexite-forme-fermee.html"><g data-id="b06" class="bridge" style="--ac:var(--amber)"><rect x="2020" y="346" width="182" height="42" rx="3"/><text x="2028" y="362" style="font-weight:600">b06</text><text x="2028" y="378" style="font-size:11.5px">Convexité et forme fermée</text></g></a>
-</svg></div></details>
-<footer>Générée par <code>tools/build_index.py</code> le 19/09/2026. Les ancres <code>#pNN-MM</code> de cette page sont les cibles des liens « prérequis » des sheets.</footer></body></html>
+<g class="node bridge" data-id="b01" data-href="sheets/bridges/bridge-01-une-seule-descente.html" data-up="p00-01 p00-02 p00-03 p00-04 p01-01 p02-01 p03-01 p03-02 p04-01 p04-02 p04-03 p04-04 p06-01 p07-01 p07-03 p07-04 p08-01" data-down="" tabindex="0" style="--ac:var(--amber)"><rect x="2020" y="56" width="182" height="42" rx="3"/><text x="2028" y="72" style="font-weight:600">b01</text><text x="2028" y="88" style="font-size:11.5px">Une seule descente</text></g>
+<g class="node bridge" data-id="b02" data-href="sheets/bridges/bridge-02-temoin-atteignable.html" data-up="p00-01 p00-02 p00-03 p00-04 p01-01 p01-02 p01-04 p01-05 p02-01 p03-01 p03-02 p04-01 p04-02 p05-01 p06-01 p07-01 p07-02 p08-01" data-down="" tabindex="0" style="--ac:var(--amber)"><rect x="2020" y="114" width="182" height="42" rx="3"/><text x="2028" y="130" style="font-weight:600">b02</text><text x="2028" y="146" style="font-size:11.5px">Le témoin atteignable</text></g>
+<g class="node bridge" data-id="b03" data-href="sheets/bridges/bridge-03-biais-variance-partout.html" data-up="p00-01 p00-02 p00-03 p00-04 p01-01 p01-02 p01-04 p01-05 p02-01 p02-02 p02-03 p03-01 p03-02 p04-01 p04-02 p05-03 p06-01 p06-02 p07-01 p07-02 p08-01" data-down="" tabindex="0" style="--ac:var(--amber)"><rect x="2020" y="172" width="182" height="42" rx="3"/><text x="2028" y="188" style="font-weight:600">b03</text><text x="2028" y="204" style="font-size:11.5px">Biais et variance partout</text></g>
+<g class="node bridge" data-id="b04" data-href="sheets/bridges/bridge-04-variance-moyenne-correlee.html" data-up="p00-01 p00-02 p00-03 p00-04 p01-01 p01-02 p01-04 p01-05 p02-01 p03-01 p03-02 p04-01 p04-02 p06-01 p06-02 p07-01 p07-02 p08-01" data-down="" tabindex="0" style="--ac:var(--amber)"><rect x="2020" y="230" width="182" height="42" rx="3"/><text x="2028" y="246" style="font-weight:600">b04</text><text x="2028" y="262" style="font-size:11.5px">La variance d&#x27;une moyenne…</text></g>
+<g class="node bridge" data-id="b05" data-href="sheets/bridges/bridge-05-escalier-vs-sensible.html" data-up="p00-01 p00-02 p00-03 p00-04 p02-01 p03-01 p03-02 p04-01 p04-02 p08-01" data-down="" tabindex="0" style="--ac:var(--amber)"><rect x="2020" y="288" width="182" height="42" rx="3"/><text x="2028" y="304" style="font-weight:600">b05</text><text x="2028" y="320" style="font-size:11.5px">Escalier vs sensible</text></g>
+<g class="node bridge" data-id="b06" data-href="sheets/bridges/bridge-06-convexite-forme-fermee.html" data-up="p00-01 p00-02 p00-03 p00-04 p02-01 p02-02 p03-01 p03-02 p04-01 p04-02 p04-03 p04-04 p05-01 p05-02 p07-04 p08-01" data-down="" tabindex="0" style="--ac:var(--amber)"><rect x="2020" y="346" width="182" height="42" rx="3"/><text x="2028" y="362" style="font-weight:600">b06</text><text x="2028" y="378" style="font-size:11.5px">Convexité et forme fermée</text></g>
+</svg></div>
+<p class="help">Tape une chaîne : son amont et son aval restent, le reste s'efface. Tape-la encore pour l'ouvrir.</p></details>
+<footer>Générée par <code>tools/build_index.py</code> le 19/09/2026. Les ancres <code>#pNN-MM</code> de cette page sont les cibles des liens « prérequis » des sheets.</footer>
+<script>(function(){
+var svg=document.querySelector('.map svg');if(!svg)return;
+var nodes=svg.querySelectorAll('g.node'),edges=svg.querySelectorAll('.edge'),cur=null;
+function reset(){cur=null;svg.classList.remove('focus');
+  nodes.forEach(function(n){n.classList.remove('on','me');});edges.forEach(function(e){e.classList.remove('on');});}
+function focus(g){cur=g;var keep={};
+  [g.dataset.id].concat(g.dataset.up.split(' '),g.dataset.down.split(' ')).forEach(function(i){if(i)keep[i]=1;});
+  svg.classList.add('focus');
+  nodes.forEach(function(n){n.classList.toggle('on',!!keep[n.dataset.id]);n.classList.toggle('me',n===g);});
+  edges.forEach(function(e){e.classList.toggle('on',!!(keep[e.dataset.from]&&keep[e.dataset.to]));});}
+function tap(g){if(g===cur){if(g.dataset.href)location.href=g.dataset.href;return;}focus(g);}
+svg.addEventListener('click',function(e){var g=e.target.closest('g.node');if(g)tap(g);else reset();});
+svg.addEventListener('keydown',function(e){var g=e.target.closest('g.node');
+  if(g&&(e.key==='Enter'||e.key===' ')){e.preventDefault();tap(g);}});
+document.addEventListener('keydown',function(e){if(e.key==='Escape')reset();});
+})();</script>
+</body></html>
