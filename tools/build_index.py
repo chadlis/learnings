@@ -49,11 +49,26 @@ for s in specs:
         if old: s['href'] = os.path.relpath(old[0], ROOT); s['exists'] = True
 byid = {s['id']: s for s in specs}
 
+def version(href):
+    """Version publiée d'une sheet, lue dans sa meta `sheet` (…;status=vN).
+
+    C'est le fichier qui fait foi, pas le spec : une sheet révisée porte sa
+    version dans son `<title>`, son footer et cette meta, et l'index doit dire
+    la même chose. Repli sur v1 si la meta manque ou n'a pas de status.
+    """
+    try:
+        t = open(f'{ROOT}/{href}', encoding='utf-8').read(4096)
+    except OSError:
+        return 'v1'
+    m = re.search(r'<meta name="sheet" content="[^"]*status=(v\d+)', t)
+    return m.group(1) if m else 'v1'
+
+
 def item(s):
     cls = 'it' + ('' if s['exists'] else ' todo')
     k = {'chain': s['number'], 'walkthrough': 'D' + s['number'], 'bridge': 'P' + s['number'], 'coding': 'C' + s['number']}[s['series']]
     sub = html.escape(s.get('subtitle', ''))
-    n = 'v1' if s['exists'] else ('spec prêt' if s['status'] == 'ready' else 'à venir')
+    n = version(s['href']) if s['exists'] else ('spec prêt' if s['status'] == 'ready' else 'à venir')
     inner = f'<span class="k">{k}</span><span class="t">{html.escape(s["title"])}<small>{LABEL[s["series"]]} · {sub}</small></span><span class="n">{n}</span>'
     return f'<a class="{cls}" href="{s["href"]}">{inner}</a>' if s['exists'] else f'<div class="{cls}">{inner}</div>'
 
