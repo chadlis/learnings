@@ -206,7 +206,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <ul>
       <li><b>Split</b> — CART ne coupe pas à l'accuracy ; l'impureté est un surrogate. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s2">p03-01 pas 2–5</a> · <a href="../chains/chain-p07-01-arbres-impurete.html">p07-01</a></li>
       <li><b>Loss</b> — gradient (<span class="m">p</span> − <span class="m">y</span>)<span class="m">x</span> jamais nul ; séparation parfaite. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s7">p03-01 pas 7</a> · <a href="../chains/chain-p05-02-logistique.html">p05-02</a> · <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a></li>
-      <li><b>Pénalité</b> — zéros exacts du Lasso ; coude = mur. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s8">p03-01 pas 8</a> · <a href="../chains/chain-p02-02-prior-penalite.html#s6">p02-02 pas 6</a></li>
+      <li><b>Pénalité</b> — zéros exacts du Lasso ; coude = mur. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s8">p03-01 pas 8</a> · <a href="../chains/chain-p02-02-prior-penalite.html#s7">p02-02 pas 7</a></li>
       <li><b>SVM</b> — vecteurs de support. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s9">p03-01 pas 9</a></li>
       <li><b>Évaluation</b> — on <b>évalue</b> en marches, on n'<b>apprend</b> pas avec. <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s10">p03-01 casse</a> · <a href="../chains/chain-p06-03-seuil-roc-pr.html">p06-03</a></li>
     </ul>
@@ -282,7 +282,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr><td>8</td><td>0,111</td><td>0</td></tr>
     </table>
     <p>À <span class="m">λ</span> = 8, L2 est encore à 0,111 : quatre fois plus de pénalité que le seuil de L1, et toujours pas de zéro. Sur <span class="m">p</span> paramètres, c'est la sélection de variables du Lasso — et l'absence de sélection de la ridge.</p>
-    <p><b>Où c'est écrit</b> : <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s8">p03-01 pas 8</a> · <a href="../chains/chain-p02-02-prior-penalite.html#s6">p02-02 pas 6</a> (L1 tranche ailleurs : le même coude, vu depuis le prior de Laplace). La convention sans ½ est celle du dépôt : un ½ déplacerait tous les seuils en <span class="m">λ</span> d'un facteur 2.</p>
+    <p><b>Où c'est écrit</b> : <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html#s8">p03-01 pas 8</a> · <a href="../chains/chain-p02-02-prior-penalite.html#s7">p02-02 pas 7</a> (L1 tranche ailleurs : le même coude, vu depuis le prior de Laplace). La convention sans ½ est celle du dépôt : un ½ déplacerait tous les seuils en <span class="m">λ</span> d'un facteur 2.</p>
   </div>
 </div>
 
@@ -360,7 +360,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <a href="../chains/chain-p03-01-critere-escalier-vs-sensible.html"><b>p03-01 — Critère en escalier vs critère sensible</b><small>la chaîne dont ce pont est la table d'entrée : tout y est dérivé et chiffré, pas 1 à 10</small></a>
     <a href="bridge-01-une-seule-descente.html"><b>b01 — Une seule descente</b><small>l'autre moitié du geste : ici la forme du critère, là le pas qui l'utilise — et le même « pente nulle, rien ne bouge »</small></a>
     <a href="bridge-06-convexite-forme-fermee.html"><b>b06 — Convexité et forme fermée</b><small>quand la pente s'annule en un point unique on résout, sinon on itère : la suite naturelle de cette table</small></a>
-    <a href="../chains/chain-p02-02-prior-penalite.html#s6"><b>p02-02 pas 6 — L1 tranche ailleurs</b><small>le coude de L1 vu depuis le prior de Laplace : même mur, autre récit</small></a>
+    <a href="../chains/chain-p02-02-prior-penalite.html#s7"><b>p02-02 pas 7 — L1 tranche ailleurs</b><small>le coude de L1 vu depuis le prior de Laplace : même mur, autre récit</small></a>
     <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html"><b>D4 — Une chaîne, trois exemples</b><small>d'où viennent la log-loss et la MSE, et l'exemple 2 (séparation parfaite) que la ligne « loss » de la table appelle</small></a>
   </div>
 </div>

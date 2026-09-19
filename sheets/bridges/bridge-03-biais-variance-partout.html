@@ -230,7 +230,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr><td>Prior</td><td>posterior</td><td><span class="m">τ</span>²</td><td><span class="m">τ</span>² étroit ↔ <span class="m">τ</span>² plat</td></tr>
       <tr><td>Boosting</td><td><span class="m">F</span></td><td><span class="m">ν</span> ; arbres</td><td>souches ↔ trop d'arbres</td></tr>
     </table>
-    <p><b>Où c'est écrit</b>, ligne à ligne : <a href="../chains/chain-p01-01-objet-aleatoire.html#s4">p01-01 pas 4–5</a> et <a href="../chains/chain-p01-03-inference-regression.html#s3">p01-03 pas 3</a> · <a href="../chains/chain-p06-01-biais-variance.html">p06-01</a> · <a href="../chains/chain-p06-02-cv-leakage.html">p06-02</a> · <a href="../chains/chain-p07-02-bagging-rf.html">p07-02</a> · <a href="../chains/chain-p02-02-prior-penalite.html#s7">p02-02 pas 7</a> et <a href="../chains/chain-p05-03-regularisation-biais-variance.html">p05-03</a> · <a href="../chains/chain-p02-03-conjugues-posterior.html#s5">p02-03 pas 5</a> · <a href="../chains/chain-p07-03-boosting.html">p07-03</a>.</p>
+    <p><b>Où c'est écrit</b>, ligne à ligne : <a href="../chains/chain-p01-01-objet-aleatoire.html#s4">p01-01 pas 4–5</a> et <a href="../chains/chain-p01-03-inference-regression.html#s3">p01-03 pas 3</a> · <a href="../chains/chain-p06-01-biais-variance.html">p06-01</a> · <a href="../chains/chain-p06-02-cv-leakage.html">p06-02</a> · <a href="../chains/chain-p07-02-bagging-rf.html">p07-02</a> · <a href="../chains/chain-p02-02-prior-penalite.html#s8">p02-02 pas 8</a> et <a href="../chains/chain-p05-03-regularisation-biais-variance.html">p05-03</a> · <a href="../chains/chain-p02-03-conjugues-posterior.html#s5">p02-03 pas 5</a> · <a href="../chains/chain-p07-03-boosting.html">p07-03</a>.</p>
     <p><b>Deux intrus utiles.</b> <span class="m">n</span> et <span class="m">B</span> ne sont pas des boutons d'arbitrage : ils font baisser la variance <i>sans</i> monter le biais. Pas de U, donc pas de réglage — on les monte tant que le budget suit.</p>
   </div>
   <div class="fig" id="fig1">
@@ -349,7 +349,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr><td>pénalité ridge</td><td><span class="m">λ</span><sub><span class="up">r</span></sub> = <span class="m">n λ</span></td><td>16</td></tr>
       <tr class="hl"><td>prior gaussien</td><td><span class="m">τ</span>² = (<span class="m">σ</span>²/<span class="m">n</span>)/<span class="m">λ</span></td><td><b>1</b></td></tr>
     </table>
-    <p>Avec <span class="m">x̄</span> = 0,9 observé, la moyenne du posterior vaut 0,9 × 0,5 = <b>0,45</b> : prior et vraisemblance pèsent exactement pareil, parce que <span class="m">τ</span>² = <span class="m">σ</span>²/<span class="m">n</span> = 1. Et le <span class="m">τ</span>² optimal vaut <span class="m">μ</span>² : le bon prior est celui dont la largeur est l'ordre de grandeur de la vérité. On ne l'a pas — d'où la validation croisée pour <span class="m">λ</span> (<a href="../chains/chain-p02-02-prior-penalite.html#s7">p02-02 pas 7</a>) et le noyage du prior quand <span class="m">n</span> grandit (<a href="../chains/chain-p02-03-conjugues-posterior.html#s5">p02-03 pas 5</a>).</p>
+    <p>Avec <span class="m">x̄</span> = 0,9 observé, la moyenne du posterior vaut 0,9 × 0,5 = <b>0,45</b> : prior et vraisemblance pèsent exactement pareil, parce que <span class="m">τ</span>² = <span class="m">σ</span>²/<span class="m">n</span> = 1. Et le <span class="m">τ</span>² optimal vaut <span class="m">μ</span>² : le bon prior est celui dont la largeur est l'ordre de grandeur de la vérité. On ne l'a pas — d'où la validation croisée pour <span class="m">λ</span> (<a href="../chains/chain-p02-02-prior-penalite.html#s8">p02-02 pas 8</a>) et le noyage du prior quand <span class="m">n</span> grandit (<a href="../chains/chain-p02-03-conjugues-posterior.html#s5">p02-03 pas 5</a>).</p>
   </div>
 </div>
 
@@ -404,7 +404,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <a href="bridge-04-variance-moyenne-correlee.html"><b>b04 — La variance d'une moyenne corrélée</b><small>le terme <span class="m">ρσ</span>² isolé : pourquoi moyenner cesse d'aider, en bagging comme en LOOCV</small></a>
     <a href="bridge-02-temoin-atteignable.html"><b>b02 — Le témoin atteignable</b><small>l'autre moitié du même sujet : là ce qui ne peut que baisser, ici ce qui se décompose</small></a>
     <a href="../chains/chain-p01-01-objet-aleatoire.html#s3"><b>p01-01 pas 3 et 9 — L'objet aléatoire</b><small>la distribution d'échantillonnage, et pourquoi un SE décrit une procédure et pas un nombre</small></a>
-    <a href="../chains/chain-p02-02-prior-penalite.html#s7"><b>p02-02 pas 7 — Le <span class="m">λ</span> réel, celui qu'on règle</b><small>d'où sort l'équivalence pénalité ↔ prior, et comment <span class="m">λ</span> se choisit en pratique</small></a>
+    <a href="../chains/chain-p02-02-prior-penalite.html#s8"><b>p02-02 pas 8 — Le <span class="m">λ</span> réel, celui qu'on règle</b><small>d'où sort l'équivalence pénalité ↔ prior, et comment <span class="m">λ</span> se choisit en pratique</small></a>
     <a href="../chains/chain-p06-01-biais-variance.html"><b>p06-01 — Biais-variance</b><small>la chaîne qui démontre la décomposition ; ce pont ne fait que la promener</small></a>
   </div>
 </div>

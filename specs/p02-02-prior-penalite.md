@@ -10,7 +10,7 @@ prereq: [p02-01, p04-02]
 anki: [stats::map, stats::regularisation, ml::ridge, ml::lasso, algebre::eigen]
 bridges: [b05, b06, b03]
 next: p02-03
-status: reviewed
+status: built
 ---
 
 ## Question de la chaîne
@@ -94,3 +94,73 @@ Pas d'Elastic Net au-delà d'une ligne. Pas de chemin de régularisation complet
 
 Ce qui **ne change pas** : le point de contact (0 ; 0,5) de la figure 1 et du tableau des priors. Il sort d'un argument de **norme minimale sur la droite des solutions** — quel point du sous-espace RSS = 0 la boule L1 touche en premier — pas d'un seuillage en λ. Aucune figure ni aucun readout n'affichait le seuil L1 : la figure 2 chiffre la pénalité λβ², déjà sans ½. Statut **reviewed**.
 
+- **Chiffres du delta : tous revérifiés, un seul arrondi corrigé** — 19/09 corr(x₁, x₂) = 0,99761 ; XᵀX = [[55 ; 110,6], [110,6 ; 222,6]], μ = 0,038334 et 277,5617, conditionnement 7 240,6 ; v_min = (−0,8955 ; 0,4450), rapport −2,012 ; OLS β̂ = (−0,5974 ; 0,7989), β̂₁ + 2β̂₂ = 1,00038 ; RSS = 0,011992, σ̂² = 0,0039973 ; écarts-types 0,3229 et 0,00380, rapport 85,1 = √7 240,6 ; ridge λ = 1 → μ 1,0383 et 278,60, conditionnement 268,3, β̂ = (0,1699 ; 0,4158) ; table λ = 0 / 0,1 / 1 / 10 conforme. Séparation : λ = 10⁻⁶ → β̂ = 11,383 ; prior noyé : 0,98592 / 0,99857 / 0,999857. **Seule correction** : le delta écrit « β̂₁ + 2β̂₂ reste entre 0,988 et 1,012 » ; les bornes exactes du leave-one-out sont **0,9879** (sans le 4ᵉ point) et **1,0121** (sans le 5ᵉ). La sheet écrit 0,988 et 1,012.
+- **SL.plane ne sait pas dessiner cette figure** — 19/09 Le delta exige `SL.plane` pour l'ellipse de confiance. `SL.plane` est le visualiseur d'application linéaire (grille + carré unité sous une matrice 2×2) : il n'expose ni ellipse, ni nuage de points, ni readouts. La figure 4 est donc faite en `SL.plot`, avec l'ellipse tracée par `P.seg` dans la couche `dyn` — donc sans SVG custom hors `SL.plot`, comme la contrainte l'exige. À confirmer.
+- **σ²(XᵀX + λI)⁻¹ est lue comme la covariance du posterior** — 19/09 Les demi-axes de la figure valent σ̂/√(μₖ + λ), ce que le delta prescrit. C'est **exactement** la covariance du posterior gaussien avec λ = σ²/τ² — cohérent avec le cadre MAP de cette chaîne. Ce n'est pas la variance d'échantillonnage de l'estimateur ridge, qui est en sandwich, σ²μₖ/(μₖ + λ)². Les deux coïncident en λ = 0. Faut-il le dire dans la sheet, ou est-ce le sujet de p02-03 ?
+- **7e maillon verbalisé et 8e ligne de résumé** — 19/09 Le delta les demande explicitement ; `tools/validate_sheet.py` bornait à 4–6 et ≤ 7. Bornes portées à 4–7 et ≤ 8 dans un commit d'outillage séparé, sans retirer ni reformuler aucun maillon existant. À confirmer en revue.
+
+## Révision v2 (18/09/2026)
+
+### Pas ajouté — « Quand rien n'est nul : le mal conditionné » [tronc]
+Placement : après « +λI translate, n'annule pas », avant « L1 tranche ailleurs ». Les pas suivants sont renumérotés.
+
+Règle. À r = 0,99, XᵀX est **inversible** : aucune valeur propre n'est nulle, la solution est unique. Ce qui casse n'est pas l'existence, c'est la variance :
+Var(β̂) = σ²(XᵀX)⁻¹ = σ² Σₖ vₖvₖᵀ / μₖ
+La variance de β̂ le long du vecteur propre vₖ vaut σ²/μₖ. Une petite valeur propre ne supprime pas la solution, elle la rend **instable** dans sa direction. +λI la relève de λ : la variance dans cette direction retombe à σ²/(μₖ + λ).
+
+Exemple fil rouge de ce pas (distinct du jeu colinéaire exact) : x₁ = (1, 2, 3, 4, 5), x₂ = (2,2 ; 3,8 ; 6,2 ; 7,8 ; 10,2), corrélation 0,9976 ; y = (1,2 ; 1,8 ; 3,2 ; 3,9 ; 5,1) ; modèle f = β₁x₁ + β₂x₂, sans intercept.
+
+Application chiffrée :
+- XᵀX = [[55 ; 110,6], [110,6 ; 222,6]] · valeurs propres **0,038** et **277,6** · conditionnement **7 240**.
+- v_min = (−0,896 ; 0,445) ∝ (−2 ; 1) — la direction « échanger β₁ contre β₂ » ; v_max ∝ (1 ; 2), la direction où les données parlent.
+- OLS : β̂ = (**−0,597** ; **0,799**) — signes opposés — alors que la combinaison stable β̂₁ + 2β̂₂ vaut 1,000.
+- σ̂² = RSS/(n − p) = 0,0120/3 = 0,0040. Écart-type de β̂ le long de v_min : √(0,0040/0,038) = **0,32** ; le long de v_max : **0,0038**. Rapport 85 = √7 240.
+- Retirer un seul point : β̂₁ va de −0,45 (sans le 2ᵉ) à −0,97 (sans le 4ᵉ) ; β̂₁ + 2β̂₂ reste entre 0,988 et 1,012.
+- Ridge λ = 1 : valeurs propres 1,04 et 278,6, conditionnement **268** ; β̂ = (0,17 ; 0,42), tout près du point de norme minimale (0,2 ; 0,4) du pas « ce que la pénalité fournit ».
+
+| λ | μ_min + λ | conditionnement | β̂ |
+| --- | --- | --- | --- |
+| 0 | 0,038 | 7 240 | (−0,60 ; 0,80) |
+| 0,1 | 0,138 | 2 007 | (−0,02 ; 0,51) |
+| 1 | 1,04 | 268 | (0,17 ; 0,42) |
+| 10 | 10,0 | 29 | (0,19 ; 0,39) |
+
+Au tableau : « Aucune valeur propre n'est nulle, donc la solution est unique, donc ce qui casse n'est pas l'existence mais la variance : σ²/μ_min explose le long de v_min, donc deux coefficients de signes opposés qui se compensent, donc quelques lignes en moins les font basculer ; +λI relève μ_min de λ, donc la variance dans cette direction redescend. »
+
+Distinction à écrire en clair, une phrase : colinéarité **exacte** ⇒ valeur propre nulle ⇒ pas d'unicité (pas 1 et 4) ; colinéarité **presque** exacte ⇒ valeur propre minuscule ⇒ unicité mais variance explosive (ce pas). Même remède, deux mécanismes.
+
+### Figure exigée
+SL.plane : le plan (β₁, β₂). Ellipse de confiance de β̂ (axes v_min / v_max, demi-axes ∝ 1/√(μₖ + λ)), les cinq β̂ leave-one-out en points à λ = 0, le point de norme minimale (0,2 ; 0,4) en repère. Curseur λ ∈ [0 ; 10] (échelle log). Readouts : μ_min + λ, conditionnement, écart-type le long de v_min, β̂. Légende : « À λ = 0 l'ellipse est une aiguille le long de (−2 ; 1) et les cinq points s'y étalent ; monte λ : l'aiguille se referme, le centre glisse vers (0,2 ; 0,4). »
+
+### Pas « ce que la pénalité fournit » — application à compléter (séparation)
+Après le tableau λ → β̂ (3,41 ; 1,85 ; 0,71), ajouter la ligne λ = 10⁻⁶ → 11,4 et la lecture : **β̂ sous séparation n'est pas une estimation.** Les données disent « le plus grand possible » ; le chiffre est entièrement fixé par λ. Ne jamais l'interpréter — ni lui, ni son odds ratio, ni son signe comparé à un autre coefficient.
+
+### Pas « λ en pratique » — paragraphe ajouté : le prior est noyé là où les données parlent
+XᵀX croît avec n ; λI ne bouge pas. Jeu colinéaire exact répliqué k fois (n = 3k) : XᵀX = k·[[14, 28], [28, 56]], valeurs propres 0 et 70k. Facteur de rétrécissement dans la direction des données : 70k/(70k + λ).
+
+| n | facteur à λ = 1 |
+| --- | --- |
+| 3 | 0,986 |
+| 30 | 0,9986 |
+| 300 | 0,99986 |
+
+Dans la direction plate, la valeur propre reste 0 → λ quel que soit n : le prior y est la seule voix, pour toujours. Au tableau : « XᵀX croît avec n et λI ne bouge pas, donc là où les données parlent le prior est noyé quand n grandit, donc là où elles se taisent il reste la seule voix, donc λ se règle en fonction de n et jamais dans l'absolu. » Renvoi p02-03 pour le posterior entier.
+
+### Où ça casse — limite ajoutée
+**Séparation sans bug.** Deux cas réels, sans leakage : une modalité rare d'une variable catégorielle à haute cardinalité (user_id, merchant_id one-hot) où tous les exemples portent le même label — quasi-séparation ; et p > n (texte, bag-of-words), où un hyperplan séparateur existe presque toujours. Signature : un coefficient qui grimpe avec les itérations, une loss qui ne se stabilise jamais. C'est pourquoi une logistique non régularisée n'est jamais utilisée sur du texte.
+
+### Résumé — lignes ajoutées
+7. À 0,99 rien n'est nul : unicité, mais Var(β̂) = σ² Σ vₖvₖᵀ/μₖ explose le long de v_min ; +λI la fait redescendre.
+8. β̂ sous séparation est le prior qui parle ; et quand n grandit, le prior est noyé là où les données parlent, seule voix là où elles se taisent.
+
+### Chaîne verbalisée — maillons ajoutés (6e, 7e)
+« Corrélation 0,99 entre deux features : qu'est-ce qui casse, exactement ? » → « Pas l'existence : XᵀX est inversible. La variance le long de v_min, σ²/μ_min — coefficients de signes opposés, instables à dix lignes près. +λI relève μ_min. »
+« Que vaut β̂ = 6 obtenu sous séparation avec λ = 0,1 ? » → « Rien : c'est λ qui parle. Change λ, il change. On ne l'interprète pas. »
+
+### Ce qui a cassé pour Salah — 18/09 (re-mesure, Q2 et Q6, non acquis)
+- Q2 : à r = 0,99, XᵀX déclarée « matrice de covariance, non inversible, noyau non nul » — faux, et le lien avec l'instabilité décrite (coefficients énormes de signes opposés, bascule quand on retire 10 lignes) n'a pas été fait. Le pas ajouté est écrit contre cette réponse. « +λI la rend positive et inversible » a été donné comme résultat, sans le mécanisme de translation du spectre (pas 5 existant, à produire).
+- Q2, dernier volet (n : 500 → 5 millions) : non répondu. Le paragraphe « prior noyé » est la réponse.
+- Q6 : « le coefficient grimpe sans limite » donné comme mécanisme (c'est le symptôme) ; la séparation parfaite non nommée, « le MLE n'existe pas » non dit ; β̂ = 6 non lu comme le prior qui parle ; « situations réelles » confondues avec la colinéarité de Q2. La limite ajoutée et la lecture ajoutée au pas 4 sont la réponse.
+- Le 15/09 avait déjà noté « +λI annule » ; le 18/09 confirme que le pas 5 n'est pas encore produit de mémoire.
+
+### Exclusions — inchangées, plus : pas de VIF, pas de SE robustes, pas d'Elastic Net au-delà de la mention existante.

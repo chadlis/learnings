@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Du prior à la pénalité — chaîne</title>
-<meta name="sheet" content="series=chain;part=02;number=02;status=v1">
+<title>Du prior à la pénalité — chaîne · v2</title>
+<meta name="sheet" content="series=chain;part=02;number=02;status=v2">
 <meta name="part" content="02 · Le bruit décide (fil B)">
 <meta name="subtitle" content="fil B — MAP, λ = σ²/τ², +λI translate, L1 tranche ailleurs">
 <meta name="prereq" content="p02-01,p04-02,p00-03">
@@ -276,10 +276,11 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <p>Parabole, <b>un</b> minimum, en <span class="m">t</span> = −0,4 → <span class="hat"><span class="m">β</span></span> = (<b>0,2</b> ; <b>0,4</b>), de norme ‖<span class="m">β</span>‖² = 0,2 et ‖<span class="m">β</span>‖<sub>2</sub> = 0,447. Les trois autres lignes du tableau du pas 1 valent 1, 10 et 2 : elles perdent toutes.</p>
     <p><b>Existence.</b> Sur le jeu séparable, <span class="up">argmin</span> [NLL(<span class="m">β</span>) + <span class="m">λβ</span>²] existe dès que <span class="m">λ</span> &gt; 0 :</p>
     <table>
-      <tr><th><span class="m">λ</span></th><th>0,01</th><th>0,1</th><th>1</th></tr>
-      <tr class="hl"><td><span class="hat"><span class="m">β</span></span></td><td><b>3,41</b></td><td><b>1,85</b></td><td><b>0,71</b></td></tr>
+      <tr><th><span class="m">λ</span></th><th>10<sup>−6</sup></th><th>0,01</th><th>0,1</th><th>1</th></tr>
+      <tr class="hl"><td><span class="hat"><span class="m">β</span></span></td><td><b>11,4</b></td><td><b>3,41</b></td><td><b>1,85</b></td><td><b>0,71</b></td></tr>
     </table>
     <p>Même <span class="m">λ</span> = 10<sup>−6</sup> suffit : il ne change rien près de l'origine, il bloque seulement la fuite à l'infini. <b>La pénalité ne rend pas la solution meilleure, elle la fait exister.</b></p>
+    <p><b><span class="hat"><span class="m">β</span></span> sous séparation n'est pas une estimation.</b> Les données disent « le plus grand possible » ; le chiffre est entièrement fixé par <span class="m">λ</span> — c'est toute la lecture du tableau, où <span class="m">λ</span> seul fait passer <span class="hat"><span class="m">β</span></span> de 11,4 à 0,71. Ne jamais l'interpréter : ni lui, ni son odds ratio, ni son signe comparé à un autre coefficient.</p>
   </div>
   <div class="fig" id="fig1">
     <div class="lbl">Figure 1 — la boule qui gonfle jusqu'à la droite</div>
@@ -334,6 +335,42 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 <div class="step" id="s6">
   <div class="rule">
+    <h3>Quand rien n'est nul : le mal conditionné <span class="tag tronc">tronc</span></h3>
+    <p>À <span class="m">r</span> = 0,99, <span class="m">X</span><sup>⊤</sup><span class="m">X</span> est <b>inversible</b> : aucune valeur propre n'est nulle, la solution est unique. Ce qui casse n'est pas l'existence, c'est la <b>variance</b> :</p>
+    <div class="eq">Var(<span class="hat"><span class="m">β</span></span>) = <span class="m">σ</span>²(<span class="m">X</span><sup>⊤</sup><span class="m">X</span>)<sup>−1</sup> = <span class="m">σ</span>² <span class="m">Σ</span><sub><span class="m">k</span></sub> <span class="m">v</span><sub><span class="m">k</span></sub><span class="m">v</span><sub><span class="m">k</span></sub><sup>⊤</sup> / <span class="m">μ</span><sub><span class="m">k</span></sub></div>
+    <p>La variance de <span class="hat"><span class="m">β</span></span> le long du vecteur propre <span class="m">v</span><sub><span class="m">k</span></sub> vaut <span class="m">σ</span>²/<span class="m">μ</span><sub><span class="m">k</span></sub>. Une petite valeur propre ne <i>supprime</i> pas la solution, elle la rend <b>instable</b> dans sa direction. +<span class="m">λI</span> la relève de <span class="m">λ</span> : la variance dans cette direction retombe à <span class="m">σ</span>²/(<span class="m">μ</span><sub><span class="m">k</span></sub> + <span class="m">λ</span>).</p>
+    <p>Colinéarité <b>exacte</b> ⇒ valeur propre nulle ⇒ pas d'unicité (pas 1 et 4) ; colinéarité <b>presque</b> exacte ⇒ valeur propre minuscule ⇒ unicité, mais variance explosive (ici). Même remède, deux mécanismes.</p>
+    <p class="say">« Aucune valeur propre n'est nulle, donc la solution est unique, donc ce qui casse n'est pas l'existence mais la variance : <span class="m">σ</span>²/<span class="m">μ</span><sub>min</sub> explose le long de <span class="m">v</span><sub>min</sub>, donc deux coefficients de signes opposés qui se compensent, donc quelques lignes en moins les font basculer ; +<span class="m">λI</span> relève <span class="m">μ</span><sub>min</sub> de <span class="m">λ</span>, donc la variance dans cette direction redescend. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — deux features corrélées à 0,9976</div>
+    <p><span class="m">x</span><sub>1</sub> = (1, 2, 3, 4, 5), <span class="m">x</span><sub>2</sub> = (2,2 ; 3,8 ; 6,2 ; 7,8 ; 10,2), <span class="m">y</span> = (1,2 ; 1,8 ; 3,2 ; 3,9 ; 5,1), modèle <span class="m">f</span> = <span class="m">β</span><sub>1</sub><span class="m">x</span><sub>1</sub> + <span class="m">β</span><sub>2</sub><span class="m">x</span><sub>2</sub>, sans intercept. Un autre jeu que le colinéaire exact du pas 1 : ici rien n'est dégénéré.</p>
+    <div class="eq"><span class="m">X</span><sup>⊤</sup><span class="m">X</span> = [[55 ; 110,6], [110,6 ; 222,6]] &nbsp;·&nbsp; <span class="m">μ</span> = <b>0,038</b> et <b>277,6</b> &nbsp;·&nbsp; conditionnement <b>7 240</b></div>
+    <p><span class="m">v</span><sub>min</sub> = (−0,896 ; 0,445) ∝ (−2 ; 1) — la direction « échanger <span class="m">β</span><sub>1</sub> contre <span class="m">β</span><sub>2</sub> » ; <span class="m">v</span><sub>max</sub> ∝ (1 ; 2), la direction où les données parlent.</p>
+    <ul>
+      <li><b>OLS</b> : <span class="hat"><span class="m">β</span></span> = (<b>−0,597</b> ; <b>0,799</b>) — signes opposés — alors que la combinaison stable <span class="hat"><span class="m">β</span></span><sub>1</sub> + 2<span class="hat"><span class="m">β</span></span><sub>2</sub> vaut <b>1,000</b>.</li>
+      <li><span class="hat"><span class="m">σ</span></span>² = RSS/(<span class="m">n</span> − <span class="m">p</span>) = 0,0120/3 = 0,0040. Écart-type de <span class="hat"><span class="m">β</span></span> le long de <span class="m">v</span><sub>min</sub> : √(0,0040/0,038) = <b>0,32</b> ; le long de <span class="m">v</span><sub>max</sub> : <b>0,0038</b>. Rapport <b>85</b> = √7 240.</li>
+      <li>Retirer <b>un seul</b> point : <span class="hat"><span class="m">β</span></span><sub>1</sub> va de −0,45 (sans le 2<sup>e</sup>) à −0,97 (sans le 4<sup>e</sup>) ; <span class="hat"><span class="m">β</span></span><sub>1</sub> + 2<span class="hat"><span class="m">β</span></span><sub>2</sub>, lui, reste entre 0,988 et 1,012.</li>
+      <li>Ridge <span class="m">λ</span> = 1 : valeurs propres 1,04 et 278,6, conditionnement <b>268</b> ; <span class="hat"><span class="m">β</span></span> = (0,17 ; 0,42), tout près du point de norme minimale (0,2 ; 0,4) du pas 4.</li>
+    </ul>
+    <table>
+      <tr><th><span class="m">λ</span></th><th><span class="m">μ</span><sub>min</sub> + <span class="m">λ</span></th><th>conditionnement</th><th><span class="hat"><span class="m">β</span></span></th></tr>
+      <tr><td>0</td><td>0,038</td><td>7 240</td><td>(−0,60 ; 0,80)</td></tr>
+      <tr><td>0,1</td><td>0,138</td><td>2 007</td><td>(−0,02 ; 0,51)</td></tr>
+      <tr class="hl"><td>1</td><td>1,04</td><td><b>268</b></td><td>(0,17 ; 0,42)</td></tr>
+      <tr><td>10</td><td>10,0</td><td>29</td><td>(0,19 ; 0,39)</td></tr>
+    </table>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — l'aiguille, et ce que <span class="m">λ</span> lui fait</div>
+    <div id="f4plot" class="wide"></div>
+    <div id="f4sliders"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">Le plan (<span class="m">β</span><sub>1</sub>, <span class="m">β</span><sub>2</sub>). L'<span class="kl2">ellipse</span> est la région à 95 % autour de <span class="hat"><span class="m">β</span></span> : ses demi-axes valent <span class="hat"><span class="m">σ</span></span>/√(<span class="m">μ</span><sub><span class="m">k</span></sub> + <span class="m">λ</span>) le long de <span class="m">v</span><sub>min</sub> et de <span class="m">v</span><sub>max</sub>. Les <span class="kd">cinq points</span> sont les <span class="hat"><span class="m">β</span></span> obtenus en retirant une ligne, à <span class="m">λ</span> = 0. À <span class="m">λ</span> = 0 l'ellipse est une <b>aiguille</b> le long de (−2 ; 1) et les cinq points s'y étalent ; monte <span class="m">λ</span> : l'aiguille se referme, et le centre glisse vers le <span class="kl1">point de norme minimale (0,2 ; 0,4)</span>.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
     <h3>L1 tranche ailleurs</h3>
     <p>Prior de Laplace ⇒ pénalité ‖<span class="m">β</span>‖<sub>1</sub> ⇒ Lasso. Même rôle qu'au pas 4 — trancher sur la droite plate — mais le point choisi <b>change</b>.</p>
     <p><b>Géométrie.</b> Gonfler la pénalité jusqu'au premier contact avec la droite, c'est gonfler sa boule. La boule L2 est ronde : elle touche n'importe où, et presque jamais sur un axe. La boule L1 est un losange dont les <b>sommets sont posés sur les axes</b> : une droite générique la rencontre d'abord par un sommet, donc avec une coordonnée exactement nulle.</p>
@@ -355,12 +392,14 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   </div>
 </div>
 
-<div class="step" id="s7">
+<div class="step" id="s8">
   <div class="rule">
     <h3>Le <span class="m">λ</span> réel, celui qu'on règle</h3>
     <p>On ne connaît ni <span class="m">σ</span>² ni <span class="m">τ</span>² : <span class="m">λ</span> ne se <b>calcule</b> pas, il se <b>choisit</b>, par validation croisée sur une grille logarithmique.</p>
     <p>Deux statuts à ne pas confondre. L'équivalence des formules — pénalité L2 = −<span class="m">log</span> d'un prior gaussien — est un <b>fait</b>, vrai ligne à ligne. L'interprétation bayésienne est une <b>lecture</b> : elle explique la <i>forme</i> de la pénalité, pas la valeur de <span class="m">λ</span>.</p>
+    <p><span class="m">X</span><sup>⊤</sup><span class="m">X</span> croît avec <span class="m">n</span> ; <span class="m">λI</span>, lui, ne bouge pas. Le même <span class="m">λ</span> ne pèse donc pas la même chose à <span class="m">n</span> = 500 et à <span class="m">n</span> = 5 millions.</p>
     <p class="say">« σ² et τ² ne sont pas observables, donc λ ne se calcule pas et se choisit par validation croisée, donc la lecture bayésienne donne la forme de la pénalité et la CV en fixe la force. »</p>
+    <p class="say">« XᵀX croît avec n et λI ne bouge pas, donc là où les données parlent le prior est noyé quand n grandit, donc là où elles se taisent il reste la seule voix, donc λ se règle en fonction de n et jamais dans l'absolu. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — les trois gestes obligatoires</div>
     <ul>
@@ -369,21 +408,30 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <li><b>Grille logarithmique</b> (10<sup>−4</sup> … 10<sup>4</sup>), et le <span class="m">λ</span> retenu doit tomber à l'<i>intérieur</i> de la grille : s'il est au bord, la grille est trop courte.</li>
     </ul>
     <p>Sur le jeu colinéaire, la CV n'a rien à départager en erreur — le RSS vaut 0 pour toute la droite. Elle choisira un <span class="m">λ</span> petit, et ce <span class="m">λ</span> petit suffit à rendre <span class="hat"><span class="m">β</span></span> unique : <span class="m">λ</span> = 0,01 → (0,200 ; 0,400).</p>
+    <p><b>Le prior est noyé là où les données parlent.</b> Jeu colinéaire exact répliqué <span class="m">k</span> fois (<span class="m">n</span> = 3<span class="m">k</span>) : <span class="m">X</span><sup>⊤</sup><span class="m">X</span> = <span class="m">k</span>·[[14, 28], [28, 56]], valeurs propres 0 et 70<span class="m">k</span>. Facteur de rétrécissement dans la direction des données : 70<span class="m">k</span>/(70<span class="m">k</span> + <span class="m">λ</span>).</p>
+    <table>
+      <tr><th><span class="m">n</span></th><th>facteur à <span class="m">λ</span> = 1</th></tr>
+      <tr><td>3</td><td>0,986</td></tr>
+      <tr><td>30</td><td>0,9986</td></tr>
+      <tr class="hl"><td>300</td><td><b>0,99986</b></td></tr>
+    </table>
+    <p>Dans la direction <b>plate</b>, en revanche, la valeur propre reste 0 → <span class="m">λ</span> quel que soit <span class="m">n</span> : le prior y est la seule voix, pour toujours. Le posterior entier dit la même chose en une fois — <a href="chain-p02-03-conjugues-posterior.html">p02-03</a>.</p>
     <div class="note">Quand <span class="m">n</span> est petit, un seul point — l'argmax du posterior — ne dit plus grand-chose : la largeur du posterior porte l'information. C'est <a href="chain-p02-03-conjugues-posterior.html">p02-03</a>.</div>
   </div>
 </div>
 
-<div class="step" id="s8">
+<div class="step" id="s9">
   <div class="rule">
     <h3>Où ça casse <span class="tag casse">casse</span></h3>
     <p>La pénalité <i>est</i> le prior. Tout ce qui casse vient de là : un prior faux, ou un prior qu'on croit poser alors qu'on en pose un autre.</p>
     <p class="say">« La pénalité est le moins log du prior, donc choisir une pénalité c'est déclarer une croyance, donc la question n'est pas de savoir si l'on régularise mais ce que l'on croit du monde. »</p>
   </div>
-  <div class="card casse"><div class="lbl">Quatre limites</div>
+  <div class="card casse"><div class="lbl">Cinq limites</div>
     <ul>
       <li><b>Prior faux.</b> L2 sur une vérité vraiment sparse répartit du poids sur des features inutiles au lieu de les éteindre ; L1 sur des effets diffus et corrélés en éteint à tort et n'en garde qu'une par groupe. Le critère ajouté doit correspondre à ce qu'on croit du monde : effets diffus ⇒ L2, vérité sparse ⇒ L1.</li>
       <li><b>Échelle.</b> ‖<span class="m">β</span>‖² compare des coefficients qui n'ont pas les mêmes unités. Sans standardisation, <span class="m">λ</span> pénalise surtout les features à petite échelle — dont les coefficients sont grands — et le prior effectivement posé n'est pas celui qu'on croyait.</li>
       <li><b>Intercept.</b> Le pénaliser revient à poser un prior centré sur 0 pour la valeur moyenne de <span class="m">y</span>, ce que personne ne croit. On le laisse libre.</li>
+      <li><b>Séparation sans bug.</b> Deux cas réels, sans la moindre fuite de cible : une <b>modalité rare</b> d'une variable catégorielle à haute cardinalité (<code>user_id</code>, <code>merchant_id</code> en one-hot) dont tous les exemples portent le même label — quasi-séparation ; et <b><span class="m">p</span> &gt; <span class="m">n</span></b> (texte, bag-of-words), où un hyperplan séparateur existe presque toujours. Signature : un coefficient qui grimpe avec les itérations, une loss qui ne se stabilise jamais. C'est pourquoi une logistique <b>non régularisée</b> ne s'utilise pas sur du texte.</li>
       <li><b>« On régularise pour éviter l'overfitting ».</b> Phrase tentante et fausse au niveau du mécanisme : la pénalité fournit l'<b>existence</b> et l'<b>unicité</b>, en tranchant là où le RSS est plat. La baisse de variance et le gain en test sont une <b>conséquence</b> (<a href="chain-p06-01-biais-variance.html">p06-01</a>). Dire la conséquence sans le mécanisme est ce qui coûte en entretien.</li>
     </ul>
   </div>
@@ -402,6 +450,8 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <li>+<span class="m">λI</span> <b>translate</b> le spectre de <span class="m">λ</span> : 0 → <span class="m">λ</span>, 70 → 70 + <span class="m">λ</span>. Rien n'est annulé, tout devient inversible.</li>
     <li>L1 tranche sur un <b>sommet</b> de sa boule, posé sur un axe : zéros exacts, (0 ; 0,5). L2 tranche au plus près : (0,2 ; 0,4), jamais zéro.</li>
     <li><span class="m">λ</span> par validation croisée ; standardiser avant ; ne pas pénaliser l'intercept.</li>
+    <li>À 0,99 <b>rien n'est nul</b> : unicité, mais Var(<span class="hat"><span class="m">β</span></span>) = <span class="m">σ</span>² <span class="m">Σ</span> <span class="m">v</span><sub><span class="m">k</span></sub><span class="m">v</span><sub><span class="m">k</span></sub><sup>⊤</sup>/<span class="m">μ</span><sub><span class="m">k</span></sub> explose le long de <span class="m">v</span><sub>min</sub> ; +<span class="m">λI</span> la fait redescendre.</li>
+    <li><span class="hat"><span class="m">β</span></span> sous séparation est <b>le prior qui parle</b> ; et quand <span class="m">n</span> grandit, le prior est noyé là où les données parlent, seule voix là où elles se taisent.</li>
   </ol>
 </div>
 <div class="phrase">« La pénalité L2 est le moins log d'un prior gaussien sur les coefficients, avec λ égal au rapport variance du bruit sur variance du prior. Ce qu'elle fournit, c'est l'existence et l'unicité : sous colinéarité elle choisit le point de norme minimale, et +λI translate chaque valeur propre de λ sans rien annuler. Un prior de Laplace donne L1, qui tranche sur un coin de sa boule et met des coefficients exactement à zéro. »</div>
@@ -409,12 +459,14 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 <section class="blk" id="verbal">
 <h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
-<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+<div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
   <ol class="verb">
     <li><div class="q">D'où sort <span class="m">λ</span>‖<span class="m">β</span>‖² ?</div><div class="a hid">Du −log d'un prior N(0, τ²) sur β. Le MAP minimise NLL + (−log prior) ; le terme quadratique tombe, avec λ = σ²/τ².</div></li>
     <li><div class="q">Que fournit la pénalité sous colinéarité ?</div><div class="a hid">L'unicité. Le RSS est constant sur la droite des solutions, la norme ne l'est pas : elle choisit (0,2 ; 0,4), le point de plus petite norme.</div></li>
     <li><div class="q">Que fait +<span class="m">λI</span> aux valeurs propres ?</div><div class="a hid">Il les translate de λ, mêmes vecteurs propres : 0 → λ, 70 → 70 + λ. Toutes positives ⇒ inversible ⇒ forme fermée. Rien n'est annulé.</div></li>
     <li><div class="q">Pourquoi L1 met-il des zéros exacts ?</div><div class="a hid">Sa boule a ses sommets sur les axes, et le premier contact tombe sur un sommet : (0 ; 0,5). En pente : |β| garde une pente constante jusqu'à 0, β² l'évanouit.</div></li>
+    <li><div class="q">Corrélation 0,99 entre deux features : qu'est-ce qui casse, exactement ?</div><div class="a hid">Pas l'existence : XᵀX est inversible. La variance le long de v<sub>min</sub>, σ²/μ<sub>min</sub> — coefficients de signes opposés, instables à dix lignes près. +λI relève μ<sub>min</sub>.</div></li>
+    <li><div class="q">Que vaut <span class="hat"><span class="m">β</span></span> = 6 obtenu sous séparation avec <span class="m">λ</span> = 0,1 ?</div><div class="a hid">Rien : c'est λ qui parle. Change λ, il change. On ne l'interprète pas.</div></li>
     <li><div class="q">Que fournit la pénalité sous séparation parfaite ?</div><div class="a hid">L'existence. La NLL seule n'a pas de minimum ; λβ² → ∞ fait remonter la somme. λ = 0,01 → β̂ = 3,41.</div></li>
   </ol>
 </div>
@@ -439,7 +491,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Chaîne p02-02 · v1 du 16/09/2026 · fil B, 2/3. Prérequis : <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, <a href="chain-p04-02-valeurs-propres-iteration.html">p04-02</a>, <a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>. Suite : <a href="chain-p02-03-conjugues-posterior.html">p02-03 Le posterior entier</a>.</footer>
+<footer>Chaîne p02-02 · v2 du 18/09/2026 · fil B, 2/3. Prérequis : <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, <a href="chain-p04-02-valeurs-propres-iteration.html">p04-02</a>, <a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>. Suite : <a href="chain-p02-03-conjugues-posterior.html">p02-03 Le posterior entier</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>
@@ -519,6 +571,53 @@ function draw3(lam){P3a.clear();P3b.clear();
    +`<div class="${lam>0?'pos':'zero'}">conditionnement<b>${lam>0?SL.fmt(k,k>=100?0:1):'∞'}</b></div>`
    +`<div class="${lam>0?'pos':'zero'}">β̂ ridge<b>${lam>0?SL.fmt(b1,3)+' ; '+SL.fmt(b2,3):'non unique'}</b></div>`;}
 SL.slider(document.getElementById('f3sliders'),{label:'λ',min:0,max:5,step:0.05,value:1,fmt:v=>SL.fmt(v,2)},draw3);
+
+/* ===== Figure 4 : le mal conditionné — l'aiguille de variance ===== */
+(function(){
+  const x1=[1,2,3,4,5], x2=[2.2,3.8,6.2,7.8,10.2], yv=[1.2,1.8,3.2,3.9,5.1];
+  const dt=(a,b)=>a.reduce((s,u,i)=>s+u*b[i],0);
+  const gram=(a,b)=>[[dt(a,a),dt(a,b)],[dt(a,b),dt(b,b)]];
+  const rhs=(a,b,y)=>[dt(a,y),dt(b,y)];
+  function solve(M,r){const d=M[0][0]*M[1][1]-M[0][1]*M[1][0];return [(r[0]*M[1][1]-M[0][1]*r[1])/d,(M[0][0]*r[1]-r[0]*M[1][0])/d];}
+  function eig(M){const a=M[0][0],b=M[0][1],d=M[1][1],tr=a+d,de=a*d-b*b,s=Math.sqrt(tr*tr-4*de);
+    const l1=(tr-s)/2,l2=(tr+s)/2,v=[-b,a-l1],n=Math.hypot(v[0],v[1]);
+    return {lo:l1,hi:l2,vlo:[v[0]/n,v[1]/n],vhi:[-v[1]/n,v[0]/n]};}
+  const G=gram(x1,x2), R=rhs(x1,x2,yv), E=eig(G), B0=solve(G,R);
+  const rss=yv.reduce((s,t,i)=>s+Math.pow(t-B0[0]*x1[i]-B0[1]*x2[i],2),0), sg=Math.sqrt(rss/3);
+  const loo=[0,1,2,3,4].map(k=>{const a=x1.filter((_,i)=>i!==k),b=x2.filter((_,i)=>i!==k),c=yv.filter((_,i)=>i!==k);
+    return solve(gram(a,b),rhs(a,b,c));});
+  const K=Math.sqrt(5.991); /* khi2 a 2 ddl, 95 % */
+  const lamOf=u=>(Math.pow(10,4*u)-1)/1000;
+  const P4=SL.plot(document.getElementById('f4plot'),{x:[-1.5,.7],y:[.15,1.25],w:600,h:321,
+    xt:[-1.5,-1,-.5,0,.5],yt:[.4,.6,.8,1,1.2],xl:'β₁',yl:'β₂'});
+  P4.label(.64,.41,'(0,2 ; 0,4)','sl-c2','end');
+  P4.label(.64,1.17,'ellipse à 95 %, demi-axes σ̂/√(μ + λ)','sl-c1','end');
+  P4.label(-1.44,.57,'les 5 β̂ « sans une ligne »','sl-c3');
+  const out=document.getElementById('f4out');
+  function draw(u){
+    const lam=lamOf(u);
+    const M=[[G[0][0]+lam,G[0][1]],[G[1][0],G[1][1]+lam]], b=solve(M,R);
+    const alo=K*sg/Math.sqrt(E.lo+lam), ahi=K*sg/Math.sqrt(E.hi+lam);
+    P4.clear();
+    let prev=null;
+    for(let i=0;i<=96;i++){const th=2*Math.PI*i/96;
+      const px=b[0]+alo*Math.cos(th)*E.vlo[0]+ahi*Math.sin(th)*E.vhi[0];
+      const py=b[1]+alo*Math.cos(th)*E.vlo[1]+ahi*Math.sin(th)*E.vhi[1];
+      if(prev)P4.seg(prev[0],prev[1],px,py,'sl-c1');
+      prev=[px,py];}
+    loo.forEach(q=>P4.dot(q[0],q[1],'sl-c3',4));
+    P4.dot(.2,.4,'sl-c2 hollow',6);
+    P4.dot(b[0],b[1],'sl-c1',6);
+    const cond=(E.hi+lam)/(E.lo+lam), sdlo=sg/Math.sqrt(E.lo+lam);
+    out.innerHTML=`<div><span class="m">λ</span><b>${SL.fmt(lam,lam<.1?4:2)}</b></div>`
+     +`<div class="${lam>0?'pos':'zero'}">μ<sub>min</sub> + λ<b>${SL.fmt(E.lo+lam,3)}</b></div>`
+     +`<div class="${cond>1000?'zero':'pos'}">conditionnement<b>${SL.fmt(cond,1)}</b></div>`
+     +`<div class="${sdlo>.1?'zero':'pos'}">écart-type le long de v<sub>min</sub><b>${SL.fmt(sdlo,4)}</b></div>`
+     +`<div>β̂<b>${SL.fmt(b[0],3)} ; ${SL.fmt(b[1],3)}</b></div>`;
+  }
+  SL.slider(document.getElementById('f4sliders'),{label:'λ',min:0,max:1,step:.005,value:0,
+    fmt:u=>SL.fmt(lamOf(u),3)},draw);
+})();
 })();
 </script>
 </body>
