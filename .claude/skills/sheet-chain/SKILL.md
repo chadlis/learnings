@@ -25,8 +25,8 @@ Une sheet est une **chaîne d'enchaînements** que Salah relit de temps en temps
 | `#hyp` | H1… numérotées, mot-clé en gras, marquées « supposé » implicitement par la couleur |
 | `.chain` | pas numérotés `div.step` : `.rule` (titre, 2–5 lignes, `div.eq`, `p.say`) + `.card.apply` (le calcul chiffré) ; `.fig` en pleine largeur quand une intuition se joue ; tags `tronc` / `casse` |
 | dernier pas | « Où ça casse », `card.casse`, 2–4 limites avec le mécanisme |
-| `#resume` | ≤ 7 lignes numérotées + `div.phrase` (la phrase d'entretien) |
-| `#verbal` | 4–6 maillons question → réponse d'une ligne, réponses floutées (`.a.hid`) |
+| `#resume` | ≤ 8 lignes numérotées + `div.phrase` (la phrase d'entretien) |
+| `#verbal` | 4–7 maillons question → réponse d'une ligne, réponses floutées (`.a.hid`) |
 | `#links` | ponts (titre + en quoi c'est le même mécanisme) et tags Anki commentés |
 | `footer` | id, version, date, prérequis, suite |
 
