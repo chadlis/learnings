@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Inférence en régression — chaîne</title>
-<meta name="sheet" content="series=chain;part=01;number=03;status=v1">
+<title>Inférence en régression — chaîne · v2</title>
+<meta name="sheet" content="series=chain;part=01;number=03;status=v2">
 <meta name="part" content="01 · L'objet aléatoire (fil A)">
 <meta name="subtitle" content="fil A ↔ fil B — d'où viennent le SE d'une pente et la loi de t">
 <meta name="prereq" content="p01-01,p01-02,p05-01">
@@ -150,7 +150,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <h1>Inférence en régression : <span>SE</span>, <span>t</span>, Student, <span class="m">n</span> − <span class="m">p</span></h1>
   <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
 </header>
-<p class="sub">Fil A, cas 2. Le logiciel affiche pour la pente <span class="m">t</span> = 17,67 et « Student à 198 degrés de liberté », et rien n'explique d'où ces deux nombres sortent. <b>Une régression n'a qu'une source d'aléa : le bruit <span class="m">ε</span></b> — les <span class="m">x</span> sont fixés, le modèle aussi. Toute la chaîne consiste à propager cet aléa jusqu'à la pente, puis à remplacer le <span class="m">σ</span> qu'on ne connaît pas. Fil rouge : ISLR <i>Advertising</i>, <code>sales ~ TV</code>, <span class="m">n</span> = 200, <span class="hat"><span class="m">β</span></span><sub>1</sub> = 0,0475, SE = 0,0027, <span class="hat"><span class="m">σ</span></span> = 3,26.</p>
+<p class="sub">Fil A, cas 1. Le logiciel affiche pour la pente <span class="m">t</span> = 17,67 et « Student à 198 degrés de liberté », et rien n'explique d'où ces deux nombres sortent. <b>Une régression n'a qu'une source d'aléa : le bruit <span class="m">ε</span></b> — les <span class="m">x</span> sont fixés, le modèle aussi. Toute la chaîne consiste à propager cet aléa jusqu'à la pente, puis à remplacer le <span class="m">σ</span> qu'on ne connaît pas. Fil rouge : ISLR <i>Advertising</i>, <code>sales ~ TV</code>, <span class="m">n</span> = 200, <span class="hat"><span class="m">β</span></span><sub>1</sub> = 0,0475, SE = 0,0027, <span class="hat"><span class="m">σ</span></span> = 3,26.</p>
 
 <div class="wrap">
 <aside class="side">
@@ -190,7 +190,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <div class="lbl">Hypothèses posées</div>
     <div class="hyp">
       <b>H1</b><span>Les bruits sont <b>iid et homoscédastiques</b> : <span class="m">E</span>[<span class="m">ε</span>|<span class="m">x</span>] = 0 et <span class="up">Var</span>(<span class="m">ε</span>|<span class="m">x</span>) = <span class="m">σ</span>², le <b>même</b> <span class="m">σ</span>² pour tous les <span class="m">x</span>. C'est ce <span class="m">σ</span>² unique qui rend la formule du SE écrivable.</span>
-      <b>H2</b><span>Les <span class="m">x</span> sont <b>fixés</b> : on raisonne conditionnellement à eux. Toutes les espérances et variances de cette page sont conditionnelles aux <span class="m">x</span>, et l'aléa vient de <span class="m">ε</span> seul.</span>
+      <b>H2</b><span>Les <span class="m">x</span> sont <b>fixés</b> : on raisonne conditionnellement à eux. Toutes les espérances et variances de cette page sont conditionnelles aux <span class="m">x</span>, et l'aléa vient de <span class="m">ε</span> seul. Si les <span class="m">x</span> sont eux-mêmes tirés, on conditionne sur les <span class="m">x</span> observés : même formule, même lecture. C'est ce qui autorise de dire indifféremment « l'objet aléatoire est l'échantillon des (<span class="m">x</span><sub><span class="m">i</span></sub>, <span class="m">y</span><sub><span class="m">i</span></sub>) » ou « ce sont les <span class="m">ε</span> » — les deux phrases mènent à <span class="up">Var</span>(<span class="hat"><span class="m">β</span></span><sub>1</sub>) = <span class="m">σ</span>²/Σ(<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">x̄</span>)².</span>
       <b>H3</b><span>Les bruits sont <b>gaussiens</b>. Nécessaire pour que <span class="m">t</span> suive <i>exactement</i> une Student ; sans elle, <span class="m">t</span> reste asymptotiquement normal par le TCL, et la page ne change qu'au dernier pas.</span>
     </div>
   </div>
@@ -273,7 +273,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <p>La variance du pas 2 contient <span class="m">σ</span>, inconnu. Même geste qu'en <a href="chain-p01-01-objet-aleatoire.html#s6">p01-01</a> : on y substitue l'estimateur du pas 3.</p>
     <div class="eq">SE(<span class="hat"><span class="m">β</span></span><sub>1</sub>) = <span class="hat"><span class="m">σ</span></span> / √Σ(<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">x̄</span>)²</div>
     <p>Deux leviers, deux seulement : le <b>bruit</b> au numérateur, l'<b>étalement des <span class="m">x</span></b> au dénominateur. Noter l'absence de <span class="m">n</span> : il n'agit qu'à travers <span class="m">S</span><sub><span class="m">xx</span></sub>, qui grandit avec le nombre de points — ajouter un point à <span class="m">x</span> = <span class="m">x̄</span> n'apporte rien à la pente.</p>
-    <p class="say">« La variance de la pente est <span class="m">σ</span>² sur l'étalement des <span class="m">x</span>, donc on y substitue <span class="hat"><span class="m">σ</span></span> qu'on sait calculer, donc le SE est <span class="hat"><span class="m">σ</span></span> divisé par la racine de Σ(<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">x̄</span>)². »</p>
+    <p class="say">« La variance de la pente est <span class="m">σ</span>² sur l'étalement des <span class="m">x</span>, donc on y substitue <span class="hat"><span class="m">σ</span></span> qu'on sait calculer, donc le SE est <span class="hat"><span class="m">σ</span></span> divisé par la racine de Σ(<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">x̄</span>)², donc pour resserrer l'intervalle sans collecter plus de points on écarte les <span class="m">x</span> — jamais un point de plus à <span class="m">x̄</span>. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application</div>
     <div class="eq">SE = 3,2587 / √1 466 829 = 3,2587 / 1 211,1 = <b>0,002691</b></div>
@@ -385,11 +385,12 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 <section class="blk" id="verbal">
 <h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
-<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
   <ol class="verb">
     <li><div class="q">Qu'est-ce qui est aléatoire dans un nuage de régression ?</div><div class="a hid">Les bruits ε, et eux seuls : les x sont fixés (H2). Les y en descendent, donc β̂₁ aussi. Une seule entrée dans la colonne aléatoire.</div></li>
     <li><div class="q">Écris β̂₁ en fonction de β₁ et des bruits, et conclus.</div><div class="a hid">β̂₁ = β₁ + Σwᵢεᵢ avec wᵢ = (xᵢ − x̄)/Σ(xⱼ − x̄)². Donc E[β̂₁] = β₁ (sans biais) et Var(β̂₁) = σ²Σwᵢ² = σ²/Σ(xᵢ − x̄)².</div></li>
     <li><div class="q">Pourquoi RSS/(n − p) et pas RSS/n ?</div><div class="a hid">L'ajustement impose p contraintes linéaires aux résidus (Σrᵢ = 0, Σrᵢxᵢ = 0) : il leur reste n − p degrés de liberté. E[RSS/n] = σ²(n − p)/n, biaisé ; diviser par n − p corrige exactement. Le n − 1 de Bessel, c'est p = 1.</div></li>
+    <li><div class="q">Comment resserrer l'IC de la pente sans collecter plus de requêtes ?</div><div class="a hid">Augmenter Σ(xᵢ − x̄)² : choisir les x pour couvrir la plage, beaucoup de très petits et de très gros, pas un tas au centre. Puis, seulement, réduire σ̂ en contrôlant les sources de bruit.</div></li>
     <li><div class="q">Pourquoi une Student et pas une normale, et à combien de degrés de liberté ?</div><div class="a hid">Parce que le SE du dénominateur est estimé et fluctue : le quotient a des queues plus lourdes. Les degrés de liberté sont ceux de σ̂², soit n − p = 198. Seuil 1,972 au lieu de 1,960 ; à petit ddl l'écart explose (2,571 à 5 ddl).</div></li>
     <li><div class="q">Que casse l'hétéroscédasticité, et que ne casse-t-elle pas ?</div><div class="a hid">Elle casse le SE — donc t, la p-value et l'IC ensemble — parce que le σ² unique n'existe plus. Elle ne casse pas le non-biais de β̂₁, qui tient à E[ε|x] = 0. Remède : des erreurs standard robustes, qui changent la largeur, pas la pente.</div></li>
   </ol>
@@ -414,7 +415,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Chaîne p01-03 · v1 du 16/09/2026 · Prérequis : p01-01, p01-02, p05-01. Suite : <a href="chain-p01-04-comparer-modeles-multiplicite.html">p01-04 Comparer deux modèles, et la multiplicité</a>.</footer>
+<footer>Chaîne p01-03 · v2 du 18/09/2026 · Prérequis : p01-01, p01-02, p05-01. Suite : <a href="chain-p01-04-comparer-modeles-multiplicite.html">p01-04 Comparer deux modèles, et la multiplicité</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

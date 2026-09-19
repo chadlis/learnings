@@ -10,7 +10,7 @@ prereq: [p01-01, p01-02, p05-01]
 anki: [stats::inference, stats::estimation, ml::regression-lineaire, stats::bessel]
 bridges: [b03, b04]
 next: p01-04
-status: reviewed
+status: built
 ---
 
 ## Question de la chaîne
@@ -95,3 +95,27 @@ simulations en pur Python) : **aucun n'est faux**. Restent cinq points à tranch
    présélections (± 20 · ± 60 · ± 145) et un faisceau de sept ajustements sur des bruits figés. À valider.
 5. **SE robustes.** — validé 16/09 Le spec dit « nommer seulement », les exclusions disent « pas de SE de White ». La sheet
    écrit « erreurs standard robustes à l'hétéroscédasticité », sans le nom de White et sans formule.
+
+### Questions pour la revue — 19/09
+- **Aucun chiffre neuf dans ce delta** — 19/09 Corrections de texte, phrase au tableau complétée, maillon verbalisé ajouté. Les chiffres de la sheet sont inchangés et ont été revérifiés au rendu : SE = 3,2587/1 211,1 = 0,002691, t = 17,67, 198 ddl.
+- **« Fil A, cas 2 » ne figurait que dans le `p.sub`** — 19/09 Corrigé en « cas 1 ». La meta `subtitle` de la sheet et le frontmatter du spec n'employaient pas la numérotation des cas : rien d'autre à reprendre. p01-04 garde « cas 2 et 3 », qui est juste.
+
+
+## Révision v2 (18/09/2026)
+
+### Corrections de texte
+- `p.sub` : « Fil A, cas 2. » → « Fil A, cas 1. » C'est l'IC et le test sur un paramètre (le cas 1 de p01-02, rejoué sur une pente) ; le cas 2 est la comparaison de deux modèles, p01-04.
+- H2 : ajouter une phrase. « Si les x sont eux-mêmes tirés, on conditionne sur les x observés : même formule, même lecture. C'est ce qui autorise de dire indifféremment “l'objet aléatoire est l'échantillon des (xᵢ, yᵢ)” ou “ce sont les ε” — les deux phrases mènent à Var(β̂₁) = σ²/Σ(xᵢ − x̄)². »
+
+### Pas « Le SE : plug-in de σ dans la variance » — « au tableau » à compléter
+Le tableau des leviers dit déjà « on écarte les x ». La phrase au tableau doit finir dessus, sinon elle n'est pas produite : « … donc le SE est σ̂ divisé par la racine de Σ(xᵢ − x̄)², donc pour resserrer l'intervalle sans collecter plus de points on écarte les x — jamais un point de plus à x̄. »
+
+### Chaîne verbalisée — maillon ajouté (6e)
+« Comment resserrer l'IC de la pente sans collecter plus de requêtes ? » → « Augmenter Σ(xᵢ − x̄)² : choisir les x pour couvrir la plage, beaucoup de très petits et de très gros, pas un tas au centre. Puis, seulement, réduire σ̂ en contrôlant les sources de bruit. »
+
+### Ce qui a cassé pour Salah — 18/09 (re-mesure, Q4 ★, non acquis)
+- Var(β̂₁) donnée comme Ĉov(x, y)/V̂ar(x) — c'est **β̂₁ lui-même**, l'estimateur à la place de sa variance. Le pas 2 existant (β̂₁ = β₁ + Σwᵢεᵢ, Var = σ²Σwᵢ²) est la réponse ; il est à produire sur papier, pas à relire.
+- Le levier « écarter les x » non trouvé alors qu'il est dans le tableau du pas 4 : d'où la phrase au tableau complétée et le maillon verbalisé ajouté.
+- Scories : « y = β̂₀ + β̂₁x + ε » (c'est ŷ = β̂₀ + β̂₁x, et des résidus eᵢ, pas le bruit) ; « 95 % des tirages contiendraient β₁ » (ce sont 95 % des **intervalles produits par la procédure**). La chaîne existante les nomme déjà ; les garder telles quelles.
+
+### Exclusions — inchangées
