@@ -24,8 +24,9 @@ TITLE = re.compile(r'<title>(.*?)</title>', re.S)
 STEP = re.compile(r'<div class="step" id="(s\d+)">(.*?)(?=<div class="step" id="|\Z)', re.S)
 H3 = re.compile(r'<h3>(.*?)</h3>', re.S)
 TAGS = re.compile(r'<[^>]+>')
-# suffixes que le <title> porte par convention de série
-SUFFIX = re.compile(r'\s*—\s*(chaîne|déroulé|pont|coding|fiche thématique)\s*$')
+# suffixes que le <title> porte par convention de série, et la version qui le suit
+# (« — chaîne · v2 ») : le libellé collé dans Anki ne doit pas changer à chaque révision.
+SUFFIX = re.compile(r'\s*—\s*(chaîne|déroulé|pont|coding|fiche thématique)(\s*·\s*v\d+)?\s*$')
 
 
 def fold(s):
