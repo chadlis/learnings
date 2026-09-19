@@ -12,8 +12,9 @@ hooks:
 	@git config core.hooksPath .githooks
 	@echo "core.hooksPath = .githooks"
 
-## test : vérifie la persistance des notes dans un Chromium headless (playwright)
+## test : graphe des prérequis (python), puis notes, service worker et déroulés dans un Chromium headless (playwright)
 test:
+	@$(PYTHON) tools/test_graph.py
 	@sh tools/run_tests.sh
 
 ## anki : régénère anki/ancres.csv (tag → sheet → ancre, à coller dans le champ Extra)
