@@ -596,10 +596,16 @@ WK.forEach((w,i)=>{ if(w.off) grid.querySelectorAll(`.cell[data-i="${i}"]`).forE
 // curseur + aujourd'hui
 const sel=document.createElement('div'); sel.className='col-sel'; grid.appendChild(sel);
 const today=document.createElement('div'); today.className='today'; grid.appendChild(today);
+// Position du jour en semaines depuis le lundi de départ, fraction comprise :
+// le trait avance dans la colonne au fil de la semaine. Hors de la grille
+// (avant le départ, après la 51e semaine), il n'est pas affiché.
+const NOW=(()=>{const d=new Date(); d.setHours(12,0,0,0); return (d-DATES[0])/864e5/7;})();
+const TODAY_WK=Math.floor(NOW);
 function place(){
   const w=grid.querySelector('.cell').getBoundingClientRect().width;
   sel.style.left=(cur*w)+'px'; sel.style.width=w+'px';
-  today.style.left=(0*w + w*(3/7))+'px';   // jeudi 10/09/2026
+  today.hidden=!(NOW>=0&&NOW<WK.length);
+  today.style.left=(NOW*w)+'px';
 }
 
 /* nom canonique des problèmes du périmètre fermé (08/09) — pour que « LC 300 J3 » dise « LIS » */
@@ -709,7 +715,7 @@ document.getElementById('zoom').onclick=e=>{
   e.target.classList.toggle('on',zoomed);
   requestAnimationFrame(()=>go(cur));
 };
-document.getElementById('goToday').onclick=()=>go(0);
+document.getElementById('goToday').onclick=()=>go(TODAY_WK);
 document.getElementById('goNext').onclick=()=>{
   for(let i=cur+1;i<WK.length;i++) if(WK[i].m){return go(i);}
   for(let i=0;i<WK.length;i++) if(WK[i].m){return go(i);}
@@ -721,7 +727,7 @@ document.addEventListener('keydown',e=>{
   if(e.key==='ArrowUp'){for(let i=cur-1;i>=0;i--) if(WK[i].m){go(i);break;} e.preventDefault();}
 });
 window.addEventListener('resize',place);
-go(0);
+go(TODAY_WK);   // la page s'ouvre sur la semaine en cours (bornée à la grille par go)
 
 /* ---------------------------------------------- filtres des deux backlogs */
 (function(){
