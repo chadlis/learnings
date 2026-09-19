@@ -10,7 +10,7 @@ prereq: [p01-01, p01-02]
 anki: [stats::inference, stats::comparaison, stats::multiplicite, ml::validation]
 bridges: [b02, b03]
 next: p01-05
-status: reviewed
+status: built
 ---
 
 ## Question de la chaîne
@@ -130,3 +130,43 @@ Porté par la sheet : la phrase du cas 3 est au pas 6, juste avant le « au tabl
 H₁ unilatérale après avoir vu le signe (double le taux de faux positifs) ; relever α après
 avoir vu p — la procédure regarde le tirage pour décider ». Ils complètent le cas 3 « gros »
 (le max de 40 configs) par deux gestes qui n'ont l'air de rien et relèvent du même mécanisme.
+
+### Questions pour la revue — 19/09
+- **La sheet portait déjà le contenu de la Révision v2, pas son étiquette.** Vérifié avant d'écrire : la phrase du cas 3 est au pas 6 (« si la procédure regarde le tirage pour décider… ») et les **deux petits cas 3** de la revue 5 du 17/09 y sont aussi ; le tableau FIXE / ALÉATOIRE / PROCÉDURE vit en p01-01, où la Révision v2 le place. Rien à porter côté contenu pour v2 : seul le `<title>`, le footer et `status=` étaient restés en v1. Ils passent directement en **v3**, qui couvre donc v2 et v3.
+- **Chiffres du delta : tous vérifiés, aucun faux** — 19/09 Variante A = 0,872 / B = 0,901, n = 1 000, b = 10, c = 39. IC Wald A [0,8513 ; 0,8927], B [0,8825 ; 0,9195], chevauchement sur [0,8825 ; 0,8927] ; apparié D = 0,029, SE = 0,006940, IC [0,0154 ; 0,0426], z = 4,179 ; McNemar χ² = 17,163 ; non apparié SE = 0,014171, z = 2,046, rapport 2,04. Pas 3, fil rouge b = 30 / c = 39 : SE imposé par H₀ = 0,0083066, SE de Wald = 0,0083017.
+- **La précision du pas 3 est dans l'application, pas dans la règle** — 19/09 Écrite dans la règle, elle portait celle-ci à 189 mots et le validateur avertissait (viser < 120). Le paragraphe « le SE de McNemar n'est pas estimé, il est imposé » est donc dans la carte d'application, juste avant les deux SE chiffrés ; le « au tableau » du delta reste dans la règle, comme la convention l'impose. À confirmer.
+
+## Révision v3 (18/09/2026)
+
+### Pas 2 « La différence est l'objet » — application à compléter : le chevauchement ne conclut rien
+Variante du fil rouge : A = 87,2 %, B = **90,1 %**, n = 1 000, b = 10 (A seul a juste), c = 39 (B seul a juste).
+
+| calcul | résultat |
+| --- | --- |
+| IC Wald séparé de A : 0,872 ± 1,96·√(0,872·0,128/1 000) | [0,851 ; 0,893] |
+| IC Wald séparé de B : 0,901 ± 1,96·√(0,901·0,099/1 000) | [0,883 ; 0,920] |
+| chevauchement | oui, sur [0,883 ; 0,893] |
+| apparié : D = (c − b)/n = 0,029 ; SE = √((b + c)/n − D²)/√n | 0,0069 ; IC [0,015 ; 0,043] ; z = 4,2 |
+| McNemar χ² = (c − b)²/(b + c) | 17,2 |
+| non apparié : SE = √(SE_A² + SE_B²) | 0,0142 ; z = 2,05 — deux fois trop large |
+
+Lecture : deux IC séparés qui se chevauchent ne disent **rien**. Var(p̂_A − p̂_B) = Var(p̂_A) + Var(p̂_B) − 2Cov, et sur un test set partagé la covariance est fortement positive — les deux modèles ratent largement les mêmes lignes. Les IC séparés jettent ce terme et sont trop larges pour la différence. L'asymétrie à savoir dire : non-chevauchement ⟹ significatif ; chevauchement ⟹ aucune conclusion.
+
+Au tableau : « L'objet d'inférence est la différence, donc sa variance contient −2Cov, donc deux IC séparés qui l'ignorent sont trop larges pour elle, donc leur chevauchement ne conclut rien — seul le non-chevauchement conclut. »
+
+### Pas 3 « Appariement : seuls les désaccords comptent » — précision ajoutée : SE sous H₀ vs SE estimé
+Sous H₀, b et c sont deux moitiés d'une Binomiale(b + c, ½) : Var(c − b) = b + c **sans rien estimer**, d'où z = (c − b)/√(b + c) — un SE **imposé par H₀**. Le Wald apparié utilise un SE **estimé** sur les données : √((b + c)/n − D²)/√n. Sur le fil rouge (b = 30, c = 39) : √(b + c)/n = 0,00831 contre 0,00830 — identiques parce que D est minuscule ; ils divergent quand D est grand. Au tableau : « Sous H₀ les désaccords se partagent à pile ou face, donc la variance de c − b est b + c sans rien estimer, donc le SE de McNemar est imposé par l'hypothèse, donc il diffère du SE de Wald dès que D s'éloigne de 0. »
+
+### Figure exigée
+Aucune pour cette révision : deux tableaux suffisent.
+
+### Chaîne verbalisée — maillon ajouté
+« Deux IC à 95 % qui se chevauchent largement : conclusion ? » → « Aucune. Ils ignorent la covariance des deux scores. Variante 87,2 % / 90,1 % : chevauchement, et z = 4,2 en apparié. Seul le non-chevauchement conclut. »
+
+### Ce qui a cassé pour Salah — 18/09 (re-mesure, Q1, acquis limite)
+- Acquis, à ne pas redémontrer : l'objet aléatoire (le jeu de 500 questions tiré), les estimateurs aléatoires dont 71 % et 68 % sont des réalisations, le design apparié Dᵢ, la restriction aux discordants **avec sa justification** (les concordants n'informent pas la différence). Tout est sorti spontanément sur un habit nouveau (deux prompts système, LLM-as-judge).
+- Non produit : **pourquoi** deux IC séparés ne répondent pas (la covariance, l'asymétrie chevauchement / non-chevauchement). Le complément du pas 2 est écrit contre ce trou.
+- « Calculer ŜE puis la p-value » : le SE de McNemar n'est pas estimé, il est fixé par H₀. La précision du pas 3 l'adresse.
+- Scorie : accᵢ écrit pour un item ; par item c'est un indicateur Yᵢ ∈ {0, 1}, et D̂ = (1/n)Σ(Yᵢᴮ − Yᵢᴬ).
+
+### Exclusions — inchangées

@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Comparer deux modèles, et pourquoi le max ment — chaîne</title>
-<meta name="sheet" content="series=chain;part=01;number=04;status=v1">
+<title>Comparer deux modèles, et pourquoi le max ment — chaîne · v3</title>
+<meta name="sheet" content="series=chain;part=01;number=04;status=v3">
 <meta name="part" content="01 · L'objet aléatoire (fil A)">
 <meta name="subtitle" content="fil A, cas 2 et 3 — appariement, McNemar, multiplicité, train/val/test">
 <meta name="prereq" content="p01-01,p01-02">
@@ -227,11 +227,24 @@ text.mk-seuil{fill:var(--red)}
     <div class="eq"><span class="up">Var</span>(<span class="m">D</span>) = <span class="up">Var</span>(<span class="hat"><span class="m">p</span></span><sub>A</sub>) + <span class="up">Var</span>(<span class="hat"><span class="m">p</span></span><sub>B</sub>) − 2<span class="up">Cov</span>(<span class="hat"><span class="m">p</span></span><sub>A</sub>, <span class="hat"><span class="m">p</span></span><sub>B</sub>)</div>
     <p>Le test <b>non apparié</b> jette le dernier terme. Sous H1 la covariance est positive : le jeter gonfle la variance, élargit l'intervalle et coûte de la puissance.</p>
     <p class="say">« Les deux modèles sont évalués sur les mêmes lignes, donc leurs erreurs sont corrélées positivement, donc la variance de la différence est plus petite que la somme des variances, donc le test non apparié manque de puissance. »</p>
+    <p class="say">« L'objet d'inférence est la différence, donc sa variance contient −2<span class="up">Cov</span>, donc deux <span class="up">IC</span> séparés qui l'ignorent sont trop larges pour elle, donc leur chevauchement ne conclut rien — seul le non-chevauchement conclut. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — ce que donne le test non apparié</div>
     <div class="eq"><span class="up">SE</span> = √(0,872·0,128/1000 + 0,881·0,119/1000)<br>&nbsp;&nbsp;&nbsp;= √(1,116·10<sup>−4</sup> + 1,048·10<sup>−4</sup>) = <b>0,0147</b></div>
     <p><span class="m">z</span> = 0,009 / 0,0147 = <b>0,61</b> ; <span class="m">p</span> ≈ <b>0,54</b>. Verdict : rien du tout.</p>
     <p>Le calcul est <i>valide</i>, il n'est pas <i>faux</i> : il répond juste à une expérience qu'on n'a pas faite (deux test sets distincts). Il a payé pour une indépendance qu'on ne consomme pas.</p>
+    <p><b>Et deux <span class="up">IC</span> séparés qui se chevauchent ?</b> Ils ne concluent rien. Variante du fil rouge où l'écart est franc : A = 87,2 %, B = <b>90,1 %</b>, <span class="m">n</span> = 1 000, <span class="m">b</span> = 10, <span class="m">c</span> = 39.</p>
+    <table>
+      <tr><th>calcul</th><th>résultat</th></tr>
+      <tr><td><span class="up">IC</span> Wald séparé de A : 0,872 ± 1,96·√(0,872·0,128/1 000)</td><td>[0,851 ; 0,893]</td></tr>
+      <tr><td><span class="up">IC</span> Wald séparé de B : 0,901 ± 1,96·√(0,901·0,099/1 000)</td><td>[0,883 ; 0,920]</td></tr>
+      <tr><td>chevauchement</td><td><b>oui</b>, sur [0,883 ; 0,893]</td></tr>
+      <tr class="hl"><td>apparié : <span class="m">D</span> = (<span class="m">c</span> − <span class="m">b</span>)/<span class="m">n</span> = 0,029 ; <span class="up">SE</span> = √((<span class="m">b</span> + <span class="m">c</span>)/<span class="m">n</span> − <span class="m">D</span>²)/√<span class="m">n</span></td><td>0,0069 ; <span class="up">IC</span> [0,015 ; 0,043] ; <span class="m">z</span> = <b>4,2</b></td></tr>
+      <tr><td>McNemar <span class="m">χ</span>² = (<span class="m">c</span> − <span class="m">b</span>)²/(<span class="m">b</span> + <span class="m">c</span>)</td><td><b>17,2</b></td></tr>
+      <tr><td>non apparié : <span class="up">SE</span> = √(<span class="up">SE</span><sub>A</sub>² + <span class="up">SE</span><sub>B</sub>²)</td><td>0,0142 ; <span class="m">z</span> = 2,05 — <b>deux fois trop large</b></td></tr>
+    </table>
+    <p>Var(<span class="hat"><span class="m">p</span></span><sub>A</sub> − <span class="hat"><span class="m">p</span></span><sub>B</sub>) = Var(<span class="hat"><span class="m">p</span></span><sub>A</sub>) + Var(<span class="hat"><span class="m">p</span></span><sub>B</sub>) − 2Cov, et sur un test set partagé la covariance est <b>fortement positive</b> : les deux modèles ratent largement les mêmes lignes. Les <span class="up">IC</span> séparés jettent ce terme, donc ils sont trop larges <i>pour la différence</i>.</p>
+    <p><b>L'asymétrie à savoir dire</b> : non-chevauchement ⟹ significatif ; chevauchement ⟹ <b>aucune conclusion</b>.</p>
   </div>
 </div>
 
@@ -243,6 +256,7 @@ text.mk-seuil{fill:var(--red)}
     <div class="eq">McNemar : <span class="m">χ</span>² = (<span class="m">c</span> − <span class="m">b</span>)² / (<span class="m">b</span> + <span class="m">c</span>), &nbsp; 1 degré de liberté</div>
     <p><span class="m">n</span> a disparu de la formule. Ce n'est pas un oubli, c'est l'énoncé.</p>
     <p class="say">« Une ligne où les deux modèles sont d'accord donne <span class="m">D</span><sub><span class="m">i</span></sub> = 0, donc elle ne pèse ni sur l'écart ni sur sa variance, donc l'effectif informatif n'est pas 1 000 mais le nombre de désaccords, donc McNemar teste seulement si les désaccords sont équilibrés. »</p>
+    <p class="say">« Sous H₀ les désaccords se partagent à pile ou face, donc la variance de <span class="m">c</span> − <span class="m">b</span> est <span class="m">b</span> + <span class="m">c</span> sans rien estimer, donc le <span class="up">SE</span> de McNemar est imposé par l'hypothèse, donc il diffère du <span class="up">SE</span> de Wald dès que <span class="m">D</span> s'éloigne de 0. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — la table 2 × 2 du fil rouge</div>
     <table>
@@ -254,6 +268,8 @@ text.mk-seuil{fill:var(--red)}
     <p><span class="m">c</span> − <span class="m">b</span> = 9, cohérent avec les +9 lignes du pas 1. Désaccords : <span class="m">b</span> + <span class="m">c</span> = <b>69</b>.</p>
     <div class="eq"><span class="m">χ</span>² = 81 / 69 = <b>1,17</b> &nbsp;→&nbsp; <span class="m">p</span> ≈ <b>0,28</b></div>
     <p>Les 931 lignes d'accord ne sont nulle part dans ce calcul. L'écart de 9 se lit sur 69 tirages à pile ou face, pas sur 1 000.</p>
+    <p><b>Le <span class="up">SE</span> de McNemar n'est pas estimé, il est imposé.</b> Sous H₀, <span class="m">b</span> et <span class="m">c</span> sont les deux moitiés d'une Binomiale(<span class="m">b</span> + <span class="m">c</span>, ½) : Var(<span class="m">c</span> − <span class="m">b</span>) = <span class="m">b</span> + <span class="m">c</span> <b>sans rien estimer</b>, d'où <span class="m">z</span> = (<span class="m">c</span> − <span class="m">b</span>)/√(<span class="m">b</span> + <span class="m">c</span>). Le Wald apparié, lui, estime son <span class="up">SE</span> sur les données : √((<span class="m">b</span> + <span class="m">c</span>)/<span class="m">n</span> − <span class="m">D</span>²)/√<span class="m">n</span>.</p>
+    <p><b>Les deux <span class="up">SE</span>, sur ce fil rouge.</b> Imposé par H₀ : √69/1 000 = <b>0,00831</b>. Estimé (Wald apparié) : √(69/1 000 − 0,009²)/√1 000 = <b>0,00830</b>. Identiques — parce que <span class="m">D</span> est minuscule. Ils divergent dès que <span class="m">D</span> est grand : c'est le <span class="m">D</span>² du radicande.</p>
   </div>
 </div>
 
@@ -389,10 +405,11 @@ text.mk-seuil{fill:var(--red)}
 
 <section class="blk" id="verbal">
 <h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
-<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
   <ol class="verb">
     <li><div class="q">Quel est l'objet aléatoire quand on compare A et B ?</div><div class="a hid">Le test set commun — les modèles sont figés. Les deux accuracies descendent du même tirage, donc leurs erreurs sont corrélées.</div></li>
     <li><div class="q">Pourquoi l'appariement gagne-t-il de la puissance ?</div><div class="a hid">Var(D) = Var<sub>A</sub> + Var<sub>B</sub> − 2Cov : ignorer la covariance gonfle la variance. Et les lignes d'accord donnent D<sub>i</sub> = 0, elles ne pèsent nulle part.</div></li>
+    <li><div class="q">Deux <span class="up">IC</span> à 95 % qui se chevauchent largement : conclusion ?</div><div class="a hid">Aucune. Ils ignorent la covariance des deux scores. Variante 87,2 % / 90,1 % : chevauchement, et z = 4,2 en apparié. Seul le non-chevauchement conclut.</div></li>
     <li><div class="q">Que teste McNemar, avec quelle statistique ?</div><div class="a hid">H₀ : les deux sortes de désaccords sont équiprobables (b = c). χ² = (c − b)²/(b + c), 1 ddl ; n n'y figure pas.</div></li>
     <li><div class="q">Pourquoi le meilleur de 40 configs surestime-t-il sa valeur ?</div><div class="a hid">Son score est un max de 40 variables bruitées, décalé de ≈ SE·E[max de 40] ≈ 2,16 SE. Chaque mesure est sans biais, leur max ne l'est pas.</div></li>
     <li><div class="q">Quel protocole répare, et que ne répare-t-il pas ?</div><div class="a hid">Train / validation / test : on choisit sur la validation, on mesure sur le test ouvert une fois. Il protège le chiffre rapporté, pas la qualité du choix si la validation est petite.</div></li>
@@ -418,7 +435,7 @@ text.mk-seuil{fill:var(--red)}
 
 </main>
 </div>
-<footer>Chaîne p01-04 · v1 du 16/09/2026 · Prérequis : p01-01, p01-02. Suite : <a href="chain-p01-05-bootstrap.html">p01-05 Bootstrap</a>.</footer>
+<footer>Chaîne p01-04 · v3 du 18/09/2026 · Prérequis : p01-01, p01-02. Suite : <a href="chain-p01-05-bootstrap.html">p01-05 Bootstrap</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>
