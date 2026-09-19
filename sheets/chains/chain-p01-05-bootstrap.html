@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Bootstrap, la distribution d'échantillonnage sans formule — chaîne</title>
-<meta name="sheet" content="series=chain;part=01;number=05;status=v1">
+<title>Bootstrap, la distribution d'échantillonnage sans formule — chaîne · v2</title>
+<meta name="sheet" content="series=chain;part=01;number=05;status=v2">
 <meta name="part" content="01 · L'objet aléatoire (fil A)">
 <meta name="subtitle" content="fil A — rééchantillonner l'échantillon pour imiter la procédure">
 <meta name="prereq" content="p01-01">
@@ -316,15 +316,41 @@ line.brk{stroke:#B7791F;stroke-width:1.6}
 
 <div class="step" id="s6">
   <div class="rule">
+    <h3>Ce qu'on rééchantillonne définit ce qu'on estime <span class="tag tronc">tronc</span></h3>
+    <p>Le bootstrap imite <b>un</b> tirage ; encore faut-il dire lequel. Dans une éval LLM, trois sources de variation sont <b>trois expériences différentes</b> : les prompts (quel jeu ai-je tiré ?), le juge (quelle relance ?), la seed du modèle évalué.</p>
+    <p>Rééchantillonner l'une mesure sa largeur, et elle seule. En mélanger deux dans les répliques produit un chiffre qui répond à une question que personne n'a posée : l'<b>estimande</b> a changé.</p>
+    <p class="say">« Le bootstrap rejoue un tirage, donc ce qu'on rééchantillonne est ce dont on mesure la largeur, donc relancer le juge dans les répliques change l'estimande, donc on sépare : les lignes pour les prompts, les relances à prompts fixés pour le juge, et on rapporte les deux. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — six prompts notés de 1 à 5 par un juge LLM</div>
+    <ul>
+      <li><b>Relance 1</b> : (5, 4, 2, 5, 3, 4), moyenne <b>3,83</b>.</li>
+      <li><b>Bootstrap des prompts</b>, par énumération exacte des 6<sup>6</sup> = 46 656 rééchantillons : <span class="up">SE</span> = <b>0,436</b>. Formule de contrôle <span class="m">s</span>/√<span class="m">n</span> · √((<span class="m">n</span>−1)/<span class="m">n</span>) = 0,436. Réponse à : « <i>et sur six autres prompts ?</i> »</li>
+      <li><b>Deux relances du juge</b>, à prompts fixés : (5, 3, 2, 5, 3, 5) → 3,83 ; (4, 4, 2, 5, 3, 4) → 3,67. Écart-type des trois moyennes : <b>0,096</b>. Réponse à : « <i>et si je relançais le juge ?</i> »</li>
+      <li><b>Relancer le juge à chaque réplique</b> du bootstrap : ≈ √(0,436² + 0,096²) = <b>0,446</b> sous indépendance — un nombre qui répond à « autres prompts <b>et</b> autre juge ». Ce n'est pas <i>plus prudent</i>, c'est une <b>autre question</b> ; sans la nommer, l'intervalle n'est pas interprétable.</li>
+    </ul>
+    <table>
+      <tr><th>on rééchantillonne</th><th>ce qui varie</th><th>la question à laquelle le <span class="up">SE</span> répond</th></tr>
+      <tr class="hl"><td>les lignes (prompts)</td><td>le jeu de test</td><td>« et sur d'autres prompts ? »</td></tr>
+      <tr><td>les relances du juge, prompts fixés</td><td>le juge</td><td>« et si le juge était relancé ? »</td></tr>
+      <tr><td>les seeds, prompts et juge fixés</td><td>le modèle évalué</td><td>« et à un autre run ? »</td></tr>
+      <tr><td>lignes <b>+</b> juge dans une même réplique</td><td>les deux</td><td>une somme sans nom — à ne pas rapporter comme un seul <span class="up">SE</span></td></tr>
+    </table>
+    <p><b>Réserve.</b> Trois relances, c'est <b>2 degrés de liberté</b> : le 0,096 est lui-même très bruité. L'exemple montre le mécanisme, il ne donne pas une estimation utilisable — en pratique <span class="m">R</span> ≥ 5 relances.</p>
+  </div>
+</div>
+
+<div class="step" id="s7">
+  <div class="rule">
     <h3>Où ça casse <span class="tag casse">casse</span></h3>
     <p>Le bootstrap copie une procédure ; il ne crée pas d'information. Ce que l'échantillon ignore de la population, l'image qu'on en tire l'ignore aussi.</p>
     <p class="say">« Le bootstrap rejoue le tirage à partir de l'échantillon, donc il hérite de tout ce que l'échantillon ignore, donc il mesure une largeur et ne corrige jamais un centre. »</p>
   </div>
-  <div class="card casse"><div class="lbl">Quatre limites</div>
+  <div class="card casse"><div class="lbl">Cinq limites</div>
     <ul>
       <li><b>Lignes dépendantes.</b> Tirer les lignes une par une suppose H1. Vingt lignes d'un même utilisateur, les images d'une même vidéo, les points voisins d'une série : le tirage ligne à ligne casse les blocs, fabrique une variabilité que le vrai tirage n'a pas, et <b>sous-estime</b> le SE. Remède : tirer des groupes ou des blocs entiers — bootstrap par cluster, par bloc (<a href="../bridges/bridge-04-variance-moyenne-correlee.html">pont 04</a>).</li>
       <li><b>Statistiques d'extrême.</b> H2 tombe. Un rééchantillon ne contient que des valeurs déjà vues, donc le maximum bootstrap ne dépasse <b>jamais</b> le maximum observé : sur nos dix latences il vaut 410 dans 65 % des cas et s'effondre sous 150 dans les autres. Sa distribution n'est pas l'image de la vraie, c'est un tas collé au bord. Même chose pour un quantile 99,9 %.</li>
       <li><b><span class="m">n</span> minuscule.</b> Tout repose sur « l'échantillon représente la population ». À <span class="m">n</span> = 10 dont une valeur à 410 ms, l'image est grossière ; le bootstrap la recopie fidèlement, défauts compris. Le 8,86 ms est le SE du monde où la population vaut exactement ces dix valeurs.</li>
+      <li><b>L'estimande cachée.</b> Un <span class="up">SE</span> bootstrap sans la phrase « j'ai rééchantillonné <span class="m">X</span> » n'est pas lisible. Le cas fréquent en éval : les répliques <b>relancent implicitement le juge</b> — température &gt; 0, pas de cache — et le <span class="up">SE</span> annoncé mélange prompts et juge sans que personne l'ait décidé.</li>
       <li><b>Ce n'est pas plus de données.</b> Le bootstrap mesure une largeur ; il ne réduit ni le biais ni la variance réelle. Test set filtré ou décalé : un intervalle étroit autour de la mauvaise valeur. Test set déjà utilisé pour <i>choisir</i> le modèle : il tourne autour d'un score gonflé (<a href="chain-p01-04-comparer-modeles-multiplicite.html#s6">p01-04, pas 6</a>).</li>
     </ul>
   </div>
@@ -341,6 +367,7 @@ line.brk{stroke:#B7791F;stroke-width:1.6}
     <li><span class="hat"><span class="up">SE</span></span><sub>boot</sub> = écart-type des <span class="m">B</span> valeurs ; IC percentile = quantiles 2,5 % et 97,5 %. Fil rouge : 8,86 ms, [119,5 ; 142,5].</li>
     <li><b>Avec remise</b> = la variabilité : (1 − 1/<span class="m">n</span>)<sup><span class="m">n</span></sup> → e<sup>−1</sup>, ≈ 37 % de lignes absentes par tirage — le 37 % du OOB.</li>
     <li>Comparer deux modèles : rééchantillonner <b>les lignes</b>, garder la différence. L'appariement est automatique.</li>
+    <li><b>Ce qu'on rééchantillonne est ce qu'on estime</b> : prompts, juge et seed sont trois expériences ; on les sépare, on ne les additionne pas dans un seul chiffre.</li>
     <li>Casse : dépendance, extrêmes, <span class="m">n</span> minuscule. Et <span class="m">B</span> ne remplace pas <span class="m">n</span> : le bootstrap mesure une largeur, il ne réduit pas un biais.</li>
   </ol>
 </div>
@@ -349,12 +376,13 @@ line.brk{stroke:#B7791F;stroke-width:1.6}
 
 <section class="blk" id="verbal">
 <h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
-<div class="card say-card"><div class="lbl">5 maillons · clique pour révéler après avoir dit</div>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
   <ol class="verb">
     <li><div class="q">Que veut-on, et qu'a-t-on ?</div><div class="a hid">La dispersion de la statistique sur des tirages répétés de la population ; on ne dispose que d'un seul échantillon, et d'aucune formule pour une médiane.</div></li>
     <li><div class="q">Que fait le bootstrap, et pourquoi est-ce légitime ?</div><div class="a hid">Il rééchantillonne l'échantillon avec remise, n éléments, B fois, et recalcule la statistique. Légitime sous H1 : l'échantillon est la meilleure image de la population, donc y tirer imite tirer dans la population.</div></li>
     <li><div class="q">Pourquoi avec remise ?</div><div class="a hid">Sans remise on retrouve le même échantillon et rien ne bouge. Avec remise, chaque tirage oublie (1 − 1/n)<sup>n</sup> → 37 % des lignes et en double d'autres : c'est la variabilité cherchée, et c'est le même 37 % que l'OOB du bagging.</div></li>
     <li><div class="q">Comment comparer deux modèles ?</div><div class="a hid">Rééchantillonner les lignes, pas les colonnes : chaque ligne emporte ses deux prédictions, on recalcule les deux scores dessus et on garde la différence. Appariement automatique ; casser l'appariement élargit le SE de 77 % sur le fil rouge.</div></li>
+    <li><div class="q">Ton collègue relance le juge à chaque réplique « pour capturer aussi sa variabilité » : ça change quoi ?</div><div class="a hid">L'estimande. Le SE mélange deux sources — 0,436 pour les prompts et 0,096 pour le juge dans l'exemple. On les sépare : bootstrap des lignes pour les prompts, R relances à prompts fixés pour le juge.</div></li>
     <li><div class="q">Quand ne pas lui faire confiance ?</div><div class="a hid">Lignes dépendantes (tirer par blocs, sinon SE sous-estimé), statistiques d'extrême (rien au-delà des valeurs vues), n minuscule (il hérite d'un échantillon non représentatif). Et il ne corrige aucun biais.</div></li>
   </ol>
 </div>
@@ -378,7 +406,7 @@ line.brk{stroke:#B7791F;stroke-width:1.6}
 
 </main>
 </div>
-<footer>Chaîne p01-05 · v1 du 16/09/2026 · Prérequis : p01-01. Suite : <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01 Du bruit à la loss (fil B)</a>.</footer>
+<footer>Chaîne p01-05 · v2 du 18/09/2026 · Prérequis : p01-01. Suite : <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01 Du bruit à la loss (fil B)</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

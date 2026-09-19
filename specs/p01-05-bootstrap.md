@@ -10,7 +10,7 @@ prereq: [p01-01]
 anki: [stats::bootstrap, stats::inference]
 bridges: [b04]
 next: p02-01
-status: reviewed
+status: built
 ---
 
 ## Question de la chaîne
@@ -86,3 +86,50 @@ des 10^10 rééchantillons possibles, script dans le scratchpad de la session) :
 - Le pas 5 emprunte le fil rouge chiffré de p01-04 (b = 30, c = 39, n = 1 000) plutôt que
   d'inventer un second jeu : bootstrap apparié SE = 0,0082 contre formule appariée 0,0083, et
   0,0147 en cassant l'appariement (+ 77 %). À confirmer que cet emprunt est souhaité.
+
+### Questions pour la revue — 19/09
+- **Chiffres du delta : tous vérifiés, aucun faux** — 19/09 Relance 1 = (5, 4, 2, 5, 3, 4), moyenne 3,8333 ; bootstrap exact de la moyenne sur les 6⁶ = 46 656 rééchantillons : SE = σ_pop/√n = 0,43568, identique à s/√n·√((n−1)/n) = 0,43568 ; relances 2 et 3 → 3,8333 et 3,6667 ; écart-type des trois moyennes (n−1) = 0,09623 ; √(0,436² + 0,096²) = 0,4462.
+- **Aucune figure ajoutée** — 19/09 Le delta laisse le `SL.repeat` « relancer le juge » en option, et juge que le tableau porte l'intuition. Il n'a pas été fait : le pas est déjà dense (quatre lignes chiffrées + un tableau à quatre entrées), et la sheet porte déjà deux figures. À rouvrir si la relecture du 25/09 trouve le tableau trop abstrait.
+- **Le 0,446 suppose l'indépendance prompts / juge** — 19/09 C'est ce que le delta écrit (« sous indépendance »), et c'est repris tel quel. Si le juge est plus dispersé sur les prompts ambigus, la somme des carrés sous-estime. La sheet ne le dit pas : c'est peut-être le sujet de P3-A (evals) plutôt que d'ici.
+
+## Révision v2 (18/09/2026)
+
+### Pas ajouté — « Ce qu'on rééchantillonne définit ce qu'on estime » [tronc]
+Placement : après « Comparer deux modèles : rééchantillonner les lignes », avant « Où ça casse ». Le pas « Où ça casse » est renuméroté.
+
+Règle. Le bootstrap imite **un** tirage ; il faut dire lequel. Dans une éval LLM, trois sources de variation sont trois expériences différentes : les prompts (quel jeu ai-je tiré ?), le juge (quelle relance ?), la seed du modèle évalué. Rééchantillonner l'une mesure sa largeur, et elle seule. En mélanger deux dans les répliques produit un chiffre qui répond à une question que personne n'a posée : l'**estimande** a changé.
+
+Exemple fil rouge de ce pas : six prompts notés de 1 à 5 par un juge LLM.
+- Relance 1 : (5, 4, 2, 5, 3, 4), moyenne **3,83**.
+- Bootstrap des prompts, énumération exacte des 6⁶ = 46 656 rééchantillons : SE = **0,436**. Formule de contrôle s/√n·√((n−1)/n) = 0,436. Réponse à : « si je tirais six autres prompts ».
+- Deux relances du juge à prompts fixés : (5, 3, 2, 5, 3, 5) → 3,83 ; (4, 4, 2, 5, 3, 4) → 3,67. Écart-type des trois moyennes : **0,096**. Réponse à : « si je relançais le juge ».
+- Relancer le juge à chaque réplique du bootstrap : ≈ √(0,436² + 0,096²) = **0,446** sous indépendance — un nombre qui répond à « autres prompts ET autre juge ». Ce n'est pas plus prudent, c'est une autre question, et sans la nommer l'intervalle n'est pas interprétable.
+
+| on rééchantillonne | ce qui varie | la question à laquelle le SE répond |
+| --- | --- | --- |
+| les lignes (prompts) | le jeu de test | « et sur d'autres prompts ? » |
+| les relances du juge, prompts fixés | le juge | « et si le juge était relancé ? » |
+| les seeds, prompts et juge fixés | le modèle évalué | « et à un autre run ? » |
+| lignes + juge dans une même réplique | les deux | une somme sans nom — à ne pas rapporter comme un seul SE |
+
+Réserve à écrire : trois relances = 2 degrés de liberté, le 0,096 est lui-même très bruité. L'exemple montre le mécanisme, il ne donne pas une estimation utilisable ; en pratique R ≥ 5 relances.
+
+Au tableau : « Le bootstrap rejoue un tirage, donc ce qu'on rééchantillonne est ce dont on mesure la largeur, donc relancer le juge dans les répliques change l'estimande, donc on sépare : lignes pour les prompts, relances à prompts fixés pour le juge, et on rapporte les deux. »
+
+### Figure exigée
+Aucune : le tableau porte l'intuition. (Optionnel si le rendu le permet sans surcharge : SL.repeat sur les six prompts, un bouton « relancer le juge » qui redessine les notes à prompts fixés, readout des deux écarts-types.)
+
+### Où ça casse — limite ajoutée
+**L'estimande cachée.** Un SE bootstrap sans la phrase « j'ai rééchantillonné X » n'est pas lisible. Le cas fréquent en éval : les répliques relancent implicitement le juge (température > 0, pas de cache) et le SE annoncé mélange prompts et juge sans que personne l'ait décidé.
+
+### Résumé — ligne ajoutée
+6. Ce qu'on rééchantillonne est ce qu'on estime : prompts, juge et seed sont trois expériences ; on les sépare, on ne les additionne pas dans un seul chiffre.
+
+### Chaîne verbalisée — maillon ajouté (6e)
+« Ton collègue relance le juge à chaque réplique “pour capturer aussi sa variabilité” : ça change quoi ? » → « L'estimande. Le SE mélange deux sources — 0,436 prompts et 0,096 juge dans l'exemple. On les sépare : bootstrap des lignes pour les prompts, R relances à prompts fixés pour le juge. »
+
+### Ce qui a cassé pour Salah — 18/09 (re-mesure, Q7, « aucune idée »)
+- Rien de la chaîne n'était disponible : ni ce qu'on rééchantillonne, ni l'objet estimé (la distribution d'échantillonnage de μ̂), ni pourquoi le TCL est douteux sur une note 1–5 tassée contre 5, ni le piège du juge. Aucun partiel à réutiliser : la sheet est à lire en entier et à produire sur papier avant la re-mesure du 25/09.
+- Le pas ajouté est le seul contenu neuf ; c'est aussi le pont vers P3-A (evals, harness), où cette distinction est le cœur du métier.
+
+### Exclusions — inchangées, plus : pas de décomposition de variance formelle (ANOVA, composantes), pas de bootstrap à deux niveaux.
