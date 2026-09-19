@@ -108,6 +108,8 @@
   /* ---------- panneau ---------- */
   .panel{margin-top:14px;border:1px solid var(--line);border-left:3px solid var(--pc,var(--p1));
     border-radius:13px;background:linear-gradient(180deg,var(--panel),var(--panel2));overflow:hidden}
+  .panel[data-prov]{border-style:dashed}
+  .warn{margin:10px 0 0;padding:8px 12px;border:1px dashed var(--coral);border-radius:6px;color:var(--coral);font-size:12.5px;line-height:1.5}
   .p-top{display:flex;flex-wrap:wrap;gap:12px;align-items:center;padding:13px 16px;border-bottom:1px solid var(--line)}
   .p-top .dt{font-family:var(--mono);font-size:12px;font-weight:700;color:var(--pc,var(--p1))}
   .p-top .tt{font-size:15px;font-weight:600;flex:1;min-width:180px}
@@ -231,6 +233,7 @@
     <div class="labels" id="labels"></div>
     <div class="scroll" id="scroll"><div class="grid" id="grid"></div></div>
   </div>
+  <p class="warn">⚠ Cascade B3→B8 provisoire (décalage par défaut, marge B8 consommée). Deux collisions à trancher à la revue du 25/09 : B4 attention ★ tombe sur la demi-semaine du 16/11 (h = 4), B7 réplication sur celle du 14/12 (h = 3).</p>
 
   <div class="panel" id="panel"></div>
 
@@ -244,26 +247,26 @@
 </div>
 <div class="fp bk" id="bk-fp">
 <p class="lede" style="padding-left:0">23 tickets, <b>pagination vérifiée sur le PDF</b> (2<sup>e</sup> éd.). Un ticket se coche quand la section est lue <b>et</b> qu'un idiome en a été écrit dans la semaine — lue seule, elle ne compte pas. À ~30 min hebdomadaires tu en traiteras une quinzaine d'ici janvier : c'est une <b>réserve ordonnée</b>, pas une liste à finir.</p>
-<div class="fpgrp" style="--fc:var(--teal)"><h3>B1 · micrograd + makemore 1 — 21/09 → 05/10</h3>
+<div class="fpgrp" style="--fc:var(--teal)"><h3>B1 · micrograd + makemore 1 — 06/10 → 12/10</h3>
 <div class="tk"><span class="id">FP-01</span><span class="ch">ch. 1 · Python Data Model, intégral<span class="pp">p. 3–18</span></span><span class="why"><code>Value.__repr__</code> et <code>__add__</code>. Le seul chapitre que Ramalho recommande à tout lecteur, quoi qu'il arrive.</span></div>
 <div class="tk"><span class="id">FP-02</span><span class="ch">ch. 16 · Operator Overloading 101 → Unary Operators<span class="pp">p. 562–568</span></span><span class="why"><code>__add__</code>, <code>__mul__</code>, <code>__pow__</code>, <code>__neg__</code>, <code>__sub__</code>, <code>__truediv__</code>.</span></div>
 <div class="tk"><span class="id">FP-03</span><span class="ch">ch. 16 · Overloading + → Wrapping-Up Arithmetic Operators<span class="pp">p. 568–577</span></span><span class="why">Opérateurs réfléchis. <code>2 * v</code> échoue sans <code>__rmul__</code> — tu vas rencontrer le bug avant de lire la section. <em>Pagination corrigée le 10/09 : la matière commence p. 568, pas 576.</em></span></div>
 <div class="tk"><span class="id">FP-04</span><span class="ch">ch. 9 · Variable Scope Rules → Closures → nonlocal<span class="pp">p. 308–316</span></span><span class="why"><code>_backward</code> <b>est</b> une closure. Le cœur conceptuel de micrograd, pas un à-côté.</span></div>
 </div>
-<div class="fpgrp" style="--fc:var(--violet)"><h3>B2 · makemore 2 — 05/10 → 16/10</h3>
+<div class="fpgrp" style="--fc:var(--violet)"><h3>B2 · makemore 2 et 3 — 13/10 → 23/10</h3>
 <div class="tk"><span class="id">FP-05</span><span class="ch">ch. 17 · Iterables vs Iterators → generator function → genexps<span class="pp">p. 599–613</span></span><span class="why">Construction du dataset, minibatchs.</span></div>
 <div class="tk"><span class="id">FP-06</span><span class="ch">ch. 2 · Why Slices and Ranges Exclude the Last Item + Slice Objects<span class="pp">p. 47–49</span></span><span class="why"><code>view(-1,6)</code>, indices de contexte, et la convention de tranche que tu poses avant chaque TAP.</span></div>
 <div class="tk"><span class="id">FP-2b</span><span class="ch">ch. 2 · Arrays → Memory Views → NumPy<span class="pp">p. 59–67</span></span><span class="why">Ramalho construit un <code>memoryview</code> sur un <code>array</code>, modifie un octet, voit la valeur changer des deux côtés. Le pont buffer / vue / copie en Python pur — il éclaire <code>keepdim</code>, la contiguïté et le bug « <code>view</code> échoue là où <code>reshape</code> passe ». <em>Ajouté après lecture du PDF complet.</em></span></div>
 </div>
-<div class="fpgrp" style="--fc:var(--blue)"><h3>B3 · makemore 3 — 19/10 → 30/10</h3>
+<div class="fpgrp" style="--fc:var(--blue)"><h3>B3 · makemore 3 — 26/10 → 06/11 (provisoire)</h3>
 <div class="tk"><span class="id">FP-07</span><span class="ch">ch. 5 · Overview of Data Class Builders → @dataclass field options<span class="pp">p. 164–186</span></span><span class="why">Objets de configuration d'expérience.</span></div>
 <div class="tk"><span class="id">FP-08</span><span class="ch">ch. 6 · Variables Are Not Boxes → Identity & Aliases → Copies Are Shallow<span class="pp">p. 202–216</span></span><span class="why"><em>Recentré le 10/09 :</em> le déclencheur est le modèle d'<b>aliasing</b> (202–207), pas seulement les copies superficielles — c'est lui qui explique vue-vs-copie en torch, tes trois cartes déjà en deck. Puis le dict de config partagé entre runs (214–216).</span></div>
 </div>
-<div class="fpgrp" style="--fc:var(--green)"><h3>B4 · makemore 4, backprop manuel — 02/11 → 13/11</h3>
+<div class="fpgrp" style="--fc:var(--green)"><h3>B4 · makemore 4, backprop manuel — 16/11 → 27/11 (provisoire)</h3>
 <div class="tk"><span class="id">FP-09</span><span class="ch">ch. 7 · Higher-Order Functions → operator → functools.partial<span class="pp">p. 234–249</span></span><span class="why">Comparaison de gradients, fonctions de vérification.</span></div>
 <div class="tk"><span class="id">FP-10</span><span class="ch">ch. 8 · Gradual Typing in Practice → Generic Collections → ABCs<span class="pp">p. 255–280</span></span><span class="why">Annoter les repos from-scratch, mypy sur tinygraph.</span></div>
 </div>
-<div class="fpgrp" style="--fc:var(--coral)"><h3>B5–B8 · GPT, BPE, from-scratch — 16/11 → 08/01</h3>
+<div class="fpgrp" style="--fc:var(--coral)"><h3>B5–B8 · GPT, BPE, from-scratch — 30/11 → 08/01 (provisoire)</h3>
 <div class="tk"><span class="id">FP-11</span><span class="ch">ch. 11 · Object Representations → __format__ / __hash__ → __slots__<span class="pp">p. 364–388</span></span><span class="why">Classes de modules propres.</span></div>
 <div class="tk"><span class="id">FP-12</span><span class="ch">ch. 12 · Protocols and Duck Typing → __getitem__ slice-aware → __getattr__<span class="pp">p. 402–411</span></span><span class="why">Comment <code>nn.Module</code> expose ses paramètres. <em>Le dynamique est en 408–411.</em></span></div>
 <div class="tk"><span class="id">FP-13</span><span class="ch">ch. 13 · Two Kinds of Protocols → Goose Typing → Static Protocols<span class="pp">p. 434–476</span></span><span class="why">Ce qu'est vraiment <code>nn.Module</code> ; socle pour lire du code de labo.</span></div>
@@ -345,98 +348,102 @@ const W = [
  ["mer 07","ml","<b>softmax stable</b> en numpy, de mémoire : soustraction du max, log-sum-exp, cas +100. <em>La veille de makemore 1, qui l'emploie.</em>"],
  ["mer 07","bloc","2 h — chain rule au tableau, trois chemins dont une variable utilisée deux fois (le bug <em>=</em> vs <em>+=</em>). ⛑ grads manuels = grads du code.","09h—11h"],
  ["jeu 08","algo","<b>LC 20 J2</b> — réécriture sans support, chrono."],
- ["jeu 08","bloc","2 h — <b>tp_makemore1</b> : bigram par comptage, échantillonnage, NLL 2,454 puis réseau ≈ 2,48. <em>Exception nommée : le jeudi est normalement le jour « prouver » (réimplémentation sans support) ; ici un build, parce que la semaine blanche du 28/09 impose de compresser B1.</em>","09h—11h"],
+ ["jeu 08","bloc","2 h — <b>tp_makemore1</b> : bigram par comptage, échantillonnage, NLL 2,454 puis réseau ≈ 2,48.","09h—11h"],
  ["ven 09","bloc","08h <b>tampon</b> · 09h <b>revue</b> (première revue longue de P2) · 10h <b>cartes B1</b> : accumulation des gradients, tri topologique, tanh, NLL 2,454 vs 2,48.","08h—11h"]]},
 
-{d:"12/10", p:"p2", t:"B2 · makemore 3 — le bloc le plus dense", h:7, dr:{algo:2,ml:2}, m:[["cp","Point de rupture n°1 du plan"]], r:[
- ["lun 12","algo","<b>LC 206 — Reverse Linked List</b>, J1 : étude et déroulement."],
- ["mar 13","ml","⚡ <b>statistiques par dimension</b> — mean/std sur le bon axe, keepdim, ce que ça change au batchnorm."],
- ["mar 13","bloc","3 h — <b>vidéo intégrale makemore 3</b> (elle enseigne la posture de diagnostic) + loss initiale trop haute, tanh saturée, init Kaiming.","09h—12h"],
- ["mer 14","ml","<b>init Kaiming à la main</b> : d'où sort le gain, le calculer pour tanh et relu, vérifier la variance des activations."],
- ["mer 14","bloc","2 h — batchnorm, pièges train/eval, histogrammes d'activations, ratio update/data.","09h—11h"],
- ["jeu 15","algo","<b>LC 206 J2</b> — réécriture sans support, chrono."],
- ["jeu 15","bloc","2 h — makemore 3 sans support ; au tableau : pourquoi l'init contrôle les gradients.","09h—11h"]]},
+{d:"12/10", p:"p2", t:"B2 · makemore 2 (Bengio 2003)", h:8, dr:{algo:2,ml:2}, r:[
+ ["lun 12","algo","<b>LC 33 — Search in Rotated Sorted Array</b>, J1 : étude et déroulement. L'invariant de recherche binaire est le plus exigeant du lot."],
+ ["lun 12","bloc","1 h — <b>micrograd → torch</b> : le même réseau jouet réécrit en PyTorch en ~20 lignes, gradients comparés terme à terme avec ton engine.py (loss.backward() ≡ ce que tu as écrit à la main). Clôt B1 <em>et</em> rallume les tenseurs au retour de la semaine blanche, la veille de makemore 2. <em>Le pont que Karpathy ne fait pas explicitement.</em>","09h—10h"],
+ ["mar 13","ml","⚡ <b>broadcasting + keepdim</b> : normaliser 27×27 par lignes, puis provoquer le bug sans keepdim et le nommer. <em>Nourrit tp_makemore2, qui tourne à 09h le même jour.</em>"],
+ ["mar 13","bloc","3 h — makemore 1 <b>de mémoire</b> + le premier « DONC » de P2 à voix haute (comptage lissé ≡ réseau régularisé, même vraisemblance). Puis tp_makemore2.","09h—12h"],
+ ["mer 14","ml","⚡ <b>cross_entropy reconstruite</b> à la main puis cassée avec des logits à +100."],
+ ["mer 14","bloc","2 h — minibatchs, balayage de LR en 10^lr, split train/dev/test. Cible dev loss ≈ 2,17.","09h—11h"],
+ ["jeu 15","algo","<b>LC 33 J2</b> — réécriture sans support, chrono. <em>Le drill ⚡ indexation fancy est supprimé : C[X] et view(-1,6) auront été vus quatre fois (09/09, 15/09, 16/09, 28/09) et le bloc de 09h les emploie en vrai.</em>"],
+ ["jeu 15","bloc","2 h — makemore 2 de mémoire + séance LR / overfitting / embeddings 2-d.","09h—11h"]]},
 
-{d:"19/10", p:"p2", t:"B3 · makemore 4 — backprop ninja", h:7, dr:{algo:2,ml:2}, r:[
- ["lun 19","algo","★ <b>LC 200 — Number of Islands</b>, J1 : étude et déroulement. <em>Les graphes sont la lacune N1 de juillet, jamais fermée. Avancés au 19/10 par le décalage du 10/09.</em>"],
- ["mar 20","ml","⚡ <b>tril, masked_fill, softmax stable</b> — ils nourrissent directement l'attention du 03/11."],
- ["mar 20","bloc","3 h — vidéo intégrale + backprop manuelle à travers cross-entropy et tanh.","09h—12h"],
- ["mer 21","ml","<b>Adam de mémoire</b> en numpy : momentum, second moment, correction de biais, AdamW. Cible &lt; 15 min."],
- ["mer 21","bloc","2 h — batchnorm manuel, backward complet. ⛑ <b>tous les <em>cmp</em> exacts sans regarder</b>.","09h—11h"],
- ["jeu 22","algo","<b>LC 200 J2</b> — réécriture sans support, chrono. Le point de mesure le plus important du trimestre."],
- ["jeu 22","bloc","2 h socratique — optimizers SGD → momentum → Adam → AdamW, learning rate schedules.","09h—11h"]]},
+{d:"19/10", p:"p2", t:"B2 · makemore 3 — le bloc le plus dense", h:7, dr:{algo:2,ml:2}, m:[["cp","Point de rupture n°1 du plan"]], r:[
+ ["lun 19","algo","<b>LC 206 — Reverse Linked List</b>, J1 : étude et déroulement."],
+ ["mar 20","ml","⚡ <b>statistiques par dimension</b> — mean/std sur le bon axe, keepdim, ce que ça change au batchnorm."],
+ ["mar 20","bloc","3 h — <b>vidéo intégrale makemore 3</b> (elle enseigne la posture de diagnostic) + loss initiale trop haute, tanh saturée, init Kaiming.","09h—12h"],
+ ["mer 21","ml","<b>init Kaiming à la main</b> : d'où sort le gain, le calculer pour tanh et relu, vérifier la variance des activations."],
+ ["mer 21","bloc","2 h — batchnorm, pièges train/eval, histogrammes d'activations, ratio update/data.","09h—11h"],
+ ["jeu 22","algo","<b>LC 206 J2</b> — réécriture sans support, chrono."],
+ ["jeu 22","bloc","2 h — makemore 3 sans support ; au tableau : pourquoi l'init contrôle les gradients.","09h—11h"]]},
 
-{d:"26/10", p:"p2", t:"B3 · régularisation + méthodologie expérimentale", h:7, dr:{algo:2,ml:2}, m:[["cp","Mini-checkpoint : backprop + debug PyTorch"]], r:[
- ["lun 26","algo","<b>Reprise à froid — LC 20 ou LC 33</b>, chrono, sans étude préalable. <em>Seul format qui mesure le critère de sortie (« medium inconnu &lt; 30 min ») : un J2 mesure toujours un problème étudié 3 jours avant.</em>"],
- ["mar 27","ml","<b>layernorm from scratch</b> + son backward ; différence opérationnelle avec batchnorm."],
- ["mar 27","bloc","3 h — dropout, weight decay, vanishing/exploding. Puis ★ <b>méthodologie expérimentale</b> : seeds, logging structuré, script d'ablation batchnorm on/off × 3 seeds, README de run.","09h—12h"],
- ["mer 28","ml","🔥 <b>debug PyTorch en direct</b> — Claude casse une boucle d'entraînement, tu trouves. Format qu'aucune vidéo ne prépare."],
- ["mer 28","bloc","2 h ⛑ mini-checkpoint : backprop au tableau + le debug ci-contre.","09h—11h"],
- ["jeu 29","algo","<b>Reprise libre</b> — créneau libéré par le passage au cycle J1/J2 : reprise d'un raté du mois, ou second passage sur les graphes si LC 200 J2 a coincé."],
- ["jeu 29","bloc","2 h — Illustrated Transformer + maths de l'attention. <b>Corpus FR prêt et GPU testé</b> — pas en décembre.","09h—11h"]]},
+{d:"26/10", p:"p2", t:"B3 · makemore 4 — backprop ninja", h:7, prov:1, dr:{algo:2,ml:2}, r:[
+ ["lun 26","algo","★ <b>LC 200 — Number of Islands</b>, J1 : étude et déroulement. <em>Les graphes sont la lacune N1 de juillet, jamais fermée. Avancés au 19/10 par le décalage du 10/09.</em>"],
+ ["mar 27","ml","⚡ <b>tril, masked_fill, softmax stable</b> — ils nourrissent directement l'attention du 03/11."],
+ ["mar 27","bloc","3 h — vidéo intégrale + backprop manuelle à travers cross-entropy et tanh.","09h—12h"],
+ ["mer 28","ml","<b>Adam de mémoire</b> en numpy : momentum, second moment, correction de biais, AdamW. Cible &lt; 15 min."],
+ ["mer 28","bloc","2 h — batchnorm manuel, backward complet. ⛑ <b>tous les <em>cmp</em> exacts sans regarder</b>.","09h—11h"],
+ ["jeu 29","algo","<b>LC 200 J2</b> — réécriture sans support, chrono. Le point de mesure le plus important du trimestre."],
+ ["jeu 29","bloc","2 h socratique — optimizers SGD → momentum → Adam → AdamW, learning rate schedules.","09h—11h"]]},
 
-{d:"02/11", p:"p2", t:"B4 · Let's build GPT — attention ★ cœur du plan", h:7, dr:{algo:2,ml:2}, r:[
- ["lun 02","algo","<b>LC 207 — Course Schedule</b> (tri topologique), J1 : étude et déroulement."],
- ["mar 03","ml","<b>Attention une tête</b> en numpy : masque causal, moyenne pondérée, scaling 1/√d. Écrire avant de regarder."],
- ["mar 03","bloc","3 h — vidéo 1/2 : bigram torch, l'astuce mathématique de la self-attention, une tête.","09h—12h"],
- ["mer 04","ml","<b>Multi-head</b> : découpage des têtes, concat, projection de sortie. Prédire toutes les shapes avant."],
- ["mer 04","bloc","2 h — vidéo 2/2 : multi-head, feedforward, résiduel, layernorm, assemblage.","09h—11h"],
- ["jeu 05","algo","<b>LC 207 J2</b> — réécriture sans support, chrono."],
- ["jeu 05","bloc","2 h — run d'entraînement sur le corpus FR (GPU) + revue reviewer du code.","09h—11h"]]},
+{d:"02/11", p:"p2", t:"B3 · régularisation + méthodologie expérimentale", h:7, prov:1, dr:{algo:2,ml:2}, m:[["cp","Mini-checkpoint : backprop + debug PyTorch"]], r:[
+ ["lun 02","algo","<b>Reprise à froid — LC 20 ou LC 33</b>, chrono, sans étude préalable. <em>Seul format qui mesure le critère de sortie (« medium inconnu &lt; 30 min ») : un J2 mesure toujours un problème étudié 3 jours avant.</em>"],
+ ["mar 03","ml","<b>layernorm from scratch</b> + son backward ; différence opérationnelle avec batchnorm."],
+ ["mar 03","bloc","3 h — dropout, weight decay, vanishing/exploding. Puis ★ <b>méthodologie expérimentale</b> : seeds, logging structuré, script d'ablation batchnorm on/off × 3 seeds, README de run.","09h—12h"],
+ ["mer 04","ml","🔥 <b>debug PyTorch en direct</b> — Claude casse une boucle d'entraînement, tu trouves. Format qu'aucune vidéo ne prépare."],
+ ["mer 04","bloc","2 h ⛑ mini-checkpoint : backprop au tableau + le debug ci-contre.","09h—11h"],
+ ["jeu 05","algo","<b>Reprise libre</b> — créneau libéré par le passage au cycle J1/J2 : reprise d'un raté du mois, ou second passage sur les graphes si LC 200 J2 a coincé."],
+ ["jeu 05","bloc","2 h — Illustrated Transformer + maths de l'attention. <b>Corpus FR prêt et GPU testé</b> — pas en décembre.","09h—11h"]]},
 
 {d:"09/11", p:"p2", t:"Maroc 10 → 17/11 — semaine blanche", h:0, dr:{algo:1}, off:1, r:[
  ["lun 09","algo","<b>LC 133 — Clone Graph</b>, J1 : étude et déroulement. Drill seul, rien d'autre cette semaine."]]},
 
-{d:"16/11", p:"p2", t:"B4 · attention de mémoire, chronométrée", h:4, dr:{algo:2,ml:1}, m:[["cp","Critère de sortie : bloc attention &lt; 30 min"],["deci","Go / no-go du repo from-scratch"]], r:[
- ["mar 17","algo","<b>LC 133 J2</b> — réécriture sans support, chrono. Retour de voyage, reprise douce."],
- ["mer 18","ml","<b>Attention causale multi-head chronométrée</b>, sans doc. Cible &lt; 25 min, shapes justifiées. <em>Critère de sortie du plan.</em>"],
- ["mer 18","bloc","2 h ⛑ <b>bloc attention de mémoire &lt; 30 min</b>, puis le modèle entier.","09h—11h"],
- ["jeu 19","algo","<b>LC 215 — Kth Largest</b> (heap), J1 : étude et déroulement."],
- ["jeu 19","bloc","2 h — run + README nanoGPT ; Raschka ch. 3-4 en appui.","09h—11h"],
- ["ven 20","deci","★ <b>Go / no-go from-scratch</b> : si les composants de novembre n'ont pas un test <em>allclose</em> qui tourne, l'artefact est abandonné plutôt que traîné jusqu'en janvier."]]},
+{d:"16/11", p:"p2", t:"B4 · Let's build GPT — attention ★ cœur du plan", h:4, prov:1, dr:{algo:2,ml:2}, r:[
+ ["lun 16","algo","<b>LC 207 — Course Schedule</b> (tri topologique), J1 : étude et déroulement."],
+ ["mar 17","ml","<b>Attention une tête</b> en numpy : masque causal, moyenne pondérée, scaling 1/√d. Écrire avant de regarder."],
+ ["mar 17","bloc","3 h — vidéo 1/2 : bigram torch, l'astuce mathématique de la self-attention, une tête.","09h—12h"],
+ ["mer 18","ml","<b>Multi-head</b> : découpage des têtes, concat, projection de sortie. Prédire toutes les shapes avant."],
+ ["mer 18","bloc","2 h — vidéo 2/2 : multi-head, feedforward, résiduel, layernorm, assemblage.","09h—11h"],
+ ["jeu 19","algo","<b>LC 207 J2</b> — réécriture sans support, chrono."],
+ ["jeu 19","bloc","2 h — run d'entraînement sur le corpus FR (GPU) + revue reviewer du code.","09h—11h"]]},
 
-{d:"23/11", p:"p2", t:"B5 · tokenizer BPE", h:7, dr:{algo:2,ml:2}, r:[
- ["lun 23","algo","<b>LC 215 J2</b> — réécriture sans support, chrono."],
- ["mar 24","ml","⚡ <b>gather / scatter</b> — le geste sous-jacent à cross_entropy et au sampling."],
- ["mar 24","bloc","3 h — vidéo BPE en entier (la seule sans équivalent écrit) + tp_bpe : merges, encode/decode.","09h—12h"],
- ["mer 25","ml","<b>BPE encode de mémoire</b>, cible &lt; 20 min."],
- ["mer 25","bloc","2 h — regex de découpage GPT-2/GPT-4, tokens spéciaux.","09h—11h"],
- ["jeu 26","algo","<b>LC 56 — Merge Intervals</b>, J1 : étude et déroulement."],
- ["jeu 26","bloc","2 h ⛑ BPE de mémoire + pourquoi les LLM ratent l'arithmétique, arbitrage de taille de vocabulaire.","09h—11h"]]},
+{d:"23/11", p:"p2", t:"B4 · attention de mémoire, chronométrée", h:7, prov:1, dr:{algo:2,ml:1}, m:[["cp","Critère de sortie : bloc attention &lt; 30 min"],["deci","Go / no-go du repo from-scratch"]], r:[
+ ["mar 24","algo","<b>LC 133 J2</b> — réécriture sans support, chrono. Retour de voyage, reprise douce."],
+ ["mer 25","ml","<b>Attention causale multi-head chronométrée</b>, sans doc. Cible &lt; 25 min, shapes justifiées. <em>Critère de sortie du plan.</em>"],
+ ["mer 25","bloc","2 h ⛑ <b>bloc attention de mémoire &lt; 30 min</b>, puis le modèle entier.","09h—11h"],
+ ["jeu 26","algo","<b>LC 215 — Kth Largest</b> (heap), J1 : étude et déroulement."],
+ ["jeu 26","bloc","2 h — run + README nanoGPT ; Raschka ch. 3-4 en appui.","09h—11h"],
+ ["ven 27","deci","★ <b>Go / no-go from-scratch</b> : si les composants de novembre n'ont pas un test <em>allclose</em> qui tourne, l'artefact est abandonné plutôt que traîné jusqu'en janvier."]]},
 
-{d:"30/11", p:"p2", t:"B6 · ARENA ch. 1 — transformer + mech interp", h:7, dr:{algo:2,ml:2}, r:[
- ["lun 30","algo","<b>LC 56 J2</b> — réécriture sans support, chrono."],
- ["mar 01","ml","<b>Hooks TransformerLens</b> — poser un hook, lire une activation, la patcher. Couplé à ARENA 1.2."],
- ["mar 01","bloc","3 h — ARENA 1.1 en passage rapide (vérification, pas apprentissage) puis 1.2 : hooks.","09h—12h"],
- ["mer 02","ml","<b>KV cache</b> implémenté : ce que ça change aux shapes du masque, et le gain en FLOPs."],
- ["mer 02","bloc","2 h — ARENA 1.2, exercices induction heads.","09h—11h"],
- ["jeu 03","algo","<b>LC 300 — LIS</b> (DP 1D), J1 : étude et déroulement. Dernier pattern du périmètre fermé."],
- ["jeu 03","bloc","2 h — ARENA 1.2, fin. <em>ARENA 1.3+ (SAE) exclu : optionnel en P3.</em>","09h—11h"]]},
+{d:"30/11", p:"p2", t:"B5 · tokenizer BPE", h:7, prov:1, dr:{algo:2,ml:2}, r:[
+ ["lun 30","algo","<b>LC 215 J2</b> — réécriture sans support, chrono."],
+ ["mar 01","ml","⚡ <b>gather / scatter</b> — le geste sous-jacent à cross_entropy et au sampling."],
+ ["mar 01","bloc","3 h — vidéo BPE en entier (la seule sans équivalent écrit) + tp_bpe : merges, encode/decode.","09h—12h"],
+ ["mer 02","ml","<b>BPE encode de mémoire</b>, cible &lt; 20 min."],
+ ["mer 02","bloc","2 h — regex de découpage GPT-2/GPT-4, tokens spéciaux.","09h—11h"],
+ ["jeu 03","algo","<b>LC 56 — Merge Intervals</b>, J1 : étude et déroulement."],
+ ["jeu 03","bloc","2 h ⛑ BPE de mémoire + pourquoi les LLM ratent l'arithmétique, arbitrage de taille de vocabulaire.","09h—11h"]]},
 
-{d:"07/12", p:"p2", t:"B7 · réplication induction heads ★ premier artefact safety", h:7, dr:{algo:2,ml:2}, m:[["deci","Format et canal de publication"]], r:[
- ["lun 07","algo","<b>LC 300 J2</b> — réécriture sans support, chrono."],
- ["mar 08","ml","<b>top-k / nucleus sampling</b> from scratch + température. Question d'entretien fréquente."],
- ["mar 08","bloc","3 h — modèle attention-only 2 couches avec <b>ton</b> code ; entraînement × 3 seeds. Les seeds sont une question d'inférence, pas un luxe.","09h—12h"],
- ["mer 09","ml","<b>Score de prefix-matching</b> implémenté proprement — couplé au bloc, réutilisable tel quel dans le rapport."],
- ["mer 09","bloc","2 h — score d'in-context learning, courbe de phase change en cours d'entraînement.","09h—11h"],
- ["jeu 10","algo","<b>Clôture du périmètre algo</b> — reprise du raté le plus coûteux des 8 familles. À partir d'ici : maintenance seulement."],
- ["jeu 10","bloc","2 h — 1 couche vs 2 couches, dispersion sur les seeds. Claude en <em>reviewer de rapport</em>.","09h—11h"],
- ["ven 11","deci","★ <b>Format et canal arrêtés</b> : blog canonique + LessWrong, structure « ce que dit le paper / ce que j'obtiens / où ça diverge »."]]},
+{d:"07/12", p:"p2", t:"B6 · ARENA ch. 1 — transformer + mech interp", h:7, prov:1, dr:{algo:2,ml:2}, r:[
+ ["lun 07","algo","<b>LC 56 J2</b> — réécriture sans support, chrono."],
+ ["mar 08","ml","<b>Hooks TransformerLens</b> — poser un hook, lire une activation, la patcher. Couplé à ARENA 1.2."],
+ ["mar 08","bloc","3 h — ARENA 1.1 en passage rapide (vérification, pas apprentissage) puis 1.2 : hooks.","09h—12h"],
+ ["mer 09","ml","<b>KV cache</b> implémenté : ce que ça change aux shapes du masque, et le gain en FLOPs."],
+ ["mer 09","bloc","2 h — ARENA 1.2, exercices induction heads.","09h—11h"],
+ ["jeu 10","algo","<b>LC 300 — LIS</b> (DP 1D), J1 : étude et déroulement. Dernier pattern du périmètre fermé."],
+ ["jeu 10","bloc","2 h — ARENA 1.2, fin. <em>ARENA 1.3+ (SAE) exclu : optionnel en P3.</em>","09h—11h"]]},
 
-{d:"14/12", p:"p2", t:"B7 · rédaction du rapport — vacances dès le 16", h:3, dr:{algo:1}, m:[["arte","Rapport de réplication induction heads"]], r:[
- ["lun 14","algo","Reprise libre d'un raté du trimestre. Léger."],
- ["mar 15","bloc","3 h — <b>rapport de réplication rédigé</b>. Format imposé, pas un tutoriel.","09h—12h"],
- ["mar 15","arte","★ <b>Artefact n°1 terminé.</b> Publication après le checkpoint, pas avant."],
- ["mer 16","bloc","Vacances 16 → 22/12. 23-24/12 tampon optionnel, non programmé."]]},
+{d:"14/12", p:"p2", t:"B7 · réplication induction heads ★ premier artefact safety", h:3, prov:1, dr:{algo:2,ml:2}, m:[["deci","Format et canal de publication"]], r:[
+ ["lun 14","algo","<b>LC 300 J2</b> — réécriture sans support, chrono."],
+ ["mar 15","ml","<b>top-k / nucleus sampling</b> from scratch + température. Question d'entretien fréquente."],
+ ["mar 15","bloc","3 h — modèle attention-only 2 couches avec <b>ton</b> code ; entraînement × 3 seeds. Les seeds sont une question d'inférence, pas un luxe.","09h—12h"],
+ ["mer 16","ml","<b>Score de prefix-matching</b> implémenté proprement — couplé au bloc, réutilisable tel quel dans le rapport."],
+ ["mer 16","bloc","2 h — score d'in-context learning, courbe de phase change en cours d'entraînement.","09h—11h"],
+ ["jeu 17","algo","<b>Clôture du périmètre algo</b> — reprise du raté le plus coûteux des 8 familles. À partir d'ici : maintenance seulement."],
+ ["jeu 17","bloc","2 h — 1 couche vs 2 couches, dispersion sur les seeds. Claude en <em>reviewer de rapport</em>.","09h—11h"],
+ ["ven 18","deci","★ <b>Format et canal arrêtés</b> : blog canonique + LessWrong, structure « ce que dit le paper / ce que j'obtiens / où ça diverge »."]]},
 
 {d:"21/12", p:"p2", t:"Vacances", h:0, dr:{}, off:1, r:[
  ["—","bloc","Rien. Le tampon des 23-24/12 reste optionnel et non programmé."]]},
 
-{d:"28/12", p:"p2", t:"B8 · marge — la seule de toute la phase", h:7, dr:{ml:2}, r:[
- ["mar 29","bloc","3 h — rattrapage libre ou avance sur le rapport. <em>Cette semaine est mangée en priorité par makemore 3 et la réplication si elles ont débordé.</em>","09h—12h"],
- ["mer 30","bloc","2 h — fiche interactive P2 : backprop, init/batchnorm, attention.","09h—11h"],
- ["mer 30","ml","<b>Attention chronométrée</b> et <b>Adam chronométré</b> — répétition sèche des critères de sortie."],
- ["jeu 31","bloc","2 h — Anki global P2.","09h—11h"]]},
+{d:"28/12", p:"p2", t:"B7 · rédaction du rapport — vacances dès le 16", h:7, prov:1, dr:{algo:1}, m:[["arte","Rapport de réplication induction heads"]], r:[
+ ["lun 28","algo","Reprise libre d'un raté du trimestre. Léger."],
+ ["mar 29","bloc","3 h — <b>rapport de réplication rédigé</b>. Format imposé, pas un tutoriel.","09h—12h"],
+ ["mar 29","arte","★ <b>Artefact n°1 terminé.</b> Publication après le checkpoint, pas avant."],
+ ["mer 30","bloc","Vacances 16 → 22/12. 23-24/12 tampon optionnel, non programmé."]]},
 
 {d:"04/01", p:"p2", t:"B8 · checkpoint Phase 2 et bascule", h:7, dr:{}, m:[["cp","Checkpoint P2 — seuil 80 %"],["deci","Arbitrage QLoRA + programme figé P3"],["arte","nanoGPT · from-scratch · rapport publiés"]], r:[
  ["mar 05","bloc","3 h — rapport et README finalisés ; bloc attention chronométré en calibration. <em>On ne bachote pas un checkpoint.</em>","09h—12h"],
@@ -664,10 +671,11 @@ function draw(){
     <div class="row ${r[1]} ${nd?'newday':'sameday'} ${hidden.has(r[1])?'hid':''}" data-k="${r[1]}" style="--kc:${cv(KC[r[1]])}">
       <span class="day">${r[0]}</span><span class="hr ${cls}">${hr||'—'}</span><span class="kk">${KL[r[1]]}</span><span class="ti" title="${ti.replace(/"/g,'&quot;')}">${ti}</span><span class="tx">${tx}</span>
     </div>`;}).join('') || `<div class="empty">Semaine sans contenu programmé.</div>`;
+  if(w.prov)panel.dataset.prov=1;else delete panel.dataset.prov;
   panel.innerHTML=`
     <div class="p-top">
       <span class="dt">sem. ${w.d}</span>
-      <span class="tt">${w.t}</span>
+      <span class="tt">${w.prov?"≈ ":""}${w.t}</span>
       ${badges}
       <span class="hrs">${w.h} h de bloc</span>
       <span class="nav"><button id="prev">←</button><button id="next">→</button></span>
