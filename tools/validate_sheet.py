@@ -73,9 +73,9 @@ if not re.search(r'SL\.(plot|repeat|descent|trace|plane)\(', t): fail('aucune fi
 for f in re.findall(r'<div class="fig" id="(fig\d+)">(.*?)</div>\s*</div>', t, re.S):
     if 'class="cap"' not in f[1]: fail(f'{f[0]} sans légende .cap')
 verb = re.findall(r'<li><div class="q">', t)
-if not (4 <= len(verb) <= 6): fail(f'chaîne verbalisée : {len(verb)} maillons (attendu 4 à 6)')
+if not (4 <= len(verb) <= 7): fail(f'chaîne verbalisée : {len(verb)} maillons (attendu 4 à 7)')
 resume = re.search(r'<div class="card resume">.*?<ol>(.*?)</ol>', t, re.S)
-if resume and len(re.findall(r'<li>', resume.group(1))) > 7: fail('résumé > 7 lignes')
+if resume and len(re.findall(r'<li>', resume.group(1))) > 8: fail('résumé > 8 lignes')
 if len(re.findall(r'<details', t)): fail('<details> Q/A interdit dans une chaîne (c\'est le format archivé)')
 if re.search(r'Encore|Difficile|Bien\s*`', t): fail('notation encore/difficile/bien interdite (Anki fait ça)')
 

@@ -34,8 +34,8 @@ Chemin de sortie déduit : `sheets/<chains|walkthroughs|bridges|coding>/<series>
 5. **Pas de la chaîne** — numérotés : règle (3 lignes max) → application chiffrée → « au tableau » (prémisse, donc, donc, résultat nommé). Marquer `[tronc]` et `[casse]`.
 6. **Figures exigées** — pour chaque figure : primitive sheetlib (`plot`, `repeat`, `descent`, `trace`, `plane`), ce qu'elle doit rendre visible, quels curseurs, et ce que la légende doit dire.
 7. **Où ça casse** — 2 à 4 limites, mécanisme en une phrase.
-8. **Résumé** (≤ 7 lignes) et **phrase d'entretien**.
-9. **Chaîne verbalisée** — 4 à 6 maillons (question → réponse d'une ligne).
+8. **Résumé** (≤ 8 lignes) et **phrase d'entretien**.
+9. **Chaîne verbalisée** — 4 à 7 maillons (question → réponse d'une ligne).
 10. **Ce qui a cassé pour Salah** — les erreurs réelles des séances ; chacune doit être adressée explicitement par un pas, une figure ou une limite. C'est la section que Claude Code ne peut pas inventer.
 11. **Exclusions** — ce que la sheet ne doit pas contenir (scope Phase 1 acté le 10/09/2026 : pas de CCP, SDP, SE de White, PCA non centrée, hessienne XGBoost, feature engineering).
 
