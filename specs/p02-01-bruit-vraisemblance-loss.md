@@ -10,7 +10,7 @@ prereq: [p00-02, p00-03]
 anki: [stats::vraisemblance, stats::mle, ml::regression-lineaire, ml::logistique, dl::cross-entropy]
 bridges: [b05, b06]
 next: p02-02
-status: reviewed
+status: built
 ---
 
 ## Question de la chaîne
@@ -93,3 +93,44 @@ Pas de prior ici (p02-02). Pas de Huber au-delà du nom. Pas de KL (p08-03).
 - **Où placer le pointeur p08-02** — validé 16/09 (overflow float32, 0 au lieu de nan). Il est au pas 5, dans la remarque sur le sous-débordement — pas dans « où ça casse », puisque le spec le déclare hors périmètre. À confirmer.
 - **Somme ou moyenne ?** — validé 16/09 La sheet écrit la cross-entropy en somme (−Σ log p_yᵢ), conformément au geste du MLE ; les frameworks moyennent par défaut. Faut-il le dire ici, ou est-ce le sujet d'une autre sheet ?
 - **`ml::regression-lineaire`** — validé 16/09 est repris tel quel du frontmatter ; vérifier que le tag existe bien sous cette forme dans Anki (les autres tags de la liste sont déjà utilisés par p01-03 et p03-01).
+
+## Révision v2 (18/09/2026)
+
+### Pas ajouté — « Le gradient, pas la valeur » [tronc]
+Placement : immédiatement après le pas « Jeter — puis s'arrêter », avant « Ce que chaque loss estime ». Les pas suivants sont renumérotés.
+
+Règle (≤ 5 lignes). Une loss n'informe l'optimiseur que par sa pente, jamais par sa valeur. Avec p = σ(z) et y ∈ {0, 1} :
+- log-loss : ∂L/∂z = p − y — la dérivée du log apporte un facteur 1/(p(1 − p)) qui annule exactement σ′(z) = p(1 − p) ;
+- MSE ∘ sigmoïde : L = (y − p)², ∂L/∂z = 2(p − y)·p(1 − p) — le σ′ survit.
+Une erreur **confiante** (p → 0 ou 1) pousse le facteur p(1 − p) vers 0 : la MSE gèle exactement les points qu'il faudrait bouger.
+
+Application chiffrée, y = 0 (le modèle se trompe d'autant plus qu'il est sûr) :
+
+| z | p = σ(z) | p(1 − p) | ∂log-loss/∂z | ∂MSE/∂z | rapport |
+| --- | --- | --- | --- | --- | --- |
+| 0 | 0,500 | 0,250 | 0,500 | 0,250 | 2 |
+| 2 | 0,881 | 0,105 | 0,881 | 0,185 | 4,8 |
+| 5 | 0,9933 | 0,00665 | 0,993 | 0,0132 | 75 |
+| 10 | 0,99995 | 4,5·10⁻⁵ | 1,000 | 9,1·10⁻⁵ | 11 000 |
+
+Au tableau : « La pente de la log-loss en z est p − y, donc une erreur confiante donne un gradient de norme proche de 1, donc le point bouge ; la pente de la MSE porte le facteur p(1 − p), donc la même erreur confiante donne un gradient qui tend vers 0, donc le point est gelé — c'est le gradient qui décide, pas la valeur de la loss. »
+
+Complément d'une ligne (renvoi b06) : MSE ∘ σ est non convexe en β ; la log-loss est convexe. Deux raisons distinctes de ne pas mettre une MSE derrière une sigmoïde.
+
+### Figure exigée
+SL.plot : |∂L/∂z| en fonction de z ∈ [−6, 10], pour y = 0, deux courbes (log-loss en sl-c1, MSE en sl-c2), un curseur z. Readouts : p, p(1 − p), les deux gradients, leur rapport. Légende : « Pousse z à 5 : la log-loss pousse encore (0,99), la MSE a lâché (0,013). Le plateau de la MSE est la figure 3 vue par sa pente. »
+
+### Où ça casse — limite existante à compléter
+La limite « σ a disparu au pas 7 » reste. Ajouter une phrase à la limite « séparation parfaite » : sous séparation la log-loss a une pente qui ne s'annule jamais — c'est le pas ajouté lu à l'envers : ce qui rend la log-loss bonne sur les erreurs confiantes est ce qui la fait fuir quand il n'y a plus d'erreur.
+
+### Résumé — ligne ajoutée
+7. Le gradient décide : log-loss → p − y ; MSE ∘ σ → ×p(1 − p), gelée sur les erreurs confiantes.
+
+### Chaîne verbalisée — maillon ajouté (7e)
+« Pourquoi MSE + sigmoïde apprend-elle si lentement les exemples confortablement faux ? » → « ∂/∂z = 2(p − y)p(1 − p) : le facteur p(1 − p) tend vers 0 quand p → 0 ou 1. La log-loss donne p − y, sans ce facteur : gradient ≈ 1 sur une erreur confiante. »
+
+### Ce qui a cassé pour Salah — 18/09 (re-mesure, Q3, non acquis)
+- MSE ↔ gaussien donné ; Bernoulli posé « sur les zᵢ » au lieu de sur yᵢ | xᵢ ; la cross-entropy non reliée au MLE — les six pas ne sont pas encore tenus de mémoire. Aucun pas ne change pour ça : la chaîne existante est la réponse, elle est à produire sur papier.
+- Le mécanisme du symptôme (« ça converge lentement, les erreurs confiantes ne bougent plus ») a été donné comme « la MSE a un cap à 1 » — une propriété de la **valeur** de la loss. Le pas ajouté est écrit contre cette réponse : le mécanisme est la pente.
+
+### Exclusions — inchangées

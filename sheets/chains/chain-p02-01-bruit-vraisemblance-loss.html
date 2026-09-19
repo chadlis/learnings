@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Du bruit à la loss — chaîne</title>
-<meta name="sheet" content="series=chain;part=02;number=01;status=v1">
+<title>Du bruit à la loss — chaîne · v2</title>
+<meta name="sheet" content="series=chain;part=02;number=01;status=v2">
 <meta name="part" content="02 · Le bruit décide (fil B)">
 <meta name="subtitle" content="fil B — hypothèse de bruit → densité → produit → log → négatif → jeter">
 <meta name="prereq" content="p00-02,p00-03">
@@ -135,7 +135,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 .sl-seg.mk-asym{stroke:var(--green);stroke-width:1.6;stroke-dasharray:4 4}
 text.mk-asym{fill:var(--green)}
 .sl-plot text.sl-c1,.sl-plot text.sl-c2,.sl-plot text.sl-c3,.sl-plot text.sl-c5{font-size:12.5px}
-.cap .kg{color:var(--pen);font-weight:600}.cap .kl{color:var(--red);font-weight:600}.cap .km{color:#B7791F;font-weight:600}
+.cap .kg{color:var(--pen);font-weight:600}.cap .kl{color:var(--red);font-weight:600}.cap .km{color:#B7791F;font-weight:600}.cap .kv{color:#6B46C1;font-weight:600}
 .fig .pan{font:600 11px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--cardmuted);margin:8px 0 0}
 </style>
 </head>
@@ -343,6 +343,34 @@ text.mk-asym{fill:var(--green)}
 
 <div class="step" id="s8">
   <div class="rule">
+    <h3>Le gradient, pas la valeur <span class="tag tronc">tronc</span></h3>
+    <p>Une loss n'informe l'optimiseur que par sa <b>pente</b>, jamais par sa valeur. Avec <span class="m">p</span> = <span class="m">σ</span>(<span class="m">z</span>) et <span class="m">y</span> ∈ {0, 1} :</p>
+    <div class="eq">log-loss : ∂<span class="m">L</span>/∂<span class="m">z</span> = <span class="m">p</span> − <span class="m">y</span> &nbsp;&nbsp;·&nbsp;&nbsp; MSE ∘ <span class="m">σ</span> : <span class="m">L</span> = (<span class="m">y</span> − <span class="m">p</span>)², ∂<span class="m">L</span>/∂<span class="m">z</span> = 2(<span class="m">p</span> − <span class="m">y</span>)·<span class="m">p</span>(1 − <span class="m">p</span>)</div>
+    <p>La dérivée du <span class="m">log</span> apporte un facteur 1/(<span class="m">p</span>(1 − <span class="m">p</span>)) qui annule <b>exactement</b> <span class="m">σ</span>′(<span class="m">z</span>) = <span class="m">p</span>(1 − <span class="m">p</span>) ; derrière une MSE, ce <span class="m">σ</span>′ survit. Une erreur <b>confiante</b> (<span class="m">p</span> → 0 ou 1) pousse le facteur <span class="m">p</span>(1 − <span class="m">p</span>) vers 0 : la MSE gèle exactement les points qu'il faudrait bouger.</p>
+    <p class="say">« La pente de la log-loss en <span class="m">z</span> est <span class="m">p</span> − <span class="m">y</span>, donc une erreur confiante donne un gradient de norme proche de 1, donc le point bouge ; la pente de la MSE porte le facteur <span class="m">p</span>(1 − <span class="m">p</span>), donc la même erreur confiante donne un gradient qui tend vers 0, donc le point est gelé — c'est le gradient qui décide, pas la valeur de la loss. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — <span class="m">y</span> = 0, le modèle se trompe d'autant plus qu'il est sûr</div>
+    <table>
+      <tr><th><span class="m">z</span></th><th><span class="m">p</span> = <span class="m">σ</span>(<span class="m">z</span>)</th><th><span class="m">p</span>(1 − <span class="m">p</span>)</th><th>∂log-loss/∂<span class="m">z</span></th><th>∂MSE/∂<span class="m">z</span></th><th>rapport</th></tr>
+      <tr><td>0</td><td>0,500</td><td>0,250</td><td>0,500</td><td>0,250</td><td>2</td></tr>
+      <tr><td>2</td><td>0,881</td><td>0,105</td><td>0,881</td><td>0,185</td><td>4,8</td></tr>
+      <tr class="hl"><td>5</td><td>0,9933</td><td>0,00665</td><td>0,993</td><td>0,0132</td><td><b>75</b></td></tr>
+      <tr><td>10</td><td>0,99995</td><td>4,5·10⁻⁵</td><td>1,000</td><td>9,1·10⁻⁵</td><td><b>11 000</b></td></tr>
+    </table>
+    <p>Le symptôme « ça converge lentement, les exemples confortablement faux ne bougent plus » n'est donc pas une histoire de <i>valeur</i> de la loss — de cap, de borne, d'échelle. C'est le facteur <span class="m">p</span>(1 − <span class="m">p</span>) dans le gradient, et rien d'autre.</p>
+    <p><b>Une seconde raison, distincte.</b> MSE ∘ <span class="m">σ</span> est <b>non convexe</b> en <span class="m">β</span>, la log-loss est convexe (<a href="../bridges/bridge-06-convexite-forme-fermee.html">b06</a>) : deux raisons indépendantes de ne pas mettre une MSE derrière une sigmoïde.</p>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — c'est la pente qui décide, pas la valeur</div>
+    <div id="f4plot" class="wide"></div>
+    <div id="f4sliders"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">Un exemple de vraie classe <span class="m">y</span> = 0 : plus <span class="m">z</span> monte, plus le modèle se trompe <i>avec assurance</i>. En ordonnée, ce que l'optimiseur reçoit — la norme du gradient par rapport à <span class="m">z</span> — pour la <span class="kg">log-loss</span> et pour la <span class="kv">MSE ∘ <span class="m">σ</span></span>. Pousse <span class="m">z</span> à 5 : la log-loss pousse encore (0,99), la MSE a lâché (0,013). <b>Le plateau de la MSE est la figure 3 vue par sa pente</b> : là où la courbe de coût s'aplatit, l'optimiseur ne reçoit plus rien.</p>
+  </div>
+</div>
+
+<div class="step" id="s9">
+  <div class="rule">
     <h3>Ce que chaque loss estime</h3>
     <p>Changer d'hypothèse de bruit ne change pas seulement la robustesse : ça change la <b>quantité estimée</b>.</p>
     <div class="eq">MSE → moyenne conditionnelle &nbsp;·&nbsp; MAE → médiane conditionnelle &nbsp;·&nbsp; log-loss et cross-entropy → probabilité conditionnelle</div>
@@ -361,7 +389,7 @@ text.mk-asym{fill:var(--green)}
   </div>
 </div>
 
-<div class="step" id="s9">
+<div class="step" id="s10">
   <div class="rule">
     <h3>Le geste, en arrière</h3>
     <p>Personne ne dit « je suppose un bruit de Laplace »&nbsp;: on choisit la MAE, et l'hypothèse est reconstituée après coup. Savoir faire le trajet dans ce sens est ce qui distingue une réponse d'un slogan.</p>
@@ -380,7 +408,7 @@ text.mk-asym{fill:var(--green)}
   </div>
 </div>
 
-<div class="step" id="s10">
+<div class="step" id="s11">
   <div class="rule">
     <h3>Où ça casse <span class="tag casse">casse</span></h3>
     <p>Le geste est mécanique, mais ses deux appuis — l'indépendance et la vraisemblance seule — lâchent dans des cas précis, et toujours pour la même raison : la vraisemblance ne détermine parfois rien du tout.</p>
@@ -390,15 +418,15 @@ text.mk-asym{fill:var(--green)}
     <ul>
       <li><b>Le produit est interdit dès qu'il y a dépendance.</b> Séries temporelles, mesures répétées sur un même sujet, phrases d'un même document : la jointe ne se factorise pas et le produit compte plusieurs fois la même information. La vraisemblance obtenue est trop piquée, donc toute barre d'erreur qui en sort est trop étroite.</li>
       <li><b>Le maximum de vraisemblance ne croit que ce qu'il a vu.</b> Pièce PPP : <span class="m">L</span>(<span class="m">p</span>) = <span class="m">p</span>³, maximale en <span class="hat"><span class="m">p</span></span> = 1 — « un échec est impossible » après trois tirages (figure 2). Même mécanisme en langue : un mot jamais vu reçoit la probabilité 0, donc toute phrase qui le contient devient impossible. Remède : ajouter une croyance — prior, ou lissage (3+1)/(3+2) = 0,8 — c'est <a href="chain-p02-02-prior-penalite.html">p02-02</a>.</li>
-      <li><b>Parfois il n'y a pas de minimum du tout.</b> Séparation parfaite : la NLL décroît vers 0 sans jamais l'atteindre, donc <span class="hat"><span class="m">β</span></span> n'existe pas et ‖<span class="m">β</span>‖ → ∞ (figure 4). Le solveur s'arrête sur son nombre d'itérations avec un coefficient énorme, ce qui ressemble à un résultat sans en être un.</li>
+      <li><b>Parfois il n'y a pas de minimum du tout.</b> Séparation parfaite : la NLL décroît vers 0 sans jamais l'atteindre, donc <span class="hat"><span class="m">β</span></span> n'existe pas et ‖<span class="m">β</span>‖ → ∞ (figure 5). Le solveur s'arrête sur son nombre d'itérations avec un coefficient énorme, ce qui ressemble à un résultat sans en être un. C'est le pas 8 lu à l'envers : sous séparation la log-loss a une pente qui <b>ne s'annule jamais</b> — ce qui la rend bonne sur les erreurs confiantes est exactement ce qui la fait fuir quand il n'y a plus d'erreur.</li>
       <li><b><span class="m">σ</span> a disparu au pas 7</b>, et c'était légitime : il ne déplace pas l'<span class="up">argmin</span> en <span class="m">β</span>. Mais une barre d'erreur sur <span class="hat"><span class="m">β</span></span>, elle, en a besoin — il faut le récupérer, <span class="hat"><span class="m">σ</span></span>² = RSS/<span class="m">n</span>. Jeter pour optimiser ne veut pas dire jeter pour conclure : c'est le retour du fil A, <a href="chain-p01-03-inference-regression.html">p01-03</a>.</li>
     </ul>
   </div>
-  <div class="fig" id="fig4">
-    <div class="lbl">Figure 4 — une loss qui n'a pas de minimum</div>
-    <div id="f4plot" class="wide"></div>
-    <div id="f4sliders"></div>
-    <div class="readouts" id="f4out"></div>
+  <div class="fig" id="fig5">
+    <div class="lbl">Figure 5 — une loss qui n'a pas de minimum</div>
+    <div id="f5plot" class="wide"></div>
+    <div id="f5sliders"></div>
+    <div class="readouts" id="f5out"></div>
     <p class="cap">L'exemple de classification, <span class="m">x</span> = (−2, −1, 1, 2) et <span class="m">y</span> = (0, 0, 1, 1) : toute pente <span class="m">β</span> &gt; 0 classe les quatre points correctement. Monte <span class="m">β</span> : la NLL descend vers 0 sans jamais l'atteindre et sa pente reste strictement négative — pour tout <span class="m">β</span>, doubler <span class="m">β</span> fait mieux. Il n'y a <b>pas</b> d'argmin, et ce n'est pas un défaut du calcul : les données disent « n'importe quelle pente pourvu qu'elle soit infinie ». La pénalité de <a href="chain-p02-02-prior-penalite.html">p02-02</a> ne rendra pas la solution meilleure, elle la fera <i>exister</i>.</p>
   </div>
 </div>
@@ -415,6 +443,7 @@ text.mk-asym{fill:var(--green)}
     <li>Gaussien → <b>MSE</b> (<span class="m">σ</span>² jeté) ; Laplace → <b>MAE</b> ; Bernoulli → <b>log-loss</b> (rien à jeter) ; catégoriel → <b>cross-entropy</b> = −<span class="m">log p</span><sub><span class="m">y</span></sub>.</li>
     <li>La forme de la loss est la forme de <b>l'exposant de la densité</b> : carré ⇒ gaussienne, valeur absolue ⇒ Laplace.</li>
     <li>Chaque loss estime une cible différente : <b>moyenne</b>, <b>médiane</b>, <b>probabilité</b>. Le geste se lit aussi à l'envers, de la loss vers le bruit.</li>
+    <li><b>Le gradient décide</b>, pas la valeur : log-loss → <span class="m">p</span> − <span class="m">y</span> ; MSE ∘ <span class="m">σ</span> → ×<span class="m">p</span>(1 − <span class="m">p</span>), gelée sur les erreurs confiantes.</li>
     <li>Ça casse par : dépendance (produit interdit), <span class="hat"><span class="m">p</span></span> = 1 du maximum de vraisemblance, séparation parfaite (pas de minimum), <span class="m">σ</span> jeté dont une barre d'erreur a pourtant besoin.</li>
   </ol>
 </div>
@@ -423,13 +452,14 @@ text.mk-asym{fill:var(--green)}
 
 <section class="blk" id="verbal">
 <h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
-<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+<div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
   <ol class="verb">
     <li><div class="q">Quelle est la seule hypothèse de la chaîne ?</div><div class="a hid">La loi du bruit — et l'indépendance conditionnelle, qui autorise le produit. Tout le reste est du calcul.</div></li>
     <li><div class="q">Déroule les six pas sur un bruit gaussien.</div><div class="a hid">Densité exp(−r²/2σ²)/(σ√2π) → produit → log (−n log(σ√2π) − RSS/2σ²) → négatif → jeter la constante et le facteur 1/(2σ²) → MSE.</div></li>
     <li><div class="q">Que jette-t-on avec Bernoulli ?</div><div class="a hid">Rien : pas de paramètre de dispersion séparé, la variance p(1−p) est fixée par la moyenne. La log-loss est la NLL telle quelle, et c'est le point d'arrêt.</div></li>
     <li><div class="q">La cross-entropy à trois classes, c'est quoi ?</div><div class="a hid">La NLL d'une catégorielle : −log de la probabilité softmax de la vraie classe. Sur z = (2, 0, −1) : −log 0,844 = 0,170 pour chat, −log 0,042 = 3,17 pour oiseau.</div></li>
     <li><div class="q">Que casse la séparation parfaite ?</div><div class="a hid">La NLL décroît vers 0 sans l'atteindre : pas de minimum, ‖β‖ → ∞. Le maximum de vraisemblance n'existe pas.</div></li>
+    <li><div class="q">Pourquoi MSE + sigmoïde apprend-elle si lentement les exemples confortablement faux ?</div><div class="a hid">∂/∂z = 2(p − y)·p(1 − p) : le facteur p(1 − p) tend vers 0 quand p → 0 ou 1. La log-loss donne p − y, sans ce facteur : gradient ≈ 1 sur une erreur confiante.</div></li>
     <li><div class="q">Que suppose la MAE, et qu'estime-t-elle ?</div><div class="a hid">Un bruit de Laplace — queues exponentielles. Elle estime la médiane conditionnelle, pas la moyenne : une autre quantité, pas la même en plus prudent.</div></li>
   </ol>
 </div>
@@ -454,7 +484,7 @@ text.mk-asym{fill:var(--green)}
 
 </main>
 </div>
-<footer>Chaîne p02-01 · v1 du 16/09/2026 · Prérequis : p00-02, p00-03. Suite : <a href="chain-p02-02-prior-penalite.html">p02-02 Du prior à la pénalité</a>.</footer>
+<footer>Chaîne p02-01 · v2 du 18/09/2026 · Prérequis : p00-02, p00-03. Suite : <a href="chain-p02-02-prior-penalite.html">p02-02 Du prior à la pénalité</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>
@@ -537,23 +567,44 @@ function draw3(p){
 }
 SL.slider(document.getElementById('f3sliders'),{label:'p',min:.01,max:.99,step:.01,value:.1},draw3);
 
-/* ===== Figure 4 : séparation parfaite, pas de minimum ===== */
+/* ===== Figure 4 : c'est la pente qui décide ===== */
+/* vraie classe y = 0 : |∂log-loss/∂z| = p, |∂(MSE∘σ)/∂z| = 2p²(1 − p) */
+const gLL=z=>sig(z), gMS=z=>{const p=sig(z);return 2*p*p*(1-p);};
+const P4=SL.plot(document.getElementById('f4plot'),{x:[-6,10],y:[0,1.08],w:600,h:260,xt:[-6,-3,0,2,5,10],yt:[.25,.5,.75,1],xl:'z = score prédit, vraie classe y = 0',yl:'|∂L/∂z| : ce que l\'optimiseur reçoit'});
+P4.fn(gLL,'sl-c1');P4.fn(gMS,'sl-c2');
+P4.label(-5.8,.72,'log-loss : |p − y|','sl-c1');
+P4.label(9.8,.44,'MSE ∘ σ : ×p(1 − p)','sl-c2','end');
+function draw4(z){
+  P4.clear();
+  const p=sig(z),v=p*(1-p),a=gLL(z),b=gMS(z);
+  P4.vline(z,'mk-r');
+  P4.dot(z,a,'sl-c1',5);P4.dot(z,b,'sl-c2',5);
+  ro(document.getElementById('f4out'),[
+    ['p = σ(z)',SL.fmt(p,5)],
+    ['p(1 − p)',SL.fmt(v,6)],
+    ['log-loss · |∂L/∂z|',SL.fmt(a,4),'pos'],
+    ['MSE ∘ σ · |∂L/∂z|',SL.fmt(b,6),'zero'],
+    ['rapport',SL.fmt(a/b,a/b>=100?0:1)]]);
+}
+SL.slider(document.getElementById('f4sliders'),{label:'z',min:-6,max:10,step:.05,value:5},draw4);
+
+/* ===== Figure 5 : séparation parfaite, pas de minimum ===== */
 const nllB=b=>2*l1pe(-b)+2*l1pe(-2*b);
 const dnllB=b=>-2*sig(-b)-4*sig(-2*b);
-const P4=SL.plot(document.getElementById('f4plot'),{x:[0,10],y:[0,3],w:600,h:260,xt:[0,2,4,6,8,10],yt:[1,2,3],xl:'β (toute pente β > 0 sépare parfaitement)',yl:'NLL(β)'});
-P4.fn(nllB,'sl-c1',320);
-P4.label(3.3,1.75,'décroît vers 0, jamais atteint','sl-c1');
-function draw4(b){
-  P4.clear();
-  P4.seg(0,0,10,0,'mk-asym');P4.text(9.7,.22,'asymptote : NLL → 0','mk-asym','end');
-  P4.vline(b,'mk-r');P4.dot(b,Math.min(nllB(b),3),'sl-c1',6);
-  ro(document.getElementById('f4out'),[
+const P5=SL.plot(document.getElementById('f5plot'),{x:[0,10],y:[0,3],w:600,h:260,xt:[0,2,4,6,8,10],yt:[1,2,3],xl:'β (toute pente β > 0 sépare parfaitement)',yl:'NLL(β)'});
+P5.fn(nllB,'sl-c1',320);
+P5.label(3.3,1.75,'décroît vers 0, jamais atteint','sl-c1');
+function draw5(b){
+  P5.clear();
+  P5.seg(0,0,10,0,'mk-asym');P5.text(9.7,.22,'asymptote : NLL → 0','mk-asym','end');
+  P5.vline(b,'mk-r');P5.dot(b,Math.min(nllB(b),3),'sl-c1',6);
+  ro(document.getElementById('f5out'),[
     ['NLL(β)',SL.fmt(nllB(b),4)],
     ['pente dNLL/dβ',SL.fmt(dnllB(b),4)],
     ['σ(β) pour x = 1',SL.fmt(sig(b),4)],
     ['un minimum\u202f?','non','zero']]);
 }
-SL.slider(document.getElementById('f4sliders'),{label:'β',min:0,max:10,step:.05,value:1},draw4);
+SL.slider(document.getElementById('f5sliders'),{label:'β',min:0,max:10,step:.05,value:1},draw5);
 })();
 </script>
 </body>
