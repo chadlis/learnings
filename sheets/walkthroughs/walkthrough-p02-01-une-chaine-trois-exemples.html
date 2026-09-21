@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="sheet" content="series=walkthrough;part=02;number=01;status=v1"><meta name="subtitle" content="fil B, de la vraisemblance à la pénalité — déroulé suivi, pas d’auto-test">
+<meta name="sheet" content="series=walkthrough;part=02;number=01;status=v2"><meta name="subtitle" content="fil B, de la vraisemblance à la pénalité — déroulé suivi, pas d’auto-test">
 <meta name="part" content="02 · Le bruit décide (fil B)"><meta name="prereq" content="p02-01"><meta name="anki" content="stats::vraisemblance,stats::regularisation">
-<title>Une chaîne, trois exemples — déroulé</title>
+<title>Une chaîne, trois exemples — déroulé · v2</title>
 <style>
 
 :root{
@@ -149,9 +149,9 @@ Modèle linéaire sans intercept : <span class="m">f(x; β) = β<sub>1</sub>x<su
 <p class="mini">Pourquoi cet exemple : petit au point de tout calculer à la main, et colinéaire — il fera casser la chaîne au pas 7, exactement là où il faut.</p>
 </div>
 
-<div class="step" id="s1"><div class="n">1</div><div class="r"><b>Hypothèse sur le bruit</b><span class="tag b">supposé</span> C'est le seul endroit où l'on suppose quelque chose. Tout le reste est du calcul.</div>
+<div class="step" id="s1"><div class="n">1</div><div class="r"><b>Hypothèse sur le bruit</b><span class="tag b">supposé</span> C'est le seul endroit où l'on suppose une loi sur les données ; l'autre hypothèse, l'indépendance, n'autorise que le produit du pas 3. Tout le reste est du calcul.</div>
 <div class="a"><span class="f"><span class="m">y<sub>i</sub> = f(x<sub>i</sub>; β) + ε<sub>i</sub></span>, &nbsp; <span class="bruit m">ε<sub>i</sub> ~ N(0, σ²)</span>, indépendants</span>
-Le bruit est gaussien, de même variance partout, et chaque observation tire le sien.</div></div>
+Le bruit est gaussien, de même variance partout, et chaque observation tire le sien. Écriture équivalente, la seule qui survivra à l'exemple 2 : <span class="m">y<sub>i</sub> | x<sub>i</sub> ~ N(f(x<sub>i</sub>; β), σ²)</span> — la gaussienne est une famille de position, <span class="m">f</span> ne fait que la translater, donc le bruit se sépare.</div></div>
 
 <div class="step" id="s2"><div class="n">2</div><div class="r"><b>Densité d'une observation</b> On modélise <span class="m">y</span> sachant <span class="m">x</span>, jamais <span class="m">x</span>. On injecte <span class="m">ε<sub>i</sub> = y<sub>i</sub> − f(x<sub>i</sub>; β)</span> dans la densité du bruit.</div>
 <div class="a"><span class="f"><span class="m">p(y<sub>i</sub> | x<sub>i</sub>; β) = (1/(σ√(2π))) · exp( −(y<sub>i</sub> − β<sub>1</sub>x<sub>1i</sub> − β<sub>2</sub>x<sub>2i</sub>)² / (2σ²) )</span></span>
@@ -215,8 +215,9 @@ Modèle : <span class="m">p<sub>i</sub> = σ(β·x<sub>i</sub>)</span>, <span cl
 <p class="mini">Pourquoi cet exemple : la chaîne est identique à l'exemple 1 jusqu'au pas 6, puis casse autrement au pas 7 — pas « trop de solutions », mais « aucune ».</p>
 </div>
 
-<div class="step"><div class="n">1</div><div class="r"><b>Hypothèse sur le bruit</b><span class="tag b">supposé</span> Pour une cible 0/1, le « bruit » est une loi de Bernoulli dont la moyenne dépend de <span class="m">x</span>.</div>
-<div class="a"><span class="f"><span class="bruit m">y<sub>i</sub> ~ Bernoulli(p<sub>i</sub>)</span>, &nbsp; <span class="m">p<sub>i</sub> = σ(β·x<sub>i</sub>)</span>, indépendants</span></div></div>
+<div class="step"><div class="n">1</div><div class="r"><b>Hypothèse sur le bruit</b><span class="tag b">supposé</span> Pour une cible 0/1, il n'y a pas de <span class="m">ε</span> à séparer : la loi de <span class="m">y</span> sachant <span class="m">x</span> est une Bernoulli dont <span class="m">f</span> règle la probabilité, et la dispersion <span class="m">p(1 − p)</span> en découle. C'est le cas général ; « prédiction + bruit » à l'exemple 1 était le cas particulier.</div>
+<div class="a"><span class="f"><span class="bruit m">y<sub>i</sub> ~ Bernoulli(p<sub>i</sub>)</span>, &nbsp; <span class="m">p<sub>i</sub> = σ(β·x<sub>i</sub>)</span>, indépendants</span>
+<span class="m">y<sub>i</sub> − p<sub>i</sub></span> vaut <span class="m">−p<sub>i</sub></span> ou <span class="m">1 − p<sub>i</sub></span> : un « bruit » dont la loi dépend de <span class="m">x<sub>i</sub></span>, rien à supposer à part.</div></div>
 
 <div class="step"><div class="n">2</div><div class="r"><b>Densité d'une observation</b> Une seule formule pour <span class="m">y = 0</span> et <span class="m">y = 1</span>. C'est l'astuce d'écriture qui rend tout mécanique.</div>
 <div class="a"><span class="f"><span class="m">p(y<sub>i</sub> | x<sub>i</sub>; β) = p<sub>i</sub><sup>y<sub>i</sub></sup> (1 − p<sub>i</sub>)<sup>1−y<sub>i</sub></sup></span></span>
@@ -339,7 +340,7 @@ C'est le <b>Lasso</b> (ici sur une MAE, mais le pas 9 ne dépend pas de la loss 
 <tr><th>pas</th><th>Ex. 1 — gaussien</th><th>Ex. 2 — Bernoulli</th><th>Ex. 3 — Laplace</th></tr>
 <tr><td>1 · bruit</td><td class="bruit">ε ~ N(0, σ²)</td><td class="bruit">y ~ Bernoulli(σ(βx))</td><td class="bruit">ε ~ Laplace(0, b)</td></tr>
 <tr><td>2–5 · densité, produit, log, négatif</td><td colspan="3" style="text-align:center;color:var(--faint);font-style:italic">le même geste, sans exception</td></tr>
-<tr><td>6 · la loss qui tombe</td><td><b>MSE</b> ; σ² jeté</td><td><b>cross-entropy</b> ; rien à jeter</td><td><b>MAE</b> ; b jeté</td></tr>
+<tr><td>6 · la loss qui tombe</td><td><b>MSE</b> ; σ² jeté</td><td><b>log-loss</b> (cross-entropy binaire) ; rien à jeter</td><td><b>MAE</b> ; b jeté</td></tr>
 <tr><td>6b · ce qu'on estime</td><td>la <b>moyenne</b> conditionnelle</td><td>la <b>probabilité</b> conditionnelle</td><td>la <b>médiane</b> conditionnelle</td></tr>
 <tr><td>7 · ce qui casse</td><td class="sel">infinité de solutions (colinéarité, valeur propre 0)</td><td class="sel">aucune solution (séparation parfaite, ‖β‖ → ∞)</td><td class="sel">infinité de solutions (même droite)</td></tr>
 <tr><td>8 · prior</td><td class="bruit">β ~ N(0, τ²)</td><td class="bruit">β ~ N(0, τ²)</td><td class="bruit">β ~ Laplace(0, τ)</td></tr>
@@ -365,7 +366,7 @@ C'est le <b>Lasso</b> (ici sur une MAE, mais le pas 9 ne dépend pas de la loss 
 </main>
 
 <aside class="marge">
-  <div class="note"><b>Deux hypothèses, pas plus</b><br>pas 1 (bruit) et pas 8 (prior). Tout le reste est du calcul.</div>
+  <div class="note"><b>Deux lois supposées, pas plus</b><br>pas 1 (la loi de y sachant x — « le bruit ») et pas 8 (le prior), plus l'indépendance qui autorise le produit. Tout le reste est du calcul.</div>
   <div class="note"><b>Le geste 3-4-5-6</b><br>produit → log → négatif → jeter. Identique dans les trois exemples, identique pour le prior.</div>
   <div class="note"><b>Deux façons de casser</b><br>trop de solutions (ex. 1, 3) ou aucune (ex. 2). La pénalité répare les deux.</div>
   <div class="note"><b>Moyenne ou médiane</b><br>MSE → moyenne conditionnelle. MAE → médiane conditionnelle. Changer de bruit change la cible, pas seulement la robustesse.</div>
