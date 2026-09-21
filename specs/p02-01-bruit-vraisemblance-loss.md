@@ -137,3 +137,28 @@ La limite « σ a disparu au pas 7 » reste. Ajouter une phrase à la limite « 
 - Le mécanisme du symptôme (« ça converge lentement, les erreurs confiantes ne bougent plus ») a été donné comme « la MSE a un cap à 1 » — une propriété de la **valeur** de la loss. Le pas ajouté est écrit contre cette réponse : le mécanisme est la pente.
 
 ### Exclusions — inchangées
+
+## Révision v3 (21/09/2026)
+
+Delta rédigé par Claude en séance à la demande de Salah (21/09), à partir de sa question sur le pas 2 : « tu dis que la seule hypothèse est celle du bruit, puis tu parles de cas où l'additivité n'a pas de sens — pas saisi ». Aucun pas ajouté ni retiré, aucune renumérotation, aucun chiffre ni figure modifiés.
+
+### Pas 2 — reformulé (titre : « L'hypothèse : la loi de y sachant x »)
+La forme générale est posée d'abord : y_i | x_i ~ Loi(f(x_i ; θ)) — le modèle prédit les paramètres d'une loi, pas y. L'écriture additive y = f + ε est présentée comme le **cas particulier des familles de position** (gaussienne, Laplace : f ne fait que translater la loi), et c'est de là que vient le mot « bruit ». Bernoulli et catégorielle : f règle une probabilité, la dispersion p(1 − p) en découle, aucun ε autonome à séparer. Le tableau d'application passe à trois colonnes (loi de y_i sachant x_i · écriture « prédiction + bruit ») avec « aucune » sur les deux lignes discrètes ; le « i.i.d. » qui traînait dans la ligne régression est retiré (c'est H2, pas la loi du bruit). Application chiffrée : p_i = 0,7 donnerait un « bruit » valant −0,7 ou +0,3, variance 0,21 = p(1 − p).
+
+### Pas 1, sous-titre, résumé 1, maillon verbalisé 1 — harmonisés
+« La seule hypothèse est la loi du bruit » remplacé par : une hypothèse de **modélisation** (la loi de y sachant x, « le bruit ») et une hypothèse de **structure** (l'indépendance, H2, qui autorise le produit). L'i.i.d. remonte au rang d'hypothèse au lieu de vivre dans une case de tableau.
+
+### Pas 3 — règle et « au tableau » reformulés
+« On injecte le résidu dans la densité du bruit » ne vaut que dans le cas additif. Nouvelle règle : on **évalue** la loi du pas 2 en la valeur observée y_i ; cas additif = densité du bruit au résidu ; cas discret = masse de la classe observée.
+
+### Pas 7 — une phrase ajoutée
+Somme ici, moyenne dans les frameworks : le 1/n est un facteur positif de plus, jeté ou gardé, même argmin. Clôt la question « somme ou moyenne ? » du 16/09.
+
+### Pas 8 — précision
+« La dérivée du log apporte un facteur 1/(p(1 − p)) » était approximatif (c'est −1/p ou 1/(1 − p) selon y). Réécrit : chacune, multipliée par σ′ = p(1 − p), laisse exactement p − y.
+
+### D4 (walkthrough-p02-01) — révisé en v2 dans le même esprit
+Ex. 1 pas 1 : l'indépendance nommée comme seconde hypothèse ; écriture équivalente y_i | x_i ~ N(f, σ²) avec la remarque « famille de position ». Ex. 2 pas 1 : « pas de ε à séparer, c'est le cas général, l'exemple 1 était le cas particulier ». Note de marge « Deux hypothèses, pas plus » corrigée. Synthèse ligne 6 : « log-loss (cross-entropy binaire) » au lieu de « cross-entropy », comme au pas 6 de l'exemple 2.
+
+### Questions pour la revue
+- Le mot « bruit » est conservé partout où il est le nom usuel (titre de la chaîne, phrase d'entretien, tags). Seule la *définition* change. Si ça reste ambigu à la relecture, la suite est de renommer le pas 2 « L'hypothèse générative » — à trancher après un passage à voix haute.

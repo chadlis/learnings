@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Du bruit à la loss — chaîne · v2</title>
-<meta name="sheet" content="series=chain;part=02;number=01;status=v2">
+<title>Du bruit à la loss — chaîne · v3</title>
+<meta name="sheet" content="series=chain;part=02;number=01;status=v3">
 <meta name="part" content="02 · Le bruit décide (fil B)">
 <meta name="subtitle" content="fil B — hypothèse de bruit → densité → produit → log → négatif → jeter">
 <meta name="prereq" content="p00-02,p00-03">
@@ -146,7 +146,7 @@ text.mk-asym{fill:var(--green)}
   <h1>Du <span>bruit</span> à la <span>loss</span></h1>
   <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
 </header>
-<p class="sub">Fil B. D'où viennent la MSE, la log-loss, la MAE, la cross-entropy ? <b>D'une seule hypothèse — la loi du bruit — et d'un geste mécanique en six pas</b> : densité, produit, log, négatif, jeter, nommer. Trois exemples minuscules le traversent : une régression sur trois points, une classification sur quatre, un softmax à trois classes. Le déroulé <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4</a> rejoue ces mêmes exemples calcul par calcul ; ici ce sont les règles.</p>
+<p class="sub">Fil B. D'où viennent la MSE, la log-loss, la MAE, la cross-entropy ? <b>D'une seule hypothèse de modélisation — la loi de <span class="m">y</span> sachant <span class="m">x</span>, qu'on appelle « le bruit » — et d'un geste mécanique en six pas</b> : densité, produit, log, négatif, jeter, nommer. Trois exemples minuscules le traversent : une régression sur trois points, une classification sur quatre, un softmax à trois classes. Le déroulé <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4</a> rejoue ces mêmes exemples calcul par calcul ; ici ce sont les règles.</p>
 
 <div class="wrap">
 <aside class="side">
@@ -199,7 +199,7 @@ text.mk-asym{fill:var(--green)}
   <div class="rule">
     <h3>Le décor</h3>
     <p>Un modèle <span class="m">f</span>(<span class="m">x</span> ; <span class="m">θ</span>), des données (<span class="m">x</span><sub><span class="m">i</span></sub>, <span class="m">y</span><sub><span class="m">i</span></sub>), et l'envie d'un <span class="m">θ</span>. Pour départager les candidats il faut un critère — et ce critère ne se décrète pas : il va se <b>déduire</b>.</p>
-    <p>La seule chose qu'on posera dans toute la chaîne est la <b>loi du bruit</b>. Tout ce qui suit est du calcul, sans un seul choix supplémentaire.</p>
+    <p>On posera deux choses, pas plus : la <b>loi de <span class="m">y</span> sachant <span class="m">x</span></b> — c'est elle qu'on appelle « le bruit » — et l'<b>indépendance</b> des observations (H2), qui autorise le produit. Tout ce qui suit est du calcul, sans un seul choix supplémentaire.</p>
     <p class="say">« Il faut un critère pour ranger les candidats <span class="m">θ</span>, donc la question est d'où il sort, donc on ne va pas le choisir mais le déduire d'une seule hypothèse. »</p>
   </div>
   <div class="card apply"><div class="lbl">Les trois exemples fil rouge</div>
@@ -216,32 +216,32 @@ text.mk-asym{fill:var(--green)}
 
 <div class="step" id="s2">
   <div class="rule">
-    <h3>L'hypothèse de bruit <span class="tag tronc">tronc</span></h3>
-    <p>Le modèle ne passe pas par les points : ce qui reste est le bruit, et on lui donne une loi. Deux écritures, la même chose :</p>
-    <div class="eq"><span class="m">y</span><sub><span class="m">i</span></sub> = <span class="m">f</span>(<span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>) + <span class="m">ε</span><sub><span class="m">i</span></sub>, &nbsp; <span class="m">ε</span><sub><span class="m">i</span></sub> ~ Loi &nbsp;&nbsp;|&nbsp;&nbsp; <span class="m">y</span><sub><span class="m">i</span></sub> ~ Loi(<span class="m">f</span>(<span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>))</div>
-    <p>La seconde est la bonne quand l'additivité n'a pas de sens : un <span class="m">y</span> à valeurs 0/1 ou une classe ne s'écrit pas « prédiction + erreur ».</p>
-    <p class="say">« La loss n'est pas choisie, elle sera déduite, donc tout ce qu'on suppose est ici : la loi du bruit. »</p>
+    <h3>L'hypothèse : la loi de <span class="m">y</span> sachant <span class="m">x</span> <span class="tag tronc">tronc</span></h3>
+    <p>Le modèle ne prédit pas <span class="m">y</span> : il prédit les <b>paramètres d'une loi</b> sur <span class="m">y</span>. C'est cette loi qu'on suppose, et rien d'autre :</p>
+    <div class="eq"><span class="m">y</span><sub><span class="m">i</span></sub> | <span class="m">x</span><sub><span class="m">i</span></sub> ~ Loi(<span class="m">f</span>(<span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>))</div>
+    <p>Quand <span class="m">f</span> ne fait que <b>translater</b> la loi — gaussienne, Laplace : des familles de position — la même hypothèse s'écrit <span class="m">y</span><sub><span class="m">i</span></sub> = <span class="m">f</span>(<span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>) + <span class="m">ε</span><sub><span class="m">i</span></sub> avec <span class="m">ε</span><sub><span class="m">i</span></sub> ~ Loi(0, ·), et c'est de là que vient le mot « bruit ». Bernoulli, catégorielle : <span class="m">f</span> règle une probabilité, la dispersion <span class="m">p</span>(1 − <span class="m">p</span>) en découle, il n'y a aucun <span class="m">ε</span> autonome à séparer. L'écriture additive est le cas particulier, pas la règle.</p>
+    <p class="say">« La loss n'est pas choisie, elle sera déduite, donc tout ce qu'on suppose est ici : la loi de <span class="m">y</span> sachant <span class="m">x</span> — le bruit, quand il se sépare. »</p>
   </div>
-  <div class="card apply"><div class="lbl">Application — une loi par exemple</div>
+  <div class="card apply"><div class="lbl">Application — une loi par exemple, les deux écritures</div>
     <table>
-      <tr><th>exemple</th><th>hypothèse de bruit</th></tr>
-      <tr><td>régression</td><td><span class="m">ε</span><sub><span class="m">i</span></sub> ~ <span class="up">N</span>(0, <span class="m">σ</span>²), i.i.d.</td></tr>
-      <tr><td>même régression, queues lourdes</td><td><span class="m">ε</span><sub><span class="m">i</span></sub> ~ Laplace(0, <span class="m">b</span>)</td></tr>
-      <tr><td>classification</td><td><span class="m">y</span><sub><span class="m">i</span></sub> ~ Bernoulli(<span class="m">p</span><sub><span class="m">i</span></sub>), <span class="m">p</span><sub><span class="m">i</span></sub> = <span class="m">σ</span>(<span class="m">βx</span><sub><span class="m">i</span></sub>)</td></tr>
-      <tr><td>trois classes</td><td><span class="m">y</span><sub><span class="m">i</span></sub> ~ Catégorielle(softmax(<span class="m">z</span><sub><span class="m">i</span></sub>))</td></tr>
+      <tr><th>exemple</th><th>loi de <span class="m">y</span><sub><span class="m">i</span></sub> sachant <span class="m">x</span><sub><span class="m">i</span></sub></th><th>écriture « prédiction + bruit »</th></tr>
+      <tr><td>régression</td><td><span class="up">N</span>(<span class="m">βx</span><sub><span class="m">i</span></sub>, <span class="m">σ</span>²)</td><td><span class="m">y</span><sub><span class="m">i</span></sub> = <span class="m">βx</span><sub><span class="m">i</span></sub> + <span class="m">ε</span><sub><span class="m">i</span></sub>, <span class="m">ε</span><sub><span class="m">i</span></sub> ~ <span class="up">N</span>(0, <span class="m">σ</span>²)</td></tr>
+      <tr><td>même régression, queues lourdes</td><td>Laplace(<span class="m">βx</span><sub><span class="m">i</span></sub>, <span class="m">b</span>)</td><td><span class="m">ε</span><sub><span class="m">i</span></sub> ~ Laplace(0, <span class="m">b</span>)</td></tr>
+      <tr><td>classification</td><td>Bernoulli(<span class="m">σ</span>(<span class="m">βx</span><sub><span class="m">i</span></sub>))</td><td><b>aucune</b> : la loi de <span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">p</span><sub><span class="m">i</span></sub> dépend de <span class="m">x</span><sub><span class="m">i</span></sub></td></tr>
+      <tr><td>trois classes</td><td>Catégorielle(softmax(<span class="m">z</span><sub><span class="m">i</span></sub>))</td><td><b>aucune</b> : une classe ne se soustrait pas</td></tr>
     </table>
-    <p>Quatre lignes, quatre losses différentes à l'arrivée. Rien d'autre ne changera dans la chaîne.</p>
+    <p>Quatre lignes, quatre losses différentes à l'arrivée. Sur la classification, <span class="m">p</span><sub><span class="m">i</span></sub> = 0,7 donnerait un « bruit » valant −0,7 ou +0,3, de variance 0,21 = <span class="m">p</span><sub><span class="m">i</span></sub>(1 − <span class="m">p</span><sub><span class="m">i</span></sub>) : rien de fixé une fois pour toutes, rien à supposer à part. Rien d'autre ne changera dans la chaîne.</p>
   </div>
 </div>
 
 <div class="step" id="s3">
   <div class="rule">
     <h3>Densité d'une observation</h3>
-    <p>On injecte le résidu <span class="m">ε</span><sub><span class="m">i</span></sub> = <span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">f</span>(<span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>) dans la densité du bruit. Chaque observation reçoit un nombre, <b>évalué</b> en un point et non intégré :</p>
+    <p>On <b>évalue</b> la loi du pas 2 en la valeur observée <span class="m">y</span><sub><span class="m">i</span></sub> : chaque observation reçoit un nombre — une densité prise en un point, ou une masse — jamais une aire. Cas additif : c'est la densité du bruit prise au résidu <span class="m">ε</span><sub><span class="m">i</span></sub> = <span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">f</span>(<span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>). Cas discret : la masse de la classe observée.</p>
     <div class="eq">gaussien : <span class="m">p</span>(<span class="m">y</span><sub><span class="m">i</span></sub> | <span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>) = (1 / (<span class="m">σ</span>√(2<span class="m">π</span>))) · exp( −(<span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">f</span>)² / (<b>2</b><span class="m">σ</span>²) )</div>
     <div class="eq">Bernoulli : <span class="m">p</span><sub><span class="m">i</span></sub><sup><span class="m">y</span><sub><span class="m">i</span></sub></sup>(1 − <span class="m">p</span><sub><span class="m">i</span></sub>)<sup>1−<span class="m">y</span><sub><span class="m">i</span></sub></sup> &nbsp;&nbsp;|&nbsp;&nbsp; catégoriel : <span class="m">p</span><sub><span class="m">y</span><sub><span class="m">i</span></sub></sub> = softmax(<span class="m">z</span><sub><span class="m">i</span></sub>)<sub><span class="m">y</span><sub><span class="m">i</span></sub></sub></div>
     <p>Le <b>2</b> sous <span class="m">σ</span>² fait partie de la gaussienne, il ne s'invente pas au pas suivant. Et c'est ici que le point-virgule se place : <span class="m">θ</span> est fixe, il paramètre la densité.</p>
-    <p class="say">« La densité du bruit est connue, donc on y injecte le résidu <span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">f</span>(<span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>), donc chaque observation reçoit un nombre — une densité évaluée en un point, jamais une aire. »</p>
+    <p class="say">« La loi de <span class="m">y</span><sub><span class="m">i</span></sub> sachant <span class="m">x</span><sub><span class="m">i</span></sub> est posée, donc on l'évalue en la valeur observée — au résidu quand le bruit se sépare, à la classe observée sinon — donc chaque observation reçoit un nombre : une densité prise en un point, jamais une aire. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application</div>
     <p><b>Régression</b>, <span class="m">σ</span> = 1. En <span class="m">β</span> = 1 les trois résidus sont nuls : chaque densité vaut 1/√(2<span class="m">π</span>) = <b>0,399</b>. En <span class="m">β</span> = 0 les résidus sont (1, 2, 3) : 0,242 · 0,054 · 0,0044.</p>
@@ -329,7 +329,7 @@ text.mk-asym{fill:var(--green)}
       <tr><td>Bernoulli(<span class="m">p</span>)</td><td><b>rien</b></td><td>−<span class="m">Σ</span>[<span class="m">y</span> <span class="m">log p</span> + (1−<span class="m">y</span>) <span class="m">log</span>(1−<span class="m">p</span>)]</td><td><b>log-loss</b></td></tr>
       <tr><td>Catégorielle</td><td><b>rien</b></td><td>−<span class="m">Σ</span> <span class="m">log p</span><sub><span class="m">y</span><sub><span class="m">i</span></sub></sub></td><td><b>cross-entropy</b></td></tr>
     </table>
-    <p><b>Régression</b> : <span class="up">argmin</span> [2,757 + 7(1−<span class="m">β</span>)²] = <span class="up">argmin</span> 14(1−<span class="m">β</span>)² = <span class="up">argmin</span> RSS, donc <span class="hat"><span class="m">β</span></span> = 1. La MSE n'a pas été choisie, elle est tombée.</p>
+    <p><b>Régression</b> : <span class="up">argmin</span> [2,757 + 7(1−<span class="m">β</span>)²] = <span class="up">argmin</span> 14(1−<span class="m">β</span>)² = <span class="up">argmin</span> RSS, donc <span class="hat"><span class="m">β</span></span> = 1. La MSE n'a pas été choisie, elle est tombée. Somme ici, moyenne dans les frameworks : le 1/<span class="m">n</span> est un facteur positif de plus, jeté ou gardé, même argmin.</p>
     <p><b>Bernoulli et catégorielle : rien à jeter.</b> Pas de paramètre de dispersion séparé — la variance <span class="m">p</span>(1 − <span class="m">p</span>) est fixée par la moyenne. La NLL <i>est</i> la loss, telle quelle. Sur les trois classes : cross-entropy = −<span class="m">log</span> 0,844 = <b>0,170</b> si la vraie classe est chat, −<span class="m">log</span> 0,042 = <b>3,17</b> si c'est oiseau. Le nom est là, on s'arrête.</p>
   </div>
   <div class="fig" id="fig3">
@@ -346,7 +346,7 @@ text.mk-asym{fill:var(--green)}
     <h3>Le gradient, pas la valeur <span class="tag tronc">tronc</span></h3>
     <p>Une loss n'informe l'optimiseur que par sa <b>pente</b>, jamais par sa valeur. Avec <span class="m">p</span> = <span class="m">σ</span>(<span class="m">z</span>) et <span class="m">y</span> ∈ {0, 1} :</p>
     <div class="eq">log-loss : ∂<span class="m">L</span>/∂<span class="m">z</span> = <span class="m">p</span> − <span class="m">y</span> &nbsp;&nbsp;·&nbsp;&nbsp; MSE ∘ <span class="m">σ</span> : <span class="m">L</span> = (<span class="m">y</span> − <span class="m">p</span>)², ∂<span class="m">L</span>/∂<span class="m">z</span> = 2(<span class="m">p</span> − <span class="m">y</span>)·<span class="m">p</span>(1 − <span class="m">p</span>)</div>
-    <p>La dérivée du <span class="m">log</span> apporte un facteur 1/(<span class="m">p</span>(1 − <span class="m">p</span>)) qui annule <b>exactement</b> <span class="m">σ</span>′(<span class="m">z</span>) = <span class="m">p</span>(1 − <span class="m">p</span>) ; derrière une MSE, ce <span class="m">σ</span>′ survit. Une erreur <b>confiante</b> (<span class="m">p</span> → 0 ou 1) pousse le facteur <span class="m">p</span>(1 − <span class="m">p</span>) vers 0 : la MSE gèle exactement les points qu'il faudrait bouger.</p>
+    <p>La dérivée de −<span class="m">log p</span> est −1/<span class="m">p</span>, celle de −<span class="m">log</span>(1 − <span class="m">p</span>) est 1/(1 − <span class="m">p</span>) : multipliée par <span class="m">σ</span>′(<span class="m">z</span>) = <span class="m">p</span>(1 − <span class="m">p</span>), chacune laisse <b>exactement</b> <span class="m">p</span> − <span class="m">y</span>. Derrière une MSE, ce <span class="m">σ</span>′ survit. Une erreur <b>confiante</b> (<span class="m">p</span> → 0 ou 1) pousse le facteur <span class="m">p</span>(1 − <span class="m">p</span>) vers 0 : la MSE gèle exactement les points qu'il faudrait bouger.</p>
     <p class="say">« La pente de la log-loss en <span class="m">z</span> est <span class="m">p</span> − <span class="m">y</span>, donc une erreur confiante donne un gradient de norme proche de 1, donc le point bouge ; la pente de la MSE porte le facteur <span class="m">p</span>(1 − <span class="m">p</span>), donc la même erreur confiante donne un gradient qui tend vers 0, donc le point est gelé — c'est le gradient qui décide, pas la valeur de la loss. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — <span class="m">y</span> = 0, le modèle se trompe d'autant plus qu'il est sûr</div>
@@ -438,7 +438,7 @@ text.mk-asym{fill:var(--green)}
 <h2 style="--ac:var(--yellow)">Résumé</h2>
 <div class="card resume"><div class="lbl">À retenir</div>
   <ol>
-    <li>Une seule hypothèse dans toute la chaîne : <b>la loi du bruit</b> (plus l'indépendance, qui autorise le produit).</li>
+    <li>Une seule hypothèse de modélisation : <b>la loi de <span class="m">y</span> sachant <span class="m">x</span></b> — « le bruit », séparable seulement quand <span class="m">f</span> ne fait que translater la loi — plus l'indépendance, qui autorise le produit.</li>
     <li>Six pas mécaniques : <b>densité → produit → log → négatif → jeter → nommer</b>. Le nom est le point d'arrêt.</li>
     <li>Gaussien → <b>MSE</b> (<span class="m">σ</span>² jeté) ; Laplace → <b>MAE</b> ; Bernoulli → <b>log-loss</b> (rien à jeter) ; catégoriel → <b>cross-entropy</b> = −<span class="m">log p</span><sub><span class="m">y</span></sub>.</li>
     <li>La forme de la loss est la forme de <b>l'exposant de la densité</b> : carré ⇒ gaussienne, valeur absolue ⇒ Laplace.</li>
@@ -454,7 +454,7 @@ text.mk-asym{fill:var(--green)}
 <h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
 <div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
   <ol class="verb">
-    <li><div class="q">Quelle est la seule hypothèse de la chaîne ?</div><div class="a hid">La loi du bruit — et l'indépendance conditionnelle, qui autorise le produit. Tout le reste est du calcul.</div></li>
+    <li><div class="q">Quelle est la seule hypothèse de la chaîne ?</div><div class="a hid">La loi de y sachant x — « le bruit » — et l'indépendance conditionnelle, qui autorise le produit. Tout le reste est du calcul. L'écriture y = f + ε n'en est qu'un cas particulier : les familles de position, gaussienne ou Laplace.</div></li>
     <li><div class="q">Déroule les six pas sur un bruit gaussien.</div><div class="a hid">Densité exp(−r²/2σ²)/(σ√2π) → produit → log (−n log(σ√2π) − RSS/2σ²) → négatif → jeter la constante et le facteur 1/(2σ²) → MSE.</div></li>
     <li><div class="q">Que jette-t-on avec Bernoulli ?</div><div class="a hid">Rien : pas de paramètre de dispersion séparé, la variance p(1−p) est fixée par la moyenne. La log-loss est la NLL telle quelle, et c'est le point d'arrêt.</div></li>
     <li><div class="q">La cross-entropy à trois classes, c'est quoi ?</div><div class="a hid">La NLL d'une catégorielle : −log de la probabilité softmax de la vraie classe. Sur z = (2, 0, −1) : −log 0,844 = 0,170 pour chat, −log 0,042 = 3,17 pour oiseau.</div></li>
@@ -484,7 +484,7 @@ text.mk-asym{fill:var(--green)}
 
 </main>
 </div>
-<footer>Chaîne p02-01 · v2 du 18/09/2026 · Prérequis : p00-02, p00-03. Suite : <a href="chain-p02-02-prior-penalite.html">p02-02 Du prior à la pénalité</a>.</footer>
+<footer>Chaîne p02-01 · v3 du 21/09/2026 · Prérequis : p00-02, p00-03. Suite : <a href="chain-p02-02-prior-penalite.html">p02-02 Du prior à la pénalité</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>
