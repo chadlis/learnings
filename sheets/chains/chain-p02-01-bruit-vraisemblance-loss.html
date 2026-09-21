@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Du bruit à la loss — chaîne · v3</title>
-<meta name="sheet" content="series=chain;part=02;number=01;status=v3">
+<title>Du bruit à la loss — chaîne · v4</title>
+<meta name="sheet" content="series=chain;part=02;number=01;status=v4">
 <meta name="part" content="02 · Le bruit décide (fil B)">
 <meta name="subtitle" content="fil B — hypothèse de bruit → densité → produit → log → négatif → jeter">
 <meta name="prereq" content="p00-02,p00-03">
@@ -146,7 +146,7 @@ text.mk-asym{fill:var(--green)}
   <h1>Du <span>bruit</span> à la <span>loss</span></h1>
   <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
 </header>
-<p class="sub">Fil B. D'où viennent la MSE, la log-loss, la MAE, la cross-entropy ? <b>D'une seule hypothèse de modélisation — la loi de <span class="m">y</span> sachant <span class="m">x</span>, qu'on appelle « le bruit » — et d'un geste mécanique en six pas</b> : densité, produit, log, négatif, jeter, nommer. Trois exemples minuscules le traversent : une régression sur trois points, une classification sur quatre, un softmax à trois classes. Le déroulé <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4</a> rejoue ces mêmes exemples calcul par calcul ; ici ce sont les règles.</p>
+<p class="sub">Fil B. D'où viennent la MSE, la log-loss, la MAE, la cross-entropy ? <b>D'une seule hypothèse de modélisation — la loi de <span class="m">y</span> sachant <span class="m">x</span>, « le bruit » par raccourci — et d'un geste mécanique en six pas</b> : densité, produit, log, négatif, jeter, nommer. Trois exemples minuscules le traversent : une régression sur trois points, une classification sur quatre, un softmax à trois classes. Le déroulé <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4</a> rejoue ces mêmes exemples calcul par calcul ; ici ce sont les règles.</p>
 
 <div class="wrap">
 <aside class="side">
@@ -199,7 +199,7 @@ text.mk-asym{fill:var(--green)}
   <div class="rule">
     <h3>Le décor</h3>
     <p>Un modèle <span class="m">f</span>(<span class="m">x</span> ; <span class="m">θ</span>), des données (<span class="m">x</span><sub><span class="m">i</span></sub>, <span class="m">y</span><sub><span class="m">i</span></sub>), et l'envie d'un <span class="m">θ</span>. Pour départager les candidats il faut un critère — et ce critère ne se décrète pas : il va se <b>déduire</b>.</p>
-    <p>On posera deux choses, pas plus : la <b>loi de <span class="m">y</span> sachant <span class="m">x</span></b> — c'est elle qu'on appelle « le bruit » — et l'<b>indépendance</b> des observations (H2), qui autorise le produit. Tout ce qui suit est du calcul, sans un seul choix supplémentaire.</p>
+    <p>Une seule hypothèse de <b>modélisation</b> — la <b>loi de <span class="m">y</span> sachant <span class="m">x</span></b>, c'est elle qu'on appelle « le bruit » — dans un cadre fixé une fois pour toutes par H1–H3 (<span class="m">y</span> sachant <span class="m">x</span>, indépendance, <span class="m">θ</span> fixe). Tout ce qui suit est du calcul, sans un seul choix supplémentaire.</p>
     <p class="say">« Il faut un critère pour ranger les candidats <span class="m">θ</span>, donc la question est d'où il sort, donc on ne va pas le choisir mais le déduire d'une seule hypothèse. »</p>
   </div>
   <div class="card apply"><div class="lbl">Les trois exemples fil rouge</div>
@@ -217,9 +217,9 @@ text.mk-asym{fill:var(--green)}
 <div class="step" id="s2">
   <div class="rule">
     <h3>L'hypothèse : la loi de <span class="m">y</span> sachant <span class="m">x</span> <span class="tag tronc">tronc</span></h3>
-    <p>Le modèle ne prédit pas <span class="m">y</span> : il prédit les <b>paramètres d'une loi</b> sur <span class="m">y</span>. C'est cette loi qu'on suppose, et rien d'autre :</p>
+    <p>Le modèle ne prédit pas <span class="m">y</span> : il prédit les <b>paramètres d'une loi</b> sur <span class="m">y</span>. C'est cette loi qu'on suppose, et rien d'autre — <b>loi conditionnelle</b> ou modèle d'observation en statistique, <i>likelihood</i> en ML probabiliste, composante aléatoire d'un GLM :</p>
     <div class="eq"><span class="m">y</span><sub><span class="m">i</span></sub> | <span class="m">x</span><sub><span class="m">i</span></sub> ~ Loi(<span class="m">f</span>(<span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>))</div>
-    <p>Quand <span class="m">f</span> ne fait que <b>translater</b> la loi — gaussienne, Laplace : des familles de position — la même hypothèse s'écrit <span class="m">y</span><sub><span class="m">i</span></sub> = <span class="m">f</span>(<span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>) + <span class="m">ε</span><sub><span class="m">i</span></sub> avec <span class="m">ε</span><sub><span class="m">i</span></sub> ~ Loi(0, ·), et c'est de là que vient le mot « bruit ». Bernoulli, catégorielle : <span class="m">f</span> règle une probabilité, la dispersion <span class="m">p</span>(1 − <span class="m">p</span>) en découle, il n'y a aucun <span class="m">ε</span> autonome à séparer. L'écriture additive est le cas particulier, pas la règle.</p>
+    <p>Quand <span class="m">f</span> ne fait que <b>translater</b> la loi — gaussienne, Laplace : des familles de position — la même hypothèse s'écrit <span class="m">y</span><sub><span class="m">i</span></sub> = <span class="m">f</span>(<span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>) + <span class="m">ε</span><sub><span class="m">i</span></sub> avec <span class="m">ε</span><sub><span class="m">i</span></sub> ~ Loi(0, ·), et c'est de là, et de là seulement, que vient le mot « bruit » : au sens strict il ne désigne que ce <span class="m">ε</span>. Bernoulli, catégorielle : <span class="m">f</span> règle une probabilité, la dispersion <span class="m">p</span>(1 − <span class="m">p</span>) en découle, il n'y a aucun <span class="m">ε</span> autonome à séparer. L'écriture additive est le cas particulier, pas la règle.</p>
     <p class="say">« La loss n'est pas choisie, elle sera déduite, donc tout ce qu'on suppose est ici : la loi de <span class="m">y</span> sachant <span class="m">x</span> — le bruit, quand il se sépare. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — une loi par exemple, les deux écritures</div>
@@ -287,7 +287,7 @@ text.mk-asym{fill:var(--green)}
     <p><b>Régression</b>, <span class="m">n</span> = 3, <span class="m">σ</span> = 1 : RSS(<span class="m">β</span>) = 14 − 28<span class="m">β</span> + 14<span class="m">β</span>² = 14(1 − <span class="m">β</span>)², donc</p>
     <div class="eq"><span class="m">ℓ</span>(<span class="m">β</span>) = −3 <span class="m">log</span>(√(2<span class="m">π</span>)) − 7(1 − <span class="m">β</span>)² = −2,757 − 7(1 − <span class="m">β</span>)²</div>
     <p><span class="m">ℓ</span>(1) = −2,757 ; <span class="m">ℓ</span>(0) = −9,757. <b>La pièce</b> : <span class="m">log L</span>(<span class="m">p</span>) = 3 <span class="m">log p</span>, valant 0 en <span class="m">p</span> = 1 et −2,079 en <span class="m">p</span> = 0,5 — même sommet que <span class="m">p</span>³.</p>
-    <p><b>Le sous-débordement, en un chiffre</b> : mille densités à 0,01 donnent un produit de 10<sup>−2000</sup>, qui vaut exactement 0 en flottant 64 bits ; la somme des logs vaut −4 605 et se calcule sans effort. (Le même réflexe, plus fin, fait écrire <span class="m">log</span>(1 + e<sup>−<span class="m">z</span></sup>) plutôt que <span class="m">log σ</span>(<span class="m">z</span>) — les flottants sont un sujet à part, <a href="chain-p08-02-flottants-lse.html">p08-02</a>.)</p>
+    <p><b>Le sous-débordement, en un chiffre</b> : mille densités à 0,01 donnent un produit de 10<sup>−2000</sup>, qui vaut exactement 0 en flottant 64 bits ; la somme des logs vaut −4 605 et se calcule sans effort. (Le même réflexe, plus fin, fait calculer −<span class="m">log σ</span>(<span class="m">z</span>) sous sa forme <span class="m">log</span>(1 + e<sup>−<span class="m">z</span></sup>) plutôt qu'en passant par <span class="m">σ</span>(<span class="m">z</span>) — et cette forme déborde encore pour <span class="m">z</span> très négatif ; la version stable est l'affaire de <a href="chain-p08-02-flottants-lse.html">p08-02</a>.)</p>
   </div>
   <div class="fig" id="fig2">
     <div class="lbl">Figure 2 — le log garde le sommet</div>
@@ -330,6 +330,7 @@ text.mk-asym{fill:var(--green)}
       <tr><td>Catégorielle</td><td><b>rien</b></td><td>−<span class="m">Σ</span> <span class="m">log p</span><sub><span class="m">y</span><sub><span class="m">i</span></sub></sub></td><td><b>cross-entropy</b></td></tr>
     </table>
     <p><b>Régression</b> : <span class="up">argmin</span> [2,757 + 7(1−<span class="m">β</span>)²] = <span class="up">argmin</span> 14(1−<span class="m">β</span>)² = <span class="up">argmin</span> RSS, donc <span class="hat"><span class="m">β</span></span> = 1. La MSE n'a pas été choisie, elle est tombée. Somme ici, moyenne dans les frameworks : le 1/<span class="m">n</span> est un facteur positif de plus, jeté ou gardé, même argmin.</p>
+    <p><b>Jeter 1/(2<span class="m">σ</span>²) suppose un <span class="m">σ</span> commun</b> à toutes les observations : c'est un facteur commun, donc il sort de la somme. Avec un <span class="m">σ</span><sub><span class="m">i</span></sub> par observation il reste <span class="m">Σ</span> <span class="m">r</span><sub><span class="m">i</span></sub>²/<span class="m">σ</span><sub><span class="m">i</span></sub>² — les moindres carrés pondérés ; et si le modèle prédit aussi <span class="m">σ</span>(<span class="m">x</span>), le <span class="m">log σ</span> ne dépend plus d'une constante mais de <span class="m">θ</span>, il ne se jette plus : c'est la Gaussian NLL, la loss d'une régression qui rend son incertitude. Même chose pour le <span class="m">b</span> de Laplace.</p>
     <p><b>Bernoulli et catégorielle : rien à jeter.</b> Pas de paramètre de dispersion séparé — la variance <span class="m">p</span>(1 − <span class="m">p</span>) est fixée par la moyenne. La NLL <i>est</i> la loss, telle quelle. Sur les trois classes : cross-entropy = −<span class="m">log</span> 0,844 = <b>0,170</b> si la vraie classe est chat, −<span class="m">log</span> 0,042 = <b>3,17</b> si c'est oiseau. Le nom est là, on s'arrête.</p>
   </div>
   <div class="fig" id="fig3">
@@ -337,7 +338,7 @@ text.mk-asym{fill:var(--green)}
     <div id="f3plot" class="wide"></div>
     <div id="f3sliders"></div>
     <div class="readouts" id="f3out"></div>
-    <p class="cap">Un seul exemple, une probabilité prédite <span class="m">p</span> pour la classe 1. La <span class="kg">log-loss quand <span class="m">y</span> = 1</span> est −<span class="m">log p</span>, la <span class="kl">log-loss quand <span class="m">y</span> = 0</span> est −<span class="m">log</span>(1 − <span class="m">p</span>) ; en pointillé, la <span class="km">MSE</span> (1 − <span class="m">p</span>)² pour comparaison. Glisse <span class="m">p</span> vers 0 avec <span class="m">y</span> = 1 : la log-loss part vers l'infini (4,61 en <span class="m">p</span> = 0,01) pendant que la MSE plafonne à 0,98. <b>La log-loss n'est pas bornée, la MSE l'est</b> : se tromper avec certitude coûte sans limite d'un côté, et à peine plus que « je ne sais pas » de l'autre. Même lecture à trois classes : la cross-entropy est ce même −<span class="m">log</span> lu sur la probabilité de la <i>vraie</i> classe.</p>
+    <p class="cap">Un seul exemple, une probabilité prédite <span class="m">p</span> pour la classe 1. La <span class="kg">log-loss quand <span class="m">y</span> = 1</span> est −<span class="m">log p</span>, la <span class="kl">log-loss quand <span class="m">y</span> = 0</span> est −<span class="m">log</span>(1 − <span class="m">p</span>) ; en pointillé, la <span class="km">MSE</span> (1 − <span class="m">p</span>)² pour comparaison. Glisse <span class="m">p</span> vers 0 avec <span class="m">y</span> = 1 : la log-loss part vers l'infini (4,61 en <span class="m">p</span> = 0,01) pendant que la MSE plafonne à 0,98. <b>La log-loss n'est pas bornée, la MSE l'est</b> : se tromper avec certitude coûte sans limite d'un côté, et au plus quatre fois « je ne sais pas » de l'autre (0,98 contre 0,25 en <span class="m">p</span> = 0,5). Même lecture à trois classes : la cross-entropy est ce même −<span class="m">log</span> lu sur la probabilité de la <i>vraie</i> classe.</p>
   </div>
 </div>
 
@@ -359,6 +360,7 @@ text.mk-asym{fill:var(--green)}
     </table>
     <p>Le symptôme « ça converge lentement, les exemples confortablement faux ne bougent plus » n'est donc pas une histoire de <i>valeur</i> de la loss — de cap, de borne, d'échelle. C'est le facteur <span class="m">p</span>(1 − <span class="m">p</span>) dans le gradient, et rien d'autre.</p>
     <p><b>Une seconde raison, distincte.</b> MSE ∘ <span class="m">σ</span> est <b>non convexe</b> en <span class="m">β</span>, la log-loss est convexe (<a href="../bridges/bridge-06-convexite-forme-fermee.html">b06</a>) : deux raisons indépendantes de ne pas mettre une MSE derrière une sigmoïde.</p>
+    <p><b>Ce <span class="m">p</span> − <span class="m">y</span> n'est pas un hasard.</b> Gaussienne, Bernoulli, catégorielle sont les trois GLM canoniques — liens identité, logit, softmax — et sous lien canonique le gradient de la NLL par rapport à la sortie linéaire vaut toujours <b>prédiction − <span class="m">y</span></b> : <span class="m">f</span> − <span class="m">y</span> pour la MSE, <span class="m">p</span> − <span class="m">y</span> pour les deux autres. Laplace n'est pas de la famille exponentielle en son paramètre de position : la MAE n'a ni forme fermée ni ce gradient, seulement le signe du résidu.</p>
   </div>
   <div class="fig" id="fig4">
     <div class="lbl">Figure 4 — c'est la pente qui décide, pas la valeur</div>
@@ -384,7 +386,7 @@ text.mk-asym{fill:var(--green)}
       <tr><td>3 (médiane)</td><td>295</td><td><b>21</b></td></tr>
       <tr><td>6 (moyenne)</td><td><b>250</b></td><td>28</td></tr>
     </table>
-    <p>Chacune gagne chez elle. Le seul point à 20 déplace la moyenne de 3 à 6 et <b>ne déplace pas</b> la médiane : sous gaussienne un résidu de 10 coûte 100 fois un résidu de 1, sous Laplace il coûte 10 fois. L'influence d'un point est non bornée d'un côté, bornée de l'autre.</p>
+    <p>Chacune gagne chez elle. Remplacer 5 par 20 déplace la moyenne de 3 à 6 et <b>ne déplace pas</b> la médiane : sous gaussienne un résidu de 10 coûte 100 fois un résidu de 1, sous Laplace il coûte 10 fois. L'influence d'un point est non bornée d'un côté, bornée de l'autre.</p>
     <p>Sur une cible asymétrique — revenus, durées, temps de réponse — moyenne et médiane ne coïncident pas, et le choix de la loss est un choix de cible.</p>
   </div>
 </div>
@@ -416,10 +418,10 @@ text.mk-asym{fill:var(--green)}
   </div>
   <div class="card casse"><div class="lbl">Quatre limites</div>
     <ul>
-      <li><b>Le produit est interdit dès qu'il y a dépendance.</b> Séries temporelles, mesures répétées sur un même sujet, phrases d'un même document : la jointe ne se factorise pas et le produit compte plusieurs fois la même information. La vraisemblance obtenue est trop piquée, donc toute barre d'erreur qui en sort est trop étroite.</li>
+      <li><b>Sous dépendance, la vraisemblance factorisée est fausse.</b> Séries temporelles, mesures répétées sur un même sujet, phrases d'un même document : la jointe ne se factorise pas et le produit compte plusieurs fois la même information. Le point estimé survit souvent — l'OLS reste consistant sous autocorrélation — mais les barres d'erreur mentent : trop étroites sous corrélation positive, le cas usuel, trop larges sous corrélation négative.</li>
       <li><b>Le maximum de vraisemblance ne croit que ce qu'il a vu.</b> Pièce PPP : <span class="m">L</span>(<span class="m">p</span>) = <span class="m">p</span>³, maximale en <span class="hat"><span class="m">p</span></span> = 1 — « un échec est impossible » après trois tirages (figure 2). Même mécanisme en langue : un mot jamais vu reçoit la probabilité 0, donc toute phrase qui le contient devient impossible. Remède : ajouter une croyance — prior, ou lissage (3+1)/(3+2) = 0,8 — c'est <a href="chain-p02-02-prior-penalite.html">p02-02</a>.</li>
       <li><b>Parfois il n'y a pas de minimum du tout.</b> Séparation parfaite : la NLL décroît vers 0 sans jamais l'atteindre, donc <span class="hat"><span class="m">β</span></span> n'existe pas et ‖<span class="m">β</span>‖ → ∞ (figure 5). Le solveur s'arrête sur son nombre d'itérations avec un coefficient énorme, ce qui ressemble à un résultat sans en être un. C'est le pas 8 lu à l'envers : sous séparation la log-loss a une pente qui <b>ne s'annule jamais</b> — ce qui la rend bonne sur les erreurs confiantes est exactement ce qui la fait fuir quand il n'y a plus d'erreur.</li>
-      <li><b><span class="m">σ</span> a disparu au pas 7</b>, et c'était légitime : il ne déplace pas l'<span class="up">argmin</span> en <span class="m">β</span>. Mais une barre d'erreur sur <span class="hat"><span class="m">β</span></span>, elle, en a besoin — il faut le récupérer, <span class="hat"><span class="m">σ</span></span>² = RSS/<span class="m">n</span>. Jeter pour optimiser ne veut pas dire jeter pour conclure : c'est le retour du fil A, <a href="chain-p01-03-inference-regression.html">p01-03</a>.</li>
+      <li><b><span class="m">σ</span> a disparu au pas 7</b>, et c'était légitime : il ne déplace pas l'<span class="up">argmin</span> en <span class="m">β</span>. Mais une barre d'erreur sur <span class="hat"><span class="m">β</span></span>, elle, en a besoin — il faut le récupérer, <span class="hat"><span class="m">σ</span></span>² = RSS/(<span class="m">n</span> − <span class="m">p</span>) avec <span class="m">p</span> coefficients — RSS/<span class="m">n</span> est le maximum de vraisemblance de <span class="m">σ</span>², biaisé vers le bas, et la question piège est là. Jeter pour optimiser ne veut pas dire jeter pour conclure : c'est le retour du fil A, <a href="chain-p01-03-inference-regression.html">p01-03</a>.</li>
     </ul>
   </div>
   <div class="fig" id="fig5">
@@ -438,7 +440,7 @@ text.mk-asym{fill:var(--green)}
 <h2 style="--ac:var(--yellow)">Résumé</h2>
 <div class="card resume"><div class="lbl">À retenir</div>
   <ol>
-    <li>Une seule hypothèse de modélisation : <b>la loi de <span class="m">y</span> sachant <span class="m">x</span></b> — « le bruit », séparable seulement quand <span class="m">f</span> ne fait que translater la loi — plus l'indépendance, qui autorise le produit.</li>
+    <li>Une seule hypothèse de modélisation : <b>la loi de <span class="m">y</span> sachant <span class="m">x</span></b> — « le bruit », séparable seulement quand <span class="m">f</span> ne fait que translater la loi — dans le cadre H1–H3, dont l'indépendance qui autorise le produit.</li>
     <li>Six pas mécaniques : <b>densité → produit → log → négatif → jeter → nommer</b>. Le nom est le point d'arrêt.</li>
     <li>Gaussien → <b>MSE</b> (<span class="m">σ</span>² jeté) ; Laplace → <b>MAE</b> ; Bernoulli → <b>log-loss</b> (rien à jeter) ; catégoriel → <b>cross-entropy</b> = −<span class="m">log p</span><sub><span class="m">y</span></sub>.</li>
     <li>La forme de la loss est la forme de <b>l'exposant de la densité</b> : carré ⇒ gaussienne, valeur absolue ⇒ Laplace.</li>
@@ -454,7 +456,7 @@ text.mk-asym{fill:var(--green)}
 <h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
 <div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
   <ol class="verb">
-    <li><div class="q">Quelle est la seule hypothèse de la chaîne ?</div><div class="a hid">La loi de y sachant x — « le bruit » — et l'indépendance conditionnelle, qui autorise le produit. Tout le reste est du calcul. L'écriture y = f + ε n'en est qu'un cas particulier : les familles de position, gaussienne ou Laplace.</div></li>
+    <li><div class="q">Qu'est-ce qu'on suppose dans la chaîne ?</div><div class="a hid">Une hypothèse de modélisation, la loi de y sachant x — « le bruit » — dans le cadre H1–H3 : y sachant x, indépendance (qui autorise le produit), θ fixe. Tout le reste est du calcul. L'écriture y = f + ε n'en est qu'un cas particulier : les familles de position, gaussienne ou Laplace.</div></li>
     <li><div class="q">Déroule les six pas sur un bruit gaussien.</div><div class="a hid">Densité exp(−r²/2σ²)/(σ√2π) → produit → log (−n log(σ√2π) − RSS/2σ²) → négatif → jeter la constante et le facteur 1/(2σ²) → MSE.</div></li>
     <li><div class="q">Que jette-t-on avec Bernoulli ?</div><div class="a hid">Rien : pas de paramètre de dispersion séparé, la variance p(1−p) est fixée par la moyenne. La log-loss est la NLL telle quelle, et c'est le point d'arrêt.</div></li>
     <li><div class="q">La cross-entropy à trois classes, c'est quoi ?</div><div class="a hid">La NLL d'une catégorielle : −log de la probabilité softmax de la vraie classe. Sur z = (2, 0, −1) : −log 0,844 = 0,170 pour chat, −log 0,042 = 3,17 pour oiseau.</div></li>
@@ -477,14 +479,14 @@ text.mk-asym{fill:var(--green)}
   </div>
 </div>
 <div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
-  <p><code>stats::vraisemblance</code> (fonction de <span class="m">θ</span> à données fixées, pas une loi sur <span class="m">θ</span>) · <code>stats::mle</code> (les six pas, <span class="hat"><span class="m">p</span></span> = 1 sur PPP) · <code>ml::regression-lineaire</code> (MSE ← gaussienne, <span class="hat"><span class="m">σ</span></span>² = RSS/<span class="m">n</span>) · <code>ml::logistique</code> (log-loss ← Bernoulli, séparation parfaite) · <code>dl::cross-entropy</code> (−<span class="m">log p</span><sub><span class="m">y</span></sub>, NLL d'une catégorielle).</p>
+  <p><code>stats::vraisemblance</code> (fonction de <span class="m">θ</span> à données fixées, pas une loi sur <span class="m">θ</span>) · <code>stats::mle</code> (les six pas, <span class="hat"><span class="m">p</span></span> = 1 sur PPP) · <code>ml::regression-lineaire</code> (MSE ← gaussienne ; <span class="m">σ</span>² : RSS/<span class="m">n</span> au maximum de vraisemblance, RSS/(<span class="m">n</span> − <span class="m">p</span>) sans biais) · <code>ml::logistique</code> (log-loss ← Bernoulli, séparation parfaite) · <code>dl::cross-entropy</code> (−<span class="m">log p</span><sub><span class="m">y</span></sub>, NLL d'une catégorielle).</p>
   <p>Une carte qui résiste après cette chaîne est une carte à refondre, pas une section à relire.</p>
 </div>
 </section>
 
 </main>
 </div>
-<footer>Chaîne p02-01 · v3 du 21/09/2026 · Prérequis : p00-02, p00-03. Suite : <a href="chain-p02-02-prior-penalite.html">p02-02 Du prior à la pénalité</a>.</footer>
+<footer>Chaîne p02-01 · v4 du 21/09/2026 · Prérequis : p00-02, p00-03. Suite : <a href="chain-p02-02-prior-penalite.html">p02-02 Du prior à la pénalité</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

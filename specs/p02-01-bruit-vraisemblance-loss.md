@@ -55,7 +55,7 @@ Trois exemples, tous minuscules, calculés à la main :
 - **Produit interdit** : dépendance (séries, mesures répétées) ⇒ la vraisemblance jointe ne se factorise pas.
 - **Le MLE ne croit que le vu** : PPP ⇒ p̂ = 1, un mot jamais vu ⇒ probabilité 0 ⇒ toute phrase impossible. Remède : prior (p02-02).
 - **Pas de minimum** : séparation parfaite ⇒ ‖β‖ → ∞ (figure 4).
-- **σ a disparu** au pas 7 : si on veut une barre d'erreur sur β̂, il faut le récupérer (σ̂² = RSS/n) — retour fil A (p01-03).
+- **σ a disparu** au pas 7 : si on veut une barre d'erreur sur β̂, il faut le récupérer (σ̂² = RSS/(n − p) ; RSS/n est le MLE, biaisé — corrigé en v4) — retour fil A (p01-03).
 
 ## Résumé
 1. Une seule hypothèse : la loi du bruit.
@@ -162,3 +162,20 @@ Ex. 1 pas 1 : l'indépendance nommée comme seconde hypothèse ; écriture équi
 
 ### Questions pour la revue
 - Le mot « bruit » est conservé partout où il est le nom usuel (titre de la chaîne, phrase d'entretien, tags). Seule la *définition* change. Si ça reste ambigu à la relecture, la suite est de renommer le pas 2 « L'hypothèse générative » — à trancher après un passage à voix haute.
+
+## Révision v4 (21/09/2026)
+
+Delta issu d'une revue externe de la v3 (chiffres recalculés, tous confirmés) et d'une question de Salah sur le mot « bruit ». Aucun pas ajouté, aucune renumérotation, aucune figure touchée.
+
+1. **Erreur corrigée, « Où ça casse » 4ᵉ limite** : σ̂² = RSS/n → RSS/(n − p). RSS/n est le MLE de σ², biaisé vers le bas ; p01-03 utilise déjà n − p. Commentaire de la carte `ml::regression-lineaire` aligné. Ligne « Où ça casse » du spec corrigée en place.
+2. **Homoscédasticité, pas 7** (application) : jeter 1/(2σ²) suppose un σ commun ; σᵢ par observation → Σ rᵢ²/σᵢ² (moindres carrés pondérés) ; σ(x) prédit → le log σ ne se jette plus, Gaussian NLL. Même chose pour b.
+3. **Dépendance, 1ʳᵉ limite** nuancée : « produit interdit » → « vraisemblance factorisée fausse ; le point estimé survit souvent (OLS consistant sous autocorrélation), les barres d'erreur mentent — trop étroites sous corrélation positive, trop larges sous négative ».
+4. **Signe, pas 5** : « log(1 + e⁻ᶻ) plutôt que log σ(z) » comparait deux quantités opposées. Réécrit : −log σ(z) calculé sous la forme log(1 + e⁻ᶻ), qui déborde encore pour z ≪ 0 ; version stable → p08-02.
+5. **Figure 3** : « à peine plus que je ne sais pas » était faux (0,98 contre 0,25, ×4). Réécrit : bornée à 1, au plus quatre fois « je ne sais pas ».
+6. **Harmonisation** « une seule hypothèse » (pas 1, résumé 1, maillon 1) : une hypothèse de modélisation (la loi de y|x) dans le cadre H1–H3. Maillon 1 reformulé « Qu'est-ce qu'on suppose dans la chaîne ? ».
+7. **Pas 9** : « le seul point à 20 déplace la moyenne de 3 à 6 » → « remplacer 5 par 20 déplace… ».
+8. **Terminologie, pas 2 et sous-titre** : la loi de y|x est nommée par ses vrais noms (loi conditionnelle, modèle d'observation, likelihood, composante aléatoire d'un GLM) ; « bruit » ne désigne au sens strict que le ε de l'écriture additive. Le titre de la chaîne et de la partie gardent « bruit » comme raccourci assumé.
+9. **Pont GLM, pas 8** (application) : gaussienne/Bernoulli/catégorielle = les trois GLM canoniques, gradient en la sortie linéaire = prédiction − y sous lien canonique ; Laplace hors famille exponentielle en position → MAE sans forme fermée, gradient = signe du résidu.
+
+### Questions pour la revue
+- Renommer la partie 02 « Le bruit décide » en « La loi de y|x décide » toucherait `tools/build_index.py` (PARTS) et la meta `part` de trois sheets : non fait, à trancher.
