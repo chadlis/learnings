@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Du prior à la pénalité — chaîne · v2</title>
-<meta name="sheet" content="series=chain;part=02;number=02;status=v2">
+<title>Du prior à la pénalité — chaîne · v3</title>
+<meta name="sheet" content="series=chain;part=02;number=02;status=v3">
 <meta name="part" content="02 · Le bruit décide (fil B)">
 <meta name="subtitle" content="fil B — MAP, λ = σ²/τ², +λI translate, L1 tranche ailleurs">
 <meta name="prereq" content="p02-01,p04-02,p00-03">
@@ -217,7 +217,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr class="hl"><td>0,2</td><td>0,4</td><td>1</td><td>0</td><td><b>0,2</b></td></tr>
     </table>
     <p>La solution n'est pas instable, elle est <b>non identifiable</b>. Même mécanisme dès que <span class="m">p</span> &gt; <span class="m">n</span> : le rang de <span class="m">X</span><sup>⊤</sup><span class="m">X</span> vaut au plus <span class="m">n</span> &lt; <span class="m">p</span>, donc au moins une valeur propre est nulle, donc une infinité de solutions. Une seule brique à retenir : <b>valeur propre nulle ⇒ pas d'unicité</b>.</p>
-    <p><b>Séparable</b> : <span class="m">x</span> = (−2, −1, 1, 2), <span class="m">y</span> = (0, 0, 1, 1), <span class="m">p</span> = <span class="m">σ</span>(<span class="m">βx</span>). NLL(<span class="m">β</span>) = 2 <span class="m">log</span>(1 + e<sup>−<span class="m">β</span></sup>) + 2 <span class="m">log</span>(1 + e<sup>−2<span class="m">β</span></sup>), strictement décroissante : <span class="hat"><span class="m">β</span></span> n'existe pas.</p>
+    <p><b>Séparable</b> : <span class="m">x</span> = (−2, −1, 1, 2), <span class="m">y</span> = (0, 0, 1, 1), <span class="m">p</span> = <span class="m">σ</span>(<span class="m">βx</span>). NLL(<span class="m">β</span>) = 2 <span class="m">log</span>(1 + e<sup>−<span class="m">β</span></sup>) + 2 <span class="m">log</span>(1 + e<sup>−2<span class="m">β</span></sup>), strictement décroissante et bornée inférieurement par 0 sans l'atteindre : le MLE <span class="hat"><span class="m">β</span></span> n'existe pas.</p>
   </div>
 </div>
 
@@ -232,9 +232,10 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="card apply"><div class="lbl">Application — deux priors, deux croyances</div>
     <table>
       <tr><th>prior</th><th>densité</th><th>ce qu'il dit</th></tr>
-      <tr class="hl"><td><span class="up">N</span>(0, <span class="m">τ</span>²)</td><td>∝ exp(−<span class="m">β</span>²/(2<span class="m">τ</span>²))</td><td>les coefficients sont <b>modérés</b>, centrés sur zéro, aucun n'est exactement nul</td></tr>
-      <tr><td>Laplace(0, <span class="m">τ</span>)</td><td>∝ exp(−|<span class="m">β</span>|/<span class="m">τ</span>)</td><td>la <b>plupart</b> sont proches de zéro, quelques-uns sont francs</td></tr>
+      <tr class="hl"><td><span class="up">N</span>(0, <span class="m">τ</span>²)</td><td>∝ exp(−<span class="m">β</span>²/(2<span class="m">τ</span>²))</td><td>les coefficients sont <b>modérés</b>, centrés sur zéro : les grands sont très improbables (queue en e<sup>−<span class="m">β</span>²</sup>)</td></tr>
+      <tr><td>Laplace(0, <span class="m">τ</span>)</td><td>∝ exp(−|<span class="m">β</span>|/<span class="m">τ</span>)</td><td>la <b>plupart</b> sont proches de zéro, quelques-uns sont francs (densité en pointe en 0, queues plus lourdes)</td></tr>
     </table>
+    <div class="note">Aucun des deux ne met de masse en 0 : lois continues, P(<span class="m">β</span> = 0) = 0 pour l'une comme pour l'autre. Le zéro exact est une propriété du <b>MAP</b> sous Laplace — la pente de |<span class="m">β</span>| reste constante jusqu'à 0 (<a href="#s7">L1 tranche ailleurs</a>, <a href="chain-p03-01-critere-escalier-vs-sensible.html">p03-01</a> habit 3) ; sous prior gaussien le MAP rétrécit sans annuler, la pente de <span class="m">β</span>² étant nulle en 0. La moyenne a posteriori, elle, n'est exactement nulle sous aucun des deux.</div>
     <p><span class="m">τ</span> est la largeur de la croyance : <span class="m">τ</span> grand = « je ne sais pas grand-chose » ; <span class="m">τ</span> petit = « je suis sûr qu'ils sont petits ». Le prior ne parle jamais des données, seulement du monde d'où elles viennent.</p>
     <div class="note">Sur le jeu colinéaire, ce prior seul ne sait rien : il donne le même poids à (1 ; 0) et à (0 ; 1). C'est <i>combiné</i> au RSS qu'il tranche.</div>
   </div>
@@ -245,6 +246,9 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <h3>−<span class="m">log</span> prior → pénalité</h3>
     <p>Maximiser le posterior, c'est minimiser son −<span class="m">log</span>. Le produit devient une somme : la NLL, plus le −<span class="m">log</span> du prior. Le geste des pas 4–6 de <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, appliqué à <span class="m">β</span> au lieu de <span class="m">y</span>.</p>
     <div class="eq">−<span class="m">log p</span>(<span class="m">β</span>) = ‖<span class="m">β</span>‖² / (2<span class="m">τ</span>²) + cste</div>
+    <p><b>D'où sort la norme.</b> Le prior porte sur un <i>vecteur</i> : <span class="m">p</span> coordonnées indépendantes, chacune <span class="up">N</span>(0, <span class="m">τ</span>²), donc la densité jointe est un produit, donc son −<span class="m">log</span> est une somme :</p>
+    <div class="eq">−<span class="m">log p</span>(<span class="m">β</span>) = <span class="m">Σ</span><sub><span class="m">j</span></sub> [ <span class="m">β</span><sub><span class="m">j</span></sub>²/(2<span class="m">τ</span>²) + <span class="m">log</span> √(2π<span class="m">τ</span>²) ] = (1/(2<span class="m">τ</span>²)) <span class="m">Σ</span><sub><span class="m">j</span></sub> <span class="m">β</span><sub><span class="m">j</span></sub>² + <span class="m">p</span> <span class="m">log</span> √(2π<span class="m">τ</span>²)</div>
+    <p>Et <span class="m">Σ</span><sub><span class="m">j</span></sub> <span class="m">β</span><sub><span class="m">j</span></sub>² est, par définition, ‖<span class="m">β</span>‖². La norme n'est que le nom de cette somme : le <b>carré</b> vient de l'exponentielle gaussienne, la <b>somme</b> de l'indépendance des coordonnées. Le terme <span class="m">p</span> <span class="m">log</span> √(2π<span class="m">τ</span>²) ne dépend pas de <span class="m">β</span> : c'est la « cste ». Laplace, même geste : <span class="m">Σ</span><sub><span class="m">j</span></sub> |<span class="m">β</span><sub><span class="m">j</span></sub>|/<span class="m">τ</span> = ‖<span class="m">β</span>‖<sub>1</sub>/<span class="m">τ</span>. Coordonnées corrélées, prior <span class="up">N</span>(0, Σ) : on obtient <span class="m">β</span><sup>⊤</sup>Σ<sup>−1</sup><span class="m">β</span>, quadratique pondérée, qui n'est plus ‖<span class="m">β</span>‖² — c'est l'indépendance plus la variance commune <span class="m">τ</span>² qui donnent la norme simple.</p>
     <div class="eq"><span class="up">argmin</span><sub><span class="m">β</span></sub> [ RSS/(2<span class="m">σ</span>²) + ‖<span class="m">β</span>‖²/(2<span class="m">τ</span>²) ] = <span class="up">argmin</span><sub><span class="m">β</span></sub> [ RSS + <span class="m">λ</span>‖<span class="m">β</span>‖² ], &nbsp; <b><span class="m">λ</span> = <span class="m">σ</span>²/<span class="m">τ</span>²</b></div>
     <p>C'est <b>Ridge</b>, et il n'a pas été choisi : il est tombé. Le facteur 2<span class="m">σ</span>², constant, ne déplace pas l'argmin.</p>
     <p class="say">« Le MAP minimise la NLL plus le moins log du prior, donc un prior gaussien ajoute un terme quadratique, donc c'est L2 avec λ = σ²/τ². »</p>
@@ -448,7 +452,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <li>MAP = NLL + (−<span class="m">log</span> prior). Gaussien → <span class="m">λ</span>‖<span class="m">β</span>‖² avec <b><span class="m">λ</span> = <span class="m">σ</span>²/<span class="m">τ</span>²</b> ; Laplace → <span class="m">λ</span>‖<span class="m">β</span>‖<sub>1</sub>.</li>
     <li>La pénalité fournit l'<b>existence</b> et l'<b>unicité</b> : elle tranche là où les données ne tranchent pas. Le gain en test est une conséquence.</li>
     <li>+<span class="m">λI</span> <b>translate</b> le spectre de <span class="m">λ</span> : 0 → <span class="m">λ</span>, 70 → 70 + <span class="m">λ</span>. Rien n'est annulé, tout devient inversible.</li>
-    <li>L1 tranche sur un <b>sommet</b> de sa boule, posé sur un axe : zéros exacts, (0 ; 0,5). L2 tranche au plus près : (0,2 ; 0,4), jamais zéro.</li>
+    <li>L1 tranche sur un <b>sommet</b> de sa boule, posé sur un axe : zéros exacts, (0 ; 0,5). L2 tranche au plus près : (0,2 ; 0,4), jamais zéro — sauf si l'estimation non pénalisée l'est déjà (<span class="hat"><span class="m">β</span></span> = <span class="m">b</span>/(1 + <span class="m">λ</span>) ne s'annule que si <span class="m">b</span> = 0).</li>
     <li><span class="m">λ</span> par validation croisée ; standardiser avant ; ne pas pénaliser l'intercept.</li>
     <li>À 0,99 <b>rien n'est nul</b> : unicité, mais Var(<span class="hat"><span class="m">β</span></span>) = <span class="m">σ</span>² <span class="m">Σ</span> <span class="m">v</span><sub><span class="m">k</span></sub><span class="m">v</span><sub><span class="m">k</span></sub><sup>⊤</sup>/<span class="m">μ</span><sub><span class="m">k</span></sub> explose le long de <span class="m">v</span><sub>min</sub> ; +<span class="m">λI</span> la fait redescendre.</li>
     <li><span class="hat"><span class="m">β</span></span> sous séparation est <b>le prior qui parle</b> ; et quand <span class="m">n</span> grandit, le prior est noyé là où les données parlent, seule voix là où elles se taisent.</li>
@@ -491,7 +495,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Chaîne p02-02 · v2 du 18/09/2026 · fil B, 2/3. Prérequis : <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, <a href="chain-p04-02-valeurs-propres-iteration.html">p04-02</a>, <a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>. Suite : <a href="chain-p02-03-conjugues-posterior.html">p02-03 Le posterior entier</a>.</footer>
+<footer>Chaîne p02-02 · v3 du 22/09/2026 · fil B, 2/3. Prérequis : <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, <a href="chain-p04-02-valeurs-propres-iteration.html">p04-02</a>, <a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>. Suite : <a href="chain-p02-03-conjugues-posterior.html">p02-03 Le posterior entier</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

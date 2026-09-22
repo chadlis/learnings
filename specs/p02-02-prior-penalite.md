@@ -164,3 +164,12 @@ Dans la direction plate, la valeur propre reste 0 → λ quel que soit n : le pr
 - Le 15/09 avait déjà noté « +λI annule » ; le 18/09 confirme que le pas 5 n'est pas encore produit de mémoire.
 
 ### Exclusions — inchangées, plus : pas de VIF, pas de SE robustes, pas d'Elastic Net au-delà de la mention existante.
+
+## Révision v3 (22/09/2026)
+
+Delta rédigé par Salah en séance (correction de fond, pas de refonte : chiffres, figures, ordre des sections et convention « loss sans ½, pénalité pesée par λ seul » inchangés).
+1. **Prior vs MAP** — tableau « deux priors, deux croyances ». L'ancienne cellule N(0, τ²) (« aucun n'est exactement nul ») attribuait au prior une propriété de l'estimateur MAP : toute loi continue donne P(β = 0) = 0, Laplace comprise. Cellule N(0, τ²) → « modérés, centrés sur zéro : les grands sont très improbables (queue en e^{−β²}) » ; cellule Laplace complétée « (densité en pointe en 0, queues plus lourdes) » ; note sous le tableau : aucun des deux priors ne met de masse en 0 ; zéro exact = propriété du MAP sous Laplace (pente de |β| constante jusqu'à 0, cf. « L1 tranche ailleurs » #s7 et p03-01 habit 3) ; sous gaussien le MAP rétrécit sans annuler (pente de β² nulle en 0) ; moyenne a posteriori jamais exactement nulle sous aucun des deux.
+2. **Décor, jeu séparable** : « strictement décroissante : β̂ n'existe pas » → « strictement décroissante et bornée inférieurement par 0 sans l'atteindre : le MLE β̂ n'existe pas » (le paramètre existe, c'est l'estimateur qui manque). Chapeaux vérifiés : présents dans le HTML (`span.hat`), c'est l'extraction texte qui les perd.
+3. **Résumé, point 5** : « jamais zéro — sauf si l'estimation non pénalisée l'est déjà (β̂ = b/(1 + λ) ne s'annule que si b = 0) ».
+4. **Pas 3, d'où sort la norme** (demande de Salah devant l'écran) : paragraphe + équation sous « −log p(β) = ‖β‖²/(2τ²) + cste » — p coordonnées indépendantes N(0, τ²) ⇒ produit ⇒ −log = somme Σ_j β_j²/(2τ²) + p log √(2πτ²) ; Σ_j β_j² est ‖β‖² par définition (carré : gaussienne ; somme : indépendance) ; Laplace ⇒ ‖β‖₁/τ ; prior N(0, Σ) corrélé ⇒ βᵀΣ⁻¹β, plus la norme simple.
+- Version : titre « · v3 », meta `status=v3`, footer « v3 du 22/09/2026 ».
