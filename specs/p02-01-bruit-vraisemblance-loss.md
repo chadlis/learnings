@@ -179,3 +179,23 @@ Delta issu d'une revue externe de la v3 (chiffres recalculés, tous confirmés) 
 
 ### Questions pour la revue
 - Renommer la partie 02 « Le bruit décide » en « La loi de y|x décide » toucherait `tools/build_index.py` (PARTS) et la meta `part` de trois sheets : non fait, à trancher.
+
+## Révision v5 (22/09/2026)
+
+Delta rédigé par Salah (prompt « Révision des trois fiches du fil B », séance fiche fermée du 22/09) ; appliqué tel quel, chiffres et figures inchangés.
+- **Numérotation 0-based** (0.1) : décor = 0, loi = 1, densité = 2, produit = 3, log = 4, négatif = 5, jeter = 6, nommer = 7. Compteur CSS `counter-reset:step -1` et sommaire `${i}` — deux tokens de la mise en page commune, seule dérogation au « CSS/JS intacts ». Les ids `#sN` restent 1-based (validateur) : `#s6` = pas 5 (négatif), `#s8` = pas 7. Liens entrants retouchés : p07-03 `#s9` → `#s10`, p08-03 libellé « pas 6 — le négatif » → « pas 5 ».
+- **Pas 7 « Nommer, s'arrêter »** (0.3) : `s7` scindé en `s7` Jeter (table bruit / jeté / reste, régression, σ commun réduit à une parenthèse — 1.11, Bernoulli rien à jeter) et `s8` Nommer (table reste / nom, MSE, cross-entropy = −log de la probabilité de la vraie classe, contrôle −ln p_c = ln Σ e^{z_j} − z_c = 2,170 − z_c, figure 3). Anciens s8–s11 → s9–s12.
+- Références (0.2) : « produit du pas 4 » → 3 (×2), « loi du pas 2 » → 1, « dès le pas 2 » → 1, « le pas 8 lu à l'envers » → « la section Le gradient, pas la valeur, lue à l'envers », « σ a disparu au pas 7 » → 6.
+- Notations (0.5) : bloc « Notations » au décor (i, k, j, p_ik, c_i, y_ik = 1[c_i = k], p_{i,c_i} = Π_k p_ik^{y_ik}, ln) ; classes nommées chat/chien/oiseau ↔ k = 1, 2, 3 ; pas 2 « catégoriel : Π_k p_ik^{y_ik} = p_{i,c_i} » à la place de p_{y_i} = softmax(z_i)_{y_i} ; « masse » de l'observation chat.
+- Exemple 3 déroulé (1.1 a→f) : pas 1 catégorielle/simplexe/K − 1, softmax dans le rôle de σ (positive, somme 1), z = Wx, Ŵ ; pas 2 one-hot (1, 0, 0), Π p_k^{y_k} = p₁ (a⁰ = 1) ; pas 4 deux règles (log produit, log puissance), Σ_i Σ_k y_ik log p_ik, un seul terme non nul, ln 0,844 = −0,170 ; pas 7 cross-entropy.
+- Pièges (1.2) : softmax ≠ cross-entropy (pas 1) ; signe — on maximise ℓ, la cross-entropy est −ℓ (pas 5).
+- Pas 9 (1.3) : E[y_k | x] = p_k, donc log-loss et cross-entropy estiment toute la loi P(y = k | x) ; table « lecture à l'envers » et résumé point 5 : « probabilité » → « toute la loi ».
+- Où ça casse (1.4, 0.4) : deux conditions (séparabilité ; σ ∈ ]0, 1[ ouvert), « le MLE β̂ n'existe pas », contre-exemple x = 3, y = 0. Limite 1 réduite (1.12).
+- Sauts comblés : Σx² = Σxy = Σy² = 14 ⇒ RSS = 14(1 − β)², ln √(2π) = 0,919, 3 × 0,919 = 2,757 (1.6) ; L(1) = 0,399³ = 0,0635, L(0) = 0,0635 e^{−7} car RSS(0) = 14 (1.7) ; deux identités −log σ(t) = log(1 + e^{−t}), 1 − σ(t) = σ(−t), un terme y = 1 et un terme y = 0, regroupement par paires (1.5) ; « indépendants suffit, i.i.d. sert à la forme des facteurs » (1.8).
+- Élagages : GLM canoniques → une phrase (1.9) ; sous-débordement → une phrase + p08-02 (1.10).
+- Chaîne verbalisée : maillon 4 → « Déroule les six pas sur trois classes » ; maillon 5 « le MLE β̂ n'existe pas ».
+- Version : titre · v5, meta status=v5, footer v5 du 22/09/2026.
+
+## Questions pour la revue (v5)
+- Numérotation 0-based obtenue par le compteur CSS de cette page seulement : p02-02 garde décor = 1. Uniformiser p02-02 (et les autres chaînes) ou non ?
+- s3 (densité) : 175 mots dans la règle après ajout — WARN validateur, laissé tel quel.

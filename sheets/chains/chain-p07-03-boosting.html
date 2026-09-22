@@ -149,7 +149,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <li><a href="chain-p03-02-gradient-descente.html#s2">p03-02 · Le pas −<span class="m">η</span>∇</a></li>
     <li><a href="chain-p07-01-arbres-impurete.html#s7">p07-01 · Arbre de régression</a></li>
     <li><a href="chain-p07-02-bagging-rf.html#s2">p07-02 · Moyenner ne touche pas au biais</a></li>
-    <li><a href="chain-p02-01-bruit-vraisemblance-loss.html#s9">p02-01 · D'où vient la loss</a></li>
+    <li><a href="chain-p02-01-bruit-vraisemblance-loss.html#s10">p02-01 · D'où vient la loss</a></li>
     <li><a href="chain-p03-01-critere-escalier-vs-sensible.html#s7">p03-01 · Gradient <span class="m">p</span> − <span class="m">y</span></a></li>
   </ol>
   <h4>Cartes Anki liées</h4>
@@ -170,7 +170,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <li><b>La descente de gradient.</b> <span class="m">θ</span> ← <span class="m">θ</span> − <span class="m">η</span>∇<span class="m">L</span> : la direction de plus forte baisse locale, un pas <span class="m">η</span>, et un pas trop grand qui oscille (<a href="chain-p03-02-gradient-descente.html#s2">p03-02 pas 2–3</a>). Toute cette chaîne ne change qu'une chose : <i>par rapport à quoi</i> on dérive.</li>
       <li><b>Un arbre de régression.</b> Coupures axe par axe, une feuille prédit la <b>moyenne</b> des <span class="m">y</span> qu'elle contient (<a href="chain-p07-01-arbres-impurete.html#s7">p07-01 pas 7</a>) ; la profondeur est le bouton de variance (<a href="chain-p07-01-arbres-impurete.html#s5">pas 5</a>).</li>
       <li><b>Moyenner ne baisse que la variance.</b> Le biais de la moyenne est exactement le biais d'un composant — démontré en une ligne de linéarité dans <a href="chain-p07-02-bagging-rf.html#s2">p07-02 pas 2</a>, et c'est de là que vient « arbres profonds pour la forêt, arbres courts pour le boosting » (<a href="chain-p07-02-bagging-rf.html#s7">pas 7</a>). On l'applique ici, on ne le redémontre pas.</li>
-      <li><b>La loss vient de l'hypothèse de bruit.</b> Gaussien ⇒ quadratique, Bernoulli ⇒ log-loss (<a href="chain-p02-01-bruit-vraisemblance-loss.html#s9">p02-01 pas 9</a>). Choisir la loss est un choix de <i>modèle</i> ; le boosting, lui, ne change pas.</li>
+      <li><b>La loss vient de l'hypothèse de bruit.</b> Gaussien ⇒ quadratique, Bernoulli ⇒ log-loss (<a href="chain-p02-01-bruit-vraisemblance-loss.html#s10">p02-01 pas 9</a>). Choisir la loss est un choix de <i>modèle</i> ; le boosting, lui, ne change pas.</li>
       <li><b>Le gradient de la log-loss.</b> Avec <span class="m">p</span> = <span class="m">σ</span>(<span class="m">F</span>), ∂<span class="m">L</span>/∂<span class="m">F</span> = <span class="m">p</span> − <span class="m">y</span>, le −1/<span class="m">p</span> du log compensant l'écrasement de <span class="m">σ</span>′ (<a href="chain-p03-01-critere-escalier-vs-sensible.html#s7">p03-01 pas 7</a>). C'est ce nombre-là que l'arbre ajuste quand on classe.</li>
     </ul>
   </div>

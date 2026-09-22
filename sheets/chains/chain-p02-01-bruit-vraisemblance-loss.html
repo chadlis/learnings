@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Du bruit à la loss — chaîne · v4</title>
-<meta name="sheet" content="series=chain;part=02;number=01;status=v4">
+<title>Du bruit à la loss — chaîne · v5</title>
+<meta name="sheet" content="series=chain;part=02;number=01;status=v5">
 <meta name="part" content="02 · Le bruit décide (fil B)">
 <meta name="subtitle" content="fil B — hypothèse de bruit → densité → produit → log → négatif → jeter">
 <meta name="prereq" content="p00-02,p00-03">
@@ -67,7 +67,7 @@ a{color:inherit}
 .hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
 .card.hyp-card{--ac:var(--coral)}
 /* ---- chain ---- */
-.chain{counter-reset:step}
+.chain{counter-reset:step -1}
 .step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
 @media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
 .step>*{min-width:0}
@@ -173,7 +173,7 @@ text.mk-asym{fill:var(--green)}
     <div class="lbl">Ce que cette chaîne suppose acquis</div>
     <ul>
       <li><b>Masse contre densité</b> (<a href="chain-p00-02-esperance-variance-densite.html">p00-02</a>). Pour un <span class="m">y</span> continu, <span class="m">p</span>(<span class="m">y</span>) est une <b>densité</b> : on l'<b>évalue</b> en un point, on ne l'intègre pas. Elle peut dépasser 1 et ce n'est pas une probabilité. Pour un <span class="m">y</span> discret, c'est une masse, et là c'en est une.</li>
-      <li><b>Indépendance ⇒ produit</b> (<a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>). Si les observations sont indépendantes sachant <span class="m">x</span> et <span class="m">θ</span>, la probabilité de les voir toutes est le produit de leurs probabilités individuelles. C'est la seule justification du produit du pas 4.</li>
+      <li><b>Indépendance ⇒ produit</b> (<a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>). Si les observations sont indépendantes sachant <span class="m">x</span> et <span class="m">θ</span>, la probabilité de les voir toutes est le produit de leurs probabilités individuelles. C'est la seule justification du produit du pas 3.</li>
       <li><b>Le log ne déplace pas l'argmax.</b> <span class="m">log</span> est strictement croissante, donc <span class="up">argmax</span> <span class="m">L</span> = <span class="up">argmax</span> <span class="m">log L</span> ; et <span class="m">log</span>(<span class="m">ab</span>) = <span class="m">log a</span> + <span class="m">log b</span> transforme le produit en somme.</li>
       <li><b>Les calculs de cette chaîne sont faits ailleurs.</b> Le déroulé <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4</a> refait les six pas ligne à ligne sur les trois mêmes exemples. Ici on garde les règles et les points d'arrêt.</li>
     </ul>
@@ -185,7 +185,7 @@ text.mk-asym{fill:var(--green)}
     <div class="lbl">Hypothèses posées</div>
     <div class="hyp">
       <b>H1</b><span>On modélise <b><span class="m">y</span> sachant <span class="m">x</span></b>, jamais <span class="m">x</span>. La loi des features ne sert à rien ici et n'est jamais écrite.</span>
-      <b>H2</b><span>Les observations sont <b>indépendantes</b> conditionnellement à <span class="m">x</span> et <span class="m">θ</span>. C'est cette hypothèse, et elle seule, qui autorise le produit du pas 4.</span>
+      <b>H2</b><span>Les observations sont <b>indépendantes</b> conditionnellement à <span class="m">x</span> et <span class="m">θ</span>. C'est cette hypothèse, et elle seule, qui autorise le produit du pas 3.</span>
       <b>H3</b><span><span class="m">θ</span> est un <b>paramètre fixe</b>, pas une variable aléatoire : cadre fréquentiste. On écrit donc <span class="m">p</span>(<span class="m">y</span> | <span class="m">x</span> ; <span class="m">θ</span>), point-virgule devant <span class="m">θ</span> — une barre supposerait une loi sur <span class="m">θ</span>, et il n'y en a pas. Le prior arrive en <a href="chain-p02-02-prior-penalite.html">p02-02</a>.</span>
     </div>
   </div>
@@ -207,10 +207,11 @@ text.mk-asym{fill:var(--green)}
       <tr><th>exemple</th><th>données</th><th>modèle</th></tr>
       <tr><td><b>régression</b></td><td><span class="m">x</span> = (1, 2, 3), <span class="m">y</span> = (1, 2, 3)</td><td><span class="m">f</span>(<span class="m">x</span> ; <span class="m">β</span>) = <span class="m">βx</span></td></tr>
       <tr><td><b>classification</b></td><td><span class="m">x</span> = (−2, −1, 1, 2), <span class="m">y</span> = (0, 0, 1, 1)</td><td><span class="m">p</span> = <span class="m">σ</span>(<span class="m">βx</span>)</td></tr>
-      <tr><td><b>trois classes</b></td><td>un exemple, logits <span class="m">z</span> = (2, 0, −1)</td><td>softmax(<span class="m">z</span>)</td></tr>
+      <tr><td><b>trois classes</b></td><td>une observation, classes chat, chien, oiseau ↔ <span class="m">k</span> = 1, 2, 3 ; logits <span class="m">z</span> = (2, 0, −1) ; vraie classe chat</td><td>softmax(<span class="m">z</span>)</td></tr>
       <tr><td><b>la pièce</b></td><td>trois tirages, trois succès (PPP)</td><td>un seul <span class="m">p</span></td></tr>
     </table>
     <p>Minuscules exprès : chaque pas de la chaîne sera chiffré à la main, et deux d'entre eux casseront.</p>
+    <p><b>Notations</b> : <span class="m">i</span> = observation, <span class="m">k</span> = classe, <span class="m">j</span> = indice muet de sommation ; <span class="m">p</span><sub><span class="m">ik</span></sub> = probabilité de la classe <span class="m">k</span> pour l'observation <span class="m">i</span>. Étiquette <span class="m">c</span><sub><span class="m">i</span></sub> ∈ {1, …, K} et one-hot <span class="m">y</span><sub><span class="m">ik</span></sub> = 1[<span class="m">c</span><sub><span class="m">i</span></sub> = <span class="m">k</span>] : les deux écritures coexistent, et <span class="m">p</span><sub><span class="m">i</span>,<span class="m">c</span><sub><span class="m">i</span></sub></sub> = <span class="m">Π</span><sub><span class="m">k</span></sub> <span class="m">p</span><sub><span class="m">ik</span></sub><sup><span class="m">y</span><sub><span class="m">ik</span></sub></sup>. Le log est le logarithme naturel, ln, partout.</p>
   </div>
 </div>
 
@@ -230,6 +231,8 @@ text.mk-asym{fill:var(--green)}
       <tr><td>classification</td><td>Bernoulli(<span class="m">σ</span>(<span class="m">βx</span><sub><span class="m">i</span></sub>))</td><td><b>aucune</b> : la loi de <span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">p</span><sub><span class="m">i</span></sub> dépend de <span class="m">x</span><sub><span class="m">i</span></sub></td></tr>
       <tr><td>trois classes</td><td>Catégorielle(softmax(<span class="m">z</span><sub><span class="m">i</span></sub>))</td><td><b>aucune</b> : une classe ne se soustrait pas</td></tr>
     </table>
+    <p><b>Trois classes, en détail.</b> <span class="m">y</span> prend K = 3 valeurs, donc la loi est la <b>catégorielle</b> (multinoulli) — le mot est du vocabulaire, il se nomme. Paramètres (<span class="m">p</span><sub>1</sub>, <span class="m">p</span><sub>2</sub>, <span class="m">p</span><sub>3</sub>) dans le simplexe : <span class="m">p</span><sub><span class="m">k</span></sub> ≥ 0, <span class="m">Σ</span><sub><span class="m">k</span></sub> <span class="m">p</span><sub><span class="m">k</span></sub> = 1, donc K − 1 = 2 paramètres libres (Bernoulli : 2 valeurs, 1 paramètre). Qui fabrique les <span class="m">p</span> : la <b>softmax</b>, dans le rôle de <span class="m">σ</span> — <span class="m">p</span><sub><span class="m">k</span></sub> = e<sup><span class="m">z</span><sub><span class="m">k</span></sub></sup> / <span class="m">Σ</span><sub><span class="m">j</span></sub> e<sup><span class="m">z</span><sub><span class="m">j</span></sub></sup>, strictement positive (une exponentielle) donc <span class="m">log</span> <span class="m">p</span><sub><span class="m">k</span></sub> toujours défini, et de somme <span class="m">Σ</span><sub><span class="m">k</span></sub> e<sup><span class="m">z</span><sub><span class="m">k</span></sub></sup> / <span class="m">Σ</span><sub><span class="m">j</span></sub> e<sup><span class="m">z</span><sub><span class="m">j</span></sub></sup> = 1. L'équivalent de <span class="m">β</span> : un logit par classe, <span class="m">z</span><sub><span class="m">k</span></sub> = <span class="m">w</span><sub><span class="m">k</span></sub> · <span class="m">x</span>, donc <span class="m">z</span> = <span class="m">W</span><span class="m">x</span> avec <span class="m">W</span> la matrice des <span class="m">w</span><sub><span class="m">k</span></sub>. L'énoncé donne <span class="m">z</span> directement, comme si <span class="m">W</span> et <span class="m">x</span> avaient été appliqués ; ce qu'on cherche est <span class="hat"><span class="m">W</span></span>.</p>
+    <p><b>Piège — softmax ≠ cross-entropy.</b> La softmax transforme les logits en probabilités (rôle de <span class="m">σ</span>) ; la cross-entropy est la loss qui tombera au pas 7. L'une est au pas 1, l'autre au pas 7.</p>
     <p>Quatre lignes, quatre losses différentes à l'arrivée. Sur la classification, <span class="m">p</span><sub><span class="m">i</span></sub> = 0,7 donnerait un « bruit » valant −0,7 ou +0,3, de variance 0,21 = <span class="m">p</span><sub><span class="m">i</span></sub>(1 − <span class="m">p</span><sub><span class="m">i</span></sub>) : rien de fixé une fois pour toutes, rien à supposer à part. Rien d'autre ne changera dans la chaîne.</p>
   </div>
 </div>
@@ -237,15 +240,15 @@ text.mk-asym{fill:var(--green)}
 <div class="step" id="s3">
   <div class="rule">
     <h3>Densité d'une observation</h3>
-    <p>On <b>évalue</b> la loi du pas 2 en la valeur observée <span class="m">y</span><sub><span class="m">i</span></sub> : chaque observation reçoit un nombre — une densité prise en un point, ou une masse — jamais une aire. Cas additif : c'est la densité du bruit prise au résidu <span class="m">ε</span><sub><span class="m">i</span></sub> = <span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">f</span>(<span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>). Cas discret : la masse de la classe observée.</p>
+    <p>On <b>évalue</b> la loi du pas 1 en la valeur observée <span class="m">y</span><sub><span class="m">i</span></sub> : chaque observation reçoit un nombre — une densité prise en un point, ou une masse — jamais une aire. Cas additif : c'est la densité du bruit prise au résidu <span class="m">ε</span><sub><span class="m">i</span></sub> = <span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">f</span>(<span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>). Cas discret : la masse de la classe observée.</p>
     <div class="eq">gaussien : <span class="m">p</span>(<span class="m">y</span><sub><span class="m">i</span></sub> | <span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>) = (1 / (<span class="m">σ</span>√(2<span class="m">π</span>))) · exp( −(<span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">f</span>)² / (<b>2</b><span class="m">σ</span>²) )</div>
-    <div class="eq">Bernoulli : <span class="m">p</span><sub><span class="m">i</span></sub><sup><span class="m">y</span><sub><span class="m">i</span></sub></sup>(1 − <span class="m">p</span><sub><span class="m">i</span></sub>)<sup>1−<span class="m">y</span><sub><span class="m">i</span></sub></sup> &nbsp;&nbsp;|&nbsp;&nbsp; catégoriel : <span class="m">p</span><sub><span class="m">y</span><sub><span class="m">i</span></sub></sub> = softmax(<span class="m">z</span><sub><span class="m">i</span></sub>)<sub><span class="m">y</span><sub><span class="m">i</span></sub></sub></div>
+    <div class="eq">Bernoulli : <span class="m">p</span><sub><span class="m">i</span></sub><sup><span class="m">y</span><sub><span class="m">i</span></sub></sup>(1 − <span class="m">p</span><sub><span class="m">i</span></sub>)<sup>1−<span class="m">y</span><sub><span class="m">i</span></sub></sup> &nbsp;&nbsp;|&nbsp;&nbsp; catégoriel : <span class="m">Π</span><sub><span class="m">k</span></sub> <span class="m">p</span><sub><span class="m">ik</span></sub><sup><span class="m">y</span><sub><span class="m">ik</span></sub></sup> = <span class="m">p</span><sub><span class="m">i</span>,<span class="m">c</span><sub><span class="m">i</span></sub></sub>, avec <span class="m">p</span><sub><span class="m">i</span>·</sub> = softmax(<span class="m">z</span><sub><span class="m">i</span></sub>)</div>
     <p>Le <b>2</b> sous <span class="m">σ</span>² fait partie de la gaussienne, il ne s'invente pas au pas suivant. Et c'est ici que le point-virgule se place : <span class="m">θ</span> est fixe, il paramètre la densité.</p>
     <p class="say">« La loi de <span class="m">y</span><sub><span class="m">i</span></sub> sachant <span class="m">x</span><sub><span class="m">i</span></sub> est posée, donc on l'évalue en la valeur observée — au résidu quand le bruit se sépare, à la classe observée sinon — donc chaque observation reçoit un nombre : une densité prise en un point, jamais une aire. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application</div>
     <p><b>Régression</b>, <span class="m">σ</span> = 1. En <span class="m">β</span> = 1 les trois résidus sont nuls : chaque densité vaut 1/√(2<span class="m">π</span>) = <b>0,399</b>. En <span class="m">β</span> = 0 les résidus sont (1, 2, 3) : 0,242 · 0,054 · 0,0044.</p>
-    <p><b>Trois classes</b>, <span class="m">z</span> = (2, 0, −1) : e² = 7,389 ; e⁰ = 1 ; e⁻¹ = 0,368 ; somme 8,757. Softmax = (<b>0,844</b> ; 0,114 ; 0,042). La densité de l'observation « chat » est 0,844 ; si la vraie classe était « oiseau », ce serait 0,042.</p>
+    <p><b>Trois classes</b>, <span class="m">z</span> = (2, 0, −1) : e² = 7,389 ; e⁰ = 1 ; e⁻¹ = 0,368 ; somme 8,757. Softmax = (7,389/8,757 ; 1/8,757 ; 0,368/8,757) = (<b>0,844</b> ; 0,114 ; 0,042). Vraie classe chat, one-hot <span class="m">y</span> = (1, 0, 0) : <span class="m">Π</span><sub><span class="m">k</span></sub> <span class="m">p</span><sub><span class="m">k</span></sub><sup><span class="m">y</span><sub><span class="m">k</span></sub></sup> = <span class="m">p</span><sub>1</sub><sup>1</sup> · <span class="m">p</span><sub>2</sub><sup>0</sup> · <span class="m">p</span><sub>3</sub><sup>0</sup> = <span class="m">p</span><sub>1</sub> (a⁰ = 1, a¹ = a). La <b>masse</b> de l'observation « chat » — masse, pas densité : <span class="m">y</span> est discret — est 0,844 ; si la vraie classe était « oiseau », ce serait 0,042.</p>
     <p><b>La pièce</b> : trois succès, chacun de probabilité <span class="m">p</span>. Trois nombres, tous égaux à <span class="m">p</span>.</p>
   </div>
   <div class="fig" id="fig1">
@@ -264,11 +267,12 @@ text.mk-asym{fill:var(--green)}
     <h3>Produit</h3>
     <p>Les observations sont indépendantes sachant <span class="m">x</span> et <span class="m">θ</span> (H2), donc la probabilité de les voir <i>toutes</i> est le produit :</p>
     <div class="eq"><span class="m">L</span>(<span class="m">θ</span>) = <span class="m">Π</span><sub><span class="m">i</span></sub> <span class="m">p</span>(<span class="m">y</span><sub><span class="m">i</span></sub> | <span class="m">x</span><sub><span class="m">i</span></sub> ; <span class="m">θ</span>)</div>
+    <p>« Indépendants » suffit pour le produit ; « identiquement distribués » sert seulement à ce que chaque facteur ait la même forme — mêmes <span class="m">β</span> et <span class="m">σ</span>.</p>
     <p>Données fixées, <span class="m">θ</span> qui varie : ce n'est plus une densité sur <span class="m">y</span>, c'est une fonction de <span class="m">θ</span>. C'est ce retournement que le mot <b>vraisemblance</b> désigne — et ce n'est pas une loi sur <span class="m">θ</span> : son intégrale ne vaut pas 1.</p>
     <p class="say">« Les observations sont indépendantes sachant <span class="m">x</span>, donc leur probabilité jointe est le produit des densités, donc <span class="m">L</span>(<span class="m">θ</span>) est une fonction de <span class="m">θ</span> à données fixées — une vraisemblance, pas une loi sur <span class="m">θ</span>. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application</div>
-    <p><b>Régression</b>, <span class="m">σ</span> = 1 : <span class="m">L</span>(<span class="m">β</span>) = (2<span class="m">π</span>)<sup>−3/2</sup> · exp(−RSS(<span class="m">β</span>)/2) avec RSS(<span class="m">β</span>) = <span class="m">Σ</span>(<span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">βx</span><sub><span class="m">i</span></sub>)². En <span class="m">β</span> = 1 : <span class="m">L</span> = 0,0635. En <span class="m">β</span> = 0 : 0,0635 · e<sup>−7</sup> = 5,79·10<sup>−5</sup>.</p>
+    <p><b>Régression</b>, <span class="m">σ</span> = 1 : <span class="m">L</span>(<span class="m">β</span>) = (2<span class="m">π</span>)<sup>−3/2</sup> · exp(−RSS(<span class="m">β</span>)/2) avec RSS(<span class="m">β</span>) = <span class="m">Σ</span>(<span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">βx</span><sub><span class="m">i</span></sub>)². En <span class="m">β</span> = 1, RSS(1) = 0 : <span class="m">L</span>(1) = (2<span class="m">π</span>)<sup>−3/2</sup> = 0,399³ = 0,0635. En <span class="m">β</span> = 0, RSS(0) = 1 + 4 + 9 = 14 : <span class="m">L</span>(0) = 0,0635 · e<sup>−14/2</sup> = 0,0635 · e<sup>−7</sup> = 5,79·10<sup>−5</sup>.</p>
     <p><b>La pièce</b> : <span class="m">L</span>(<span class="m">p</span>) = <span class="m">p</span> · <span class="m">p</span> · <span class="m">p</span> = <span class="m">p</span>³.</p>
     <p><b>Vérification qu'aucune loi ne se cache là</b> : ∫<sub>0</sub><sup>1</sup> <span class="m">p</span>³ d<span class="m">p</span> = 1/4 ≠ 1. La vraisemblance n'est pas normalisée en <span class="m">θ</span>, et rien ne la normalisera avant le prior de <a href="chain-p02-02-prior-penalite.html">p02-02</a>.</p>
   </div>
@@ -284,10 +288,11 @@ text.mk-asym{fill:var(--green)}
     <p class="say">« Le log est croissant, donc il ne déplace pas l'argmax, donc le produit devient une somme de <span class="m">n</span> termes — dont <span class="m">n</span> constantes, une par observation. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application</div>
-    <p><b>Régression</b>, <span class="m">n</span> = 3, <span class="m">σ</span> = 1 : RSS(<span class="m">β</span>) = 14 − 28<span class="m">β</span> + 14<span class="m">β</span>² = 14(1 − <span class="m">β</span>)², donc</p>
+    <p><b>Régression</b>, <span class="m">n</span> = 3, <span class="m">σ</span> = 1. <span class="m">Σ</span><span class="m">x</span>² = 1 + 4 + 9 = 14, <span class="m">Σ</span><span class="m">x</span><span class="m">y</span> = 14, <span class="m">Σ</span><span class="m">y</span>² = 14, donc RSS(<span class="m">β</span>) = <span class="m">Σ</span><span class="m">y</span>² − 2<span class="m">β</span><span class="m">Σ</span><span class="m">x</span><span class="m">y</span> + <span class="m">β</span>²<span class="m">Σ</span><span class="m">x</span>² = 14 − 28<span class="m">β</span> + 14<span class="m">β</span>² = 14(1 − <span class="m">β</span>)². Et ln √(2<span class="m">π</span>) = 0,919, donc 3 × 0,919 = 2,757 :</p>
     <div class="eq"><span class="m">ℓ</span>(<span class="m">β</span>) = −3 <span class="m">log</span>(√(2<span class="m">π</span>)) − 7(1 − <span class="m">β</span>)² = −2,757 − 7(1 − <span class="m">β</span>)²</div>
+    <p><b>Trois classes</b> : <span class="m">log</span> <span class="m">Π</span><sub><span class="m">i</span></sub> <span class="m">Π</span><sub><span class="m">k</span></sub> <span class="m">p</span><sub><span class="m">ik</span></sub><sup><span class="m">y</span><sub><span class="m">ik</span></sub></sup>, deux règles nommées séparément — log d'un produit = somme des logs ; log d'une puissance = exposant × log — donne <span class="m">Σ</span><sub><span class="m">i</span></sub> <span class="m">Σ</span><sub><span class="m">k</span></sub> <span class="m">y</span><sub><span class="m">ik</span></sub> <span class="m">log</span> <span class="m">p</span><sub><span class="m">ik</span></sub>. Un seul <span class="m">y</span><sub><span class="m">ik</span></sub> non nul par observation, donc <span class="m">Σ</span><sub><span class="m">k</span></sub> <span class="m">y</span><sub><span class="m">ik</span></sub> <span class="m">log</span> <span class="m">p</span><sub><span class="m">ik</span></sub> = <span class="m">log</span> <span class="m">p</span><sub><span class="m">i</span>,<span class="m">c</span><sub><span class="m">i</span></sub></sub> : ici 1 · ln 0,844 + 0 · ln 0,114 + 0 · ln 0,042 = ln 0,844 = −0,170.</p>
     <p><span class="m">ℓ</span>(1) = −2,757 ; <span class="m">ℓ</span>(0) = −9,757. <b>La pièce</b> : <span class="m">log L</span>(<span class="m">p</span>) = 3 <span class="m">log p</span>, valant 0 en <span class="m">p</span> = 1 et −2,079 en <span class="m">p</span> = 0,5 — même sommet que <span class="m">p</span>³.</p>
-    <p><b>Le sous-débordement, en un chiffre</b> : mille densités à 0,01 donnent un produit de 10<sup>−2000</sup>, qui vaut exactement 0 en flottant 64 bits ; la somme des logs vaut −4 605 et se calcule sans effort. (Le même réflexe, plus fin, fait calculer −<span class="m">log σ</span>(<span class="m">z</span>) sous sa forme <span class="m">log</span>(1 + e<sup>−<span class="m">z</span></sup>) plutôt qu'en passant par <span class="m">σ</span>(<span class="m">z</span>) — et cette forme déborde encore pour <span class="m">z</span> très négatif ; la version stable est l'affaire de <a href="chain-p08-02-flottants-lse.html">p08-02</a>.)</p>
+    <p><b>Sous-débordement</b> : mille densités à 0,01 font un produit de 10<sup>−2000</sup>, exactement 0 en flottant ; la somme des logs vaut −4 605 et se calcule. La forme stable de −<span class="m">log</span> <span class="m">σ</span>(<span class="m">z</span>) est l'affaire de <a href="chain-p08-02-flottants-lse.html">p08-02</a>.</p>
   </div>
   <div class="fig" id="fig2">
     <div class="lbl">Figure 2 — le log garde le sommet</div>
@@ -303,6 +308,7 @@ text.mk-asym{fill:var(--green)}
     <h3>Négatif</h3>
     <p>Maximiser <span class="m">ℓ</span> revient à minimiser son opposé. On pose</p>
     <div class="eq">NLL(<span class="m">θ</span>) = −<span class="m">ℓ</span>(<span class="m">θ</span>) &nbsp;&nbsp;&nbsp; <span class="up">argmax</span><sub><span class="m">θ</span></sub> <span class="m">ℓ</span>(<span class="m">θ</span>) = <span class="up">argmin</span><sub><span class="m">θ</span></sub> NLL(<span class="m">θ</span>)</div>
+    <p><b>Piège de signe.</b> Ce qu'on <b>maximise</b> est ℓ, la log-vraisemblance ; la cross-entropy est −ℓ. Appeler cross-entropy une somme qu'on maximise est une erreur de signe.</p>
     <p>Rien d'autre n'a changé : mêmes termes, même argument, un signe. C'est ce signe, et lui seul, qui fabrique une <b>loss</b> à partir d'une vraisemblance.</p>
     <p class="say">« Maximiser <span class="m">ℓ</span> revient à minimiser −<span class="m">ℓ</span>, donc on pose NLL = −<span class="m">ℓ</span>, donc une loss n'est rien d'autre qu'une log-vraisemblance retournée. »</p>
   </div>
@@ -310,28 +316,48 @@ text.mk-asym{fill:var(--green)}
     <div class="eq">gaussien : NLL(<span class="m">β</span>) = <span class="m">n</span> <span class="m">log</span>(<span class="m">σ</span>√(2<span class="m">π</span>)) + RSS(<span class="m">β</span>) / (2<span class="m">σ</span>²)</div>
     <p>Sur la régression, <span class="m">σ</span> = 1 : NLL(<span class="m">β</span>) = 2,757 + 7(1 − <span class="m">β</span>)². Minimale en <span class="m">β</span> = 1, valeur 2,757.</p>
     <div class="eq">Bernoulli : NLL(<span class="m">β</span>) = −<span class="m">Σ</span><sub><span class="m">i</span></sub> [ <span class="m">y</span><sub><span class="m">i</span></sub> <span class="m">log p</span><sub><span class="m">i</span></sub> + (1 − <span class="m">y</span><sub><span class="m">i</span></sub>) <span class="m">log</span>(1 − <span class="m">p</span><sub><span class="m">i</span></sub>) ]</div>
-    <p>Sur la classification, en regroupant les quatre points : NLL(<span class="m">β</span>) = 2 <span class="m">log</span>(1 + e<sup>−<span class="m">β</span></sup>) + 2 <span class="m">log</span>(1 + e<sup>−2<span class="m">β</span></sup>). NLL(0) = 4 <span class="m">log</span> 2 = 2,773 ; NLL(2) = 0,290.</p>
+    <p>Sur la classification, deux identités : −<span class="m">log</span> <span class="m">σ</span>(<span class="m">t</span>) = <span class="m">log</span>(1 + e<sup>−<span class="m">t</span></sup>) et 1 − <span class="m">σ</span>(<span class="m">t</span>) = <span class="m">σ</span>(−<span class="m">t</span>). Terme <span class="m">x</span> = 1, <span class="m">y</span> = 1 : −<span class="m">log</span> <span class="m">σ</span>(<span class="m">β</span>) = <span class="m">log</span>(1 + e<sup>−<span class="m">β</span></sup>). Terme <span class="m">x</span> = −1, <span class="m">y</span> = 0 : −<span class="m">log</span>(1 − <span class="m">σ</span>(−<span class="m">β</span>)) = −<span class="m">log</span> <span class="m">σ</span>(<span class="m">β</span>) = <span class="m">log</span>(1 + e<sup>−<span class="m">β</span></sup>). La paire ±1 donne 2 <span class="m">log</span>(1 + e<sup>−<span class="m">β</span></sup>), la paire ±2 donne de même 2 <span class="m">log</span>(1 + e<sup>−2<span class="m">β</span></sup>) :</p>
+    <div class="eq">NLL(<span class="m">β</span>) = 2 <span class="m">log</span>(1 + e<sup>−<span class="m">β</span></sup>) + 2 <span class="m">log</span>(1 + e<sup>−2<span class="m">β</span></sup>)</div>
+    <p>NLL(0) = 4 ln 2 = 2,773 ; NLL(2) = 0,290.</p>
   </div>
 </div>
 
 <div class="step" id="s7">
   <div class="rule">
-    <h3>Jeter — puis s'arrêter <span class="tag tronc">tronc</span></h3>
-    <p>L'<span class="up">argmin</span> ne bouge ni sous une constante additive ni sous un facteur multiplicatif positif. On jette donc tout ce qui ne dépend pas de <span class="m">θ</span>.</p>
-    <p>Ce qui reste <b>porte un nom</b>, et c'est le <b>point d'arrêt</b> de la chaîne : il n'y a rien à simplifier après, rien à continuer. Reconnaître le nom fait partie du geste au même titre que le calcul.</p>
+    <h3>Jeter <span class="tag tronc">tronc</span></h3>
+    <p>L'argmin ne bouge ni sous une constante additive ni sous un facteur multiplicatif positif. On jette donc tout ce qui ne dépend pas de <span class="m">θ</span>.</p>
     <p class="say">« La constante ne dépend pas de <span class="m">θ</span>, donc elle ne déplace pas l'argmin, donc on la jette, donc ce qui reste est la loss, et sa forme est la forme de l'exposant de la densité. »</p>
+  </div>
+  <div class="card apply"><div class="lbl">Application — ce qu'on jette, ce qui reste</div>
+    <table>
+      <tr><th>bruit</th><th>ce qu'on jette</th><th>ce qui reste</th></tr>
+      <tr class="hl"><td><span class="up">N</span>(0, <span class="m">σ</span>²)</td><td><span class="m">n</span> <span class="m">log</span>(<span class="m">σ</span>√(2<span class="m">π</span>)) et 1/(2<span class="m">σ</span>²)</td><td><span class="m">Σ</span> <span class="m">r</span><sub><span class="m">i</span></sub>²</td></tr>
+      <tr><td>Laplace(0, <span class="m">b</span>)</td><td><span class="m">n</span> <span class="m">log</span>(2<span class="m">b</span>) et 1/<span class="m">b</span></td><td><span class="m">Σ</span> |<span class="m">r</span><sub><span class="m">i</span></sub>|</td></tr>
+      <tr><td>Bernoulli(<span class="m">p</span>)</td><td><b>rien</b></td><td>−<span class="m">Σ</span>[<span class="m">y</span> <span class="m">log</span> <span class="m">p</span> + (1−<span class="m">y</span>) <span class="m">log</span>(1−<span class="m">p</span>)]</td></tr>
+      <tr><td>Catégorielle</td><td><b>rien</b></td><td>−<span class="m">Σ</span><sub><span class="m">i</span></sub> <span class="m">log</span> <span class="m">p</span><sub><span class="m">i</span>,<span class="m">c</span><sub><span class="m">i</span></sub></sub></td></tr>
+    </table>
+    <p><b>Régression</b> : <span class="up">argmin</span> [2,757 + 7(1−<span class="m">β</span>)²] = <span class="up">argmin</span> 14(1−<span class="m">β</span>)² = <span class="up">argmin</span> RSS, donc <span class="hat"><span class="m">β</span></span> = 1. Somme ici, moyenne dans les frameworks : le 1/<span class="m">n</span> est un facteur positif de plus, jeté ou gardé, même argmin.</p>
+    <p><b>Jeter 1/(2<span class="m">σ</span>²) suppose un <span class="m">σ</span> commun</b> à toutes les observations : c'est un facteur commun, donc il sort de la somme (un <span class="m">σ</span><sub><span class="m">i</span></sub> par observation : moindres carrés pondérés ; un <span class="m">σ</span>(<span class="m">x</span>) prédit par le modèle : le <span class="m">log</span> <span class="m">σ</span> dépend de <span class="m">θ</span>, il ne se jette plus, c'est la Gaussian NLL). Même chose pour le <span class="m">b</span> de Laplace.</p>
+    <p><b>Bernoulli et catégorielle : rien à jeter.</b> Pas de paramètre de dispersion séparé — la variance <span class="m">p</span>(1 − <span class="m">p</span>) est fixée par la moyenne. La NLL est déjà la loss.</p>
+  </div>
+</div>
+
+<div class="step" id="s8">
+  <div class="rule">
+    <h3>Nommer, s'arrêter <span class="tag tronc">tronc</span></h3>
+    <p>Ce qui reste <b>porte un nom</b> : MSE, MAE, log-loss, cross-entropy. C'est le <b>point d'arrêt</b> de la chaîne : il n'y a rien à calculer après, rien à simplifier, rien à continuer. Reconnaître le nom fait partie du geste au même titre que le calcul.</p>
+    <p class="say">« Ce qui reste porte un nom, donc la chaîne est finie, donc on s'arrête : la MSE n'a pas été choisie, elle est tombée d'un bruit gaussien, et la cross-entropy est le −log de la probabilité donnée à la vraie classe. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — les quatre arrivées</div>
     <table>
-      <tr><th>bruit</th><th>ce qu'on jette</th><th>ce qui reste</th><th>son nom</th></tr>
-      <tr class="hl"><td><span class="up">N</span>(0, <span class="m">σ</span>²)</td><td><span class="m">n</span> <span class="m">log</span>(<span class="m">σ</span>√(2<span class="m">π</span>)) et 1/(2<span class="m">σ</span>²)</td><td><span class="m">Σ</span> <span class="m">r</span><sub><span class="m">i</span></sub>²</td><td><b>MSE</b></td></tr>
-      <tr><td>Laplace(0, <span class="m">b</span>)</td><td><span class="m">n</span> <span class="m">log</span>(2<span class="m">b</span>) et 1/<span class="m">b</span></td><td><span class="m">Σ</span> |<span class="m">r</span><sub><span class="m">i</span></sub>|</td><td><b>MAE</b></td></tr>
-      <tr><td>Bernoulli(<span class="m">p</span>)</td><td><b>rien</b></td><td>−<span class="m">Σ</span>[<span class="m">y</span> <span class="m">log p</span> + (1−<span class="m">y</span>) <span class="m">log</span>(1−<span class="m">p</span>)]</td><td><b>log-loss</b></td></tr>
-      <tr><td>Catégorielle</td><td><b>rien</b></td><td>−<span class="m">Σ</span> <span class="m">log p</span><sub><span class="m">y</span><sub><span class="m">i</span></sub></sub></td><td><b>cross-entropy</b></td></tr>
+      <tr><th>bruit</th><th>ce qui reste</th><th>son nom</th></tr>
+      <tr class="hl"><td><span class="up">N</span>(0, <span class="m">σ</span>²)</td><td><span class="m">Σ</span> <span class="m">r</span><sub><span class="m">i</span></sub>²</td><td><b>MSE</b></td></tr>
+      <tr><td>Laplace(0, <span class="m">b</span>)</td><td><span class="m">Σ</span> |<span class="m">r</span><sub><span class="m">i</span></sub>|</td><td><b>MAE</b></td></tr>
+      <tr><td>Bernoulli(<span class="m">p</span>)</td><td>−<span class="m">Σ</span>[<span class="m">y</span> <span class="m">log</span> <span class="m">p</span> + (1−<span class="m">y</span>) <span class="m">log</span>(1−<span class="m">p</span>)]</td><td><b>log-loss</b></td></tr>
+      <tr><td>Catégorielle</td><td>−<span class="m">Σ</span><sub><span class="m">i</span></sub> <span class="m">log</span> <span class="m">p</span><sub><span class="m">i</span>,<span class="m">c</span><sub><span class="m">i</span></sub></sub></td><td><b>cross-entropy</b></td></tr>
     </table>
-    <p><b>Régression</b> : <span class="up">argmin</span> [2,757 + 7(1−<span class="m">β</span>)²] = <span class="up">argmin</span> 14(1−<span class="m">β</span>)² = <span class="up">argmin</span> RSS, donc <span class="hat"><span class="m">β</span></span> = 1. La MSE n'a pas été choisie, elle est tombée. Somme ici, moyenne dans les frameworks : le 1/<span class="m">n</span> est un facteur positif de plus, jeté ou gardé, même argmin.</p>
-    <p><b>Jeter 1/(2<span class="m">σ</span>²) suppose un <span class="m">σ</span> commun</b> à toutes les observations : c'est un facteur commun, donc il sort de la somme. Avec un <span class="m">σ</span><sub><span class="m">i</span></sub> par observation il reste <span class="m">Σ</span> <span class="m">r</span><sub><span class="m">i</span></sub>²/<span class="m">σ</span><sub><span class="m">i</span></sub>² — les moindres carrés pondérés ; et si le modèle prédit aussi <span class="m">σ</span>(<span class="m">x</span>), le <span class="m">log σ</span> ne dépend plus d'une constante mais de <span class="m">θ</span>, il ne se jette plus : c'est la Gaussian NLL, la loss d'une régression qui rend son incertitude. Même chose pour le <span class="m">b</span> de Laplace.</p>
-    <p><b>Bernoulli et catégorielle : rien à jeter.</b> Pas de paramètre de dispersion séparé — la variance <span class="m">p</span>(1 − <span class="m">p</span>) est fixée par la moyenne. La NLL <i>est</i> la loss, telle quelle. Sur les trois classes : cross-entropy = −<span class="m">log</span> 0,844 = <b>0,170</b> si la vraie classe est chat, −<span class="m">log</span> 0,042 = <b>3,17</b> si c'est oiseau. Le nom est là, on s'arrête.</p>
+    <p><b>Régression</b> : ce qui reste est la somme des carrés des résidus, <b>MSE</b>. La MSE n'a pas été choisie, elle est tombée. On s'arrête.</p>
+    <p><b>Trois classes</b> : <b>cross-entropy</b> = −log de la probabilité donnée à la vraie classe, −ln <span class="m">p</span><sub><span class="m">c</span></sub>. −ln 0,844 = <b>0,170</b> si la vraie classe est chat, −ln 0,042 = <b>3,17</b> si c'est oiseau. Contrôle : −ln <span class="m">p</span><sub><span class="m">c</span></sub> = ln <span class="m">Σ</span><sub><span class="m">j</span></sub> e<sup><span class="m">z</span><sub><span class="m">j</span></sub></sup> − <span class="m">z</span><sub><span class="m">c</span></sub> = ln 8,757 − <span class="m">z</span><sub><span class="m">c</span></sub> = 2,170 − <span class="m">z</span><sub><span class="m">c</span></sub> : 2,170 − 2 = 0,170 et 2,170 + 1 = 3,17. Le nom est là, on s'arrête.</p>
   </div>
   <div class="fig" id="fig3">
     <div class="lbl">Figure 3 — ce que coûte une erreur confiante</div>
@@ -342,7 +368,7 @@ text.mk-asym{fill:var(--green)}
   </div>
 </div>
 
-<div class="step" id="s8">
+<div class="step" id="s9">
   <div class="rule">
     <h3>Le gradient, pas la valeur <span class="tag tronc">tronc</span></h3>
     <p>Une loss n'informe l'optimiseur que par sa <b>pente</b>, jamais par sa valeur. Avec <span class="m">p</span> = <span class="m">σ</span>(<span class="m">z</span>) et <span class="m">y</span> ∈ {0, 1} :</p>
@@ -360,7 +386,7 @@ text.mk-asym{fill:var(--green)}
     </table>
     <p>Le symptôme « ça converge lentement, les exemples confortablement faux ne bougent plus » n'est donc pas une histoire de <i>valeur</i> de la loss — de cap, de borne, d'échelle. C'est le facteur <span class="m">p</span>(1 − <span class="m">p</span>) dans le gradient, et rien d'autre.</p>
     <p><b>Une seconde raison, distincte.</b> MSE ∘ <span class="m">σ</span> est <b>non convexe</b> en <span class="m">β</span>, la log-loss est convexe (<a href="../bridges/bridge-06-convexite-forme-fermee.html">b06</a>) : deux raisons indépendantes de ne pas mettre une MSE derrière une sigmoïde.</p>
-    <p><b>Ce <span class="m">p</span> − <span class="m">y</span> n'est pas un hasard.</b> Gaussienne, Bernoulli, catégorielle sont les trois GLM canoniques — liens identité, logit, softmax — et sous lien canonique le gradient de la NLL par rapport à la sortie linéaire vaut toujours <b>prédiction − <span class="m">y</span></b> : <span class="m">f</span> − <span class="m">y</span> pour la MSE, <span class="m">p</span> − <span class="m">y</span> pour les deux autres. Laplace n'est pas de la famille exponentielle en son paramètre de position : la MAE n'a ni forme fermée ni ce gradient, seulement le signe du résidu.</p>
+    <p>Ce <span class="m">p</span> − <span class="m">y</span> n'est pas un hasard : sous lien canonique (identité, logit, softmax), le gradient de la NLL en la sortie linéaire vaut toujours <b>prédiction − <span class="m">y</span></b>.</p>
   </div>
   <div class="fig" id="fig4">
     <div class="lbl">Figure 4 — c'est la pente qui décide, pas la valeur</div>
@@ -371,12 +397,13 @@ text.mk-asym{fill:var(--green)}
   </div>
 </div>
 
-<div class="step" id="s9">
+<div class="step" id="s10">
   <div class="rule">
     <h3>Ce que chaque loss estime</h3>
     <p>Changer d'hypothèse de bruit ne change pas seulement la robustesse : ça change la <b>quantité estimée</b>.</p>
-    <div class="eq">MSE → moyenne conditionnelle &nbsp;·&nbsp; MAE → médiane conditionnelle &nbsp;·&nbsp; log-loss et cross-entropy → probabilité conditionnelle</div>
-    <p>« Laquelle veux-tu prédire ? » est donc une question qui précède toute considération de robustesse, et qui se pose dès le pas 2.</p>
+    <div class="eq">MSE → moyenne conditionnelle &nbsp;·&nbsp; MAE → médiane conditionnelle &nbsp;·&nbsp; log-loss et cross-entropy → <b>toute la loi</b> conditionnelle P(<span class="m">y</span> = <span class="m">k</span> | <span class="m">x</span>)</div>
+    <p>Pourquoi toute la loi : E[<span class="m">y</span><sub><span class="m">k</span></sub> | <span class="m">x</span>] = 1 · P(<span class="m">y</span> = <span class="m">k</span> | <span class="m">x</span>) + 0 · P(<span class="m">y</span> ≠ <span class="m">k</span> | <span class="m">x</span>) = <span class="m">p</span><sub><span class="m">k</span></sub>. La log-loss et la cross-entropy estiment donc P(<span class="m">y</span> = <span class="m">k</span> | <span class="m">x</span>) pour chaque <span class="m">k</span>, pas un résumé : moyenne = un nombre, médiane = un nombre, log-loss = la loi entière.</p>
+    <p>« Laquelle veux-tu prédire ? » est donc une question qui précède toute considération de robustesse, et qui se pose dès le pas 1.</p>
     <p class="say">« Le minimiseur de <span class="m">Σ</span>(<span class="m">y</span> − <span class="m">c</span>)² est la moyenne et celui de <span class="m">Σ</span>|<span class="m">y</span> − <span class="m">c</span>| est la médiane, donc changer le bruit change la quantité estimée, donc MSE et MAE ne sont pas deux précisions du même nombre mais deux nombres. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — un modèle constant, cinq valeurs</div>
@@ -391,7 +418,7 @@ text.mk-asym{fill:var(--green)}
   </div>
 </div>
 
-<div class="step" id="s10">
+<div class="step" id="s11">
   <div class="rule">
     <h3>Le geste, en arrière</h3>
     <p>Personne ne dit « je suppose un bruit de Laplace »&nbsp;: on choisit la MAE, et l'hypothèse est reconstituée après coup. Savoir faire le trajet dans ce sens est ce qui distingue une réponse d'un slogan.</p>
@@ -403,14 +430,14 @@ text.mk-asym{fill:var(--green)}
       <tr><th>ce qu'on lit</th><th>exposant</th><th>bruit supposé</th><th>cible</th></tr>
       <tr><td><span class="m">Σ</span>(<span class="m">y</span> − <span class="m">f</span>)²</td><td>carré</td><td>gaussien</td><td>moyenne</td></tr>
       <tr><td><span class="m">Σ</span>|<span class="m">y</span> − <span class="m">f</span>|</td><td>valeur absolue</td><td>Laplace</td><td>médiane</td></tr>
-      <tr><td>−<span class="m">Σ</span>[<span class="m">y</span> <span class="m">log p</span> + …]</td><td><span class="m">log</span> d'une puissance</td><td>Bernoulli</td><td>probabilité</td></tr>
-      <tr class="hl"><td>−<span class="m">log p</span><sub><span class="m">y</span></sub></td><td><span class="m">log</span> d'une puissance</td><td>catégorielle</td><td>probabilité</td></tr>
+      <tr><td>−<span class="m">Σ</span>[<span class="m">y</span> <span class="m">log p</span> + …]</td><td><span class="m">log</span> d'une puissance</td><td>Bernoulli</td><td>toute la loi P(<span class="m">y</span> = 1 | <span class="m">x</span>)</td></tr>
+      <tr class="hl"><td>−<span class="m">log p</span><sub><span class="m">y</span></sub></td><td><span class="m">log</span> d'une puissance</td><td>catégorielle</td><td>toute la loi P(<span class="m">y</span> = <span class="m">k</span> | <span class="m">x</span>)</td></tr>
     </table>
     <p><b>Le lien cross-entropy ↔ MLE, en quatre pas</b>, quand la mémoire lâche : (1) une loi paramétrée pour <span class="m">y</span> sachant <span class="m">x</span> — ici une catégorielle de paramètre softmax(<span class="m">z</span>) ; (2) la probabilité d'une observation — <span class="m">p</span><sub><span class="m">y</span></sub>, la coordonnée de la vraie classe ; (3) le produit sur les observations ; (4) <span class="up">argmax</span>, donc <span class="up">argmin</span> du −<span class="m">log</span>. On arrive sur −<span class="m">Σ log p</span><sub><span class="m">y</span><sub><span class="m">i</span></sub></sub> : la cross-entropy <b>est</b> le maximum de vraisemblance d'une catégorielle, pas une loss inventée à part.</p>
   </div>
 </div>
 
-<div class="step" id="s11">
+<div class="step" id="s12">
   <div class="rule">
     <h3>Où ça casse <span class="tag casse">casse</span></h3>
     <p>Le geste est mécanique, mais ses deux appuis — l'indépendance et la vraisemblance seule — lâchent dans des cas précis, et toujours pour la même raison : la vraisemblance ne détermine parfois rien du tout.</p>
@@ -418,10 +445,10 @@ text.mk-asym{fill:var(--green)}
   </div>
   <div class="card casse"><div class="lbl">Quatre limites</div>
     <ul>
-      <li><b>Sous dépendance, la vraisemblance factorisée est fausse.</b> Séries temporelles, mesures répétées sur un même sujet, phrases d'un même document : la jointe ne se factorise pas et le produit compte plusieurs fois la même information. Le point estimé survit souvent — l'OLS reste consistant sous autocorrélation — mais les barres d'erreur mentent : trop étroites sous corrélation positive, le cas usuel, trop larges sous corrélation négative.</li>
+      <li><b>Sous dépendance, la vraisemblance factorisée est fausse.</b> Séries temporelles, mesures répétées sur un même sujet, phrases d'un même document : la jointe ne se factorise pas et le produit compte plusieurs fois la même information. Le point estimé survit souvent, mais les barres d'erreur mentent.</li>
       <li><b>Le maximum de vraisemblance ne croit que ce qu'il a vu.</b> Pièce PPP : <span class="m">L</span>(<span class="m">p</span>) = <span class="m">p</span>³, maximale en <span class="hat"><span class="m">p</span></span> = 1 — « un échec est impossible » après trois tirages (figure 2). Même mécanisme en langue : un mot jamais vu reçoit la probabilité 0, donc toute phrase qui le contient devient impossible. Remède : ajouter une croyance — prior, ou lissage (3+1)/(3+2) = 0,8 — c'est <a href="chain-p02-02-prior-penalite.html">p02-02</a>.</li>
-      <li><b>Parfois il n'y a pas de minimum du tout.</b> Séparation parfaite : la NLL décroît vers 0 sans jamais l'atteindre, donc <span class="hat"><span class="m">β</span></span> n'existe pas et ‖<span class="m">β</span>‖ → ∞ (figure 5). Le solveur s'arrête sur son nombre d'itérations avec un coefficient énorme, ce qui ressemble à un résultat sans en être un. C'est le pas 8 lu à l'envers : sous séparation la log-loss a une pente qui <b>ne s'annule jamais</b> — ce qui la rend bonne sur les erreurs confiantes est exactement ce qui la fait fuir quand il n'y a plus d'erreur.</li>
-      <li><b><span class="m">σ</span> a disparu au pas 7</b>, et c'était légitime : il ne déplace pas l'<span class="up">argmin</span> en <span class="m">β</span>. Mais une barre d'erreur sur <span class="hat"><span class="m">β</span></span>, elle, en a besoin — il faut le récupérer, <span class="hat"><span class="m">σ</span></span>² = RSS/(<span class="m">n</span> − <span class="m">p</span>) avec <span class="m">p</span> coefficients — RSS/<span class="m">n</span> est le maximum de vraisemblance de <span class="m">σ</span>², biaisé vers le bas, et la question piège est là. Jeter pour optimiser ne veut pas dire jeter pour conclure : c'est le retour du fil A, <a href="chain-p01-03-inference-regression.html">p01-03</a>.</li>
+      <li><b>Parfois il n'y a pas de minimum du tout.</b> Séparation parfaite : deux conditions, toutes deux nécessaires — (i) séparabilité : augmenter <span class="m">β</span> améliore tous les points à la fois, donc la NLL descend toujours ; (ii) <span class="m">σ</span> ∈ ]0, 1[ ouvert, donc −<span class="m">log</span> <span class="m">p</span> &gt; 0 et la NLL ne touche jamais 0. Donc le MLE <span class="hat"><span class="m">β</span></span> n'existe pas — le paramètre existe, c'est l'estimateur qui manque — et ‖<span class="m">β</span>‖ → ∞ (figure 5). Contre-exemple : ajoute un point mal placé, <span class="m">x</span> = 3, <span class="m">y</span> = 0 ; son terme −<span class="m">log</span>(1 − <span class="m">σ</span>(3<span class="m">β</span>)) remonte avec <span class="m">β</span>, et un minimum existe. Le solveur s'arrête sur son nombre d'itérations avec un coefficient énorme, ce qui ressemble à un résultat sans en être un. C'est la section « Le gradient, pas la valeur » lue à l'envers : sous séparation la log-loss a une pente qui <b>ne s'annule jamais</b> — ce qui la rend bonne sur les erreurs confiantes est exactement ce qui la fait fuir quand il n'y a plus d'erreur.</li>
+      <li><b><span class="m">σ</span> a disparu au pas 6</b>, et c'était légitime : il ne déplace pas l'<span class="up">argmin</span> en <span class="m">β</span>. Mais une barre d'erreur sur <span class="hat"><span class="m">β</span></span>, elle, en a besoin — il faut le récupérer, <span class="hat"><span class="m">σ</span></span>² = RSS/(<span class="m">n</span> − <span class="m">p</span>) avec <span class="m">p</span> coefficients — RSS/<span class="m">n</span> est le maximum de vraisemblance de <span class="m">σ</span>², biaisé vers le bas, et la question piège est là. Jeter pour optimiser ne veut pas dire jeter pour conclure : c'est le retour du fil A, <a href="chain-p01-03-inference-regression.html">p01-03</a>.</li>
     </ul>
   </div>
   <div class="fig" id="fig5">
@@ -444,7 +471,7 @@ text.mk-asym{fill:var(--green)}
     <li>Six pas mécaniques : <b>densité → produit → log → négatif → jeter → nommer</b>. Le nom est le point d'arrêt.</li>
     <li>Gaussien → <b>MSE</b> (<span class="m">σ</span>² jeté) ; Laplace → <b>MAE</b> ; Bernoulli → <b>log-loss</b> (rien à jeter) ; catégoriel → <b>cross-entropy</b> = −<span class="m">log p</span><sub><span class="m">y</span></sub>.</li>
     <li>La forme de la loss est la forme de <b>l'exposant de la densité</b> : carré ⇒ gaussienne, valeur absolue ⇒ Laplace.</li>
-    <li>Chaque loss estime une cible différente : <b>moyenne</b>, <b>médiane</b>, <b>probabilité</b>. Le geste se lit aussi à l'envers, de la loss vers le bruit.</li>
+    <li>Chaque loss estime une cible différente : <b>moyenne</b>, <b>médiane</b>, <b>toute la loi</b> P(<span class="m">y</span> = <span class="m">k</span> | <span class="m">x</span>). Le geste se lit aussi à l'envers, de la loss vers le bruit.</li>
     <li><b>Le gradient décide</b>, pas la valeur : log-loss → <span class="m">p</span> − <span class="m">y</span> ; MSE ∘ <span class="m">σ</span> → ×<span class="m">p</span>(1 − <span class="m">p</span>), gelée sur les erreurs confiantes.</li>
     <li>Ça casse par : dépendance (produit interdit), <span class="hat"><span class="m">p</span></span> = 1 du maximum de vraisemblance, séparation parfaite (pas de minimum), <span class="m">σ</span> jeté dont une barre d'erreur a pourtant besoin.</li>
   </ol>
@@ -459,8 +486,8 @@ text.mk-asym{fill:var(--green)}
     <li><div class="q">Qu'est-ce qu'on suppose dans la chaîne ?</div><div class="a hid">Une hypothèse de modélisation, la loi de y sachant x — « le bruit » — dans le cadre H1–H3 : y sachant x, indépendance (qui autorise le produit), θ fixe. Tout le reste est du calcul. L'écriture y = f + ε n'en est qu'un cas particulier : les familles de position, gaussienne ou Laplace.</div></li>
     <li><div class="q">Déroule les six pas sur un bruit gaussien.</div><div class="a hid">Densité exp(−r²/2σ²)/(σ√2π) → produit → log (−n log(σ√2π) − RSS/2σ²) → négatif → jeter la constante et le facteur 1/(2σ²) → MSE.</div></li>
     <li><div class="q">Que jette-t-on avec Bernoulli ?</div><div class="a hid">Rien : pas de paramètre de dispersion séparé, la variance p(1−p) est fixée par la moyenne. La log-loss est la NLL telle quelle, et c'est le point d'arrêt.</div></li>
-    <li><div class="q">La cross-entropy à trois classes, c'est quoi ?</div><div class="a hid">La NLL d'une catégorielle : −log de la probabilité softmax de la vraie classe. Sur z = (2, 0, −1) : −log 0,844 = 0,170 pour chat, −log 0,042 = 3,17 pour oiseau.</div></li>
-    <li><div class="q">Que casse la séparation parfaite ?</div><div class="a hid">La NLL décroît vers 0 sans l'atteindre : pas de minimum, ‖β‖ → ∞. Le maximum de vraisemblance n'existe pas.</div></li>
+    <li><div class="q">Déroule les six pas sur trois classes.</div><div class="a hid">Catégorielle de paramètre softmax(z) → one-hot, masse Π<sub>k</sub> p<sub>k</sub><sup>y<sub>k</sub></sup> = p<sub>c</sub> → produit sur i → log : Σ<sub>i</sub> Σ<sub>k</sub> y<sub>ik</sub> log p<sub>ik</sub> → négatif → rien à jeter → <b>cross-entropy</b> = −log p<sub>vraie classe</sub>. Sur z = (2, 0, −1) : −ln 0,844 = 0,170 pour chat, −ln 0,042 = 3,17 pour oiseau.</div></li>
+    <li><div class="q">Que casse la séparation parfaite ?</div><div class="a hid">La NLL décroît vers 0 sans l'atteindre : pas de minimum, ‖β‖ → ∞. Le MLE β̂ n'existe pas : le paramètre existe, c'est l'estimateur qui manque.</div></li>
     <li><div class="q">Pourquoi MSE + sigmoïde apprend-elle si lentement les exemples confortablement faux ?</div><div class="a hid">∂/∂z = 2(p − y)·p(1 − p) : le facteur p(1 − p) tend vers 0 quand p → 0 ou 1. La log-loss donne p − y, sans ce facteur : gradient ≈ 1 sur une erreur confiante.</div></li>
     <li><div class="q">Que suppose la MAE, et qu'estime-t-elle ?</div><div class="a hid">Un bruit de Laplace — queues exponentielles. Elle estime la médiane conditionnelle, pas la moyenne : une autre quantité, pas la même en plus prudent.</div></li>
   </ol>
@@ -486,7 +513,7 @@ text.mk-asym{fill:var(--green)}
 
 </main>
 </div>
-<footer>Chaîne p02-01 · v4 du 21/09/2026 · Prérequis : p00-02, p00-03. Suite : <a href="chain-p02-02-prior-penalite.html">p02-02 Du prior à la pénalité</a>.</footer>
+<footer>Chaîne p02-01 · v5 du 22/09/2026 · Prérequis : p00-02, p00-03. Suite : <a href="chain-p02-02-prior-penalite.html">p02-02 Du prior à la pénalité</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>
@@ -499,7 +526,7 @@ apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').m
 btn.onclick=()=>apply(!body.classList.contains('white'));
 /* toc */
 const toc=document.getElementById('toc');
-document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i+1}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
+document.querySelectorAll('.step').forEach((s,i)=>{const li=document.createElement('li');li.innerHTML=`<a href="#${s.id}">${i}. ${s.querySelector('h3').firstChild.textContent.trim()}</a>`;toc.appendChild(li);});
 const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
 document.querySelectorAll('.step').forEach(s=>io.observe(s));
 /* stepper */
