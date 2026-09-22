@@ -26,3 +26,22 @@ Delta rédigé par Claude en séance à la demande de Salah, dans le sillage de 
 - Note de marge « Deux hypothèses, pas plus » → « Deux lois supposées, pas plus … plus l'indépendance ».
 - Synthèse, ligne 6, colonne Bernoulli : « log-loss (cross-entropy binaire) ».
 - Version : meta `status=v2`, titre suffixé « · v2 ». Pas de footer dans ce gabarit, rien à y écrire.
+
+## Révision v3 (22/09/2026)
+
+Delta rédigé par Claude en séance à la demande de Salah : « ajoute un exemple de cas multiclass simple ». Un quatrième onglet, gabarit `nav.echelle` conservé, rail inchangé (mêmes pas 0–11), aucun chiffre des exemples 1–3 modifié.
+- **Exemple 4 — trois classes, catégorielle (softmax)**, dimension zéro : y = (chat, chat, chat, chien, oiseau), n = (3, 1, 1), z = β ∈ ℝ³, p = softmax(β).
+  - Pas 1 : y ~ Catégorielle(softmax(β)) ; Bernoulli = cas K = 2.
+  - Pas 2 : p(yᵢ | β) = softmax(β)_{yᵢ} ; chiffré en β = (2, 0, −1) : (0,844 ; 0,114 ; 0,042).
+  - Pas 3–5 : L = p_chat³ · p_chien · p_oiseau ; ℓ = 3β_chat + β_chien + β_oiseau − 5·LSE(β) ; NLL(2, 0, −1) = 3×0,170 + 2,17 + 3,17 = 5,85.
+  - Pas 6 : rien à jeter → cross-entropy = −Σᵢ log p_{yᵢ} ; forme logits LSE(z) − z_y (`CrossEntropyLoss`) ; softmax à K = 2 = sigmoïde de la différence des logits.
+  - Pas 7 [casse] : p̂ = n/5 = (0,6 ; 0,2 ; 0,2) unique, mais β̂ = log p̂ + c·(1,1,1) pour tout c — non identifiable, vallée plate venue du modèle (K logits pour K − 1 degrés de liberté) ; NLL = 4,75 sur toute la droite ; table de quatre représentants avec ‖β‖² (5,44 ; 2,41 ; 5,62 ; 0,80). Seconde casse en mini : classe jamais vue ⇒ p̂ₖ = 0 ⇒ β̂ₖ → −∞ (ex. 2).
+  - Pas 8–9 : βₖ ~ N(0, τ²) → λ‖β‖².
+  - Pas 10 : sur la droite, ‖β‖² parabole en c, minimum à Σβ = 0 → (0,732 ; −0,366 ; −0,366) ; vaut pour tout λ (la NLL ne dépend que des différences). Figure `fig-plate-softmax` : NLL plate le long de c, NLL + λ(0,80 + 3c²) pour λ ∈ {0 ; 0,05 ; 0,2 ; 0,5}, minimum en c = 0.
+  - Pas 11 (numérique, descente de gradient) : λ = 0,01 → (0,724 ; −0,362 ; −0,362), p̂ = (0,597 ; 0,201 ; 0,201) ; λ = 0,1 → (0,660 ; −0,330 ; −0,330), p̂ = (0,574 ; 0,213 ; 0,213) ; λ = 1 → (0,353 ; −0,176 ; −0,176), p̂ = (0,459 ; 0,271 ; 0,271). Somme nulle à chaque λ ; p̂ glisse vers l'uniforme (lissage de Laplace, version continue).
+- Synthèse : colonne « Ex. 4 — catégorielle » ; titre « Les quatre exemples côte à côte » ; colspan 2–5 passé à 4.
+- Marge : « Deux façons de casser » mentionne l'ex. 4 ; note ajoutée « Sigmoïde = softmax à deux ».
+- Porte : exercice ajouté, ex. 4 avec n = (3, 2, 0).
+- En-tête : « rejouée telle quelle sur trois autres ».
+- Version : meta `status=v3`, titre suffixé « · v3 ». Pas de footer dans ce gabarit.
+- Rail : entrée Synthèse « quatre exemples côte à côte ». Table du pas 7 sans colonne softmax (identique sur chaque ligne, dite dans le texte) pour tenir à 390 px.

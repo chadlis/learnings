@@ -3,9 +3,9 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<meta name="sheet" content="series=walkthrough;part=02;number=01;status=v2"><meta name="subtitle" content="fil B, de la vraisemblance à la pénalité — déroulé suivi, pas d’auto-test">
+<meta name="sheet" content="series=walkthrough;part=02;number=01;status=v3"><meta name="subtitle" content="fil B, de la vraisemblance à la pénalité — déroulé suivi, pas d’auto-test">
 <meta name="part" content="02 · Le bruit décide (fil B)"><meta name="prereq" content="p02-01"><meta name="anki" content="stats::vraisemblance,stats::regularisation">
-<title>Une chaîne, trois exemples — déroulé · v2</title>
+<title>Une chaîne, trois exemples — déroulé · v3</title>
 <style>
 
 :root{
@@ -123,14 +123,14 @@ input[type=range]{width:180px;vertical-align:middle;accent-color:var(--ink)}
   <a href="#s9">9<small>−log prior → pénalité</small></a>
   <a href="#s10">10<small>ce que la pénalité fournit</small></a>
   <a href="#s11">11<small>β̂ pénalisé, chiffré</small></a>
-  <a href="#syn" class="sep">Synthèse<small>trois exemples côte à côte</small></a>
+  <a href="#syn" class="sep">Synthèse<small>quatre exemples côte à côte</small></a>
 </nav>
 
 <main>
 <header>
   <nav class="fil" aria-label="Fil d’Ariane"><a href="../../index.html">← Index des fiches</a><span><b>Fil B</b>, de la vraisemblance à la pénalité. Le fil A : <a href="walkthrough-p01-01-intervalle-procedure.html">cas 1</a> · <a href="walkthrough-p01-02-comparer-deux-modeles.html">cas 2</a> · <a href="walkthrough-p01-03-biais-du-max.html">cas 3</a></span></nav>
   <h1>Une chaîne,<br>trois exemples</h1>
-  <p>Fil B. La même chaîne de 11 pas, déroulée entièrement sur un exemple, puis rejouée telle quelle sur deux autres. À gauche de chaque pas, la règle ; à droite, son application chiffrée. Lis l'exemple 1 en entier avant de changer d'onglet.</p>
+  <p>Fil B. La même chaîne de 11 pas, déroulée entièrement sur un exemple, puis rejouée telle quelle sur trois autres. À gauche de chaque pas, la règle ; à droite, son application chiffrée. Lis l'exemple 1 en entier avant de changer d'onglet.</p>
   <div class="legend"><span class="b">ce qu'on suppose</span><span class="s">ce qui casse</span><span class="v">ce que les données déterminent</span></div>
 </header>
 
@@ -138,6 +138,7 @@ input[type=range]{width:180px;vertical-align:middle;accent-color:var(--ink)}
   <button role="tab" aria-selected="true" data-ex="e1">Exemple 1 — régression, bruit gaussien</button>
   <button role="tab" aria-selected="false" data-ex="e2">Exemple 2 — classification, Bernoulli</button>
   <button role="tab" aria-selected="false" data-ex="e3">Exemple 3 — même régression, bruit de Laplace</button>
+  <button role="tab" aria-selected="false" data-ex="e4">Exemple 4 — trois classes, catégorielle (softmax)</button>
 </div>
 
 <!-- ============================ EXEMPLE 1 ============================ -->
@@ -333,20 +334,83 @@ C'est le <b>Lasso</b> (ici sur une MAE, mais le pas 9 ne dépend pas de la loss 
 <div class="a">Pour <span class="m">λ</span> petit, <span class="m">β̂ ≈ (0 ; 0,5)</span> ; quand <span class="m">λ</span> monte, <span class="m">β̂<sub>2</sub></span> descend vers 0 et <span class="m">β̂<sub>1</sub></span> reste exactement à 0.</div></div>
 </section>
 
+<!-- ============================ EXEMPLE 4 ============================ -->
+<section class="ex" id="e4">
+<div class="decor"><b>0 · Le décor</b>
+Cinq observations, trois classes, aucune feature : le cas multiclasse en dimension zéro.
+<span class="f"><span class="m">y = (chat, chat, chat, chien, oiseau)</span> &nbsp;·&nbsp; comptes <span class="m">n = (3, 1, 1)</span></span>
+Modèle : un logit par classe, <span class="m">z = β = (β<sub>chat</sub>, β<sub>chien</sub>, β<sub>oiseau</sub>)</span>, et <span class="m">p = softmax(β)</span>, c'est-à-dire <span class="m">p<sub>k</sub> = e<sup>β<sub>k</sub></sup> / Σ<sub>j</sub> e<sup>β<sub>j</sub></sup></span>. On cherche trois nombres.
+<p class="mini">Pourquoi cet exemple : c'est l'exemple 2 avec K = 3 au lieu de 2, et la chaîne tombe sur la cross-entropy de <code>CrossEntropyLoss</code>. Au pas 7, elle casse comme l'exemple 1 (trop de solutions) — mais la vallée plate vient du <i>modèle</i>, pas des données.</p>
+</div>
+
+<div class="step"><div class="n">1</div><div class="r"><b>Hypothèse sur le bruit</b><span class="tag b">supposé</span> Comme à l'exemple 2, pas de <span class="m">ε</span> : la loi de <span class="m">y</span> est catégorielle, <span class="m">f</span> règle le vecteur de probabilités. Bernoulli est le cas K = 2.</div>
+<div class="a"><span class="f"><span class="bruit m">y<sub>i</sub> ~ Catégorielle(p)</span>, &nbsp; <span class="m">p = softmax(β)</span>, indépendants</span>
+Le softmax est là pour une seule raison : sortir des <span class="m">p<sub>k</sub></span> positifs qui somment à 1, quel que soit <span class="m">β ∈ ℝ³</span>. Il joue le rôle de la sigmoïde.</div></div>
+
+<div class="step"><div class="n">2</div><div class="r"><b>Densité d'une observation</b> La probabilité de la classe observée, et rien d'autre. L'écriture one-hot <span class="m">Π<sub>k</sub> p<sub>k</sub><sup>y<sub>ik</sub></sup></span> généralise le <span class="m">p<sup>y</sup>(1 − p)<sup>1−y</sup></span> de l'exemple 2.</div>
+<div class="a"><span class="f"><span class="m">p(y<sub>i</sub> | β) = softmax(β)<sub>y<sub>i</sub></sub> = e<sup>β<sub>y<sub>i</sub></sub></sup> / Σ<sub>j</sub> e<sup>β<sub>j</sub></sup></span></span>
+Chiffré, en <span class="m">β = (2, 0, −1)</span> : <span class="m">softmax = (0,844 ; 0,114 ; 0,042)</span>. Une observation « chat » a densité 0,844 ; une observation « oiseau », 0,042.</div></div>
+
+<div class="step"><div class="n">3</div><div class="r"><b>Produit</b> Identique.</div>
+<div class="a"><span class="f"><span class="m">L(β) = Π<sub>i=1</sub><sup>5</sup> softmax(β)<sub>y<sub>i</sub></sub> = p<sub>chat</sub><sup>3</sup> · p<sub>chien</sub> · p<sub>oiseau</sub></span></span>
+Les observations de même classe se regroupent : la vraisemblance ne voit que les comptes.</div></div>
+
+<div class="step"><div class="n">4</div><div class="r"><b>Log</b> Identique. Le log d'un softmax est <span class="m">β<sub>k</sub> − log Σ<sub>j</sub> e<sup>β<sub>j</sub></sup></span> : le logit de la classe, moins le log-somme-exp.</div>
+<div class="a"><span class="f"><span class="m">ℓ(β) = 3β<sub>chat</sub> + β<sub>chien</sub> + β<sub>oiseau</sub> − 5 · log(e<sup>β<sub>chat</sub></sup> + e<sup>β<sub>chien</sub></sup> + e<sup>β<sub>oiseau</sub></sup>)</span></span>
+Le <span class="m">5</span> devant le log-somme-exp : un par observation, comme le <span class="m">3</span> de l'exemple 1.</div></div>
+
+<div class="step"><div class="n">5</div><div class="r"><b>Négatif</b> Identique.</div>
+<div class="a"><span class="f"><span class="m">NLL(β) = 5 · LSE(β) − (3β<sub>chat</sub> + β<sub>chien</sub> + β<sub>oiseau</sub>)</span></span>
+En <span class="m">β = (2, 0, −1)</span> : <span class="m">3 × 0,170 + 2,17 + 3,17 = 5,85</span>. Chaque terme est un <span class="m">−log p<sub>y<sub>i</sub></sub></span> : 0,170 pour un chat bien classé, 3,17 pour l'oiseau que le modèle croit improbable.</div></div>
+
+<div class="step key"><div class="n">6</div><div class="r"><b>Jeter → la loss</b> Rien à jeter, comme à l'exemple 2 : la catégorielle n'a pas de paramètre de dispersion, ses <span class="m">p<sub>k</sub></span> fixent tout.</div>
+<div class="a"><span class="f"><span class="m">NLL(β) = −Σ<sub>i</sub> log p<sub>y<sub>i</sub></sub> = −Σ<sub>i</sub> Σ<sub>k</sub> y<sub>ik</sub> log p<sub>k</sub></span> &nbsp;=&nbsp; <b>cross-entropy</b>, telle quelle</span>
+<b>La cross-entropy n'a pas été choisie, elle est tombée de la catégorielle.</b> Pour K = 2, <span class="m">p<sub>1</sub> = 1/(1 + e<sup>β<sub>0</sub> − β<sub>1</sub></sup>) = σ(β<sub>1</sub> − β<sub>0</sub>)</span> : le softmax à deux classes <i>est</i> la sigmoïde de la différence des logits, et la cross-entropy redevient la log-loss.
+<p class="mini">Forme en logits : <span class="m">−log p<sub>y</sub> = LSE(z) − z<sub>y</sub></span>. C'est ce que calcule <code>CrossEntropyLoss</code>, qui prend les logits bruts — jamais softmax puis log, sinon <span class="m">log 0 = −inf</span> dès qu'un logit domine. Même règle que <code>BCEWithLogitsLoss</code> à l'exemple 2.</p></div></div>
+
+<div class="step casse"><div class="n">7</div><div class="r"><b>Minimiser → ce qui casse</b><span class="tag s">casse</span> Gradient nul : <span class="m">∂NLL/∂β<sub>k</sub> = 5p<sub>k</sub> − n<sub>k</sub> = 0</span>. Les probabilités optimales sont les fréquences. Mais <span class="m">β</span> ?</div>
+<div class="a"><span class="f"><span class="m">p̂ = n/5 = (0,6 ; 0,2 ; 0,2)</span>, unique. &nbsp; <span class="m">β̂ = log p̂ + c·(1, 1, 1)</span>, <span class="sel m">pour tout c</span></span>
+Ajouter la même constante aux trois logits ne change pas le softmax : <span class="m">e<sup>β<sub>k</sub>+c</sup> / Σ<sub>j</sub> e<sup>β<sub>j</sub>+c</sup> = e<sup>β<sub>k</sub></sup> / Σ<sub>j</sub> e<sup>β<sub>j</sub></sup></span>. La NLL est plate le long de la direction <span class="m">(1, 1, 1)</span>, valeur <span class="m">4,75</span> partout dessus — et le même softmax <span class="m">(0,6 ; 0,2 ; 0,2)</span> sur chaque ligne de la table.
+<table>
+<tr><th class="num">β<sub>chat</sub></th><th class="num">β<sub>chien</sub></th><th class="num">β<sub>oiseau</sub></th><th>NLL</th><th class="num">‖β‖²</th></tr>
+<tr><td class="num">−0,511</td><td class="num">−1,609</td><td class="num">−1,609</td><td class="vrai">4,75</td><td class="num">5,44</td></tr>
+<tr><td class="num">0</td><td class="num">−1,099</td><td class="num">−1,099</td><td class="vrai">4,75</td><td class="num">2,41</td></tr>
+<tr><td class="num">2</td><td class="num">0,901</td><td class="num">0,901</td><td class="vrai">4,75</td><td class="num">5,62</td></tr>
+<tr class="hb"><td class="num">0,732</td><td class="num">−0,366</td><td class="num">−0,366</td><td class="vrai">4,75</td><td class="num"><b>0,80</b></td></tr>
+</table>
+Même casse qu'à l'exemple 1, <b>non identifiable</b>, une droite entière de solutions — mais la vallée plate est dans le modèle, pas dans les données : K logits pour K − 1 degrés de liberté. C'est pourquoi la logistique binaire n'a qu'un β (la classe 0 sert de référence, logit fixé à 0), et pourquoi <code>statsmodels</code> fait pareil en multinomial.
+<p class="mini"><span class="tag s">et l'autre casse</span> Si une classe n'est jamais observée, <span class="m">n<sub>k</sub> = 0</span> ⇒ <span class="m">p̂<sub>k</sub> = 0</span> ⇒ <span class="m">β̂<sub>k</sub> → −∞</span> : aucune solution, exemple 2. Un mot absent du corpus reçoit une probabilité nulle et rend toute phrase qui le contient impossible. Les deux façons de casser tiennent dans le même exemple.</p></div></div>
+
+<div class="step"><div class="n">8</div><div class="r"><b>Prior sur θ</b><span class="tag b">supposé</span> Identique.</div>
+<div class="a"><span class="f"><span class="bruit m">β<sub>k</sub> ~ N(0, τ²)</span>, indépendants</span></div></div>
+
+<div class="step"><div class="n">9</div><div class="r"><b>−log prior → pénalité</b> Identique.</div>
+<div class="a"><span class="f"><span class="m">argmin<sub>β</sub> [ NLL(β) + λ‖β‖² ]</span></span></div></div>
+
+<div class="step key"><div class="n">10</div><div class="r"><b>Ce que la pénalité fournit</b> Sur la droite <span class="m">log p̂ + c·1</span>, la NLL est constante ; <span class="m">‖β‖²</span> ne l'est pas. Lui seul décide de <span class="m">c</span>.</div>
+<div class="a"><span class="m">‖log p̂ + c·1‖²</span> est une parabole en <span class="m">c</span>, minimale quand la moyenne des trois logits est nulle : <span class="m">c = −moyenne(log p̂) = 1,243</span> → <span class="m">β̂ = (0,732 ; −0,366 ; −0,366)</span>, la ligne grise de la table.
+<figure id="fig-plate-softmax"></figure>
+Et cela vaut pour tout <span class="m">λ</span> : la NLL ne dépend que des différences <span class="m">β<sub>k</sub> − β<sub>j</sub></span>, et à différences fixées <span class="m">‖β‖²</span> est minimal quand <span class="m">Σ<sub>k</sub> β<sub>k</sub> = 0</span>. <b>Ridge choisit le représentant à somme nulle</b> — c'est la contrainte « sum-to-zero » que les logiciels imposent parfois à la main. Même geste qu'à l'exemple 1 : rien d'annulé, une direction plate rendue courbe.</div></div>
+
+<div class="step"><div class="n">11</div><div class="r"><b>β̂ pénalisé, chiffré</b> Numériquement (pas de forme fermée, comme à l'exemple 2).</div>
+<div class="a"><span class="m">λ = 0,01</span> → <span class="m">β̂ = (<b>0,724</b> ; −0,362 ; −0,362)</span>, <span class="m">p̂ = (0,597 ; 0,201 ; 0,201)</span> &nbsp;·&nbsp; <span class="m">λ = 0,1</span> → <span class="m">(0,660 ; −0,330 ; −0,330)</span>, <span class="m">p̂ = (0,574 ; 0,213 ; 0,213)</span> &nbsp;·&nbsp; <span class="m">λ = 1</span> → <span class="m">(0,353 ; −0,176 ; −0,176)</span>, <span class="m">p̂ = (0,459 ; 0,271 ; 0,271)</span>.
+<p class="mini">Somme nulle à chaque λ. Et quand λ monte, <span class="m">p̂</span> glisse des fréquences <span class="m">(0,6 ; 0,2 ; 0,2)</span> vers l'uniforme <span class="m">(⅓, ⅓, ⅓)</span> : le prior « logits proches de zéro » est un prior « classes proches d'équiprobables ». C'est le lissage de Laplace de l'exemple 2, version continue.</p></div></div>
+</section>
+
 <!-- ============================ SYNTHÈSE ============================ -->
 <section id="syn">
-<h2><span class="n">▮</span><span>Les trois exemples côte à côte</span></h2>
+<h2><span class="n">▮</span><span>Les quatre exemples côte à côte</span></h2>
 <table class="syn">
-<tr><th>pas</th><th>Ex. 1 — gaussien</th><th>Ex. 2 — Bernoulli</th><th>Ex. 3 — Laplace</th></tr>
-<tr><td>1 · bruit</td><td class="bruit">ε ~ N(0, σ²)</td><td class="bruit">y ~ Bernoulli(σ(βx))</td><td class="bruit">ε ~ Laplace(0, b)</td></tr>
-<tr><td>2–5 · densité, produit, log, négatif</td><td colspan="3" style="text-align:center;color:var(--faint);font-style:italic">le même geste, sans exception</td></tr>
-<tr><td>6 · la loss qui tombe</td><td><b>MSE</b> ; σ² jeté</td><td><b>log-loss</b> (cross-entropy binaire) ; rien à jeter</td><td><b>MAE</b> ; b jeté</td></tr>
-<tr><td>6b · ce qu'on estime</td><td>la <b>moyenne</b> conditionnelle</td><td>la <b>probabilité</b> conditionnelle</td><td>la <b>médiane</b> conditionnelle</td></tr>
-<tr><td>7 · ce qui casse</td><td class="sel">infinité de solutions (colinéarité, valeur propre 0)</td><td class="sel">aucune solution (séparation parfaite, ‖β‖ → ∞)</td><td class="sel">infinité de solutions (même droite)</td></tr>
-<tr><td>8 · prior</td><td class="bruit">β ~ N(0, τ²)</td><td class="bruit">β ~ N(0, τ²)</td><td class="bruit">β ~ Laplace(0, τ)</td></tr>
-<tr><td>9 · la pénalité qui tombe</td><td><b>λ‖β‖²</b>, λ = σ²/τ²</td><td><b>λβ²</b></td><td><b>λ‖β‖<sub>1</sub></b></td></tr>
-<tr><td>10 · ce qu'elle fournit</td><td>tranche : norme minimale (0,2 ; 0,4) ; spectre translaté, inversible</td><td>rend coercif : le minimum existe et est unique</td><td>tranche : sparse (0 ; 0,5)</td></tr>
-<tr><td>11 · β̂</td><td>(0,197 ; 0,394) à λ = 1</td><td>3,41 à λ = 0,01</td><td>≈ (0 ; 0,5) à λ petit</td></tr>
+<tr><th>pas</th><th>Ex. 1 — gaussien</th><th>Ex. 2 — Bernoulli</th><th>Ex. 3 — Laplace</th><th>Ex. 4 — catégorielle</th></tr>
+<tr><td>1 · bruit</td><td class="bruit">ε ~ N(0, σ²)</td><td class="bruit">y ~ Bernoulli(σ(βx))</td><td class="bruit">ε ~ Laplace(0, b)</td><td class="bruit">y ~ Cat(softmax(β))</td></tr>
+<tr><td>2–5 · densité, produit, log, négatif</td><td colspan="4" style="text-align:center;color:var(--faint);font-style:italic">le même geste, sans exception</td></tr>
+<tr><td>6 · la loss qui tombe</td><td><b>MSE</b> ; σ² jeté</td><td><b>log-loss</b> (cross-entropy binaire) ; rien à jeter</td><td><b>MAE</b> ; b jeté</td><td><b>cross-entropy</b> ; rien à jeter</td></tr>
+<tr><td>6b · ce qu'on estime</td><td>la <b>moyenne</b> conditionnelle</td><td>la <b>probabilité</b> conditionnelle</td><td>la <b>médiane</b> conditionnelle</td><td>le <b>vecteur de probabilités</b> conditionnel</td></tr>
+<tr><td>7 · ce qui casse</td><td class="sel">infinité de solutions (colinéarité, valeur propre 0)</td><td class="sel">aucune solution (séparation parfaite, ‖β‖ → ∞)</td><td class="sel">infinité de solutions (même droite)</td><td class="sel">infinité de solutions (softmax invariant par β + c·1) ; aucune si une classe n'est jamais vue</td></tr>
+<tr><td>8 · prior</td><td class="bruit">β ~ N(0, τ²)</td><td class="bruit">β ~ N(0, τ²)</td><td class="bruit">β ~ Laplace(0, τ)</td><td class="bruit">β<sub>k</sub> ~ N(0, τ²)</td></tr>
+<tr><td>9 · la pénalité qui tombe</td><td><b>λ‖β‖²</b>, λ = σ²/τ²</td><td><b>λβ²</b></td><td><b>λ‖β‖<sub>1</sub></b></td><td><b>λ‖β‖²</b></td></tr>
+<tr><td>10 · ce qu'elle fournit</td><td>tranche : norme minimale (0,2 ; 0,4) ; spectre translaté, inversible</td><td>rend coercif : le minimum existe et est unique</td><td>tranche : sparse (0 ; 0,5)</td><td>tranche : représentant à somme nulle ; p̂ tiré vers l'uniforme</td></tr>
+<tr><td>11 · β̂</td><td>(0,197 ; 0,394) à λ = 1</td><td>3,41 à λ = 0,01</td><td>≈ (0 ; 0,5) à λ petit</td><td>(0,724 ; −0,362 ; −0,362) à λ = 0,01</td></tr>
 </table>
 
 <div class="tableau">
@@ -358,7 +422,7 @@ C'est le <b>Lasso</b> (ici sur une MAE, mais le pas 9 ne dépend pas de la loss 
 
 <div class="porte">
 <h3 style="margin-top:0">Pour rejouer la chaîne seul</h3>
-<p style="margin:0">Prends l'exemple 1, remplace <span class="m">y</span> par <span class="m">(1, 2, 4)</span> — la colinéarité des <span class="m">x</span> ne bouge pas. Refais les pas 6, 7, 10, 11. Puis prends l'exemple 2 avec <span class="m">y = (0, 1, 0, 1)</span> — plus séparable — et vois ce qui change au pas 7.</p>
+<p style="margin:0">Prends l'exemple 1, remplace <span class="m">y</span> par <span class="m">(1, 2, 4)</span> — la colinéarité des <span class="m">x</span> ne bouge pas. Refais les pas 6, 7, 10, 11. Puis prends l'exemple 2 avec <span class="m">y = (0, 1, 0, 1)</span> — plus séparable — et vois ce qui change au pas 7. Enfin l'exemple 4 avec <span class="m">n = (3, 2, 0)</span> : quelle casse, et que fait λ ?</p>
 <p style="margin:.9rem 0 0">Puis retour à l’<a href="../../index.html">index des fiches</a>, ou à la <a href="../archive/sheet-t03-vraisemblance-mle-map.html">fiche 03</a> pour te tester sur la même chaîne, question par question.</p>
 </div>
 </section>
@@ -368,7 +432,8 @@ C'est le <b>Lasso</b> (ici sur une MAE, mais le pas 9 ne dépend pas de la loss 
 <aside class="marge">
   <div class="note"><b>Deux lois supposées, pas plus</b><br>pas 1 (la loi de y sachant x — « le bruit ») et pas 8 (le prior), plus l'indépendance qui autorise le produit. Tout le reste est du calcul.</div>
   <div class="note"><b>Le geste 3-4-5-6</b><br>produit → log → négatif → jeter. Identique dans les trois exemples, identique pour le prior.</div>
-  <div class="note"><b>Deux façons de casser</b><br>trop de solutions (ex. 1, 3) ou aucune (ex. 2). La pénalité répare les deux.</div>
+  <div class="note"><b>Deux façons de casser</b><br>trop de solutions (ex. 1, 3, 4) ou aucune (ex. 2, et ex. 4 si une classe manque). La pénalité répare les deux.</div>
+  <div class="note"><b>Sigmoïde = softmax à deux</b><br>σ(z) est le softmax de (0, z). La logistique binaire fixe le logit de référence à 0 ; c’est ce qui lui évite la direction plate de l’exemple 4.</div>
   <div class="note"><b>Moyenne ou médiane</b><br>MSE → moyenne conditionnelle. MAE → médiane conditionnelle. Changer de bruit change la cible, pas seulement la robustesse.</div>
   <div class="note"><b>+λI translate</b><br>chaque valeur propre monte de λ. Rien n'est annulé. Le Lasso annule des coefficients, autre objet.</div>
 </aside>
@@ -444,6 +509,29 @@ function on(fig,ok){if(!fig)return false;if(ok)return true;fig.innerHTML='<figca
     else{txt(g,X(1),T+16,'pas de minimum : \u2016\u03b2\u2016 \u2192 \u221e',{fs:12,fill:SEL,fw:'bold'});st.textContent='le MLE n\u2019existe pas';}}
   draw();
   cap(fig,'Quatre points parfaitement s\u00e9par\u00e9s, une pente \u03b2. En pointill\u00e9, la log-loss seule : elle descend vers 0 sans s\u2019arr\u00eater, le solveur suit et \u03b2 file \u00e0 l\u2019infini. Clique sur un \u03bb : le terme \u03bb\u03b2\u00b2 relève la courbe loin de l\u2019origine, la somme devient coercive, et un minimum appara\u00eet \u2014 unique, parce que la somme est strictement convexe. Avec \u03bb = 0,001, \u03b2\u0302 est d\u00e9j\u00e0 fini. La p\u00e9nalit\u00e9 ne rend pas la solution \u00ab meilleure \u00bb : elle la fait exister.');
+})();
+
+/* ---------- 7. la direction plate du softmax ---------- */
+(function(){
+  var fig=document.getElementById('fig-plate-softmax');if(!fig)return;var c=ctrlBar(fig);
+  var lams=[0,0.05,0.2,0.5];var cur=0;var bts=[];var st=stat(c);
+  lams.forEach(function(l,i){bts.push(btn(c,'λ = '+(l===0?'0':String(l).replace('.',',')),function(){cur=i;draw();}));});
+  var W=660,H=270;var s=el('svg',{viewBox:'0 0 '+W+' '+H,role:'img','aria-label':'NLL et NLL pénalisée le long de la direction (1,1,1) des logits'},fig);
+  var g=el('g',{},s);var L=60,T=30,w=560,h=190,C0=-2,C1=2,Y0=4,Y1=12;
+  var NLL0=4.751,N2=0.804;
+  function X(cc){return L+(cc-C0)/(C1-C0)*w;}function Y(v){return T+h-(Math.min(v,Y1)-Y0)/(Y1-Y0)*h;}
+  function draw(){clear(g);bts.forEach(function(b,i){b.setAttribute('aria-pressed',i===cur);});var lam=lams[cur];
+    axes(g,L,T,w,h,'c : même constante ajoutée aux trois logits','loss');
+    [4,6,8,10,12].forEach(function(v){txt(g,L-8,Y(v)+4,fr(v,0),{ta:'end',fs:11,fill:FA});});[-2,-1,0,1,2].forEach(function(cc){txt(g,X(cc),T+h+16,String(cc).replace('-','−'),{ta:'middle',fs:11,fill:FA});});
+    el('line',{x1:X(0),y1:T,x2:X(0),y2:T+h,stroke:FA,'stroke-width':.7,'stroke-dasharray':'2 3'},g);
+    var p0=[],p1=[];for(var cc=C0;cc<=C1+1e-9;cc+=0.02){p0.push([X(cc),Y(NLL0)]);p1.push([X(cc),Y(NLL0+lam*(N2+3*cc*cc))]);}
+    path(g,p0,FA,1.5,'4 3');txt(g,X(-1.95),Y(NLL0)-6,'NLL seule : plate, 4,75 partout — aucun c préféré',{fs:11,fill:FA,fi:'italic'});
+    if(lam>0){path(g,p1,INK,2.5);el('circle',{cx:X(0),cy:Y(NLL0+lam*N2),r:6,fill:SEL},g);
+      txt(g,X(0)+8,T+16,'minimum en c = 0 : Σβ = 0',{fs:12,fill:SEL,fw:'bold'});
+      st.textContent='+ λ‖β‖² = λ(0,80 + 3c²) : parabole, un seul c';}
+    else{txt(g,X(-1.9),T+16,'une droite entière de solutions',{fs:12,fill:SEL,fw:'bold'});st.textContent='le MLE existe mais n’est pas unique';}}
+  draw();
+  cap(fig,'On part du point à somme nulle β̂ = (0,732 ; −0,366 ; −0,366) et on ajoute la même constante c aux trois logits. Le softmax ne bouge pas, donc la NLL non plus : la ligne pointillée est plate, c’est la vallée de l’exemple 1 vue de profil. Clique sur un λ : ‖β‖² = 0,80 + 3c² courbe la vallée et choisit c = 0, le représentant à somme nulle — pour tout λ. La figure ne montre que cette direction : hors d’elle, λ tire aussi p̂ vers l’uniforme (pas 11).');
 })();
 
 /* ---------- tabs ---------- */
