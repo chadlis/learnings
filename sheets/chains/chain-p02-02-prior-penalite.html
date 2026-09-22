@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Du prior à la pénalité — chaîne · v3</title>
-<meta name="sheet" content="series=chain;part=02;number=02;status=v3">
+<title>Du prior à la pénalité — chaîne · v4</title>
+<meta name="sheet" content="series=chain;part=02;number=02;status=v4">
 <meta name="part" content="02 · Le bruit décide (fil B)">
 <meta name="subtitle" content="fil B — MAP, λ = σ²/τ², +λI translate, L1 tranche ailleurs">
 <meta name="prereq" content="p02-01,p04-02,p00-03">
@@ -178,7 +178,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <li><b>Le geste en six pas</b> (<a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>) : densité → produit → log → négatif → jeter → nommer. Il produit la NLL. Ici on ne le redéroule pas : on le <b>rejoue sur un deuxième objet</b>, le prior, et on additionne.</li>
       <li><b>Bayes</b> (<a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>) : <span class="m">p</span>(<span class="m">β</span> | <span class="m">D</span>) = <span class="m">p</span>(<span class="m">D</span> | <span class="m">β</span>) <span class="m">p</span>(<span class="m">β</span>) / <span class="m">p</span>(<span class="m">D</span>), donc <span class="m">p</span>(<span class="m">β</span> | <span class="m">D</span>) ∝ <span class="m">L</span>(<span class="m">β</span>) <span class="m">p</span>(<span class="m">β</span>) à données fixées : le dénominateur ne dépend pas de <span class="m">β</span> et ne déplace aucun argmax.</li>
       <li><b>Valeurs propres</b> (<a href="chain-p04-02-valeurs-propres-iteration.html">p04-02</a>) : si <span class="m">Av</span> = <span class="m">μv</span> alors (<span class="m">A</span> + <span class="m">λI</span>)<span class="m">v</span> = (<span class="m">μ</span> + <span class="m">λ</span>)<span class="m">v</span>. Mêmes vecteurs propres, spectre décalé. Une matrice symétrique est inversible si et seulement si aucune valeur propre n'est nulle.</li>
-      <li><b>Les calculs sont faits ailleurs.</b> Le déroulé <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4</a> refait les marches 8 à 11 ligne à ligne sur ce même jeu colinéaire. Ici on garde les règles, les chiffres d'arrivée et les points d'arrêt.</li>
+      <li><b>Les calculs sont faits ailleurs.</b> Le déroulé <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4</a> refait les marches 9 à 12 ligne à ligne sur ce même jeu colinéaire. Ici on garde les règles, les chiffres d'arrivée et les points d'arrêt.</li>
     </ul>
   </div>
 </section>
@@ -202,12 +202,15 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="rule">
     <h3>Le décor</h3>
     <p>La vraisemblance ne détermine pas toujours un <span class="hat"><span class="m">β</span></span>, et elle échoue de deux façons opposées : <b>trop</b> de solutions, ou <b>aucune</b>. Colinéarité parfaite : une droite entière de <span class="m">β</span> donne exactement le même RSS. Séparation parfaite : la NLL décroît vers 0 sans jamais l'atteindre.</p>
-    <p>Dans les deux cas il manque un critère. Comme la loss au pas 1 de <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, il ne va pas se décréter : il va se déduire.</p>
+    <p>Dans les deux cas il manque un critère. Comme la loss au pas 0 de <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, il ne va pas se décréter : il va se déduire.</p>
     <p class="say">« La vraisemblance seule laisse une droite entière de solutions ou n'en laisse aucune, donc il manque un critère, donc on ne va pas l'inventer mais le déduire d'une seconde hypothèse. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — les deux jeux fil rouge</div>
     <p><b>Colinéaire</b> : <span class="m">x</span><sub>1</sub> = (1, 2, 3), <span class="m">x</span><sub>2</sub> = (2, 4, 6) = 2<span class="m">x</span><sub>1</sub>, <span class="m">y</span> = (1, 2, 3), modèle <span class="m">f</span> = <span class="m">β</span><sub>1</sub><span class="m">x</span><sub>1</sub> + <span class="m">β</span><sub>2</sub><span class="m">x</span><sub>2</sub>.</p>
     <div class="eq"><span class="m">X</span><sup>⊤</sup><span class="m">X</span> = [[14, 28], [28, 56]] &nbsp;·&nbsp; valeurs propres <b>0</b> et <b>70</b> &nbsp;·&nbsp; <span class="m">X</span><sup>⊤</sup><span class="m">y</span> = (14, 28)</div>
+    <p><b>D'où sort <span class="m">X</span><sup>⊤</sup><span class="m">y</span>.</b> Le gradient du RSS = ‖<span class="m">y</span> − <span class="m">X</span><span class="m">β</span>‖² vaut −2<span class="m">X</span><sup>⊤</sup>(<span class="m">y</span> − <span class="m">X</span><span class="m">β</span>) ; l'annuler donne les <b>équations normales</b> <span class="m">X</span><sup>⊤</sup><span class="m">X</span><span class="m">β</span> = <span class="m">X</span><sup>⊤</sup><span class="m">y</span>. <span class="m">X</span><sup>⊤</sup><span class="m">y</span> en est le second membre : (<span class="m">x</span><sub>1</sub>·<span class="m">y</span>, <span class="m">x</span><sub>2</sub>·<span class="m">y</span>) = (1 + 4 + 9 ; 2 + 8 + 18) = (14, 28).</p>
+    <p><b>Les valeurs propres sont des directions de l'espace des coefficients</b>, pas des features. <span class="m">μ</span> = 70 le long de <span class="m">v</span> = (1, 2) : bouger les deux coefficients dans le même sens change les prédictions, la loss est raide. <span class="m">μ</span> = 0 le long de <span class="m">v</span> = (2, −1) : <span class="m">X</span><span class="m">v</span> = 2<span class="m">x</span><sub>1</sub> − <span class="m">x</span><sub>2</sub> = 0, donc les prédictions ne bougent pas, la loss est plate — c'est la droite de solutions. Vérification : <span class="m">X</span><sup>⊤</sup><span class="m">X</span>(2, −1) = (28 − 28, 56 − 56) = 0.</p>
+    <p><b>Contre-idée à écarter</b> : « deux features identiques ⇒ deux valeurs propres identiques ⇒ <span class="m">κ</span> = 1 ». C'est l'inverse : colinéarité exacte ⇒ 0 et 70, le plus différent possible. <span class="m">κ</span> = 1, c'est des features orthogonales de même norme (<span class="m">X</span><sup>⊤</sup><span class="m">X</span> = <span class="m">c</span>I).</p>
     <p>Rang 1 : toute la droite <span class="m">s</span> = <span class="m">β</span><sub>1</sub> + 2<span class="m">β</span><sub>2</sub> = 1 a RSS = 0.</p>
     <table>
       <tr><th><span class="m">β</span><sub>1</sub></th><th><span class="m">β</span><sub>2</sub></th><th><span class="m">s</span></th><th>RSS</th><th>‖<span class="m">β</span>‖²</th></tr>
@@ -217,7 +220,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr class="hl"><td>0,2</td><td>0,4</td><td>1</td><td>0</td><td><b>0,2</b></td></tr>
     </table>
     <p>La solution n'est pas instable, elle est <b>non identifiable</b>. Même mécanisme dès que <span class="m">p</span> &gt; <span class="m">n</span> : le rang de <span class="m">X</span><sup>⊤</sup><span class="m">X</span> vaut au plus <span class="m">n</span> &lt; <span class="m">p</span>, donc au moins une valeur propre est nulle, donc une infinité de solutions. Une seule brique à retenir : <b>valeur propre nulle ⇒ pas d'unicité</b>.</p>
-    <p><b>Séparable</b> : <span class="m">x</span> = (−2, −1, 1, 2), <span class="m">y</span> = (0, 0, 1, 1), <span class="m">p</span> = <span class="m">σ</span>(<span class="m">βx</span>). NLL(<span class="m">β</span>) = 2 <span class="m">log</span>(1 + e<sup>−<span class="m">β</span></sup>) + 2 <span class="m">log</span>(1 + e<sup>−2<span class="m">β</span></sup>), strictement décroissante et bornée inférieurement par 0 sans l'atteindre : le MLE <span class="hat"><span class="m">β</span></span> n'existe pas.</p>
+    <p><b>Séparable</b> : <span class="m">x</span> = (−2, −1, 1, 2), <span class="m">y</span> = (0, 0, 1, 1), <span class="m">p</span> = <span class="m">σ</span>(<span class="m">βx</span>). NLL(<span class="m">β</span>) = 2 <span class="m">log</span>(1 + e<sup>−<span class="m">β</span></sup>) + 2 <span class="m">log</span>(1 + e<sup>−2<span class="m">β</span></sup>), strictement décroissante et bornée inférieurement par 0 sans l'atteindre : le MLE <span class="hat"><span class="m">β</span></span> n'existe pas (le paramètre existe, c'est l'estimateur qui manque). La formule est dérivée terme à terme dans <a href="chain-p02-01-bruit-vraisemblance-loss.html#s6">p02-01, pas 5</a>.</p>
   </div>
 </div>
 
@@ -314,9 +317,12 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <p class="say">« Ajouter λI ajoute λ à chaque valeur propre, donc la valeur propre nulle devient λ, donc la matrice devient inversible, donc la forme fermée existe à nouveau. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — la forme fermée retrouvée</div>
+    <p><b>D'où elle sort, en cinq lignes.</b> Critère ‖<span class="m">y</span> − <span class="m">X</span><span class="m">β</span>‖² + <span class="m">λ</span>‖<span class="m">β</span>‖². Gradient : −2<span class="m">X</span><sup>⊤</sup><span class="m">y</span> + 2<span class="m">X</span><sup>⊤</sup><span class="m">X</span><span class="m">β</span> + 2<span class="m">λ</span><span class="m">β</span>. Nul ⇔ <span class="m">X</span><sup>⊤</sup><span class="m">X</span><span class="m">β</span> + <span class="m">λ</span><span class="m">β</span> = <span class="m">X</span><sup>⊤</sup><span class="m">y</span>. Or <span class="m">λ</span><span class="m">β</span> = <span class="m">λI</span><span class="m">β</span> — on n'additionne pas une matrice et un scalaire, c'est de là que sort le I — donc (<span class="m">X</span><sup>⊤</sup><span class="m">X</span> + <span class="m">λI</span>)<span class="m">β</span> = <span class="m">X</span><sup>⊤</sup><span class="m">y</span>. Inversible parce que toutes ses valeurs propres valent <span class="m">μ</span><sub><span class="m">k</span></sub> + <span class="m">λ</span> &gt; 0.</p>
     <div class="eq"><span class="hat"><span class="m">β</span></span> = (<span class="m">X</span><sup>⊤</sup><span class="m">X</span> + <span class="m">λI</span>)<sup>−1</sup> <span class="m">X</span><sup>⊤</sup><span class="m">y</span></div>
+    <p><b>Pourquoi (<span class="m">X</span><sup>⊤</sup><span class="m">X</span>)<sup>−1</sup><span class="m">X</span><sup>⊤</sup><span class="m">y</span> échoue à <span class="m">λ</span> = 0</b> : <span class="m">μ</span> = 0 ⇔ un <span class="m">v</span> ≠ 0 est envoyé sur 0 ⇔ <span class="m">β</span> et <span class="m">β</span> + <span class="m">t</span><span class="m">v</span> donnent la même sortie ⇔ aucune inverse ne peut choisir. Le système a des solutions — une infinité — c'est la formule qui n'a plus de sens.</p>
     <p><span class="m">λ</span> = 1 : la matrice vaut [[15, 28], [28, 57]], déterminant 855 − 784 = <b>71</b> = 1 × 71, le produit des deux valeurs propres.</p>
     <div class="eq"><span class="hat"><span class="m">β</span></span><sub>1</sub> = (57·14 − 28·28)/71 = 14/71 = <b>0,197</b> &nbsp;·&nbsp; <span class="hat"><span class="m">β</span></span><sub>2</sub> = (15·28 − 28·14)/71 = 28/71 = <b>0,394</b></div>
+    <p><b>Conditionnement</b> : <span class="m">κ</span> = <span class="m">μ</span><sub>max</sub>/<span class="m">μ</span><sub>min</sub>, ∞ si <span class="m">μ</span><sub>min</sub> = 0. Ici, un thermomètre de « +<span class="m">λI</span> relève <span class="m">μ</span><sub>min</sub> », rien d'autre. C'est un <i>rapport</i>, pas une raideur : ce qui fixe la stabilité de <span class="hat"><span class="m">β</span></span> est <span class="m">μ</span><sub>min</sub> (Var = <span class="m">σ</span>²/<span class="m">μ</span><sub>min</sub>) ; <span class="m">κ</span> dit seulement qu'une direction est mieux déterminée qu'une autre. Ce que <span class="m">κ</span> fait à la vitesse de la descente de gradient et à la précision numérique : partie optimisation.</p>
     <table>
       <tr><th><span class="m">λ</span></th><th>petite v.p.</th><th>grande v.p.</th><th>conditionnement</th><th><span class="hat"><span class="m">β</span></span></th></tr>
       <tr><td>0</td><td>0</td><td>70</td><td>∞ — non inversible</td><td>toute la droite</td></tr>
@@ -356,13 +362,6 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <li>Retirer <b>un seul</b> point : <span class="hat"><span class="m">β</span></span><sub>1</sub> va de −0,45 (sans le 2<sup>e</sup>) à −0,97 (sans le 4<sup>e</sup>) ; <span class="hat"><span class="m">β</span></span><sub>1</sub> + 2<span class="hat"><span class="m">β</span></span><sub>2</sub>, lui, reste entre 0,988 et 1,012.</li>
       <li>Ridge <span class="m">λ</span> = 1 : valeurs propres 1,04 et 278,6, conditionnement <b>268</b> ; <span class="hat"><span class="m">β</span></span> = (0,17 ; 0,42), tout près du point de norme minimale (0,2 ; 0,4) du pas 4.</li>
     </ul>
-    <table>
-      <tr><th><span class="m">λ</span></th><th><span class="m">μ</span><sub>min</sub> + <span class="m">λ</span></th><th>conditionnement</th><th><span class="hat"><span class="m">β</span></span></th></tr>
-      <tr><td>0</td><td>0,038</td><td>7 240</td><td>(−0,60 ; 0,80)</td></tr>
-      <tr><td>0,1</td><td>0,138</td><td>2 007</td><td>(−0,02 ; 0,51)</td></tr>
-      <tr class="hl"><td>1</td><td>1,04</td><td><b>268</b></td><td>(0,17 ; 0,42)</td></tr>
-      <tr><td>10</td><td>10,0</td><td>29</td><td>(0,19 ; 0,39)</td></tr>
-    </table>
   </div>
   <div class="fig" id="fig4">
     <div class="lbl">Figure 4 — l'aiguille, et ce que <span class="m">λ</span> lui fait</div>
@@ -480,7 +479,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <h2 style="--ac:var(--violet)">Ponts et cartes</h2>
 <div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
   <div class="bridges">
-    <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html"><b>D4 — fil B, calculé</b><small>marches 8 à 11 : le prior, son −log, la pénalité, le β̂ pénalisé chiffré sur ce même jeu colinéaire</small></a>
+    <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html"><b>D4 — fil B, calculé</b><small>marches 9 à 12 : le prior, son −log, la pénalité, le β̂ pénalisé chiffré sur ce même jeu colinéaire</small></a>
     <a href="chain-p03-01-critere-escalier-vs-sensible.html"><b>p03-01 — critère en escalier vs sensible</b><small>la même pénalité lue par sa pente : pourquoi L2 n'atteint jamais 0 et L1 s'y colle (habit 3)</small></a>
     <a href="../bridges/bridge-06-convexite-forme-fermee.html"><b>Convexité et forme fermée</b><small>+λI rend le critère strictement convexe : un seul point annule la pente, donc une forme fermée</small></a>
     <a href="../bridges/bridge-03-biais-variance-partout.html"><b>Biais et variance partout</b><small>ce que λ coûte en biais et gagne en variance — la conséquence, une fois le mécanisme posé</small></a>
@@ -495,7 +494,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Chaîne p02-02 · v3 du 22/09/2026 · fil B, 2/3. Prérequis : <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, <a href="chain-p04-02-valeurs-propres-iteration.html">p04-02</a>, <a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>. Suite : <a href="chain-p02-03-conjugues-posterior.html">p02-03 Le posterior entier</a>.</footer>
+<footer>Chaîne p02-02 · v4 du 22/09/2026 · fil B, 2/3. Prérequis : <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, <a href="chain-p04-02-valeurs-propres-iteration.html">p04-02</a>, <a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>. Suite : <a href="chain-p02-03-conjugues-posterior.html">p02-03 Le posterior entier</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

@@ -173,3 +173,14 @@ Delta rédigé par Salah en séance (correction de fond, pas de refonte : chiffr
 3. **Résumé, point 5** : « jamais zéro — sauf si l'estimation non pénalisée l'est déjà (β̂ = b/(1 + λ) ne s'annule que si b = 0) ».
 4. **Pas 3, d'où sort la norme** (demande de Salah devant l'écran) : paragraphe + équation sous « −log p(β) = ‖β‖²/(2τ²) + cste » — p coordonnées indépendantes N(0, τ²) ⇒ produit ⇒ −log = somme Σ_j β_j²/(2τ²) + p log √(2πτ²) ; Σ_j β_j² est ‖β‖² par définition (carré : gaussienne ; somme : indépendance) ; Laplace ⇒ ‖β‖₁/τ ; prior N(0, Σ) corrélé ⇒ βᵀΣ⁻¹β, plus la norme simple.
 - Version : titre « · v3 », meta `status=v3`, footer « v3 du 22/09/2026 ».
+
+## Révision v4 (22/09/2026)
+
+Delta rédigé par Salah (prompt « Révision des trois fiches du fil B », section 2 ; 2.1–2.3 et 2.5 déjà en v3). Chiffres et figures inchangés.
+- 2.2 : « le MLE β̂ n'existe pas (le paramètre existe, c'est l'estimateur qui manque) », renvoi à p02-01 #s6 (pas 5) pour la dérivation de NLL(β).
+- 2.4 décor colinéaire : Xᵀy comme second membre des équations normales (∇RSS = −2Xᵀ(y − Xβ)), (x₁·y, x₂·y) = (14, 28) ; valeurs propres = directions de l'espace des coefficients, μ = 70 le long de (1, 2), μ = 0 le long de (2, −1) avec Xv = 2x₁ − x₂ = 0 et XᵀX(2, −1) = 0 ; contre-idée « features identiques ⇒ κ = 1 » écartée (κ = 1 ⇔ XᵀX = cI).
+- 2.6 pas 5 : forme fermée dérivée en cinq lignes (critère, gradient, λβ = λIβ, (XᵀX + λI)β = Xᵀy, inversible car μ_k + λ > 0) ; pourquoi (XᵀX)⁻¹Xᵀy échoue à λ = 0 (v envoyé sur 0 ⇒ aucune inverse ne peut choisir ; le système a des solutions, la formule n'a plus de sens).
+- 2.7 : κ = μ_max/μ_min défini avant la table du pas 5 ; thermomètre de « +λI relève μ_min » ; rapport, pas raideur — la stabilité de β̂ est fixée par μ_min ; renvoi « partie optimisation ».
+- 2.8 : table λ / μ_min + λ / κ / β̂ du pas 6 supprimée (doublon de la figure 4).
+- 0.2 : « marches 8 à 11 » → « 9 à 12 » (×2) ; « pas 1 de p02-01 » → « pas 0 ».
+- Version : titre · v4, meta status=v4, footer v4 du 22/09/2026.
