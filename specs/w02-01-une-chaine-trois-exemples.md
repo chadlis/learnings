@@ -45,3 +45,14 @@ Delta rédigé par Claude en séance à la demande de Salah : « ajoute un exemp
 - En-tête : « rejouée telle quelle sur trois autres ».
 - Version : meta `status=v3`, titre suffixé « · v3 ». Pas de footer dans ce gabarit.
 - Rail : entrée Synthèse « quatre exemples côte à côte ». Table du pas 7 sans colonne softmax (identique sur chaque ligne, dite dans le texte) pour tenir à 390 px.
+
+## Révision v4 (22/09/2026)
+
+Delta rédigé par Salah (prompt « Révision des trois fiches du fil B », sections 0 et 3). Gabarit `nav.echelle` conservé ; chiffres des exemples 1–3 inchangés.
+- **Numérotation** (0.1) : pas 7 « Nommer, s'arrêter » ajouté dans chaque onglet ; anciens 7–11 → 8–12 (ids `s7`–`s11` → `s8`–`s12`, nouveau `s7`) ; rail, synthèse, marge, porte et renvois internes mis à jour ; en-tête « 12 pas ».
+- **Exemple 4 réécrit** (3.1) : une observation, z = (2, 0, −1), chat/chien/oiseau ↔ k = 1, 2, 3, pas 0 à 7 avec les briques 1.1 (a)→(f) — catégorielle/simplexe/K − 1, softmax rôle de σ (positive, somme 1), z = Wx et Ŵ, masse one-hot Π p_k^{y_k} = p₁ (a⁰ = 1), chiffré e² = 7,389, e⁰ = 1, e⁻¹ = 0,368, somme 8,757, p = (0,844 ; 0,114 ; 0,042), log en deux règles, ln 0,844 = −0,170, pièges softmax ≠ cross-entropy et signe, cross-entropy 0,170 / 3,17, contrôle 2,170 − z_c, ln explicite ; pas 8–12 en une ligne « identiques à l'exemple 2, avec λ‖W‖² ». La version v3 (dimension zéro, n = (3, 1, 1), direction plate β + c·1, figure `fig-plate-softmax`) est retirée — récupérable dans l'historique (commit 4f8f6be).
+- Exemple 1 : valeurs propres calculées (tr = 70, det = 0, μ(μ − 70) = 0, contrôles somme/produit, vecteurs propres vérifiés) (3.3) ; σ̂² = RSS/(n − p), RSS/n biaisé (0.4) ; ‖β‖² développé, minimum en −b/(2a) = −0,4 (3.4) ; inverse 2×2 rappelée, produits intermédiaires 798 − 784, 420 − 392 (3.5) ; β̂ = (r/5)(1, 2) dérivé par vecteur propre de Xᵀy, r = 70/(70 + λ) à la place de s (3.6, 0.5), readout de la figure 1 « r = ».
+- Exemple 2 : forme en logits dérivée (deux identités, un terme y = 1, un terme y = 0, paires ±1 et ±2), BCEWithLogitsLoss en une clause + p08-02 (3.7) ; ligne β = 1 calculée : 2·0,313 + 2·0,127 = 0,880 (3.8) ; pas 12 : condition Σ(p_i − y_i)x_i + 2λβ = 0 résolue par bissection (3.9) ; encadré MSE : « bornée » = argument de valeur, gradient = mécanisme, convexité en une ligne (3.10).
+- Exemple 3 : ‖β‖₁ minimisée cas par cas (3.11) ; brique Laplace réduite (mécanisme en un chiffre, table 3 lignes, Huber + prix en une ligne, « ce qu'il faut savoir dire ») (3.12).
+- Synthèse (3.13) : lignes 6 · jeter et 7 · nommer, 7b Bernoulli « toute la loi P(y = 1 | x) », colonne Ex. 4 (pas 1–7, « idem ex. 2 » pour 8–12).
+- Version : meta status=v4, titre « · v4 ».
