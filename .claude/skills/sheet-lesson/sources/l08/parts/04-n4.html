@@ -1,0 +1,49 @@
+<!-- ============================ n4 ============================ -->
+<section class="notion outil" id="n4">
+  <h3>L'espérance d'un produit, seulement sous indépendance <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 29</p>
+  <div class="idee">
+    <p>Pour un produit, c'est l'inverse : il faut une hypothèse. Si X et Y sont indépendantes, connaître X ne dit rien de Y, et la moyenne du produit se coupe en produit des moyennes.</p>
+    <p>Si elles bougent ensemble, les grandes valeurs de X tombent avec les grandes valeurs de Y, et la moyenne du produit dépasse le produit des moyennes. Cet écart E[XY] − E[X]E[Y] a un nom : la <b>covariance</b> (<a href="lesson-00-09-covariance-correlation.html#n1">l09</a>).</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — la moyenne des produits, case par case</div>
+    <div id="v4ctl" class="sl-ctl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">Chaque case contient le produit x · y ; plus elle est foncée, plus le couple (x, y) est probable. E[XY] est la moyenne des produits pondérée par ces probabilités. <b>Indépendants</b> : les 36 cases pèsent 1/36 et E[XY] = 3,5 × 3,5. <b>Y = X</b> : seule la diagonale compte, les grands x tombent avec les grands y, et E[XY] monte à 15,17. <b>Y = 7 − X</b> : les grands x tombent avec les petits y, et E[XY] descend à 9,33.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>X</i>, <i>Y</i> indépendantes ⟹ E[<i>XY</i>] = E[<i>X</i>] · E[<i>Y</i>] &nbsp;&nbsp;&nbsp; et plus généralement E[<i>g</i>(<i>X</i>) <i>h</i>(<i>Y</i>)] = E[<i>g</i>(<i>X</i>)] · E[<i>h</i>(<i>Y</i>)]</div>
+    <ul><li><b>Indépendance</b> : P(X = x, Y = y) = P(X = x) P(Y = y) pour tous x et y.</li><li>Le sens ⟸ est faux : l'égalité ne prouve pas l'indépendance.</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux dés, un dé compté deux fois, Y = X²</small></summary><div class="in">
+    <ol>
+      <li><b>Deux dés indépendants.</b> E[XY] = 3,5 × 3,5 = 12,25.</li>
+      <li><b>Le même dé compté deux fois</b> (Y = X). E[XY] = E[X²] = 91/6 = 15,17. L'écart 15,17 − 12,25 = 2,92 est la variance du dé (notion 6).</li>
+      <li><b>Dépendance totale, égalité quand même.</b> X uniforme sur {−1, 0, 1} et Y = X². E[XY] = E[X³] = (−1 + 0 + 1)/3 = 0, et E[X] E[Y] = 0 × ⅔ = 0. Pourtant Y est entièrement déterminée par X.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la preuve de Brunton : c'est ici, et seulement ici, que l'indépendance sert</small></summary><div class="in">
+    <div class="drv">
+      <div>E[<i>XY</i>] = Σ<sub><i>x</i></sub> Σ<sub><i>y</i></sub> <i>x</i> <i>y</i> P(<i>x</i>, <i>y</i>)</div><span>espérance d'une fonction du couple</span>
+      <div>= Σ<sub><i>x</i></sub> Σ<sub><i>y</i></sub> <i>x</i> <i>y</i> P(<i>X</i> = <i>x</i>) P(<i>Y</i> = <i>y</i>)</div><span><b>indépendance</b> : la jointe est un produit</span>
+      <div>= (Σ<sub><i>x</i></sub> <i>x</i> P(<i>X</i> = <i>x</i>)) · (Σ<sub><i>y</i></sub> <i>y</i> P(<i>Y</i> = <i>y</i>))</div><span>la double somme se factorise</span>
+      <div>= E[<i>X</i>] · E[<i>Y</i>]</div><span>définition</span>
+    </div>
+    <p>Compare avec la notion 3. Là, on sommait sur y pour retrouver une loi marginale, ce qui marche toujours. Ici, on factorise la jointe, ce qui demande l'indépendance. Remplacer x y par g(x) h(y) donne la version générale.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>les trois cas</small></summary><div class="in">
+<pre class="py">{{CODE:c4}}</pre>
+<pre class="out">{{OUT:c4}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>La réciproque est fausse</b> (exemple 3). E[XY] = E[X]E[Y] équivaut à une covariance nulle, pas à l'indépendance.</li>
+      <li><b>Ne pas déplacer l'hypothèse.</b> C'est l'espérance d'un <b>produit</b> qui demande l'indépendance, pas l'espérance d'une somme.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (29) affirme que si X et Y sont dépendantes, l'espérance du produit n'est pas le produit des espérances. Pas forcément : l'exemple 3 donne l'égalité avec une dépendance totale.</div>
+  </div></details>
+  <p class="garde">E[XY] = E[X] · E[Y] sous indépendance. La réciproque est fausse.</p>
+</section>
+

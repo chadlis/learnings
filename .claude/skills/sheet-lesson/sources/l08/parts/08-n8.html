@@ -1,0 +1,63 @@
+<!-- ============================ n8 ============================ -->
+<section class="notion outil" id="n8">
+  <h3>L'exponentielle : espérance, variance, médiane <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 31 · Example of Computing the Expectation and Variance of an Exponential Distribution</p>
+  <div class="idee">
+    <p>Brunton fait enfin un calcul sur une loi continue (il ne saute que E[T²]) : l'attente T jusqu'au prochain événement d'un flux de taux λ (un mail, un appel, une panne). Le résultat surprend : la moyenne et l'écart-type sont égaux, et la médiane est nettement plus courte que la moyenne.</p>
+    <p>La loi est très asymétrique : beaucoup d'attentes courtes, quelques attentes longues qui tirent la moyenne vers la droite. C'est la situation de la figure 2, sur une loi qu'on rencontre partout.</p>
+    <p>La moyenne se devine : à λ événements par heure, on attend en moyenne 1/λ heure. À 4 spams par heure, un spam toutes les 15 minutes.</p>
+  </div>
+  <div class="fig vis" id="v8">
+    <div class="lbl">Voir l'idée — huit heures de spams, à 4 par heure</div>
+    <div id="v8ctl" class="sl-ctl"></div>
+    <div id="v8plot" class="wide"></div>
+    <div class="readouts" id="v8out"></div>
+    <p class="cap">En haut, l'heure d'arrivée de chaque spam ; en bas, une pastille par attente entre deux spams. Les attentes courtes s'empilent à gauche, quelques longues s'étirent à droite et tirent la moyenne (rouge) au-delà de la médiane (bleu). En théorie : moyenne 15 min, médiane 10,4 min, et 63 % des attentes plus courtes que la moyenne. <b>Lance une nouvelle journée</b> : les chiffres bougent, la médiane reste presque toujours sous la moyenne.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les résultats</div>
+    <div class="eq"><i>f</i>(<i>t</i>) = λ e<sup>−λ<i>t</i></sup>, <i>t</i> ≥ 0 &nbsp;&nbsp;⟹&nbsp;&nbsp; E[<i>T</i>] = 1/λ, &nbsp; Var(<i>T</i>) = 1/λ², &nbsp; σ = 1/λ, &nbsp; médiane = ln 2 / λ ≈ 0,693 / λ</div>
+    <ul><li>T ≥ 0 : toutes les intégrales vont de 0 à l'infini, pas de −∞.</li></ul>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — l'attente exponentielle et ses deux centres</div>
+    <div id="f4plot" class="wide"></div>
+    <div id="f4ctl"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">Fais varier le <b>taux λ</b> (événements par heure). La courbe part de la hauteur λ ; la moyenne et la médiane se déplacent ensemble, proportionnellement à 1/λ, et la médiane reste toujours à 69 % de la moyenne.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>λ = 2, une ampoule, des spams</small></summary><div class="in">
+    <ol>
+      <li><b>λ = 2 par heure.</b> Attente moyenne 0,5 h, écart-type 0,5 h, médiane 0,347 h, soit 21 min.</li>
+      <li><b>Une ampoule de durée moyenne 100 h</b> (λ = 1/100). La moitié des ampoules meurt avant 100 ln 2 = 69,3 h.</li>
+      <li><b>Des spams à 4 par heure.</b> Attente moyenne 15 min, médiane 60 ln 2/4 = 10,4 min.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>deux intégrations par parties ; Brunton fait la première</small></summary><div class="in">
+    <p><b>Espérance.</b> Par parties avec u = t et dv = λ e<sup>−λt</sup> dt, donc v = −e<sup>−λt</sup> :</p>
+    <div class="drv">
+      <div>E[<i>T</i>] = ∫<sub>0</sub><sup>∞</sup> <i>t</i> λ e<sup>−λ<i>t</i></sup> d<i>t</i></div><span>définition</span>
+      <div>= [−<i>t</i> e<sup>−λ<i>t</i></sup>]<sub>0</sub><sup>∞</sup> + ∫<sub>0</sub><sup>∞</sup> e<sup>−λ<i>t</i></sup> d<i>t</i></div><span>parties ; le crochet vaut 0 aux deux bornes, l'exponentielle écrase t</span>
+      <div>= [−e<sup>−λ<i>t</i></sup>/λ]<sub>0</sub><sup>∞</sup> = 1/λ</div><span>primitive de l'exponentielle</span>
+    </div>
+    <p><b>Second moment</b>, le calcul que Brunton laisse : par parties avec u = t².</p>
+    <div class="drv">
+      <div>E[<i>T</i>²] = ∫<sub>0</sub><sup>∞</sup> <i>t</i>² λ e<sup>−λ<i>t</i></sup> d<i>t</i> = [−<i>t</i>² e<sup>−λ<i>t</i></sup>]<sub>0</sub><sup>∞</sup> + ∫<sub>0</sub><sup>∞</sup> 2<i>t</i> e<sup>−λ<i>t</i></sup> d<i>t</i></div><span>LOTUS (notion 5), puis parties</span>
+      <div>= (2/λ) ∫<sub>0</sub><sup>∞</sup> <i>t</i> λ e<sup>−λ<i>t</i></sup> d<i>t</i> = (2/λ) · (1/λ) = 2/λ²</div><span>on retrouve E[T]</span>
+      <div>Var(<i>T</i>) = 2/λ² − 1/λ² = 1/λ²</div><span>forme de calcul (notion 6)</span>
+    </div>
+    <p><b>Médiane.</b> F(m) = 1 − e<sup>−λm</sup> = ½, donc e<sup>−λm</sup> = ½, donc m = ln 2/λ.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>et le piège du paramètre de numpy</small></summary><div class="in">
+<pre class="py">{{CODE:c8}}</pre>
+<pre class="out">{{OUT:c8}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Les bornes.</b> La densité est nulle pour t &lt; 0 ; intégrer depuis −∞ la formule λe<sup>−λt</sup> fait diverger le calcul.</li>
+      <li><b>numpy prend la moyenne, pas le taux.</b> rng.exponential(scale=…) attend 1/λ ; lui passer λ se trompe d'un facteur λ² sur la moyenne et l'écart-type, λ⁴ sur la variance.</li>
+      <li><b>« σ = moyenne » n'explique pas l'absence de mémoire.</b> Brunton pose la question. C'est l'inverse : l'absence de mémoire, P(T &gt; s + t | T &gt; s) = e<sup>−λt</sup> (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n4">l05</a>), force la loi exponentielle, qui force σ = moyenne. La réciproque est fausse : pour une log-normale avec ln T ~ N(0, ln 2), moyenne et écart-type valent √2 = 1,414, et cette loi a de la mémoire.</li>
+    </ul>
+  </div></details>
+  <p class="garde">Exponentielle(λ) : moyenne = écart-type = 1/λ, et la médiane ln 2/λ est plus courte que la moyenne.</p>
+</section>
+

@@ -1,0 +1,3 @@
+skewness  2.69
+kurtosis  8.24
+default   5.24  (excess = kurtosis - 3)

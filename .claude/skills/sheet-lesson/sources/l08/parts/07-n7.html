@@ -1,0 +1,55 @@
+<!-- ============================ n7 ============================ -->
+<section class="notion culture" id="n7">
+  <h3>Moments bruts, centrés, asymétrie, kurtosis <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 28, 30 et 37</p>
+  <div class="idee">
+    <p>Brunton appelle l'espérance le premier <b>moment</b> et relie la variance au second (28), qu'il écrit ensuite « second moment moins premier au carré » (37). Le mot vient de la physique : un moment est une moyenne pondérée d'une puissance de la distance. Plus la puissance k est grande, plus la masse lointaine écrase le reste. Les moments successifs décrivent donc la forme de la loi, du plus grossier au plus fin.</p>
+    <p>Puissance paire (2, 4) : le signe disparaît, seule la distance compte. Puissance impaire (3) : le signe reste, et les écarts à gauche et à droite se compensent, sauf si un côté porte des écarts plus longs.</p>
+  </div>
+  <div class="fig vis" id="v7">
+    <div class="lbl">Voir l'idée — plus la puissance monte, plus la masse lointaine écrase le reste</div>
+    <div id="v7ctl" class="sl-ctl"></div><div id="v7sl"></div>
+    <div id="v7plot" class="wide"></div>
+    <div class="readouts" id="v7out"></div>
+    <p class="cap">Chaque barre est la contribution p · (x − μ)<sup>k</sup> d'une valeur, à l'échelle de la plus grande ; leur somme est le moment centré d'ordre k. Sur Z, la valeur 10 fait 50 % de la somme des barres en valeur absolue à k = 1, 90 % à k = 2, 98,8 % à k = 3 et 99,9 % à k = 4. À k = 1, les deux côtés s'annulent toujours, sur toute loi : c'est la définition de μ. À k = 3, la barre de gauche est négative : sur {1, 3} les deux côtés s'annulent encore ; sur Z, la valeur lointaine 10 l'emporte malgré sa masse de 0,1 (−0,9 + 72,9 = 72).</p>
+  </div>
+  <div class="formule"><div class="lbl">Les formules</div>
+    <div class="eq">brut : E[<i>X</i><sup><i>k</i></sup>] &nbsp;&nbsp; centré : E[(<i>X</i> − μ)<sup><i>k</i></sup>] &nbsp;&nbsp; asymétrie : E[(<i>X</i> − μ)³] / σ³ &nbsp;&nbsp; kurtosis : E[(<i>X</i> − μ)⁴] / σ⁴</div>
+    <ul><li>Brut = autour de 0, centré = autour de μ. Le moment centré d'ordre 1 vaut toujours 0.</li><li>Var = brut<sub>2</sub> − brut<sub>1</sub>² : la même forme que le théorème de Huygens en mécanique, inertie autour de l'origine = inertie autour du centre + masse × distance².</li><li>Diviser par σ³ et σ⁴ rend l'asymétrie et la kurtosis sans unité : elles décrivent la forme, pas l'échelle.</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>les deux lois de la séance du 10/10</small></summary><div class="in">
+    <table>
+      <tr><th>Ordre</th><th>Ce qu'il mesure</th><th>X ∈ {1, 3}</th><th>Z ∈ {0, 10}</th></tr>
+      <tr><td>1 (brut)</td><td>position</td><td>2</td><td>1</td></tr>
+      <tr><td>2 (centré)</td><td>étalement</td><td>1</td><td>9</td></tr>
+      <tr><td>3 (standardisé)</td><td>asymétrie</td><td>0</td><td>2,67</td></tr>
+      <tr><td>4 (standardisé)</td><td>poids des queues</td><td>1</td><td>8,11</td></tr>
+    </table>
+    <p>Repère : une normale a une asymétrie 0 et une kurtosis 3. On parle souvent d'<b>excès de kurtosis</b>, kurtosis − 3, nul pour la normale. Pour X ∈ {1, 3}, la kurtosis vaut 1, le minimum possible : deux masses, aucune queue.</p>
+    <p>En ML : Adam garde deux moyennes mobiles du gradient, m (moment brut d'ordre 1, la direction) et v (moment brut d'ordre 2, l'échelle). Certaines activations de LLM ont des queues extrêmes, et ces valeurs aberrantes cassent une quantification uniforme (LLM.int8).</p>
+  </div></details>
+  <details class="preuve"><summary>Le calcul sur Z <small>μ = 1, σ = 3, écarts −1 et +9</small></summary><div class="in">
+    <div class="drv">
+      <div>E[(<i>Z</i> − μ)³] = 0,9 × (−1)³ + 0,1 × 9³ = −0,9 + 72,9 = 72</div><span>cubes des écarts, pondérés</span>
+      <div>asymétrie = 72 / 3³ = 72 / 27 ≈ 2,67</div><span>positive : la queue est à droite</span>
+      <div>E[(<i>Z</i> − μ)⁴] = 0,9 × 1 + 0,1 × 9⁴ = 0,9 + 656,1 = 657</div><span>puissances 4</span>
+      <div>kurtosis = 657 / 3⁴ = 657 / 81 ≈ 8,11</div><span>bien plus que 3 : queues lourdes</span>
+    </div>
+    <p>Pour X ∈ {1, 3}, les cubes des écarts ±1 s'annulent (asymétrie 0) et E[(X − μ)⁴] = σ⁴ = 1 (kurtosis 1).</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>scipy, et le piège de l'excès</small></summary><div class="in">
+<pre class="py">{{CODE:c7}}</pre>
+<pre class="out">{{OUT:c7}}</pre>
+    <p>L'échantillon donne 2,69 et 8,24 au lieu de 2,67 et 8,11 : la proportion de 10 tirée n'est pas exactement 0,1, et les moments d'ordre élevé amplifient cet écart.</p>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>La kurtosis ne mesure pas l'« aplatissement ».</b> Beaucoup de manuels le disent, et le nom français « coefficient d'aplatissement » porte le même mythe. Les valeurs à moins de 1σ du centre contribuent au plus 1 à la kurtosis (0,11 sur 3 pour une normale) : tout le reste vient des queues (Westfall, 2014).</li>
+      <li><b>Asymétrie nulle n'implique pas symétrie.</b> L'implication ne vaut que dans l'autre sens.</li>
+      <li><b>scipy.stats.kurtosis renvoie l'excès par défaut</b> (fisher=True) : 5,24 au lieu de 8,24 sur le même échantillon.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (37) dit que « E[X³] est l'asymétrie » et « E[X⁴] la kurtosis ». Ce sont des moments bruts ; l'asymétrie et la kurtosis sont des moments centrés, divisés par σ³ et σ⁴ pour ne dépendre ni de la position ni de l'unité.</div>
+  </div></details>
+  <p class="garde">Ordre 3 : de quel côté est la queue. Ordre 4 : à quel point les queues pèsent.</p>
+</section>
+

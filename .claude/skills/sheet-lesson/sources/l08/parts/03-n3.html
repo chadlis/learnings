@@ -1,0 +1,53 @@
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>L'espérance est linéaire, sans aucune hypothèse <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 29 · Properties of the Expected Value</p>
+  <div class="idee">
+    <p>C'est la propriété la plus utile de l'espérance, et elle ne demande rien. Pour additionner des espérances, on n'a pas besoin de savoir comment les variables dépendent l'une de l'autre.</p>
+    <p>L'image : chaque tirage du couple donne une somme x + y. Sur beaucoup de tirages, la moyenne des sommes est la somme des moyennes, quelle que soit la façon dont x et y bougent ensemble. Que Y suive X de près ou pas du tout change la forme de la loi de X + Y, jamais son espérance, son centre de masse.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — la dépendance change la forme, pas le centre</div>
+    <div id="v3ctl" class="sl-ctl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">La loi de X + Y pour deux dés, selon la façon dont Y dépend de X. La forme change du tout au tout, le point d'équilibre reste en 7 = 3,5 + 3,5. <b>Lance 300 couples</b> : la moyenne des sommes (point bleu) tombe à quelques dixièmes de 7, et exactement sur 7 pour Y = 7 − X.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">E[<i>aX</i> + <i>bY</i> + <i>c</i>] = <i>a</i> E[<i>X</i>] + <i>b</i> E[<i>Y</i>] + <i>c</i></div>
+    <ul><li><b>Aucune hypothèse</b> : X et Y peuvent être dépendantes, et de lois différentes.</li><li>Pour n termes : E[X<sub>1</sub> + … + X<sub>n</sub>] = E[X<sub>1</sub>] + … + E[X<sub>n</sub>].</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux dés, dépendance totale, cent pièces, anniversaires</small></summary><div class="in">
+    <ol>
+      <li><b>Deux dés.</b> E[X + Y] = 3,5 + 3,5 = 7.</li>
+      <li><b>Dépendance totale : Y = X.</b> E[X + Y] = E[2X] = 7 aussi. La dépendance change la loi de la somme, pas son espérance.</li>
+      <li><b>Cent pièces, sans Pascal.</b> X = B<sub>1</sub> + … + B<sub>100</sub>, où B<sub>i</sub> vaut 1 si la pièce i tombe sur pile. E[X] = 100 × ½ = 50 : le résultat de la notion 1, en une ligne.</li>
+      <li><b>Anniversaires.</b> Parmi 23 personnes il y a C(23, 2) = 253 paires, et chacune partage un anniversaire avec probabilité 1/365. Le nombre moyen de paires qui partagent vaut 253/365 = 0,69. Les paires ne sont pas mutuellement indépendantes (si 1–2 et 2–3 partagent, 1–3 partage forcément), et la linéarité s'en moque.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>discrète, sur la loi jointe : on somme, on ne factorise jamais</small></summary><div class="in">
+    <p>Notation : P(x, y) abrège P(X = x, Y = y).</p>
+    <div class="drv">
+      <div>E[<i>X</i> + <i>Y</i>] = Σ<sub><i>x</i></sub> Σ<sub><i>y</i></sub> (<i>x</i> + <i>y</i>) P(<i>x</i>, <i>y</i>)</div><span>espérance d'une fonction du couple (notion 5)</span>
+      <div>= Σ<sub><i>x</i></sub> Σ<sub><i>y</i></sub> <i>x</i> P(<i>x</i>, <i>y</i>) + Σ<sub><i>x</i></sub> Σ<sub><i>y</i></sub> <i>y</i> P(<i>x</i>, <i>y</i>)</div><span>distribuer</span>
+      <div>= Σ<sub><i>x</i></sub> <i>x</i> Σ<sub><i>y</i></sub> P(<i>x</i>, <i>y</i>) + Σ<sub><i>y</i></sub> <i>y</i> Σ<sub><i>x</i></sub> P(<i>x</i>, <i>y</i>)</div><span>sortir x de la somme en y, et y de la somme en x</span>
+      <div>= Σ<sub><i>x</i></sub> <i>x</i> P(<i>X</i> = <i>x</i>) + Σ<sub><i>y</i></sub> <i>y</i> P(<i>Y</i> = <i>y</i>)</div><span>marginaliser (l07)</span>
+      <div>= E[<i>X</i>] + E[<i>Y</i>]</div><span>définition</span>
+    </div>
+    <p><b>L'indépendance n'apparaît à aucune ligne</b> : on a sommé une variable, jamais factorisé la jointe. Pour les constantes : E[aX + c] = Σ (ax + c) P(x) = a Σ x P(x) + c Σ P(x) = a E[X] + c, puisque les probabilités somment à 1.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>deux variables très dépendantes</small></summary><div class="in">
+<pre class="py">{{CODE:c3}}</pre>
+<pre class="out">{{OUT:c3}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Pas à travers une fonction non linéaire.</b> E[X²] ≠ E[X]² (dé : 15,17 contre 12,25), E[1/X] ≠ 1/E[X].</li>
+      <li><b>Pas à travers un produit sans hypothèse</b> (notion 4).</li>
+      <li><b>C'est une propriété de l'espérance, pas de la variance.</b> Var(X + Y) n'est pas toujours Var X + Var Y (<a href="lesson-00-09-covariance-correlation.html#n2">l09</a>), et Var(2X) = 4 Var X (notion 9).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (35) justifie E[X̄] = μ « parce que les X sont indépendants ». La linéarité suffit ; l'indépendance ne sert qu'à calculer Var(X̄).</div>
+  </div></details>
+  <p class="garde">L'espérance d'une somme est la somme des espérances, sans aucune hypothèse.</p>
+</section>
+

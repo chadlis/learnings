@@ -33,16 +33,16 @@ Où une loi est-elle centrée, à quel point s'étale-t-elle, et que deviennent 
 - Code : moyenne de 100 000 lancers de dé ≈ 3,5.
 - Où ça casse : E[X] n'est pas forcément une valeur possible ; elle peut ne pas exister (Cauchy) ; **E[X] est un nombre fixe, propriété de la loi, alors que la moyenne d'un échantillon est une réalisation de la variable X̄** (l10).
 - Brunton dit / c'est : « le premier moment, comme le moment d'inertie » → E[X] est le centre de masse ; le moment d'inertie correspond à la variance (n6).
-- Ce qu'on garde : E[X] = Σ x P(X = x), le point d'équilibre de la loi ; un nombre, pas une variable aléatoire.
+- Ce qu'on garde : X discrète : E[X] = Σ x P(X = x), le point d'équilibre de la loi ; un nombre, pas une variable aléatoire.
 
 ### n2 · Moyenne, médiane, mode — OUTIL — Brunton 28
 - Idée : trois centres ; l'espérance n'est pas la valeur probable ; la médiane est robuste, la moyenne sensible aux valeurs extrêmes.
 - Formules : médiane m telle que F(m) = ½ (cas général : P(X ≤ m) ≥ ½ et P(X ≥ m) ≥ ½) ; mode = argmax de la PMF ou de la densité.
 - Exemples : dé → les trois valent 3,5 sauf le mode (toutes les faces) ; loi bimodale en ±1 : moyenne 0 jamais tirée ; exponentielle(λ) : médiane ln 2/λ < moyenne 1/λ ; patrimoine américain selon Brunton : médiane ≈ 200 k$, moyenne ≈ 1 M$ (facteur 5).
 - Figure 2 (log-normale, curseur σ).
-- Code : log-normale, moyenne contre médiane, et l'effet d'un milliardaire ajouté à 1 000 ménages.
+- Code : log-normale, moyenne contre médiane, et l'effet d'un milliardaire ajouté à 100 000 ménages.
 - Où ça casse : médiane non unique (loi à trou, discret) ; « la moyenne est représentative » faux en queue lourde.
-- Ce qu'on garde : pour les lois asymétriques à droite usuelles, mode < médiane < moyenne (règle, pas théorème) ; la moyenne minimise l'erreur quadratique, la médiane l'erreur absolue ; la médiane résiste aux extrêmes.
+- Ce qu'on garde : résumer X par un nombre c : la moyenne minimise l'erreur quadratique E[(X − c)²], la médiane l'erreur absolue E[|X − c|] ; c'est pourquoi une valeur extrême tire la moyenne et laisse la médiane presque en place.
 
 ### n3 · L'espérance est linéaire, sans aucune hypothèse — OUTIL — Brunton 29
 - Formule : E[aX + bY + c] = aE[X] + bE[Y] + c, pour toutes X, Y, même dépendantes.
@@ -69,7 +69,7 @@ Où une loi est-elle centrée, à quel point s'étale-t-elle, et que deviennent 
 - Exemples : E[X²] du dé = 91/6 ; gain g(x) = 2x + 1 → 8 ; E[(X − 3,5)²] = 35/12.
 - Code : LOTUS contre loi de g(X) construite à la main.
 - Où ça casse : E[g(X)] ≠ g(E[X]) : 15,17 contre 12,25 pour le carré ; l'écart est exactement la variance (n6).
-- Ce qu'on garde : E[g(X)] = Σ g(x) P(X = x), sans chercher la loi de g(X).
+- Ce qu'on garde : X discrète : E[g(X)] = Σ g(x) P(X = x), sans chercher la loi de g(X).
 
 ### n6 · La variance est l'inertie autour du centre — OUTIL — Brunton 30
 - Idée : l'écart moyen au centre, au carré ; physique : moment d'inertie autour du centre de masse, la distance compte au carré.
@@ -80,7 +80,7 @@ Où une loi est-elle centrée, à quel point s'étale-t-elle, et que deviennent 
 - Code : np.var contre la formule.
 - Où ça casse : unité au carré ; une valeur lointaine domine ; 68 % dans ±1σ n'est vrai que pour la normale ; variance infinie possible (Pareto) ; **la variance n'est pas linéaire : Var(2X) = 4 Var X** (n9).
 - Brunton dit / c'est : « les moments identifient la loi » → pas toujours.
-- Ce qu'on garde : Var(X) = E[(X − μ)²] = E[X²] − μ².
+- Ce qu'on garde : Var(X) = E[(X − μ)²] = E[X²] − μ², avec μ = E[X].
 
 ### n7 · Moments bruts, centrés, asymétrie, kurtosis — CULTURE — Brunton 28, 30, 37
 - Contenu : séance du 10/10. Moment brut E[X^k] (autour de 0), centré E[(X − μ)^k] (autour de μ) ; ordre 1 position, 2 étalement, 3 asymétrie (puissance impaire, les côtés se compensent), 4 queues ; standardisés par σ³, σ⁴. Var = brut₂ − brut₁² (même forme que Huygens). Tableau X ∈ {1, 3} / Z : 2 / 1 ; 1 / 9 ; 0 / 2,67 ; 1 / 8,11. Normale : kurtosis 3 (excès 0). La kurtosis mesure les queues, pas l'aplatissement (Westfall 2014). ML : Adam (moments 1 et 2 bruts du gradient), activations à queues lourdes et quantization (LLM.int8).
@@ -92,7 +92,7 @@ Où une loi est-elle centrée, à quel point s'étale-t-elle, et que deviennent 
 - Formules : E[T] = 1/λ, E[T²] = 2/λ², Var = 1/λ², σ = 1/λ, médiane ln 2/λ ≈ 0,69/λ.
 - Preuve : deux intégrations par parties (Brunton fait la première, la seconde est donnée ici) ; médiane par 1 − e^(−λm) = ½.
 - Exemples : λ = 2 → 0,5 ; 0,25 ; 0,347 ; ampoule de durée moyenne 100 h → médiane 69,3 h ; spams à 4 par heure → attente moyenne 15 min, médiane 10,4 min.
-- Figure 5 (densité, curseur λ, moyenne et médiane marquées).
+- Figure 4 (densité, curseur λ, moyenne et médiane marquées).
 - Code : simulation.
 - Où ça casse : bornes d'intégration 0 à ∞, pas −∞ ; σ = moyenne n'est pas la cause de l'absence de mémoire (question posée par Brunton).
 - Ce qu'on garde : exponentielle(λ) : moyenne = écart-type = 1/λ, médiane ln 2/λ.
@@ -102,11 +102,11 @@ Où une loi est-elle centrée, à quel point s'étale-t-elle, et que deviennent 
 - Formules : E[aX + b] = aE[X] + b ; Var(aX + b) = a² Var(X) ; écart-type |a|σ.
 - Preuve : Brunton 32, une ligne.
 - Exemples : °C → °F (a = 9/5, b = 32) : variance × 3,24, écart-type × 1,8 ; gain G = 2X + 1 sur un dé : E = 8, Var = 11,67 ; Var(5) = 0 ; Var(−X) = Var(X).
-- Figure 6 (curseurs a, b sur le dé).
+- Figure 5 (curseurs a, b sur le dé).
 - Code.
 - Où ça casse : **la variance n'est pas linéaire** : Var(2X) = 4 Var X ≠ 2 Var X ; ce n'est pas Var(X + Y) (l09) ; a < 0 : écart-type |a|σ.
 - Brunton dit / c'est : (23) « l'écart-type de aX + b est a²σ² » → c'est la variance.
-- Ce qu'on garde : Var(aX + b) = a² Var X : b disparaît, a sort au carré.
+- Ce qu'on garde : a et b constantes : Var(aX + b) = a² Var X ; b disparaît, a sort au carré.
 
 ### n10 · L'énergie cinétique d'un gaz — CULTURE — Brunton 32
 - Contenu : vitesse d'une molécule = vecteur (Vx, Vy, Vz) à composantes indépendantes N(0, σ²) ; E[½ m |V|²] = ½ m (E[Vx²] + E[Vy²] + E[Vz²]) = (3/2) m σ², par linéarité seule, sans l'intégrale de Maxwell. Avec σ² = kT/m : (3/2) kT.
@@ -118,7 +118,7 @@ Où une loi est-elle centrée, à quel point s'étale-t-elle, et que deviennent 
 - Formule : X à valeurs dans {0, 1, 2, …} ⇒ E[X] = Σ_{k ≥ 1} P(X ≥ k).
 - Preuve : le triangle de Brunton (k P(X = k) = k copies de P(X = k), lues par lignes).
 - Exemples : dé → (6 + 5 + 4 + 3 + 2 + 1)/6 = 3,5 ; géométrique(p) → Σ q^(k − 1) = 1/p, donc 6 lancers en moyenne pour un 6.
-- Figure 7 (escalier P(X ≥ k), dé ou géométrique).
+- Figure 6 (escalier P(X ≥ k), dé ou géométrique).
 - Code.
 - Brunton dit / c'est : P(X ≥ k) = 1 − F(k) → 1 − F(k − 1).
 - Ce qu'on garde (pas de carte) : une espérance est la somme des probabilités de survie.
@@ -127,9 +127,9 @@ Où une loi est-elle centrée, à quel point s'étale-t-elle, et que deviennent 
 - Figure 1 (n1) — `plot` : loi d'un dé pipé en barres, curseur « poids du 6 » de 1/6 à 0,9, triangle d'appui sous E[X] ; readouts E[X] et P(6).
 - Figure 2 (n2) — `plot` : densité log-normale de médiane 1, curseur σ ∈ [0,1 ; 2], mode, médiane et moyenne en traits ; readout moyenne/médiane ; légende : à σ = 1,79 la moyenne vaut 5 fois la médiane, le rapport du patrimoine américain cité par Brunton.
 - Figure 3 (n6) — `plot` : boutons dé · {1, 3} · {0, 4} · Z ; en haut la loi, en bas les contributions p·(x − μ)² ; readouts Var, σ, part de la plus grosse contribution.
-- Figure 5 (n8) — `plot` : densité exponentielle, curseur λ, moyenne et médiane ; readouts.
-- Figure 6 (n9) — `plot` : loi de aX + b pour un dé, curseurs a ∈ [−3 ; 3], b ∈ [−5 ; 5] ; readouts E, Var, σ.
-- Figure 7 (n11) — `plot` : escalier des P(X ≥ k), boutons dé · géométrique(1/6) ; readout de la somme.
+- Figure 4 (n8) — `plot` : densité exponentielle, curseur λ, moyenne et médiane ; readouts.
+- Figure 5 (n9) — `plot` : loi de aX + b pour un dé, curseurs a ∈ [−3 ; 3], b ∈ [−5 ; 5] ; readouts E, Var, σ.
+- Figure 6 (n11) — `plot` : escalier des P(X ≥ k), boutons dé · géométrique(1/6) ; readout de la somme.
 
 ## Résumé
 1. E[X] = Σ x P(X = x) : le centre de masse, un nombre fixe de la loi.
@@ -188,3 +188,24 @@ Delta : sous chaque `div.idee`, une vignette `div.fig.vis` « Voir l'idée » qu
 - v11 (n11) — le triangle de Brunton animé : 21 cases lues par colonnes puis par lignes.
 
 Vérifié : chaque chiffre des légendes recalculé (script), chaque vignette manipulée et capturée, 0 erreur JS, pas de débordement à 390 px. Le validateur exige désormais la vignette (WARN si absente, FAIL si elle précède l'idée ou n'a pas de légende) et tolère une idée jusqu'à 180 mots.
+
+## Révision v3 (10/10/2026)
+
+Relecture en contexte frais de la v2 publiée. Source canonique de la page désormais : `KIT/l08-example/` (`head.html`, `parts/*.html`, `js/10-figures.js`, `js/20-vignettes.js`, `code/`), assemblée par `KIT/build.py`. Chaque chiffre ci-dessous est recalculé par script ; aucune correction n'a été rejetée.
+
+- v7 (n7) : la légende disait la barre de gauche négative « aux k impairs » et le « côté lourd » gagnant sur Z, faux à k = 1 (le moment centré d'ordre 1 est nul sur toute loi) et ambigu (le côté de masse 0,9 perd), avec 99 % pour les 98,8 % affichés ; elle distingue maintenant k = 1 de k = 3 (−0,9 + 72,9 = 72), et l'idée parle d'un côté qui « porte des écarts plus longs ».
+- v5 (n5) : « g(E[X]) ne tombe sur E[g(X)] que pour g affine » est faux en général ((x − 3,5)³ sur le dé : E[g(X)] = 0 = g(3,5)) ; l'énoncé est restreint aux trois g affichées, avec Jensen pour le carré, et la légende nomme les faces qui arrivent deux à deux au même point (1 et 6 en 6,25 ; 2 et 5 en 2,25 ; 3 et 4 en 0,25).
+- v2 (n2), deux bosses : la médiane tombe aussi dans le trou et sa ligne bleue était cachée sous la rouge ; la légende dit que toute valeur entre 2,95 et 7,05 coupe les 24 points en deux, les tirets bleus sont tracés par-dessus la moyenne, et l'étiquette « l'individu du milieu » devient « coupe les individus en deux » (deux individus du milieu quand n est pair).
+- v2 (n2), patrimoine : à la largeur de pile 0,5, le readout « mode ≈ 1 » égale la médiane alors que la garde disait mode < médiane ; la légende le dit et renvoie à la figure 2.
+- v10 (n10) : la vignette « l'énergie » trace E[|V|²] → 3σ² = 5,07 ; la légende précise qu'avec m = 2, ½ m |V|² = |V|², donc la dernière barre est aussi l'énergie moyenne (3/2) m σ² = 5,07.
+- n9, où ça casse : le contre-exemple des constantes (l'erreur de Salah du 09/10) écrivait Var(X + Y) = 0 ; il écrit maintenant Var(aX + bY) = Var(a + b) = 0.
+- Liens : les renvois vers `map.html#lNN` pointent vers les notions des leçons, ancres vérifiées dans les cibles : l04 `#n2` ; l05 `#n3` (prérequis), `#n4` (n8), `#n2` (n11) ; l06 `#n1` ; l07 `#n2` et `#n4` ; l09 `#n1` (n4), `#n2` (n3, n6, n9), la page pour la suite ; l10 `#n4` (LGN) et `#n3` (X̄) ; l12 `#n1`, où l12 énonce « finie près de 0, elle identifie la loi » et montre les sœurs de la log-normale. Le lien de la barre de navigation vers la carte reste.
+- v3 (n3) : « rejoint 7 » ne collait pas au premier lancer (graine 5 : 6,87 en indépendant, 6,78 pour Y = X ; écart maximal 0,49 sur les graines 5 à 44) ; la légende dit « à quelques dixièmes de 7, et exactement sur 7 pour Y = 7 − X ».
+- v9 (n9) : « allonge chaque côté de 1,8 » devient « multiplie chaque côté par 1,8, donc chaque aire par 1,8² = 3,24 », et les trois journées sont dites équiprobables (⅓), ce que suppose la variance 16,67.
+- v6 (n6) : à d = 0,25, les masses de rayon 9 sur une orbite de rayon 11 cachaient les flèches ; leur rayon vaut min(9 ; 0,4 R). À 390 px, le panneau gauche défile (largeur minimale 440 px) au lieu de réduire ses graduations à 7 px.
+- Readouts trop longs : v10 et v11 mettent le détail de la somme dans le label et gardent une valeur courte (8,89 ; 21/6 ; 3,5). Même défaut, même correction, étendus à v9 (« 16,67 × 3,24 = 54 » sur deux lignes à 1 280 px) et v3 (« six barres paires » → « 6 barres paires »).
+- n8, où ça casse : le 1,414 supposait ln T ~ N(0, ln 2) sans le dire ; c'est écrit, moyenne et écart-type valent √2 = 1,414.
+- Règles transversales : gras décoratif retiré des idées de n1, n3, n6 et n9 (en n6, le gras passe sur le mot défini, « variance ») ; aucun `<b>` hors étiquette dans les encadrés Brunton ; « jeu de test (test set) » au premier usage (n6) ; « ce qu'on garde » des notions OUTIL : n2 ramené à une idée (ce que minimise chaque centre, d'où la robustesse de la médiane ; l'ordre mode < médiane < moyenne reste dans « où ça casse » et le résumé), cadre ajouté à n1 et n5 (X discrète), n6 (μ = E[X]) et n9 (a et b constantes), toutes sous 40 mots.
+- Spec : numéros des figures de n8, n9, n11 corrigés (4, 5, 6, comme sur la page, et non 5, 6, 7) ; le code de n2 ajoute le milliardaire à 100 000 ménages, pas 1 000.
+
+Vérifié : `validate_sheet.py --render` 0 FAIL, 0 WARN ; 0 erreur JS ; pas de débordement à 390 px ; vignettes v2, v3, v5, v6, v7, v9, v10, v11 capturées dans leurs états concernés à 1 280 et 390 px, et toutes les figures dans leur état initial en clair et en sombre.

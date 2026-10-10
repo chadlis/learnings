@@ -1,0 +1,60 @@
+<!-- ============================ n1 ============================ -->
+<section class="notion outil" id="n1">
+  <h3>L'espérance est le centre de masse <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 28 · The Expected Value (Mean) of a Probability Distribution</p>
+  <div class="idee">
+    <p>Brunton part d'une question pratique : si je tire beaucoup de valeurs de cette loi et que je fais leur moyenne, quel nombre est-ce que j'attends ? Ce nombre est l'<b>espérance</b>.</p>
+    <p>L'image physique la rend immédiate. Pose sur une règle une masse P(X = x) à chaque position x ; la masse totale vaut 1. L'espérance est le point où la règle tient en équilibre sur un doigt. Une valeur lointaine pèse davantage parce qu'elle a un plus grand bras de levier : c'est pour ça qu'on multiplie chaque valeur par sa probabilité avant d'additionner.</p>
+    <p>La règle tient en c quand les bras de levier de gauche et de droite se compensent : Σ (x − c) P(X = x) = 0. Développe : Σ x P(X = x) − c = 0, puisque les probabilités somment à 1. Donc c = Σ x P(X = x), et c'est la définition.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — la règle penche du côté du plus grand bras de levier</div>
+    <div id="v1ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">Trois masses : 0,5 en 1, 0,3 en 2, 0,2 en 6. Déplace le <b>doigt c</b> : la règle penche du côté où la somme masse × bras de levier l'emporte. Elle tient en c = 2,3, à droite des deux masses lourdes, parce que la petite masse en 6 a un bras de levier de 3,7 : 0,2 × 3,7 = 0,5 × 1,3 + 0,3 × 0,3 = 0,74. Puis <b>tire 1 000 valeurs</b> : le doigt suit leur moyenne, et la règle se rapproche de l'horizontale.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">E[<i>X</i>] = Σ<sub><i>x</i></sub> <i>x</i> · P(<i>X</i> = <i>x</i>) &nbsp;&nbsp;(discret) &nbsp;&nbsp;&nbsp; E[<i>X</i>] = ∫ <i>x</i> <i>f</i>(<i>x</i>) d<i>x</i> &nbsp;&nbsp;(continu)</div>
+    <ul><li>La somme ou l'intégrale doit converger <b>absolument</b> : Σ |x| P(X = x) &lt; ∞. Sinon l'espérance n'existe pas.</li><li>On la note aussi μ, ou μ<sub><i>X</i></sub> quand il y a plusieurs variables.</li></ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — un dé pipé en équilibre sur son espérance</div>
+    <div id="f1plot" class="wide"></div>
+    <div id="f1ctl"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Monte le <b>poids du 6</b> : la masse glisse vers la droite et le point d'appui rouge suit. À 1/6 le dé est équilibré et le point d'appui est en 3,5, entre deux faces. Le triangle est le doigt qui tient la règle.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>pièce, dé, cent pièces, uniforme</small></summary><div class="in">
+    <ol>
+      <li><b>Une pièce.</b> X = 1 si pile, 0 sinon, P(X = 1) = p. E[X] = 0 × (1 − p) + 1 × p = p.</li>
+      <li><b>Un dé équilibré.</b> E[X] = (1 + 2 + 3 + 4 + 5 + 6)/6 = 21/6 = 3,5. Le centre de masse n'est pas une face : on ne tirera jamais 3,5.</li>
+      <li><b>Cent pièces</b> (l'exemple de Brunton). X = nombre de piles. Avec les probabilités du triangle de Pascal, Σ k · C(100, k)/2<sup>100</sup> = 50. La notion 3 l'obtient en une ligne.</li>
+      <li><b>Continu, uniforme sur [0, 1].</b> La densité vaut 1 sur l'intervalle : E[X] = ∫<sub>0</sub><sup>1</sup> x dx = ½.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Pourquoi la moyenne des tirages tend vers E[X] <small>l'argument, la preuve est en l10</small></summary><div class="in">
+    <p>Tire N valeurs. La valeur x sort à peu près N · P(X = x) fois, si N est grand. La moyenne des tirages vaut alors :</p>
+    <div class="drv">
+      <div>(1/N) Σ<sub>tirages</sub> valeur</div><span>la moyenne qu'on calcule</span>
+      <div>≈ (1/N) Σ<sub><i>x</i></sub> <i>x</i> · N P(<i>X</i> = <i>x</i>)</div><span>on regroupe les tirages par valeur</span>
+      <div>= Σ<sub><i>x</i></sub> <i>x</i> P(<i>X</i> = <i>x</i>) = E[<i>X</i>]</div><span>les N se simplifient</span>
+    </div>
+    <p>Le « à peu près » est exactement ce que la loi des grands nombres rend précis (<a href="lesson-00-10-inegalites-lgn.html#n4">l10</a>).</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>la moyenne de 100 000 lancers</small></summary><div class="in">
+<pre class="py">{{CODE:c1}}</pre>
+<pre class="out">{{OUT:c1}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>E[X] n'est pas forcément une valeur possible.</b> 3,5 pour un dé, 0,3 pour une pièce de biais 0,3.</li>
+      <li><b>Elle peut ne pas exister.</b> Pour une loi de Cauchy, les queues sont si lourdes que ∫ |x| f(x) dx diverge. La symétrie ferait croire à une moyenne nulle, puisque ∫ de −a à a de x f(x) dx vaut 0 ; mais une moyenne d'échantillon ne s'y stabilise jamais (<a href="lesson-00-10-inegalites-lgn.html#n4">l10</a>).</li>
+      <li><b>E[X] est un nombre fixe, pas une variable aléatoire.</b> C'est une propriété de la loi. La moyenne de dix lancers, elle, change à chaque série : c'est une réalisation x̄ de la variable X̄ (<a href="lesson-00-10-inegalites-lgn.html#n3">l10</a>). Écrire « μ = 3,2 » pour « x̄ = 3,2 sur ce tirage » mélange les deux.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (28) dit que l'espérance, premier moment, est « un peu comme le moment d'inertie ». C'est le centre de masse ; le moment d'inertie autour du centre correspond à la variance (notion 6).</div>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (28) dit aussi que « la variance autour de μ se réduit » quand on tire plus de valeurs. Ce qui se réduit, c'est la variance de la moyenne X̄ des tirages ; celle de X ne bouge pas, c'est une propriété de la loi (<a href="lesson-00-10-inegalites-lgn.html#n3">l10</a>).</div>
+  </div></details>
+  <p class="garde">X discrète : E[X] = Σ x · P(X = x), le point d'équilibre de la loi. C'est un nombre, pas une variable aléatoire.</p>
+</section>
+

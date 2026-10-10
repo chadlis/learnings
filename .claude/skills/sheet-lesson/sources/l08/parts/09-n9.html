@@ -1,0 +1,59 @@
+<!-- ============================ n9 ============================ -->
+<section class="notion outil" id="n9">
+  <h3>Changer d'unité : Var(aX + b) = a² Var(X) <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 32 (et 30 pour Var(2X))</p>
+  <div class="idee">
+    <p>Brunton convertit des températures : F = (9/5) C + 32. Faut-il tout recalculer en °F ? Non. Décaler toutes les valeurs de b déplace le centre de b, mais ne change aucun écart au centre : la variance ne bouge pas.</p>
+    <p>Multiplier par a multiplie chaque écart par a, donc chaque écart au carré par a². C'est pour ça que la variance n'est pas linéaire : un facteur sort au carré, et une constante disparaît.</p>
+  </div>
+  <div class="fig vis" id="v9">
+    <div class="lbl">Voir l'idée — décaler ne touche aucun écart, étirer les multiplie</div>
+    <div id="v9ctl" class="sl-ctl"></div>
+    <div id="v9plot" class="wide"></div>
+    <div class="readouts" id="v9out"></div>
+    <p class="cap">Trois journées à 10, 15 et 20 °C, chacune de probabilité ⅓. Chaque écart à la moyenne est le côté d'un carré, et la variance est l'aire moyenne des carrés. <b>+ 32</b> fait glisser le tout : les carrés ne changent pas. <b>× 1,8</b> multiplie chaque côté par 1,8, donc chaque aire par 1,8² = 3,24. Les deux ensemble donnent les °F : la variance passe de 16,67 à 16,67 × 3,24 = 54.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les formules</div>
+    <div class="eq">E[<i>aX</i> + <i>b</i>] = <i>a</i> E[<i>X</i>] + <i>b</i> &nbsp;&nbsp;&nbsp;&nbsp; Var(<i>aX</i> + <i>b</i>) = <i>a</i>² Var(<i>X</i>) &nbsp;&nbsp;&nbsp;&nbsp; σ<sub><i>aX</i> + <i>b</i></sub> = |<i>a</i>| σ<sub><i>X</i></sub></div>
+    <ul><li>Aucune hypothèse : a et b sont des constantes, X est quelconque.</li></ul>
+  </div>
+  <div class="fig" id="fig5">
+    <div class="lbl">Figure 5 — transformer un dé : b déplace, a étire</div>
+    <div id="f5plot" class="wide"></div>
+    <div id="f5ctl"></div>
+    <div class="readouts" id="f5out"></div>
+    <p class="cap">La loi de aX + b pour un dé, avec sa moyenne (trait rouge) et ±σ (segment vert). Bouge <b>b</b> : tout glisse, la variance ne change pas. Bouge <b>a</b> : les barres s'écartent, l'écart-type suit |a| et la variance a². À a = 0, tout tombe sur b et la variance s'annule.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>constante, signe, un gain, des températures</small></summary><div class="in">
+    <ol>
+      <li><b>Var(5) = 0</b> et <b>Var(X + 5) = Var(X)</b>.</li>
+      <li><b>Var(−X) = Var(X).</b> Retourner la loi ne change pas son étalement.</li>
+      <li><b>Un gain G = 2X + 1 sur un dé.</b> E[G] = 2 × 3,5 + 1 = 8 ; Var(G) = 4 × 2,917 = 11,67 ; écart-type 3,42.</li>
+      <li><b>De °C en °F.</b> E<sub>F</sub> = 1,8 E<sub>C</sub> + 32 ; la variance est multipliée par 1,8² = 3,24 et l'écart-type par 1,8. Un écart-type de 5 °C devient 9 °F.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la ligne de Brunton : les b s'annulent</small></summary><div class="in">
+    <div class="drv">
+      <div>Var(<i>aX</i> + <i>b</i>) = E[(<i>aX</i> + <i>b</i> − E[<i>aX</i> + <i>b</i>])²]</div><span>définition</span>
+      <div>= E[(<i>aX</i> + <i>b</i> − <i>a</i>μ − <i>b</i>)²]</div><span>E[aX + b] = aμ + b (notion 3)</span>
+      <div>= E[<i>a</i>² (<i>X</i> − μ)²]</div><span>b s'annule, a se factorise</span>
+      <div>= <i>a</i>² E[(<i>X</i> − μ)²] = <i>a</i>² Var(<i>X</i>)</div><span>linéarité</span>
+    </div>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>Var(X + 5), Var(2X), et deux dés</small></summary><div class="in">
+<pre class="py">{{CODE:c9}}</pre>
+<pre class="out">{{OUT:c9}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>La variance n'est pas linéaire.</b> Var(2X) = 4 Var(X), pas 2 Var(X). Écrire Var(aX + bY) = a Var X + b Var Y fait deux erreurs : les coefficients sortent au carré, et il manque le terme croisé en Cov(X, Y) (<a href="lesson-00-09-covariance-correlation.html#n2">l09</a>).</li>
+      <li><b>2X n'est pas X + X'.</b> Doubler un dé donne une variance de 11,67 ; additionner deux dés indépendants donne 5,83 (code ci-dessus). La différence 11,67 − 5,83 = 5,83 est le terme croisé 2 Cov(X, X) = 2 Var X.</li>
+      <li><b>Le terme croisé n'est pas 2ab E[XY].</b> Teste avec deux constantes, X = Y = 1 : Var(aX + bY) = Var(a + b) = 0, mais a² · 0 + b² · 0 + 2ab E[XY] donnerait 2ab ≠ 0. Comme la variance, le terme croisé doit ignorer un décalage : c'est 2ab E[(X − μ<sub>X</sub>)(Y − μ<sub>Y</sub>)] = 2ab Cov(X, Y), pas 2ab E[XY] (<a href="lesson-00-09-covariance-correlation.html#n2">l09</a>).</li>
+      <li><b>Additivité n'est pas linéarité.</b> L'indépendance donne l'additivité, Var(X + Y) = Var X + Var Y, et avec des coefficients Var(aX + bY) = a² Var X + b² Var Y. Même sous indépendance, la variance n'est jamais linéaire.</li>
+      <li><b>a &lt; 0.</b> L'écart-type est |a| σ, jamais a σ.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (23) dit que le nouvel écart-type est « a²σ² ». C'est la variance ; l'écart-type est |a| σ. Il le corrige lui-même dans la vidéo 24.</div>
+  </div></details>
+  <p class="garde">a et b constantes : Var(aX + b) = a² Var(X) ; b disparaît, a sort au carré. La variance n'est pas linéaire.</p>
+</section>
+

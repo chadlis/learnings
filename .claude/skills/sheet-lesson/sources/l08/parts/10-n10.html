@@ -1,0 +1,36 @@
+<!-- ============================ n10 ============================ -->
+<section class="notion culture" id="n10">
+  <h3>L'énergie cinétique d'un gaz <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 32</p>
+  <div class="idee">
+    <p>Brunton : « la température n'est que l'énergie cinétique moyenne des molécules ». Il calcule E[½ m V²] avec la loi de Maxwell de la vitesse, au prix d'une intégrale et d'une fonction gamma.</p>
+    <p>La linéarité permet de s'en passer. La vitesse d'une molécule est un vecteur (V<sub>x</sub>, V<sub>y</sub>, V<sub>z</sub>) dont chaque composante est normale, centrée, de variance σ² ; son carré est V<sub>x</sub>² + V<sub>y</sub>² + V<sub>z</sub>². La loi de Maxwell qu'utilise Brunton est exactement la loi de la norme |V| quand les trois composantes sont indépendantes N(0, σ²), avec le même σ : les deux calculs portent sur la même chose.</p>
+  </div>
+  <div class="fig vis" id="v10">
+    <div class="lbl">Voir l'idée — l'énergie se calcule composante par composante</div>
+    <div id="v10ctl" class="sl-ctl"></div>
+    <div id="v10plot" class="wide"></div>
+    <div class="readouts" id="v10out"></div>
+    <p class="cap">À gauche, les vitesses (V<sub>x</sub>, V<sub>y</sub>) des molécules, σ = 1,3 ; la flèche rouge est la dernière arrivée, et sa troisième composante V<sub>z</sub> n'est pas dessinée. À droite, la moyenne de chaque carré de composante, puis celle de |V|² = V<sub>x</sub>² + V<sub>y</sub>² + V<sub>z</sub>² : la dernière barre est exactement l'empilement des trois autres. <b>Ajoute des molécules</b> : les barres rejoignent σ² = 1,69 et 3σ² = 5,07. Avec m = 2, ½ m |V|² = |V|² : la dernière barre est aussi l'énergie moyenne, (3/2) m σ² = 5,07.</p>
+  </div>
+  <div class="formule"><div class="lbl">Le calcul</div>
+    <div class="eq">E[½ <i>m</i> (<i>V<sub>x</sub></i>² + <i>V<sub>y</sub></i>² + <i>V<sub>z</sub></i>²)] = ½ <i>m</i> (E[<i>V<sub>x</sub></i>²] + E[<i>V<sub>y</sub></i>²] + E[<i>V<sub>z</sub></i>²]) = (3/2) <i>m</i> σ²</div>
+    <ul><li>E[V<sub>x</sub>²] = Var(V<sub>x</sub>) + E[V<sub>x</sub>]² = σ² + 0 (notion 6).</li><li>En physique, σ² = kT/m, d'où E = (3/2) kT.</li></ul>
+  </div>
+  <details class="ex"><summary>Exemple <small>m = 2, σ = 1,3</small></summary><div class="in">
+    <p>(3/2) × 2 × 1,3² = 3 × 1,69 = 5,07.</p>
+  </div></details>
+  <details class="preuve"><summary>Pourquoi aucune intégrale n'est nécessaire</summary><div class="in">
+    <p>La linéarité s'applique à la somme des trois carrés, sans même demander l'indépendance des composantes. Il ne reste que E[V<sub>x</sub>²], qui se lit sur la variance d'une composante. L'intégrale de Brunton calcule la même chose par un chemin plus long : elle passe par la loi de la norme de V, alors que l'espérance n'en a pas besoin.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>un million de molécules</small></summary><div class="in">
+<pre class="py">{{CODE:c10}}</pre>
+<pre class="out">{{OUT:c10}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul><li><b>On obtient l'espérance de l'énergie, pas sa loi.</b> Pour la loi, il faut la méthode de Brunton 23 (<a href="lesson-00-06-fonctions-standardisation.html#n1">l06</a>) ; il dit lui-même que « c'est toute une affaire ».</li></ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (32) conclut : « c'est la température de ton gaz ». C'est proportionnel à la température : E = (3/2) kT.</div>
+  </div></details>
+  <p class="garde">La linéarité évite des intégrales entières : une espérance de somme se calcule terme à terme.</p>
+</section>
+

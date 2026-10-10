@@ -1,0 +1,3 @@
+independent dice: E[XY] ≈ 12.24, E[X]E[Y] ≈ 12.25
+same die (Y = X): E[XY] ≈ 15.17, E[X]E[Y] ≈ 12.25
+Y = X² on (-1, 0, 1): E[XY] ≈ 0.001, E[X]E[Y] ≈ 0.001

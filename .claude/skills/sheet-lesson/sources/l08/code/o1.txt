@@ -1,0 +1,2 @@
+mean of rolls: 3.498
+mean number of heads: 50.02

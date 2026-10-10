@@ -1,0 +1,59 @@
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>Moyenne, médiane, mode : trois centres <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 28</p>
+  <div class="idee">
+    <p>Le centre de masse n'est pas le seul centre. La <b>médiane</b> coupe la masse en deux moitiés ; le <b>mode</b> est l'endroit où la masse est la plus haute. Pour une gaussienne les trois coïncident, et c'est ce qui donne la fausse intuition que « la moyenne, c'est la valeur typique ».</p>
+    <p>Brunton prend deux contre-exemples. Une loi à deux bosses symétriques a son centre de masse au milieu, là où il n'y a presque rien. Le patrimoine des ménages américains, lui, a quelques fortunes immenses très loin à droite : elles tirent le point d'équilibre bien au-delà du ménage typique, alors que la médiane ne bouge presque pas.</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — deux contre-exemples à « la moyenne est la valeur typique »</div>
+    <div id="v2ctl" class="sl-ctl"></div><div id="v2sl"></div>
+    <div id="v2plot" class="wide"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">Chaque point est un individu, le triangle rouge est le point d'équilibre de la notion 1. <b>Une bosse</b> : les trois centres coïncident. <b>Deux bosses</b> : la moyenne tombe dans le trou, où il n'y a personne, et le mode est double. La médiane aussi est dans le trou : toute valeur entre 2,95 et 7,05 coupe les 24 points en deux, 5 n'est qu'une convention. <b>Patrimoine</b> : ajoute des <b>grosses fortunes</b>. Avec quatre, la moyenne passe de 1,13 à 3 fois le ménage médian de départ ; la médiane, le ménage du milieu en bleu, passe seulement de 1 à 1,11. À cette largeur de pile, le mode se confond avec la médiane ; la figure 2 les sépare.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les définitions</div>
+    <div class="eq">médiane <i>m</i> : F(<i>m</i>) = ½ &nbsp;&nbsp;&nbsp;&nbsp; mode : la valeur où P(<i>X</i> = <i>x</i>) ou <i>f</i>(<i>x</i>) est maximale</div>
+    <ul><li>F est la fonction de répartition, F(x) = P(X ≤ x).</li><li>Cas général, discret compris : m est médiane si P(X ≤ m) ≥ ½ et P(X ≥ m) ≥ ½.</li></ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — une loi asymétrique écarte ses trois centres</div>
+    <div id="f2plot" class="wide"></div>
+    <div id="f2ctl"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Une log-normale, l'axe des x en multiples de la médiane. Augmente <b>σ</b>, l'écart-type de ln X, qui règle l'asymétrie : la médiane reste en 1, le mode recule et finit collé à 0, la moyenne part à droite. Vers σ = 1,79, la moyenne vaut <b>5 fois</b> la médiane, le rapport du patrimoine américain que cite Brunton.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>dé, deux bosses, attente, patrimoine</small></summary><div class="in">
+    <ol>
+      <li><b>Un dé.</b> Moyenne 3,5. Médiane : tout m de [3, 4] coupe la masse en deux, on prend 3,5 par convention. Pas de mode unique : les six faces ont la même probabilité.</li>
+      <li><b>Deux bosses en −1 et +1, de même poids.</b> La moyenne vaut 0, une valeur qu'on n'observe presque jamais.</li>
+      <li><b>Une attente exponentielle</b> de taux λ : moyenne 1/λ, médiane ln 2/λ ≈ 0,69/λ (preuve en notion 8). Pour des spams à 4 par heure : 15 min de moyenne, 10,4 min de médiane.</li>
+      <li><b>Le patrimoine</b>, avec les chiffres cités par Brunton : médiane ≈ 200 k$, moyenne ≈ 1 M$. Une log-normale de médiane 200 k$ a ce rapport 5 quand σ ≈ 1,79 ; son mode est alors vers 8 k$. Attention, ce σ est l'écart-type de ln X, pas celui du patrimoine.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Ce que chaque centre minimise <small>moyenne et erreur quadratique, médiane et erreur absolue</small></summary><div class="in">
+    <p>Cherchons le nombre c qui résume le mieux X. Si l'erreur est mesurée au carré, c'est la moyenne :</p>
+    <div class="drv">
+      <div>E[(<i>X</i> − <i>c</i>)²] = E[((<i>X</i> − μ) + (μ − <i>c</i>))²]</div><span>on intercale μ</span>
+      <div>= E[(<i>X</i> − μ)²] + 2(μ − <i>c</i>) E[<i>X</i> − μ] + (μ − <i>c</i>)²</div><span>développer, linéarité (notion 3)</span>
+      <div>= E[(<i>X</i> − μ)²] + (μ − <i>c</i>)²</div><span>E[X − μ] = 0 ; le premier terme est la variance (notion 6)</span>
+    </div>
+    <p>Le premier terme ne dépend pas de c, le second est nul seulement en c = μ. Si l'erreur est mesurée en valeur absolue, E[|X − c|] a pour dérivée en c la quantité P(X &lt; c) − P(X &gt; c), nulle quand c coupe la masse en deux : c'est la médiane. Et pour une variable discrète, si l'on compte seulement « juste ou faux », P(X ≠ c) est minimale là où P(X = c) est maximale : c'est le mode.</p>
+    <p>C'est la raison pour laquelle une régression en erreur quadratique estime une moyenne conditionnelle, et une régression en erreur absolue une médiane conditionnelle.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>un milliardaire dans 100 000 ménages</small></summary><div class="in">
+<pre class="py">{{CODE:c2}}</pre>
+<pre class="out">{{OUT:c2}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>La médiane peut ne pas être unique.</b> Pour une loi à trou, toute valeur du trou coupe la masse en deux. Pour un dé, tout m entre 3 et 4 convient.</li>
+      <li><b>« La moyenne est représentative » est faux en queue lourde.</b> Une seule fortune de 100 milliards double la moyenne de 100 000 ménages et laisse la médiane intacte (code ci-dessus).</li>
+      <li><b>Le mode est le centre le plus fragile.</b> Sur un histogramme, il dépend de la largeur des classes.</li>
+      <li><b>« mode &lt; médiane &lt; moyenne » n'est pas un théorème.</b> L'ordre vaut pour la log-normale, l'exponentielle ou la gamma, mais une loi légèrement asymétrique à droite peut avoir l'ordre inverse (une Weibull de forme 3,5, par exemple).</li>
+    </ul>
+  </div></details>
+  <p class="garde">Résumer X par un nombre c : la moyenne minimise l'erreur quadratique E[(X − c)²], la médiane l'erreur absolue E[|X − c|]. C'est pourquoi une valeur extrême tire la moyenne et laisse la médiane presque en place.</p>
+</section>
+

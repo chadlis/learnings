@@ -1,0 +1,56 @@
+<!-- ============================ n11 ============================ -->
+<section class="notion culture" id="n11">
+  <h3>La somme des queues <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 43 · The Tail Sum Formula in Probability</p>
+  <div class="idee">
+    <p>Entre deux vidéos lourdes, Brunton glisse une formule « un peu surprenante » : pour une variable à valeurs entières positives, l'espérance est la somme des probabilités de dépasser chaque seuil.</p>
+    <p>Son dessin : écrire k · P(X = k) comme k copies de P(X = k), empilées en colonne, puis lire le tableau par lignes. Chaque ligne est une probabilité de queue.</p>
+  </div>
+  <div class="fig vis" id="v11">
+    <div class="lbl">Voir l'idée — le même tableau, lu par colonnes puis par lignes</div>
+    <div id="v11ctl" class="sl-ctl"></div>
+    <div id="v11plot" class="wide"></div>
+    <div class="readouts" id="v11out"></div>
+    <p class="cap">Un dé : la colonne k empile k copies de P(X = k) = ⅙, soit 21 cases et une aire totale de 21/6 = 3,5 = E[X]. <b>Par lignes</b>, les cases glissent sans changer de nombre : la ligne r contient P<sub>r</sub>, …, P<sub>6</sub>, c'est-à-dire P(X ≥ r). Même aire, seconde formule.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>X</i> ∈ {0, 1, 2, …} ⟹ E[<i>X</i>] = Σ<sub><i>k</i> ≥ 1</sub> P(<i>X</i> ≥ <i>k</i>) = Σ<sub><i>k</i> ≥ 0</sub> P(<i>X</i> &gt; <i>k</i>)</div>
+    <ul><li>X doit être positive et entière.</li><li>P(X ≥ k) = 1 − F(k − 1), où F est la fonction de répartition.</li></ul>
+  </div>
+  <div class="fig" id="fig6">
+    <div class="lbl">Figure 6 — l'espérance comme aire sous l'escalier de survie</div>
+    <div id="f6ctl" class="sl-ctl"></div>
+    <div id="f6plot" class="wide"></div>
+    <div class="readouts" id="f6out"></div>
+    <p class="cap">Chaque marche a pour hauteur P(X ≥ k) et pour largeur 1 : <b>l'aire totale est E[X]</b>. Pour un dé, 21/6 = 3,5. Pour la géométrique (nombre de lancers jusqu'au premier 6), chaque marche est multipliée par 5/6 et l'aire vaut 6. La marche k occupe l'intervalle [k − 1, k].</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>un dé, la géométrique</small></summary><div class="in">
+    <ol>
+      <li><b>Un dé.</b> P(X ≥ k) = (7 − k)/6, donc E[X] = (6 + 5 + 4 + 3 + 2 + 1)/6 = 21/6 = 3,5.</li>
+      <li><b>La géométrique</b>, nombre d'essais jusqu'au premier succès (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n2">l05</a>). P(X ≥ k) = q<sup>k − 1</sup>, avec q = 1 − p, puisque les k − 1 premiers essais doivent échouer. E[X] = 1 + q + q² + … = 1/(1 − q) = 1/p : six lancers en moyenne pour obtenir un 6.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>le triangle de Brunton</small></summary><div class="in">
+<pre class="tri">E[X] = 1·P₁ + 2·P₂ + 3·P₃ + … + n·Pₙ
+
+     = P₁ + P₂ + P₃ + … + Pₙ     → P(X ≥ 1)
+          + P₂ + P₃ + … + Pₙ     → P(X ≥ 2)
+               + P₃ + … + Pₙ     → P(X ≥ 3)
+                          …
+                        + Pₙ     → P(X ≥ n)</pre>
+    <p>Notons P<sub>k</sub> = P(X = k). La colonne de P<sub>k</sub> le contient exactement k fois : on retrouve Σ k P<sub>k</sub>. La ligne r somme P<sub>r</sub> + P<sub>r+1</sub> + …, c'est-à-dire P(X ≥ r). Pour une variable non bornée, réordonner une série de termes positifs est permis ; Brunton ne le dit pas.</p>
+  </div></details>
+  <details class="code"><summary>Calculer en Python <small>le dé, et la géométrique simulée</small></summary><div class="in">
+<pre class="py">{{CODE:c11}}</pre>
+<pre class="out">{{OUT:c11}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Le décalage d'un cran.</b> 1 − F(k) = P(X &gt; k), pas P(X ≥ k).</li>
+      <li><b>La version continue</b>, que Brunton ne donne pas : pour X ≥ 0, E[X] = ∫<sub>0</sub><sup>∞</sup> P(X &gt; x) dx.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (43) dit que P(X ≥ k) est « 1 moins la fonction de répartition en k ». C'est 1 − F(k − 1).</div>
+  </div></details>
+  <p class="garde">Une espérance est la somme des probabilités de survie.</p>
+</section>
+

@@ -1,0 +1,48 @@
+<!-- ============================ n5 ============================ -->
+<section class="notion outil" id="n5">
+  <h3>L'espérance d'une fonction de X <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 29</p>
+  <div class="idee">
+    <p>Pour calculer E[g(X)], il paraît naturel de chercher d'abord la loi de Y = g(X), puis d'appliquer la définition. C'est inutile. On garde les probabilités de X et on remplace chaque valeur x par g(x) ; Brunton : « on reprend la formule et on remplace x par g de x ».</p>
+    <p>Le nom anglais, <i>law of the unconscious statistician</i> (LOTUS), vient de là : tout le monde le fait sans y penser, et c'est juste. Brunton prévient que ce n'est « pas évident » : c'est un théorème, pas la définition.</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — on garde les masses, on déplace les valeurs</div>
+    <div id="v5ctl" class="sl-ctl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">En haut, les six faces d'un dé, chacune de masse ⅙. Choisis g : chaque masse voyage de x jusqu'à g(x) sans changer de poids, et E[g(X)] est le point d'équilibre en bas (triangle rouge). Avec (x − 3,5)², les faces arrivent deux à deux au même point (1 et 6 en 6,25 ; 2 et 5 en 2,25 ; 3 et 4 en 0,25) et leurs masses s'additionnent : c'est la preuve de LOTUS. Le rond bleu marque g(E[X]). Parmi ces trois g, il ne tombe sur E[g(X)] que pour la fonction affine ; pour une g convexe comme le carré, il reste à gauche (inégalité de Jensen).</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">E[<i>g</i>(<i>X</i>)] = Σ<sub><i>x</i></sub> <i>g</i>(<i>x</i>) P(<i>X</i> = <i>x</i>) &nbsp;&nbsp;&nbsp;&nbsp; E[<i>g</i>(<i>X</i>)] = ∫ <i>g</i>(<i>x</i>) <i>f</i>(<i>x</i>) d<i>x</i></div>
+    <ul><li>Même condition de convergence que pour E[X].</li><li>Vaut aussi pour un couple : E[g(X, Y)] = Σ<sub>x</sub> Σ<sub>y</sub> g(x, y) P(x, y). C'est ce qu'utilisent les preuves des notions 3 et 4.</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>le carré, un gain, l'écart à la moyenne</small></summary><div class="in">
+    <ol>
+      <li><b>E[X²] pour un dé.</b> (1 + 4 + 9 + 16 + 25 + 36)/6 = 91/6 = 15,17. C'est le « second moment » de Brunton.</li>
+      <li><b>Un gain g(x) = 2x + 1.</b> E[g(X)] = Σ (2x + 1)/6 = 48/6 = 8.</li>
+      <li><b>L'écart au carré à la moyenne</b>, g(x) = (x − 3,5)². Les six valeurs sont 6,25 ; 2,25 ; 0,25 ; 0,25 ; 2,25 ; 6,25, de moyenne 17,5/6 = 35/12 = 2,917. C'est déjà la variance du dé.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>discrète : regrouper les x qui donnent le même y</small></summary><div class="in">
+    <div class="drv">
+      <div>E[<i>Y</i>] = Σ<sub><i>y</i></sub> <i>y</i> P(<i>Y</i> = <i>y</i>)</div><span>définition, sur la loi de Y = g(X)</span>
+      <div>= Σ<sub><i>y</i></sub> <i>y</i> Σ<sub><i>x</i> : <i>g</i>(<i>x</i>) = <i>y</i></sub> P(<i>X</i> = <i>x</i>)</div><span>{Y = y} est la réunion disjointe des {X = x} tels que g(x) = y</span>
+      <div>= Σ<sub><i>y</i></sub> Σ<sub><i>x</i> : <i>g</i>(<i>x</i>) = <i>y</i></sub> <i>g</i>(<i>x</i>) P(<i>X</i> = <i>x</i>)</div><span>dans chaque groupe, y = g(x)</span>
+      <div>= Σ<sub><i>x</i></sub> <i>g</i>(<i>x</i>) P(<i>X</i> = <i>x</i>)</div><span>chaque x est dans exactement un groupe</span>
+    </div>
+    <p>Brunton admet LOTUS dans les deux cas. La preuve discrète ci-dessus est courte ; en continu, elle demande un changement de variable (<a href="lesson-00-06-fonctions-standardisation.html#n1">l06</a>).</p>
+  </div></details>
+  <details class="code"><summary>Calculer en Python <small>LOTUS contre la loi de g(X) construite à la main</small></summary><div class="in">
+<pre class="py">{{CODE:c5}}</pre>
+<pre class="out">{{OUT:c5}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>E[g(X)] ≠ g(E[X]) en général.</b> Pour un dé, E[X²] = 15,17 contre 3,5² = 12,25. Pour g convexe, E[g(X)] ≥ g(E[X]) (inégalité de Jensen) ; pour le carré, l'écart est exactement la variance (notion 6).</li>
+      <li><b>LOTUS donne l'espérance, pas la loi.</b> Brancher la densité de X dans g ne donne pas la densité de g(X) ; pour la loi, il faut la méthode de Brunton 23 (<a href="lesson-00-06-fonctions-standardisation.html#n1">l06</a>).</li>
+    </ul>
+  </div></details>
+  <p class="garde">X discrète : E[g(X)] = Σ g(x) · P(X = x) ; on repondère les g(x) par les probabilités de X, sans chercher la loi de g(X).</p>
+</section>
+

@@ -1,0 +1,62 @@
+<!-- ============================ n6 ============================ -->
+<section class="notion outil" id="n6">
+  <h3>La variance est l'inertie autour du centre <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 30 · Variance and Standard Deviation</p>
+  <div class="idee">
+    <p>Deux lois peuvent avoir le même centre et s'étaler très différemment. Brunton définit la <b>variance</b> comme la moyenne des carrés des écarts à μ : on prend l'écart de chaque valeur à la moyenne, on le met au carré, et on fait la moyenne pondérée par les probabilités.</p>
+    <p>Sur deux masses de ½ placées en 1 et 3 : μ = 2, écarts −1 et +1, carrés 1 et 1, variance 1. Écarte-les en 0 et 4 : écarts ±2, carrés 4 et 4, variance 4.</p>
+    <p>L'image est celle du <b>moment d'inertie</b>. Tiens un bâton par son centre et fais-le tourner. Des poids près de ta main se lancent facilement ; les mêmes poids aux deux bouts résistent beaucoup plus. À chaque tour, un poids à la distance r parcourt un cercle de rayon r, donc va à une vitesse proportionnelle à r, et l'énergie ½mv² croît comme r². En probabilités, les masses sont les probabilités, l'axe est la moyenne, et la variance est cette inertie : une valeur deux fois plus loin compte quatre fois plus.</p>
+  </div>
+  <div class="fig vis" id="v6">
+    <div class="lbl">Voir l'idée — les carrés des écarts, et le bâton qui tourne</div>
+    <div id="v6ctl"></div>
+    <div id="v6plot" class="wide"></div>
+    <div class="readouts" id="v6out"></div>
+    <p class="cap">Deux masses de ½ en μ − d et μ + d, avec μ = 2. À gauche, chaque écart à μ est le côté d'un carré : la variance est l'aire moyenne de ces carrés. À droite, les mêmes masses sur un bâton tenu par son centre : leur vitesse (flèches) est proportionnelle à d, leur énergie à d². Passe de <b>d = 1</b>, la loi {1, 3}, à <b>d = 2</b>, la loi {0, 4} : les côtés doublent, les aires et l'inertie quadruplent.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">définition : Var(<i>X</i>) = E[(<i>X</i> − μ)²] &nbsp;&nbsp;&nbsp; forme de calcul : Var(<i>X</i>) = E[<i>X</i>²] − μ² &nbsp;&nbsp;&nbsp; σ = √Var(<i>X</i>)</div>
+    <ul><li>μ = E[X]. La forme de calcul s'appelle la formule de König-Huygens (preuve dépliable plus bas).</li><li>E[X²] doit être finie.</li><li>σ, l'écart-type, est dans l'unité de X ; la variance est dans l'unité au carré.</li><li>Le carré est un choix : on pourrait mesurer l'étalement par E[|X − μ|]. On garde le carré parce que, sous indépendance, les variances s'additionnent : c'est de l'additivité, pas de la linéarité (<a href="lesson-00-09-covariance-correlation.html#n2">l09</a>, et notion 9).</li></ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — d'où vient la variance, valeur par valeur</div>
+    <div id="f3ctl" class="sl-ctl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">En haut la loi P(X = x), en bas la contribution de chaque valeur à la variance, p · (x − μ)². La variance est la <b>somme des barres du bas</b>. Les trois premières lois partagent la même échelle : passe de {1, 3} à {0, 4}, la distance double et les barres du bas quadruplent. Puis choisis <b>Z</b> (l'échelle change) : la valeur 10, qui ne pèse que 10 %, fait 90 % de la variance.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>constante, deux masses, Bernoulli, dé, Z</small></summary><div class="in">
+    <ol>
+      <li><b>Une constante</b> X = 5 : aucun écart, Var = 0.</li>
+      <li><b>Deux masses.</b> X ∈ {1, 3} avec probabilité ½ chacune : μ = 2, écarts ±1, Var = 1. Y ∈ {0, 4} : même centre, écarts ±2, Var = 4.</li>
+      <li><b>Bernoulli(p).</b> X² = X puisque X vaut 0 ou 1, donc E[X²] = p et Var = p − p² = p(1 − p). Elle est maximale à p = ½, là où l'issue est la plus incertaine.</li>
+      <li><b>Un dé.</b> 91/6 − 3,5² = 35/12 = 2,917 ; σ = 1,708.</li>
+      <li><b>Z = 0 avec probabilité 0,9, ou 10 avec probabilité 0,1.</b> μ = 1, écarts −1 et +9, Var = 0,9 × 1 + 0,1 × 81 = 9, σ = 3.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la forme de calcul, et pourquoi Var ≥ 0</small></summary><div class="in">
+    <div class="drv">
+      <div>Var(<i>X</i>) = E[(<i>X</i> − μ)²]</div><span>définition</span>
+      <div>= E[<i>X</i>² − 2μ<i>X</i> + μ²]</div><span>développer le carré</span>
+      <div>= E[<i>X</i>²] − 2μ E[<i>X</i>] + μ²</div><span>linéarité (notion 3) ; μ est une constante et E[μ²] = μ²</span>
+      <div>= E[<i>X</i>²] − 2μ² + μ² = E[<i>X</i>²] − μ²</div><span>E[X] = μ</span>
+    </div>
+    <p><b>Var(X) ≥ 0</b>, c'est le devoir que donne Brunton : la variance est l'espérance d'un carré, donc d'une quantité positive. Conséquence : E[X²] ≥ E[X]², avec égalité seulement si X est constante.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>la part de chaque valeur, et np.var</small></summary><div class="in">
+<pre class="py">{{CODE:c6}}</pre>
+<pre class="out">{{OUT:c6}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>L'unité est au carré.</b> Une variance en cm² ne se compare pas à une longueur : on rapporte l'écart-type.</li>
+      <li><b>Une valeur lointaine domine</b> (exemple 5). Un seul point aberrant dans un jeu de test (test set) peut gonfler la variance.</li>
+      <li><b>« 68 % dans ±1σ » est une propriété de la normale, pas une signification générale de σ.</b> Pour Z, 90 % de la masse est à moins de 1σ et 10 % est à 3σ, sans rien entre.</li>
+      <li><b>La variance peut être infinie</b> (Pareto d'indice ≤ 2) : l'écart-type d'un échantillon ne se stabilise alors jamais.</li>
+      <li><b>La variance n'est pas linéaire.</b> Var(2X) = 4 Var X, pas 2 Var X (notion 9), et Var(X + Y) a un terme croisé (<a href="lesson-00-09-covariance-correlation.html#n2">l09</a>).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (28, 30) dit que la suite des moments, comme une série de Taylor, « identifie de façon unique » la loi. Pas toujours : il existe des lois différentes qui ont tous leurs moments égaux, la log-normale en est l'exemple classique. L'énoncé vrai passe par la fonction génératrice (<a href="lesson-00-12-generatrice-preuve-tcl.html#n1">l12</a>).</div>
+  </div></details>
+  <p class="garde">Var(X) = E[(X − μ)²] = E[X²] − μ², avec μ = E[X] : l'inertie autour du centre, où la distance compte au carré.</p>
+</section>
+
