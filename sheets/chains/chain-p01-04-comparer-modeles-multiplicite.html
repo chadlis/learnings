@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Comparer deux modèles, et pourquoi le max ment — chaîne · v3</title>
-<meta name="sheet" content="series=chain;part=01;number=04;status=v3">
+<title>Comparer deux modèles, et pourquoi le max ment — chaîne · v4</title>
+<meta name="sheet" content="series=chain;part=01;number=04;status=v4">
 <meta name="part" content="01 · L'objet aléatoire (fil A)">
 <meta name="subtitle" content="fil A, cas 2 et 3 — appariement, McNemar, multiplicité, train/val/test">
 <meta name="prereq" content="p01-01,p01-02">
@@ -157,7 +157,7 @@ text.mk-seuil{fill:var(--red)}
     <li><a href="chain-p01-01-objet-aleatoire.html#s2">p01-01 · Les trois colonnes</a></li>
     <li><a href="chain-p01-01-objet-aleatoire.html#s5">p01-01 · Le SE d'une proportion</a></li>
     <li><a href="chain-p01-02-ic-test-procedure.html#s2">p01-02 · H₀ et p-value</a></li>
-    <li><a href="chain-p00-02-esperance-variance-densite.html">p00-02 · Variance d'une différence</a></li>
+    <li><a href="../lessons/lesson-00-09-covariance-correlation.html#n2">l09 · Variance d'une différence</a></li>
   </ol>
   <h4>Cartes Anki liées</h4>
   <div class="tags"><code>stats::inference</code><code>stats::comparaison</code><code>stats::multiplicite</code><code>ml::validation</code></div>
@@ -181,7 +181,7 @@ text.mk-seuil{fill:var(--red)}
       <li><b>L'objet aléatoire est le tirage.</b> Trois colonnes : le paramètre vrai (fixe, inconnu), l'estimateur (aléatoire, fonction du tirage), le tirage lui-même (<a href="chain-p01-01-objet-aleatoire.html#s2">p01-01, pas 2</a>). Ici le tirage est le <b>test set</b> ; les deux modèles sont figés.</li>
       <li><b>SE d'une proportion.</b> <span class="up">SE</span>(<span class="hat"><span class="m">p</span></span>) = √(<span class="m">π</span>(1−<span class="m">π</span>)/<span class="m">n</span>), estimé par plug-in (<a href="chain-p01-01-objet-aleatoire.html#s5">p01-01, pas 5</a>). Pour <span class="m">π</span> = 0,87 et <span class="m">n</span> = 1 000 : 0,0106, soit 1,06 point.</li>
       <li><b>H₀ porte sur le paramètre, la p-value est une aire sous H₀</b> (<a href="chain-p01-02-ic-test-procedure.html#s2">p01-02, pas 2</a> et <a href="chain-p01-02-ic-test-procedure.html#s3">pas 3</a>). On ne « prouve » jamais H₀ ; on la rejette ou on ne la rejette pas.</li>
-      <li><b>Variance d'une différence.</b> <span class="up">Var</span>(<span class="m">X</span> − <span class="m">Y</span>) = <span class="up">Var</span>(<span class="m">X</span>) + <span class="up">Var</span>(<span class="m">Y</span>) − 2<span class="up">Cov</span>(<span class="m">X</span>, <span class="m">Y</span>) (<a href="chain-p00-02-esperance-variance-densite.html">p00-02</a>). Le terme −2Cov est tout le cas 2.</li>
+      <li><b>Variance d'une différence.</b> <span class="up">Var</span>(<span class="m">X</span> − <span class="m">Y</span>) = <span class="up">Var</span>(<span class="m">X</span>) + <span class="up">Var</span>(<span class="m">Y</span>) − 2<span class="up">Cov</span>(<span class="m">X</span>, <span class="m">Y</span>) (<a href="../lessons/lesson-00-09-covariance-correlation.html#n2">l09, notion 2</a>). Le terme −2Cov est tout le cas 2.</li>
     </ul>
   </div>
 </section>
@@ -237,8 +237,8 @@ text.mk-seuil{fill:var(--red)}
     <table>
       <tr><th>calcul</th><th>résultat</th></tr>
       <tr><td><span class="up">IC</span> Wald séparé de A : 0,872 ± 1,96·√(0,872·0,128/1 000)</td><td>[0,851 ; 0,893]</td></tr>
-      <tr><td><span class="up">IC</span> Wald séparé de B : 0,901 ± 1,96·√(0,901·0,099/1 000)</td><td>[0,883 ; 0,920]</td></tr>
-      <tr><td>chevauchement</td><td><b>oui</b>, sur [0,883 ; 0,893]</td></tr>
+      <tr><td><span class="up">IC</span> Wald séparé de B : 0,901 ± 1,96·√(0,901·0,099/1 000)</td><td>[0,882 ; 0,920]</td></tr>
+      <tr><td>chevauchement</td><td><b>oui</b>, sur [0,882 ; 0,893]</td></tr>
       <tr class="hl"><td>apparié : <span class="m">D</span> = (<span class="m">c</span> − <span class="m">b</span>)/<span class="m">n</span> = 0,029 ; <span class="up">SE</span> = √((<span class="m">b</span> + <span class="m">c</span>)/<span class="m">n</span> − <span class="m">D</span>²)/√<span class="m">n</span></td><td>0,0069 ; <span class="up">IC</span> [0,015 ; 0,043] ; <span class="m">z</span> = <b>4,2</b></td></tr>
       <tr><td>McNemar <span class="m">χ</span>² = (<span class="m">c</span> − <span class="m">b</span>)²/(<span class="m">b</span> + <span class="m">c</span>)</td><td><b>17,2</b></td></tr>
       <tr><td>non apparié : <span class="up">SE</span> = √(<span class="up">SE</span><sub>A</sub>² + <span class="up">SE</span><sub>B</sub>²)</td><td>0,0142 ; <span class="m">z</span> = 2,05 — <b>deux fois trop large</b></td></tr>
@@ -435,7 +435,7 @@ text.mk-seuil{fill:var(--red)}
 
 </main>
 </div>
-<footer>Chaîne p01-04 · v3 du 18/09/2026 · Prérequis : p01-01, p01-02. Suite : <a href="chain-p01-05-bootstrap.html">p01-05 Bootstrap</a>.</footer>
+<footer>Chaîne p01-04 · v4 du 10/10/2026 · Prérequis : p01-01, p01-02. Suite : <a href="chain-p01-05-bootstrap.html">p01-05 Bootstrap</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

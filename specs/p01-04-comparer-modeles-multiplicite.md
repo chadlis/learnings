@@ -144,8 +144,8 @@ Variante du fil rouge : A = 87,2 %, B = **90,1 %**, n = 1 000, b = 10 (A seul a 
 | calcul | résultat |
 | --- | --- |
 | IC Wald séparé de A : 0,872 ± 1,96·√(0,872·0,128/1 000) | [0,851 ; 0,893] |
-| IC Wald séparé de B : 0,901 ± 1,96·√(0,901·0,099/1 000) | [0,883 ; 0,920] |
-| chevauchement | oui, sur [0,883 ; 0,893] |
+| IC Wald séparé de B : 0,901 ± 1,96·√(0,901·0,099/1 000) | [0,882 ; 0,920] |
+| chevauchement | oui, sur [0,882 ; 0,893] |
 | apparié : D = (c − b)/n = 0,029 ; SE = √((b + c)/n − D²)/√n | 0,0069 ; IC [0,015 ; 0,043] ; z = 4,2 |
 | McNemar χ² = (c − b)²/(b + c) | 17,2 |
 | non apparié : SE = √(SE_A² + SE_B²) | 0,0142 ; z = 2,05 — deux fois trop large |
@@ -170,3 +170,7 @@ Aucune pour cette révision : deux tableaux suffisent.
 - Scorie : accᵢ écrit pour un item ; par item c'est un indicateur Yᵢ ∈ {0, 1}, et D̂ = (1/n)Σ(Yᵢᴮ − Yᵢᴬ).
 
 ### Exclusions — inchangées
+
+## Révision v4 (10/10/2026)
+
+Erratum d'arrondi relevé par la relecture de la leçon l09 : la borne basse de l'IC de Wald séparé de B vaut 0,901 − 1,96 × 0,009445 = 0,88249, donc 0,882 à trois décimales, et non 0,883 ; le chevauchement devient [0,882 ; 0,893]. La conclusion ne change pas.
