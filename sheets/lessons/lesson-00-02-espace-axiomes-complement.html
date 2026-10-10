@@ -1,0 +1,1312 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Ω, axiomes, complément, triangle de Pascal — leçon</title>
+<meta name="sheet" content="series=lesson;part=00;number=02;status=v1">
+<meta name="part" content="00 · Socle probabiliste">
+<meta name="subtitle" content="socle — Brunton 04 à 07 : événements comme ensembles, trois axiomes, le réflexe du complément">
+<meta name="prereq" content="l01">
+<meta name="anki" content="stats::axiomes,stats::complement">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- série `coding` : squelette annoté et ruban de SL.trace (inerte hors coding) ---- */
+.skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.skel b{color:var(--pen);font-weight:600}
+.step .card.full,.step .card.casse{grid-column:1 / -1}
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .wide table{min-width:520px}
+.card .wide th:nth-child(2),.card .wide td:nth-child(2),
+.card .wide th:nth-child(3),.card .wide td:nth-child(3){text-align:left}
+.readouts .c1 b{color:var(--pen)}.readouts .c3 b{color:var(--red)}
+.sl-trace{--cw:58px;--cgap:8px;margin:4px 0 2px}
+.sl-cells{display:flex;gap:var(--cgap)}
+.sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
+.sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
+.sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.dim{background:rgba(34,48,43,.07);border-color:rgba(34,48,43,.18);border-style:dashed}
+.sl-cell.dim b,.sl-cell.dim i{color:var(--cardmuted);opacity:.5}
+.sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
+.sl-cell.win{border-color:var(--green);border-width:2.5px}
+.sl-ptrs{position:relative;height:20px;margin-top:5px}
+.sl-ptr{position:absolute;top:0;left:calc(var(--i) * (var(--cw) + var(--cgap)));width:var(--cw);text-align:center;font:600 12px var(--sans);color:var(--pen)}
+.sl-note{font-size:14px;color:var(--cardink);margin-top:10px}
+.sl-inv{font:12.5px/1.55 var(--mono);color:var(--cardmuted);margin-top:6px;border-left:2px solid #B7791F;padding-left:10px}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ===== série `lesson` : le cours autoporteur du socle (10/10/2026) ===== */
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px;color:var(--muted);margin:10px 0 0}
+.legend .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-right:6px}
+.lecon{counter-reset:notion}
+.notion{padding:22px 0 28px;border-top:1.5px dashed var(--line);max-width:900px}
+.notion h3{position:relative;padding-left:44px;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.3;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:2px}
+.notion h3::before{counter-increment:notion;content:counter(notion);position:absolute;left:0;top:-1px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle;text-shadow:none}
+.tag.outil{color:var(--mint)}.tag.culture{color:var(--violet)}
+.src{font-size:12.5px;color:var(--faint);margin:0 0 10px 44px}
+.idee{margin-left:44px;color:var(--chalk);font-size:16px;line-height:1.62;max-width:72ch}
+.idee p{margin:7px 0}
+.idee b{color:var(--yellow);font-weight:600}
+.formule{margin:12px 0 10px 44px;background:var(--card);color:var(--cardink);border-radius:3px;padding:12px 18px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--yellow)}
+.formule .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:4px}
+.formule .eq{font-size:17.5px}
+.formule ul{padding-left:18px;margin-top:6px}.formule li{font-size:14.5px;margin:3px 0;color:var(--cardmuted)}
+.notion .fig{margin-left:44px}
+details{margin:8px 0 0 44px;background:var(--card);color:var(--cardink);border-radius:3px;border-left:4px solid var(--ac,var(--yellow));box-shadow:0 10px 20px -16px rgba(0,0,0,.6)}
+details>summary{cursor:pointer;list-style:none;padding:9px 14px;font:600 13px var(--sans);letter-spacing:.03em;color:var(--cardink)}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸";display:inline-block;width:16px;color:var(--cardmuted)}
+details[open]>summary::before{content:"▾"}
+details>summary small{font-weight:400;color:var(--cardmuted);margin-left:6px;letter-spacing:0}
+details .in{padding:2px 18px 14px}
+details .in p,details .in li{font-size:15px;line-height:1.55;margin:5px 0}
+details .in ol,details .in ul{padding-left:20px}
+details.ex{--ac:var(--teal)}details.preuve{--ac:var(--violet)}details.code{--ac:var(--blue)}details.casse{--ac:var(--pink)}details.loin{--ac:var(--faint)}
+.drv{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:4px 16px;margin:8px 0;align-items:baseline}
+.drv>div{font-family:var(--math);font-size:16px;line-height:1.6}
+.drv>span{font-size:13.5px;color:var(--cardmuted);border-left:2px solid var(--cardline);padding-left:10px}
+@media(max-width:700px){.drv{grid-template-columns:minmax(0,1fr)}.drv>span{margin-bottom:6px}}
+pre.py,pre.out,pre.tri{font:13px/1.6 var(--mono);background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:pre}
+pre.out{background:transparent;border:1px dashed var(--cardline);color:var(--cardmuted)}
+pre.out::before{content:"sortie\A";font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.brunton{margin:10px 0 4px;padding:8px 12px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft);font-size:14.5px}
+.brunton b{display:block;font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:2px}
+.garde{margin:14px 0 0 44px;font-family:var(--serif);font-size:16.5px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--yellow);padding:4px 0 4px 14px;max-width:72ch}
+.garde::before{content:"Ce qu'on garde";display:block;font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);text-shadow:none;margin-bottom:2px}
+.notion.culture .garde{border-left-color:var(--violet)}
+.notion table{background:var(--cardsoft);border-radius:3px}
+.sl-fulcrum{fill:var(--red)}.sl-bar2{fill:var(--red);opacity:.55}.sl-bar3{fill:var(--pen);opacity:.6}
+@media(max-width:600px){.idee,.formule,details,.garde,.src,.notion .fig{margin-left:0}.notion h3{font-size:19px}}
+.sl-seg.sl-c1{stroke:var(--pen);stroke-width:2}.sl-seg.sl-c2{stroke:#6B46C1;stroke-width:2}.sl-seg.sl-c3{stroke:var(--red);stroke-width:2}.sl-seg.sl-c4{stroke:#1F5FA8;stroke-width:2}
+/* ===== v2 (10/10/2026) : vignettes « voir l'idée », sous chaque idée ===== */
+.fig.vis{--ac:var(--teal)}
+.v-row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:center}
+.v-row>div{flex:1 1 280px;min-width:0}.v-row>.v-mini{flex:0 1 220px}
+.v-row .sl-plot{min-width:0}
+.nogrid .sl-grid{display:none}
+.sl-ruler{fill:var(--cardmuted)}
+.sl-mass{fill:#6B46C1;opacity:.85}
+.sl-mass-t{font:600 11px var(--sans);fill:#fff}
+.sl-sq{fill:rgba(107,70,193,.16);stroke:#6B46C1;stroke-width:1.5}
+.sl-sq-t{font:600 12.5px var(--mono);fill:#6B46C1}
+.sl-cellp{fill:#6B46C1}.sl-cello{fill:none;stroke:var(--cardline)}
+.sl-prod{font:12px var(--mono);fill:var(--cardmuted);opacity:.5}.sl-prod.on{font-weight:700;fill:var(--cardink);opacity:1}
+.sl-seg.sl-dash{stroke-dasharray:4 3}.sl-seg.sl-link{stroke:rgba(34,48,43,.28);stroke-dasharray:3 3}
+.sl-seg.sl-c5{stroke:#B7791F;stroke-width:2}
+.sl-orbit{fill:none;stroke:rgba(34,48,43,.3);stroke-dasharray:3 4}
+.sl-stick{stroke:var(--cardmuted);stroke-width:4;stroke-linecap:round}
+.sl-dot.sl-tiny{stroke:none;opacity:.5}
+.sl-k1{fill:var(--pen)}.sl-k2{fill:#6B46C1}.sl-k3{fill:var(--red)}.sl-k4{fill:#1F5FA8}.sl-k5{fill:#B7791F}.sl-k6{fill:var(--green)}.sl-kc{opacity:.5}
+.sl-cell-t{font:600 11px var(--sans);fill:var(--cardink)}
+/* ---- propre à cette leçon ---- */
+text.sl-c1,text.sl-c2,text.sl-c3,text.sl-c4,text.sl-c5{stroke:none}
+.l2-frame{fill:none;stroke:var(--cardmuted);stroke-width:1.5}
+.l2-edge{fill:none;stroke:var(--cardink);stroke-width:1.6}
+.l2-ong{opacity:.3}.l2-sol{fill:#6B46C1}.l2-hole{fill:var(--card)}
+.l2-name{font:600 15px var(--serif);fill:var(--cardink);font-style:italic}
+.l2-el{font:12.5px var(--mono);fill:var(--cardmuted)}.l2-el.on{font-weight:700;fill:var(--cardink)}
+.l2-cell{fill:var(--cardsoft);stroke:var(--cardline);stroke-width:1.2}.l2-cell.on{fill:rgba(107,70,193,.3);stroke:#6B46C1;stroke-width:1.6}
+.l2-ct{font:600 15px var(--mono);fill:var(--cardink)}
+.l2-pt{font:600 12.5px var(--mono);fill:var(--cardink)}
+.l2-eqt{font:14px var(--sans);fill:var(--cardink)}
+.l2-pl{font:600 14px var(--sans);fill:var(--cardink)}
+.l2-ghost{fill:none;stroke:var(--cardline);stroke-width:1.5;stroke-dasharray:3 3}
+.l2-rest{fill:var(--cardsoft);stroke:var(--cardline)}
+.l2-bbox{fill:none;stroke:#1F5FA8;stroke-width:2;stroke-dasharray:5 3}
+.sl-dot.hollow.l2-ok{stroke:var(--cardmuted);stroke-width:1.4}
+.sl-fn.l2-dashfn{stroke-dasharray:6 4}
+.l2-zoneA{fill:rgba(107,70,193,.18)}
+.l2-cut{stroke:var(--cardink);stroke-width:1.5}
+.l2-big{font:600 14px var(--sans);fill:var(--cardink);paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round}
+.l2-dart{fill:#1F5FA8;opacity:.55}.l2-dart.in{fill:var(--red);opacity:.75}
+.l2-a{fill:rgba(107,70,193,.22);stroke:#6B46C1;stroke-width:1.2}.l2-b{fill:rgba(31,95,168,.2);stroke:#1F5FA8;stroke-width:1.2}.l2-ab{fill:rgba(184,50,42,.24);stroke:var(--red);stroke-width:1.6}
+.l2-tally{font:700 17px var(--mono);fill:var(--cardink)}.l2-tally.two{fill:var(--red)}
+.l2-suit{font:17px var(--serif);fill:var(--cardink)}.l2-suit.red{fill:var(--red)}
+.l2-chord{stroke:rgba(34,48,43,.14);stroke-width:1}
+.l2-match{stroke:var(--red);stroke-width:2.6}
+.l2-p{fill:#1F5FA8;stroke:var(--card);stroke-width:1.5}.l2-p.hit{fill:var(--red)}
+.l2-good{fill:var(--cardsoft);stroke:var(--cardline)}.l2-bad{fill:var(--red);opacity:.85}
+.l2-pick{fill:none;stroke:var(--pen);stroke-width:2.6}
+.v-row>.l2-lot{flex:0 1 264px}
+.l2-pc{fill:var(--cardsoft);stroke:var(--cardline)}.l2-pc.row{fill:rgba(31,95,168,.16);stroke:#1F5FA8}
+.l2-pc.par{fill:rgba(183,121,31,.35);stroke:#B7791F;stroke-width:1.6}.l2-pc.tgt{fill:rgba(184,50,42,.26);stroke:var(--red);stroke-width:2}
+.l2-peg{fill:var(--cardmuted)}.l2-ball{fill:#B7791F;stroke:none}
+.l2-bin{stroke:var(--cardline);stroke-width:1}
+.l2-box{fill:none;stroke:var(--cardmuted);stroke-width:1.5;stroke-dasharray:5 3}
+.l2-tbg{fill:var(--card);opacity:.85}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 2</div>
+  <h1>Ω, axiomes, complément, <span>triangle de Pascal</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Avant de calculer des probabilités, il faut un langage : l'<b>univers</b> Ω de tout ce qui peut arriver, les <b>événements</b> comme sous-ensembles, et <b>trois axiomes</b> dont tout le reste se déduit. Le réflexe qui en sort, passer par le complément, résout le paradoxe des anniversaires. La leçon suit Brunton 04 à 07, avec ses exemples : trois lancers de pièce, la fléchette, 23 personnes dans une salle, un lot de pièces à contrôler, le triangle de Pascal et la planche de Galton.</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="lesson-00-01-compter.html">l01 · Compter</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::axiomes</code><code>stats::complement</code></div>
+  <h4>Suite</h4>
+  <ol>
+    <li><a href="lesson-00-03-conditionner-bayes-independance.html">l03 · Conditionner, Bayes, indépendance</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>Compter les cas.</b> Quand les issues sont équiprobables, P(A) = #A/#Ω, le nombre de cas favorables sur le nombre de cas possibles (<a href="lesson-00-01-compter.html#n2">l01, notion 2</a>).</li>
+      <li><b>Principe multiplicatif.</b> Enchaîner des choix multiplie les nombres de façons : trois lancers de pièce donnent 2 × 2 × 2 = 8 suites (<a href="lesson-00-01-compter.html#n3">l01, notion 3</a>).</li>
+      <li><b>Ordonné sans remise.</b> Il y a n(n − 1)…(n − r + 1) = n!/(n − r)! suites de r éléments distincts pris parmi n (<a href="lesson-00-01-compter.html#n4">l01, notion 4</a>).</li>
+      <li><b>Coefficient C(n, r).</b> C(n, r) = n!/(r!(n − r)!) compte les sous-ensembles de r éléments pris parmi n, sans ordre (<a href="lesson-00-01-compter.html#n5">l01, notion 5</a>).</li>
+    </ul>
+    <p>Notation : comme en l01, <b>F</b> pour face et <b>P</b> pour pile. Brunton écrit H (heads, face) et T (tails, pile) : son HTH est ici FPF.</p>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">
+<!-- ============================ n1 ============================ -->
+<section class="notion outil" id="n1">
+  <h3>Ω, issues, événements : le langage des ensembles <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 04 · Set Theory in Probability – Sample Spaces and Events</p>
+  <div class="idee">
+    <p>Brunton prévient : c'est un peu sec, mais c'est le langage de tout le reste. Une expérience aléatoire, par exemple : lancer trois pièces. L'<b>univers</b> Ω est l'ensemble de toutes les issues possibles ; une <b>issue</b> ω est une réalisation, ce qui sort quand on fait l'expérience. Ici Ω a 8 issues, de FFF à PPP.</p>
+    <p>Un <b>événement</b> se dit en mots et s'écrit comme un sous-ensemble de Ω. A, « le premier lancer donne F », regroupe 4 issues ; B, « le deuxième donne P », en regroupe 4 aussi, dont 2 en commun avec A. « A ou B » est l'<b>union</b> A ∪ B, le grand parapluie : 6 issues. « A et B » est l'<b>intersection</b> A ∩ B, plus restrictive : FPF et FPP. « Non A » est le <b>complémentaire</b> Aᶜ : les 4 issues qui commencent par P.</p>
+    <p>Avec deux pièces, Brunton dessine l'image exacte : un carré de quatre cases FF, FP, PF, PP, où A est la moitié du haut et B la moitié de droite.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — chaque opération est une région</div>
+    <div id="v1ctl" class="sl-ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">Le premier panneau est le diagramme de Venn des trois lancers, chaque issue écrite dans sa région ; le second, la grille exacte de Brunton pour deux pièces (ligne : premier lancer, colonne : deuxième). Choisis une opération : la même région s'allume des deux côtés. <b>A ∪ B</b> couvre 6 issues sur 8 et 3 cases sur 4, la même probabilité 0,75, parce que A et B ne regardent pas le troisième lancer. <b>(A ∪ B)ᶜ</b>, « ni A ni B », vaut Aᶜ ∩ Bᶜ : PFF et PFP, une case sur quatre.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les définitions</div>
+    <div class="eq">A ⊆ Ω &nbsp;&nbsp;&nbsp; A ∪ B = {ω : ω ∈ A ou ω ∈ B} &nbsp;&nbsp;&nbsp; A ∩ B = {ω : ω ∈ A et ω ∈ B} &nbsp;&nbsp;&nbsp; Aᶜ = {ω ∈ Ω : ω ∉ A}</div>
+    <div class="eq">De Morgan : (A ∪ B)ᶜ = Aᶜ ∩ Bᶜ &nbsp;&nbsp;&nbsp; (A ∩ B)ᶜ = Aᶜ ∪ Bᶜ</div>
+    <ul>
+      <li>Ω doit être exhaustif (une issue sort toujours) et ses issues doivent s'exclure (une seule sort à la fois). C'est ce qui rendra P(Ω) = 1 légitime (notion 2).</li>
+      <li>A <b>se réalise</b> quand l'issue ω qui sort appartient à A. ω est la réalisation ; Ω, A et plus tard P sont fixés avant l'expérience.</li>
+      <li>A et B sont <b>incompatibles</b> (disjoints) quand A ∩ B = ∅, où ∅ est l'événement impossible, sans aucune issue.</li>
+      <li>De Morgan transforme « au moins un des deux » en « aucun des deux » : c'est l'outil du complément (notion 4).</li>
+      <li>∪ et ∩ sont commutatives et associatives (Brunton) : A ∪ B ∪ C s'écrit sans parenthèses.</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>un dé, De Morgan, trois lancers, univers infinis</small></summary><div class="in">
+    <ol>
+      <li><b>Un dé.</b> Ω = {1, 2, 3, 4, 5, 6}, A = « pair » = {2, 4, 6}, B = « au moins 4 » = {4, 5, 6}. A ∪ B = {2, 4, 5, 6}, A ∩ B = {4, 6}, Aᶜ = {1, 3, 5}.</li>
+      <li><b>De Morgan sur le même dé.</b> « Ni pair ni au moins 4 » : (A ∪ B)ᶜ = {1, 3}. Et Aᶜ ∩ Bᶜ = {1, 3, 5} ∩ {1, 2, 3} = {1, 3} : le même ensemble.</li>
+      <li><b>Les trois lancers de Brunton.</b> A = {FFF, FFP, FPF, FPP}, B = {FPF, FPP, PPF, PPP}. A ∪ B a 6 issues, A ∩ B = {FPF, FPP}, Aᶜ = {PFF, PFP, PPF, PPP}.</li>
+      <li><b>Des univers infinis.</b> Le nombre de mails reçus en une heure : Ω = {0, 1, 2, …}, et « au moins 3 mails » = {3, 4, 5, …}. La température de midi : Ω est un intervalle de réels, « plus de 30 °C » en est un sous-intervalle. L'événement reste un sous-ensemble ; c'est le comptage qui ne suffit plus (notion 2).</li>
+      <li><b>Issue ou événement ?</b> FFP est une issue ; {FFP} est un événement, celui qui ne contient qu'elle. « Au moins un F » est un événement de 7 issues : tout sauf PPP.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>les événements sont des ensembles</small></summary><div class="in">
+<pre class="py">from itertools import product
+
+omega = {"".join(w) for w in product("FP", repeat=3)}   # F = face, P = pile
+A = {w for w in omega if w[0] == "F"}                   # first flip is F
+B = {w for w in omega if w[1] == "P"}                   # second flip is P
+
+# in Python, | is union, &amp; is intersection
+print("A or B :", sorted(A | B))       # union
+print("A and B:", sorted(A &amp; B))       # intersection
+print("not A  :", sorted(omega - A))   # complement, relative to omega
+# De Morgan: "neither A nor B" is the complement of "A or B"
+print("De Morgan holds:", omega - (A | B) == (omega - A) &amp; (omega - B))
+
+# equally likely outcomes: P(E) = #E / #omega
+for name, E in [("A", A), ("A or B", A | B), ("A and B", A &amp; B)]:
+    print(f"P({name}) = {len(E)}/{len(omega)} = {len(E) / len(omega):.3f}")</pre>
+<pre class="out">A or B : ['FFF', 'FFP', 'FPF', 'FPP', 'PPF', 'PPP']
+A and B: ['FPF', 'FPP']
+not A  : ['PFF', 'PFP', 'PPF', 'PPP']
+De Morgan holds: True
+P(A) = 4/8 = 0.500
+P(A or B) = 6/8 = 0.750
+P(A and B) = 2/8 = 0.250</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>« Ou » est inclusif.</b> A ∪ B contient aussi les issues qui sont dans les deux. Brunton se reprend lui-même : dire « A et B » pour l'union, c'est dire exactement le contraire.</li>
+      <li><b>L'union n'est pas une somme.</b> #A + #B = 4 + 4 = 8, mais A ∪ B n'a que 6 issues : FPF et FPP sont comptées deux fois (notion 3).</li>
+      <li><b>Une issue est un résultat complet de l'expérience.</b> Pour trois lancers, « F » n'est pas une issue, c'est un morceau d'issue ; l'univers {F, P} décrirait un seul lancer.</li>
+      <li><b>Le complémentaire dépend de Ω.</b> Sur un dé, « non pair » = {1, 3, 5} ; si Ω était {1, …, 10}, ce serait {1, 3, 5, 7, 9}.</li>
+      <li><b>Un diagramme de Venn ne dit rien des probabilités</b> tant que ses aires ne sont pas à l'échelle. La grille l'est : chaque case vaut ¼.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (04) dessine A et B comme deux cercles quelconques qui se chevauchent, et ajoute que « techniquement » ces deux événements sont indépendants, sans montrer où cela se voit. Ses cercles ne peuvent pas le montrer. La grille le montre : l'aire du chevauchement, ¼, est le produit des aires, ½ × ½. C'est la définition de l'indépendance (<a href="lesson-00-03-conditionner-bayes-independance.html#n7">l03, notion 7</a>).</div>
+  </div></details>
+  <p class="garde">Un événement est un sous-ensemble de Ω (les issues) : ou = ∪ (inclusif), et = ∩, non = ᶜ ; (A ∪ B)ᶜ = Aᶜ ∩ Bᶜ.</p>
+</section>
+
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>Trois axiomes, et ce qu'ils donnent : complément, monotonie <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 04</p>
+  <div class="idee">
+    <p>Compter #A/#Ω suppose des issues équiprobables. Brunton a pensé apporter une pièce truquée ; prenons P(face) = 0,7 : compter ne suffit plus, il faut peser les issues. Une probabilité devient une fonction P qui donne à chaque événement un nombre entre 0 et 1, avec trois exigences seulement : P(Ω) = 1, P(A) ≥ 0, et l'additivité pour deux événements disjoints.</p>
+    <p>Son image est une cible. Une fléchette lancée uniformément au hasard dans Ω touche A avec une probabilité égale à l'aire de A divisée par l'aire de Ω. La pièce truquée est une cible coupée en deux zones, 0,7 pour face et 0,3 pour pile.</p>
+    <p>Tout le reste se déduit en découpant en morceaux disjoints. Face et pile ne se chevauchent pas et couvrent la cible, donc P(face) + P(pile) = 1 et P(pile) = 1 − 0,7 = 0,3 : c'est la règle du <b>complément</b>. Si A est dans B, B a toute l'aire de A plus un morceau, donc P(A) ≤ P(B) : la <b>monotonie</b>.</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — la probabilité est l'aire où tombe la fléchette</div>
+    <div id="v2ctl" class="sl-ctl"></div>
+    <div id="v2plot" class="wide"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">La cible est Ω, d'aire 1, et 100 fléchettes y sont déjà plantées. Choisis une cible, puis <b>lance 500 fléchettes</b> uniformes : la fréquence des touches dans A se rapproche de son aire, 0,5 pour la pièce juste, 0,7 pour la pièce truquée, 0,2 pour le disque. La fréquence hors de A vaut toujours exactement 1 moins la fréquence dans A : chaque fléchette tombe dans A ou dans Aᶜ, jamais dans les deux, jamais ailleurs.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les trois axiomes, et leurs conséquences</div>
+    <div class="eq">(1) P(Ω) = 1 &nbsp;&nbsp;&nbsp; (2) P(A) ≥ 0 pour tout événement A &nbsp;&nbsp;&nbsp; (3) A ∩ B = ∅ ⇒ P(A ∪ B) = P(A) + P(B)</div>
+    <div class="eq">P(Aᶜ) = 1 − P(A) &nbsp;&nbsp;&nbsp; P(∅) = 0 &nbsp;&nbsp;&nbsp; A ⊆ B ⇒ P(A) ≤ P(B) &nbsp;&nbsp;&nbsp; P(A) ≤ 1</div>
+    <ul>
+      <li>(1) dit qu'une issue sort toujours, parce que Ω est exhaustif. C'est lui qui fournit le « 1 » du complément.</li>
+      <li>(2) interdit les poids négatifs. C'est lui qui fait marcher la monotonie.</li>
+      <li>(3) ne vaut que pour des événements <b>disjoints</b>. C'est l'hypothèse qui manque quand on additionne des événements qui se chevauchent (notion 3).</li>
+      <li>Pour un univers infini comme Ω = {0, 1, 2, …}, on exige l'additivité pour toute suite d'événements deux à deux disjoints : P(A₁ ∪ A₂ ∪ …) = P(A₁) + P(A₂) + … (additivité dénombrable). Elle ne se déduit pas de la version à deux événements.</li>
+      <li>Quand les issues sont équiprobables, P(A) = #A/#Ω vérifie les trois axiomes : le comptage de <a href="lesson-00-01-compter.html#n2">l01</a> en est un cas particulier.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — chaque conséquence est un découpage en morceaux disjoints</div>
+    <div id="f1ctl" class="sl-ctl"></div><div id="f1sl"></div>
+    <div id="f1plot" class="wide"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Ω est la bande entière, d'aire 1. <b>Complément</b> : A et Aᶜ sont disjoints et remplissent Ω ; l'axiome 3 puis l'axiome 1 donnent P(A) + P(Aᶜ) = 1. Fais glisser <b>P(A)</b> : Aᶜ prend toujours exactement le reste. <b>Monotonie</b> : B, de probabilité 0,6, se coupe en A et B ∩ Aᶜ, deux morceaux disjoints ; le second a une aire positive ou nulle (axiome 2), donc P(B) ≥ P(A). <b>∅</b> : Ω = Ω ∪ ∅ avec deux morceaux disjoints, donc P(∅) = 0.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>pièce truquée, dé, double six, une fausse probabilité</small></summary><div class="in">
+    <ol>
+      <li><b>La pièce truquée.</b> P(face) = 0,7 ⇒ P(pile) = 1 − 0,7 = 0,3, par le complément.</li>
+      <li><b>Un dé juste.</b> P(« pas de 6 ») = 1 − 1/6 = 5/6.</li>
+      <li><b>Monotonie, deux dés.</b> « Double six » ⊆ « au moins un six », donc P(double six) ≤ P(au moins un six) : 1/36 ≤ 11/36 (le 11/36 de <a href="lesson-00-01-compter.html#n2">l01</a>).</li>
+      <li><b>P(A) ≤ 1.</b> A ⊆ Ω, donc P(A) ≤ P(Ω) = 1 : la monotonie appliquée à Ω.</li>
+      <li><b>Une fausse probabilité.</b> Un « dé » dont chaque face aurait la probabilité 0,2 donnerait P(Ω) = 6 × 0,2 = 1,2 par l'axiome 3 : il viole l'axiome 1, ce n'est pas une probabilité.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>trois conséquences, trois découpages</small></summary><div class="in">
+    <div class="drv">
+      <div>Ω = A ∪ Aᶜ, avec A ∩ Aᶜ = ∅</div><span>définition du complémentaire</span>
+      <div>P(Ω) = P(A) + P(Aᶜ)</div><span>axiome 3</span>
+      <div>1 = P(A) + P(Aᶜ), donc P(Aᶜ) = 1 − P(A)</div><span>axiome 1</span>
+      <div>Ω = Ω ∪ ∅, avec Ω ∩ ∅ = ∅</div><span>∅ n'a aucune issue</span>
+      <div>P(Ω) = P(Ω) + P(∅), donc P(∅) = 0</div><span>axiome 3, puis soustraire</span>
+      <div>A ⊆ B : B = A ∪ (B ∩ Aᶜ), disjoints</div><span>couper B en « dans A » et « hors de A »</span>
+      <div>P(B) = P(A) + P(B ∩ Aᶜ) ≥ P(A)</div><span>axiome 3, puis axiome 2</span>
+    </div>
+    <p>La méthode est toujours la même : écrire l'événement comme une réunion de morceaux <b>disjoints</b>, appliquer l'axiome 3, puis conclure avec l'axiome 1 ou 2. La notion 3 l'applique une fois de plus.</p>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Une probabilité n'est pas une fréquence.</b> La fréquence des touches sur 500 fléchettes change d'une série à l'autre ; P(A) est un nombre fixe, l'aire de A. Les deux se rapprochent quand le nombre de lancers grandit, c'est la loi des grands nombres (<a href="lesson-00-10-inegalites-lgn.html#n4">l10</a>).</li>
+      <li><b>La monotonie ne marche que dans un sens.</b> P(A) ≤ P(B) ne dit pas que A ⊆ B : sur un dé, P({1}) = 1/6 ≤ P({2, 3}) = 2/6, et {1} n'est pas dans {2, 3}.</li>
+      <li><b>Probabilité nulle ne veut pas dire impossible.</b> Une ligne de la cible n'a pas d'aire : l'événement « la fléchette tombe sur cette ligne » a probabilité 0, et il n'est pas vide, il peut arriver. P(∅) = 0, mais la réciproque est fausse (<a href="lesson-00-04-variables-binomiale-normale.html#n2">l04</a>, les densités).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (04) énonce l'axiome 3 pour deux événements disjoints seulement, et dit que P donne une probabilité à « chaque sous-ensemble » de Ω. Pour un univers infini, il faut l'additivité pour une suite infinie d'événements disjoints. Pour un univers continu comme la cible, on ne peut pas donner une aire cohérente à tous les sous-ensembles : on se limite aux événements dits mesurables, c'est la théorie de la mesure qu'il cite comme « page un ». Pour les univers finis de cette leçon, sa version suffit.</div>
+  </div></details>
+  <p class="garde">Trois axiomes : P(Ω) = 1, P(A) ≥ 0, P(A ∪ B) = P(A) + P(B) si A ∩ B = ∅ ; le complément, la monotonie et P(∅) = 0 en découlent par découpage disjoint.</p>
+</section>
+
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>Inclusion-exclusion : ne pas compter deux fois le chevauchement <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 04</p>
+  <div class="idee">
+    <p>L'axiome 3 additionne des événements disjoints. Si A et B se chevauchent, P(A) + P(B) compte deux fois leur partie commune. Sur les trois lancers de Brunton, P(A) + P(B) = 4/8 + 4/8 = 1, alors que A ∪ B n'a que 6 issues. Les deux issues de trop sont FPF et FPP, qui sont à la fois dans A et dans B.</p>
+    <p>La correction consiste à retirer une fois le chevauchement : 4/8 + 4/8 − 2/8 = 6/8. En aires, c'est l'image de Brunton : l'aire couverte par deux disques qui se recouvrent est la somme des deux aires moins l'aire de la lentille commune, sinon la lentille est peinte deux fois.</p>
+    <p>Même calcul sur un jeu de 52 cartes : « cœur ou roi » vaut 13/52 + 4/52 − 1/52 = 16/52, parce que le roi de cœur est à la fois un cœur et un roi.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — le chevauchement compté deux fois</div>
+    <div id="v3ctl" class="sl-ctl"></div><div id="v3step" class="sl-ctl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">Chaque case porte le nombre de fois qu'elle a été comptée. L'état de départ est celui de P(A) + P(B) : les cases de A ∩ B portent un <b>2</b>, c'est le double comptage. <b>Retirer A ∩ B</b> les ramène à 1 : il reste 6 issues sur 8. Passe aux <b>52 cartes</b> (A : les cœurs, B : les rois) : 13 + 4 = 17 comptages, mais le roi de cœur l'a été deux fois, et l'union compte 16 cartes.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</div>
+    <ul>
+      <li><b>Aucune hypothèse</b> sur A et B. S'ils sont disjoints, P(A ∩ B) = 0 et on retrouve l'axiome 3.</li>
+      <li>Conséquence, la <b>borne de l'union</b> : P(A ∪ B) ≤ P(A) + P(B), avec égalité si et seulement si P(A ∩ B) = 0. Elle s'étend à k événements : P(A₁ ∪ … ∪ A<sub>k</sub>) ≤ P(A₁) + … + P(A<sub>k</sub>).</li>
+      <li>Trois événements : P(A ∪ B ∪ C) = P(A) + P(B) + P(C) − P(A ∩ B) − P(A ∩ C) − P(B ∩ C) + P(A ∩ B ∩ C). Le centre a été ajouté trois fois puis retiré trois fois : on le rajoute une fois.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — deux modèles sur le même jeu de test</div>
+    <div id="f2ctl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Chaque point est un exemple d'un jeu de test (test set) de 100. Le modèle A se trompe sur 10 exemples, le modèle B sur 8. Fais varier le nombre <b>c</b> d'exemples où les deux se trompent : « au moins un des deux se trompe » vaut 10 + 8 − c. À c = 0, les erreurs sont disjointes et on atteint la borne de l'union, 18 ; à c = 5, il en reste 13 ; à c = 8, B ne se trompe que là où A se trompe déjà, et l'union se réduit aux 10 erreurs de A.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>dé, cartes, trois lancers, trois dés, deux modèles, Bonferroni</small></summary><div class="in">
+    <ol>
+      <li><b>Un dé.</b> « Pair ou au moins 4 » : 3/6 + 3/6 − 2/6 = 4/6, les faces 2, 4, 5 et 6.</li>
+      <li><b>Les cartes.</b> « Cœur ou roi » : 13/52 + 4/52 − 1/52 = 16/52 = 4/13 ≈ 0,308.</li>
+      <li><b>Les trois lancers de Brunton.</b> 4/8 + 4/8 − 2/8 = 6/8.</li>
+      <li><b>Trois événements.</b> Au moins un 6 en trois lancers de dé, avec A<sub>i</sub> = « le lancer i donne 6 » : 3 × 1/6 − 3 × 1/36 + 1/216 = 91/216 ≈ 0,421. La notion 4 obtient le même nombre en une ligne par le complément : 1 − (5/6)³ = 91/216.</li>
+      <li><b>Deux modèles (ML).</b> Sur un jeu de test, A se trompe sur 10 % des exemples, B sur 8 %, les deux à la fois sur 5 %. Au moins un des deux se trompe sur 0,10 + 0,08 − 0,05 = 13 % des exemples, et aucun ne se trompe sur 87 %. Additionner donnerait 18 %, la borne de l'union, atteinte seulement si les deux modèles ne se trompaient jamais sur les mêmes exemples. En pratique ils butent sur les mêmes exemples difficiles, ce qui compte dès qu'on compare leurs taux de bonnes réponses (accuracy) sur ce jeu de test partagé (<a href="lesson-00-09-covariance-correlation.html#n6">l09</a>).</li>
+      <li><b>Bonferroni.</b> 40 tests, chacun avec un risque α de faux positif. P(au moins un faux positif) ≤ 40α par la borne de l'union : avec α = 5 %, la borne vaut 2 et ne dit rien ; avec α = 0,05/40, elle garantit P(au moins un faux positif) ≤ 0,05, sans aucune hypothèse d'indépendance entre les tests. C'est la correction de Bonferroni.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>deux découpages disjoints, puis soustraire</small></summary><div class="in">
+    <div class="drv">
+      <div>A ∪ B = A ∪ (B ∩ Aᶜ), disjoints</div><span>ce que B ajoute à A</span>
+      <div>P(A ∪ B) = P(A) + P(B ∩ Aᶜ)</div><span>axiome 3</span>
+      <div>B = (A ∩ B) ∪ (B ∩ Aᶜ), disjoints</div><span>couper B selon A</span>
+      <div>P(B) = P(A ∩ B) + P(B ∩ Aᶜ)</div><span>axiome 3</span>
+      <div>P(B ∩ Aᶜ) = P(B) − P(A ∩ B)</div><span>soustraire</span>
+      <div>P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</div><span>substituer dans la deuxième ligne</span>
+    </div>
+    <p>La borne de l'union suit de P(A ∩ B) ≥ 0 (axiome 2). Pour k événements, on l'applique de proche en proche : P(A₁ ∪ … ∪ A<sub>k</sub>) ≤ P(A₁ ∪ … ∪ A<sub>k−1</sub>) + P(A<sub>k</sub>).</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>100 000 cartes : l'identité vaut aussi pour les fréquences</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(0)
+n = 100_000
+rank = rng.integers(0, 13, size=n)     # 12 = king
+suit = rng.integers(0, 4, size=n)      # 0 = hearts
+A = suit == 0                          # the card is a heart
+B = rank == 12                         # the card is a king
+
+freq = lambda E: E.mean()              # relative frequency of an event
+print(f"freq(A or B)                      = {freq(A | B):.4f}")
+# inclusion-exclusion holds exactly for frequencies too: each card is counted once
+print(f"freq(A) + freq(B) - freq(A and B) = {freq(A) + freq(B) - freq(A &amp; B):.4f}")
+print(f"freq(A) + freq(B), double count   = {freq(A) + freq(B):.4f}")
+print(f"exact P(A or B) = 16/52           = {16 / 52:.4f}")</pre>
+<pre class="out">freq(A or B)                      = 0.3068
+freq(A) + freq(B) - freq(A and B) = 0.3068
+freq(A) + freq(B), double count   = 0.3259
+exact P(A or B) = 16/52           = 0.3077</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Additionner sans retirer ne vaut que pour des événements disjoints.</b> « 1/6 de chances d'avoir un 6 à chaque lancer, donc 6/6 = 1 en six lancers » est faux : les événements se chevauchent, et la vraie valeur est 1 − (5/6)⁶ ≈ 0,665 (notion 4).</li>
+      <li><b>Disjoint n'est pas indépendant.</b> Deux événements disjoints de probabilité positive sont au contraire très dépendants : si A arrive, B ne peut plus arriver (<a href="lesson-00-03-conditionner-bayes-independance.html#n7">l03</a>).</li>
+      <li><b>Pour trois événements, retirer les paires ne suffit pas.</b> Le centre A ∩ B ∩ C a été ajouté trois fois et retiré trois fois : il faut le rajouter (exemple 4).</li>
+      <li><b>La borne de l'union est grossière quand les événements se chevauchent beaucoup.</b> Elle peut même dépasser 1 (40 tests à 5 % : borne 2). Bonferroni est donc prudent, jamais faux.</li>
+    </ul>
+  </div></details>
+  <p class="garde">P(A ∪ B) = P(A) + P(B) − P(A ∩ B), sans aucune hypothèse ; d'où la borne de l'union P(A ∪ B) ≤ P(A) + P(B), avec égalité quand A et B sont disjoints.</p>
+</section>
+
+<!-- ============================ n4 ============================ -->
+<section class="notion outil" id="n4">
+  <h3>Anniversaires : passer par le complément <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 05 · The Birthday Problem in Probability – P(A) = 1 − P(not A)</p>
+  <div class="idee">
+    <p>Combien faut-il de personnes dans une salle pour qu'il y ait plus d'une chance sur deux que deux d'entre elles aient le même anniversaire ? L'intuition répond 365/2 ≈ 183. La réponse est 23.</p>
+    <p>Brunton commence par les paires. Range les n personnes en cercle : la première se compare aux n − 1 autres, la deuxième aux n − 2 restantes, et ainsi de suite jusqu'à 0, soit n(n − 1)/2 comparaisons. À 23 personnes, il y a déjà 253 paires, et chacune est une occasion de coïncidence. L'intuition compte les personnes, alors que ce sont les paires qui comptent.</p>
+    <p>Pour le calcul exact, « au moins deux partagent » est un enfer de cas : une paire, deux paires, un triplet… Son <b>complément</b>, « tous différents », est un seul produit. La première personne prend n'importe quel jour, 365/365 ; la deuxième doit en éviter un, 364/365 ; la troisième en éviter deux, 363/365. À 23 personnes, ce produit vaut 0,4927, donc P(partage) = 1 − 0,4927 = 0,5073.</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — 23 personnes, 253 paires</div>
+    <div id="v4ctl" class="sl-ctl"></div><div id="v4sl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">Chaque trait relie deux personnes : à 23, il y en a 253. Dans la salle tirée au départ, une paire tombe le même jour, en rouge. <b>Tire d'autres salles</b> : tantôt aucune paire rouge, tantôt une ou deux. <b>Lance 1 000 salles</b> : à n = 23, environ une salle sur deux contient au moins un partage (0,507 en théorie). Fais varier <b>n</b> : 45 paires et 0,117 à 10 personnes, 1 225 paires et 0,970 à 50.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(au moins deux partagent) = 1 − P(tous différents) = 1 − (365 × 364 × … × (365 − <i>n</i> + 1)) / 365<sup><i>n</i></sup> = 1 − 365! / ((365 − <i>n</i>)! · 365<sup><i>n</i></sup>)</div>
+    <ul>
+      <li>Les 365 jours sont équiprobables (pas de 29 février) et les anniversaires sont indépendants (pas de jumeaux). Les 365<sup>n</sup> suites d'anniversaires sont alors équiprobables, et P = #/#Ω s'applique (<a href="lesson-00-01-compter.html#n2">l01</a>).</li>
+      <li>Dénominateur : principe multiplicatif, 365 choix par personne (<a href="lesson-00-01-compter.html#n3">l01</a>). Numérateur : n jours tous différents, un tirage ordonné sans remise (<a href="lesson-00-01-compter.html#n4">l01</a>).</li>
+      <li>n ≤ 365. À 366 personnes, deux partagent forcément (principe des tiroirs) : le produit contient le facteur 0.</li>
+      <li>Le complément est la règle P(A) = 1 − P(Aᶜ) de la notion 2, et De Morgan (notion 1) traduit « au moins une paire partage » en son contraire, « aucune paire ne partage ».</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — P(partage) selon n, et ce que l'approximation par paires oublie</div>
+    <div id="f3ctl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Trait plein : la probabilité exacte d'un partage, qui passe 0,5 entre 22 personnes (0,476) et 23 (0,507). Tirets : 1 − (364/365)<sup>n(n − 1)/2</sup>, le calcul qui traite les paires comme si elles étaient indépendantes. Les deux courbes se confondent presque : la case « écart » vaut 0,0068 à n = 23, et 0,0099 au plus, vers n = 34. Courbe ocre : la probabilité que quelqu'un ait ton anniversaire, 1 − (364/365)<sup>n − 1</sup>, seulement 0,059 à 23 personnes ; elle ne passe ½ qu'à 254 personnes, soit 253 autres que toi. C'est elle que l'intuition 365/2 a en tête. Déplace <b>n</b> pour lire les valeurs.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>2, 3, 20 et 23 personnes, ton anniversaire, collisions de hachage</small></summary><div class="in">
+    <ol>
+      <li><b>Deux personnes.</b> 1 − 364/365 = 1/365 ≈ 0,0027.</li>
+      <li><b>Trois personnes.</b> 1 − (364 × 363)/365² ≈ 0,0082.</li>
+      <li><b>Vingt personnes (Brunton).</b> 190 paires ; P(tous différents) = 0,5886, le 0,589 qu'il lit sur Wolfram Alpha, donc P(partage) = 0,4114.</li>
+      <li><b>Vingt-trois personnes.</b> 253 paires, P(partage) = 0,5073. Repères : 0,117 à 10 personnes, 0,706 à 30, 0,970 à 50, 0,9992 à 70.</li>
+      <li><b>Ton anniversaire à toi.</b> P(au moins une des m autres personnes est née le même jour que toi) = 1 − (364/365)<sup>m</sup>. Il faut m = 253 autres personnes pour dépasser ½ : ce sont 253 comparaisons, toutes avec toi, et cette fois indépendantes.</li>
+      <li><b>Collisions de hachage (ML).</b> Une empreinte de 32 bits prend 2³² ≈ 4,3 milliards de valeurs. Pour dédupliquer 100 000 documents distincts, P(au moins une fausse collision) ≈ 1 − e<sup>−C(100 000, 2)/2³²</sup> ≈ 0,69 ; la moitié est atteinte vers 77 000 documents. Avec 64 bits, 2,7 × 10⁻¹⁰. Même calcul pour des graines aléatoires de 32 bits tirées pour 10 000 exécutions : 0,012 de risque que deux exécutions partagent la même graine.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>le produit, puis pourquoi le seuil est à 23</small></summary><div class="in">
+    <div class="drv">
+      <div>Ω = suites (<i>b</i>₁, …, <i>b<sub>n</sub></i>) de jours, #Ω = 365<sup><i>n</i></sup></div><span>principe multiplicatif</span>
+      <div>Aᶜ = « tous différents », #Aᶜ = 365 × 364 × … × (365 − <i>n</i> + 1)</div><span>ordonné sans remise</span>
+      <div>P(Aᶜ) = ∏<sub><i>k</i>=0</sub><sup><i>n</i>−1</sup> (365 − <i>k</i>)/365 = ∏<sub><i>k</i>=0</sub><sup><i>n</i>−1</sup> (1 − <i>k</i>/365)</div><span>suites équiprobables</span>
+      <div>P(A) = 1 − P(Aᶜ)</div><span>complément (notion 2)</span>
+    </div>
+    <p>Pourquoi 23 ? Chaque facteur est proche de 1, et 1 − x ≤ e<sup>−x</sup>, avec un écart minuscule quand x est petit :</p>
+    <div class="drv">
+      <div>P(Aᶜ) ≤ exp(−(0 + 1 + … + (<i>n</i> − 1))/365) = exp(−<i>n</i>(<i>n</i> − 1)/730)</div><span>1 − x ≤ e<sup>−x</sup>, puis somme des exposants</span>
+      <div><i>n</i>(<i>n</i> − 1)/2 ≥ 365 ln 2 ⇒ P(Aᶜ) ≤ exp(−ln 2) = ½</div><span>exp est croissante</span>
+    </div>
+    <p>À 23 personnes, 253/365 = 0,693151 &gt; ln 2 = 0,693147 : la borne prouve que 23 suffit, P(Aᶜ) ≤ 0,499998. Que 22 ne suffise pas, c'est le calcul exact qui le montre : P(Aᶜ) = 0,524. Le seuil se compte donc en paires, il en faut 365 ln 2 ≈ 253. En ordre de grandeur, n ≈ √(2 · 365 · ln 2) ≈ 22,5 : le nombre de personnes nécessaire croît comme la racine du nombre de jours. C'est ce qui rend les collisions de hachage si précoces (exemple 6).</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>la boucle du devoir de Brunton, et 100 000 salles</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+# Brunton's homework: multiply factor by factor (365! itself overflows a float)
+p_none, n = 1.0, 0
+while 1 - p_none &lt;= 0.5:
+    p_none *= (365 - n) / 365      # person n+1 avoids the n days already taken
+    n += 1
+print(f"first n with P(share) &gt; 0.5: {n}, P(share) = {1 - p_none:.4f}")
+
+# simulate 100 000 rooms of 23 people
+rng = np.random.default_rng(0)
+days = np.sort(rng.integers(0, 365, size=(100_000, 23)), axis=1)
+# after sorting, a shared birthday shows up as two equal neighbours
+shared = (np.diff(days, axis=1) == 0).any(axis=1)
+print(f"simulated P(share), n = 23: {shared.mean():.4f}")
+
+pairs = 23 * 22 // 2
+# treating the 253 pairs as independent events gives only an approximation
+print(f"1 - (364/365)^{pairs} = {1 - (364 / 365) ** pairs:.4f}")</pre>
+<pre class="out">first n with P(share) &gt; 0.5: 23, P(share) = 0.5073
+simulated P(share), n = 23: 0.5070
+1 - (364/365)^253 = 0.5005</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Les paires ne sont pas mutuellement indépendantes.</b> Si 1 et 2 partagent et si 2 et 3 partagent, alors 1 et 3 partagent forcément. Deux à deux, ces événements sont pourtant indépendants : P(1–2 et 1–3) = 1/365² = (1/365)², mais P(1–2, 1–3 et 2–3) = 1/365², et non (1/365)³ (<a href="lesson-00-03-conditionner-bayes-independance.html#n9">l03</a>). D'où 1 − (364/365)²⁵³ = 0,5005 au lieu de 0,5073 : une approximation, à 0,007 près (figure 3). Le nombre moyen de paires qui partagent, lui, vaut exactement 253/365 = 0,69 : la linéarité de l'espérance ne demande aucune indépendance (<a href="lesson-00-08-esperance-variance.html#n3">l08</a>, exemple 4).</li>
+      <li><b>Les naissances ne sont pas uniformes sur l'année.</b> Une saisonnalité rend un partage plus probable, jamais moins : à 23 personnes, une saisonnalité de ± 10 % donne 0,509 au lieu de 0,507. L'uniforme est le cas le moins favorable aux coïncidences, ce qui rend le 23 prudent.</li>
+      <li><b>365! ≈ 2,5 × 10⁷⁷⁸ dépasse le plus grand flottant</b> (1,8 × 10³⁰⁸) : math.gamma(366) lève OverflowError, np.prod renvoie inf. Les entiers exacts de Python passent, pas les flottants : on multiplie facteur par facteur, comme le conseille Brunton, ou on passe par math.lgamma (<a href="../chains/chain-p08-02-flottants-lse.html">flottants et log-sum-exp</a>).</li>
+      <li><b>« Au moins un » appelle presque toujours le complément « aucun ».</b> Un système de composants en parallèle tombe en panne si tous tombent en panne : P(il fonctionne) = 1 − P(tous en panne) (<a href="lesson-00-03-conditionner-bayes-independance.html#n8">l03</a>).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (05) compare les 190 paires de 20 personnes à 365/2 = 182,5, puis prévient que l'heuristique est grossière. Le bon seuil n'est pas 365/2 : chaque paire coïncide avec probabilité 1/365, et il faut environ 365 ln 2 ≈ 253 paires pour atteindre ½, soit exactement 23 personnes (preuve ci-dessus). Il présente aussi la règle du complément comme « essentiellement la loi des probabilités totales » : elle découle directement des axiomes 1 et 3 (notion 2).</div>
+  </div></details>
+  <p class="garde">« Au moins un » se calcule par le complément : 1 − ∏<sub>k=0</sub><sup>n−1</sup> (365 − k)/365 dépasse ½ dès 23 personnes (253 paires ≈ 365 ln 2).</p>
+</section>
+
+<!-- ============================ n5 ============================ -->
+<section class="notion culture" id="n5">
+  <h3>Contrôle qualité : la loi hypergéométrique <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 06 · Quality Control, Non-Destructive Inspection and the "Multinomial" Distribution</p>
+  <div class="idee">
+    <p>Dans une usine aéronautique, tester une pièce composite veut souvent dire la détruire, la casser ou la découper. On n'en teste donc qu'un échantillon. Un lot de N = 100 pièces contient K = 5 pièces défectueuses ; on en tire n = 10 au hasard, sans remise. Quelle est la probabilité d'y trouver exactement k défectueuses ?</p>
+    <p>Brunton compte, en lettres ; avec nos chiffres : il y a C(100, 10) échantillons possibles, tous équiprobables. Pour en former un qui contient exactement k défectueuses, on choisit lesquelles parmi les 5, en C(5, k) façons, et on complète avec 10 − k bonnes pièces parmi les 95, en C(95, 10 − k) façons. Chaque choix des unes va avec chaque choix des autres : le principe multiplicatif fait le produit.</p>
+    <p>Pour k = 0 : C(95, 10)/C(100, 10) = 0,584. Contrôler 10 % du lot laisse passer tous les défauts plus d'une fois sur deux.</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — un lot de 100 pièces, 5 défectueuses, 10 tirées</div>
+    <div id="v5ctl" class="sl-ctl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">Les 5 cases rouges sont les pièces défectueuses, les 10 cases cerclées l'échantillon. <b>Tire 10 pièces</b> plusieurs fois : le plus souvent, aucune case rouge n'est cerclée. <b>Lance 1 000 contrôles</b> : les barres du second panneau montrent la part des contrôles qui trouvent 0, 1, 2, 3 défauts ou plus, et elles s'approchent des points creux, la théorie : 0,584, 0,339, 0,070 et 0,007.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(<i>X</i> = <i>k</i> ; <i>N</i>, <i>K</i>, <i>n</i>) = C(<i>K</i>, <i>k</i>) · C(<i>N</i> − <i>K</i>, <i>n</i> − <i>k</i>) / C(<i>N</i>, <i>n</i>)</div>
+    <ul>
+      <li>N pièces dont K défectueuses, n tirées. X, le nombre de défectueuses tirées, prend les valeurs k de max(0, n − (N − K)) à min(n, K). La liste de ces probabilités est une <b>loi de probabilité</b> (PMF), la <b>loi hypergéométrique</b> ; les variables aléatoires sont définies en <a href="lesson-00-04-variables-binomiale-normale.html#n1">l04</a>.</li>
+      <li><b>Sans remise</b> : une pièce tirée ne revient pas dans le lot. C'est pourquoi on compte des sous-ensembles avec C(·, ·) (<a href="lesson-00-01-compter.html#n5">l01</a>).</li>
+      <li><b>Échantillon vraiment aléatoire</b> : chacun des C(N, n) échantillons a la même probabilité. C'est l'hypothèse qui autorise P = #/#Ω.</li>
+      <li>N, K et n sont des <b>paramètres fixes</b>, d'où le point-virgule : P(X = k ; N, K, n), et non P(X = k ∣ N, K, n). La barre ∣ est réservée au conditionnement sur un événement ou une variable aléatoire (<a href="lesson-00-03-conditionner-bayes-independance.html#n1">l03</a>).</li>
+      <li>En moyenne, l'échantillon contient nK/N = 10 × 5/100 = 0,5 défectueuse (l'espérance, <a href="lesson-00-08-esperance-variance.html#n1">l08</a>).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — sans remise contre avec remise</div>
+    <div id="f4ctl"></div>
+    <div id="f4plot" class="wide"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">Barres violettes : la loi hypergéométrique, sans remise, pour N = 100 et K = 5. Barres bleues : la loi binomiale de même proportion 5 %, le cas avec remise (<a href="lesson-00-04-variables-binomiale-normale.html#n4">l04</a>). Augmente la <b>taille n de l'échantillon</b> : la barre k = 0 fond, plus vite sans remise, parce que chaque bonne pièce retirée rend les défectueuses plus fréquentes parmi celles qui restent. Pour descendre sous 5 % de chances de tout rater, il faut tirer 45 pièces sur 100 (0,046) ; avec remise, il en faudrait 59.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>un lot de 5, le lot de Brunton, deux as, un audit d'étiquettes</small></summary><div class="in">
+    <ol>
+      <li><b>Le plus petit lot.</b> N = 5 pièces dont K = 2 défectueuses, n = 2 tirées. Il y a C(5, 2) = 10 paires possibles. Aucune défectueuse : C(3, 2) = 3 paires, 3/10. Une : 2 × 3 = 6 paires, 6/10. Deux : 1 paire, 1/10. Total 10/10.</li>
+      <li><b>Le lot de 100 pièces.</b> N = 100, K = 5, n = 10. P(0) = 0,584, P(1) = 0,339, P(2) = 0,070, P(3) = 0,0064 ; P(détecter au moins un défaut) = 1 − 0,584 = 0,416.</li>
+      <li><b>Le poker.</b> Une main de 5 cartes est un échantillon sans remise d'un « lot » de 52 cartes dont 4 as : P(exactement 2 as) = C(4, 2) · C(48, 3)/C(52, 5) = 6 × 17 296/2 598 960 ≈ 0,040.</li>
+      <li><b>L'audit d'étiquettes (ML).</b> Un jeu d'évaluation de 1 000 exemples en contient 50 mal étiquetés ; on en relit 20 au hasard. P(n'en voir aucun) = C(950, 20)/C(1 000, 20) ≈ 0,355 : une relecture de 20 exemples rate tout plus d'une fois sur trois.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>D'où vient la formule <small>compter des sous-ensembles, puis découper</small></summary><div class="in">
+    <div class="drv">
+      <div>Ω = sous-ensembles de <i>n</i> pièces, #Ω = C(<i>N</i>, <i>n</i>)</div><span>non ordonné, sans remise</span>
+      <div>choisir les <i>k</i> défectueuses parmi <i>K</i> : C(<i>K</i>, <i>k</i>) façons</div><span>même règle, chez les défectueuses</span>
+      <div>choisir les <i>n</i> − <i>k</i> bonnes parmi <i>N</i> − <i>K</i> : C(<i>N</i> − <i>K</i>, <i>n</i> − <i>k</i>) façons</div><span>même règle, chez les bonnes</span>
+      <div>#{<i>X</i> = <i>k</i>} = C(<i>K</i>, <i>k</i>) · C(<i>N</i> − <i>K</i>, <i>n</i> − <i>k</i>)</div><span>principe multiplicatif</span>
+      <div>P(<i>X</i> = <i>k</i>) = #{<i>X</i> = <i>k</i>} / #Ω</div><span>échantillons équiprobables</span>
+    </div>
+    <p>Les probabilités somment à 1 : chaque échantillon contient un nombre bien défini de défectueuses, donc les événements {X = k} découpent Ω en morceaux disjoints (notion 2). Ce découpage s'écrit Σ<sub>k</sub> C(K, k) C(N − K, n − k) = C(N, n), l'identité de Vandermonde.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>50 000 contrôles, sans remise puis avec remise</small></summary><div class="in">
+<pre class="py">import numpy as np
+from math import comb
+
+N, K, n = 100, 5, 10
+rng = np.random.default_rng(0)
+lot = np.zeros(N, dtype=int)
+lot[:K] = 1                                   # 1 = defective part
+trials = 50_000
+# without replacement: a part drawn does not go back into the lot
+without = np.array([rng.choice(lot, n, replace=False).sum() for _ in range(trials)])
+# with replacement: every draw sees the same proportion K/N
+with_r = rng.choice(lot, size=(trials, n), replace=True).sum(axis=1)
+
+print("        without replacement     with replacement")
+for k in range(4):
+    hyper = comb(K, k) * comb(N - K, n - k) / comb(N, n)
+    binom = comb(n, k) * (K / N) ** k * (1 - K / N) ** (n - k)
+    print(f"k={k}   sim {np.mean(without == k):.4f}  hyper {hyper:.4f}"
+          f"   sim {np.mean(with_r == k):.4f}  binom {binom:.4f}")</pre>
+<pre class="out">        without replacement     with replacement
+k=0   sim 0.5803  hyper 0.5838   sim 0.5997  binom 0.5987
+k=1   sim 0.3426  hyper 0.3394   sim 0.3129  binom 0.3151
+k=2   sim 0.0707  hyper 0.0702   sim 0.0751  binom 0.0746
+k=3   sim 0.0063  hyper 0.0064   sim 0.0111  binom 0.0105</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Avec remise, ou dans un lot immense, la loi devient binomiale.</b> Chaque tirage voit alors la même proportion K/N de défectueuses. À n = 10, l'écart reste modeste (0,584 contre 0,599 pour P(0)) ; il grandit avec la part du lot qu'on prélève (figure 4).</li>
+      <li><b>Le vrai problème du contrôle qualité est l'inverse</b>, Brunton le dit en fin de vidéo : on ne connaît pas K, on veut l'estimer à partir du k observé. En fréquentiste, K est un paramètre fixe inconnu, et on cherche les valeurs de K qui rendent le k observé plausible ; en bayésien, on donne une loi à K et on calcule P(K ∣ X = k) (<a href="lesson-00-03-conditionner-bayes-independance.html#n4">l03</a>). Les deux écritures disent deux choses différentes : P(X = k ; K), K fixe, contre P(K ∣ X = k), K aléatoire.</li>
+      <li><b>L'échantillon doit être aléatoire.</b> Prélever les 10 pièces du dessus de la palette, où les défauts sont peut-être regroupés, casse l'équiprobabilité des échantillons, et la formule ne s'applique plus.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (06) appelle cette loi la « loi multinomiale ». C'est la loi hypergéométrique : deux classes, tirage sans remise ; avec plus de deux classes, c'est l'hypergéométrique multivariée. La loi multinomiale est le cas avec remise, des essais indépendants à plusieurs issues (notion 7), comme la binomiale l'est pour deux issues. Au tableau, il dit aussi « C(k, m) divisé par C(n − k, r − m) » : c'est un produit. Enfin, il change de lettres en cours de vidéo (n puis N pour le lot, r puis n pour l'échantillon, k puis B pour les défectueuses, m puis b pour celles qu'on trouve) ; on garde ici N, K, n, k.</div>
+  </div></details>
+  <p class="garde">Tirer n objets sans remise dans un lot de N qui en contient K marqués : P(X = k ; N, K, n) = C(K, k) C(N − K, n − k)/C(N, n), la loi hypergéométrique. Avec remise, ou dans un lot immense, c'est la binomiale.</p>
+</section>
+
+<!-- ============================ n6 ============================ -->
+<section class="notion culture" id="n6">
+  <h3>Binôme de Newton, triangle de Pascal, planche de Galton <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 07 · The Binomial Distribution and the Multinomial Distribution</p>
+  <div class="idee">
+    <p>Développer (x + y)² donne x² + 2xy + y². Pour (x + y)<sup>n</sup>, chaque terme du développement choisit x ou y dans chacun des n facteurs. Le coefficient de x<sup>k</sup>y<sup>n − k</sup> compte les façons de choisir les k facteurs qui donnent x : c'est C(n, k), d'où son nom de coefficient binomial.</p>
+    <p>Brunton rappelle qu'on n'a pas besoin de développer : le <b>triangle de Pascal</b> donne les coefficients, chaque nombre étant la somme des deux nombres au-dessus de lui. La ligne 3 se lit 1 3 3 1, et (x + y)³ = x³ + 3x²y + 3xy² + y³.</p>
+    <p>Puis il évoque le Plinko d'un jeu télévisé, la <b>planche de Galton</b> : une bille tombe à travers des rangées de clous et rebondit à gauche ou à droite sur chacun. Pour finir dans la case k, elle doit aller k fois à droite : C(n, k) chemins sur 2<sup>n</sup>. Lâche beaucoup de billes, et elles s'empilent en cloche.</p>
+  </div>
+  <div class="fig vis" id="v6">
+    <div class="lbl">Voir l'idée — chaque case est la somme des deux du dessus</div>
+    <div id="v6ctl" class="sl-ctl"></div><div id="v6sl"></div>
+    <div id="v6plot" class="wide"></div>
+    <div class="readouts" id="v6out"></div>
+    <p class="cap">Choisis une <b>ligne n</b> et une <b>position k</b> : la case C(n, k) s'allume en rouge, avec en ocre les deux cases dont elle est la somme. Au départ, C(4, 2) = 6 = 3 + 3. La ligne n, en bleu, donne les coefficients de (x + y)<sup>n</sup>, et leur somme vaut 2<sup>n</sup> (prendre x = y = 1). <b>Construis le triangle</b> pour voir chaque ligne naître de la précédente.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les formules</div>
+    <div class="eq">(<i>x</i> + <i>y</i>)<sup><i>n</i></sup> = Σ<sub><i>k</i>=0</sub><sup><i>n</i></sup> C(<i>n</i>, <i>k</i>) <i>x</i><sup><i>k</i></sup> <i>y</i><sup><i>n</i>−<i>k</i></sup> &nbsp;&nbsp;&nbsp;&nbsp; C(<i>n</i>, <i>k</i>) = C(<i>n</i> − 1, <i>k</i> − 1) + C(<i>n</i> − 1, <i>k</i>)</div>
+    <ul>
+      <li>La règle de Pascal vaut pour 1 ≤ k ≤ n − 1, ou partout si l'on pose C(m, j) = 0 hors de 0 ≤ j ≤ m.</li>
+      <li>C(n, k) = n!/(k!(n − k)!), le nombre de sous-ensembles de taille k (<a href="lesson-00-01-compter.html#n5">l01</a>) ; C(n, 0) = C(n, n) = 1, avec la convention 0! = 1.</li>
+      <li>x = y = 1 donne Σ<sub>k</sub> C(n, k) = 2<sup>n</sup> : un ensemble de n éléments a 2<sup>n</sup> sous-ensembles. Les trois lancers de la notion 1 ont 8 issues, donc 2⁸ = 256 événements.</li>
+      <li>Galton : si chaque rebond va à droite avec probabilité ½, indépendamment des autres, les 2<sup>n</sup> chemins sont équiprobables et la bille finit en case k avec probabilité C(n, k)/2<sup>n</sup>. C'est la loi binomiale de paramètres n et ½ (<a href="lesson-00-04-variables-binomiale-normale.html#n4">l04</a>).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig5">
+    <div class="lbl">Figure 5 — la planche de Galton</div>
+    <div id="f5ctl" class="sl-ctl"></div><div id="f5sl"></div>
+    <div id="f5plot" class="wide"></div>
+    <div class="readouts" id="f5out"></div>
+    <p class="cap">Chaque bille traverse 10 rangées de clous. Les 200 billes du départ sont déjà dans leurs cases ; <b>lâche 200 billes</b> de plus et regarde-les rebondir. Les points creux sont les effectifs attendus, nombre de billes × C(10, k)/2¹⁰ : la case du milieu reçoit 252/1 024 = 24,6 % des billes, chaque bord 1/1 024. Penche la planche avec <b>p</b>, la probabilité de rebondir à droite : la cloche glisse et devient asymétrique, c'est la loi binomiale (10, p).</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>(x + y)³, la ligne 4, la règle de Pascal, Galton à 10 rangées</small></summary><div class="in">
+    <ol>
+      <li><b>(x + y)³</b> = x³ + 3x²y + 3xy² + y³. Avec x = y = 1 : 1 + 3 + 3 + 1 = 8 = 2³.</li>
+      <li><b>La ligne 4 : 1 4 6 4 1.</b> En 4 lancers de pièce, 6 suites contiennent exactement deux F : FFPP, FPFP, FPPF, PFFP, PFPF, PPFF, sur 2⁴ = 16 suites.</li>
+      <li><b>La règle de Pascal.</b> C(5, 2) = C(4, 1) + C(4, 2) = 4 + 6 = 10.</li>
+      <li><b>Galton à 10 rangées.</b> 2¹⁰ = 1 024 chemins. La case du milieu en reçoit C(10, 5) = 252, soit 24,6 % des billes ; les cases 4, 5 et 6 ensemble, (210 + 252 + 210)/1 024 = 0,656.</li>
+      <li><b>Les mains de poker.</b> C(52, 5) = 2 598 960 est une case de la ligne 52 du triangle.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>Pascal en comptant, le binôme en développant</small></summary><div class="in">
+    <p><b>La règle de Pascal.</b> Parmi n objets, mets le dernier à part. Les sous-ensembles de taille k se rangent en deux familles :</p>
+    <div class="drv">
+      <div>ceux qui contiennent le dernier objet : C(<i>n</i> − 1, <i>k</i> − 1)</div><span>choisir les k − 1 autres parmi n − 1</span>
+      <div>ceux qui ne le contiennent pas : C(<i>n</i> − 1, <i>k</i>)</div><span>choisir les k parmi les n − 1 autres</span>
+      <div>C(<i>n</i>, <i>k</i>) = C(<i>n</i> − 1, <i>k</i> − 1) + C(<i>n</i> − 1, <i>k</i>)</div><span>deux familles disjointes qui couvrent tout</span>
+    </div>
+    <p><b>Le binôme.</b></p>
+    <div class="drv">
+      <div>(<i>x</i> + <i>y</i>)<sup><i>n</i></sup> = (<i>x</i> + <i>y</i>)(<i>x</i> + <i>y</i>) ⋯ (<i>x</i> + <i>y</i>)</div><span>n facteurs</span>
+      <div>développer = choisir <i>x</i> ou <i>y</i> dans chaque facteur : 2<sup><i>n</i></sup> produits</div><span>principe multiplicatif</span>
+      <div>un produit vaut <i>x</i><sup><i>k</i></sup><i>y</i><sup><i>n</i>−<i>k</i></sup> si <i>x</i> vient de <i>k</i> facteurs : C(<i>n</i>, <i>k</i>) produits</div><span>choisir ces k facteurs</span>
+      <div>(<i>x</i> + <i>y</i>)<sup><i>n</i></sup> = Σ<sub><i>k</i></sub> C(<i>n</i>, <i>k</i>) <i>x</i><sup><i>k</i></sup><i>y</i><sup><i>n</i>−<i>k</i></sup></div><span>regrouper les produits égaux</span>
+    </div>
+    <p><b>Galton.</b> Un chemin est une suite de n rebonds G ou D, comme une suite de n lancers. Finir en case k, c'est avoir exactement k D : C(n, k) chemins. La règle de Pascal s'y lit aussi : pour arriver en position k après n rangées, la bille était en position k − 1 ou k une rangée plus haut, d'où C(n − 1, k − 1) + C(n − 1, k) chemins.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>Pascal sans factorielle, et 100 000 billes</small></summary><div class="in">
+<pre class="py">import numpy as np
+from math import comb
+
+# Pascal's rule builds the triangle with additions only, no factorial
+row = [1]
+for n in range(1, 11):
+    row = [1] + [row[k - 1] + row[k] for k in range(1, n)] + [1]
+print("row 10:", row)
+print("equals math.comb:", row == [comb(10, k) for k in range(11)])
+print("sum of the row:", sum(row), "= 2^10")
+
+# Galton board: 10 rows of pegs, each bounce goes right with probability 1/2
+rng = np.random.default_rng(0)
+# the bin a bead lands in = its number of right bounces
+bins = rng.integers(0, 2, size=(100_000, 10)).sum(axis=1)
+freq = np.bincount(bins, minlength=11) / len(bins)
+for k in (0, 3, 5):
+    exact = comb(10, k) / 2**10
+    print(f"bin {k}: simulated {freq[k]:.4f}   C(10, {k})/2^10 = {exact:.4f}")</pre>
+<pre class="out">row 10: [1, 10, 45, 120, 210, 252, 210, 120, 45, 10, 1]
+equals math.comb: True
+sum of the row: 1024 = 2^10
+bin 0: simulated 0.0011   C(10, 0)/2^10 = 0.0010
+bin 3: simulated 0.1184   C(10, 3)/2^10 = 0.1172
+bin 5: simulated 0.2451   C(10, 5)/2^10 = 0.2461</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Les coefficients eux-mêmes ne convergent pas vers une normale.</b> La ligne 100 culmine à C(100, 50) ≈ 10²⁹. Ce qui prend la forme d'une cloche, c'est la ligne divisée par 2<sup>n</sup>, une loi de probabilité, une fois centrée en n/2 et mise à l'échelle de √n/2 : c'est le théorème de de Moivre-Laplace (<a href="lesson-00-04-variables-binomiale-normale.html#n5">l04</a>).</li>
+      <li><b>La planche ne donne C(n, k)/2<sup>n</sup> que si chaque rebond est à 50/50 et indépendant des précédents.</b> Une planche penchée donne la binomiale (n, p), asymétrique (figure 5).</li>
+      <li><b>Un coefficient n'est pas une probabilité.</b> C(10, 5) = 252 est un nombre de chemins ; il devient une probabilité une fois multiplié par la probabilité de chaque chemin, ici 1/2¹⁰.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (07) dit qu'une main de 5 cartes « est distribuée selon la loi binomiale », et appelle « loi binomiale » le nombre de mains. C(52, 5) = 2 598 960 est un coefficient binomial, un nombre de façons. La loi binomiale, P(X = k ; n, p) = C(n, k) p<sup>k</sup>(1 − p)<sup>n − k</sup>, compte des succès dans n essais indépendants (<a href="lesson-00-04-variables-binomiale-normale.html#n4">l04</a>). Une main est un sous-ensemble tiré uniformément, sans remise : c'est le nombre d'as qu'elle contient qui suit une loi hypergéométrique (notion 5, exemple 3). Il dit aussi que les lignes du triangle « convergent vers la normale » : seulement après division par 2<sup>n</sup>, centrage et mise à l'échelle.</div>
+  </div></details>
+  <p class="garde">(x + y)ⁿ = Σ C(n, k) xᵏ yⁿ⁻ᵏ ; chaque case du triangle de Pascal est la somme des deux du dessus ; la ligne n divisée par 2ⁿ est la loi de la case d'arrivée d'une bille de Galton.</p>
+</section>
+
+<!-- ============================ n7 ============================ -->
+<section class="notion culture" id="n7">
+  <h3>Coefficient multinomial : répartir en plusieurs groupes <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 07</p>
+  <div class="idee">
+    <p>C(n, k) coupe n objets en deux groupes : les k choisis et les autres. Pour r groupes, Brunton distribue comme aux cartes : on sert le premier groupe, puis le deuxième dans ce qui reste, et ainsi de suite. Les nombres de façons se multiplient.</p>
+    <p>Sept personnes à répartir en trois sous-comités de 2, 3 et 2 : C(7, 2) = 21 choix pour le premier, C(5, 3) = 10 pour le deuxième parmi les 5 restantes, C(2, 2) = 1 pour le dernier, qui prend ce qui reste. En tout, 21 × 10 × 1 = 210 répartitions, et c'est aussi 7!/(2! 3! 2!) : les factorielles intermédiaires se simplifient.</p>
+    <p>Aux cartes, distribuer les 52 cartes en quatre mains de 13, comme au bridge ou au spades de Brunton, se fait de 52!/(13!)⁴ ≈ 5,36 × 10²⁸ façons.</p>
+  </div>
+  <div class="fig vis" id="v7">
+    <div class="lbl">Voir l'idée — servir les comités un par un</div>
+    <div id="v7ctl" class="sl-ctl"></div>
+    <div id="v7plot" class="wide"></div>
+    <div class="readouts" id="v7out"></div>
+    <p class="cap">Une répartition des sept personnes est affichée. <b>Distribue</b> : le premier comité en prend 2 parmi 7, le deuxième 3 parmi les 5 restantes, le dernier prend les 2 qui restent, sans choix. Le produit 21 × 10 × 1 = 210 compte des comités <b>étiquetés</b>, le comité 1 n'est pas le comité 3. Rends les deux comités de 2 <b>interchangeables</b> : chaque répartition est alors comptée deux fois, une par étiquetage, et il en reste 105.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">coefficient multinomial : <i>n</i>! / (<i>n</i>₁! <i>n</i>₂! ⋯ <i>n<sub>r</sub></i>!) &nbsp;&nbsp;&nbsp; avec <i>n</i>₁ + <i>n</i>₂ + … + <i>n<sub>r</sub></i> = <i>n</i></div>
+    <ul>
+      <li>Les tailles doivent épuiser les n objets : c'est cette contrainte qui fait apparaître, en fin de calcul, le facteur 0! = 1.</li>
+      <li>Les groupes sont <b>étiquetés</b> (comité 1, comité 2…) ; l'ordre à l'intérieur d'un groupe ne compte pas.</li>
+      <li>r = 2 redonne le coefficient binomial : n!/(k!(n − k)!) = C(n, k).</li>
+      <li>C'est le coefficient de x₁<sup>n₁</sup> ⋯ x<sub>r</sub><sup>n<sub>r</sub></sup> dans (x₁ + … + x<sub>r</sub>)<sup>n</sup>, la formule du multinôme, comme C(n, k) l'est dans (x + y)<sup>n</sup>.</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux binômes, les comités, deux mains, le bridge, les paires, un dé</small></summary><div class="in">
+    <ol>
+      <li><b>r = 2.</b> Quatre personnes en deux binômes étiquetés : 4!/(2! 2!) = 6 = C(4, 2).</li>
+      <li><b>Les comités.</b> Sept personnes en 2, 3, 2 : 210 répartitions étiquetées, 105 si les deux binômes sont interchangeables.</li>
+      <li><b>Deux mains de poker, et le reste du paquet.</b> 52!/(5! 5! 42!) = 3 986 646 103 440, c'est-à-dire C(52, 5) × C(47, 5) : la première main, puis la seconde parmi les 47 cartes restantes.</li>
+      <li><b>Le bridge.</b> Quatre mains de 13 : 52!/(13!)⁴ ≈ 5,36 × 10²⁸.</li>
+      <li><b>Former des paires</b> (devoir de Brunton). 2m personnes en m paires sans étiquette : (2m)!/(2<sup>m</sup> m!). On compte d'abord les paires étiquetées, (2m)!/(2!)<sup>m</sup>, puis on divise par les m! ordres des paires : 3, 15, 105 et 945 façons pour 4, 6, 8 et 10 personnes.</li>
+      <li><b>Du coefficient à une loi.</b> Un dé lancé 6 fois donne chaque face exactement une fois avec probabilité 6!/(1!)⁶ × (1/6)⁶ = 720/46 656 ≈ 0,015 : chaque suite a la probabilité (1/6)⁶, et le coefficient compte les suites. C'est un calcul de loi multinomiale, avec remise.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>le produit télescopique de Brunton</small></summary><div class="in">
+    <div class="drv">
+      <div>C(<i>n</i>, <i>n</i>₁) · C(<i>n</i> − <i>n</i>₁, <i>n</i>₂) ⋯ C(<i>n</i> − <i>n</i>₁ − … − <i>n<sub>r</sub></i>₋₁, <i>n<sub>r</sub></i>)</div><span>servir les groupes un par un, principe multiplicatif</span>
+      <div>= <i>n</i>!/(<i>n</i>₁! (<i>n</i> − <i>n</i>₁)!) · (<i>n</i> − <i>n</i>₁)!/(<i>n</i>₂! (<i>n</i> − <i>n</i>₁ − <i>n</i>₂)!) ⋯</div><span>écrire chaque coefficient</span>
+      <div>= <i>n</i>! / (<i>n</i>₁! <i>n</i>₂! ⋯ <i>n<sub>r</sub></i>!) · 1/(<i>n</i> − <i>n</i>₁ − … − <i>n<sub>r</sub></i>)!</div><span>chaque reste (n − n₁ − … − n<sub>j</sub>)! se simplifie avec le numérateur suivant</span>
+      <div>= <i>n</i>! / (<i>n</i>₁! <i>n</i>₂! ⋯ <i>n<sub>r</sub></i>!)</div><span>n − n₁ − … − n<sub>r</sub> = 0, et 0! = 1</span>
+    </div>
+    <p>Autre lecture : aligne les n objets dans un ordre, de n! façons, puis donne les n₁ premiers au groupe 1, les n₂ suivants au groupe 2, et ainsi de suite. Permuter les objets à l'intérieur d'un groupe ne change pas la répartition : on divise par n₁! ⋯ n<sub>r</sub>!.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>compter les 210 répartitions une à une</small></summary><div class="in">
+<pre class="py">from itertools import permutations
+from math import factorial
+
+# give each of the 7 people the label of the committee they join:
+# a (2 seats), b (3 seats), c (2 seats)
+labeled = set(permutations("aabbbcc"))
+formula = factorial(7) // (factorial(2) * factorial(3) * factorial(2))
+print("labeled committees:", len(labeled), "| 7!/(2! 3! 2!) =", formula)
+
+# two committees of 2 interchangeable: a split and its a &lt;-&gt; c swap coincide
+swap = str.maketrans("ac", "ca")
+unlabeled = {min(p, tuple("".join(p).translate(swap))) for p in labeled}
+print("two pairs interchangeable:", len(unlabeled), "| 210 / 2! =", formula // 2)</pre>
+<pre class="out">labeled committees: 210 | 7!/(2! 3! 2!) = 210
+two pairs interchangeable: 105 | 210 / 2! = 105</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Les tailles doivent sommer à n.</b> Sinon la formule produit un nombre qui ne compte rien (voir l'encadré).</li>
+      <li><b>Des groupes de même taille sans étiquette</b> sont comptés plusieurs fois : on divise par le nombre de façons de permuter ces groupes entre eux (105 au lieu de 210, ou le m! des paires).</li>
+      <li><b>Un coefficient n'est pas une loi.</b> Le coefficient compte des façons. La loi multinomiale, P(Y₁ = n₁, …, Y<sub>r</sub> = n<sub>r</sub>) = n!/(n₁! ⋯ n<sub>r</sub>!) · p₁<sup>n₁</sup> ⋯ p<sub>r</sub><sup>n<sub>r</sub></sup>, où Y<sub>j</sub> compte les essais tombés dans la classe j, décrit n essais indépendants à r issues, avec remise (exemple 6). Distribuer des cartes se fait sans remise : les effectifs par classe d'une main (combien de cœurs, de carreaux…) suivent l'hypergéométrique multivariée (notion 5).</li>
+      <li><b>Ce n'est pas le produit des tailles</b>, Brunton le souligne : 2 × 3 × 2 = 12, alors qu'il y a 210 répartitions.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (07) appelle « loi multinomiale » le nombre n!/(n₁! ⋯ n<sub>r</sub>!) : c'est un coefficient, un nombre de façons, pas une loi ; la loi multinomiale y ajoute les probabilités p₁<sup>n₁</sup> ⋯ p<sub>r</sub><sup>n<sub>r</sub></sup> (exemple 6). Son devoir « sept personnes en sous-comités de 2, 3 et 3 » viole la contrainte : 2 + 3 + 3 = 8. Avec sept personnes en 2, 3 et 2 : 210 répartitions étiquetées, 105 si les deux binômes sont interchangeables ; avec huit personnes en 2, 3 et 3 : 560, ou 280.</div>
+  </div></details>
+  <p class="garde">n objets en r groupes étiquetés de tailles n₁, …, nᵣ, de somme n : n!/(n₁! ⋯ nᵣ!) façons, en servant les groupes un par un ; diviser encore quand des groupes de même taille sont interchangeables.</p>
+</section>
+
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Ω est l'ensemble des issues ; un événement est un sous-ensemble ; « ou » = ∪, « et » = ∩, « non » = ᶜ, et (A ∪ B)ᶜ = Aᶜ ∩ Bᶜ.</li>
+    <li>Trois axiomes : P(Ω) = 1, P(A) ≥ 0, additivité pour des événements disjoints ; tout le reste se déduit par découpage disjoint.</li>
+    <li>P(Aᶜ) = 1 − P(A) ; A ⊆ B ⇒ P(A) ≤ P(B).</li>
+    <li>P(A ∪ B) = P(A) + P(B) − P(A ∩ B), d'où la borne de l'union P(A ∪ B) ≤ P(A) + P(B).</li>
+    <li>« Au moins un » se calcule par son complément « aucun ».</li>
+    <li>Anniversaires : n personnes font n(n − 1)/2 paires ; 23 personnes, 253 paires, P(partage) = 0,507.</li>
+    <li>Tirer sans remise dans un lot à deux classes : loi hypergéométrique ; avec remise : binomiale.</li>
+    <li>C(n, k) : binôme, triangle de Pascal, planche de Galton ; n!/(n₁! ⋯ nᵣ!) pour r groupes étiquetés.</li>
+  </ol>
+</div>
+<div class="phrase">« Une probabilité est une fonction sur les événements, des sous-ensembles de Ω, qui vérifie trois axiomes : P(Ω) = 1, positivité, additivité pour des événements disjoints. Tout en découle par découpage en morceaux disjoints : le complément, la monotonie, l'inclusion-exclusion. Le réflexe pratique : « au moins un » se calcule par son complément, et c'est ce qui donne 23 personnes pour un anniversaire commun. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Qu'est-ce qu'un événement, et que veut dire « A se réalise » ?</div><div class="a hid">Un sous-ensemble de Ω, décrit en mots ; A se réalise quand l'issue ω qui sort appartient à A.</div></li>
+    <li><div class="q">Énonce les trois axiomes d'une probabilité.</div><div class="a hid">P(Ω) = 1 ; P(A) ≥ 0 pour tout A ; si A ∩ B = ∅, P(A ∪ B) = P(A) + P(B).</div></li>
+    <li><div class="q">Démontre P(Aᶜ) = 1 − P(A).</div><div class="a hid">Ω = A ∪ Aᶜ, avec A et Aᶜ disjoints : l'axiome 3 donne P(Ω) = P(A) + P(Aᶜ), et l'axiome 1 donne P(Ω) = 1.</div></li>
+    <li><div class="q">Que vaut P(A ∪ B) quand A et B se chevauchent ?</div><div class="a hid">P(A) + P(B) − P(A ∩ B) : sans le terme retiré, le chevauchement est compté deux fois.</div></li>
+    <li><div class="q">Pourquoi 23 personnes suffisent-elles pour un anniversaire commun à plus de 50 % ?</div><div class="a hid">P(tous différents) = 365/365 × 364/365 × … × 343/365 = 0,493, donc 0,507 ; 23 personnes font 253 paires, et il en faut ≈ 365 ln 2 ≈ 253.</div></li>
+    <li><div class="q">Pourquoi 1 − (364/365)²⁵³ n'est-il qu'une approximation ?</div><div class="a hid">Les 253 paires ne sont pas mutuellement indépendantes (1–2 et 2–3 imposent 1–3) : 0,5005 au lieu de 0,5073.</div></li>
+    <li><div class="q">Un lot de 100 pièces en contient 5 défectueuses, on en tire 10 : quelle loi, et pourquoi pas la binomiale ?</div><div class="a hid">La loi hypergéométrique, parce que le tirage est sans remise : P(aucune défectueuse) = C(95, 10)/C(100, 10) = 0,584, contre 0,95¹⁰ = 0,599 avec remise.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Chaînes et déroulés</div>
+  <div class="bridges">
+    <a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html"><b>Comparer deux modèles, et pourquoi le max ment</b><small>1 − 0,95⁴⁰ = 0,87 : le complément de « aucun faux positif » (notion 4) ; Bonferroni est la borne de l'union (notion 3).</small></a>
+    <a href="../walkthroughs/walkthrough-p01-03-biais-du-max.html"><b>Le biais du max (déroulé)</b><small>« Au moins une configuration paraît significative » se calcule par son complément, « aucune ne le paraît ».</small></a>
+    <a href="../chains/chain-p07-02-bagging-rf.html"><b>Bagging et forêt aléatoire</b><small>P(une ligne est tirée au moins une fois) = 1 − (1 − 1/n)ⁿ → 0,632 : le complément de « jamais tirée », dont les puissances viennent de l'indépendance des tirages.</small></a>
+    <a href="../chains/chain-p08-02-flottants-lse.html"><b>Flottants et log-sum-exp</b><small>365! déborde, un produit de facteurs proches de 1 se calcule en logarithmes (notion 4).</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::axiomes</code> (notions 1, 2, 3) · <code>stats::complement</code> (notion 4). Les notions 5, 6 et 7 sont culture, sans carte.</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l02 · v1 du 10/10/2026 · Brunton 04 à 07 · Prérequis : <a href="lesson-00-01-compter.html">l01 · Compter</a>. Suite : <a href="lesson-00-03-conditionner-bayes-independance.html">l03 · Conditionner, Bayes, indépendance</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* ===== commun à toutes les leçons (kit, étalon l08 v2) ===== */
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc : une entrée par notion, étiquette comprise */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.notion').forEach((s,i)=>{const li=document.createElement('li');const t=s.querySelector('h3').firstChild.textContent.trim();const k=s.classList.contains('culture')?' · culture':'';li.innerHTML=`<a href="#${s.id}">${i+1}. ${t}${k}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.notion').forEach(s=>io.observe(s));
+/* une ancre #nN ouvre la notion visée ; rien n'est replié par défaut hors des blocs */
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outils de dessin ===== */
+function curve(P,f,a,b,cls,ymax){let d='';const n=240;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;let y=f(x);if(!isFinite(y))continue;y=Math.min(y,ymax);d+=(d?' L':'M')+P.sx(x).toFixed(1)+' '+P.sy(y).toFixed(1);}SL.el('path',{d:d,class:'sl-fn '+cls,fill:'none'},P.dyn);}
+function bar(P,x0,x1,y,cls){const a=P.sx(x0),b=P.sx(x1);SL.el('rect',{x:Math.min(a,b),y:P.sy(y),width:Math.max(1.5,Math.abs(b-a)),height:Math.max(0,P.sy(0)-P.sy(y)),class:cls||'sl-bar'},P.dyn);}
+/* SL.plot trace l'axe vertical en x = 0 ; quand 0 porte une barre, on le ramène au bord gauche */
+function leftAxis(P,x0){const ax=P.svg.querySelectorAll('line.sl-axis');if(ax[1]){ax[1].setAttribute('x1',P.sx(x0));ax[1].setAttribute('x2',P.sx(x0));}}
+function rd(host,items){host.innerHTML=items.map(it=>`<div class="${it[2]||''}">${it[0]}<b>${it[1]}</b></div>`).join('');}
+function buttons(host,names,cb){const bs=names.map((n,i)=>{const b=SL.h('button','tb',host,n);b.onclick=()=>{bs.forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');cb(i);};return b;});bs[0].onclick();return bs;}
+
+
+/* ===== v2 : vignettes « voir l'idée », une par notion, juste sous l'idée ===== */
+/* tween : animation 0 → 1 lissée ; runner : un jeton par figure, un nouveau clic tue l'animation en cours */
+function runner(){let t={dead:true};return ()=>{t.dead=true;t={dead:false};return t;};}
+function tween(ms,draw,tk,done){if(SL.reduced){draw(1);if(done)done();return;}const t0=performance.now();const st=t=>{if(tk&&tk.dead)return;let u=Math.min(1,(t-t0)/ms);u=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;draw(u);if(u<1)requestAnimationFrame(st);else if(done)done();};requestAnimationFrame(st);}
+function loop(tk,step){if(SL.reduced){let g=0;while(step()!==false&&g++<1e5);return;}const f=()=>{if(tk.dead)return;if(step()!==false)requestAnimationFrame(f);};requestAnimationFrame(f);}
+function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function pick(r,v,p){let u=r(),a=0;for(let i=0;i<v.length;i++){a+=p[i];if(u<a)return v[i];}return v[v.length-1];}
+function gauss(r){let u=0;while(u===0)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());}
+function fulcrum(P,x){const cx=P.sx(x),cy=P.sy(0);SL.el('path',{d:`M${cx.toFixed(1)} ${(cy+1).toFixed(1)} L${(cx-8).toFixed(1)} ${(cy+16).toFixed(1)} L${(cx+8).toFixed(1)} ${(cy+16).toFixed(1)} Z`,class:'sl-fulcrum'},P.dyn);}
+function median(a){const s=a.slice().sort((x,y)=>x-y),n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;}
+function rect(P,x0,x1,y0,y1,cls,parent){const a=P.sx(x0),b=P.sx(x1),c=P.sy(y0),d=P.sy(y1);return SL.el('rect',{x:Math.min(a,b).toFixed(1),y:Math.min(c,d).toFixed(1),width:Math.abs(b-a).toFixed(1),height:Math.abs(d-c).toFixed(1),class:cls},parent||P.dyn);}
+/* pile de pastilles : une par individu, regroupées par classe de largeur bw */
+function stack(P,vals,bw,r,clsOf,centred){const bins=new Map();vals.forEach((v,i)=>{const b=centred?Math.round(v/bw):Math.floor(v/bw);if(!bins.has(b))bins.set(b,[]);bins.get(b).push(i);});
+  const res=[];bins.forEach((ids,b)=>{const c=centred?b*bw:(b+0.5)*bw,cx=P.sx(c);res.push({c:c,ids:ids});ids.forEach((i,j)=>SL.el('circle',{cx:cx.toFixed(1),cy:(P.sy(0)-r-1-j*(2*r+1)).toFixed(1),r:r,class:'sl-dot '+clsOf(i)},P.dyn));});return res;}
+
+
+/* ===== outils propres à l02 ===== */
+function fx(x,d){return x.toFixed(d).replace('.',',');}
+const SUP='⁰¹²³⁴⁵⁶⁷⁸⁹';function sup(n){return String(n).split('').map(c=>SUP[+c]).join('');}
+function comb(n,k){if(k<0||k>n)return 0;let r=1;for(let i=1;i<=k;i++)r=r*(n-k+i)/i;return r;}
+
+/* ===== Figure 1 : trois conséquences, trois découpages disjoints ===== */
+(function(){
+  const P=SL.plot(document.getElementById('f1plot'),{x:[0,1],y:[0,1],w:560,h:210,xt:[0,0.2,0.4,0.6,0.8,1],yt:[],xl:'aire = probabilité'});
+  const out=document.getElementById('f1out'),PB=0.6,st={m:0,a:0.3};
+  function piece(x0,x1,cls,txt){if(x1-x0<1e-9)return;rect(P,x0,x1,0.4,0.76,cls);if(txt&&x1-x0>0.075)P.text((x0+x1)/2,0.54,txt,'l2-pl','middle');}
+  function draw(){
+    P.clear();const a=st.a;
+    if(st.m===0){
+      piece(0,a,'sl-k2 sl-kc','A');piece(a,1,'sl-k5 sl-kc','Aᶜ');
+      P.text(0.5,0.86,'Ω = A ∪ Aᶜ, deux morceaux disjoints','','middle');
+      P.text(0.5,0.16,'P(A) + P(Aᶜ) = '+fx(a,2)+' + '+fx(1-a,2)+' = 1 = P(Ω)','l2-eqt','middle');
+      rd(out,[['P(A)',fx(a,2)],['P(Aᶜ) = 1 − P(A)',fx(1-a,2),'c3'],['P(A) + P(Aᶜ), axiomes 3 et 1','1']]);
+    }else if(st.m===1){
+      piece(0,a,'sl-k2 sl-kc','A');piece(a,PB,'sl-k4 sl-kc','B ∩ Aᶜ');piece(PB,1,'l2-rest','');
+      rect(P,0,PB,0.37,0.79,'l2-bbox');
+      P.text(PB/2,0.86,'B, d’aire 0,6, contient A','sl-c4','middle');
+      P.text(0.5,0.16,'P(B) = P(A) + P(B ∩ Aᶜ) = '+fx(a,2)+' + '+fx(PB-a,2)+' ≥ P(A)','l2-eqt','middle');
+      rd(out,[['P(A)',fx(a,2)],['P(B ∩ Aᶜ) ≥ 0, axiome 2',fx(PB-a,2)],['P(B) = P(A) + P(B ∩ Aᶜ)','0,6','c3']]);
+    }else{
+      piece(0,1,'sl-k5 sl-kc','Ω tout entier');
+      P.text(0.5,0.86,'∅ n’a aucune issue, il n’y a rien à peindre','','middle');
+      P.text(0.5,0.16,'Ω = Ω ∪ ∅, disjoints, donc P(Ω) = P(Ω) + P(∅)','l2-eqt','middle');
+      rd(out,[['P(Ω)','1'],['P(Ω ∪ ∅) = P(Ω) + P(∅)','1 = 1 + P(∅)'],['P(∅)','0','c3']]);
+    }
+  }
+  const f1sl=document.getElementById('f1sl');
+  buttons(document.getElementById('f1ctl'),['complément','monotonie, A ⊆ B','l’impossible, ∅'],k=>{st.m=k;f1sl.style.display=k===2?'none':'';draw();});
+  SL.slider(document.getElementById('f1sl'),{label:'P(A)',min:0.05,max:0.55,step:0.01,value:0.3,fmt:v=>fx(v,2)},v=>{st.a=v;draw();});
+})();
+
+/* ===== Figure 2 : deux modèles, un test set de 100 exemples ===== */
+(function(){
+  const P=SL.plot(document.getElementById('f2plot'),{x:[-0.6,19.6],y:[-0.6,5.5],w:560,h:220,xt:[],yt:[]});
+  P.svg.querySelectorAll('line.sl-axis').forEach(l=>l.remove());
+  const out=document.getElementById('f2out'),r=rng(7),perm=[...Array(100).keys()];
+  for(let i=99;i>0;i--){const j=Math.floor(r()*(i+1));[perm[i],perm[j]]=[perm[j],perm[i]];}
+  const xy=i=>[i%20,4-Math.floor(i/20)];
+  P.label(-0.4,5.0,'● A seul se trompe','sl-c2','start');P.label(5.4,5.0,'● B seul','sl-c4','start');P.label(9.0,5.0,'● les deux','sl-c3','start');P.label(13.0,5.0,'○ aucun ne se trompe','','start');
+  function draw(c){
+    P.clear();const A=new Set(perm.slice(0,10)),B=new Set(perm.slice(0,c).concat(perm.slice(10,10+8-c)));
+    for(let i=0;i<100;i++){const[x,y]=xy(i),a=A.has(i),b=B.has(i);
+      P.dot(x,y,a&&b?'sl-c3':a?'sl-c2':b?'sl-c4':'hollow l2-ok',a||b?7:5.5);}
+    rd(out,[['A se trompe','10'],['B se trompe','8'],['les deux, c',String(c)],['au moins un, 10 + 8 − c',String(18-c),'c3'],['aucun ne se trompe',String(82+c)]]);
+  }
+  SL.slider(document.getElementById('f2ctl'),{label:'les deux se trompent, c',min:0,max:8,step:1,value:5,fmt:v=>String(v)},draw);
+})();
+
+/* ===== Figure 3 : P(partage) selon n ===== */
+(function(){
+  const P=SL.plot(document.getElementById('f3plot'),{x:[0,80],y:[0,1],w:560,h:290,xt:[0,10,20,30,40,50,60,70,80],yt:[0,0.25,0.5,0.75,1],xl:'n personnes',yl:'probabilité'});
+  const out=document.getElementById('f3out'),N=80,ex=[0],ap=[0],me=[0];let q=1;
+  for(let n=1;n<=N;n++){q*=(365-(n-1))/365;ex.push(1-q);ap.push(1-Math.pow(364/365,n*(n-1)/2));me.push(1-Math.pow(364/365,n-1));}
+  function path(arr,cls){let d='';for(let n=1;n<=N;n++)d+=(d?' L':'M')+P.sx(n).toFixed(1)+' '+P.sy(arr[n]).toFixed(1);SL.el('path',{d:d,class:'sl-fn '+cls,fill:'none'},P.layer);}
+  SL.el('line',{x1:P.sx(0),x2:P.sx(80),y1:P.sy(0.5),y2:P.sy(0.5),class:'sl-seg sl-dash'},P.layer);
+  path(me,'sl-c5');path(ap,'sl-c4 l2-dashfn');path(ex,'sl-c1');
+  P.label(79,0.42,'— exacte','sl-c1','end');P.label(79,0.34,'- - paires supposées indépendantes','sl-c4','end');P.label(79,0.26,'— quelqu’un a ton anniversaire','sl-c5','end');
+  function draw(n){
+    P.clear();P.vline(n,'sl-c3 sl-dash');
+    P.dot(n,ex[n],'sl-c1',5);P.dot(n,ap[n],'hollow sl-c4',5);P.dot(n,me[n],'sl-c5',4.5);
+    rd(out,[['n personnes, paires',n+'\u202f; '+(n*(n-1)/2)],['P(partage) exacte',fx(ex[n],4),'c3'],['paires supposées indépendantes',fx(ap[n],4)],['écart, exacte − tirets',fx(ex[n]-ap[n],4)],['quelqu’un a ton anniversaire',fx(me[n],4)]]);
+  }
+  SL.slider(document.getElementById('f3ctl'),{label:'n personnes',min:2,max:80,step:1,value:23,fmt:v=>String(v)},draw);
+})();
+
+/* ===== Figure 4 : hypergéométrique contre binomiale ===== */
+(function(){
+  const NN=100,K=5,out=document.getElementById('f4out');
+  const P=SL.plot(document.getElementById('f4plot'),{x:[-0.6,6.6],y:[0,1],w:560,h:260,xt:[0,1,2,3,4,5],yt:[0,0.25,0.5,0.75,1],xl:'k, défectueuses dans l’échantillon',yl:'P(X = k)'});
+  leftAxis(P,-0.6);
+  SL.el('text',{x:P.sx(6).toFixed(1),y:(P.sy(0)+16).toFixed(1),'text-anchor':'middle',class:'sl-tick'},P.layer).textContent='≥ 6';
+  P.label(6.5,0.94,'▮ sans remise, hypergéométrique','sl-c2','end');P.label(6.5,0.86,'▮ avec remise, binomiale (n, 0,05)','sl-c1','end');
+  function draw(n){
+    P.clear();const h=[],b=[];
+    for(let k=0;k<=6;k++){h.push(k<=Math.min(n,K)?comb(K,k)*comb(NN-K,n-k)/comb(NN,n):0);b.push(k<=n?comb(n,k)*Math.pow(0.05,k)*Math.pow(0.95,n-k):0);}
+    let bt=0;for(let k=0;k<6;k++)bt+=b[k];b[6]=Math.max(0,1-bt);
+    for(let k=0;k<=6;k++){if(h[k]>0)bar(P,k-0.36,k-0.02,h[k],'sl-bar');if(b[k]>1e-9)bar(P,k+0.02,k+0.36,b[k],'sl-bar3');}
+    rd(out,[['P(aucun défaut), sans remise',fx(h[0],3),'c3'],['avec remise, 0,95'+sup(n),fx(b[0],3)],['E[X] = nK/N',fx(n*K/NN,2)]]);
+  }
+  SL.slider(document.getElementById('f4ctl'),{label:'taille n de l’échantillon',min:1,max:60,step:1,value:10,fmt:v=>String(v)},draw);
+})();
+
+/* ===== Figure 5 : la planche de Galton ===== */
+(function(){
+  const R=10,out=document.getElementById('f5out');
+  const P=SL.plot(document.getElementById('f5plot'),{x:[-0.7,10.7],y:[0,2.14],w:560,h:400,xt:[0,1,2,3,4,5,6,7,8,9,10],yt:[],xl:'case k = nombre de rebonds à droite'});
+  leftAxis(P,-0.7);
+  const pegY=i=>2.0-i*0.096;
+  for(let i=0;i<R;i++)for(let j=0;j<=i;j++)SL.el('circle',{cx:P.sx(5-i/2+j).toFixed(1),cy:P.sy(pegY(i)).toFixed(1),r:2.8,class:'l2-peg'},P.layer);
+  for(let k=0;k<=R+1;k++)SL.el('line',{x1:P.sx(k-0.5).toFixed(1),x2:P.sx(k-0.5).toFixed(1),y1:P.sy(0).toFixed(1),y2:P.sy(1.0).toFixed(1),class:'l2-bin'},P.layer);
+  const st={p:0.5,counts:new Array(R+1).fill(0),balls:[],planned:0};let r=rng(3),seed=3;const fresh=runner();
+  function path(){const xs=[5],ys=[2.12];let k=0;for(let i=0;i<R;i++){xs.push(5-i/2+k);ys.push(pegY(i)+0.035);if(r()<st.p)k++;}xs.push(k);ys.push(0.04);return {xs:xs,ys:ys,k:k,t:0};}
+  function pmf(k){return comb(R,k)*Math.pow(st.p,k)*Math.pow(1-st.p,R-k);}
+  function draw(){
+    P.clear();const landed=st.counts.reduce((a,b)=>a+b,0);let pm=0;for(let k=0;k<=R;k++)pm=Math.max(pm,pmf(k));
+    const sc=0.92/Math.max(1,st.planned*pm,Math.max(...st.counts));
+    for(let k=0;k<=R;k++){if(st.counts[k])bar(P,k-0.38,k+0.38,st.counts[k]*sc,'sl-bar');if(landed)P.dot(k,landed*pmf(k)*sc,'hollow sl-c3',4);}
+    st.balls.forEach(b=>{const s=Math.min(R,Math.floor(b.t)),u=b.t-s,x=b.xs[s]+(b.xs[s+1]-b.xs[s])*u,y=b.ys[s]+(b.ys[s+1]-b.ys[s])*u;P.dot(x,y,'l2-ball',4.2);});
+    const mean=landed?st.counts.reduce((a,c,k)=>a+c*k,0)/landed:0;
+    rd(out,[['billes arrivées',String(landed)],['part en case 5',landed?fx(st.counts[5]/landed,3):'—'],['théorie, case 5',fx(pmf(5),3),'c3'],['case moyenne (théorie 10p = '+fx(10*st.p,1)+')',landed?fx(mean,2):'—']]);
+  }
+  function instant(n){for(let i=0;i<n;i++)st.counts[path().k]++;st.planned+=n;}
+  function reset(){fresh();st.counts.fill(0);st.balls=[];st.planned=0;r=rng(seed=3);instant(200);draw();}
+  const ctl=document.getElementById('f5ctl');
+  SL.h('button','tb',ctl,'▶ lâcher 200 billes').onclick=()=>{
+    if(SL.reduced){instant(200);draw();return;}
+    const tk=fresh();st.balls=st.balls.filter(b=>b.t<R+1);st.planned+=200;let left=200;
+    loop(tk,()=>{if(left>0){st.balls.push(path());left--;}
+      st.balls.forEach(b=>b.t+=0.34);st.balls=st.balls.filter(b=>{if(b.t>=R+1){st.counts[b.k]++;return false;}return true;});
+      draw();return left>0||st.balls.length>0;});};
+  SL.h('button','tb',ctl,'vider').onclick=()=>{fresh();st.counts.fill(0);st.balls=[];st.planned=0;draw();};
+  SL.slider(document.getElementById('f5sl'),{label:'p, rebond à droite',min:0.1,max:0.9,step:0.05,value:0.5,fmt:v=>fx(v,2)},v=>{st.p=v;reset();});
+})();
+
+/* ===== v1 : chaque opération est une région (Venn des trois lancers, grille de deux pièces) ===== */
+(function(){
+  const host=document.getElementById('v1plot'),out=document.getElementById('v1out');
+  const row=SL.h('div','v-row',host),L=SL.h('div','',row),R=SL.h('div','v-mini',row);
+  const S=SL.el('svg',{viewBox:'0 0 330 236',class:'sl-plot'},L),G=SL.el('svg',{viewBox:'0 0 220 236',class:'sl-plot sl-mini'},R);
+  const defs=SL.el('defs',{},S),cp=SL.el('clipPath',{id:'l2v1clip'},defs);SL.el('circle',{cx:202,cy:112,r:80},cp);
+  const fillG=SL.el('g',{class:'l2-ong'},S);
+  SL.el('rect',{x:6,y:6,width:318,height:224,class:'l2-frame'},S);
+  SL.el('circle',{cx:128,cy:112,r:80,class:'l2-edge'},S);SL.el('circle',{cx:202,cy:112,r:80,class:'l2-edge'},S);
+  [['Ω',18,26],['A',62,40],['B',268,40]].forEach(t=>{const e=SL.el('text',{x:t[1],y:t[2],'text-anchor':'middle',class:'l2-name'},S);e.textContent=t[0];});
+  const pos={FFF:[80,102],FFP:[80,130],FPF:[165,102],FPP:[165,130],PPF:[250,102],PPP:[250,130],PFF:[42,216],PFP:[288,216]};
+  const els={};Object.keys(pos).forEach(w=>{const e=SL.el('text',{x:pos[w][0],y:pos[w][1],'text-anchor':'middle',class:'l2-el'},S);e.textContent=w;els[w]=e;});
+  const cells={};[['FF',50,46],['FP',128,46],['PF',50,124],['PP',128,124]].forEach(c=>{
+    const r=SL.el('rect',{x:c[1],y:c[2],width:76,height:76,class:'l2-cell'},G);
+    const t=SL.el('text',{x:c[1]+38,y:c[2]+44,'text-anchor':'middle',class:'l2-ct'},G);t.textContent=c[0];cells[c[0]]=r;});
+  [['F',36,89],['P',36,167],['F',88,36],['P',166,36]].forEach(t=>{const e=SL.el('text',{x:t[1],y:t[2],'text-anchor':'middle',class:'l2-name'},G);e.textContent=t[0];});
+  SL.el('text',{x:20,y:24,'text-anchor':'middle',class:'sl-lbl'},G).textContent='1er \\ 2e';
+  SL.el('text',{x:128,y:224,'text-anchor':'middle',class:'sl-lbl'},G).textContent='A = ligne F, B = colonne P';
+  const inA=w=>w[0]==='F',inB=w=>w[1]==='P';
+  const ops=[
+    {n:'A',w:'1er lancer F',f:w=>inA(w),fill:()=>[['c',128]]},
+    {n:'B',w:'2e lancer P',f:w=>inB(w),fill:()=>[['c',202]]},
+    {n:'A ∪ B',w:'1er F ou 2e P',f:w=>inA(w)||inB(w),fill:()=>[['c',128],['c',202]]},
+    {n:'A ∩ B',w:'1er F et 2e P',f:w=>inA(w)&&inB(w),fill:()=>[['clip',128]]},
+    {n:'Aᶜ',w:'1er lancer P',f:w=>!inA(w),fill:()=>[['r'],['h',128]]},
+    {n:'(A ∪ B)ᶜ',w:'ni 1er F, ni 2e P',f:w=>!(inA(w)||inB(w)),fill:()=>[['r'],['h',128],['h',202]]}];
+  function show(i){
+    const o=ops[i];while(fillG.firstChild)fillG.removeChild(fillG.firstChild);
+    o.fill().forEach(f=>{if(f[0]==='r')SL.el('rect',{x:6,y:6,width:318,height:224,class:'l2-sol'},fillG);
+      else if(f[0]==='c')SL.el('circle',{cx:f[1],cy:112,r:80,class:'l2-sol'},fillG);
+      else if(f[0]==='h')SL.el('circle',{cx:f[1],cy:112,r:80,class:'l2-hole'},fillG);
+      else SL.el('circle',{cx:f[1],cy:112,r:80,class:'l2-sol','clip-path':'url(#l2v1clip)'},fillG);});
+    let k=0;Object.keys(els).forEach(w=>{const on=o.f(w);if(on)k++;els[w].setAttribute('class','l2-el'+(on?' on':''));});
+    let m=0;Object.keys(cells).forEach(w=>{const on=o.f(w);if(on)m++;cells[w].setAttribute('class','l2-cell'+(on?' on':''));});
+    rd(out,[['événement',o.n],['en mots',o.w],['trois lancers',k+(k>1?' issues':' issue')+' sur 8'],['deux pièces',m+(m>1?' cases':' case')+' sur 4'],['probabilité',k+'/8 = '+fx(k/8,2),'c3']]);
+  }
+  buttons(document.getElementById('v1ctl'),ops.map(o=>o.n),show);
+})();
+
+/* ===== v2 : la fléchette, la probabilité est une aire ===== */
+(function(){
+  const host=document.getElementById('v2plot'),out=document.getElementById('v2out');
+  const S=SL.el('svg',{viewBox:'0 0 560 300',class:'sl-plot'},host);
+  const X0=20,Y0=20,W=520,H=260,RD=Math.sqrt(0.2*W*H/Math.PI);
+  const zone=SL.el('g',{},S),darts=SL.el('g',{},S),labs=SL.el('g',{},S);
+  SL.el('rect',{x:X0,y:Y0,width:W,height:H,class:'l2-frame'},S);
+  const modes=[{n:'pièce juste',a:0.5,t:'coin'},{n:'pièce truquée, 0,7',a:0.7,t:'coin'},{n:'un disque A',a:0.2,t:'disk'}];
+  const st={m:0,d:[],in:0};const fresh=runner();let seed=1;
+  function inA(x,y){const M=modes[st.m];return M.t==='disk'?Math.hypot(x-(X0+W/2),y-(Y0+H/2))<RD:x<X0+M.a*W;}
+  function txt(x,y,s,cls,anc){const e=SL.el('text',{x:x,y:y,'text-anchor':anc||'middle',class:cls||'l2-big'},labs);e.textContent=s;
+    try{const bb=e.getBBox();if(bb.width){const r=SL.el('rect',{x:(bb.x-5).toFixed(1),y:(bb.y-2).toFixed(1),width:(bb.width+10).toFixed(1),height:(bb.height+4).toFixed(1),rx:3,class:'l2-tbg'},labs);labs.insertBefore(r,e);}}catch(err){}}
+  function board(){
+    while(zone.firstChild)zone.removeChild(zone.firstChild);while(labs.firstChild)labs.removeChild(labs.firstChild);
+    const M=modes[st.m];
+    if(M.t==='disk'){SL.el('circle',{cx:X0+W/2,cy:Y0+H/2,r:RD,class:'l2-zoneA'},zone);
+      txt(X0+W/2,Y0+H/2+5,'A, aire 0,2');txt(X0+14,Y0+24,'Aᶜ, aire 0,8','l2-big','start');}
+    else{const xa=X0+M.a*W;SL.el('rect',{x:X0,y:Y0,width:M.a*W,height:H,class:'l2-zoneA'},zone);
+      SL.el('line',{x1:xa,x2:xa,y1:Y0,y2:Y0+H,class:'l2-cut'},zone);
+      txt(X0+M.a*W/2,Y0+H/2+5,'A = face, aire '+fx(M.a,1));txt(xa+(1-M.a)*W/2,Y0+H/2+5,'Aᶜ = pile, aire '+fx(1-M.a,1));}
+  }
+  function add(r,n){for(let i=0;i<n;i++){const x=X0+r()*W,y=Y0+r()*H,a=inA(x,y);st.d.push(a);if(a)st.in++;
+    SL.el('circle',{cx:x.toFixed(1),cy:y.toFixed(1),r:3,class:'l2-dart'+(a?' in':'')},darts);}}
+  function readout(){const n=st.d.length,M=modes[st.m];
+    rd(out,[['fléchettes',String(n)],['fréquence dans A',fx(st.in/n,3)],['P(A), aire de A',fx(M.a,1),'c3'],['fréquence hors de A',fx((n-st.in)/n,3)]]);}
+  function reset(){fresh();while(darts.firstChild)darts.removeChild(darts.firstChild);st.d=[];st.in=0;board();add(rng(1),100);readout();}
+  buttons(document.getElementById('v2ctl'),modes.map(m=>m.n),k=>{st.m=k;reset();});
+  SL.h('button','tb',document.getElementById('v2ctl'),'▶ lancer 500 fléchettes').onclick=()=>{
+    const tk=fresh(),r=rng(100+(seed++));let left=500;loop(tk,()=>{const k=Math.min(10,left);add(r,k);left-=k;readout();return left>0;});};
+})();
+
+/* ===== v3 : le chevauchement compté deux fois ===== */
+(function(){
+  const host=document.getElementById('v3plot'),out=document.getElementById('v3out');
+  const st={m:0,s:1};
+  const RK=['A','2','3','4','5','6','7','8','9','10','V','D','R'],SU=['♥','♦','♣','♠'];
+  function draw(){
+    host.innerHTML='';const S=SL.el('svg',{viewBox:'0 0 560 '+(st.m?200:190),class:'sl-plot'},host);
+    let cells=[];
+    if(st.m===0){const C=['FF','FP','PF','PP'];
+      ['F','P'].forEach((r,i)=>C.forEach((c,j)=>cells.push({x:70+j*112,y:30+i*76,w:104,h:68,lab:r+c,a:r==='F',b:c[0]==='P'})));
+      ['FF','FP','PF','PP'].forEach((c,j)=>{const t=SL.el('text',{x:70+j*112+52,y:20,'text-anchor':'middle',class:'sl-lbl'},S);t.textContent='2e et 3e\u00a0: '+c;});
+      ['1er F','1er P'].forEach((c,i)=>{const t=SL.el('text',{x:34,y:30+i*76+39,'text-anchor':'middle',class:'sl-lbl'},S);t.textContent=c;});
+    }else{
+      SU.forEach((s,i)=>RK.forEach((r,j)=>cells.push({x:52+j*38,y:28+i*40,w:35,h:37,lab:'',a:i===0,b:r==='R'})));
+      RK.forEach((r,j)=>{const t=SL.el('text',{x:52+j*38+17.5,y:20,'text-anchor':'middle',class:'sl-lbl'},S);t.textContent=r;});
+      SU.forEach((s,i)=>{const t=SL.el('text',{x:34,y:28+i*40+24,'text-anchor':'middle',class:'l2-suit'+(i<2?' red':'')},S);t.textContent=s;});
+    }
+    let nA=0,nB=0,nAB=0,tot=0,twos=0;
+    cells.forEach(c=>{const v=(c.a?1:0)+(st.s>=1&&c.b?1:0)-(st.s>=2&&c.a&&c.b?1:0);
+      if(c.a)nA++;if(c.b)nB++;if(c.a&&c.b)nAB++;tot+=v;if(v===2)twos++;
+      const bOn=st.s>=1&&c.b,cls=c.a&&bOn?'l2-ab':c.a?'l2-a':bOn?'l2-b':'l2-cell';
+      SL.el('rect',{x:c.x,y:c.y,width:c.w,height:c.h,class:cls},S);
+      if(c.lab){const t=SL.el('text',{x:c.x+c.w/2,y:c.y+16,'text-anchor':'middle',class:'l2-el'},S);t.textContent=c.lab;}
+      if(v>0){const t=SL.el('text',{x:c.x+c.w/2,y:c.y+c.h/2+(c.lab?14:6),'text-anchor':'middle',class:'l2-tally'+(v===2?' two':'')},S);t.textContent=String(v);}});
+    const N=cells.length,u=nA+nB-nAB;
+    const cnt=st.s===0?String(nA):st.s===1?nA+' + '+nB+' = '+(nA+nB):(nA+nB)+' − '+nAB+' = '+u;
+    const pr=st.s===0?['P(A)',nA+'/'+N]:st.s===1?['P(A) + P(B), faux',(nA+nB)+'/'+N]:['P(A ∪ B)',u+'/'+N+' ≈ '+fx(u/N,3),'c3'];
+    rd(out,[['A\u00a0: '+(st.m?'les cœurs':'1er lancer F')+', B\u00a0: '+(st.m?'les rois':'2e lancer P'),st.m?'52 cartes':'8 issues'],['cases comptées',cnt],['cases comptées deux fois',String(twos)],pr]);
+  }
+  buttons(document.getElementById('v3ctl'),['trois lancers','52 cartes'],k=>{st.m=k;draw();});
+  const bs=buttons(document.getElementById('v3step'),['1. compter A','2. ajouter B','3. retirer A ∩ B'],k=>{st.s=k;draw();});
+  bs[1].onclick();
+})();
+
+/* ===== v4 : n personnes, n(n − 1)/2 paires ===== */
+(function(){
+  const host=document.getElementById('v4plot'),out=document.getElementById('v4out');
+  const S=SL.el('svg',{viewBox:'0 0 560 310',class:'sl-plot'},host);
+  const chords=SL.el('g',{},S),match=SL.el('g',{},S),ppl=SL.el('g',{},S);
+  const CX=280,CY=155,RR=130,MO=['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'],ML=[31,28,31,30,31,30,31,31,30,31,30,31];
+  function date(d){let m=0;while(d>=ML[m]){d-=ML[m];m++;}return (d+1)+' '+MO[m];}
+  const st={n:23,days:[],seed:1,sim:null};const fresh=runner();
+  function room(seed){const r=rng(seed);return Array.from({length:60},()=>Math.floor(365*r()));}
+  function pt(i,n){const a=-Math.PI/2+2*Math.PI*i/n;return [CX+RR*Math.cos(a),CY+RR*Math.sin(a)];}
+  function pnone(n){let q=1;for(let k=0;k<n;k++)q*=(365-k)/365;return q;}
+  function drawChords(){while(chords.firstChild)chords.removeChild(chords.firstChild);const n=st.n;chords.setAttribute('opacity',Math.min(1,320/(n*(n-1)/2)).toFixed(3));
+    for(let i=0;i<n;i++)for(let j=i+1;j<n;j++){const a=pt(i,n),b=pt(j,n);SL.el('line',{x1:a[0].toFixed(1),y1:a[1].toFixed(1),x2:b[0].toFixed(1),y2:b[1].toFixed(1),class:'l2-chord'},chords);}}
+  function drawRoom(days){while(match.firstChild)match.removeChild(match.firstChild);while(ppl.firstChild)ppl.removeChild(ppl.firstChild);
+    const n=st.n,hit=new Set(),shared=[];let k=0;
+    for(let i=0;i<n;i++)for(let j=i+1;j<n;j++)if(days[i]===days[j]){k++;hit.add(i);hit.add(j);if(!shared.includes(days[i]))shared.push(days[i]);
+      const a=pt(i,n),b=pt(j,n);SL.el('line',{x1:a[0].toFixed(1),y1:a[1].toFixed(1),x2:b[0].toFixed(1),y2:b[1].toFixed(1),class:'l2-match'},match);}
+    for(let i=0;i<n;i++){const a=pt(i,n);SL.el('circle',{cx:a[0].toFixed(1),cy:a[1].toFixed(1),r:n>40?4.5:6,class:'l2-p'+(hit.has(i)?' hit':'')},ppl);}
+    return {k:k,shared:shared};}
+  function readout(res){const n=st.n,pairs=n*(n-1)/2;
+    const ds=res.shared.length?res.shared.slice(0,2).map(date).join(', ')+(res.shared.length>2?', +'+(res.shared.length-2):''):'aucun';
+    rd(out,[['paires, n(n − 1)/2',String(pairs)],['paires qui partagent, cette salle',String(res.k)],['jours partagés',ds],
+      ['salles avec un partage',st.sim?fx(st.sim.hit/st.sim.n,3)+' sur '+st.sim.n:'pas encore lancées'],['P(partage) exacte',fx(1-pnone(n),3),'c3']]);}
+  function redraw(){drawChords();readout(drawRoom(st.days));}
+  st.days=room(st.seed);
+  const ctl=document.getElementById('v4ctl');
+  SL.h('button','tb',ctl,'tirer une autre salle').onclick=()=>{fresh();st.seed++;st.days=room(st.seed);st.sim=null;readout(drawRoom(st.days));};
+  SL.h('button','tb',ctl,'▶ 1 000 salles').onclick=()=>{const tk=fresh(),r=rng(500+st.seed);st.sim={n:0,hit:0};let last=null;
+    loop(tk,()=>{for(let b=0;b<20&&st.sim.n<1000;b++){const d=Array.from({length:60},()=>Math.floor(365*r()));const seen=new Set();let h=false;
+        for(let i=0;i<st.n;i++){if(seen.has(d[i])){h=true;break;}seen.add(d[i]);}st.sim.n++;if(h)st.sim.hit++;last=d;}
+      readout(drawRoom(last));return st.sim.n<1000;});};
+  SL.slider(document.getElementById('v4sl'),{label:'n personnes',min:2,max:60,step:1,value:23,fmt:v=>String(v)},v=>{fresh();st.n=v;st.sim=null;redraw();});
+})();
+
+/* ===== v5 : un lot de 100 pièces, 5 défectueuses, 10 tirées ===== */
+(function(){
+  const host=document.getElementById('v5plot'),out=document.getElementById('v5out');
+  const row=SL.h('div','v-row',host),L=SL.h('div','v-mini l2-lot',row),R=SL.h('div','',row);
+  const S=SL.el('svg',{viewBox:'0 0 264 264',class:'sl-plot'},L);
+  const r0=rng(5),bad=new Set();while(bad.size<5)bad.add(Math.floor(100*r0()));
+  const cell=[];for(let i=0;i<100;i++){const x=4+(i%10)*26,y=4+Math.floor(i/10)*26;
+    SL.el('rect',{x:x,y:y,width:22,height:22,rx:2,class:bad.has(i)?'l2-bad':'l2-good'},S);
+    cell.push(SL.el('rect',{x:x-2,y:y-2,width:26,height:26,rx:3,class:'l2-pick',style:'display:none'},S));}
+  const P=SL.plot(R,{x:[-0.6,3.6],y:[-0.09,0.7],w:470,h:264,xt:[],yt:[0,0.2,0.4,0.6],yl:'part des contrôles'});
+  leftAxis(P,-0.6);
+  const TH=[0.583752,0.339391,0.070219,0.006638];
+  ['0','1','2','≥ 3'].forEach((t,k)=>SL.el('text',{x:P.sx(k).toFixed(1),y:(P.sy(0)+16).toFixed(1),'text-anchor':'middle',class:'sl-tick'},P.layer).textContent=t);
+  SL.el('text',{x:P.sx(3.55).toFixed(1),y:(P.sy(0.66)).toFixed(1),'text-anchor':'end',class:'sl-lbl'},P.layer).textContent='○ théorie';
+  const st={k:0,n:0,c:[0,0,0,0]};const fresh=runner();let seed=2,cseed=924;
+  function sample(r){const s=new Set();while(s.size<10)s.add(Math.floor(100*r()));return s;}
+  function show(s){let k=0;cell.forEach((c,i)=>{c.style.display=s.has(i)?'':'none';});s.forEach(i=>{if(bad.has(i))k++;});return k;}
+  function draw(){P.clear();for(let k=0;k<4;k++){if(st.n)bar(P,k-0.3,k+0.3,st.c[k]/st.n,'sl-bar');P.dot(k,TH[k],'hollow sl-c3',5);}
+    rd(out,[['défectueuses dans cet échantillon',String(st.k)],['contrôles',st.n?String(st.n):'aucun'],['aucun défaut vu (théorie 0,584)',st.n?fx(st.c[0]/st.n,3):'—'],['un défaut (théorie 0,339)',st.n?fx(st.c[1]/st.n,3):'—']]);}
+  st.k=show(sample(rng(2)));draw();
+  const ctl=document.getElementById('v5ctl');
+  SL.h('button','tb',ctl,'tirer 10 pièces').onclick=()=>{fresh();st.k=show(sample(rng(10+(seed++))));draw();};
+  SL.h('button','tb',ctl,'▶ 1 000 contrôles').onclick=()=>{const tk=fresh(),r=rng(cseed++);st.n=0;st.c=[0,0,0,0];
+    loop(tk,()=>{let s=null;for(let b=0;b<25&&st.n<1000;b++){s=sample(r);let k=0;s.forEach(i=>{if(bad.has(i))k++;});st.c[Math.min(k,3)]++;st.n++;}
+      st.k=show(s);draw();return st.n<1000;});};
+})();
+
+/* ===== v6 : le triangle de Pascal, chaque case est la somme des deux du dessus ===== */
+(function(){
+  const host=document.getElementById('v6plot'),out=document.getElementById('v6out');
+  const S=SL.el('svg',{viewBox:'0 0 560 300',class:'sl-plot'},host);
+  const RM=8,cx=(r,k)=>280+(k-r/2)*58,cy=r=>14+r*32;
+  const arrows=SL.el('g',{},S),cells=[];
+  for(let r=0;r<=RM;r++){cells.push([]);for(let k=0;k<=r;k++){const g=SL.el('g',{},S);
+    const b=SL.el('rect',{x:(cx(r,k)-25).toFixed(1),y:cy(r),width:50,height:25,rx:3,class:'l2-pc'},g);
+    const t=SL.el('text',{x:cx(r,k).toFixed(1),y:cy(r)+17,'text-anchor':'middle',class:'l2-pt'},g);t.textContent=String(comb(r,k));cells[r].push({g:g,b:b});}}
+  const st={n:4,k:2,upto:RM};const fresh=runner();
+  function draw(){
+    while(arrows.firstChild)arrows.removeChild(arrows.firstChild);const n=st.n,k=Math.min(st.k,n);
+    for(let r=0;r<=RM;r++)for(let j=0;j<=r;j++){const c=cells[r][j];c.g.style.opacity=r<=st.upto?'1':'0';
+      let cls='l2-pc';if(r===n)cls+=' row';if(r===n-1&&(j===k-1||j===k))cls+=' par';if(r===n&&j===k)cls+=' tgt';c.b.setAttribute('class',cls);}
+    [k-1,k].forEach(j=>{if(j<0||j>n-1)return;SL.el('line',{x1:cx(n-1,j).toFixed(1),y1:cy(n-1)+25,x2:(cx(n,k)+(j<k?-7:7)).toFixed(1),y2:cy(n)-1,class:'sl-seg sl-arrow','marker-end':'url(#sl-ah)'},arrows);});
+    const a=comb(n-1,k-1),b=comb(n-1,k),rowv=[];for(let j=0;j<=n;j++)rowv.push(comb(n,j));
+    rd(out,[['ligne '+n+', les coefficients de (x + y)'+sup(n),rowv.join(' ')],['somme de la ligne',(1<<n)+' = 2'+sup(n)],['C('+n+', '+k+') = les deux du dessus',comb(n,k)+' = '+a+' + '+b,'c3']]);
+  }
+  const sl=document.getElementById('v6sl'),dn=SL.h('div','',sl),dk=SL.h('div','',sl);
+  const ks=SL.slider(dk,{label:'position k',min:0,max:4,step:1,value:2,fmt:v=>String(v)},v=>{if(v>st.n){ks.set(st.n);return;}st.k=v;draw();});
+  SL.slider(dn,{label:'ligne n',min:1,max:8,step:1,value:4,fmt:v=>String(v)},v=>{st.n=v;ks.input.max=v;ks.set(Math.min(st.k,v));});
+  SL.h('button','tb',document.getElementById('v6ctl'),'▶ construire ligne par ligne').onclick=()=>{const tk=fresh();
+    if(SL.reduced){st.upto=RM;draw();return;}const t0=performance.now();st.upto=-1;draw();
+    loop(tk,()=>{const u=Math.floor((performance.now()-t0)/450);if(u!==st.upto){st.upto=Math.min(RM,u);draw();}return st.upto<RM;});};
+})();
+
+/* ===== v7 : servir les comités un par un ===== */
+(function(){
+  const host=document.getElementById('v7plot'),out=document.getElementById('v7out');
+  const S=SL.el('svg',{viewBox:'0 0 560 240',class:'sl-plot'},host);
+  const BX=[{x:28,w:140,s:2},{x:200,w:180,s:3},{x:412,w:140,s:2}],BY=140,poolY=42,poolX=i=>100+i*60;
+  const lab=[];BX.forEach((b,j)=>{SL.el('rect',{x:b.x,y:BY,width:b.w,height:70,rx:4,class:'l2-box'+(j===1?'':' pair')},S);
+    const t=SL.el('text',{x:b.x+b.w/2,y:BY-10,'text-anchor':'middle',class:'sl-lbl'},S);lab.push(t);});
+  for(let i=0;i<7;i++)SL.el('circle',{cx:100+i*60,cy:poolY,r:16,class:'l2-ghost'},S);
+  SL.el('text',{x:12,y:poolY+5,'text-anchor':'start',class:'sl-lbl'},S).textContent='au départ';
+  const seat=(j,s)=>[BX[j].x+BX[j].w*(s+0.5)/BX[j].s,BY+35];
+  const P=[];for(let i=0;i<7;i++){const g=SL.el('g',{},S);SL.el('circle',{r:16,class:'sl-mass'},g);const t=SL.el('text',{y:4,'text-anchor':'middle',class:'sl-mass-t'},g);t.textContent=String(i+1);P.push(g);}
+  const st={perm:[0,1,2,3,4,5,6],same:false,phase:3};const fresh=runner();let seed=4;
+  function target(i){const p=st.perm.indexOf(i);if(p<2)return seat(0,p);if(p<5)return seat(1,p-2);return seat(2,p-5);}
+  function phaseOf(i){const p=st.perm.indexOf(i);return p<2?0:p<5?1:2;}
+  function place(u){for(let i=0;i<7;i++){const ph=phaseOf(i),a=[poolX(i),poolY],b=target(i);let v=ph<Math.floor(u)?1:ph>Math.floor(u)?0:u-Math.floor(u);
+      v=v<.5?2*v*v:1-Math.pow(-2*v+2,2)/2;P[i].setAttribute('transform','translate('+(a[0]+(b[0]-a[0])*v).toFixed(1)+' '+(a[1]+(b[1]-a[1])*v).toFixed(1)+')');}}
+  function readout(u){const done=Math.floor(u);
+    lab[0].textContent=st.same?'binôme, 2 places':'comité 1, 2 places';lab[1].textContent='comité 2, 3 places';lab[2].textContent=st.same?'binôme, 2 places':'comité 3, 2 places';
+    rd(out,[['1er comité, C(7, 2)',done>=1?'21':'…'],['2e, C(5, 3) parmi les 5 restantes',done>=2?'10':'…'],['3e, C(2, 2), les 2 dernières',done>=3?'1':'…'],
+      [st.same?'répartitions, 210 / 2!':'répartitions, 21 × 10 × 1',done>=3?(st.same?'105':'210'):'…','c3']]);}
+  function shuffle(r){const a=[0,1,2,3,4,5,6];for(let i=6;i>0;i--){const j=Math.floor(r()*(i+1));[a[i],a[j]]=[a[j],a[i]];}return a;}
+  st.perm=shuffle(rng(3));place(3);readout(3);
+  const ctl=document.getElementById('v7ctl');
+  SL.h('button','tb',ctl,'▶ distribuer au hasard').onclick=()=>{const tk=fresh();st.perm=shuffle(rng(seed++));
+    if(SL.reduced){place(3);readout(3);return;}const t0=performance.now();
+    loop(tk,()=>{const u=Math.min(3,(performance.now()-t0)/700);place(u);readout(u);return u<3;});};
+  const tg=SL.h('button','tb',ctl,'comités de 2 interchangeables');tg.setAttribute('aria-pressed','false');
+  tg.onclick=()=>{st.same=!st.same;tg.setAttribute('aria-pressed',String(st.same));readout(3);place(3);};
+})();
+
+})();
+</script>
+</body>
+</html>

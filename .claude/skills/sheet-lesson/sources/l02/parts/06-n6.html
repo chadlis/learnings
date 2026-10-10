@@ -1,0 +1,72 @@
+<!-- ============================ n6 ============================ -->
+<section class="notion culture" id="n6">
+  <h3>Binôme de Newton, triangle de Pascal, planche de Galton <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 07 · The Binomial Distribution and the Multinomial Distribution</p>
+  <div class="idee">
+    <p>Développer (x + y)² donne x² + 2xy + y². Pour (x + y)<sup>n</sup>, chaque terme du développement choisit x ou y dans chacun des n facteurs. Le coefficient de x<sup>k</sup>y<sup>n − k</sup> compte les façons de choisir les k facteurs qui donnent x : c'est C(n, k), d'où son nom de coefficient binomial.</p>
+    <p>Brunton rappelle qu'on n'a pas besoin de développer : le <b>triangle de Pascal</b> donne les coefficients, chaque nombre étant la somme des deux nombres au-dessus de lui. La ligne 3 se lit 1 3 3 1, et (x + y)³ = x³ + 3x²y + 3xy² + y³.</p>
+    <p>Puis il évoque le Plinko d'un jeu télévisé, la <b>planche de Galton</b> : une bille tombe à travers des rangées de clous et rebondit à gauche ou à droite sur chacun. Pour finir dans la case k, elle doit aller k fois à droite : C(n, k) chemins sur 2<sup>n</sup>. Lâche beaucoup de billes, et elles s'empilent en cloche.</p>
+  </div>
+  <div class="fig vis" id="v6">
+    <div class="lbl">Voir l'idée — chaque case est la somme des deux du dessus</div>
+    <div id="v6ctl" class="sl-ctl"></div><div id="v6sl"></div>
+    <div id="v6plot" class="wide"></div>
+    <div class="readouts" id="v6out"></div>
+    <p class="cap">Choisis une <b>ligne n</b> et une <b>position k</b> : la case C(n, k) s'allume en rouge, avec en ocre les deux cases dont elle est la somme. Au départ, C(4, 2) = 6 = 3 + 3. La ligne n, en bleu, donne les coefficients de (x + y)<sup>n</sup>, et leur somme vaut 2<sup>n</sup> (prendre x = y = 1). <b>Construis le triangle</b> pour voir chaque ligne naître de la précédente.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les formules</div>
+    <div class="eq">(<i>x</i> + <i>y</i>)<sup><i>n</i></sup> = Σ<sub><i>k</i>=0</sub><sup><i>n</i></sup> C(<i>n</i>, <i>k</i>) <i>x</i><sup><i>k</i></sup> <i>y</i><sup><i>n</i>−<i>k</i></sup> &nbsp;&nbsp;&nbsp;&nbsp; C(<i>n</i>, <i>k</i>) = C(<i>n</i> − 1, <i>k</i> − 1) + C(<i>n</i> − 1, <i>k</i>)</div>
+    <ul>
+      <li>La règle de Pascal vaut pour 1 ≤ k ≤ n − 1, ou partout si l'on pose C(m, j) = 0 hors de 0 ≤ j ≤ m.</li>
+      <li>C(n, k) = n!/(k!(n − k)!), le nombre de sous-ensembles de taille k (<a href="lesson-00-01-compter.html#n5">l01</a>) ; C(n, 0) = C(n, n) = 1, avec la convention 0! = 1.</li>
+      <li>x = y = 1 donne Σ<sub>k</sub> C(n, k) = 2<sup>n</sup> : un ensemble de n éléments a 2<sup>n</sup> sous-ensembles. Les trois lancers de la notion 1 ont 8 issues, donc 2⁸ = 256 événements.</li>
+      <li>Galton : si chaque rebond va à droite avec probabilité ½, indépendamment des autres, les 2<sup>n</sup> chemins sont équiprobables et la bille finit en case k avec probabilité C(n, k)/2<sup>n</sup>. C'est la loi binomiale de paramètres n et ½ (<a href="lesson-00-04-variables-binomiale-normale.html#n4">l04</a>).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig5">
+    <div class="lbl">Figure 5 — la planche de Galton</div>
+    <div id="f5ctl" class="sl-ctl"></div><div id="f5sl"></div>
+    <div id="f5plot" class="wide"></div>
+    <div class="readouts" id="f5out"></div>
+    <p class="cap">Chaque bille traverse 10 rangées de clous. Les 200 billes du départ sont déjà dans leurs cases ; <b>lâche 200 billes</b> de plus et regarde-les rebondir. Les points creux sont les effectifs attendus, nombre de billes × C(10, k)/2¹⁰ : la case du milieu reçoit 252/1 024 = 24,6 % des billes, chaque bord 1/1 024. Penche la planche avec <b>p</b>, la probabilité de rebondir à droite : la cloche glisse et devient asymétrique, c'est la loi binomiale (10, p).</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>(x + y)³, la ligne 4, la règle de Pascal, Galton à 10 rangées</small></summary><div class="in">
+    <ol>
+      <li><b>(x + y)³</b> = x³ + 3x²y + 3xy² + y³. Avec x = y = 1 : 1 + 3 + 3 + 1 = 8 = 2³.</li>
+      <li><b>La ligne 4 : 1 4 6 4 1.</b> En 4 lancers de pièce, 6 suites contiennent exactement deux F : FFPP, FPFP, FPPF, PFFP, PFPF, PPFF, sur 2⁴ = 16 suites.</li>
+      <li><b>La règle de Pascal.</b> C(5, 2) = C(4, 1) + C(4, 2) = 4 + 6 = 10.</li>
+      <li><b>Galton à 10 rangées.</b> 2¹⁰ = 1 024 chemins. La case du milieu en reçoit C(10, 5) = 252, soit 24,6 % des billes ; les cases 4, 5 et 6 ensemble, (210 + 252 + 210)/1 024 = 0,656.</li>
+      <li><b>Les mains de poker.</b> C(52, 5) = 2 598 960 est une case de la ligne 52 du triangle.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>Pascal en comptant, le binôme en développant</small></summary><div class="in">
+    <p><b>La règle de Pascal.</b> Parmi n objets, mets le dernier à part. Les sous-ensembles de taille k se rangent en deux familles :</p>
+    <div class="drv">
+      <div>ceux qui contiennent le dernier objet : C(<i>n</i> − 1, <i>k</i> − 1)</div><span>choisir les k − 1 autres parmi n − 1</span>
+      <div>ceux qui ne le contiennent pas : C(<i>n</i> − 1, <i>k</i>)</div><span>choisir les k parmi les n − 1 autres</span>
+      <div>C(<i>n</i>, <i>k</i>) = C(<i>n</i> − 1, <i>k</i> − 1) + C(<i>n</i> − 1, <i>k</i>)</div><span>deux familles disjointes qui couvrent tout</span>
+    </div>
+    <p><b>Le binôme.</b></p>
+    <div class="drv">
+      <div>(<i>x</i> + <i>y</i>)<sup><i>n</i></sup> = (<i>x</i> + <i>y</i>)(<i>x</i> + <i>y</i>) ⋯ (<i>x</i> + <i>y</i>)</div><span>n facteurs</span>
+      <div>développer = choisir <i>x</i> ou <i>y</i> dans chaque facteur : 2<sup><i>n</i></sup> produits</div><span>principe multiplicatif</span>
+      <div>un produit vaut <i>x</i><sup><i>k</i></sup><i>y</i><sup><i>n</i>−<i>k</i></sup> si <i>x</i> vient de <i>k</i> facteurs : C(<i>n</i>, <i>k</i>) produits</div><span>choisir ces k facteurs</span>
+      <div>(<i>x</i> + <i>y</i>)<sup><i>n</i></sup> = Σ<sub><i>k</i></sub> C(<i>n</i>, <i>k</i>) <i>x</i><sup><i>k</i></sup><i>y</i><sup><i>n</i>−<i>k</i></sup></div><span>regrouper les produits égaux</span>
+    </div>
+    <p><b>Galton.</b> Un chemin est une suite de n rebonds G ou D, comme une suite de n lancers. Finir en case k, c'est avoir exactement k D : C(n, k) chemins. La règle de Pascal s'y lit aussi : pour arriver en position k après n rangées, la bille était en position k − 1 ou k une rangée plus haut, d'où C(n − 1, k − 1) + C(n − 1, k) chemins.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>Pascal sans factorielle, et 100 000 billes</small></summary><div class="in">
+<pre class="py">{{CODE:c6}}</pre>
+<pre class="out">{{OUT:c6}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Les coefficients eux-mêmes ne convergent pas vers une normale.</b> La ligne 100 culmine à C(100, 50) ≈ 10²⁹. Ce qui prend la forme d'une cloche, c'est la ligne divisée par 2<sup>n</sup>, une loi de probabilité, une fois centrée en n/2 et mise à l'échelle de √n/2 : c'est le théorème de de Moivre-Laplace (<a href="lesson-00-04-variables-binomiale-normale.html#n5">l04</a>).</li>
+      <li><b>La planche ne donne C(n, k)/2<sup>n</sup> que si chaque rebond est à 50/50 et indépendant des précédents.</b> Une planche penchée donne la binomiale (n, p), asymétrique (figure 5).</li>
+      <li><b>Un coefficient n'est pas une probabilité.</b> C(10, 5) = 252 est un nombre de chemins ; il devient une probabilité une fois multiplié par la probabilité de chaque chemin, ici 1/2¹⁰.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (07) dit qu'une main de 5 cartes « est distribuée selon la loi binomiale », et appelle « loi binomiale » le nombre de mains. C(52, 5) = 2 598 960 est un coefficient binomial, un nombre de façons. La loi binomiale, P(X = k ; n, p) = C(n, k) p<sup>k</sup>(1 − p)<sup>n − k</sup>, compte des succès dans n essais indépendants (<a href="lesson-00-04-variables-binomiale-normale.html#n4">l04</a>). Une main est un sous-ensemble tiré uniformément, sans remise : c'est le nombre d'as qu'elle contient qui suit une loi hypergéométrique (notion 5, exemple 3). Il dit aussi que les lignes du triangle « convergent vers la normale » : seulement après division par 2<sup>n</sup>, centrage et mise à l'échelle.</div>
+  </div></details>
+  <p class="garde">(x + y)ⁿ = Σ C(n, k) xᵏ yⁿ⁻ᵏ ; chaque case du triangle de Pascal est la somme des deux du dessus ; la ligne n divisée par 2ⁿ est la loi de la case d'arrivée d'une bille de Galton.</p>
+</section>
+

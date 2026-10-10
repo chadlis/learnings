@@ -1,0 +1,67 @@
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>Inclusion-exclusion : ne pas compter deux fois le chevauchement <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 04</p>
+  <div class="idee">
+    <p>L'axiome 3 additionne des événements disjoints. Si A et B se chevauchent, P(A) + P(B) compte deux fois leur partie commune. Sur les trois lancers de Brunton, P(A) + P(B) = 4/8 + 4/8 = 1, alors que A ∪ B n'a que 6 issues. Les deux issues de trop sont FPF et FPP, qui sont à la fois dans A et dans B.</p>
+    <p>La correction consiste à retirer une fois le chevauchement : 4/8 + 4/8 − 2/8 = 6/8. En aires, c'est l'image de Brunton : l'aire couverte par deux disques qui se recouvrent est la somme des deux aires moins l'aire de la lentille commune, sinon la lentille est peinte deux fois.</p>
+    <p>Même calcul sur un jeu de 52 cartes : « cœur ou roi » vaut 13/52 + 4/52 − 1/52 = 16/52, parce que le roi de cœur est à la fois un cœur et un roi.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — le chevauchement compté deux fois</div>
+    <div id="v3ctl" class="sl-ctl"></div><div id="v3step" class="sl-ctl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">Chaque case porte le nombre de fois qu'elle a été comptée. L'état de départ est celui de P(A) + P(B) : les cases de A ∩ B portent un <b>2</b>, c'est le double comptage. <b>Retirer A ∩ B</b> les ramène à 1 : il reste 6 issues sur 8. Passe aux <b>52 cartes</b> (A : les cœurs, B : les rois) : 13 + 4 = 17 comptages, mais le roi de cœur l'a été deux fois, et l'union compte 16 cartes.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</div>
+    <ul>
+      <li><b>Aucune hypothèse</b> sur A et B. S'ils sont disjoints, P(A ∩ B) = 0 et on retrouve l'axiome 3.</li>
+      <li>Conséquence, la <b>borne de l'union</b> : P(A ∪ B) ≤ P(A) + P(B), avec égalité si et seulement si P(A ∩ B) = 0. Elle s'étend à k événements : P(A₁ ∪ … ∪ A<sub>k</sub>) ≤ P(A₁) + … + P(A<sub>k</sub>).</li>
+      <li>Trois événements : P(A ∪ B ∪ C) = P(A) + P(B) + P(C) − P(A ∩ B) − P(A ∩ C) − P(B ∩ C) + P(A ∩ B ∩ C). Le centre a été ajouté trois fois puis retiré trois fois : on le rajoute une fois.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — deux modèles sur le même jeu de test</div>
+    <div id="f2ctl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Chaque point est un exemple d'un jeu de test (test set) de 100. Le modèle A se trompe sur 10 exemples, le modèle B sur 8. Fais varier le nombre <b>c</b> d'exemples où les deux se trompent : « au moins un des deux se trompe » vaut 10 + 8 − c. À c = 0, les erreurs sont disjointes et on atteint la borne de l'union, 18 ; à c = 5, il en reste 13 ; à c = 8, B ne se trompe que là où A se trompe déjà, et l'union se réduit aux 10 erreurs de A.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>dé, cartes, trois lancers, trois dés, deux modèles, Bonferroni</small></summary><div class="in">
+    <ol>
+      <li><b>Un dé.</b> « Pair ou au moins 4 » : 3/6 + 3/6 − 2/6 = 4/6, les faces 2, 4, 5 et 6.</li>
+      <li><b>Les cartes.</b> « Cœur ou roi » : 13/52 + 4/52 − 1/52 = 16/52 = 4/13 ≈ 0,308.</li>
+      <li><b>Les trois lancers de Brunton.</b> 4/8 + 4/8 − 2/8 = 6/8.</li>
+      <li><b>Trois événements.</b> Au moins un 6 en trois lancers de dé, avec A<sub>i</sub> = « le lancer i donne 6 » : 3 × 1/6 − 3 × 1/36 + 1/216 = 91/216 ≈ 0,421. La notion 4 obtient le même nombre en une ligne par le complément : 1 − (5/6)³ = 91/216.</li>
+      <li><b>Deux modèles (ML).</b> Sur un jeu de test, A se trompe sur 10 % des exemples, B sur 8 %, les deux à la fois sur 5 %. Au moins un des deux se trompe sur 0,10 + 0,08 − 0,05 = 13 % des exemples, et aucun ne se trompe sur 87 %. Additionner donnerait 18 %, la borne de l'union, atteinte seulement si les deux modèles ne se trompaient jamais sur les mêmes exemples. En pratique ils butent sur les mêmes exemples difficiles, ce qui compte dès qu'on compare leurs taux de bonnes réponses (accuracy) sur ce jeu de test partagé (<a href="lesson-00-09-covariance-correlation.html#n6">l09</a>).</li>
+      <li><b>Bonferroni.</b> 40 tests, chacun avec un risque α de faux positif. P(au moins un faux positif) ≤ 40α par la borne de l'union : avec α = 5 %, la borne vaut 2 et ne dit rien ; avec α = 0,05/40, elle garantit P(au moins un faux positif) ≤ 0,05, sans aucune hypothèse d'indépendance entre les tests. C'est la correction de Bonferroni.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>deux découpages disjoints, puis soustraire</small></summary><div class="in">
+    <div class="drv">
+      <div>A ∪ B = A ∪ (B ∩ Aᶜ), disjoints</div><span>ce que B ajoute à A</span>
+      <div>P(A ∪ B) = P(A) + P(B ∩ Aᶜ)</div><span>axiome 3</span>
+      <div>B = (A ∩ B) ∪ (B ∩ Aᶜ), disjoints</div><span>couper B selon A</span>
+      <div>P(B) = P(A ∩ B) + P(B ∩ Aᶜ)</div><span>axiome 3</span>
+      <div>P(B ∩ Aᶜ) = P(B) − P(A ∩ B)</div><span>soustraire</span>
+      <div>P(A ∪ B) = P(A) + P(B) − P(A ∩ B)</div><span>substituer dans la deuxième ligne</span>
+    </div>
+    <p>La borne de l'union suit de P(A ∩ B) ≥ 0 (axiome 2). Pour k événements, on l'applique de proche en proche : P(A₁ ∪ … ∪ A<sub>k</sub>) ≤ P(A₁ ∪ … ∪ A<sub>k−1</sub>) + P(A<sub>k</sub>).</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>100 000 cartes : l'identité vaut aussi pour les fréquences</small></summary><div class="in">
+<pre class="py">{{CODE:c3}}</pre>
+<pre class="out">{{OUT:c3}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Additionner sans retirer ne vaut que pour des événements disjoints.</b> « 1/6 de chances d'avoir un 6 à chaque lancer, donc 6/6 = 1 en six lancers » est faux : les événements se chevauchent, et la vraie valeur est 1 − (5/6)⁶ ≈ 0,665 (notion 4).</li>
+      <li><b>Disjoint n'est pas indépendant.</b> Deux événements disjoints de probabilité positive sont au contraire très dépendants : si A arrive, B ne peut plus arriver (<a href="lesson-00-03-conditionner-bayes-independance.html#n7">l03</a>).</li>
+      <li><b>Pour trois événements, retirer les paires ne suffit pas.</b> Le centre A ∩ B ∩ C a été ajouté trois fois et retiré trois fois : il faut le rajouter (exemple 4).</li>
+      <li><b>La borne de l'union est grossière quand les événements se chevauchent beaucoup.</b> Elle peut même dépasser 1 (40 tests à 5 % : borne 2). Bonferroni est donc prudent, jamais faux.</li>
+    </ul>
+  </div></details>
+  <p class="garde">P(A ∪ B) = P(A) + P(B) − P(A ∩ B), sans aucune hypothèse ; d'où la borne de l'union P(A ∪ B) ≤ P(A) + P(B), avec égalité quand A et B sont disjoints.</p>
+</section>
+

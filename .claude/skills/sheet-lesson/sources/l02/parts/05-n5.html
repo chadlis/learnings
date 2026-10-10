@@ -1,0 +1,66 @@
+<!-- ============================ n5 ============================ -->
+<section class="notion culture" id="n5">
+  <h3>Contrôle qualité : la loi hypergéométrique <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 06 · Quality Control, Non-Destructive Inspection and the "Multinomial" Distribution</p>
+  <div class="idee">
+    <p>Dans une usine aéronautique, tester une pièce composite veut souvent dire la détruire, la casser ou la découper. On n'en teste donc qu'un échantillon. Un lot de N = 100 pièces contient K = 5 pièces défectueuses ; on en tire n = 10 au hasard, sans remise. Quelle est la probabilité d'y trouver exactement k défectueuses ?</p>
+    <p>Brunton compte, en lettres ; avec nos chiffres : il y a C(100, 10) échantillons possibles, tous équiprobables. Pour en former un qui contient exactement k défectueuses, on choisit lesquelles parmi les 5, en C(5, k) façons, et on complète avec 10 − k bonnes pièces parmi les 95, en C(95, 10 − k) façons. Chaque choix des unes va avec chaque choix des autres : le principe multiplicatif fait le produit.</p>
+    <p>Pour k = 0 : C(95, 10)/C(100, 10) = 0,584. Contrôler 10 % du lot laisse passer tous les défauts plus d'une fois sur deux.</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — un lot de 100 pièces, 5 défectueuses, 10 tirées</div>
+    <div id="v5ctl" class="sl-ctl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">Les 5 cases rouges sont les pièces défectueuses, les 10 cases cerclées l'échantillon. <b>Tire 10 pièces</b> plusieurs fois : le plus souvent, aucune case rouge n'est cerclée. <b>Lance 1 000 contrôles</b> : les barres du second panneau montrent la part des contrôles qui trouvent 0, 1, 2, 3 défauts ou plus, et elles s'approchent des points creux, la théorie : 0,584, 0,339, 0,070 et 0,007.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(<i>X</i> = <i>k</i> ; <i>N</i>, <i>K</i>, <i>n</i>) = C(<i>K</i>, <i>k</i>) · C(<i>N</i> − <i>K</i>, <i>n</i> − <i>k</i>) / C(<i>N</i>, <i>n</i>)</div>
+    <ul>
+      <li>N pièces dont K défectueuses, n tirées. X, le nombre de défectueuses tirées, prend les valeurs k de max(0, n − (N − K)) à min(n, K). La liste de ces probabilités est une <b>loi de probabilité</b> (PMF), la <b>loi hypergéométrique</b> ; les variables aléatoires sont définies en <a href="lesson-00-04-variables-binomiale-normale.html#n1">l04</a>.</li>
+      <li><b>Sans remise</b> : une pièce tirée ne revient pas dans le lot. C'est pourquoi on compte des sous-ensembles avec C(·, ·) (<a href="lesson-00-01-compter.html#n5">l01</a>).</li>
+      <li><b>Échantillon vraiment aléatoire</b> : chacun des C(N, n) échantillons a la même probabilité. C'est l'hypothèse qui autorise P = #/#Ω.</li>
+      <li>N, K et n sont des <b>paramètres fixes</b>, d'où le point-virgule : P(X = k ; N, K, n), et non P(X = k ∣ N, K, n). La barre ∣ est réservée au conditionnement sur un événement ou une variable aléatoire (<a href="lesson-00-03-conditionner-bayes-independance.html#n1">l03</a>).</li>
+      <li>En moyenne, l'échantillon contient nK/N = 10 × 5/100 = 0,5 défectueuse (l'espérance, <a href="lesson-00-08-esperance-variance.html#n1">l08</a>).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — sans remise contre avec remise</div>
+    <div id="f4ctl"></div>
+    <div id="f4plot" class="wide"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">Barres violettes : la loi hypergéométrique, sans remise, pour N = 100 et K = 5. Barres bleues : la loi binomiale de même proportion 5 %, le cas avec remise (<a href="lesson-00-04-variables-binomiale-normale.html#n4">l04</a>). Augmente la <b>taille n de l'échantillon</b> : la barre k = 0 fond, plus vite sans remise, parce que chaque bonne pièce retirée rend les défectueuses plus fréquentes parmi celles qui restent. Pour descendre sous 5 % de chances de tout rater, il faut tirer 45 pièces sur 100 (0,046) ; avec remise, il en faudrait 59.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>un lot de 5, le lot de Brunton, deux as, un audit d'étiquettes</small></summary><div class="in">
+    <ol>
+      <li><b>Le plus petit lot.</b> N = 5 pièces dont K = 2 défectueuses, n = 2 tirées. Il y a C(5, 2) = 10 paires possibles. Aucune défectueuse : C(3, 2) = 3 paires, 3/10. Une : 2 × 3 = 6 paires, 6/10. Deux : 1 paire, 1/10. Total 10/10.</li>
+      <li><b>Le lot de 100 pièces.</b> N = 100, K = 5, n = 10. P(0) = 0,584, P(1) = 0,339, P(2) = 0,070, P(3) = 0,0064 ; P(détecter au moins un défaut) = 1 − 0,584 = 0,416.</li>
+      <li><b>Le poker.</b> Une main de 5 cartes est un échantillon sans remise d'un « lot » de 52 cartes dont 4 as : P(exactement 2 as) = C(4, 2) · C(48, 3)/C(52, 5) = 6 × 17 296/2 598 960 ≈ 0,040.</li>
+      <li><b>L'audit d'étiquettes (ML).</b> Un jeu d'évaluation de 1 000 exemples en contient 50 mal étiquetés ; on en relit 20 au hasard. P(n'en voir aucun) = C(950, 20)/C(1 000, 20) ≈ 0,355 : une relecture de 20 exemples rate tout plus d'une fois sur trois.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>D'où vient la formule <small>compter des sous-ensembles, puis découper</small></summary><div class="in">
+    <div class="drv">
+      <div>Ω = sous-ensembles de <i>n</i> pièces, #Ω = C(<i>N</i>, <i>n</i>)</div><span>non ordonné, sans remise</span>
+      <div>choisir les <i>k</i> défectueuses parmi <i>K</i> : C(<i>K</i>, <i>k</i>) façons</div><span>même règle, chez les défectueuses</span>
+      <div>choisir les <i>n</i> − <i>k</i> bonnes parmi <i>N</i> − <i>K</i> : C(<i>N</i> − <i>K</i>, <i>n</i> − <i>k</i>) façons</div><span>même règle, chez les bonnes</span>
+      <div>#{<i>X</i> = <i>k</i>} = C(<i>K</i>, <i>k</i>) · C(<i>N</i> − <i>K</i>, <i>n</i> − <i>k</i>)</div><span>principe multiplicatif</span>
+      <div>P(<i>X</i> = <i>k</i>) = #{<i>X</i> = <i>k</i>} / #Ω</div><span>échantillons équiprobables</span>
+    </div>
+    <p>Les probabilités somment à 1 : chaque échantillon contient un nombre bien défini de défectueuses, donc les événements {X = k} découpent Ω en morceaux disjoints (notion 2). Ce découpage s'écrit Σ<sub>k</sub> C(K, k) C(N − K, n − k) = C(N, n), l'identité de Vandermonde.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>50 000 contrôles, sans remise puis avec remise</small></summary><div class="in">
+<pre class="py">{{CODE:c5}}</pre>
+<pre class="out">{{OUT:c5}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Avec remise, ou dans un lot immense, la loi devient binomiale.</b> Chaque tirage voit alors la même proportion K/N de défectueuses. À n = 10, l'écart reste modeste (0,584 contre 0,599 pour P(0)) ; il grandit avec la part du lot qu'on prélève (figure 4).</li>
+      <li><b>Le vrai problème du contrôle qualité est l'inverse</b>, Brunton le dit en fin de vidéo : on ne connaît pas K, on veut l'estimer à partir du k observé. En fréquentiste, K est un paramètre fixe inconnu, et on cherche les valeurs de K qui rendent le k observé plausible ; en bayésien, on donne une loi à K et on calcule P(K ∣ X = k) (<a href="lesson-00-03-conditionner-bayes-independance.html#n4">l03</a>). Les deux écritures disent deux choses différentes : P(X = k ; K), K fixe, contre P(K ∣ X = k), K aléatoire.</li>
+      <li><b>L'échantillon doit être aléatoire.</b> Prélever les 10 pièces du dessus de la palette, où les défauts sont peut-être regroupés, casse l'équiprobabilité des échantillons, et la formule ne s'applique plus.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (06) appelle cette loi la « loi multinomiale ». C'est la loi hypergéométrique : deux classes, tirage sans remise ; avec plus de deux classes, c'est l'hypergéométrique multivariée. La loi multinomiale est le cas avec remise, des essais indépendants à plusieurs issues (notion 7), comme la binomiale l'est pour deux issues. Au tableau, il dit aussi « C(k, m) divisé par C(n − k, r − m) » : c'est un produit. Enfin, il change de lettres en cours de vidéo (n puis N pour le lot, r puis n pour l'échantillon, k puis B pour les défectueuses, m puis b pour celles qu'on trouve) ; on garde ici N, K, n, k.</div>
+  </div></details>
+  <p class="garde">Tirer n objets sans remise dans un lot de N qui en contient K marqués : P(X = k ; N, K, n) = C(K, k) C(N − K, n − k)/C(N, n), la loi hypergéométrique. Avec remise, ou dans un lot immense, c'est la binomiale.</p>
+</section>
+

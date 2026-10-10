@@ -1,0 +1,2 @@
+labeled committees: 210 | 7!/(2! 3! 2!) = 210
+two pairs interchangeable: 105 | 210 / 2! = 105

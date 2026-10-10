@@ -1,0 +1,53 @@
+<!-- ============================ n1 ============================ -->
+<section class="notion outil" id="n1">
+  <h3>Ω, issues, événements : le langage des ensembles <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 04 · Set Theory in Probability – Sample Spaces and Events</p>
+  <div class="idee">
+    <p>Brunton prévient : c'est un peu sec, mais c'est le langage de tout le reste. Une expérience aléatoire, par exemple : lancer trois pièces. L'<b>univers</b> Ω est l'ensemble de toutes les issues possibles ; une <b>issue</b> ω est une réalisation, ce qui sort quand on fait l'expérience. Ici Ω a 8 issues, de FFF à PPP.</p>
+    <p>Un <b>événement</b> se dit en mots et s'écrit comme un sous-ensemble de Ω. A, « le premier lancer donne F », regroupe 4 issues ; B, « le deuxième donne P », en regroupe 4 aussi, dont 2 en commun avec A. « A ou B » est l'<b>union</b> A ∪ B, le grand parapluie : 6 issues. « A et B » est l'<b>intersection</b> A ∩ B, plus restrictive : FPF et FPP. « Non A » est le <b>complémentaire</b> Aᶜ : les 4 issues qui commencent par P.</p>
+    <p>Avec deux pièces, Brunton dessine l'image exacte : un carré de quatre cases FF, FP, PF, PP, où A est la moitié du haut et B la moitié de droite.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — chaque opération est une région</div>
+    <div id="v1ctl" class="sl-ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">Le premier panneau est le diagramme de Venn des trois lancers, chaque issue écrite dans sa région ; le second, la grille exacte de Brunton pour deux pièces (ligne : premier lancer, colonne : deuxième). Choisis une opération : la même région s'allume des deux côtés. <b>A ∪ B</b> couvre 6 issues sur 8 et 3 cases sur 4, la même probabilité 0,75, parce que A et B ne regardent pas le troisième lancer. <b>(A ∪ B)ᶜ</b>, « ni A ni B », vaut Aᶜ ∩ Bᶜ : PFF et PFP, une case sur quatre.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les définitions</div>
+    <div class="eq">A ⊆ Ω &nbsp;&nbsp;&nbsp; A ∪ B = {ω : ω ∈ A ou ω ∈ B} &nbsp;&nbsp;&nbsp; A ∩ B = {ω : ω ∈ A et ω ∈ B} &nbsp;&nbsp;&nbsp; Aᶜ = {ω ∈ Ω : ω ∉ A}</div>
+    <div class="eq">De Morgan : (A ∪ B)ᶜ = Aᶜ ∩ Bᶜ &nbsp;&nbsp;&nbsp; (A ∩ B)ᶜ = Aᶜ ∪ Bᶜ</div>
+    <ul>
+      <li>Ω doit être exhaustif (une issue sort toujours) et ses issues doivent s'exclure (une seule sort à la fois). C'est ce qui rendra P(Ω) = 1 légitime (notion 2).</li>
+      <li>A <b>se réalise</b> quand l'issue ω qui sort appartient à A. ω est la réalisation ; Ω, A et plus tard P sont fixés avant l'expérience.</li>
+      <li>A et B sont <b>incompatibles</b> (disjoints) quand A ∩ B = ∅, où ∅ est l'événement impossible, sans aucune issue.</li>
+      <li>De Morgan transforme « au moins un des deux » en « aucun des deux » : c'est l'outil du complément (notion 4).</li>
+      <li>∪ et ∩ sont commutatives et associatives (Brunton) : A ∪ B ∪ C s'écrit sans parenthèses.</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>un dé, De Morgan, trois lancers, univers infinis</small></summary><div class="in">
+    <ol>
+      <li><b>Un dé.</b> Ω = {1, 2, 3, 4, 5, 6}, A = « pair » = {2, 4, 6}, B = « au moins 4 » = {4, 5, 6}. A ∪ B = {2, 4, 5, 6}, A ∩ B = {4, 6}, Aᶜ = {1, 3, 5}.</li>
+      <li><b>De Morgan sur le même dé.</b> « Ni pair ni au moins 4 » : (A ∪ B)ᶜ = {1, 3}. Et Aᶜ ∩ Bᶜ = {1, 3, 5} ∩ {1, 2, 3} = {1, 3} : le même ensemble.</li>
+      <li><b>Les trois lancers de Brunton.</b> A = {FFF, FFP, FPF, FPP}, B = {FPF, FPP, PPF, PPP}. A ∪ B a 6 issues, A ∩ B = {FPF, FPP}, Aᶜ = {PFF, PFP, PPF, PPP}.</li>
+      <li><b>Des univers infinis.</b> Le nombre de mails reçus en une heure : Ω = {0, 1, 2, …}, et « au moins 3 mails » = {3, 4, 5, …}. La température de midi : Ω est un intervalle de réels, « plus de 30 °C » en est un sous-intervalle. L'événement reste un sous-ensemble ; c'est le comptage qui ne suffit plus (notion 2).</li>
+      <li><b>Issue ou événement ?</b> FFP est une issue ; {FFP} est un événement, celui qui ne contient qu'elle. « Au moins un F » est un événement de 7 issues : tout sauf PPP.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>les événements sont des ensembles</small></summary><div class="in">
+<pre class="py">{{CODE:c1}}</pre>
+<pre class="out">{{OUT:c1}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>« Ou » est inclusif.</b> A ∪ B contient aussi les issues qui sont dans les deux. Brunton se reprend lui-même : dire « A et B » pour l'union, c'est dire exactement le contraire.</li>
+      <li><b>L'union n'est pas une somme.</b> #A + #B = 4 + 4 = 8, mais A ∪ B n'a que 6 issues : FPF et FPP sont comptées deux fois (notion 3).</li>
+      <li><b>Une issue est un résultat complet de l'expérience.</b> Pour trois lancers, « F » n'est pas une issue, c'est un morceau d'issue ; l'univers {F, P} décrirait un seul lancer.</li>
+      <li><b>Le complémentaire dépend de Ω.</b> Sur un dé, « non pair » = {1, 3, 5} ; si Ω était {1, …, 10}, ce serait {1, 3, 5, 7, 9}.</li>
+      <li><b>Un diagramme de Venn ne dit rien des probabilités</b> tant que ses aires ne sont pas à l'échelle. La grille l'est : chaque case vaut ¼.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (04) dessine A et B comme deux cercles quelconques qui se chevauchent, et ajoute que « techniquement » ces deux événements sont indépendants, sans montrer où cela se voit. Ses cercles ne peuvent pas le montrer. La grille le montre : l'aire du chevauchement, ¼, est le produit des aires, ½ × ½. C'est la définition de l'indépendance (<a href="lesson-00-03-conditionner-bayes-independance.html#n7">l03, notion 7</a>).</div>
+  </div></details>
+  <p class="garde">Un événement est un sous-ensemble de Ω (les issues) : ou = ∪ (inclusif), et = ∩, non = ᶜ ; (A ∪ B)ᶜ = Aᶜ ∩ Bᶜ.</p>
+</section>
+

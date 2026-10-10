@@ -1,0 +1,4 @@
+freq(A or B)                      = 0.3068
+freq(A) + freq(B) - freq(A and B) = 0.3068
+freq(A) + freq(B), double count   = 0.3259
+exact P(A or B) = 16/52           = 0.3077

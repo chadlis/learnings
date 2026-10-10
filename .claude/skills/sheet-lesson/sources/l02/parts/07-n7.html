@@ -1,0 +1,60 @@
+<!-- ============================ n7 ============================ -->
+<section class="notion culture" id="n7">
+  <h3>Coefficient multinomial : répartir en plusieurs groupes <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 07</p>
+  <div class="idee">
+    <p>C(n, k) coupe n objets en deux groupes : les k choisis et les autres. Pour r groupes, Brunton distribue comme aux cartes : on sert le premier groupe, puis le deuxième dans ce qui reste, et ainsi de suite. Les nombres de façons se multiplient.</p>
+    <p>Sept personnes à répartir en trois sous-comités de 2, 3 et 2 : C(7, 2) = 21 choix pour le premier, C(5, 3) = 10 pour le deuxième parmi les 5 restantes, C(2, 2) = 1 pour le dernier, qui prend ce qui reste. En tout, 21 × 10 × 1 = 210 répartitions, et c'est aussi 7!/(2! 3! 2!) : les factorielles intermédiaires se simplifient.</p>
+    <p>Aux cartes, distribuer les 52 cartes en quatre mains de 13, comme au bridge ou au spades de Brunton, se fait de 52!/(13!)⁴ ≈ 5,36 × 10²⁸ façons.</p>
+  </div>
+  <div class="fig vis" id="v7">
+    <div class="lbl">Voir l'idée — servir les comités un par un</div>
+    <div id="v7ctl" class="sl-ctl"></div>
+    <div id="v7plot" class="wide"></div>
+    <div class="readouts" id="v7out"></div>
+    <p class="cap">Une répartition des sept personnes est affichée. <b>Distribue</b> : le premier comité en prend 2 parmi 7, le deuxième 3 parmi les 5 restantes, le dernier prend les 2 qui restent, sans choix. Le produit 21 × 10 × 1 = 210 compte des comités <b>étiquetés</b>, le comité 1 n'est pas le comité 3. Rends les deux comités de 2 <b>interchangeables</b> : chaque répartition est alors comptée deux fois, une par étiquetage, et il en reste 105.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">coefficient multinomial : <i>n</i>! / (<i>n</i>₁! <i>n</i>₂! ⋯ <i>n<sub>r</sub></i>!) &nbsp;&nbsp;&nbsp; avec <i>n</i>₁ + <i>n</i>₂ + … + <i>n<sub>r</sub></i> = <i>n</i></div>
+    <ul>
+      <li>Les tailles doivent épuiser les n objets : c'est cette contrainte qui fait apparaître, en fin de calcul, le facteur 0! = 1.</li>
+      <li>Les groupes sont <b>étiquetés</b> (comité 1, comité 2…) ; l'ordre à l'intérieur d'un groupe ne compte pas.</li>
+      <li>r = 2 redonne le coefficient binomial : n!/(k!(n − k)!) = C(n, k).</li>
+      <li>C'est le coefficient de x₁<sup>n₁</sup> ⋯ x<sub>r</sub><sup>n<sub>r</sub></sup> dans (x₁ + … + x<sub>r</sub>)<sup>n</sup>, la formule du multinôme, comme C(n, k) l'est dans (x + y)<sup>n</sup>.</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux binômes, les comités, deux mains, le bridge, les paires, un dé</small></summary><div class="in">
+    <ol>
+      <li><b>r = 2.</b> Quatre personnes en deux binômes étiquetés : 4!/(2! 2!) = 6 = C(4, 2).</li>
+      <li><b>Les comités.</b> Sept personnes en 2, 3, 2 : 210 répartitions étiquetées, 105 si les deux binômes sont interchangeables.</li>
+      <li><b>Deux mains de poker, et le reste du paquet.</b> 52!/(5! 5! 42!) = 3 986 646 103 440, c'est-à-dire C(52, 5) × C(47, 5) : la première main, puis la seconde parmi les 47 cartes restantes.</li>
+      <li><b>Le bridge.</b> Quatre mains de 13 : 52!/(13!)⁴ ≈ 5,36 × 10²⁸.</li>
+      <li><b>Former des paires</b> (devoir de Brunton). 2m personnes en m paires sans étiquette : (2m)!/(2<sup>m</sup> m!). On compte d'abord les paires étiquetées, (2m)!/(2!)<sup>m</sup>, puis on divise par les m! ordres des paires : 3, 15, 105 et 945 façons pour 4, 6, 8 et 10 personnes.</li>
+      <li><b>Du coefficient à une loi.</b> Un dé lancé 6 fois donne chaque face exactement une fois avec probabilité 6!/(1!)⁶ × (1/6)⁶ = 720/46 656 ≈ 0,015 : chaque suite a la probabilité (1/6)⁶, et le coefficient compte les suites. C'est un calcul de loi multinomiale, avec remise.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>le produit télescopique de Brunton</small></summary><div class="in">
+    <div class="drv">
+      <div>C(<i>n</i>, <i>n</i>₁) · C(<i>n</i> − <i>n</i>₁, <i>n</i>₂) ⋯ C(<i>n</i> − <i>n</i>₁ − … − <i>n<sub>r</sub></i>₋₁, <i>n<sub>r</sub></i>)</div><span>servir les groupes un par un, principe multiplicatif</span>
+      <div>= <i>n</i>!/(<i>n</i>₁! (<i>n</i> − <i>n</i>₁)!) · (<i>n</i> − <i>n</i>₁)!/(<i>n</i>₂! (<i>n</i> − <i>n</i>₁ − <i>n</i>₂)!) ⋯</div><span>écrire chaque coefficient</span>
+      <div>= <i>n</i>! / (<i>n</i>₁! <i>n</i>₂! ⋯ <i>n<sub>r</sub></i>!) · 1/(<i>n</i> − <i>n</i>₁ − … − <i>n<sub>r</sub></i>)!</div><span>chaque reste (n − n₁ − … − n<sub>j</sub>)! se simplifie avec le numérateur suivant</span>
+      <div>= <i>n</i>! / (<i>n</i>₁! <i>n</i>₂! ⋯ <i>n<sub>r</sub></i>!)</div><span>n − n₁ − … − n<sub>r</sub> = 0, et 0! = 1</span>
+    </div>
+    <p>Autre lecture : aligne les n objets dans un ordre, de n! façons, puis donne les n₁ premiers au groupe 1, les n₂ suivants au groupe 2, et ainsi de suite. Permuter les objets à l'intérieur d'un groupe ne change pas la répartition : on divise par n₁! ⋯ n<sub>r</sub>!.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>compter les 210 répartitions une à une</small></summary><div class="in">
+<pre class="py">{{CODE:c7}}</pre>
+<pre class="out">{{OUT:c7}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Les tailles doivent sommer à n.</b> Sinon la formule produit un nombre qui ne compte rien (voir l'encadré).</li>
+      <li><b>Des groupes de même taille sans étiquette</b> sont comptés plusieurs fois : on divise par le nombre de façons de permuter ces groupes entre eux (105 au lieu de 210, ou le m! des paires).</li>
+      <li><b>Un coefficient n'est pas une loi.</b> Le coefficient compte des façons. La loi multinomiale, P(Y₁ = n₁, …, Y<sub>r</sub> = n<sub>r</sub>) = n!/(n₁! ⋯ n<sub>r</sub>!) · p₁<sup>n₁</sup> ⋯ p<sub>r</sub><sup>n<sub>r</sub></sup>, où Y<sub>j</sub> compte les essais tombés dans la classe j, décrit n essais indépendants à r issues, avec remise (exemple 6). Distribuer des cartes se fait sans remise : les effectifs par classe d'une main (combien de cœurs, de carreaux…) suivent l'hypergéométrique multivariée (notion 5).</li>
+      <li><b>Ce n'est pas le produit des tailles</b>, Brunton le souligne : 2 × 3 × 2 = 12, alors qu'il y a 210 répartitions.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (07) appelle « loi multinomiale » le nombre n!/(n₁! ⋯ n<sub>r</sub>!) : c'est un coefficient, un nombre de façons, pas une loi ; la loi multinomiale y ajoute les probabilités p₁<sup>n₁</sup> ⋯ p<sub>r</sub><sup>n<sub>r</sub></sup> (exemple 6). Son devoir « sept personnes en sous-comités de 2, 3 et 3 » viole la contrainte : 2 + 3 + 3 = 8. Avec sept personnes en 2, 3 et 2 : 210 répartitions étiquetées, 105 si les deux binômes sont interchangeables ; avec huit personnes en 2, 3 et 3 : 560, ou 280.</div>
+  </div></details>
+  <p class="garde">n objets en r groupes étiquetés de tailles n₁, …, nᵣ, de somme n : n!/(n₁! ⋯ nᵣ!) façons, en servant les groupes un par un ; diviser encore quand des groupes de même taille sont interchangeables.</p>
+</section>
+

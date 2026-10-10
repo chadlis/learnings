@@ -1,0 +1,6 @@
+row 10: [1, 10, 45, 120, 210, 252, 210, 120, 45, 10, 1]
+equals math.comb: True
+sum of the row: 1024 = 2^10
+bin 0: simulated 0.0011   C(10, 0)/2^10 = 0.0010
+bin 3: simulated 0.1184   C(10, 3)/2^10 = 0.1172
+bin 5: simulated 0.2451   C(10, 5)/2^10 = 0.2461

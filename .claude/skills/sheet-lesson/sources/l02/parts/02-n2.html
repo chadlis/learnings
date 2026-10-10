@@ -1,0 +1,66 @@
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>Trois axiomes, et ce qu'ils donnent : complément, monotonie <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 04</p>
+  <div class="idee">
+    <p>Compter #A/#Ω suppose des issues équiprobables. Brunton a pensé apporter une pièce truquée ; prenons P(face) = 0,7 : compter ne suffit plus, il faut peser les issues. Une probabilité devient une fonction P qui donne à chaque événement un nombre entre 0 et 1, avec trois exigences seulement : P(Ω) = 1, P(A) ≥ 0, et l'additivité pour deux événements disjoints.</p>
+    <p>Son image est une cible. Une fléchette lancée uniformément au hasard dans Ω touche A avec une probabilité égale à l'aire de A divisée par l'aire de Ω. La pièce truquée est une cible coupée en deux zones, 0,7 pour face et 0,3 pour pile.</p>
+    <p>Tout le reste se déduit en découpant en morceaux disjoints. Face et pile ne se chevauchent pas et couvrent la cible, donc P(face) + P(pile) = 1 et P(pile) = 1 − 0,7 = 0,3 : c'est la règle du <b>complément</b>. Si A est dans B, B a toute l'aire de A plus un morceau, donc P(A) ≤ P(B) : la <b>monotonie</b>.</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — la probabilité est l'aire où tombe la fléchette</div>
+    <div id="v2ctl" class="sl-ctl"></div>
+    <div id="v2plot" class="wide"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">La cible est Ω, d'aire 1, et 100 fléchettes y sont déjà plantées. Choisis une cible, puis <b>lance 500 fléchettes</b> uniformes : la fréquence des touches dans A se rapproche de son aire, 0,5 pour la pièce juste, 0,7 pour la pièce truquée, 0,2 pour le disque. La fréquence hors de A vaut toujours exactement 1 moins la fréquence dans A : chaque fléchette tombe dans A ou dans Aᶜ, jamais dans les deux, jamais ailleurs.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les trois axiomes, et leurs conséquences</div>
+    <div class="eq">(1) P(Ω) = 1 &nbsp;&nbsp;&nbsp; (2) P(A) ≥ 0 pour tout événement A &nbsp;&nbsp;&nbsp; (3) A ∩ B = ∅ ⇒ P(A ∪ B) = P(A) + P(B)</div>
+    <div class="eq">P(Aᶜ) = 1 − P(A) &nbsp;&nbsp;&nbsp; P(∅) = 0 &nbsp;&nbsp;&nbsp; A ⊆ B ⇒ P(A) ≤ P(B) &nbsp;&nbsp;&nbsp; P(A) ≤ 1</div>
+    <ul>
+      <li>(1) dit qu'une issue sort toujours, parce que Ω est exhaustif. C'est lui qui fournit le « 1 » du complément.</li>
+      <li>(2) interdit les poids négatifs. C'est lui qui fait marcher la monotonie.</li>
+      <li>(3) ne vaut que pour des événements <b>disjoints</b>. C'est l'hypothèse qui manque quand on additionne des événements qui se chevauchent (notion 3).</li>
+      <li>Pour un univers infini comme Ω = {0, 1, 2, …}, on exige l'additivité pour toute suite d'événements deux à deux disjoints : P(A₁ ∪ A₂ ∪ …) = P(A₁) + P(A₂) + … (additivité dénombrable). Elle ne se déduit pas de la version à deux événements.</li>
+      <li>Quand les issues sont équiprobables, P(A) = #A/#Ω vérifie les trois axiomes : le comptage de <a href="lesson-00-01-compter.html#n2">l01</a> en est un cas particulier.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — chaque conséquence est un découpage en morceaux disjoints</div>
+    <div id="f1ctl" class="sl-ctl"></div><div id="f1sl"></div>
+    <div id="f1plot" class="wide"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Ω est la bande entière, d'aire 1. <b>Complément</b> : A et Aᶜ sont disjoints et remplissent Ω ; l'axiome 3 puis l'axiome 1 donnent P(A) + P(Aᶜ) = 1. Fais glisser <b>P(A)</b> : Aᶜ prend toujours exactement le reste. <b>Monotonie</b> : B, de probabilité 0,6, se coupe en A et B ∩ Aᶜ, deux morceaux disjoints ; le second a une aire positive ou nulle (axiome 2), donc P(B) ≥ P(A). <b>∅</b> : Ω = Ω ∪ ∅ avec deux morceaux disjoints, donc P(∅) = 0.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>pièce truquée, dé, double six, une fausse probabilité</small></summary><div class="in">
+    <ol>
+      <li><b>La pièce truquée.</b> P(face) = 0,7 ⇒ P(pile) = 1 − 0,7 = 0,3, par le complément.</li>
+      <li><b>Un dé juste.</b> P(« pas de 6 ») = 1 − 1/6 = 5/6.</li>
+      <li><b>Monotonie, deux dés.</b> « Double six » ⊆ « au moins un six », donc P(double six) ≤ P(au moins un six) : 1/36 ≤ 11/36 (le 11/36 de <a href="lesson-00-01-compter.html#n2">l01</a>).</li>
+      <li><b>P(A) ≤ 1.</b> A ⊆ Ω, donc P(A) ≤ P(Ω) = 1 : la monotonie appliquée à Ω.</li>
+      <li><b>Une fausse probabilité.</b> Un « dé » dont chaque face aurait la probabilité 0,2 donnerait P(Ω) = 6 × 0,2 = 1,2 par l'axiome 3 : il viole l'axiome 1, ce n'est pas une probabilité.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>trois conséquences, trois découpages</small></summary><div class="in">
+    <div class="drv">
+      <div>Ω = A ∪ Aᶜ, avec A ∩ Aᶜ = ∅</div><span>définition du complémentaire</span>
+      <div>P(Ω) = P(A) + P(Aᶜ)</div><span>axiome 3</span>
+      <div>1 = P(A) + P(Aᶜ), donc P(Aᶜ) = 1 − P(A)</div><span>axiome 1</span>
+      <div>Ω = Ω ∪ ∅, avec Ω ∩ ∅ = ∅</div><span>∅ n'a aucune issue</span>
+      <div>P(Ω) = P(Ω) + P(∅), donc P(∅) = 0</div><span>axiome 3, puis soustraire</span>
+      <div>A ⊆ B : B = A ∪ (B ∩ Aᶜ), disjoints</div><span>couper B en « dans A » et « hors de A »</span>
+      <div>P(B) = P(A) + P(B ∩ Aᶜ) ≥ P(A)</div><span>axiome 3, puis axiome 2</span>
+    </div>
+    <p>La méthode est toujours la même : écrire l'événement comme une réunion de morceaux <b>disjoints</b>, appliquer l'axiome 3, puis conclure avec l'axiome 1 ou 2. La notion 3 l'applique une fois de plus.</p>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Une probabilité n'est pas une fréquence.</b> La fréquence des touches sur 500 fléchettes change d'une série à l'autre ; P(A) est un nombre fixe, l'aire de A. Les deux se rapprochent quand le nombre de lancers grandit, c'est la loi des grands nombres (<a href="lesson-00-10-inegalites-lgn.html#n4">l10</a>).</li>
+      <li><b>La monotonie ne marche que dans un sens.</b> P(A) ≤ P(B) ne dit pas que A ⊆ B : sur un dé, P({1}) = 1/6 ≤ P({2, 3}) = 2/6, et {1} n'est pas dans {2, 3}.</li>
+      <li><b>Probabilité nulle ne veut pas dire impossible.</b> Une ligne de la cible n'a pas d'aire : l'événement « la fléchette tombe sur cette ligne » a probabilité 0, et il n'est pas vide, il peut arriver. P(∅) = 0, mais la réciproque est fausse (<a href="lesson-00-04-variables-binomiale-normale.html#n2">l04</a>, les densités).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (04) énonce l'axiome 3 pour deux événements disjoints seulement, et dit que P donne une probabilité à « chaque sous-ensemble » de Ω. Pour un univers infini, il faut l'additivité pour une suite infinie d'événements disjoints. Pour un univers continu comme la cible, on ne peut pas donner une aire cohérente à tous les sous-ensembles : on se limite aux événements dits mesurables, c'est la théorie de la mesure qu'il cite comme « page un ». Pour les univers finis de cette leçon, sa version suffit.</div>
+  </div></details>
+  <p class="garde">Trois axiomes : P(Ω) = 1, P(A) ≥ 0, P(A ∪ B) = P(A) + P(B) si A ∩ B = ∅ ; le complément, la monotonie et P(∅) = 0 en découlent par découpage disjoint.</p>
+</section>
+

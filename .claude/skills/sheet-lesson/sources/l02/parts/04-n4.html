@@ -1,0 +1,72 @@
+<!-- ============================ n4 ============================ -->
+<section class="notion outil" id="n4">
+  <h3>Anniversaires : passer par le complément <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 05 · The Birthday Problem in Probability – P(A) = 1 − P(not A)</p>
+  <div class="idee">
+    <p>Combien faut-il de personnes dans une salle pour qu'il y ait plus d'une chance sur deux que deux d'entre elles aient le même anniversaire ? L'intuition répond 365/2 ≈ 183. La réponse est 23.</p>
+    <p>Brunton commence par les paires. Range les n personnes en cercle : la première se compare aux n − 1 autres, la deuxième aux n − 2 restantes, et ainsi de suite jusqu'à 0, soit n(n − 1)/2 comparaisons. À 23 personnes, il y a déjà 253 paires, et chacune est une occasion de coïncidence. L'intuition compte les personnes, alors que ce sont les paires qui comptent.</p>
+    <p>Pour le calcul exact, « au moins deux partagent » est un enfer de cas : une paire, deux paires, un triplet… Son <b>complément</b>, « tous différents », est un seul produit. La première personne prend n'importe quel jour, 365/365 ; la deuxième doit en éviter un, 364/365 ; la troisième en éviter deux, 363/365. À 23 personnes, ce produit vaut 0,4927, donc P(partage) = 1 − 0,4927 = 0,5073.</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — 23 personnes, 253 paires</div>
+    <div id="v4ctl" class="sl-ctl"></div><div id="v4sl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">Chaque trait relie deux personnes : à 23, il y en a 253. Dans la salle tirée au départ, une paire tombe le même jour, en rouge. <b>Tire d'autres salles</b> : tantôt aucune paire rouge, tantôt une ou deux. <b>Lance 1 000 salles</b> : à n = 23, environ une salle sur deux contient au moins un partage (0,507 en théorie). Fais varier <b>n</b> : 45 paires et 0,117 à 10 personnes, 1 225 paires et 0,970 à 50.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(au moins deux partagent) = 1 − P(tous différents) = 1 − (365 × 364 × … × (365 − <i>n</i> + 1)) / 365<sup><i>n</i></sup> = 1 − 365! / ((365 − <i>n</i>)! · 365<sup><i>n</i></sup>)</div>
+    <ul>
+      <li>Les 365 jours sont équiprobables (pas de 29 février) et les anniversaires sont indépendants (pas de jumeaux). Les 365<sup>n</sup> suites d'anniversaires sont alors équiprobables, et P = #/#Ω s'applique (<a href="lesson-00-01-compter.html#n2">l01</a>).</li>
+      <li>Dénominateur : principe multiplicatif, 365 choix par personne (<a href="lesson-00-01-compter.html#n3">l01</a>). Numérateur : n jours tous différents, un tirage ordonné sans remise (<a href="lesson-00-01-compter.html#n4">l01</a>).</li>
+      <li>n ≤ 365. À 366 personnes, deux partagent forcément (principe des tiroirs) : le produit contient le facteur 0.</li>
+      <li>Le complément est la règle P(A) = 1 − P(Aᶜ) de la notion 2, et De Morgan (notion 1) traduit « au moins une paire partage » en son contraire, « aucune paire ne partage ».</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — P(partage) selon n, et ce que l'approximation par paires oublie</div>
+    <div id="f3ctl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Trait plein : la probabilité exacte d'un partage, qui passe 0,5 entre 22 personnes (0,476) et 23 (0,507). Tirets : 1 − (364/365)<sup>n(n − 1)/2</sup>, le calcul qui traite les paires comme si elles étaient indépendantes. Les deux courbes se confondent presque : la case « écart » vaut 0,0068 à n = 23, et 0,0099 au plus, vers n = 34. Courbe ocre : la probabilité que quelqu'un ait ton anniversaire, 1 − (364/365)<sup>n − 1</sup>, seulement 0,059 à 23 personnes ; elle ne passe ½ qu'à 254 personnes, soit 253 autres que toi. C'est elle que l'intuition 365/2 a en tête. Déplace <b>n</b> pour lire les valeurs.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>2, 3, 20 et 23 personnes, ton anniversaire, collisions de hachage</small></summary><div class="in">
+    <ol>
+      <li><b>Deux personnes.</b> 1 − 364/365 = 1/365 ≈ 0,0027.</li>
+      <li><b>Trois personnes.</b> 1 − (364 × 363)/365² ≈ 0,0082.</li>
+      <li><b>Vingt personnes (Brunton).</b> 190 paires ; P(tous différents) = 0,5886, le 0,589 qu'il lit sur Wolfram Alpha, donc P(partage) = 0,4114.</li>
+      <li><b>Vingt-trois personnes.</b> 253 paires, P(partage) = 0,5073. Repères : 0,117 à 10 personnes, 0,706 à 30, 0,970 à 50, 0,9992 à 70.</li>
+      <li><b>Ton anniversaire à toi.</b> P(au moins une des m autres personnes est née le même jour que toi) = 1 − (364/365)<sup>m</sup>. Il faut m = 253 autres personnes pour dépasser ½ : ce sont 253 comparaisons, toutes avec toi, et cette fois indépendantes.</li>
+      <li><b>Collisions de hachage (ML).</b> Une empreinte de 32 bits prend 2³² ≈ 4,3 milliards de valeurs. Pour dédupliquer 100 000 documents distincts, P(au moins une fausse collision) ≈ 1 − e<sup>−C(100 000, 2)/2³²</sup> ≈ 0,69 ; la moitié est atteinte vers 77 000 documents. Avec 64 bits, 2,7 × 10⁻¹⁰. Même calcul pour des graines aléatoires de 32 bits tirées pour 10 000 exécutions : 0,012 de risque que deux exécutions partagent la même graine.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>le produit, puis pourquoi le seuil est à 23</small></summary><div class="in">
+    <div class="drv">
+      <div>Ω = suites (<i>b</i>₁, …, <i>b<sub>n</sub></i>) de jours, #Ω = 365<sup><i>n</i></sup></div><span>principe multiplicatif</span>
+      <div>Aᶜ = « tous différents », #Aᶜ = 365 × 364 × … × (365 − <i>n</i> + 1)</div><span>ordonné sans remise</span>
+      <div>P(Aᶜ) = ∏<sub><i>k</i>=0</sub><sup><i>n</i>−1</sup> (365 − <i>k</i>)/365 = ∏<sub><i>k</i>=0</sub><sup><i>n</i>−1</sup> (1 − <i>k</i>/365)</div><span>suites équiprobables</span>
+      <div>P(A) = 1 − P(Aᶜ)</div><span>complément (notion 2)</span>
+    </div>
+    <p>Pourquoi 23 ? Chaque facteur est proche de 1, et 1 − x ≤ e<sup>−x</sup>, avec un écart minuscule quand x est petit :</p>
+    <div class="drv">
+      <div>P(Aᶜ) ≤ exp(−(0 + 1 + … + (<i>n</i> − 1))/365) = exp(−<i>n</i>(<i>n</i> − 1)/730)</div><span>1 − x ≤ e<sup>−x</sup>, puis somme des exposants</span>
+      <div><i>n</i>(<i>n</i> − 1)/2 ≥ 365 ln 2 ⇒ P(Aᶜ) ≤ exp(−ln 2) = ½</div><span>exp est croissante</span>
+    </div>
+    <p>À 23 personnes, 253/365 = 0,693151 &gt; ln 2 = 0,693147 : la borne prouve que 23 suffit, P(Aᶜ) ≤ 0,499998. Que 22 ne suffise pas, c'est le calcul exact qui le montre : P(Aᶜ) = 0,524. Le seuil se compte donc en paires, il en faut 365 ln 2 ≈ 253. En ordre de grandeur, n ≈ √(2 · 365 · ln 2) ≈ 22,5 : le nombre de personnes nécessaire croît comme la racine du nombre de jours. C'est ce qui rend les collisions de hachage si précoces (exemple 6).</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>la boucle du devoir de Brunton, et 100 000 salles</small></summary><div class="in">
+<pre class="py">{{CODE:c4}}</pre>
+<pre class="out">{{OUT:c4}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Les paires ne sont pas mutuellement indépendantes.</b> Si 1 et 2 partagent et si 2 et 3 partagent, alors 1 et 3 partagent forcément. Deux à deux, ces événements sont pourtant indépendants : P(1–2 et 1–3) = 1/365² = (1/365)², mais P(1–2, 1–3 et 2–3) = 1/365², et non (1/365)³ (<a href="lesson-00-03-conditionner-bayes-independance.html#n9">l03</a>). D'où 1 − (364/365)²⁵³ = 0,5005 au lieu de 0,5073 : une approximation, à 0,007 près (figure 3). Le nombre moyen de paires qui partagent, lui, vaut exactement 253/365 = 0,69 : la linéarité de l'espérance ne demande aucune indépendance (<a href="lesson-00-08-esperance-variance.html#n3">l08</a>, exemple 4).</li>
+      <li><b>Les naissances ne sont pas uniformes sur l'année.</b> Une saisonnalité rend un partage plus probable, jamais moins : à 23 personnes, une saisonnalité de ± 10 % donne 0,509 au lieu de 0,507. L'uniforme est le cas le moins favorable aux coïncidences, ce qui rend le 23 prudent.</li>
+      <li><b>365! ≈ 2,5 × 10⁷⁷⁸ dépasse le plus grand flottant</b> (1,8 × 10³⁰⁸) : math.gamma(366) lève OverflowError, np.prod renvoie inf. Les entiers exacts de Python passent, pas les flottants : on multiplie facteur par facteur, comme le conseille Brunton, ou on passe par math.lgamma (<a href="../chains/chain-p08-02-flottants-lse.html">flottants et log-sum-exp</a>).</li>
+      <li><b>« Au moins un » appelle presque toujours le complément « aucun ».</b> Un système de composants en parallèle tombe en panne si tous tombent en panne : P(il fonctionne) = 1 − P(tous en panne) (<a href="lesson-00-03-conditionner-bayes-independance.html#n8">l03</a>).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (05) compare les 190 paires de 20 personnes à 365/2 = 182,5, puis prévient que l'heuristique est grossière. Le bon seuil n'est pas 365/2 : chaque paire coïncide avec probabilité 1/365, et il faut environ 365 ln 2 ≈ 253 paires pour atteindre ½, soit exactement 23 personnes (preuve ci-dessus). Il présente aussi la règle du complément comme « essentiellement la loi des probabilités totales » : elle découle directement des axiomes 1 et 3 (notion 2).</div>
+  </div></details>
+  <p class="garde">« Au moins un » se calcule par le complément : 1 − ∏<sub>k=0</sub><sup>n−1</sup> (365 − k)/365 dépasse ½ dès 23 personnes (253 paires ≈ 365 ln 2).</p>
+</section>
+

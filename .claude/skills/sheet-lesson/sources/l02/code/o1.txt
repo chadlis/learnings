@@ -1,0 +1,7 @@
+A or B : ['FFF', 'FFP', 'FPF', 'FPP', 'PPF', 'PPP']
+A and B: ['FPF', 'FPP']
+not A  : ['PFF', 'PFP', 'PPF', 'PPP']
+De Morgan holds: True
+P(A) = 4/8 = 0.500
+P(A or B) = 6/8 = 0.750
+P(A and B) = 2/8 = 0.250

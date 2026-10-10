@@ -1,0 +1,43 @@
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 2</div>
+  <h1>Ω, axiomes, complément, <span>triangle de Pascal</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Avant de calculer des probabilités, il faut un langage : l'<b>univers</b> Ω de tout ce qui peut arriver, les <b>événements</b> comme sous-ensembles, et <b>trois axiomes</b> dont tout le reste se déduit. Le réflexe qui en sort, passer par le complément, résout le paradoxe des anniversaires. La leçon suit Brunton 04 à 07, avec ses exemples : trois lancers de pièce, la fléchette, 23 personnes dans une salle, un lot de pièces à contrôler, le triangle de Pascal et la planche de Galton.</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="lesson-00-01-compter.html">l01 · Compter</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::axiomes</code><code>stats::complement</code></div>
+  <h4>Suite</h4>
+  <ol>
+    <li><a href="lesson-00-03-conditionner-bayes-independance.html">l03 · Conditionner, Bayes, indépendance</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>Compter les cas.</b> Quand les issues sont équiprobables, P(A) = #A/#Ω, le nombre de cas favorables sur le nombre de cas possibles (<a href="lesson-00-01-compter.html#n2">l01, notion 2</a>).</li>
+      <li><b>Principe multiplicatif.</b> Enchaîner des choix multiplie les nombres de façons : trois lancers de pièce donnent 2 × 2 × 2 = 8 suites (<a href="lesson-00-01-compter.html#n3">l01, notion 3</a>).</li>
+      <li><b>Ordonné sans remise.</b> Il y a n(n − 1)…(n − r + 1) = n!/(n − r)! suites de r éléments distincts pris parmi n (<a href="lesson-00-01-compter.html#n4">l01, notion 4</a>).</li>
+      <li><b>Coefficient C(n, r).</b> C(n, r) = n!/(r!(n − r)!) compte les sous-ensembles de r éléments pris parmi n, sans ordre (<a href="lesson-00-01-compter.html#n5">l01, notion 5</a>).</li>
+    </ul>
+    <p>Notation : comme en l01, <b>F</b> pour face et <b>P</b> pour pile. Brunton écrit H (heads, face) et T (tails, pile) : son HTH est ici FPF.</p>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">

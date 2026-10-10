@@ -1,0 +1,55 @@
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Ω est l'ensemble des issues ; un événement est un sous-ensemble ; « ou » = ∪, « et » = ∩, « non » = ᶜ, et (A ∪ B)ᶜ = Aᶜ ∩ Bᶜ.</li>
+    <li>Trois axiomes : P(Ω) = 1, P(A) ≥ 0, additivité pour des événements disjoints ; tout le reste se déduit par découpage disjoint.</li>
+    <li>P(Aᶜ) = 1 − P(A) ; A ⊆ B ⇒ P(A) ≤ P(B).</li>
+    <li>P(A ∪ B) = P(A) + P(B) − P(A ∩ B), d'où la borne de l'union P(A ∪ B) ≤ P(A) + P(B).</li>
+    <li>« Au moins un » se calcule par son complément « aucun ».</li>
+    <li>Anniversaires : n personnes font n(n − 1)/2 paires ; 23 personnes, 253 paires, P(partage) = 0,507.</li>
+    <li>Tirer sans remise dans un lot à deux classes : loi hypergéométrique ; avec remise : binomiale.</li>
+    <li>C(n, k) : binôme, triangle de Pascal, planche de Galton ; n!/(n₁! ⋯ nᵣ!) pour r groupes étiquetés.</li>
+  </ol>
+</div>
+<div class="phrase">« Une probabilité est une fonction sur les événements, des sous-ensembles de Ω, qui vérifie trois axiomes : P(Ω) = 1, positivité, additivité pour des événements disjoints. Tout en découle par découpage en morceaux disjoints : le complément, la monotonie, l'inclusion-exclusion. Le réflexe pratique : « au moins un » se calcule par son complément, et c'est ce qui donne 23 personnes pour un anniversaire commun. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Qu'est-ce qu'un événement, et que veut dire « A se réalise » ?</div><div class="a hid">Un sous-ensemble de Ω, décrit en mots ; A se réalise quand l'issue ω qui sort appartient à A.</div></li>
+    <li><div class="q">Énonce les trois axiomes d'une probabilité.</div><div class="a hid">P(Ω) = 1 ; P(A) ≥ 0 pour tout A ; si A ∩ B = ∅, P(A ∪ B) = P(A) + P(B).</div></li>
+    <li><div class="q">Démontre P(Aᶜ) = 1 − P(A).</div><div class="a hid">Ω = A ∪ Aᶜ, avec A et Aᶜ disjoints : l'axiome 3 donne P(Ω) = P(A) + P(Aᶜ), et l'axiome 1 donne P(Ω) = 1.</div></li>
+    <li><div class="q">Que vaut P(A ∪ B) quand A et B se chevauchent ?</div><div class="a hid">P(A) + P(B) − P(A ∩ B) : sans le terme retiré, le chevauchement est compté deux fois.</div></li>
+    <li><div class="q">Pourquoi 23 personnes suffisent-elles pour un anniversaire commun à plus de 50 % ?</div><div class="a hid">P(tous différents) = 365/365 × 364/365 × … × 343/365 = 0,493, donc 0,507 ; 23 personnes font 253 paires, et il en faut ≈ 365 ln 2 ≈ 253.</div></li>
+    <li><div class="q">Pourquoi 1 − (364/365)²⁵³ n'est-il qu'une approximation ?</div><div class="a hid">Les 253 paires ne sont pas mutuellement indépendantes (1–2 et 2–3 imposent 1–3) : 0,5005 au lieu de 0,5073.</div></li>
+    <li><div class="q">Un lot de 100 pièces en contient 5 défectueuses, on en tire 10 : quelle loi, et pourquoi pas la binomiale ?</div><div class="a hid">La loi hypergéométrique, parce que le tirage est sans remise : P(aucune défectueuse) = C(95, 10)/C(100, 10) = 0,584, contre 0,95¹⁰ = 0,599 avec remise.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Chaînes et déroulés</div>
+  <div class="bridges">
+    <a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html"><b>Comparer deux modèles, et pourquoi le max ment</b><small>1 − 0,95⁴⁰ = 0,87 : le complément de « aucun faux positif » (notion 4) ; Bonferroni est la borne de l'union (notion 3).</small></a>
+    <a href="../walkthroughs/walkthrough-p01-03-biais-du-max.html"><b>Le biais du max (déroulé)</b><small>« Au moins une configuration paraît significative » se calcule par son complément, « aucune ne le paraît ».</small></a>
+    <a href="../chains/chain-p07-02-bagging-rf.html"><b>Bagging et forêt aléatoire</b><small>P(une ligne est tirée au moins une fois) = 1 − (1 − 1/n)ⁿ → 0,632 : le complément de « jamais tirée », dont les puissances viennent de l'indépendance des tirages.</small></a>
+    <a href="../chains/chain-p08-02-flottants-lse.html"><b>Flottants et log-sum-exp</b><small>365! déborde, un produit de facteurs proches de 1 se calcule en logarithmes (notion 4).</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::axiomes</code> (notions 1, 2, 3) · <code>stats::complement</code> (notion 4). Les notions 5, 6 et 7 sont culture, sans carte.</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l02 · v1 du 10/10/2026 · Brunton 04 à 07 · Prérequis : <a href="lesson-00-01-compter.html">l01 · Compter</a>. Suite : <a href="lesson-00-03-conditionner-bayes-independance.html">l03 · Conditionner, Bayes, indépendance</a>.</footer>
+</div>
