@@ -1,0 +1,50 @@
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>Le principe multiplicatif et l'arbre des choix <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 02 (l'arbre des deux dés) et 03 · Counting Probabilities with Combinatorics and the Factorial</p>
+  <div class="idee">
+    <p>Pour les deux dés, Brunton dessine un <b>arbre</b> : six branches pour le premier dé, et chacune se divise en six branches pour le second. Une feuille est un couple, un chemin de la racine à une feuille est une suite de choix. 6 × 6 = 36 feuilles, sans les lister.</p>
+    <p>La règle tient en une phrase : si un résultat se construit en étapes, avec k<sub>1</sub> options à la première puis k<sub>2</sub> à la deuxième quel que soit le premier choix, il y a k<sub>1</sub> × k<sub>2</sub> résultats. Dix lancers de pièce, deux options à chaque étape : 2 × 2 × … × 2 = 2¹⁰ = 1 024 séquences ; « on peut se convaincre que ça devient exponentiel ». Une plaque de quatre lettres puis deux chiffres : 26⁴ × 10² = 45 697 600.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — chaque étape multiplie le nombre de feuilles</div>
+    <div id="v3ctl" class="sl-ctl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">L'arbre de Brunton. Chaque niveau est une étape, chaque branche une option, chaque feuille une séquence complète. Avec <b>3 pièces</b>, chaque nœud se divise en 2 : 2 × 2 × 2 = 8 feuilles, de PPP à FFF, et le chemin rouge est la séquence PFP. Ajoute une pièce : le nombre de feuilles double. Choisis <b>deux dés</b> : 6 branches, chacune se divise en 6, 36 feuilles. <b>Tire une séquence</b> : un chemin de la racine à une feuille, une option par étape.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">nombre de résultats = <i>k</i><sub>1</sub> × <i>k</i><sub>2</sub> × … × <i>k<sub>r</sub></i></div>
+    <ul>
+      <li>Le résultat se construit en <i>r</i> étapes, avec <i>k<sub>i</sub></i> options à l'étape <i>i</i>.</li>
+      <li><b>Le nombre d'options d'une étape ne dépend pas des choix précédents.</b> Les options elles-mêmes peuvent en dépendre : la deuxième carte est l'une des 51 qui restent, lesquelles dépend de la première, mais il en reste toujours 51. C'est ce qui permet de multiplier au lieu d'additionner branche par branche.</li>
+      <li>Deux chemins différents donnent deux résultats différents, et chaque résultat a son chemin. Sinon on compte certains résultats plusieurs fois.</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>pièces, dés, plaques, une grille d'hyperparamètres</small></summary><div class="in">
+    <ol>
+      <li><b>Deux, trois pièces</b> : 2 × 2 = 4 séquences, 2 × 2 × 2 = 8.</li>
+      <li><b>Deux dés</b> : 6 × 6 = 36 couples, le Ω de la notion 2.</li>
+      <li><b>Dix pièces</b> : 2¹⁰ = 1 024. Mille pièces : 2¹⁰⁰⁰ ≈ 10³⁰¹, qu'aucun arbre ne dessinera.</li>
+      <li><b>Une plaque</b> de quatre lettres (26 options chacune) puis deux chiffres (10 options chacun), répétitions permises : 26 × 26 × 26 × 26 × 10 × 10 = 45 697 600.</li>
+      <li><b>Une grille d'hyperparamètres.</b> 4 taux d'apprentissage × 3 tailles de batch × 5 profondeurs = 60 entraînements. Un quatrième hyperparamètre à 5 valeurs les porte à 300 : chaque axe ajouté multiplie le coût, c'est pour cela qu'on passe à une recherche aléatoire.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>par récurrence sur les étapes, en lisant l'arbre</small></summary><div class="in">
+    <p>Notons N<sub><i>r</i></sub> le nombre de feuilles d'un arbre à <i>r</i> étapes.</p>
+    <div class="drv">
+      <div>N<sub>1</sub> = <i>k</i><sub>1</sub></div><span>une étape : une feuille par option</span>
+      <div>N<sub><i>r</i></sub> = <i>k</i><sub>1</sub> × (feuilles sous une branche)</div><span>les k<sub>1</sub> branches de la racine portent chacune un sous-arbre ; ils ont tous le même nombre de feuilles, car le nombre d'options ne dépend pas du chemin</span>
+      <div>= <i>k</i><sub>1</sub> × (<i>k</i><sub>2</sub> × … × <i>k<sub>r</sub></i>)</div><span>chaque sous-arbre a r − 1 étapes, hypothèse de récurrence</span>
+    </div>
+    <p>L'hypothèse sert à la deuxième ligne : si le nombre d'options variait d'une branche à l'autre, il faudrait additionner les sous-arbres un par un au lieu de multiplier.</p>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Le nombre d'options dépend du chemin.</b> Deux dés, le second strictement plus grand que le premier : après un 1, 5 options ; après un 2, 4 ; … après un 6, aucune. Total 5 + 4 + 3 + 2 + 1 + 0 = 15, pas 6 × 5 = 30. On additionne alors les branches.</li>
+      <li><b>Deux chemins pour un même résultat.</b> Choisir deux personnes parmi dix « une première, puis une seconde » donne 10 × 9 = 90 chemins, mais chaque paire est comptée deux fois : 45 paires. C'est la division par r! de la notion 5.</li>
+      <li><b>L'arbre explose.</b> Il sert à comprendre, pas à compter : à partir de quelques étapes on ne le dessine plus, on multiplie.</li>
+    </ul>
+  </div></details>
+  <p class="garde">Un résultat construit en r étapes, avec k<sub>i</sub> options à l'étape i quels que soient les choix précédents, et deux suites de choix distinctes donnant deux résultats distincts : k<sub>1</sub> × k<sub>2</sub> × … × k<sub>r</sub> résultats.</p>
+</section>

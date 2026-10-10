@@ -1,0 +1,63 @@
+<!-- ============================ n5 ============================ -->
+<section class="notion outil" id="n5">
+  <h3>Sans ordre ni remise : C(n, r), diviser par r! <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 03</p>
+  <div class="idee">
+    <p>Une <b>main</b> de poker n'a pas d'ordre : {R, D, 2, 3, 7} et {R, 2, D, 7, 3} sont la même main, « je peux déplacer mes cartes ». Pour compter les mains, Brunton repart des séquences de la notion 4 et se demande combien de séquences donnent la même main.</p>
+    <p>Les cinq cartes d'une main peuvent se ranger de 5 × 4 × 3 × 2 × 1 = 5! = 120 façons, ses <b>permutations</b>. Chaque main correspond donc à exactement 120 séquences, et il y a 311 875 200/120 = 2 598 960 mains. « Je veux que tu ralentisses et que tu y réfléchisses : c'est un point vraiment important. » Ce nombre se note C(52, 5), « 5 parmi 52 ».</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — une main, ce sont r! séquences</div>
+    <div id="v5ctl" class="sl-ctl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">Trois cartes parmi cinq piques, as, roi, dame, valet et 10 : il y a 5 × 4 × 3 = 60 séquences. <b>Rangées par main</b>, chaque ligne réunit les 3! = 6 ordres des mêmes trois cartes : 10 lignes, donc 60/6 = 10 mains. Passe à l'<b>ordre de distribution</b> : les six séquences de la main surlignée se dispersent parmi les 60, mais il y en a toujours exactement six, pour chaque main. <b>Main suivante</b> en surligne une autre. C'est l'argument de Brunton pour diviser par r!.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">C(<i>n</i>, <i>r</i>) = <i>n</i>! / (<i>r</i>! (<i>n</i> − <i>r</i>)!) = <i>n</i>(<i>n</i> − 1) … (<i>n</i> − <i>r</i> + 1) / <i>r</i>!</div>
+    <ul>
+      <li><i>n</i> objets <b>distincts</b>, <i>r</i> ≤ <i>n</i>, sans remise, et l'ordre ne compte pas : on compte des sous-ensembles de taille <i>r</i>.</li>
+      <li>L'hypothèse « distincts » sert : elle garantit que les <i>r</i> objets d'une main donnent <i>r</i>! séquences toutes différentes.</li>
+      <li>On l'écrit aussi avec <i>n</i> au-dessus de <i>r</i> entre parenthèses, ou <i>C</i><sub><i>n</i></sub><sup><i>r</i></sup> dans les vieux manuels ; en anglais, « n choose r ». Symétrie : C(<i>n</i>, <i>r</i>) = C(<i>n</i>, <i>n</i> − <i>r</i>), et C(<i>n</i>, 0) = C(<i>n</i>, <i>n</i>) = 1.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — les 1 024 séquences de dix lancers, rangées par nombre de piles</div>
+    <div id="f3ctl" class="sl-ctl"></div>
+    <div id="f3sl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Les 2¹⁰ = 1 024 séquences de la notion 3, rangées selon leur nombre de piles. La barre k compte C(10, k) séquences : il suffit de choisir quels k lancers, parmi les dix, tombent sur pile. Les barres somment à 1 024. <b>Au moins 5</b> piles, la question qui ouvre Brunton 03 : 252 + 210 + 120 + 45 + 10 + 1 = 638 séquences, soit 638/1024 = 0,623. Passe à <b>exactement</b> et à k = 7 : 120/1024 = 0,117, le nombre de la notion 1.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>trois cartes parmi cinq, poker, pièces, loto, variables explicatives</small></summary><div class="in">
+    <ol>
+      <li><b>Trois cartes parmi cinq</b> : 5 × 4 × 3 = 60 séquences, divisées par 3! = 6 : C(5, 3) = 10 mains (la vignette).</li>
+      <li><b>Les mains de poker</b> : C(52, 5) = 311 875 200/120 = 2 598 960.</li>
+      <li><b>Un carré</b> (quatre cartes de même hauteur) : on choisit la hauteur, 13 options ; les quatre cartes sont alors imposées ; la cinquième est l'une des 48 restantes. 13 × 48 = 624 mains, soit 624/2 598 960 ≈ 1 chance sur 4 165. La quinte flush que cite Brunton 02 : 10 par couleur, royale comprise, 40 mains, 1,5 × 10⁻⁵.</li>
+      <li><b>Sept piles en dix lancers</b> : C(10, 7) = 120 séquences sur 1 024, la probabilité 0,117 de la notion 1. Au moins cinq : 638/1024 = 0,623 (figure 3).</li>
+      <li><b>Un loto</b> 6 parmi 49 : C(49, 6) = 13 983 816 grilles.</li>
+      <li><b>Des sous-ensembles de variables explicatives (features).</b> Chercher le meilleur sous-ensemble de 5 features parmi 20 demanderait C(20, 5) = 15 504 entraînements, et 2²⁰ = 1 048 576 toutes tailles confondues : on ne fait donc jamais de recherche exhaustive. Une forêt aléatoire tire aussi m features parmi p à chaque nœud, mais pour décorréler ses arbres (<a href="../chains/chain-p07-02-bagging-rf.html">p07-02</a>).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>compter les séquences de deux façons</small></summary><div class="in">
+    <div class="drv">
+      <div>#séquences = <i>n</i>! / (<i>n</i> − <i>r</i>)!</div><span>notion 4 : r tirages ordonnés sans remise</span>
+      <div>#séquences = #mains × <i>r</i>!</div><span>chaque séquence appartient à une seule main, celle de ses r objets, et chaque main en donne r! (principe multiplicatif : r places pour le premier objet, r − 1 pour le deuxième…)</span>
+      <div>#mains = <i>n</i>! / (<i>r</i>! (<i>n</i> − <i>r</i>)!) = C(<i>n</i>, <i>r</i>)</div><span>égaler les deux comptes et diviser par r!</span>
+    </div>
+    <p><b>Symétrie.</b> Choisir les r objets qu'on garde, c'est choisir les n − r qu'on laisse : C(n, r) = C(n, n − r). La formule le montre aussi, r! et (n − r)! échangent leurs places. Ainsi C(52, 47) = C(52, 5) = 2 598 960.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>six séquences par main, et les 2 598 960 mains énumérées</small></summary><div class="in">
+<pre class="py">{{CODE:c3}}</pre>
+<pre class="out">{{OUT:c3}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Diviser par r! demande des objets distincts.</b> Avec remise, la séquence (5, 5) n'a qu'un ordre, pas deux : diviser 36 par 2! donne 18, alors que deux dés sans ordre ont 21 résultats (notion 6, figure 4).</li>
+      <li><b>Un numérateur ordonné sur un dénominateur non ordonné.</b> Pour une probabilité, compter A et Ω dans le même modèle. Les carrés comptés dans l'ordre, 624 × 120 = 74 880 séquences, se divisent par 311 875 200 séquences : on retrouve 624/2 598 960. Mélanger les deux fausse le résultat d'un facteur 120.</li>
+      <li><b>r &gt; n.</b> C(n, r) = 0 : on ne choisit pas 6 cartes parmi 5.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (03) dit « pour chaque séquence, il y a r! mains équivalentes ». C'est l'inverse : chaque main correspond à r! séquences, d'où la division du nombre de séquences par r!.</div>
+  </div></details>
+  <p class="garde">Choisir r objets parmi n distincts, sans ordre ni remise : C(n, r) = n!/(r!(n − r)!), car chaque main correspond à r! séquences.</p>
+</section>

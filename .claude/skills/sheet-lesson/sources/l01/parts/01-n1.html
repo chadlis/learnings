@@ -1,0 +1,43 @@
+<!-- ============================ n1 ============================ -->
+<section class="notion culture" id="n1">
+  <h3>Le cadre : une pièce déterministe, deux problèmes duaux <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 01 · Probability and Statistics: Overview (et la fin de 02)</p>
+  <div class="idee">
+    <p>Brunton part d'une pièce. Elle obéit à F = ma : sa masse, son inertie, la résistance de l'air et la gravité fixent l'issue. Le lancer est déterministe, mais trop difficile à prédire avec l'information dont je dispose : « pour moi, c'est aléatoire ». Un système trop complexe pour être mesuré ou modélisé en entier est un bon candidat pour un modèle probabiliste.</p>
+    <p>Ce modèle a un paramètre, θ = P(pile). La <b>probabilité</b> va du modèle connu vers les données à venir : si θ = ½, sept piles en dix lancers ont la probabilité 120/1024 = 0,117. La <b>statistique</b> fait le chemin inverse : j'ai obtenu dix piles sur dix, que dire de θ ? La pièce est-elle honnête ? Brunton parle de deux problèmes <b>duaux</b>, les deux faces d'une même pièce.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — le même nombre p(k ; θ), lu dans les deux sens</div>
+    <div id="v1ctl"></div>
+    <div id="v1seq" class="seq"></div>
+    <div id="v1plot"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">p(k ; θ) est la probabilité de k piles en 10 lancers d'une pièce de paramètre θ. Le premier panneau, la <b>probabilité</b> : θ est fixé, on lit les onze issues k = 0 … 10, et leurs barres somment à 1. Le second, la <b>statistique</b> : k est observé, on lit le même nombre comme une fonction de θ, la vraisemblance ; son aire vaut 1/11, pas 1 : ce n'est pas une loi de θ. Au départ θ = ½ et k = 7 : la barre rouge et le point rouge valent tous deux 0,117, et la courbe culmine en θ = 0,7. Passe <b>k à 10</b> : p(10 ; ½) ≈ 0,001. <b>Lance 10 pièces</b> : la séquence, tirée avec le θ courant, fixe k, et la courbe du second panneau se recalcule. Pour θ ≠ ½, p(k ; θ) ne se lit plus en comptant : c'est la loi binomiale de <a href="lesson-00-04-variables-binomiale-normale.html#n4">l04</a>.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les deux écritures</div>
+    <div class="eq">fréquentiste : <i>p</i>(<i>x</i> ; θ), θ fixe &nbsp;&nbsp;&nbsp;&nbsp; bayésien : <i>p</i>(<i>x</i> ∣ θ) et <i>p</i>(θ ∣ <i>x</i>), θ aléatoire</div>
+    <ul>
+      <li><b>Fréquentiste</b> : θ est un nombre fixe et inconnu. Le point-virgule se lit « calculé avec la valeur θ » : rien n'est conditionné, et « la probabilité de θ » n'a pas de sens. Lue comme une fonction de θ, la même quantité s'appelle la vraisemblance, L(θ ; <i>x</i>).</li>
+      <li><b>Bayésien</b> : θ est une variable aléatoire, munie d'une loi a priori. <i>p</i>(<i>x</i> ∣ θ) est alors un vrai conditionnement, et <i>p</i>(θ ∣ <i>x</i>), la loi a posteriori, a un sens (Bayes en <a href="lesson-00-03-conditionner-bayes-independance.html#n4">l03</a>).</li>
+      <li>La barre ∣ est réservée au conditionnement sur un événement ou une variable aléatoire. Les deux se combinent : <i>p</i>(<i>y</i> ∣ <i>x</i> ; θ) conditionne sur l'entrée <i>x</i>, aléatoire, avec des poids θ fixes (<a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>).</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>sept piles, dix piles, les questions de Brunton, un réseau de neurones</small></summary><div class="in">
+    <ol>
+      <li><b>Probabilité, θ = ½ connu.</b> Sur dix lancers, sept piles ont la probabilité 120/1024 = 0,117. Le 120 est le nombre de séquences de dix lancers qui contiennent sept piles : la notion 5 apprend à le compter.</li>
+      <li><b>Statistique, données connues : dix piles sur dix.</b> p(10 piles ; θ = ½) = 1/1024 ≈ 0,001. Ce nombre dit que ce résultat est rare pour une pièce honnête. Ce n'est pas « la probabilité que la pièce soit honnête » : θ n'a pas de probabilité en fréquentiste.</li>
+      <li><b>Les questions d'appel de Brunton 01</b>, toutes des comptes. Trois dés de somme 13 : 21 triplets sur 6³ = 216, soit 0,097. Le nombre de mains de poker : 2 598 960 (notion 5).</li>
+      <li><b>Un réseau de neurones.</b> Ses poids sont un θ. Les apprendre à partir de données est un problème de statistique (Brunton 01) ; générer avec un modèle entraîné, θ fixé, est un problème de probabilité.</li>
+    </ol>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Écrire p(x ∣ θ) en fréquentiste.</b> Si θ n'a pas de loi dans ton modèle, il n'y a rien sur quoi conditionner : écris p(x ; θ) et L(θ ; x). Garde la barre pour ce qui est aléatoire, une entrée x, un événement B, ou θ lui-même en bayésien.</li>
+      <li><b>Probabilité ou statistique ?</b> La question à se poser : qu'est-ce qui est connu ? Le modèle, et on prédit les données ; ou les données, et on remonte au modèle.</li>
+      <li><b>Le hasard dépend de l'information.</b> Brunton imagine un classifieur qui, en filmant la pièce jusqu'au sommet de sa course, annoncerait pile ou face mieux qu'une chance sur deux : pour lui la pièce serait moins aléatoire. Peu de phénomènes sont aléatoires en eux-mêmes ; Brunton cite la désintégration radioactive.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (01) dit que la statistique, c'est « la probabilité des paramètres sachant les données », P(θ ∣ données), et donne pour exemple un test d'hypothèse : « je suis confiant à 95 % que ce médicament marche, ou ne marche pas ». C'est le cadrage bayésien seulement. En statistique fréquentiste θ est fixe : on écrit p(x ; θ) et l'on maximise la vraisemblance L(θ ; x). Un test au seuil de 5 % ne dit pas que le médicament marche avec probabilité 95 % : si le médicament ne fait rien, la procédure conclut à tort à un effet dans 5 % des essais. Le 95 % porte sur la procédure, comme pour un intervalle de confiance (<a href="../chains/chain-p01-02-ic-test-procedure.html#s5">p01-02, pas 5</a>). Il écrit aussi la probabilité des données « sachant des paramètres », P(X = v ∣ θ) ; en fréquentiste, c'est p(x ; θ).</div>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (01) énonce le théorème central limite ainsi : la moyenne de variables de même loi « tend vers une loi normale », quelle que soit la loi de départ. Il faut aussi que les variables soient indépendantes et de variance finie. Une même variable recopiée n fois a pour moyenne cette variable, qui garde sa loi ; la moyenne de n variables de Cauchy indépendantes reste une Cauchy. Énoncé exact en <a href="lesson-00-11-tcl.html#n1">l11</a>.</div>
+  </div></details>
+  <p class="garde">Probabilité : θ connu, on prédit les données. Statistique : les données sont là, on remonte à θ. En fréquentiste θ est fixe et s'écrit après un point-virgule, p(x ; θ) ; la barre ∣ est réservée au conditionnement.</p>
+</section>

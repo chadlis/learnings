@@ -1,0 +1,64 @@
+<!-- ============================ n4 ============================ -->
+<section class="notion outil" id="n4">
+  <h3>Tirer dans l'ordre, avec ou sans remise <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 03</p>
+  <div class="idee">
+    <p>Une <b>séquence</b> est un tirage où l'ordre compte : PF n'est pas FP. Pour la pièce, chaque lancer est « une pièce neuve » : un pile au premier n'empêche pas un pile au second. C'est un tirage <b>avec remise</b>, 2 options à chacune des 10 étapes, 2¹⁰ séquences.</p>
+    <p>Distribue maintenant cinq cartes du dessus d'un paquet de 52, dans l'ordre. La première a 52 possibilités ; une fois sortie, il en reste 51 pour la deuxième, puis 50, 49, 48. Le réservoir rétrécit : c'est un tirage <b>sans remise</b>, 52 × 51 × 50 × 49 × 48 = 311 875 200 séquences. Brunton l'écrit 52!/47! : la factorielle 52! = 52 × 51 × … × 2 × 1, divisée par 47!, ne garde que les cinq premiers facteurs. « Ces deux cas ont des probabilités très différentes. »</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — le réservoir qui rétrécit, ou qu'on remplit à nouveau</div>
+    <div id="v4ctl" class="sl-ctl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">Le paquet de 52 cartes et les cinq cases de Brunton. <b>Distribue</b> : chaque carte tirée sort du paquet, et la case suivante n'a plus que 51, puis 50, 49, 48 choix. Le produit 52 × 51 × 50 × 49 × 48 = 311 875 200 compte les séquences de cinq cartes. <b>Avec remise</b>, la carte revient dans le paquet avant le tirage suivant : 52 choix à chaque case, 52⁵ = 380 204 032 séquences, et une même carte peut sortir deux fois.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">avec remise : <i>n</i><sup><i>r</i></sup> &nbsp;&nbsp;&nbsp;&nbsp; sans remise : <i>n</i>!/(<i>n</i> − <i>r</i>)! = <i>n</i>(<i>n</i> − 1) … (<i>n</i> − <i>r</i> + 1)</div>
+    <ul>
+      <li><i>n</i> objets <b>distincts</b>, <i>r</i> tirages, et deux séquences qui diffèrent par l'ordre comptent pour deux. Pour la pièce n = 2 et r = 10 ; pour les cartes n = 52 et r = 5.</li>
+      <li>Sans remise, il faut <i>r</i> ≤ <i>n</i> : il y a <i>r</i> facteurs, du plus grand, <i>n</i>, au plus petit, <i>n</i> − <i>r</i> + 1.</li>
+      <li><i>n</i>! = <i>n</i>(<i>n</i> − 1) … 2 · 1, et 0! = 1 par convention, pour que <i>r</i> = <i>n</i> donne <i>n</i>!/0! = <i>n</i>!, le nombre d'ordres de <i>n</i> objets.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — le rapport des deux formules est une probabilité</div>
+    <div id="f2ctl" class="sl-ctl"></div>
+    <div id="f2sl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Parmi les n<sup>r</sup> séquences avec remise, les n!/(n − r)! sont celles où aucun objet ne se répète. Leur rapport est donc la probabilité que r tirages avec remise soient tous différents. Pour <b>n = 26</b> et r = 4, quatre lettres de plaque toutes différentes : 358 800/456 976 = 0,785, le devoir que donne Brunton. Choisis <b>n = 365</b> et monte <b>r</b> : à r = 23 le rapport passe sous ½ (0,493) ; c'est le problème des anniversaires de <a href="lesson-00-02-espace-axiomes-complement.html#n4">l02</a>.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>pièces, cartes, plaques, podium, tokens</small></summary><div class="in">
+    <ol>
+      <li><b>Dix lancers</b> : n = 2, r = 10, avec remise : 2¹⁰ = 1 024.</li>
+      <li><b>Cinq cartes dans l'ordre</b> : 52!/47! = 311 875 200. Si l'on remettait et rebattait à chaque fois : 52⁵ = 380 204 032.</li>
+      <li><b>Plaques</b>, le devoir de Brunton. Avec répétitions : 26⁴ × 10² = 45 697 600. Sans lettre ni chiffre répété : 26 × 25 × 24 × 23 × 10 × 9 = 32 292 000. Avec répétitions permises, la probabilité que les quatre lettres soient toutes différentes : 358 800/456 976 = 0,785.</li>
+      <li><b>Un podium</b> de 8 coureurs, or, argent, bronze : 8 × 7 × 6 = 336.</li>
+      <li><b>Les ordres d'un paquet</b> : 52! ≈ 8,07 × 10⁶⁷.</li>
+      <li><b>Des séquences de tokens.</b> Un vocabulaire de V = 50 257 tokens (celui de GPT-2) et des séquences de L tokens, qui peuvent se répéter : V<sup>L</sup>. Pour L = 3, environ 1,27 × 10¹⁴ ; pour un contexte de 1 024 tokens, environ 10⁴⁸¹⁴.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>le principe multiplicatif, deux fois</small></summary><div class="in">
+    <div class="drv">
+      <div><i>n</i> × <i>n</i> × … × <i>n</i> = <i>n</i><sup><i>r</i></sup></div><span>avec remise : n options à chacune des r étapes (notion 3)</span>
+      <div><i>n</i> × (<i>n</i> − 1) × … × (<i>n</i> − <i>r</i> + 1)</div><span>sans remise : à l'étape i, i − 1 objets sont déjà sortis, il en reste n − i + 1, quels qu'ils soient</span>
+      <div>= [<i>n</i>(<i>n</i> − 1) … (<i>n</i> − <i>r</i> + 1) × (<i>n</i> − <i>r</i>)!] / (<i>n</i> − <i>r</i>)!</div><span>multiplier et diviser par (n − r)!</span>
+      <div>= <i>n</i>! / (<i>n</i> − <i>r</i>)!</div><span>le numérateur est le produit de n jusqu'à 1</span>
+    </div>
+    <p>C'est le devoir de Brunton : 52!/47! = (52 × 51 × 50 × 49 × 48 × 47!)/47!, et les 47 derniers facteurs se simplifient.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>énumérer, compter, simuler les plaques, et un piège de numpy</small></summary><div class="in">
+<pre class="py">{{CODE:c2}}</pre>
+<pre class="out">{{OUT:c2}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Plus de tirages que d'objets.</b> Sans remise, r &gt; n est impossible : 7 cartes distinctes parmi 6, c'est 0 façon.</li>
+      <li><b>Des objets identiques.</b> Les formules supposent n objets distincts. Les anagrammes de PAPA ne sont pas 4! = 24 mais 4!/(2! × 2!) = 6 : c'est le coefficient multinomial de <a href="lesson-00-02-espace-axiomes-complement.html#n7">l02</a>.</li>
+      <li><b>Les entiers débordent.</b> numpy calcule sur 64 bits : np.prod jusqu'à 21 renvoie un nombre négatif sans prévenir (code ci-dessus). Utilise math.factorial, math.perm, ou des logarithmes.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (03) lit à voix haute « 52 fois 51 fois 50 fois 48 fois 49 fois 48 ». C'est un lapsus : il y a cinq facteurs, 52 × 51 × 50 × 49 × 48, un par carte distribuée.</div>
+  </div></details>
+  <p class="garde">r tirages ordonnés parmi n objets distincts : n<sup>r</sup> avec remise, n!/(n − r)! = n(n − 1)…(n − r + 1) sans remise.</p>
+</section>

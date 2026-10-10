@@ -1,0 +1,1200 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Compter — leçon</title>
+<meta name="sheet" content="series=lesson;part=00;number=01;status=v1">
+<meta name="part" content="00 · Socle probabiliste">
+<meta name="subtitle" content="socle — Brunton 01 à 03 : P = cas favorables sur cas possibles, les quatre façons de compter">
+<meta name="prereq" content="aucun">
+<meta name="anki" content="stats::denombrement">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- série `coding` : squelette annoté et ruban de SL.trace (inerte hors coding) ---- */
+.skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.skel b{color:var(--pen);font-weight:600}
+.step .card.full,.step .card.casse{grid-column:1 / -1}
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .wide table{min-width:520px}
+.card .wide th:nth-child(2),.card .wide td:nth-child(2),
+.card .wide th:nth-child(3),.card .wide td:nth-child(3){text-align:left}
+.readouts .c1 b{color:var(--pen)}.readouts .c3 b{color:var(--red)}
+.sl-trace{--cw:58px;--cgap:8px;margin:4px 0 2px}
+.sl-cells{display:flex;gap:var(--cgap)}
+.sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
+.sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
+.sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.dim{background:rgba(34,48,43,.07);border-color:rgba(34,48,43,.18);border-style:dashed}
+.sl-cell.dim b,.sl-cell.dim i{color:var(--cardmuted);opacity:.5}
+.sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
+.sl-cell.win{border-color:var(--green);border-width:2.5px}
+.sl-ptrs{position:relative;height:20px;margin-top:5px}
+.sl-ptr{position:absolute;top:0;left:calc(var(--i) * (var(--cw) + var(--cgap)));width:var(--cw);text-align:center;font:600 12px var(--sans);color:var(--pen)}
+.sl-note{font-size:14px;color:var(--cardink);margin-top:10px}
+.sl-inv{font:12.5px/1.55 var(--mono);color:var(--cardmuted);margin-top:6px;border-left:2px solid #B7791F;padding-left:10px}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ===== série `lesson` : le cours autoporteur du socle (10/10/2026) ===== */
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px;color:var(--muted);margin:10px 0 0}
+.legend .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-right:6px}
+.lecon{counter-reset:notion}
+.notion{padding:22px 0 28px;border-top:1.5px dashed var(--line);max-width:900px}
+.notion h3{position:relative;padding-left:44px;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.3;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:2px}
+.notion h3::before{counter-increment:notion;content:counter(notion);position:absolute;left:0;top:-1px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle;text-shadow:none}
+.tag.outil{color:var(--mint)}.tag.culture{color:var(--violet)}
+.src{font-size:12.5px;color:var(--faint);margin:0 0 10px 44px}
+.idee{margin-left:44px;color:var(--chalk);font-size:16px;line-height:1.62;max-width:72ch}
+.idee p{margin:7px 0}
+.idee b{color:var(--yellow);font-weight:600}
+.formule{margin:12px 0 10px 44px;background:var(--card);color:var(--cardink);border-radius:3px;padding:12px 18px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--yellow)}
+.formule .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:4px}
+.formule .eq{font-size:17.5px}
+.formule ul{padding-left:18px;margin-top:6px}.formule li{font-size:14.5px;margin:3px 0;color:var(--cardmuted)}
+.notion .fig{margin-left:44px}
+details{margin:8px 0 0 44px;background:var(--card);color:var(--cardink);border-radius:3px;border-left:4px solid var(--ac,var(--yellow));box-shadow:0 10px 20px -16px rgba(0,0,0,.6)}
+details>summary{cursor:pointer;list-style:none;padding:9px 14px;font:600 13px var(--sans);letter-spacing:.03em;color:var(--cardink)}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸";display:inline-block;width:16px;color:var(--cardmuted)}
+details[open]>summary::before{content:"▾"}
+details>summary small{font-weight:400;color:var(--cardmuted);margin-left:6px;letter-spacing:0}
+details .in{padding:2px 18px 14px}
+details .in p,details .in li{font-size:15px;line-height:1.55;margin:5px 0}
+details .in ol,details .in ul{padding-left:20px}
+details.ex{--ac:var(--teal)}details.preuve{--ac:var(--violet)}details.code{--ac:var(--blue)}details.casse{--ac:var(--pink)}details.loin{--ac:var(--faint)}
+.drv{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:4px 16px;margin:8px 0;align-items:baseline}
+.drv>div{font-family:var(--math);font-size:16px;line-height:1.6}
+.drv>span{font-size:13.5px;color:var(--cardmuted);border-left:2px solid var(--cardline);padding-left:10px}
+@media(max-width:700px){.drv{grid-template-columns:minmax(0,1fr)}.drv>span{margin-bottom:6px}}
+pre.py,pre.out,pre.tri{font:13px/1.6 var(--mono);background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:pre}
+pre.out{background:transparent;border:1px dashed var(--cardline);color:var(--cardmuted)}
+pre.out::before{content:"sortie\A";font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.brunton{margin:10px 0 4px;padding:8px 12px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft);font-size:14.5px}
+.brunton b{display:block;font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:2px}
+.garde{margin:14px 0 0 44px;font-family:var(--serif);font-size:16.5px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--yellow);padding:4px 0 4px 14px;max-width:72ch}
+.garde::before{content:"Ce qu'on garde";display:block;font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);text-shadow:none;margin-bottom:2px}
+.notion.culture .garde{border-left-color:var(--violet)}
+.notion table{background:var(--cardsoft);border-radius:3px}
+.sl-fulcrum{fill:var(--red)}.sl-bar2{fill:var(--red);opacity:.55}.sl-bar3{fill:var(--pen);opacity:.6}
+@media(max-width:600px){.idee,.formule,details,.garde,.src,.notion .fig{margin-left:0}.notion h3{font-size:19px}}
+.sl-seg.sl-c1{stroke:var(--pen);stroke-width:2}.sl-seg.sl-c2{stroke:#6B46C1;stroke-width:2}.sl-seg.sl-c3{stroke:var(--red);stroke-width:2}.sl-seg.sl-c4{stroke:#1F5FA8;stroke-width:2}
+/* ===== v2 (10/10/2026) : vignettes « voir l'idée », sous chaque idée ===== */
+.fig.vis{--ac:var(--teal)}
+.v-row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:center}
+.v-row>div{flex:1 1 280px;min-width:0}.v-row>.v-mini{flex:0 1 220px}
+.v-row .sl-plot{min-width:0}
+.nogrid .sl-grid{display:none}
+.sl-ruler{fill:var(--cardmuted)}
+.sl-mass{fill:#6B46C1;opacity:.85}
+.sl-mass-t{font:600 11px var(--sans);fill:#fff}
+.sl-sq{fill:rgba(107,70,193,.16);stroke:#6B46C1;stroke-width:1.5}
+.sl-sq-t{font:600 12.5px var(--mono);fill:#6B46C1}
+.sl-cellp{fill:#6B46C1}.sl-cello{fill:none;stroke:var(--cardline)}
+.sl-prod{font:12px var(--mono);fill:var(--cardmuted);opacity:.5}.sl-prod.on{font-weight:700;fill:var(--cardink);opacity:1}
+.sl-seg.sl-dash{stroke-dasharray:4 3}.sl-seg.sl-link{stroke:rgba(34,48,43,.28);stroke-dasharray:3 3}
+.sl-seg.sl-c5{stroke:#B7791F;stroke-width:2}
+.sl-orbit{fill:none;stroke:rgba(34,48,43,.3);stroke-dasharray:3 4}
+.sl-stick{stroke:var(--cardmuted);stroke-width:4;stroke-linecap:round}
+.sl-dot.sl-tiny{stroke:none;opacity:.5}
+.sl-k1{fill:var(--pen)}.sl-k2{fill:#6B46C1}.sl-k3{fill:var(--red)}.sl-k4{fill:#1F5FA8}.sl-k5{fill:#B7791F}.sl-k6{fill:var(--green)}.sl-kc{opacity:.5}
+.sl-cell-t{font:600 11px var(--sans);fill:var(--cardink)}
+/* ---- propre à cette leçon ---- */
+.sl-cellp.sl-a{fill-opacity:.32;stroke:#6B46C1;stroke-width:1.2}
+.sl-off{opacity:.38}
+.sl-cell-t.big{font-size:16px}
+.v-tt{font:600 12px var(--sans);letter-spacing:.03em;color:var(--cardmuted);text-align:center;margin:4px 0 0}
+.seq{font:600 15px var(--mono);color:var(--cardink);text-align:center;min-height:24px;margin:2px 0 4px;letter-spacing:.12em}
+.seq small{font:12.5px var(--sans);letter-spacing:0;color:var(--cardmuted)}
+.sl-card{fill:var(--cardsoft);stroke:var(--cardline);stroke-width:1}
+.sl-card.out{fill:none;stroke-dasharray:3 3}
+.sl-card.hl{fill:rgba(240,209,120,.6);stroke:#B7791F;stroke-width:1.5}
+.sl-card-t{font:600 11.5px var(--mono);fill:var(--cardink)}
+.sl-card-t.red{fill:var(--red)}
+.sl-card-t.out{opacity:.22}
+.sl-slot{fill:none;stroke:var(--cardline);stroke-width:1.5}
+.sl-slot.on{fill:rgba(240,209,120,.35);stroke:#B7791F}
+.sl-slot-n{font:600 20px var(--mono);fill:var(--cardink)}
+.sl-slot-c{font:600 15px var(--mono);fill:var(--cardink)}
+.sl-slot-c.red{fill:var(--red)}
+.sl-cell2{fill:var(--cardsoft);stroke:var(--cardline);stroke-width:1}
+.sl-cell2.on{fill:rgba(240,209,120,.6);stroke:#B7791F;stroke-width:1.5}
+.sl-seq-t{font:12px var(--mono);fill:var(--cardmuted)}
+.sl-seq-t.on{fill:var(--cardink);font-weight:700}
+.sl-star{font:30px var(--math);fill:#B7791F}
+.sl-barg{font:30px var(--mono);fill:var(--cardink)}
+.sl-pos{font:11px var(--mono);fill:var(--cardmuted)}
+.sl-pos.on{fill:#B7791F;font-weight:700}
+.sl-q{fill:var(--cardsoft);stroke:var(--cardline);stroke-width:1.5}
+.sl-q.on{fill:rgba(240,209,120,.5);stroke:#B7791F;stroke-width:2.5}
+.sl-qf{font:21px var(--math);fill:var(--cardink)}
+.sl-qi{font:11px var(--mono);fill:var(--pen)}
+.sl-qe{font:12px var(--sans);fill:var(--cardmuted)}
+.sl-qh{font:600 12.5px var(--sans);fill:var(--cardink)}
+.sl-qn{font:600 11px var(--sans);fill:var(--red)}
+.sl-tree{stroke:rgba(34,48,43,.35);stroke-width:1.2}
+.sl-tree.on{stroke:var(--red);stroke-width:3}
+.sl-leaf{font:10.5px var(--mono);fill:var(--cardmuted)}
+.sl-leaf.on{fill:var(--red);font-weight:700}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 1</div>
+  <h1>Compter, la probabilité comme <span>dénombrement</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Quand toutes les issues ont la même chance, une probabilité est un <b>rapport de deux comptes</b> : les cas favorables sur les cas possibles. Tout l'art est de compter sans tout énumérer. La leçon suit Brunton 01 à 03 avec ses exemples : une pièce, deux dés, un jeu de 52 cartes, des plaques d'immatriculation. Elle ajoute le quatrième cas de dénombrement, que Brunton ne traite pas.</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li>aucun : l'arithmétique suffit</li>
+  </ol>
+  <h4>Suite</h4>
+  <ol>
+    <li><a href="lesson-00-02-espace-axiomes-complement.html">l02 · Ω, axiomes, complément</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::denombrement</code></div>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>Rien de probabiliste.</b> C'est la première leçon du socle : Ω, les événements et les axiomes viennent en <a href="lesson-00-02-espace-axiomes-complement.html#n1">l02</a>.</li>
+      <li><b>Fractions et pourcentages.</b> Simplifier 6/36 = 1/6, et lire 11/36 ≈ 0,306, soit un peu moins d'une chance sur trois.</li>
+      <li><b>Puissances et produits.</b> 2¹⁰ = 2 × 2 × … × 2, dix facteurs, vaut 1 024. Un produit de facteurs qui décroissent, comme 5 × 4 × 3, se lit de gauche à droite.</li>
+      <li><b>Le code est facultatif.</b> Il utilise <code>itertools</code>, <code>math.comb</code>, <code>math.perm</code> et numpy, et chaque sortie a été produite en exécutant le bloc.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">
+<!-- ============================ n1 ============================ -->
+<section class="notion culture" id="n1">
+  <h3>Le cadre : une pièce déterministe, deux problèmes duaux <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 01 · Probability and Statistics: Overview (et la fin de 02)</p>
+  <div class="idee">
+    <p>Brunton part d'une pièce. Elle obéit à F = ma : sa masse, son inertie, la résistance de l'air et la gravité fixent l'issue. Le lancer est déterministe, mais trop difficile à prédire avec l'information dont je dispose : « pour moi, c'est aléatoire ». Un système trop complexe pour être mesuré ou modélisé en entier est un bon candidat pour un modèle probabiliste.</p>
+    <p>Ce modèle a un paramètre, θ = P(pile). La <b>probabilité</b> va du modèle connu vers les données à venir : si θ = ½, sept piles en dix lancers ont la probabilité 120/1024 = 0,117. La <b>statistique</b> fait le chemin inverse : j'ai obtenu dix piles sur dix, que dire de θ ? La pièce est-elle honnête ? Brunton parle de deux problèmes <b>duaux</b>, les deux faces d'une même pièce.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — le même nombre p(k ; θ), lu dans les deux sens</div>
+    <div id="v1ctl"></div>
+    <div id="v1seq" class="seq"></div>
+    <div id="v1plot"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">p(k ; θ) est la probabilité de k piles en 10 lancers d'une pièce de paramètre θ. Le premier panneau, la <b>probabilité</b> : θ est fixé, on lit les onze issues k = 0 … 10, et leurs barres somment à 1. Le second, la <b>statistique</b> : k est observé, on lit le même nombre comme une fonction de θ, la vraisemblance ; son aire vaut 1/11, pas 1 : ce n'est pas une loi de θ. Au départ θ = ½ et k = 7 : la barre rouge et le point rouge valent tous deux 0,117, et la courbe culmine en θ = 0,7. Passe <b>k à 10</b> : p(10 ; ½) ≈ 0,001. <b>Lance 10 pièces</b> : la séquence, tirée avec le θ courant, fixe k, et la courbe du second panneau se recalcule. Pour θ ≠ ½, p(k ; θ) ne se lit plus en comptant : c'est la loi binomiale de <a href="lesson-00-04-variables-binomiale-normale.html#n4">l04</a>.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les deux écritures</div>
+    <div class="eq">fréquentiste : <i>p</i>(<i>x</i> ; θ), θ fixe &nbsp;&nbsp;&nbsp;&nbsp; bayésien : <i>p</i>(<i>x</i> ∣ θ) et <i>p</i>(θ ∣ <i>x</i>), θ aléatoire</div>
+    <ul>
+      <li><b>Fréquentiste</b> : θ est un nombre fixe et inconnu. Le point-virgule se lit « calculé avec la valeur θ » : rien n'est conditionné, et « la probabilité de θ » n'a pas de sens. Lue comme une fonction de θ, la même quantité s'appelle la vraisemblance, L(θ ; <i>x</i>).</li>
+      <li><b>Bayésien</b> : θ est une variable aléatoire, munie d'une loi a priori. <i>p</i>(<i>x</i> ∣ θ) est alors un vrai conditionnement, et <i>p</i>(θ ∣ <i>x</i>), la loi a posteriori, a un sens (Bayes en <a href="lesson-00-03-conditionner-bayes-independance.html#n4">l03</a>).</li>
+      <li>La barre ∣ est réservée au conditionnement sur un événement ou une variable aléatoire. Les deux se combinent : <i>p</i>(<i>y</i> ∣ <i>x</i> ; θ) conditionne sur l'entrée <i>x</i>, aléatoire, avec des poids θ fixes (<a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>).</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>sept piles, dix piles, les questions de Brunton, un réseau de neurones</small></summary><div class="in">
+    <ol>
+      <li><b>Probabilité, θ = ½ connu.</b> Sur dix lancers, sept piles ont la probabilité 120/1024 = 0,117. Le 120 est le nombre de séquences de dix lancers qui contiennent sept piles : la notion 5 apprend à le compter.</li>
+      <li><b>Statistique, données connues : dix piles sur dix.</b> p(10 piles ; θ = ½) = 1/1024 ≈ 0,001. Ce nombre dit que ce résultat est rare pour une pièce honnête. Ce n'est pas « la probabilité que la pièce soit honnête » : θ n'a pas de probabilité en fréquentiste.</li>
+      <li><b>Les questions d'appel de Brunton 01</b>, toutes des comptes. Trois dés de somme 13 : 21 triplets sur 6³ = 216, soit 0,097. Le nombre de mains de poker : 2 598 960 (notion 5).</li>
+      <li><b>Un réseau de neurones.</b> Ses poids sont un θ. Les apprendre à partir de données est un problème de statistique (Brunton 01) ; générer avec un modèle entraîné, θ fixé, est un problème de probabilité.</li>
+    </ol>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Écrire p(x ∣ θ) en fréquentiste.</b> Si θ n'a pas de loi dans ton modèle, il n'y a rien sur quoi conditionner : écris p(x ; θ) et L(θ ; x). Garde la barre pour ce qui est aléatoire, une entrée x, un événement B, ou θ lui-même en bayésien.</li>
+      <li><b>Probabilité ou statistique ?</b> La question à se poser : qu'est-ce qui est connu ? Le modèle, et on prédit les données ; ou les données, et on remonte au modèle.</li>
+      <li><b>Le hasard dépend de l'information.</b> Brunton imagine un classifieur qui, en filmant la pièce jusqu'au sommet de sa course, annoncerait pile ou face mieux qu'une chance sur deux : pour lui la pièce serait moins aléatoire. Peu de phénomènes sont aléatoires en eux-mêmes ; Brunton cite la désintégration radioactive.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (01) dit que la statistique, c'est « la probabilité des paramètres sachant les données », P(θ ∣ données), et donne pour exemple un test d'hypothèse : « je suis confiant à 95 % que ce médicament marche, ou ne marche pas ». C'est le cadrage bayésien seulement. En statistique fréquentiste θ est fixe : on écrit p(x ; θ) et l'on maximise la vraisemblance L(θ ; x). Un test au seuil de 5 % ne dit pas que le médicament marche avec probabilité 95 % : si le médicament ne fait rien, la procédure conclut à tort à un effet dans 5 % des essais. Le 95 % porte sur la procédure, comme pour un intervalle de confiance (<a href="../chains/chain-p01-02-ic-test-procedure.html#s5">p01-02, pas 5</a>). Il écrit aussi la probabilité des données « sachant des paramètres », P(X = v ∣ θ) ; en fréquentiste, c'est p(x ; θ).</div>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (01) énonce le théorème central limite ainsi : la moyenne de variables de même loi « tend vers une loi normale », quelle que soit la loi de départ. Il faut aussi que les variables soient indépendantes et de variance finie. Une même variable recopiée n fois a pour moyenne cette variable, qui garde sa loi ; la moyenne de n variables de Cauchy indépendantes reste une Cauchy. Énoncé exact en <a href="lesson-00-11-tcl.html#n1">l11</a>.</div>
+  </div></details>
+  <p class="garde">Probabilité : θ connu, on prédit les données. Statistique : les données sont là, on remonte à θ. En fréquentiste θ est fixe et s'écrit après un point-virgule, p(x ; θ) ; la barre ∣ est réservée au conditionnement.</p>
+</section>
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>Une probabilité est un rapport de deux comptes <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 02 · Gentle Introduction to Probability: Counting Coin Flips and Dice</p>
+  <div class="idee">
+    <p>Brunton commence par le dénominateur : la liste de tout ce qui peut arriver, qu'il appelle Ω. Deux lancers de pièce donnent Ω = {PP, PF, FP, FF}, quatre issues. L'événement A, « au moins un pile », en contient trois : P(A) = 3/4. L'événement B, « aucun pile », n'en contient qu'une, FF : P(B) = 1/4.</p>
+    <p>Avec deux dés, Ω compte 6 × 6 = 36 couples. Pour « au moins un 5 », Brunton les passe en revue : (1, 5), (2, 5), (3, 5), (4, 5), les six couples qui commencent par 5, puis (6, 5). Onze cas, donc P = 11/36 = 0,306, « un peu moins d'une chance sur trois ». Énumérer, c'est « compter sur ses doigts » : on ne veut pas le faire, mais on peut toujours y revenir comme expérience de pensée.</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — les cases de Ω, les cases de A</div>
+    <div id="v2ctl" class="sl-ctl"></div>
+    <div id="v2plot" class="wide"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">Chaque case est une issue de Ω, toutes de même chance. Choisis un <b>événement</b> : ses cases se colorent, et P(A) est leur nombre divisé par le nombre total de cases. Deux pièces, au moins un pile : 3/4 ; aucun pile : 1/4. Deux dés, au moins un 5 : la colonne du 5 et la ligne du 5, 6 + 6 − 1 = 11 cases, car (5, 5) n'est comptée qu'une fois ; 11/36 = 0,306. Somme 7 : 6/36. <b>Lance 1 000 fois</b> : chaque lancer est un point dans sa case, chaque case en reçoit à peu près autant, c'est ce que veut dire équiprobable, et la fréquence de A s'approche du rapport.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(<i>A</i>) = #<i>A</i> / #Ω = nombre de cas favorables / nombre de cas possibles</div>
+    <ul>
+      <li>Ω est fini, et #Ω désigne son nombre d'éléments. A est une partie de Ω.</li>
+      <li><b>Les issues de Ω sont équiprobables.</b> C'est l'hypothèse qui fait tout : pièce honnête, dé équilibré, et lancers indépendants, « les deux dés ne s'influencent pas » (Brunton les énonce). Sans elle, compter les cases ne donne plus la probabilité (figure 1).</li>
+      <li>On compte A et Ω de la même façon : si Ω est fait de couples ordonnés, A aussi.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — l'hypothèse se voit : compter les cases, ou mesurer leur aire</div>
+    <div id="f1ctl"></div>
+    <div id="f1plot" class="wide"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Les mêmes 36 cases, mais chacune a pour largeur la probabilité de la face du premier dé et pour hauteur celle du second : son aire est sa probabilité. Augmente <b>P(5)</b>, la même sur les deux dés : la colonne et la ligne du 5 s'élargissent. Compter les cases de A donne toujours 11/36 = 0,306 ; l'aire de A, elle, vaut 1 − (1 − q)² et monte jusqu'à 0,75 pour q = 0,5. #A/#Ω ne vaut que si toutes les cases ont la même aire.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux pièces, deux dés de trois façons, somme 7, trois dés</small></summary><div class="in">
+    <ol>
+      <li><b>Deux pièces.</b> Ω = {PP, PF, FP, FF}. Au moins un pile : {PP, PF, FP}, 3/4 = 75 %. Aucun pile : {FF}, 1/4 = 25 %.</li>
+      <li><b>Deux dés, au moins un 5, en énumérant</b> : 11 couples sur 36, 11/36 = 0,306.</li>
+      <li><b>Le même, en raisonnant</b> (la troisième méthode de Brunton) : soit le premier dé fait 5, soit il ne fait pas 5 et le second fait 5. P = 1/6 + 5/6 × 1/6 = 6/36 + 5/36 = 11/36. Ce calcul utilise déjà la règle de multiplication et l'indépendance, que <a href="lesson-00-03-conditionner-bayes-independance.html#n2">l03</a> formalise.</li>
+      <li><b>Le même, par le complément</b> : aucun 5, c'est 5 × 5 = 25 couples, donc P(au moins un 5) = 1 − 25/36 = 11/36. « Au moins un » se calcule presque toujours ainsi (<a href="lesson-00-02-espace-axiomes-complement.html#n2">l02</a>).</li>
+      <li><b>Somme 7</b> : (1, 6), (2, 5), (3, 4), (4, 3), (5, 2), (6, 1), donc 6/36 = 1/6.</li>
+      <li><b>Trois dés de somme 13</b>, une question d'appel de Brunton 01 : Ω compte 6³ = 216 triplets, dont 21 de somme 13 (énumérés par le code ci-dessous), soit 21/216 = 0,097.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>énumérer Ω, puis lancer 100 000 fois</small></summary><div class="in">
+<pre class="py">import numpy as np
+from itertools import product
+
+# Enumerate Omega for two fair dice, then count the event "at least one 5"
+omega = list(product(range(1, 7), repeat=2))
+A = [w for w in omega if 5 in w]
+print(f"#Omega = {len(omega)}, #A = {len(A)}, P(A) = {len(A) / len(omega):.4f}")
+
+# Three dice summing to 13 (a teaser question of video 01)
+triples = [t for t in product(range(1, 7), repeat=3) if sum(t) == 13]
+print(f"three dice, sum 13: {len(triples)}/216 = {len(triples) / 216:.4f}")
+
+# Simulate 100,000 throws of two dice: each of the 36 cells gets about 1/36 of them
+rng = np.random.default_rng(0)
+d = rng.integers(1, 7, size=(100_000, 2))
+cells = np.bincount((d[:, 0] - 1) * 6 + (d[:, 1] - 1), minlength=36)
+print(f"throws per cell: min {cells.min()}, max {cells.max()}, expected {100_000 / 36:.0f}")
+print(f"frequency of A: {(d == 5).any(axis=1).mean():.4f}   (11/36 = {11 / 36:.4f})")</pre>
+<pre class="out">#Omega = 36, #A = 11, P(A) = 0.3056
+three dice, sum 13: 21/216 = 0.0972
+throws per cell: min 2655, max 2886, expected 2778
+frequency of A: 0.3071   (11/36 = 0.3056)</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Des issues qui ne sont pas équiprobables.</b> Avec un dé pipé, les 36 couples n'ont plus la même chance : il faut pondérer chaque case par sa probabilité (figure 1), ce que font les axiomes de <a href="lesson-00-02-espace-axiomes-complement.html#n2">l02</a>.</li>
+      <li><b>Un Ω mal choisi.</b> Si l'on liste les résultats de deux dés sans ordre, {1, 5}, {5, 5}…, on trouve 21 issues, dont 6 contiennent un 5 : 6/21 = 0,286, faux. {5, 5} ne sort que d'une façon, {1, 5} de deux. Même piège chez d'Alembert, en 1754 (article « Croix ou pile » de l'Encyclopédie) : pour au moins un pile en deux lancers, il retient trois issues, pile, face puis pile, face puis face, et trouve 2/3 au lieu de 3/4 ; la première vaut 1/2, les deux autres 1/4. Le remède : un Ω dont les issues sont vraiment équiprobables, ici les couples ordonnés (notion 6).</li>
+      <li><b>Un Ω infini.</b> Compter ne marche plus. Sur un Ω infini dénombrable, aucune loi ne donne la même probabilité à toutes les issues : des masses égales et positives sommeraient à l'infini. Sur un intervalle, une densité uniforme existe, mais chaque issue a la probabilité 0 et l'on mesure des longueurs, pas des comptes. Le rang du premier pile demande une loi discrète (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n2">l05</a>), le temps d'attente avant le prochain mail une densité (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n3">l05</a>).</li>
+      <li><b>Compter ne passe pas à l'échelle.</b> 300 piles sur 1 000 lancers ou au moins trois 5 sur 15 dés : impossible à lister. Les notions 3 à 7 comptent sans énumérer.</li>
+    </ul>
+  </div></details>
+  <p class="garde">Si les issues de Ω sont équiprobables, P(A) = #A/#Ω, cas favorables sur cas possibles. Deux dés, au moins un 5 : 11/36.</p>
+</section>
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>Le principe multiplicatif et l'arbre des choix <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 02 (l'arbre des deux dés) et 03 · Counting Probabilities with Combinatorics and the Factorial</p>
+  <div class="idee">
+    <p>Pour les deux dés, Brunton dessine un <b>arbre</b> : six branches pour le premier dé, et chacune se divise en six branches pour le second. Une feuille est un couple, un chemin de la racine à une feuille est une suite de choix. 6 × 6 = 36 feuilles, sans les lister.</p>
+    <p>La règle tient en une phrase : si un résultat se construit en étapes, avec k<sub>1</sub> options à la première puis k<sub>2</sub> à la deuxième quel que soit le premier choix, il y a k<sub>1</sub> × k<sub>2</sub> résultats. Dix lancers de pièce, deux options à chaque étape : 2 × 2 × … × 2 = 2¹⁰ = 1 024 séquences ; « on peut se convaincre que ça devient exponentiel ». Une plaque de quatre lettres puis deux chiffres : 26⁴ × 10² = 45 697 600.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — chaque étape multiplie le nombre de feuilles</div>
+    <div id="v3ctl" class="sl-ctl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">L'arbre de Brunton. Chaque niveau est une étape, chaque branche une option, chaque feuille une séquence complète. Avec <b>3 pièces</b>, chaque nœud se divise en 2 : 2 × 2 × 2 = 8 feuilles, de PPP à FFF, et le chemin rouge est la séquence PFP. Ajoute une pièce : le nombre de feuilles double. Choisis <b>deux dés</b> : 6 branches, chacune se divise en 6, 36 feuilles. <b>Tire une séquence</b> : un chemin de la racine à une feuille, une option par étape.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">nombre de résultats = <i>k</i><sub>1</sub> × <i>k</i><sub>2</sub> × … × <i>k<sub>r</sub></i></div>
+    <ul>
+      <li>Le résultat se construit en <i>r</i> étapes, avec <i>k<sub>i</sub></i> options à l'étape <i>i</i>.</li>
+      <li><b>Le nombre d'options d'une étape ne dépend pas des choix précédents.</b> Les options elles-mêmes peuvent en dépendre : la deuxième carte est l'une des 51 qui restent, lesquelles dépend de la première, mais il en reste toujours 51. C'est ce qui permet de multiplier au lieu d'additionner branche par branche.</li>
+      <li>Deux chemins différents donnent deux résultats différents, et chaque résultat a son chemin. Sinon on compte certains résultats plusieurs fois.</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>pièces, dés, plaques, une grille d'hyperparamètres</small></summary><div class="in">
+    <ol>
+      <li><b>Deux, trois pièces</b> : 2 × 2 = 4 séquences, 2 × 2 × 2 = 8.</li>
+      <li><b>Deux dés</b> : 6 × 6 = 36 couples, le Ω de la notion 2.</li>
+      <li><b>Dix pièces</b> : 2¹⁰ = 1 024. Mille pièces : 2¹⁰⁰⁰ ≈ 10³⁰¹, qu'aucun arbre ne dessinera.</li>
+      <li><b>Une plaque</b> de quatre lettres (26 options chacune) puis deux chiffres (10 options chacun), répétitions permises : 26 × 26 × 26 × 26 × 10 × 10 = 45 697 600.</li>
+      <li><b>Une grille d'hyperparamètres.</b> 4 taux d'apprentissage × 3 tailles de batch × 5 profondeurs = 60 entraînements. Un quatrième hyperparamètre à 5 valeurs les porte à 300 : chaque axe ajouté multiplie le coût, c'est pour cela qu'on passe à une recherche aléatoire.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>par récurrence sur les étapes, en lisant l'arbre</small></summary><div class="in">
+    <p>Notons N<sub><i>r</i></sub> le nombre de feuilles d'un arbre à <i>r</i> étapes.</p>
+    <div class="drv">
+      <div>N<sub>1</sub> = <i>k</i><sub>1</sub></div><span>une étape : une feuille par option</span>
+      <div>N<sub><i>r</i></sub> = <i>k</i><sub>1</sub> × (feuilles sous une branche)</div><span>les k<sub>1</sub> branches de la racine portent chacune un sous-arbre ; ils ont tous le même nombre de feuilles, car le nombre d'options ne dépend pas du chemin</span>
+      <div>= <i>k</i><sub>1</sub> × (<i>k</i><sub>2</sub> × … × <i>k<sub>r</sub></i>)</div><span>chaque sous-arbre a r − 1 étapes, hypothèse de récurrence</span>
+    </div>
+    <p>L'hypothèse sert à la deuxième ligne : si le nombre d'options variait d'une branche à l'autre, il faudrait additionner les sous-arbres un par un au lieu de multiplier.</p>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Le nombre d'options dépend du chemin.</b> Deux dés, le second strictement plus grand que le premier : après un 1, 5 options ; après un 2, 4 ; … après un 6, aucune. Total 5 + 4 + 3 + 2 + 1 + 0 = 15, pas 6 × 5 = 30. On additionne alors les branches.</li>
+      <li><b>Deux chemins pour un même résultat.</b> Choisir deux personnes parmi dix « une première, puis une seconde » donne 10 × 9 = 90 chemins, mais chaque paire est comptée deux fois : 45 paires. C'est la division par r! de la notion 5.</li>
+      <li><b>L'arbre explose.</b> Il sert à comprendre, pas à compter : à partir de quelques étapes on ne le dessine plus, on multiplie.</li>
+    </ul>
+  </div></details>
+  <p class="garde">Un résultat construit en r étapes, avec k<sub>i</sub> options à l'étape i quels que soient les choix précédents, et deux suites de choix distinctes donnant deux résultats distincts : k<sub>1</sub> × k<sub>2</sub> × … × k<sub>r</sub> résultats.</p>
+</section>
+<!-- ============================ n4 ============================ -->
+<section class="notion outil" id="n4">
+  <h3>Tirer dans l'ordre, avec ou sans remise <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 03</p>
+  <div class="idee">
+    <p>Une <b>séquence</b> est un tirage où l'ordre compte : PF n'est pas FP. Pour la pièce, chaque lancer est « une pièce neuve » : un pile au premier n'empêche pas un pile au second. C'est un tirage <b>avec remise</b>, 2 options à chacune des 10 étapes, 2¹⁰ séquences.</p>
+    <p>Distribue maintenant cinq cartes du dessus d'un paquet de 52, dans l'ordre. La première a 52 possibilités ; une fois sortie, il en reste 51 pour la deuxième, puis 50, 49, 48. Le réservoir rétrécit : c'est un tirage <b>sans remise</b>, 52 × 51 × 50 × 49 × 48 = 311 875 200 séquences. Brunton l'écrit 52!/47! : la factorielle 52! = 52 × 51 × … × 2 × 1, divisée par 47!, ne garde que les cinq premiers facteurs. « Ces deux cas ont des probabilités très différentes. »</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — le réservoir qui rétrécit, ou qu'on remplit à nouveau</div>
+    <div id="v4ctl" class="sl-ctl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">Le paquet de 52 cartes et les cinq cases de Brunton. <b>Distribue</b> : chaque carte tirée sort du paquet, et la case suivante n'a plus que 51, puis 50, 49, 48 choix. Le produit 52 × 51 × 50 × 49 × 48 = 311 875 200 compte les séquences de cinq cartes. <b>Avec remise</b>, la carte revient dans le paquet avant le tirage suivant : 52 choix à chaque case, 52⁵ = 380 204 032 séquences, et une même carte peut sortir deux fois.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">avec remise : <i>n</i><sup><i>r</i></sup> &nbsp;&nbsp;&nbsp;&nbsp; sans remise : <i>n</i>!/(<i>n</i> − <i>r</i>)! = <i>n</i>(<i>n</i> − 1) … (<i>n</i> − <i>r</i> + 1)</div>
+    <ul>
+      <li><i>n</i> objets <b>distincts</b>, <i>r</i> tirages, et deux séquences qui diffèrent par l'ordre comptent pour deux. Pour la pièce n = 2 et r = 10 ; pour les cartes n = 52 et r = 5.</li>
+      <li>Sans remise, il faut <i>r</i> ≤ <i>n</i> : il y a <i>r</i> facteurs, du plus grand, <i>n</i>, au plus petit, <i>n</i> − <i>r</i> + 1.</li>
+      <li><i>n</i>! = <i>n</i>(<i>n</i> − 1) … 2 · 1, et 0! = 1 par convention, pour que <i>r</i> = <i>n</i> donne <i>n</i>!/0! = <i>n</i>!, le nombre d'ordres de <i>n</i> objets.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — le rapport des deux formules est une probabilité</div>
+    <div id="f2ctl" class="sl-ctl"></div>
+    <div id="f2sl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Parmi les n<sup>r</sup> séquences avec remise, les n!/(n − r)! sont celles où aucun objet ne se répète. Leur rapport est donc la probabilité que r tirages avec remise soient tous différents. Pour <b>n = 26</b> et r = 4, quatre lettres de plaque toutes différentes : 358 800/456 976 = 0,785, le devoir que donne Brunton. Choisis <b>n = 365</b> et monte <b>r</b> : à r = 23 le rapport passe sous ½ (0,493) ; c'est le problème des anniversaires de <a href="lesson-00-02-espace-axiomes-complement.html#n4">l02</a>.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>pièces, cartes, plaques, podium, tokens</small></summary><div class="in">
+    <ol>
+      <li><b>Dix lancers</b> : n = 2, r = 10, avec remise : 2¹⁰ = 1 024.</li>
+      <li><b>Cinq cartes dans l'ordre</b> : 52!/47! = 311 875 200. Si l'on remettait et rebattait à chaque fois : 52⁵ = 380 204 032.</li>
+      <li><b>Plaques</b>, le devoir de Brunton. Avec répétitions : 26⁴ × 10² = 45 697 600. Sans lettre ni chiffre répété : 26 × 25 × 24 × 23 × 10 × 9 = 32 292 000. Avec répétitions permises, la probabilité que les quatre lettres soient toutes différentes : 358 800/456 976 = 0,785.</li>
+      <li><b>Un podium</b> de 8 coureurs, or, argent, bronze : 8 × 7 × 6 = 336.</li>
+      <li><b>Les ordres d'un paquet</b> : 52! ≈ 8,07 × 10⁶⁷.</li>
+      <li><b>Des séquences de tokens.</b> Un vocabulaire de V = 50 257 tokens (celui de GPT-2) et des séquences de L tokens, qui peuvent se répéter : V<sup>L</sup>. Pour L = 3, environ 1,27 × 10¹⁴ ; pour un contexte de 1 024 tokens, environ 10⁴⁸¹⁴.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>le principe multiplicatif, deux fois</small></summary><div class="in">
+    <div class="drv">
+      <div><i>n</i> × <i>n</i> × … × <i>n</i> = <i>n</i><sup><i>r</i></sup></div><span>avec remise : n options à chacune des r étapes (notion 3)</span>
+      <div><i>n</i> × (<i>n</i> − 1) × … × (<i>n</i> − <i>r</i> + 1)</div><span>sans remise : à l'étape i, i − 1 objets sont déjà sortis, il en reste n − i + 1, quels qu'ils soient</span>
+      <div>= [<i>n</i>(<i>n</i> − 1) … (<i>n</i> − <i>r</i> + 1) × (<i>n</i> − <i>r</i>)!] / (<i>n</i> − <i>r</i>)!</div><span>multiplier et diviser par (n − r)!</span>
+      <div>= <i>n</i>! / (<i>n</i> − <i>r</i>)!</div><span>le numérateur est le produit de n jusqu'à 1</span>
+    </div>
+    <p>C'est le devoir de Brunton : 52!/47! = (52 × 51 × 50 × 49 × 48 × 47!)/47!, et les 47 derniers facteurs se simplifient.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>énumérer, compter, simuler les plaques, et un piège de numpy</small></summary><div class="in">
+<pre class="py">import math
+import numpy as np
+from itertools import product, permutations
+
+n, r = 5, 3
+print("ordered, with replacement   :", len(list(product(range(n), repeat=r))), "=", n**r)
+print("ordered, without replacement:", len(list(permutations(range(n), r))), "=", math.perm(n, r))
+print("5 cards in order            :", math.perm(52, 5), "=", 52 * 51 * 50 * 49 * 48)
+
+# Plates: 4 letters drawn with replacement; how often are they all different?
+rng = np.random.default_rng(1)
+letters = np.sort(rng.integers(0, 26, size=(200_000, 4)), axis=1)
+distinct = (np.diff(letters, axis=1) &gt; 0).all(axis=1)
+exact = math.perm(26, 4) / 26**4
+print(f"P(4 distinct letters): simulated {distinct.mean():.4f}, exact {exact:.4f}")
+
+# Trap: numpy integers are 64-bit and overflow silently
+print("np.prod(1..21)     =", np.prod(np.arange(1, 22)))
+print("math.factorial(21) =", math.factorial(21))</pre>
+<pre class="out">ordered, with replacement   : 125 = 125
+ordered, without replacement: 60 = 60
+5 cards in order            : 311875200 = 311875200
+P(4 distinct letters): simulated 0.7849, exact 0.7852
+np.prod(1..21)     = -4249290049419214848
+math.factorial(21) = 51090942171709440000</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Plus de tirages que d'objets.</b> Sans remise, r &gt; n est impossible : 7 cartes distinctes parmi 6, c'est 0 façon.</li>
+      <li><b>Des objets identiques.</b> Les formules supposent n objets distincts. Les anagrammes de PAPA ne sont pas 4! = 24 mais 4!/(2! × 2!) = 6 : c'est le coefficient multinomial de <a href="lesson-00-02-espace-axiomes-complement.html#n7">l02</a>.</li>
+      <li><b>Les entiers débordent.</b> numpy calcule sur 64 bits : np.prod jusqu'à 21 renvoie un nombre négatif sans prévenir (code ci-dessus). Utilise math.factorial, math.perm, ou des logarithmes.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (03) lit à voix haute « 52 fois 51 fois 50 fois 48 fois 49 fois 48 ». C'est un lapsus : il y a cinq facteurs, 52 × 51 × 50 × 49 × 48, un par carte distribuée.</div>
+  </div></details>
+  <p class="garde">r tirages ordonnés parmi n objets distincts : n<sup>r</sup> avec remise, n!/(n − r)! = n(n − 1)…(n − r + 1) sans remise.</p>
+</section>
+<!-- ============================ n5 ============================ -->
+<section class="notion outil" id="n5">
+  <h3>Sans ordre ni remise : C(n, r), diviser par r! <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 03</p>
+  <div class="idee">
+    <p>Une <b>main</b> de poker n'a pas d'ordre : {R, D, 2, 3, 7} et {R, 2, D, 7, 3} sont la même main, « je peux déplacer mes cartes ». Pour compter les mains, Brunton repart des séquences de la notion 4 et se demande combien de séquences donnent la même main.</p>
+    <p>Les cinq cartes d'une main peuvent se ranger de 5 × 4 × 3 × 2 × 1 = 5! = 120 façons, ses <b>permutations</b>. Chaque main correspond donc à exactement 120 séquences, et il y a 311 875 200/120 = 2 598 960 mains. « Je veux que tu ralentisses et que tu y réfléchisses : c'est un point vraiment important. » Ce nombre se note C(52, 5), « 5 parmi 52 ».</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — une main, ce sont r! séquences</div>
+    <div id="v5ctl" class="sl-ctl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">Trois cartes parmi cinq piques, as, roi, dame, valet et 10 : il y a 5 × 4 × 3 = 60 séquences. <b>Rangées par main</b>, chaque ligne réunit les 3! = 6 ordres des mêmes trois cartes : 10 lignes, donc 60/6 = 10 mains. Passe à l'<b>ordre de distribution</b> : les six séquences de la main surlignée se dispersent parmi les 60, mais il y en a toujours exactement six, pour chaque main. <b>Main suivante</b> en surligne une autre. C'est l'argument de Brunton pour diviser par r!.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">C(<i>n</i>, <i>r</i>) = <i>n</i>! / (<i>r</i>! (<i>n</i> − <i>r</i>)!) = <i>n</i>(<i>n</i> − 1) … (<i>n</i> − <i>r</i> + 1) / <i>r</i>!</div>
+    <ul>
+      <li><i>n</i> objets <b>distincts</b>, <i>r</i> ≤ <i>n</i>, sans remise, et l'ordre ne compte pas : on compte des sous-ensembles de taille <i>r</i>.</li>
+      <li>L'hypothèse « distincts » sert : elle garantit que les <i>r</i> objets d'une main donnent <i>r</i>! séquences toutes différentes.</li>
+      <li>On l'écrit aussi avec <i>n</i> au-dessus de <i>r</i> entre parenthèses, ou <i>C</i><sub><i>n</i></sub><sup><i>r</i></sup> dans les vieux manuels ; en anglais, « n choose r ». Symétrie : C(<i>n</i>, <i>r</i>) = C(<i>n</i>, <i>n</i> − <i>r</i>), et C(<i>n</i>, 0) = C(<i>n</i>, <i>n</i>) = 1.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — les 1 024 séquences de dix lancers, rangées par nombre de piles</div>
+    <div id="f3ctl" class="sl-ctl"></div>
+    <div id="f3sl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Les 2¹⁰ = 1 024 séquences de la notion 3, rangées selon leur nombre de piles. La barre k compte C(10, k) séquences : il suffit de choisir quels k lancers, parmi les dix, tombent sur pile. Les barres somment à 1 024. <b>Au moins 5</b> piles, la question qui ouvre Brunton 03 : 252 + 210 + 120 + 45 + 10 + 1 = 638 séquences, soit 638/1024 = 0,623. Passe à <b>exactement</b> et à k = 7 : 120/1024 = 0,117, le nombre de la notion 1.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>trois cartes parmi cinq, poker, pièces, loto, variables explicatives</small></summary><div class="in">
+    <ol>
+      <li><b>Trois cartes parmi cinq</b> : 5 × 4 × 3 = 60 séquences, divisées par 3! = 6 : C(5, 3) = 10 mains (la vignette).</li>
+      <li><b>Les mains de poker</b> : C(52, 5) = 311 875 200/120 = 2 598 960.</li>
+      <li><b>Un carré</b> (quatre cartes de même hauteur) : on choisit la hauteur, 13 options ; les quatre cartes sont alors imposées ; la cinquième est l'une des 48 restantes. 13 × 48 = 624 mains, soit 624/2 598 960 ≈ 1 chance sur 4 165. La quinte flush que cite Brunton 02 : 10 par couleur, royale comprise, 40 mains, 1,5 × 10⁻⁵.</li>
+      <li><b>Sept piles en dix lancers</b> : C(10, 7) = 120 séquences sur 1 024, la probabilité 0,117 de la notion 1. Au moins cinq : 638/1024 = 0,623 (figure 3).</li>
+      <li><b>Un loto</b> 6 parmi 49 : C(49, 6) = 13 983 816 grilles.</li>
+      <li><b>Des sous-ensembles de variables explicatives (features).</b> Chercher le meilleur sous-ensemble de 5 features parmi 20 demanderait C(20, 5) = 15 504 entraînements, et 2²⁰ = 1 048 576 toutes tailles confondues : on ne fait donc jamais de recherche exhaustive. Une forêt aléatoire tire aussi m features parmi p à chaque nœud, mais pour décorréler ses arbres (<a href="../chains/chain-p07-02-bagging-rf.html">p07-02</a>).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>compter les séquences de deux façons</small></summary><div class="in">
+    <div class="drv">
+      <div>#séquences = <i>n</i>! / (<i>n</i> − <i>r</i>)!</div><span>notion 4 : r tirages ordonnés sans remise</span>
+      <div>#séquences = #mains × <i>r</i>!</div><span>chaque séquence appartient à une seule main, celle de ses r objets, et chaque main en donne r! (principe multiplicatif : r places pour le premier objet, r − 1 pour le deuxième…)</span>
+      <div>#mains = <i>n</i>! / (<i>r</i>! (<i>n</i> − <i>r</i>)!) = C(<i>n</i>, <i>r</i>)</div><span>égaler les deux comptes et diviser par r!</span>
+    </div>
+    <p><b>Symétrie.</b> Choisir les r objets qu'on garde, c'est choisir les n − r qu'on laisse : C(n, r) = C(n, n − r). La formule le montre aussi, r! et (n − r)! échangent leurs places. Ainsi C(52, 47) = C(52, 5) = 2 598 960.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>six séquences par main, et les 2 598 960 mains énumérées</small></summary><div class="in">
+<pre class="py">from collections import Counter
+from itertools import combinations, permutations
+from math import comb
+
+# Each 3-card hand out of 5 cards corresponds to exactly 3! = 6 sequences
+seqs = list(permutations("ARDVT", 3))        # T stands for the 10
+hands = Counter(frozenset(s) for s in seqs)
+print(len(seqs), "sequences,", len(hands), "hands,", set(hands.values()), "sequences per hand")
+
+# Enumerate all 5-card poker hands and count four of a kind
+deck = [(rank, suit) for rank in range(13) for suit in range(4)]
+n_hands = n_quads = 0
+for hand in combinations(deck, 5):
+    n_hands += 1
+    n_quads += 4 in Counter(rank for rank, _ in hand).values()
+print(n_hands, "hands =", comb(52, 5), "| four of a kind:", n_quads, "=", 13 * 48)
+print(f"P(four of a kind) = {n_quads / n_hands:.6f}, about 1 in {n_hands / n_quads:.0f}")</pre>
+<pre class="out">60 sequences, 10 hands, {6} sequences per hand
+2598960 hands = 2598960 | four of a kind: 624 = 624
+P(four of a kind) = 0.000240, about 1 in 4165</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Diviser par r! demande des objets distincts.</b> Avec remise, la séquence (5, 5) n'a qu'un ordre, pas deux : diviser 36 par 2! donne 18, alors que deux dés sans ordre ont 21 résultats (notion 6, figure 4).</li>
+      <li><b>Un numérateur ordonné sur un dénominateur non ordonné.</b> Pour une probabilité, compter A et Ω dans le même modèle. Les carrés comptés dans l'ordre, 624 × 120 = 74 880 séquences, se divisent par 311 875 200 séquences : on retrouve 624/2 598 960. Mélanger les deux fausse le résultat d'un facteur 120.</li>
+      <li><b>r &gt; n.</b> C(n, r) = 0 : on ne choisit pas 6 cartes parmi 5.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (03) dit « pour chaque séquence, il y a r! mains équivalentes ». C'est l'inverse : chaque main correspond à r! séquences, d'où la division du nombre de séquences par r!.</div>
+  </div></details>
+  <p class="garde">Choisir r objets parmi n distincts, sans ordre ni remise : C(n, r) = n!/(r!(n − r)!), car chaque main correspond à r! séquences.</p>
+</section>
+<!-- ============================ n6 ============================ -->
+<section class="notion culture" id="n6">
+  <h3>Sans ordre, avec remise : C(n + r − 1, r) <span class="tag culture">culture</span></h3>
+  <p class="src">absent chez Brunton : la case qui manque à sa vidéo 03</p>
+  <div class="idee">
+    <p>Lance deux dés ensemble sans les distinguer, et note seulement les valeurs obtenues : {1, 1}, {1, 2}, …, {6, 6}. Combien de résultats ? Pas 36, l'ordre ne compte plus ; pas 36/2 = 18 non plus, car un double comme {5, 5} n'avait qu'un ordre. Il y en a 21.</p>
+    <p>L'astuce classique s'appelle <b>étoiles et barres</b>. Prends 3 boules de glace parmi 4 parfums, un parfum pouvant revenir. Écris chaque boule par une étoile et sépare les parfums par 3 barres : ★★|★|| veut dire deux vanille, un chocolat, ni fraise ni pistache. Chaque panier devient une suite de 6 symboles, et une telle suite est fixée par la place de ses 3 étoiles : C(6, 3) = 20 paniers.</p>
+  </div>
+  <div class="fig vis" id="v6">
+    <div class="lbl">Voir l'idée — un panier, c'est une place pour chaque étoile</div>
+    <div id="v6ctl" class="sl-ctl"></div>
+    <div id="v6plot" class="wide"></div>
+    <div class="readouts" id="v6out"></div>
+    <p class="cap">Un panier de 3 boules parmi 4 parfums (vanille, chocolat, fraise, pistache) s'écrit avec 3 étoiles, les boules, et 3 barres, les séparations entre parfums : ★★|★|| se lit deux vanille, un chocolat. Chaque panier est une façon de placer 3 étoiles parmi 6 places : C(6, 3) = 20, tous listés en dessous. <b>Panier suivant</b> les parcourt. <b>Deux dés sans ordre</b> : 2 étoiles et 5 barres pour 6 faces, C(7, 2) = 21 résultats.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">C(<i>n</i> + <i>r</i> − 1, <i>r</i>) = C(<i>n</i> + <i>r</i> − 1, <i>n</i> − 1)</div>
+    <ul>
+      <li><i>n</i> types distincts, <i>r</i> tirages avec remise, l'ordre ne compte pas : on compte des <b>multi-ensembles</b>, des ensembles où un élément peut revenir.</li>
+      <li><i>r</i> peut dépasser <i>n</i> : 10 boules parmi 4 parfums, C(13, 10) = 286 paniers.</li>
+      <li>Ces résultats ne sont pas équiprobables quand ils viennent de tirages indépendants : la formule compte des résultats, elle ne donne pas de probabilité (où ça casse).</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>dés, glaces, dominos, bootstrap</small></summary><div class="in">
+    <ol>
+      <li><b>Deux dés sans ordre</b> : n = 6, r = 2, C(7, 2) = 21 : les 15 paires de faces différentes et les 6 doubles.</li>
+      <li><b>Trois boules, quatre parfums</b> : C(6, 3) = 20.</li>
+      <li><b>Trois dés sans ordre</b> : C(8, 3) = 56.</li>
+      <li><b>Un jeu de dominos double-six</b> : chaque domino est un multi-ensemble de 2 valeurs parmi 7 (de 0 à 6), C(8, 2) = 28 dominos.</li>
+      <li><b>Le bootstrap.</b> Rééchantillonner 10 lignes avec remise parmi 10 (<a href="../chains/chain-p01-05-bootstrap.html#s4">p01-05, pas 4</a>) : si l'on ne regarde que combien de fois chaque ligne revient, il y a C(19, 10) = 92 378 rééchantillons distincts.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>une bijection entre paniers et suites d'étoiles et de barres</small></summary><div class="in">
+    <div class="drv">
+      <div>panier ↦ ★…★ | ★…★ | … | ★…★</div><span>autant d'étoiles que de boules du type 1, une barre, puis le type 2, et ainsi de suite : n − 1 barres en tout</span>
+      <div>suite ↦ panier</div><span>lire les étoiles entre deux barres redonne les quantités : l'application se renverse, c'est une bijection</span>
+      <div>#suites = C(<i>n</i> + <i>r</i> − 1, <i>r</i>)</div><span>une suite de r + n − 1 symboles est fixée par les r places de ses étoiles (notion 5)</span>
+    </div>
+    <p>Choisir les n − 1 places des barres revient au même : d'où la seconde écriture, C(n + r − 1, n − 1).</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>21 résultats, mais pas de même probabilité</small></summary><div class="in">
+<pre class="py">import numpy as np
+from itertools import combinations_with_replacement
+from math import comb, factorial
+
+# Unordered results of two dice: multisets {i, j} with i &lt;= j
+multisets = list(combinations_with_replacement(range(1, 7), 2))
+print(len(multisets), "unordered results = C(7, 2) =", comb(7, 2))
+
+# They are not equally likely: throw 100,000 pairs and sort each one
+rng = np.random.default_rng(2)
+d = np.sort(rng.integers(1, 7, size=(100_000, 2)), axis=1)
+freq = lambda a, b: np.mean((d[:, 0] == a) &amp; (d[:, 1] == b))
+print("{5, 5}:", f"{freq(5, 5):.4f}  (1/36 = {1 / 36:.4f})")
+print("{1, 5}:", f"{freq(1, 5):.4f}  (2/36 = {2 / 36:.4f})")
+
+# Counting "at least one 5" on the 21 multisets gives the wrong answer
+naive = sum(5 in m for m in multisets) / len(multisets)
+simulated = (d == 5).any(axis=1).mean()
+print(f"at least one 5: 6/21 = {naive:.4f}, simulated {simulated:.4f}, 11/36 = {11 / 36:.4f}")
+
+# Bootstrap of 10 rows: distinct resamples, and P(each row appears exactly once)
+print("C(19, 10) =", comb(19, 10), "  P(all 10 rows once) =", round(factorial(10) / 10**10, 5))</pre>
+<pre class="out">21 unordered results = C(7, 2) = 21
+{5, 5}: 0.0284  (1/36 = 0.0278)
+{1, 5}: 0.0564  (2/36 = 0.0556)
+at least one 5: 6/21 = 0.2857, simulated 0.3078, 11/36 = 0.3056
+C(19, 10) = 92378   P(all 10 rows once) = 0.00036</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Ces résultats ne sont pas équiprobables.</b> Deux dés lancés au hasard donnent {5, 5} d'une seule façon, (5, 5), et {1, 5} de deux, (1, 5) et (5, 1) : 1/36 contre 2/36. Compter « au moins un 5 » sur les 21 résultats donne 6/21 = 0,286, au lieu de 11/36 = 0,306 (code ci-dessus). Pour une probabilité, revenir aux séquences ordonnées, qui, elles, sont équiprobables. Il existe des modèles où les multi-ensembles le sont, la statistique de Bose-Einstein des photons, mais pas des dés ni des rééchantillonnages tirés indépendamment.</li>
+      <li><b>Le bootstrap, même piège.</b> Les 92 378 rééchantillons n'ont pas la même chance : celui qui contient les 10 lignes une fois chacune a la probabilité 10!/10¹⁰ = 0,00036, celui qui répète 10 fois une ligne donnée 10⁻¹⁰.</li>
+      <li><b>Le même compte sous un autre nom.</b> Ranger r boules indiscernables dans n boîtes, c'est choisir combien de boules vont dans chaque boîte : C(n + r − 1, r). Si les boules sont numérotées, chacune choisit sa boîte : n<sup>r</sup> (notion 4). Avant de compter, se demander si les objets se distinguent.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (03) présente trois cas : ordonné avec remise, ordonné sans remise, non ordonné sans remise. Il en manque un quatrième, non ordonné avec remise, qui se compte par C(n + r − 1, r). Le tableau complet est en notion 7.</div>
+  </div></details>
+  <p class="garde">Avec remise et sans ordre, on compte des multi-ensembles : C(n + r − 1, r), par étoiles et barres. Ils ne sont pas équiprobables : pour une probabilité, on compte les séquences.</p>
+</section>
+<!-- ============================ n7 ============================ -->
+<section class="notion outil" id="n7">
+  <h3>Les quatre cas : deux questions choisissent la formule <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 03 (le devoir des plaques), complété du quatrième cas</p>
+  <div class="idee">
+    <p>Pour la plaque d'immatriculation, Brunton pose deux questions avant tout calcul. « L'ordre compte-t-il ? Clairement oui. » « Avec ou sans remise ? Réalistement avec : AABB99 est une plaque tout à fait valable. » Il en déduit la case, ordre et remise ; le calcul, un n<sup>r</sup> par bloc, est laissé en devoir : 26⁴ × 10² = 45 697 600.</p>
+    <p>Ces deux questions suffisent toujours. Chacune a deux réponses, d'où quatre cas, et une formule par cas. Le signal se lit dans l'énoncé. <b>L'ordre compte</b> pour une séquence, un code, un classement, une plaque ; il ne compte pas pour une main, un comité, un sous-ensemble, un panier. <b>On remet</b> quand un même objet peut revenir, une face de dé, une lettre, un parfum ; on ne remet pas quand un objet sorti ne revient pas, une carte distribuée, un coureur sur le podium.</p>
+  </div>
+  <div class="fig vis" id="v7">
+    <div class="lbl">Voir l'idée — le tableau 2 × 2, et un scénario par case</div>
+    <div id="v7ctl" class="sl-ctl"></div>
+    <div id="v7plot" class="wide"></div>
+    <div class="readouts" id="v7out"></div>
+    <p class="cap">Deux questions, quatre cases. Choisis un <b>scénario</b> : la case qui répond aux deux questions s'allume, avec le compte. La plaque : l'ordre compte, une lettre peut revenir, donc n<sup>r</sup> sur chaque bloc puis le principe multiplicatif, 26⁴ × 10² = 45 697 600. Le podium : l'ordre compte, un coureur ne monte pas deux fois, 8 × 7 × 6 = 336. La main de poker : ni ordre ni remise, C(52, 5). Les boules de glace : sans ordre et avec répétition, la case que Brunton ne traite pas. Chaque case porte aussi le nom de la fonction d'itertools qui l'énumère.</p>
+  </div>
+  <div class="formule"><div class="lbl">Le tableau</div>
+    <div class="eq">l'ordre compte : <i>n</i><sup><i>r</i></sup> avec remise &nbsp;·&nbsp; <i>n</i>!/(<i>n</i> − <i>r</i>)! sans remise<br>l'ordre ne compte pas : C(<i>n</i> + <i>r</i> − 1, <i>r</i>) avec remise &nbsp;·&nbsp; C(<i>n</i>, <i>r</i>) sans remise</div>
+    <ul>
+      <li><i>n</i> objets distincts, <i>r</i> tirages. Si l'énoncé mêle plusieurs réservoirs (lettres puis chiffres), on compte chaque bloc puis on multiplie (notion 3).</li>
+      <li>« L'ordre compte » se décide par la question, pas par les objets : cinq cartes distribuées sont une séquence si l'on demande dans quel ordre elles sortent, une main sinon. « C'est toi l'arbitre du scénario que tu comptes », dit Brunton.</li>
+      <li><b>Pour une probabilité</b>, A et Ω se comptent dans le même cas, et dans un cas où les issues sont équiprobables. Avec des tirages indépendants, ce n'est pas la case sans ordre avec remise.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — les quatre cas sur deux dés</div>
+    <div id="f4ctl" class="sl-ctl"></div>
+    <div id="f4plot" class="wide"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">Les quatre cas avec n = 6 faces et r = 2 dés, dans la grille de la notion 2. <b>Ordonné avec remise</b> : les 36 couples. <b>Ordonné sans remise</b> : on retire les 6 doubles, 6 × 5 = 30. <b>Sans ordre ni remise</b> : (2, 5) et (5, 2) ne font qu'un, on garde une case sur deux, 30/2! = 15 = C(6, 2). <b>Sans ordre, avec remise</b> : on rajoute les doubles, 21 = C(7, 2), et non 36/2! = 18, parce qu'un double n'a qu'un ordre. Chaque case affiche alors sa probabilité, 1/36 pour un double, 2/36 pour une paire : le piège de la notion 6.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>un scénario par case, puis quelques autres</small></summary><div class="in">
+    <ol>
+      <li><b>Ordre et remise : la plaque.</b> L'ordre compte, une lettre peut revenir. 26⁴ lettres × 10² chiffres = 45 697 600. Même case : dix lancers de pièce, 2¹⁰ = 1 024 ; un mot de passe de 8 caractères parmi 62 (lettres et chiffres) : 62⁸ ≈ 2,18 × 10¹⁴.</li>
+      <li><b>Ordre sans remise : le podium.</b> Or, argent, bronze parmi 8 coureurs, un coureur par marche : 8 × 7 × 6 = 336. Même case : cinq cartes distribuées dans l'ordre, 311 875 200.</li>
+      <li><b>Ni ordre ni remise : la main.</b> C(52, 5) = 2 598 960 mains de poker ; C(49, 6) = 13 983 816 grilles de loto ; C(20, 5) = 15 504 sous-ensembles de 5 features parmi 20.</li>
+      <li><b>Sans ordre, avec remise : le panier.</b> 3 boules parmi 4 parfums : C(6, 3) = 20 ; deux dés sans les distinguer : C(7, 2) = 21.</li>
+      <li><b>Le même problème dans deux cases.</b> La probabilité d'un carré au poker se calcule en mains, 624/2 598 960, ou en séquences, 74 880/311 875 200 : même résultat, parce que les deux cases sont sans remise et que chaque main compte r! = 120 séquences en haut comme en bas.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>les quatre fonctions d'itertools, une par case</small></summary><div class="in">
+<pre class="py">from itertools import product, permutations, combinations, combinations_with_replacement
+from math import comb, perm
+
+n, r = 6, 2                                    # two dice
+faces = range(1, n + 1)
+cases = [
+    ("ordered,   with replacement     n^r", product(faces, repeat=r), n**r),
+    ("ordered,   without replacement  n!/(n-r)!", permutations(faces, r), perm(n, r)),
+    ("unordered, without replacement  C(n, r)", combinations(faces, r), comb(n, r)),
+    ("unordered, with replacement     C(n+r-1, r)",
+     combinations_with_replacement(faces, r), comb(n + r - 1, r)),
+]
+for name, it, formula in cases:
+    print(f"{name:&lt;45} enumerated {len(list(it)):&gt;2}   formula {formula:&gt;2}")</pre>
+<pre class="out">ordered,   with replacement     n^r           enumerated 36   formula 36
+ordered,   without replacement  n!/(n-r)!     enumerated 30   formula 30
+unordered, without replacement  C(n, r)       enumerated 15   formula 15
+unordered, with replacement     C(n+r-1, r)   enumerated 21   formula 21</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Deux réservoirs dans un même énoncé.</b> La plaque n'est pas 36⁶ : quatre places prennent une lettre, deux un chiffre. On compte chaque bloc, puis on multiplie.</li>
+      <li><b>L'ordre caché dans la question.</b> « Combien de façons de distribuer 5 cartes » est ambigu : à toi de dire si tu comptes des séquences ou des mains, et de compter A dans le même cas.</li>
+      <li><b>La case sans ordre avec remise ne donne pas de probabilité</b> par #A/#Ω quand les tirages sont indépendants : ses issues ne sont pas équiprobables (figure 4, notion 6).</li>
+      <li><b>Des objets identiques</b>, comme les lettres de PAPA, sortent du tableau : c'est le coefficient multinomial (<a href="lesson-00-02-espace-axiomes-complement.html#n7">l02</a>). Un tirage sans remise où l'on compte les « bons » objets tirés, comme des pièces défectueuses, mène à la loi hypergéométrique (<a href="lesson-00-02-espace-axiomes-complement.html#n5">l02</a>).</li>
+    </ul>
+  </div></details>
+  <p class="garde">Deux questions choisissent la formule : l'ordre compte-t-il ? remet-on ? oui-oui n<sup>r</sup>, oui-non n!/(n − r)!, non-non C(n, r), non-oui C(n + r − 1, r).</p>
+</section>
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Probabilité : θ connu, on prédit les données. Statistique : les données sont là, on remonte à θ. En fréquentiste θ est fixe : p(x ; θ).</li>
+    <li>Issues équiprobables : P(A) = #A/#Ω. Deux dés, au moins un 5 : 11/36.</li>
+    <li>Principe multiplicatif : k<sub>1</sub> × k<sub>2</sub> × … × k<sub>r</sub>, les feuilles de l'arbre.</li>
+    <li>Ordonné : n<sup>r</sup> avec remise, n!/(n − r)! sans remise.</li>
+    <li>Sans ordre ni remise : C(n, r) = n!/(r!(n − r)!), on divise par les r! ordres d'une main.</li>
+    <li>Sans ordre, avec remise : C(n + r − 1, r), des issues qui ne sont pas équiprobables quand elles viennent de tirages indépendants.</li>
+    <li>Deux questions choisissent la formule : l'ordre compte-t-il ? remet-on ?</li>
+  </ol>
+</div>
+<div class="phrase">« Quand les issues sont équiprobables, une probabilité est un rapport de deux comptes. Pour compter r tirages parmi n, deux questions suffisent : l'ordre compte-t-il, remet-on ? On obtient n<sup>r</sup>, n!/(n − r)!, C(n, r) ou C(n + r − 1, r). Le piège : les résultats sans ordre avec remise ne sont pas équiprobables quand ils viennent de tirages indépendants, donc pour une probabilité on compte les séquences. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Deux dés : quelle est la probabilité d'au moins un 5 ?</div><div class="a hid">11/36 : 36 couples équiprobables, dont 11 contiennent un 5. Ou 1 − 25/36 par le complément.</div></li>
+    <li><div class="q">Combien de séquences de dix lancers de pièce, et pourquoi ?</div><div class="a hid">2¹⁰ = 1 024 : deux options à chacune des dix étapes, quel que soit le passé (principe multiplicatif).</div></li>
+    <li><div class="q">Combien de façons de distribuer cinq cartes dans l'ordre ? Et combien de mains de poker ?</div><div class="a hid">52 × 51 × 50 × 49 × 48 = 311 875 200 séquences ; divisées par 5! = 120, 2 598 960 mains.</div></li>
+    <li><div class="q">Pourquoi divise-t-on par r! pour passer des séquences aux mains ?</div><div class="a hid">Chaque main de r objets distincts correspond à exactement r! séquences, ses permutations.</div></li>
+    <li><div class="q">Quelles deux questions choisissent la formule, et que donnent les quatre réponses ?</div><div class="a hid">L'ordre compte-t-il ? Remet-on ? Oui-oui n<sup>r</sup>, oui-non n!/(n − r)!, non-non C(n, r), non-oui C(n + r − 1, r).</div></li>
+    <li><div class="q">Pourquoi 6/21 est-il faux pour « au moins un 5 » sur deux dés ?</div><div class="a hid">Les 21 résultats sans ordre ne sont pas équiprobables : {5, 5} vaut 1/36, {1, 5} vaut 2/36. On compte les 36 couples : 11/36.</div></li>
+    <li><div class="q">En fréquentiste, écris-tu p(x ∣ θ) ou p(x ; θ) ? Pourquoi ?</div><div class="a hid">p(x ; θ) : θ est un nombre fixe, pas une variable aléatoire, il n'y a rien à conditionner. La barre est réservée au conditionnement.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Leçons, ponts et chaînes</div>
+  <div class="bridges">
+    <a href="lesson-00-02-espace-axiomes-complement.html"><b>l02 · Ω, axiomes, complément</b><small>La suite directe : Ω et les événements formalisés, P quand les issues ne sont plus équiprobables, les anniversaires (figure 2), Pascal et C(n, k).</small></a>
+    <a href="lesson-00-04-variables-binomiale-normale.html#n4"><b>l04 · La loi binomiale</b><small>C(n, k) p<sup>k</sup>(1 − p)<sup>n − k</sup> : les C(10, k) séquences de la figure 3, chacune pondérée par sa probabilité.</small></a>
+    <a href="../chains/chain-p01-05-bootstrap.html#s4"><b>Bootstrap, pourquoi avec remise</b><small>Une ligne absente d'un rééchantillon : (n − 1)<sup>n</sup> séquences sur n<sup>n</sup>, soit (1 − 1/n)<sup>n</sup>, qui tend vers e⁻¹ ≈ 0,368 (notion 4).</small></a>
+    <a href="../chains/chain-p07-02-bagging-rf.html"><b>Bagging et forêt aléatoire</b><small>63 % de lignes distinctes par bootstrap, et m features tirées parmi p à chaque coupure (notion 5).</small></a>
+    <a href="../chains/chain-p08-03-cross-entropy-entropie-kl.html"><b>Cross-entropy, entropie, KL</b><small>Un modèle qui n'a rien appris donne 1/V à chacun des V tokens, le cas équiprobable de la notion 2 : sa loss vaut ln V.</small></a>
+    <a href="../chains/chain-p01-02-ic-test-procedure.html#s5"><b>Sur quoi porte le 95 %</b><small>Le niveau de confiance porte sur la procédure, pas sur θ : le premier « Brunton, rectifié » de la notion 1.</small></a>
+    <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html"><b>Du bruit à la loss</b><small>p(y ∣ x ; θ) : la barre pour l'entrée aléatoire, le point-virgule pour les poids fixes (notion 1).</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::denombrement</code> (notions 2, 3, 4, 5 et 7 ; les notions 1 et 6 sont de la culture, sans carte).</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l01 · v1 du 10/10/2026 · Brunton 01 à 03 · Prérequis : aucun. Suite : <a href="lesson-00-02-espace-axiomes-complement.html">l02 · Ω, axiomes, complément</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* ===== commun à toutes les leçons (kit, étalon l08 v2) ===== */
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc : une entrée par notion, étiquette comprise */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.notion').forEach((s,i)=>{const li=document.createElement('li');const t=s.querySelector('h3').firstChild.textContent.trim();const k=s.classList.contains('culture')?' · culture':'';li.innerHTML=`<a href="#${s.id}">${i+1}. ${t}${k}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.notion').forEach(s=>io.observe(s));
+/* une ancre #nN ouvre la notion visée ; rien n'est replié par défaut hors des blocs */
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outils de dessin ===== */
+function curve(P,f,a,b,cls,ymax){let d='';const n=240;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;let y=f(x);if(!isFinite(y))continue;y=Math.min(y,ymax);d+=(d?' L':'M')+P.sx(x).toFixed(1)+' '+P.sy(y).toFixed(1);}SL.el('path',{d:d,class:'sl-fn '+cls,fill:'none'},P.dyn);}
+function bar(P,x0,x1,y,cls){const a=P.sx(x0),b=P.sx(x1);SL.el('rect',{x:Math.min(a,b),y:P.sy(y),width:Math.max(1.5,Math.abs(b-a)),height:Math.max(0,P.sy(0)-P.sy(y)),class:cls||'sl-bar'},P.dyn);}
+/* SL.plot trace l'axe vertical en x = 0 ; quand 0 porte une barre, on le ramène au bord gauche */
+function leftAxis(P,x0){const ax=P.svg.querySelectorAll('line.sl-axis');if(ax[1]){ax[1].setAttribute('x1',P.sx(x0));ax[1].setAttribute('x2',P.sx(x0));}}
+function rd(host,items){host.innerHTML=items.map(it=>`<div class="${it[2]||''}">${it[0]}<b>${it[1]}</b></div>`).join('');}
+function buttons(host,names,cb){const bs=names.map((n,i)=>{const b=SL.h('button','tb',host,n);b.onclick=()=>{bs.forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');cb(i);};return b;});bs[0].onclick();return bs;}
+
+
+/* ===== v2 : vignettes « voir l'idée », une par notion, juste sous l'idée ===== */
+/* tween : animation 0 → 1 lissée ; runner : un jeton par figure, un nouveau clic tue l'animation en cours */
+function runner(){let t={dead:true};return ()=>{t.dead=true;t={dead:false};return t;};}
+function tween(ms,draw,tk,done){if(SL.reduced){draw(1);if(done)done();return;}const t0=performance.now();const st=t=>{if(tk&&tk.dead)return;let u=Math.min(1,(t-t0)/ms);u=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;draw(u);if(u<1)requestAnimationFrame(st);else if(done)done();};requestAnimationFrame(st);}
+function loop(tk,step){if(SL.reduced){let g=0;while(step()!==false&&g++<1e5);return;}const f=()=>{if(tk.dead)return;if(step()!==false)requestAnimationFrame(f);};requestAnimationFrame(f);}
+function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function pick(r,v,p){let u=r(),a=0;for(let i=0;i<v.length;i++){a+=p[i];if(u<a)return v[i];}return v[v.length-1];}
+function gauss(r){let u=0;while(u===0)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());}
+function fulcrum(P,x){const cx=P.sx(x),cy=P.sy(0);SL.el('path',{d:`M${cx.toFixed(1)} ${(cy+1).toFixed(1)} L${(cx-8).toFixed(1)} ${(cy+16).toFixed(1)} L${(cx+8).toFixed(1)} ${(cy+16).toFixed(1)} Z`,class:'sl-fulcrum'},P.dyn);}
+function median(a){const s=a.slice().sort((x,y)=>x-y),n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;}
+function rect(P,x0,x1,y0,y1,cls,parent){const a=P.sx(x0),b=P.sx(x1),c=P.sy(y0),d=P.sy(y1);return SL.el('rect',{x:Math.min(a,b).toFixed(1),y:Math.min(c,d).toFixed(1),width:Math.abs(b-a).toFixed(1),height:Math.abs(d-c).toFixed(1),class:cls},parent||P.dyn);}
+/* pile de pastilles : une par individu, regroupées par classe de largeur bw */
+function stack(P,vals,bw,r,clsOf,centred){const bins=new Map();vals.forEach((v,i)=>{const b=centred?Math.round(v/bw):Math.floor(v/bw);if(!bins.has(b))bins.set(b,[]);bins.get(b).push(i);});
+  const res=[];bins.forEach((ids,b)=>{const c=centred?b*bw:(b+0.5)*bw,cx=P.sx(c);res.push({c:c,ids:ids});ids.forEach((i,j)=>SL.el('circle',{cx:cx.toFixed(1),cy:(P.sy(0)-r-1-j*(2*r+1)).toFixed(1),r:r,class:'sl-dot '+clsOf(i)},P.dyn));});return res;}
+
+
+/* ===== l01 : outils propres à la leçon ===== */
+const NB=' ';
+/* entier groupé par trois, ou mantisse × 10^e au-delà du milliard (HTML : pour rd) */
+function big(x){if(x<1e9)return Math.round(x).toString().replace(/\B(?=(\d{3})+(?!\d))/g,NB);
+  let e=Math.floor(Math.log10(x)),m=x/Math.pow(10,e);if(m>=9.995){m/=10;e++;}return SL.fmt(m,2)+' × 10<sup>'+e+'</sup>';}
+function txt(parent,x,y,s,cls,anchor){const t=SL.el('text',{x:(+x).toFixed(1),y:(+y).toFixed(1),'text-anchor':anchor||'middle',class:cls||'sl-lbl'},parent);t.textContent=s;return t;}
+
+/* ===== figure 1 (n2) : compter les cases, ou mesurer leur aire ===== */
+(function(){
+  const host=document.getElementById('f1plot'),out=document.getElementById('f1out');host.classList.add('nogrid');
+  const P=SL.plot(host,{x:[0,1],y:[0,1],w:440,h:432,xt:[],yt:[],xl:'premier dé en colonne, second en ligne'});
+  function draw(q){
+    P.clear();
+    const w=[1,2,3,4,5,6].map(f=>f===5?q:(1-q)/5),c=[0];w.forEach(v=>c.push(c[c.length-1]+v));
+    for(let i=0;i<6;i++)for(let j=0;j<6;j++){
+      const inA=i===4||j===4;
+      rect(P,c[i]+0.004,c[i+1]-0.004,c[j]+0.004,c[j+1]-0.004,inA?'sl-cellp sl-a':'sl-cello');
+    }
+    for(let i=0;i<6;i++){const m=(c[i]+c[i+1])/2;
+      txt(P.dyn,P.sx(m),P.sy(0)+15,String(i+1),'sl-tick');
+      txt(P.dyn,P.sx(0)-7,P.sy(m)+4,String(i+1),'sl-tick','end');}
+    const pa=1-(1-q)*(1-q);
+    rd(out,[['compter les cases, #A/#Ω','11/36 = 0,306'],['aire de A = P(A)',SL.fmt(pa,3),'c3'],['P(5) sur chaque dé',Math.abs(q-1/6)<1e-6?'1/6':SL.fmt(q,2)],['aire de la case (5, 5)',SL.fmt(q*q,3)]]);
+  }
+  SL.slider(document.getElementById('f1ctl'),{label:'P(5) par dé',min:1/6,max:0.5,step:1/60,value:1/6,fmt:v=>Math.abs(v-1/6)<1e-6?'1/6':SL.fmt(v,2)},draw);
+})();
+
+/* ===== figure 2 (n4) : le rapport des deux formules, P(r tirages tous différents) ===== */
+(function(){
+  const ctl=document.getElementById('f2ctl'),sdiv=document.getElementById('f2sl'),host=document.getElementById('f2plot'),out=document.getElementById('f2out');
+  const N=[{n:6,R:8,r:3,lab:'n = 6, un dé'},{n:26,R:14,r:4,lab:'n = 26, des lettres'},{n:52,R:16,r:5,lab:'n = 52, des cartes'},{n:365,R:60,r:23,lab:'n = 365, des jours'}];
+  const ratio=(n,r)=>{let p=1;for(let i=0;i<r;i++)p*=(n-i)/n;return p;};
+  const perm=(n,r)=>{let p=1;for(let i=0;i<r;i++)p*=(n-i);return p;};
+  function show(k){
+    const L=N[k];host.innerHTML='';sdiv.innerHTML='';
+    const dt=L.R<=16?2:10,xt=[];for(let t=0;t<=L.R;t+=dt)xt.push(t);
+    const P=SL.plot(host,{x:[0,L.R+0.6],y:[0,1.08],w:560,h:260,xt:xt,yt:[0,0.25,0.5,0.75,1],xl:'r, nombre de tirages'});
+    P.label(L.R+0.5,1.0,'● P(r tirages, tous différents)','sl-c2','end');
+    function draw(r){
+      P.clear();P.seg(0,0.5,L.R+0.6,0.5,'sl-dash');
+      for(let s=1;s<=L.R;s++)P.dot(s,ratio(L.n,s),s===r?'sl-c3':'sl-c2',s===r?6:3.2);
+      P.seg(r,0,r,0.92,'sl-c3 sl-dash');
+      rd(out,[['n<sup>r</sup>, avec remise',big(Math.pow(L.n,r))],['n!/(n − r)!, tous différents',big(perm(L.n,r))],['rapport = P(tous différents)',SL.fmt(ratio(L.n,r),3),'c3']]);
+    }
+    SL.slider(sdiv,{label:'r tirages',min:1,max:L.R,step:1,value:L.r,fmt:v=>String(v)},draw);
+  }
+  const bs=buttons(ctl,N.map(x=>x.lab),show);bs[1].onclick();
+})();
+
+/* ===== figure 3 (n5) : les 1 024 séquences de dix lancers, par nombre de piles ===== */
+(function(){
+  const C=[1,10,45,120,210,252,210,120,45,10,1];
+  const out=document.getElementById('f3out');
+  const P=SL.plot(document.getElementById('f3plot'),{x:[-0.6,10.6],y:[0,290],w:560,h:270,xt:[0,1,2,3,4,5,6,7,8,9,10],yt:[0,50,100,150,200,250],xl:'k, nombre de piles sur 10'});
+  leftAxis(P,-0.6);
+  P.label(10.5,276,'barre k : C(10, k) séquences','','end');
+  const st={mode:0,k:5};
+  function draw(){
+    P.clear();let s=0;
+    C.forEach((c,k)=>{const on=st.mode===0?k>=st.k:k===st.k;if(on)s+=c;bar(P,k-0.36,k+0.36,c,on?'sl-bar2':'sl-bar');P.text(k,c+6,String(c),'','middle');});
+    rd(out,[[(st.mode===0?'au moins ':'exactement ')+st.k+' pile'+(st.k>1?'s':''),big(s)+' séquences','c3'],['toutes les séquences, 2¹⁰',big(1024)],['probabilité',s+'/1024 = '+SL.fmt(s/1024,3),'c3']]);
+  }
+  buttons(document.getElementById('f3ctl'),['au moins k piles','exactement k piles'],m=>{st.mode=m;draw();});
+  SL.slider(document.getElementById('f3sl'),{label:'k',min:0,max:10,step:1,value:5,fmt:v=>String(v)},v=>{st.k=v;draw();});
+})();
+
+/* ===== figure 4 (n7) : les quatre cas sur deux dés ===== */
+(function(){
+  const host=document.getElementById('f4plot'),out=document.getElementById('f4out');host.classList.add('nogrid');
+  const P=SL.plot(host,{x:[0.5,6.5],y:[0.5,6.5],w:440,h:432,xt:[1,2,3,4,5,6],yt:[1,2,3,4,5,6],xl:'premier dé en colonne, second en ligne'});
+  const M=[
+    {lab:'ordonné, avec remise : 36',f:(i,j)=>true,ro:[['cases retenues','36','c3'],['formule','6² = 36'],['on compte','(d₁, d₂) ordonnés']]},
+    {lab:'ordonné, sans remise : 30',f:(i,j)=>i!==j,ro:[['cases retenues','30','c3'],['formule','6 × 5 = 30'],['retirés','les 6 doubles']]},
+    {lab:'sans ordre ni remise : 15',f:(i,j)=>j>i,ro:[['cases retenues','15','c3'],['formule','C(6, 2) = 15'],['depuis les 30','30/2! = 15']]},
+    {lab:'sans ordre, avec remise : 21',f:(i,j)=>j>=i,ro:[['cases retenues','21','c3'],['formule','C(7, 2) = 21'],['depuis les 36','36/2! = 18 ≠ 21'],['au moins un 5','11/36, pas 6/21']]}];
+  function draw(k){
+    P.clear();const m=M[k];
+    for(let i=1;i<=6;i++)for(let j=1;j<=6;j++){
+      const on=m.f(i,j);rect(P,i-0.46,i+0.46,j-0.46,j+0.46,on?'sl-cellp sl-a':'sl-cello');
+      const lab=k>=2&&on?'{'+i+', '+j+'}':'('+i+', '+j+')';
+      if(k===3&&on){P.text(i,j+0.06,lab,'sl-cell-t','middle');P.text(i,j-0.3,i===j?'1/36':'2/36','sl-cell-t','middle');}
+      else P.text(i,j-0.1,lab,'sl-cell-t'+(on?'':' sl-off'),'middle');
+    }
+    rd(out,m.ro);
+  }
+  buttons(document.getElementById('f4ctl'),M.map(m=>m.lab),draw);
+})();
+
+/* ===== v1 : le même nombre p(k ; θ), lu dans les deux sens ===== */
+(function(){
+  const ctl=document.getElementById('v1ctl'),host=document.getElementById('v1plot'),out=document.getElementById('v1out'),seqEl=document.getElementById('v1seq');
+  const C=[1,10,45,120,210,252,210,120,45,10,1];
+  const p=(k,t)=>C[k]*Math.pow(t,k)*Math.pow(1-t,10-k);
+  const row=SL.h('div','v-row',host),L=SL.h('div','',row),R=SL.h('div','',row);
+  const st={t:0.5,k:7,seq:null,shown:0};
+  const scale=m=>[0.3,0.45,0.65,1.05].find(v=>v>=m*1.08)||1.05;
+  const ticks=y=>y<=0.3?[0,0.1,0.2,0.3]:y<=0.45?[0,0.2,0.4]:y<=0.65?[0,0.2,0.4,0.6]:[0,0.5,1];
+  const fp=x=>x<0.0005?'< 0,001':SL.fmt(x,3);
+  function draw(){
+    L.innerHTML='';R.innerHTML='';
+    const t=st.t,k=st.k,pk=p(k,t);
+    SL.h('div','v-tt',L,'probabilité : θ = '+SL.fmt(t,2)+' fixé, k varie');
+    let mL=0;for(let j=0;j<=10;j++)mL=Math.max(mL,p(j,t));const yL=scale(mL);
+    const A=SL.plot(L,{x:[-0.6,10.6],y:[0,yL],w:300,h:230,xt:[0,2,4,6,8,10],yt:ticks(yL),xl:'k piles sur 10'});
+    leftAxis(A,-0.6);
+    for(let j=0;j<=10;j++)bar(A,j-0.38,j+0.38,p(j,t),j===k?'sl-bar2':'sl-bar');
+    SL.h('div','v-tt',R,'statistique : k = '+k+' observé, θ varie');
+    const peak=p(k,k/10),yR=scale(peak);
+    const B=SL.plot(R,{x:[0,1],y:[0,yR],w:300,h:230,xt:[0,0.25,0.5,0.75,1],yt:ticks(yR),xl:'θ = P(pile)'});
+    curve(B,x=>p(k,x),0,1,'sl-c1',yR);
+    B.vline(t,'sl-c4 sl-dash');B.dot(k/10,peak,'hollow sl-c1',5);B.dot(t,pk,'sl-c3',5.5);
+    rd(out,[['p(k ; θ), dans les deux panneaux',fp(pk),'c3'],['θ fixé',SL.fmt(t,2)],['k observé',String(k)],['θ qui maximise la courbe',SL.fmt(k/10,1)]]);
+    if(st.seq){const s=st.seq.slice(0,st.shown).join(' ');seqEl.innerHTML=s+(st.shown===10?' <small>→ k = '+st.seq.filter(c=>c==='P').length+' piles, tirés avec θ = '+SL.fmt(st.tseq,2)+'</small>':'');}
+    else seqEl.innerHTML='<small>aucune séquence tirée</small>';
+  }
+  const a=SL.h('div','',ctl);
+  const sT=SL.slider(a,{label:'θ = P(pile)',min:0.05,max:0.95,step:0.05,value:0.5,fmt:v=>SL.fmt(v,2)},v=>{st.t=v;draw();});
+  const sK=SL.slider(a,{label:'k observé',min:0,max:10,step:1,value:7,fmt:v=>String(v)},v=>{st.k=v;if(st.seq&&st.shown===10&&st.seq.filter(c=>c==='P').length!==v)st.seq=null;draw();});
+  const fresh=runner();let seed=3;
+  SL.h('button','tb',SL.h('div','sl-ctl',ctl),'▶ lancer 10 pièces').onclick=()=>{
+    const tk=fresh(),r=rng(seed++);st.seq=[];st.tseq=st.t;for(let i=0;i<10;i++)st.seq.push(r()<st.t?'P':'F');
+    const done=()=>{st.shown=10;sK.set(st.seq.filter(c=>c==='P').length);};
+    if(SL.reduced){done();return;}
+    st.shown=0;let i=0;const step=()=>{if(tk.dead)return;i++;st.shown=i;draw();if(i<10)setTimeout(step,110);else done();};setTimeout(step,60);
+  };
+  draw();
+})();
+
+/* ===== v2 : les cases de Ω, les cases de A, et 1 000 lancers ===== */
+(function(){
+  const ctl=document.getElementById('v2ctl'),host=document.getElementById('v2plot'),out=document.getElementById('v2out');host.classList.add('nogrid');
+  const EV=[{dice:0,f:(a,b)=>a===1||b===1,lab:'deux pièces, au moins un pile'},{dice:0,f:(a,b)=>a===2&&b===2,lab:'deux pièces, aucun pile'},
+            {dice:1,f:(a,b)=>a===5||b===5,lab:'deux dés, au moins un 5'},{dice:1,f:(a,b)=>a+b===7,lab:'deux dés, somme 7'}];
+  let cur=2,P=null,dots=null,n=0,hits=0,seed=7;const fresh=runner();
+  function report(){
+    const E=EV[cur],m=E.dice?6:2,N=m*m;let a=0;for(let i=1;i<=m;i++)for(let j=1;j<=m;j++)if(E.f(i,j))a++;
+    rd(out,[['#Ω, issues possibles',String(N)],['#A, cas favorables',String(a),'c3'],['P(A) = #A/#Ω',a+'/'+N+' = '+SL.fmt(a/N,3),'c3'],n?['fréquence de A sur '+big(n)+' lancers',SL.fmt(hits/n,3)]:['fréquence de A','aucun lancer']]);
+  }
+  function setup(k){
+    fresh();cur=k;n=0;hits=0;host.innerHTML='';
+    const E=EV[k],m=E.dice?6:2,nm=v=>E.dice?String(v):(v===1?'P':'F');
+    P=SL.plot(host,{x:[0.5,m+0.5],y:[0.5,m+0.5],w:440,h:432,xt:[],yt:[],xl:E.dice?'premier dé en colonne, second en ligne':'premier lancer en colonne, second en ligne'});
+    for(let v=1;v<=m;v++){txt(P.layer,P.sx(v),P.sy(0.5)+15,nm(v),'sl-tick');txt(P.layer,P.sx(0.5)-7,P.sy(v)+4,nm(v),'sl-tick','end');}
+    for(let i=1;i<=m;i++)for(let j=1;j<=m;j++)rect(P,i-0.46,i+0.46,j-0.46,j+0.46,E.f(i,j)?'sl-cellp sl-a':'sl-cello',P.layer);
+    dots=SL.el('g',{},P.layer);const labs=SL.el('g',{},P.layer);
+    for(let i=1;i<=m;i++)for(let j=1;j<=m;j++)txt(labs,P.sx(i),P.sy(j)+(E.dice?4:6),E.dice?'('+i+', '+j+')':nm(i)+nm(j),E.dice?'sl-cell-t':'sl-cell-t big');
+    report();
+  }
+  function throwN(){
+    const tk=fresh(),r=rng(seed++),E=EV[cur],m=E.dice?6:2;n=0;hits=0;while(dots.firstChild)dots.removeChild(dots.firstChild);
+    loop(tk,()=>{const k=n<40?1:n<200?4:12;for(let j=0;j<k&&n<1000;j++){const a=1+Math.floor(m*r()),b=1+Math.floor(m*r());n++;if(E.f(a,b))hits++;
+      SL.el('circle',{cx:P.sx(a-0.42+0.84*r()).toFixed(1),cy:P.sy(b-0.42+0.84*r()).toFixed(1),r:1.9,class:'sl-dot sl-c4 sl-tiny'},dots);}report();return n<1000;});
+  }
+  const bs=buttons(ctl,EV.map(e=>e.lab),setup);
+  SL.h('button','tb',ctl,'▶ lancer 1 000 fois').onclick=throwN;
+  bs[2].onclick();
+})();
+
+/* ===== v3 : l'arbre, chaque étape multiplie les feuilles ===== */
+(function(){
+  const ctl=document.getElementById('v3ctl'),host=document.getElementById('v3plot'),out=document.getElementById('v3out');
+  const W=560,H=290,ML=14,MR=64,MT=18,MB=40;
+  const S=SL.el('svg',{viewBox:`0 0 ${W} ${H}`,class:'sl-plot'},host),G=SL.el('g',{},S);
+  const M=[{ks:[2]},{ks:[2,2]},{ks:[2,2,2]},{ks:[2,2,2,2]},{ks:[6,6]}],lab=['1 pièce','2 pièces','3 pièces','4 pièces','deux dés'];
+  const DEF=[[0],[0,1],[0,1,0],[0,1,0,1],[2,4]];
+  let cur=2,path=DEF[2].slice(),seed=9;const fresh=runner();
+  const coin=()=>M[cur].ks[0]===2,nm=v=>coin()?(v===0?'P':'F'):String(v+1);
+  const pname=()=>coin()?path.map(nm).join(''):'('+path.map(nm).join(', ')+')';
+  function draw(upto){
+    while(G.firstChild)G.removeChild(G.firstChild);
+    const ks=M[cur].ks,r=ks.length,L=ks.reduce((a,b)=>a*b,1);
+    const pre=d=>ks.slice(0,d).reduce((a,b)=>a*b,1),lx=i=>ML+(i+0.5)*(W-ML-MR)/L,ly=d=>MT+d*(H-MT-MB)/r;
+    const nx=(d,idx)=>{const s=L/pre(d);return lx(idx*s+(s-1)/2);};
+    const pidx=[0];for(let d=0;d<r;d++)pidx.push(pidx[d]*ks[d]+path[d]);
+    for(let d=0;d<r;d++){
+      for(let idx=0;idx<pre(d);idx++)for(let c=0;c<ks[d];c++){
+        const on=d<upto&&idx===pidx[d]&&c===path[d],ch=idx*ks[d]+c;
+        const x1=nx(d,idx),y1=ly(d),x2=nx(d+1,ch),y2=ly(d+1);
+        SL.el('line',{x1:x1.toFixed(1),y1:y1.toFixed(1),x2:x2.toFixed(1),y2:y2.toFixed(1),class:'sl-tree'+(on?' on':'')},G);
+        if(L<=16||d===0||on)txt(G,(x1+x2)/2+(c<ks[d]/2?-10:10),(y1+y2)/2+4,nm(c),'sl-leaf'+(on?' on':''));
+      }
+      txt(G,W-MR+12,ly(d+1)+4,'× '+ks[d],'sl-qh','start');
+    }
+    for(let d=0;d<=r;d++)for(let idx=0;idx<pre(d);idx++){
+      const on=d<=upto&&idx===pidx[d];
+      SL.el('circle',{cx:nx(d,idx).toFixed(1),cy:ly(d).toFixed(1),r:on?4:2.4,class:'sl-dot '+(on?'sl-c3':'sl-c1')},G);}
+    for(let i=0;i<L;i++){const on=upto>=r&&i===pidx[r];
+      if(L<=16||on){let s='',q=i;for(let d=r-1;d>=0;d--){s=nm(q%ks[d])+(coin()?'':(s?', ':''))+s;q=Math.floor(q/ks[d]);}
+        const t=txt(G,lx(i),ly(r)+18,coin()?s:'('+s+')','sl-leaf'+(on?' on':''));if(L===16)t.setAttribute('style','font-size:9px');}}
+    txt(G,W-MR+12,ly(r)+18,'= '+L,'sl-qh','start');
+    rd(out,[['étapes',String(r)],['options par étape',ks.join(' × ')],['feuilles = séquences',String(L),'c3'],['chemin rouge',upto>=r?pname():'…']]);
+  }
+  buttons(ctl,lab,k=>{fresh();cur=k;path=DEF[k].slice();draw(M[k].ks.length);});
+  SL.h('button','tb',ctl,'▶ une séquence au hasard').onclick=()=>{
+    const tk=fresh(),r=rng(seed++),ks=M[cur].ks;path=ks.map(k=>Math.floor(k*r()));
+    tween(260*ks.length+200,u=>draw(Math.min(ks.length,Math.floor(u*(ks.length+0.999)))),tk);
+  };
+  ctl.querySelectorAll('button')[2].onclick();
+})();
+
+/* ===== v4 : le paquet qui rétrécit, ou qu'on remplit à nouveau ===== */
+(function(){
+  const ctl=document.getElementById('v4ctl'),host=document.getElementById('v4plot'),out=document.getElementById('v4out');
+  const W=560,H=250,S=SL.el('svg',{viewBox:`0 0 ${W} ${H}`,class:'sl-plot'},host);
+  const RK=['A','2','3','4','5','6','7','8','9','10','V','D','R'],SU=['♠','♥','♦','♣'];
+  const cw=41,chh=23,x0=(W-13*cw)/2,y0=6,red=i=>{const s=Math.floor(i/13);return s===1||s===2;},name=i=>RK[i%13]+SU[Math.floor(i/13)];
+  const cards=[];
+  for(let i=0;i<52;i++){const s=Math.floor(i/13),k=i%13;
+    const r=SL.el('rect',{x:x0+k*cw+2,y:y0+s*(chh+3),width:cw-4,height:chh,rx:3,class:'sl-card'},S);
+    cards.push({r:r,t:txt(S,x0+k*cw+cw/2,y0+s*(chh+3)+16,name(i),'sl-card-t'+(red(i)?' red':''))});}
+  const sw=92,sx0=(W-5*sw)/2,sy=y0+4*(chh+3)+30,slots=[];
+  for(let j=0;j<5;j++){const x=sx0+j*sw;
+    slots.push({r:SL.el('rect',{x:x+8,y:sy,width:sw-16,height:78,rx:4,class:'sl-slot'},S),n:txt(S,x+sw/2,sy+28,'','sl-slot-n'),c:txt(S,x+sw/2,sy+60,'','sl-slot-c')});
+    if(j<4)txt(S,x+sw,sy+28,'×','sl-slot-n');
+    txt(S,x+sw/2,sy+96,'carte '+(j+1),'sl-pos');}
+  let mode=0,dealt=[],shown=5,seed=4;const fresh=runner();
+  function render(){
+    const gone=mode===0?dealt.slice(0,shown):[],last=shown>0?dealt[shown-1]:-1;
+    cards.forEach((c,i)=>{const o=gone.includes(i);c.r.setAttribute('class','sl-card'+(o?' out':mode===1&&i===last?' hl':''));c.t.setAttribute('class','sl-card-t'+(red(i)?' red':'')+(o?' out':''));});
+    slots.forEach((s,j)=>{s.n.textContent=String(mode===0?52-j:52);s.c.textContent=j<shown?name(dealt[j]):'';
+      s.c.setAttribute('class','sl-slot-c'+(j<shown&&red(dealt[j])?' red':''));s.r.setAttribute('class','sl-slot'+(j<shown?' on':''));});
+    const A=big(311875200),B=big(380204032);
+    rd(out,mode===0?[['choix à chaque tirage','52·51·50·49·48'],['séquences sans remise',A,'c3'],['avec remise, 52⁵',B]]
+                   :[['choix à chaque tirage','52·52·52·52·52'],['séquences avec remise',B,'c3'],['sans remise, 52!/47!',A]]);
+  }
+  function draw5(r){dealt=[];while(dealt.length<5){const c=Math.floor(52*r());if(mode===1||!dealt.includes(c))dealt.push(c);}}
+  draw5(rng(seed++));
+  buttons(ctl,['sans remise','avec remise'],k=>{fresh();mode=k;shown=5;render();});
+  SL.h('button','tb',ctl,'▶ distribuer 5 cartes').onclick=()=>{
+    const tk=fresh();draw5(rng(seed++));
+    if(SL.reduced){shown=5;render();return;}
+    shown=0;render();const step=()=>{if(tk.dead)return;shown++;render();if(shown<5)setTimeout(step,420);};setTimeout(step,250);
+  };
+})();
+
+/* ===== v5 : une main, ce sont r! séquences ===== */
+(function(){
+  const ctl=document.getElementById('v5ctl'),host=document.getElementById('v5plot'),out=document.getElementById('v5out');
+  const C=['A','R','D','V','10'],seqs=[],hands=[];
+  for(let a=0;a<5;a++)for(let b=0;b<5;b++)for(let c=0;c<5;c++)if(a!==b&&b!==c&&a!==c)seqs.push([a,b,c]);
+  for(let a=0;a<5;a++)for(let b=a+1;b<5;b++)for(let c=b+1;c<5;c++)hands.push([a,b,c]);
+  const hid=s=>hands.findIndex(h=>h.every(x=>s.includes(x))),col=[];const seen=Array(10).fill(0);
+  seqs.forEach(s=>{const h=hid(s);col.push([h,seen[h]++]);});
+  const W=560,H=270,ML=92,MT=6,cw=(W-ML-6)/6,rh=26;
+  const S=SL.el('svg',{viewBox:`0 0 ${W} ${H}`,class:'sl-plot'},host);
+  const labs=hands.map((h,i)=>txt(S,ML-8,MT+i*rh+17,'{'+h.map(x=>C[x]).join(', ')+'}','sl-seq-t','end'));
+  const cells=seqs.map(s=>({r:SL.el('rect',{width:cw-6,height:rh-5,rx:3,class:'sl-cell2'},S),t:txt(S,0,0,s.map(x=>C[x]).join(' '),'sl-seq-t')}));
+  let u=1,hl=0;const fresh=runner();
+  function place(v){
+    seqs.forEach((s,p)=>{const r0=Math.floor(p/6),c0=p%6,r1=col[p][0],c1=col[p][1];
+      const x=ML+(c0+(c1-c0)*v)*cw+3,y=MT+(r0+(r1-r0)*v)*rh;
+      cells[p].r.setAttribute('x',x.toFixed(1));cells[p].r.setAttribute('y',y.toFixed(1));
+      cells[p].t.setAttribute('x',(x+(cw-6)/2).toFixed(1));cells[p].t.setAttribute('y',(y+15).toFixed(1));});
+    labs.forEach(l=>l.setAttribute('opacity',v.toFixed(2)));
+  }
+  function paint(){
+    seqs.forEach((s,p)=>{const on=col[p][0]===hl;cells[p].r.setAttribute('class','sl-cell2'+(on?' on':''));cells[p].t.setAttribute('class','sl-seq-t'+(on?' on':''));});
+    labs.forEach((l,i)=>l.setAttribute('class','sl-seq-t'+(i===hl?' on':'')));
+    rd(out,[['séquences, 5 · 4 · 3','60'],['ordres d’une main, 3!','6'],['mains, 60/6','10','c3'],['main surlignée','{'+hands[hl].map(x=>C[x]).join(', ')+'}']]);
+  }
+  place(1);paint();
+  buttons(ctl,['rangées par main','ordre de distribution'],k=>{const tk=fresh(),a=u,b=k===0?1:0;if(a===b){place(b);return;}tween(1000,v=>{u=a+(b-a)*v;place(u);},tk);});
+  SL.h('button','tb',ctl,'main suivante').onclick=()=>{hl=(hl+1)%10;paint();};
+})();
+
+/* ===== v6 : étoiles et barres ===== */
+(function(){
+  const ctl=document.getElementById('v6ctl'),host=document.getElementById('v6plot'),out=document.getElementById('v6out');
+  const MODES=[{n:4,r:3,nm:['vanille','chocolat','fraise','pistache'],sh:['van.','choc.','fr.','pist.'],start:1},{n:6,r:2,nm:['1','2','3','4','5','6'],sh:['1','2','3','4','5','6'],start:4}];
+  function multisets(n,r){const res=[];const rec=(s,cur)=>{if(cur.length===r){res.push(cur.slice());return;}for(let t=s;t<n;t++){cur.push(t);rec(t,cur);cur.pop();}};rec(0,[]);return res;}
+  const code=(ms,n)=>{const c=Array(n).fill(0);ms.forEach(t=>c[t]++);return c.map(x=>'★'.repeat(x)).join('|');};
+  const W=560,H=300,S=SL.el('svg',{viewBox:`0 0 ${W} ${H}`,class:'sl-plot'},host),G=SL.el('g',{},S);
+  let mode=0,idx=1,list=[];
+  function draw(){
+    while(G.firstChild)G.removeChild(G.firstChild);
+    const m=MODES[mode],ms=list[idx],str=code(ms,m.n),L=str.length,sw=46,x0=(W-L*sw)/2;
+    const stars=[];
+    str.split('').forEach((ch,i)=>{const x=x0+i*sw+sw/2;txt(G,x,46,ch==='★'?'★':'|',ch==='★'?'sl-star':'sl-barg');
+      txt(G,x,68,String(i+1),'sl-pos'+(ch==='★'?' on':''));if(ch==='★')stars.push(i+1);});
+    const cnt=Array(m.n).fill(0);ms.forEach(t=>cnt[t]++);
+    const desc=mode===0?cnt.map((c,t)=>c+' '+m.nm[t]).join(' · '):'les dés montrent {'+ms.map(t=>m.nm[t]).join(', ')+'}';
+    txt(G,W/2,94,desc,'sl-qh');
+    const cols=mode===0?5:7,rows=Math.ceil(list.length/cols),gw=(W-20)/cols,gh=36;S.setAttribute('viewBox',`0 0 ${W} ${114+rows*gh+2}`);
+    list.forEach((q,i)=>{const cx=10+(i%cols)*gw,cy=114+Math.floor(i/cols)*gh,on=i===idx;
+      SL.el('rect',{x:(cx+3).toFixed(1),y:cy.toFixed(1),width:(gw-6).toFixed(1),height:(gh-6).toFixed(1),rx:3,class:'sl-cell2'+(on?' on':'')},G);
+      txt(G,cx+gw/2,cy+gh/2+1,code(q,m.n),'sl-seq-t'+(on?' on':''));});
+    const N=list.length,tot=m.r+m.n-1;
+    rd(out,[['étoiles + barres',m.r+' + '+(m.n-1)+' = '+tot+' places'],[(mode===0?'paniers':'résultats')+', C('+tot+', '+m.r+')',String(N),'c3'],['places des étoiles',stars.join(', ')],[(mode===0?'panier':'résultat')+' affiché',mode===0?ms.map(t=>m.sh[t]).join(' '):'{'+ms.map(t=>m.nm[t]).join(', ')+'}']]);
+  }
+  buttons(ctl,['glaces : 3 boules, 4 parfums','deux dés sans ordre'],k=>{mode=k;list=multisets(MODES[k].n,MODES[k].r);idx=MODES[k].start;draw();});
+  SL.h('button','tb',ctl,'▶ panier suivant').onclick=()=>{idx=(idx+1)%list.length;draw();};
+})();
+
+/* ===== v7 : le tableau 2 × 2, et un scénario par case ===== */
+(function(){
+  const ctl=document.getElementById('v7ctl'),host=document.getElementById('v7plot'),out=document.getElementById('v7out');
+  const W=560,H=300,ML=118,MT=30,cw=(W-ML-8)/2,ch=(H-MT-8)/2;
+  const S=SL.el('svg',{viewBox:`0 0 ${W} ${H}`,class:'sl-plot'},host);
+  txt(S,ML+cw/2,MT-10,'avec remise','sl-qh');txt(S,ML+1.5*cw,MT-10,'sans remise','sl-qh');
+  txt(S,ML-10,MT+ch/2-4,'l’ordre','sl-qh','end');txt(S,ML-10,MT+ch/2+13,'compte','sl-qh','end');
+  txt(S,ML-10,MT+1.5*ch-4,'l’ordre ne','sl-qh','end');txt(S,ML-10,MT+1.5*ch+13,'compte pas','sl-qh','end');
+  const CELL=[[{f:'nʳ',i:'product(…, repeat=r)',e:'pièces, plaques, mots de passe'},{f:'n!/(n − r)!',i:'permutations(…, r)',e:'cartes distribuées, podium'}],
+              [{f:'C(n + r − 1, r)',i:'combinations_with_replacement',e:'paniers, dés sans ordre',x:'absent chez Brunton'},{f:'C(n, r)',i:'combinations(…, r)',e:'mains, comités, features'}]];
+  const R=[[0,0],[0,0]];
+  for(let o=0;o<2;o++)for(let m=0;m<2;m++){const x=ML+m*cw,y=MT+o*ch,c=CELL[o][m];
+    R[o][m]=SL.el('rect',{x:x+4,y:y+4,width:cw-8,height:ch-8,rx:5,class:'sl-q'},S);
+    const tf=txt(S,x+cw/2,y+44,c.f==='nʳ'?'n':c.f,'sl-qf');if(c.f==='nʳ'){const ts=SL.el('tspan',{dy:'-9','font-size':'14'},tf);ts.textContent='r';}txt(S,x+cw/2,y+70,c.i,'sl-qi');txt(S,x+cw/2,y+92,c.e,'sl-qe');if(c.x)txt(S,x+cw/2,y+112,c.x,'sl-qn');}
+  const SC=[{l:'plaque',o:0,m:0,how:'26⁴ × 10²',n:45697600},{l:'10 lancers de pièce',o:0,m:0,how:'2¹⁰',n:1024},{l:'podium, 8 coureurs',o:0,m:1,how:'8 × 7 × 6',n:336},
+            {l:'main de poker',o:1,m:1,how:'C(52, 5)',n:2598960},{l:'5 features parmi 20',o:1,m:1,how:'C(20, 5)',n:15504},{l:'3 boules, 4 parfums',o:1,m:0,how:'C(6, 3)',n:20}];
+  buttons(ctl,SC.map(s=>s.l),k=>{const s=SC[k];
+    for(let o=0;o<2;o++)for(let m=0;m<2;m++)R[o][m].setAttribute('class','sl-q'+(o===s.o&&m===s.m?' on':''));
+    rd(out,[['l’ordre compte ?',s.o===0?'oui':'non'],['remet-on ?',s.m===0?'oui':'non'],['compte : '+s.how,big(s.n),'c3']]);});
+})();
+
+})();
+</script>
+</body>
+</html>

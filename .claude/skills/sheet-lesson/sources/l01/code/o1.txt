@@ -1,0 +1,4 @@
+#Omega = 36, #A = 11, P(A) = 0.3056
+three dice, sum 13: 21/216 = 0.0972
+throws per cell: min 2655, max 2886, expected 2778
+frequency of A: 0.3071   (11/36 = 0.3056)

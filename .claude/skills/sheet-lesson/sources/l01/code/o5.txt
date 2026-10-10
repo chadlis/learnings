@@ -1,0 +1,4 @@
+ordered,   with replacement     n^r           enumerated 36   formula 36
+ordered,   without replacement  n!/(n-r)!     enumerated 30   formula 30
+unordered, without replacement  C(n, r)       enumerated 15   formula 15
+unordered, with replacement     C(n+r-1, r)   enumerated 21   formula 21

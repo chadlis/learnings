@@ -1,0 +1,54 @@
+<!-- ============================ n6 ============================ -->
+<section class="notion culture" id="n6">
+  <h3>Sans ordre, avec remise : C(n + r − 1, r) <span class="tag culture">culture</span></h3>
+  <p class="src">absent chez Brunton : la case qui manque à sa vidéo 03</p>
+  <div class="idee">
+    <p>Lance deux dés ensemble sans les distinguer, et note seulement les valeurs obtenues : {1, 1}, {1, 2}, …, {6, 6}. Combien de résultats ? Pas 36, l'ordre ne compte plus ; pas 36/2 = 18 non plus, car un double comme {5, 5} n'avait qu'un ordre. Il y en a 21.</p>
+    <p>L'astuce classique s'appelle <b>étoiles et barres</b>. Prends 3 boules de glace parmi 4 parfums, un parfum pouvant revenir. Écris chaque boule par une étoile et sépare les parfums par 3 barres : ★★|★|| veut dire deux vanille, un chocolat, ni fraise ni pistache. Chaque panier devient une suite de 6 symboles, et une telle suite est fixée par la place de ses 3 étoiles : C(6, 3) = 20 paniers.</p>
+  </div>
+  <div class="fig vis" id="v6">
+    <div class="lbl">Voir l'idée — un panier, c'est une place pour chaque étoile</div>
+    <div id="v6ctl" class="sl-ctl"></div>
+    <div id="v6plot" class="wide"></div>
+    <div class="readouts" id="v6out"></div>
+    <p class="cap">Un panier de 3 boules parmi 4 parfums (vanille, chocolat, fraise, pistache) s'écrit avec 3 étoiles, les boules, et 3 barres, les séparations entre parfums : ★★|★|| se lit deux vanille, un chocolat. Chaque panier est une façon de placer 3 étoiles parmi 6 places : C(6, 3) = 20, tous listés en dessous. <b>Panier suivant</b> les parcourt. <b>Deux dés sans ordre</b> : 2 étoiles et 5 barres pour 6 faces, C(7, 2) = 21 résultats.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">C(<i>n</i> + <i>r</i> − 1, <i>r</i>) = C(<i>n</i> + <i>r</i> − 1, <i>n</i> − 1)</div>
+    <ul>
+      <li><i>n</i> types distincts, <i>r</i> tirages avec remise, l'ordre ne compte pas : on compte des <b>multi-ensembles</b>, des ensembles où un élément peut revenir.</li>
+      <li><i>r</i> peut dépasser <i>n</i> : 10 boules parmi 4 parfums, C(13, 10) = 286 paniers.</li>
+      <li>Ces résultats ne sont pas équiprobables quand ils viennent de tirages indépendants : la formule compte des résultats, elle ne donne pas de probabilité (où ça casse).</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>dés, glaces, dominos, bootstrap</small></summary><div class="in">
+    <ol>
+      <li><b>Deux dés sans ordre</b> : n = 6, r = 2, C(7, 2) = 21 : les 15 paires de faces différentes et les 6 doubles.</li>
+      <li><b>Trois boules, quatre parfums</b> : C(6, 3) = 20.</li>
+      <li><b>Trois dés sans ordre</b> : C(8, 3) = 56.</li>
+      <li><b>Un jeu de dominos double-six</b> : chaque domino est un multi-ensemble de 2 valeurs parmi 7 (de 0 à 6), C(8, 2) = 28 dominos.</li>
+      <li><b>Le bootstrap.</b> Rééchantillonner 10 lignes avec remise parmi 10 (<a href="../chains/chain-p01-05-bootstrap.html#s4">p01-05, pas 4</a>) : si l'on ne regarde que combien de fois chaque ligne revient, il y a C(19, 10) = 92 378 rééchantillons distincts.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>une bijection entre paniers et suites d'étoiles et de barres</small></summary><div class="in">
+    <div class="drv">
+      <div>panier ↦ ★…★ | ★…★ | … | ★…★</div><span>autant d'étoiles que de boules du type 1, une barre, puis le type 2, et ainsi de suite : n − 1 barres en tout</span>
+      <div>suite ↦ panier</div><span>lire les étoiles entre deux barres redonne les quantités : l'application se renverse, c'est une bijection</span>
+      <div>#suites = C(<i>n</i> + <i>r</i> − 1, <i>r</i>)</div><span>une suite de r + n − 1 symboles est fixée par les r places de ses étoiles (notion 5)</span>
+    </div>
+    <p>Choisir les n − 1 places des barres revient au même : d'où la seconde écriture, C(n + r − 1, n − 1).</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>21 résultats, mais pas de même probabilité</small></summary><div class="in">
+<pre class="py">{{CODE:c4}}</pre>
+<pre class="out">{{OUT:c4}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Ces résultats ne sont pas équiprobables.</b> Deux dés lancés au hasard donnent {5, 5} d'une seule façon, (5, 5), et {1, 5} de deux, (1, 5) et (5, 1) : 1/36 contre 2/36. Compter « au moins un 5 » sur les 21 résultats donne 6/21 = 0,286, au lieu de 11/36 = 0,306 (code ci-dessus). Pour une probabilité, revenir aux séquences ordonnées, qui, elles, sont équiprobables. Il existe des modèles où les multi-ensembles le sont, la statistique de Bose-Einstein des photons, mais pas des dés ni des rééchantillonnages tirés indépendamment.</li>
+      <li><b>Le bootstrap, même piège.</b> Les 92 378 rééchantillons n'ont pas la même chance : celui qui contient les 10 lignes une fois chacune a la probabilité 10!/10¹⁰ = 0,00036, celui qui répète 10 fois une ligne donnée 10⁻¹⁰.</li>
+      <li><b>Le même compte sous un autre nom.</b> Ranger r boules indiscernables dans n boîtes, c'est choisir combien de boules vont dans chaque boîte : C(n + r − 1, r). Si les boules sont numérotées, chacune choisit sa boîte : n<sup>r</sup> (notion 4). Avant de compter, se demander si les objets se distinguent.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (03) présente trois cas : ordonné avec remise, ordonné sans remise, non ordonné sans remise. Il en manque un quatrième, non ordonné avec remise, qui se compte par C(n + r − 1, r). Le tableau complet est en notion 7.</div>
+  </div></details>
+  <p class="garde">Avec remise et sans ordre, on compte des multi-ensembles : C(n + r − 1, r), par étoiles et barres. Ils ne sont pas équiprobables : pour une probabilité, on compte les séquences.</p>
+</section>

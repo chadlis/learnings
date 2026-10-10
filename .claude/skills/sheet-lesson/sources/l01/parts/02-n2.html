@@ -1,0 +1,54 @@
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>Une probabilité est un rapport de deux comptes <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 02 · Gentle Introduction to Probability: Counting Coin Flips and Dice</p>
+  <div class="idee">
+    <p>Brunton commence par le dénominateur : la liste de tout ce qui peut arriver, qu'il appelle Ω. Deux lancers de pièce donnent Ω = {PP, PF, FP, FF}, quatre issues. L'événement A, « au moins un pile », en contient trois : P(A) = 3/4. L'événement B, « aucun pile », n'en contient qu'une, FF : P(B) = 1/4.</p>
+    <p>Avec deux dés, Ω compte 6 × 6 = 36 couples. Pour « au moins un 5 », Brunton les passe en revue : (1, 5), (2, 5), (3, 5), (4, 5), les six couples qui commencent par 5, puis (6, 5). Onze cas, donc P = 11/36 = 0,306, « un peu moins d'une chance sur trois ». Énumérer, c'est « compter sur ses doigts » : on ne veut pas le faire, mais on peut toujours y revenir comme expérience de pensée.</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — les cases de Ω, les cases de A</div>
+    <div id="v2ctl" class="sl-ctl"></div>
+    <div id="v2plot" class="wide"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">Chaque case est une issue de Ω, toutes de même chance. Choisis un <b>événement</b> : ses cases se colorent, et P(A) est leur nombre divisé par le nombre total de cases. Deux pièces, au moins un pile : 3/4 ; aucun pile : 1/4. Deux dés, au moins un 5 : la colonne du 5 et la ligne du 5, 6 + 6 − 1 = 11 cases, car (5, 5) n'est comptée qu'une fois ; 11/36 = 0,306. Somme 7 : 6/36. <b>Lance 1 000 fois</b> : chaque lancer est un point dans sa case, chaque case en reçoit à peu près autant, c'est ce que veut dire équiprobable, et la fréquence de A s'approche du rapport.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(<i>A</i>) = #<i>A</i> / #Ω = nombre de cas favorables / nombre de cas possibles</div>
+    <ul>
+      <li>Ω est fini, et #Ω désigne son nombre d'éléments. A est une partie de Ω.</li>
+      <li><b>Les issues de Ω sont équiprobables.</b> C'est l'hypothèse qui fait tout : pièce honnête, dé équilibré, et lancers indépendants, « les deux dés ne s'influencent pas » (Brunton les énonce). Sans elle, compter les cases ne donne plus la probabilité (figure 1).</li>
+      <li>On compte A et Ω de la même façon : si Ω est fait de couples ordonnés, A aussi.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — l'hypothèse se voit : compter les cases, ou mesurer leur aire</div>
+    <div id="f1ctl"></div>
+    <div id="f1plot" class="wide"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Les mêmes 36 cases, mais chacune a pour largeur la probabilité de la face du premier dé et pour hauteur celle du second : son aire est sa probabilité. Augmente <b>P(5)</b>, la même sur les deux dés : la colonne et la ligne du 5 s'élargissent. Compter les cases de A donne toujours 11/36 = 0,306 ; l'aire de A, elle, vaut 1 − (1 − q)² et monte jusqu'à 0,75 pour q = 0,5. #A/#Ω ne vaut que si toutes les cases ont la même aire.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux pièces, deux dés de trois façons, somme 7, trois dés</small></summary><div class="in">
+    <ol>
+      <li><b>Deux pièces.</b> Ω = {PP, PF, FP, FF}. Au moins un pile : {PP, PF, FP}, 3/4 = 75 %. Aucun pile : {FF}, 1/4 = 25 %.</li>
+      <li><b>Deux dés, au moins un 5, en énumérant</b> : 11 couples sur 36, 11/36 = 0,306.</li>
+      <li><b>Le même, en raisonnant</b> (la troisième méthode de Brunton) : soit le premier dé fait 5, soit il ne fait pas 5 et le second fait 5. P = 1/6 + 5/6 × 1/6 = 6/36 + 5/36 = 11/36. Ce calcul utilise déjà la règle de multiplication et l'indépendance, que <a href="lesson-00-03-conditionner-bayes-independance.html#n2">l03</a> formalise.</li>
+      <li><b>Le même, par le complément</b> : aucun 5, c'est 5 × 5 = 25 couples, donc P(au moins un 5) = 1 − 25/36 = 11/36. « Au moins un » se calcule presque toujours ainsi (<a href="lesson-00-02-espace-axiomes-complement.html#n2">l02</a>).</li>
+      <li><b>Somme 7</b> : (1, 6), (2, 5), (3, 4), (4, 3), (5, 2), (6, 1), donc 6/36 = 1/6.</li>
+      <li><b>Trois dés de somme 13</b>, une question d'appel de Brunton 01 : Ω compte 6³ = 216 triplets, dont 21 de somme 13 (énumérés par le code ci-dessous), soit 21/216 = 0,097.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>énumérer Ω, puis lancer 100 000 fois</small></summary><div class="in">
+<pre class="py">{{CODE:c1}}</pre>
+<pre class="out">{{OUT:c1}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Des issues qui ne sont pas équiprobables.</b> Avec un dé pipé, les 36 couples n'ont plus la même chance : il faut pondérer chaque case par sa probabilité (figure 1), ce que font les axiomes de <a href="lesson-00-02-espace-axiomes-complement.html#n2">l02</a>.</li>
+      <li><b>Un Ω mal choisi.</b> Si l'on liste les résultats de deux dés sans ordre, {1, 5}, {5, 5}…, on trouve 21 issues, dont 6 contiennent un 5 : 6/21 = 0,286, faux. {5, 5} ne sort que d'une façon, {1, 5} de deux. Même piège chez d'Alembert, en 1754 (article « Croix ou pile » de l'Encyclopédie) : pour au moins un pile en deux lancers, il retient trois issues, pile, face puis pile, face puis face, et trouve 2/3 au lieu de 3/4 ; la première vaut 1/2, les deux autres 1/4. Le remède : un Ω dont les issues sont vraiment équiprobables, ici les couples ordonnés (notion 6).</li>
+      <li><b>Un Ω infini.</b> Compter ne marche plus. Sur un Ω infini dénombrable, aucune loi ne donne la même probabilité à toutes les issues : des masses égales et positives sommeraient à l'infini. Sur un intervalle, une densité uniforme existe, mais chaque issue a la probabilité 0 et l'on mesure des longueurs, pas des comptes. Le rang du premier pile demande une loi discrète (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n2">l05</a>), le temps d'attente avant le prochain mail une densité (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n3">l05</a>).</li>
+      <li><b>Compter ne passe pas à l'échelle.</b> 300 piles sur 1 000 lancers ou au moins trois 5 sur 15 dés : impossible à lister. Les notions 3 à 7 comptent sans énumérer.</li>
+    </ul>
+  </div></details>
+  <p class="garde">Si les issues de Ω sont équiprobables, P(A) = #A/#Ω, cas favorables sur cas possibles. Deux dés, au moins un 5 : 11/36.</p>
+</section>

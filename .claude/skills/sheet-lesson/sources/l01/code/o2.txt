@@ -1,0 +1,6 @@
+ordered, with replacement   : 125 = 125
+ordered, without replacement: 60 = 60
+5 cards in order            : 311875200 = 311875200
+P(4 distinct letters): simulated 0.7849, exact 0.7852
+np.prod(1..21)     = -4249290049419214848
+math.factorial(21) = 51090942171709440000

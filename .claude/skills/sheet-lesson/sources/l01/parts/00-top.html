@@ -1,0 +1,42 @@
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 1</div>
+  <h1>Compter, la probabilité comme <span>dénombrement</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Quand toutes les issues ont la même chance, une probabilité est un <b>rapport de deux comptes</b> : les cas favorables sur les cas possibles. Tout l'art est de compter sans tout énumérer. La leçon suit Brunton 01 à 03 avec ses exemples : une pièce, deux dés, un jeu de 52 cartes, des plaques d'immatriculation. Elle ajoute le quatrième cas de dénombrement, que Brunton ne traite pas.</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li>aucun : l'arithmétique suffit</li>
+  </ol>
+  <h4>Suite</h4>
+  <ol>
+    <li><a href="lesson-00-02-espace-axiomes-complement.html">l02 · Ω, axiomes, complément</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::denombrement</code></div>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>Rien de probabiliste.</b> C'est la première leçon du socle : Ω, les événements et les axiomes viennent en <a href="lesson-00-02-espace-axiomes-complement.html#n1">l02</a>.</li>
+      <li><b>Fractions et pourcentages.</b> Simplifier 6/36 = 1/6, et lire 11/36 ≈ 0,306, soit un peu moins d'une chance sur trois.</li>
+      <li><b>Puissances et produits.</b> 2¹⁰ = 2 × 2 × … × 2, dix facteurs, vaut 1 024. Un produit de facteurs qui décroissent, comme 5 × 4 × 3, se lit de gauche à droite.</li>
+      <li><b>Le code est facultatif.</b> Il utilise <code>itertools</code>, <code>math.comb</code>, <code>math.perm</code> et numpy, et chaque sortie a été produite en exécutant le bloc.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">

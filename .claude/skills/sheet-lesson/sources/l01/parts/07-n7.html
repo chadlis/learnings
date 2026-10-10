@@ -1,0 +1,53 @@
+<!-- ============================ n7 ============================ -->
+<section class="notion outil" id="n7">
+  <h3>Les quatre cas : deux questions choisissent la formule <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 03 (le devoir des plaques), complété du quatrième cas</p>
+  <div class="idee">
+    <p>Pour la plaque d'immatriculation, Brunton pose deux questions avant tout calcul. « L'ordre compte-t-il ? Clairement oui. » « Avec ou sans remise ? Réalistement avec : AABB99 est une plaque tout à fait valable. » Il en déduit la case, ordre et remise ; le calcul, un n<sup>r</sup> par bloc, est laissé en devoir : 26⁴ × 10² = 45 697 600.</p>
+    <p>Ces deux questions suffisent toujours. Chacune a deux réponses, d'où quatre cas, et une formule par cas. Le signal se lit dans l'énoncé. <b>L'ordre compte</b> pour une séquence, un code, un classement, une plaque ; il ne compte pas pour une main, un comité, un sous-ensemble, un panier. <b>On remet</b> quand un même objet peut revenir, une face de dé, une lettre, un parfum ; on ne remet pas quand un objet sorti ne revient pas, une carte distribuée, un coureur sur le podium.</p>
+  </div>
+  <div class="fig vis" id="v7">
+    <div class="lbl">Voir l'idée — le tableau 2 × 2, et un scénario par case</div>
+    <div id="v7ctl" class="sl-ctl"></div>
+    <div id="v7plot" class="wide"></div>
+    <div class="readouts" id="v7out"></div>
+    <p class="cap">Deux questions, quatre cases. Choisis un <b>scénario</b> : la case qui répond aux deux questions s'allume, avec le compte. La plaque : l'ordre compte, une lettre peut revenir, donc n<sup>r</sup> sur chaque bloc puis le principe multiplicatif, 26⁴ × 10² = 45 697 600. Le podium : l'ordre compte, un coureur ne monte pas deux fois, 8 × 7 × 6 = 336. La main de poker : ni ordre ni remise, C(52, 5). Les boules de glace : sans ordre et avec répétition, la case que Brunton ne traite pas. Chaque case porte aussi le nom de la fonction d'itertools qui l'énumère.</p>
+  </div>
+  <div class="formule"><div class="lbl">Le tableau</div>
+    <div class="eq">l'ordre compte : <i>n</i><sup><i>r</i></sup> avec remise &nbsp;·&nbsp; <i>n</i>!/(<i>n</i> − <i>r</i>)! sans remise<br>l'ordre ne compte pas : C(<i>n</i> + <i>r</i> − 1, <i>r</i>) avec remise &nbsp;·&nbsp; C(<i>n</i>, <i>r</i>) sans remise</div>
+    <ul>
+      <li><i>n</i> objets distincts, <i>r</i> tirages. Si l'énoncé mêle plusieurs réservoirs (lettres puis chiffres), on compte chaque bloc puis on multiplie (notion 3).</li>
+      <li>« L'ordre compte » se décide par la question, pas par les objets : cinq cartes distribuées sont une séquence si l'on demande dans quel ordre elles sortent, une main sinon. « C'est toi l'arbitre du scénario que tu comptes », dit Brunton.</li>
+      <li><b>Pour une probabilité</b>, A et Ω se comptent dans le même cas, et dans un cas où les issues sont équiprobables. Avec des tirages indépendants, ce n'est pas la case sans ordre avec remise.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — les quatre cas sur deux dés</div>
+    <div id="f4ctl" class="sl-ctl"></div>
+    <div id="f4plot" class="wide"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">Les quatre cas avec n = 6 faces et r = 2 dés, dans la grille de la notion 2. <b>Ordonné avec remise</b> : les 36 couples. <b>Ordonné sans remise</b> : on retire les 6 doubles, 6 × 5 = 30. <b>Sans ordre ni remise</b> : (2, 5) et (5, 2) ne font qu'un, on garde une case sur deux, 30/2! = 15 = C(6, 2). <b>Sans ordre, avec remise</b> : on rajoute les doubles, 21 = C(7, 2), et non 36/2! = 18, parce qu'un double n'a qu'un ordre. Chaque case affiche alors sa probabilité, 1/36 pour un double, 2/36 pour une paire : le piège de la notion 6.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>un scénario par case, puis quelques autres</small></summary><div class="in">
+    <ol>
+      <li><b>Ordre et remise : la plaque.</b> L'ordre compte, une lettre peut revenir. 26⁴ lettres × 10² chiffres = 45 697 600. Même case : dix lancers de pièce, 2¹⁰ = 1 024 ; un mot de passe de 8 caractères parmi 62 (lettres et chiffres) : 62⁸ ≈ 2,18 × 10¹⁴.</li>
+      <li><b>Ordre sans remise : le podium.</b> Or, argent, bronze parmi 8 coureurs, un coureur par marche : 8 × 7 × 6 = 336. Même case : cinq cartes distribuées dans l'ordre, 311 875 200.</li>
+      <li><b>Ni ordre ni remise : la main.</b> C(52, 5) = 2 598 960 mains de poker ; C(49, 6) = 13 983 816 grilles de loto ; C(20, 5) = 15 504 sous-ensembles de 5 features parmi 20.</li>
+      <li><b>Sans ordre, avec remise : le panier.</b> 3 boules parmi 4 parfums : C(6, 3) = 20 ; deux dés sans les distinguer : C(7, 2) = 21.</li>
+      <li><b>Le même problème dans deux cases.</b> La probabilité d'un carré au poker se calcule en mains, 624/2 598 960, ou en séquences, 74 880/311 875 200 : même résultat, parce que les deux cases sont sans remise et que chaque main compte r! = 120 séquences en haut comme en bas.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>les quatre fonctions d'itertools, une par case</small></summary><div class="in">
+<pre class="py">{{CODE:c5}}</pre>
+<pre class="out">{{OUT:c5}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Deux réservoirs dans un même énoncé.</b> La plaque n'est pas 36⁶ : quatre places prennent une lettre, deux un chiffre. On compte chaque bloc, puis on multiplie.</li>
+      <li><b>L'ordre caché dans la question.</b> « Combien de façons de distribuer 5 cartes » est ambigu : à toi de dire si tu comptes des séquences ou des mains, et de compter A dans le même cas.</li>
+      <li><b>La case sans ordre avec remise ne donne pas de probabilité</b> par #A/#Ω quand les tirages sont indépendants : ses issues ne sont pas équiprobables (figure 4, notion 6).</li>
+      <li><b>Des objets identiques</b>, comme les lettres de PAPA, sortent du tableau : c'est le coefficient multinomial (<a href="lesson-00-02-espace-axiomes-complement.html#n7">l02</a>). Un tirage sans remise où l'on compte les « bons » objets tirés, comme des pièces défectueuses, mène à la loi hypergéométrique (<a href="lesson-00-02-espace-axiomes-complement.html#n5">l02</a>).</li>
+    </ul>
+  </div></details>
+  <p class="garde">Deux questions choisissent la formule : l'ordre compte-t-il ? remet-on ? oui-oui n<sup>r</sup>, oui-non n!/(n − r)!, non-non C(n, r), non-oui C(n + r − 1, r).</p>
+</section>

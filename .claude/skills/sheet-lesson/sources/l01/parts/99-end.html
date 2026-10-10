@@ -1,0 +1,57 @@
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Probabilité : θ connu, on prédit les données. Statistique : les données sont là, on remonte à θ. En fréquentiste θ est fixe : p(x ; θ).</li>
+    <li>Issues équiprobables : P(A) = #A/#Ω. Deux dés, au moins un 5 : 11/36.</li>
+    <li>Principe multiplicatif : k<sub>1</sub> × k<sub>2</sub> × … × k<sub>r</sub>, les feuilles de l'arbre.</li>
+    <li>Ordonné : n<sup>r</sup> avec remise, n!/(n − r)! sans remise.</li>
+    <li>Sans ordre ni remise : C(n, r) = n!/(r!(n − r)!), on divise par les r! ordres d'une main.</li>
+    <li>Sans ordre, avec remise : C(n + r − 1, r), des issues qui ne sont pas équiprobables quand elles viennent de tirages indépendants.</li>
+    <li>Deux questions choisissent la formule : l'ordre compte-t-il ? remet-on ?</li>
+  </ol>
+</div>
+<div class="phrase">« Quand les issues sont équiprobables, une probabilité est un rapport de deux comptes. Pour compter r tirages parmi n, deux questions suffisent : l'ordre compte-t-il, remet-on ? On obtient n<sup>r</sup>, n!/(n − r)!, C(n, r) ou C(n + r − 1, r). Le piège : les résultats sans ordre avec remise ne sont pas équiprobables quand ils viennent de tirages indépendants, donc pour une probabilité on compte les séquences. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Deux dés : quelle est la probabilité d'au moins un 5 ?</div><div class="a hid">11/36 : 36 couples équiprobables, dont 11 contiennent un 5. Ou 1 − 25/36 par le complément.</div></li>
+    <li><div class="q">Combien de séquences de dix lancers de pièce, et pourquoi ?</div><div class="a hid">2¹⁰ = 1 024 : deux options à chacune des dix étapes, quel que soit le passé (principe multiplicatif).</div></li>
+    <li><div class="q">Combien de façons de distribuer cinq cartes dans l'ordre ? Et combien de mains de poker ?</div><div class="a hid">52 × 51 × 50 × 49 × 48 = 311 875 200 séquences ; divisées par 5! = 120, 2 598 960 mains.</div></li>
+    <li><div class="q">Pourquoi divise-t-on par r! pour passer des séquences aux mains ?</div><div class="a hid">Chaque main de r objets distincts correspond à exactement r! séquences, ses permutations.</div></li>
+    <li><div class="q">Quelles deux questions choisissent la formule, et que donnent les quatre réponses ?</div><div class="a hid">L'ordre compte-t-il ? Remet-on ? Oui-oui n<sup>r</sup>, oui-non n!/(n − r)!, non-non C(n, r), non-oui C(n + r − 1, r).</div></li>
+    <li><div class="q">Pourquoi 6/21 est-il faux pour « au moins un 5 » sur deux dés ?</div><div class="a hid">Les 21 résultats sans ordre ne sont pas équiprobables : {5, 5} vaut 1/36, {1, 5} vaut 2/36. On compte les 36 couples : 11/36.</div></li>
+    <li><div class="q">En fréquentiste, écris-tu p(x ∣ θ) ou p(x ; θ) ? Pourquoi ?</div><div class="a hid">p(x ; θ) : θ est un nombre fixe, pas une variable aléatoire, il n'y a rien à conditionner. La barre est réservée au conditionnement.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Leçons, ponts et chaînes</div>
+  <div class="bridges">
+    <a href="lesson-00-02-espace-axiomes-complement.html"><b>l02 · Ω, axiomes, complément</b><small>La suite directe : Ω et les événements formalisés, P quand les issues ne sont plus équiprobables, les anniversaires (figure 2), Pascal et C(n, k).</small></a>
+    <a href="lesson-00-04-variables-binomiale-normale.html#n4"><b>l04 · La loi binomiale</b><small>C(n, k) p<sup>k</sup>(1 − p)<sup>n − k</sup> : les C(10, k) séquences de la figure 3, chacune pondérée par sa probabilité.</small></a>
+    <a href="../chains/chain-p01-05-bootstrap.html#s4"><b>Bootstrap, pourquoi avec remise</b><small>Une ligne absente d'un rééchantillon : (n − 1)<sup>n</sup> séquences sur n<sup>n</sup>, soit (1 − 1/n)<sup>n</sup>, qui tend vers e⁻¹ ≈ 0,368 (notion 4).</small></a>
+    <a href="../chains/chain-p07-02-bagging-rf.html"><b>Bagging et forêt aléatoire</b><small>63 % de lignes distinctes par bootstrap, et m features tirées parmi p à chaque coupure (notion 5).</small></a>
+    <a href="../chains/chain-p08-03-cross-entropy-entropie-kl.html"><b>Cross-entropy, entropie, KL</b><small>Un modèle qui n'a rien appris donne 1/V à chacun des V tokens, le cas équiprobable de la notion 2 : sa loss vaut ln V.</small></a>
+    <a href="../chains/chain-p01-02-ic-test-procedure.html#s5"><b>Sur quoi porte le 95 %</b><small>Le niveau de confiance porte sur la procédure, pas sur θ : le premier « Brunton, rectifié » de la notion 1.</small></a>
+    <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html"><b>Du bruit à la loss</b><small>p(y ∣ x ; θ) : la barre pour l'entrée aléatoire, le point-virgule pour les poids fixes (notion 1).</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::denombrement</code> (notions 2, 3, 4, 5 et 7 ; les notions 1 et 6 sont de la culture, sans carte).</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l01 · v1 du 10/10/2026 · Brunton 01 à 03 · Prérequis : aucun. Suite : <a href="lesson-00-02-espace-axiomes-complement.html">l02 · Ω, axiomes, complément</a>.</footer>
+</div>

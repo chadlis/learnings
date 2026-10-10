@@ -1,0 +1,3 @@
+60 sequences, 10 hands, {6} sequences per hand
+2598960 hands = 2598960 | four of a kind: 624 = 624
+P(four of a kind) = 0.000240, about 1 in 4165
