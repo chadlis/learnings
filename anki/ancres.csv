@@ -154,6 +154,7 @@ stats::conditionnement;p00-03;Conditionnement et Bayes;https://learnings-ek5.pag
 stats::covariance;p00-02;Espérance, variance, masse vs densité;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-02-esperance-variance-densite.html;
 stats::densite;p00-02;Espérance, variance, masse vs densité;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-02-esperance-variance-densite.html#s7;s7
 stats::entropie;p08-03;Cross-entropy, entropie, KL;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-03-cross-entropy-entropie-kl.html#s4;s4
+stats::esperance;l08;Espérance et variance;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-08-esperance-variance.html;
 stats::esperance;p00-02;Espérance, variance, masse vs densité;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-02-esperance-variance-densite.html;
 stats::estimation;b03;Biais et variance partout;https://learnings-ek5.pages.dev/sheets/bridges/bridge-03-biais-variance-partout.html#s5;s5
 stats::estimation;p01-01;L'objet aléatoire;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-01-objet-aleatoire.html;
@@ -173,10 +174,13 @@ stats::inference;w01-05;La chaîne du test en régression, hypothèse par hypoth
 stats::kl;p08-03;Cross-entropy, entropie, KL;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-03-cross-entropy-entropie-kl.html;
 stats::lgn;p00-04;Moyenne, loi des grands nombres, théorème central limite;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-04-moyenne-lgn-tcl.html;
 stats::lois;p00-01;Lois usuelles — quelle situation déclenche quelle loi;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-01-lois-quand-laquelle.html;
+stats::lotus;l08;Espérance et variance;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-08-esperance-variance.html;
 stats::map;p02-02;Du prior à la pénalité;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-02-prior-penalite.html;
 stats::map;p02-03;Le posterior entier;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-03-conjugues-posterior.html;
+stats::mediane;l08;Espérance et variance;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-08-esperance-variance.html;
 stats::mle;p02-01;Du bruit à la loss;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-01-bruit-vraisemblance-loss.html;
 stats::mle-map;p02-03;Le posterior entier;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-03-conjugues-posterior.html;
+stats::moments;l08;Espérance et variance;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-08-esperance-variance.html#n7;n7
 stats::multiplicite;b02;Le témoin atteignable;https://learnings-ek5.pages.dev/sheets/bridges/bridge-02-temoin-atteignable.html;
 stats::multiplicite;p01-04;Comparer deux modèles, et pourquoi le max ment;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-04-comparer-modeles-multiplicite.html;
 stats::multiplicite;w01-03;Le biais du max;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p01-03-biais-du-max.html;
@@ -195,6 +199,7 @@ stats::se;p00-04;Moyenne, loi des grands nombres, théorème central limite;http
 stats::tcl;p00-04;Moyenne, loi des grands nombres, théorème central limite;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-04-moyenne-lgn-tcl.html;
 stats::tcl;p01-01;L'objet aléatoire;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-01-objet-aleatoire.html;
 stats::variance;b04;La variance d'une moyenne corrélée;https://learnings-ek5.pages.dev/sheets/bridges/bridge-04-variance-moyenne-correlee.html;
+stats::variance;l08;Espérance et variance;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-08-esperance-variance.html;
 stats::variance;p00-02;Espérance, variance, masse vs densité;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-02-esperance-variance-densite.html;
 stats::vraisemblance;p02-01;Du bruit à la loss;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-01-bruit-vraisemblance-loss.html;
 stats::vraisemblance;w02-01;Une chaîne, trois exemples;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html;
