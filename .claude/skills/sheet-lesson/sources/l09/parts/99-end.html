@@ -1,0 +1,56 @@
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Cov(X, Y) = E[(X − μ<sub>X</sub>)(Y − μ<sub>Y</sub>)] = E[XY] − E[X]E[Y] : la moyenne du rectangle signé ; Cov(X, X) = Var X.</li>
+    <li>Var(aX + bY) = a² Var X + b² Var Y + 2ab Cov(X, Y), sans hypothèse ; le terme croisé est en Cov, jamais en E[XY].</li>
+    <li>L'indépendance annule le terme croisé (Cov = 0 suffit, notion 3) : c'est de l'additivité, la variance n'est jamais linéaire.</li>
+    <li>i.i.d. = deux hypothèses : l'indépendance annule les covariances, la même loi donne nσ².</li>
+    <li>Indépendance ⇒ Cov = 0 ; la réciproque est fausse (Y = X²) : la covariance ne voit que le linéaire.</li>
+    <li>ρ = Cov/(σ<sub>X</sub> σ<sub>Y</sub>) ∈ [−1, 1], sans unité, de signe inversé si l'on retourne une variable ; ρ² est la part expliquée par la meilleure droite.</li>
+    <li>Couple gaussien : Cov = 0 ⇔ indépendance ; la covariance vient de la rotation de l'ellipse.</li>
+    <li>Deux modèles sur le même jeu de test : −2 Cov réduit la variance de la différence, seuls les désaccords comptent.</li>
+  </ol>
+</div>
+<div class="phrase">« La covariance est l'espérance du produit des écarts au centre, E[XY] − E[X]E[Y]. C'est le terme croisé de la variance d'une somme, Var(X + Y) = Var X + Var Y + 2 Cov ; l'indépendance l'annule, mais une covariance nulle ne prouve pas l'indépendance, sauf pour un couple gaussien. Normalisée par les écarts-types, elle devient la corrélation, entre −1 et 1. C'est pour ça qu'on compare deux modèles sur le même jeu de test : leurs scores sont corrélés positivement, et −2 Cov réduit la variance de leur différence. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Définis la covariance, puis donne sa forme de calcul.</div><div class="a hid">La moyenne du produit des écarts au centre, E[(X − μ<sub>X</sub>)(Y − μ<sub>Y</sub>)] ; E[XY] − E[X]E[Y].</div></li>
+    <li><div class="q">Développe Var(aX + bY). Pourquoi le terme croisé ne peut-il pas être 2ab E[XY] ?</div><div class="a hid">a² Var X + b² Var Y + 2ab Cov(X, Y). Avec X = Y = 1, la variance vaut 0, alors que 2ab E[XY] vaudrait 2ab.</div></li>
+    <li><div class="q">Que vaut Var(X − Y) pour deux dés indépendants ? Et Var(2X) ?</div><div class="a hid">2,917 + 2,917 = 5,83, pas 0 : l'indépendance donne l'additivité, pas la linéarité. Var(2X) = 4 Var X = 11,67.</div></li>
+    <li><div class="q">Dans Var(X<sub>1</sub> + … + X<sub>n</sub>) = nσ², où sert l'indépendance, où sert la même loi ?</div><div class="a hid">L'indépendance annule les n(n − 1) covariances ; la même loi rend les n variances égales à σ².</div></li>
+    <li><div class="q">Une covariance nulle prouve-t-elle l'indépendance ?</div><div class="a hid">Non : X uniforme sur {−1, 0, 1} et Y = X² ont Cov = 0. Oui seulement pour un couple gaussien.</div></li>
+    <li><div class="q">Que devient ρ(aX + b, cY + d) ?</div><div class="a hid">signe(ac) · ρ(X, Y) : ni les unités ni les décalages ne comptent, mais retourner une seule variable change le signe.</div></li>
+    <li><div class="q">Pourquoi compare-t-on deux modèles sur le même jeu de test ?</div><div class="a hid">Var(D̂) = Var p̂<sub>A</sub> + Var p̂<sub>B</sub> − 2 Cov, et Cov &gt; 0 parce qu'ils ratent les mêmes questions : écart-type 0,0069 contre 0,0142 sur deux jeux de test.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts et chaînes</div>
+  <div class="bridges">
+    <a href="../bridges/bridge-04-variance-moyenne-correlee.html"><b>Variance d'une moyenne corrélée</b><small>La grille de la figure 1 avec toutes les covariances à ρσ² : un plancher que moyenner ne franchit pas.</small></a>
+    <a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html"><b>Comparer deux modèles</b><small>Appariement et McNemar : la notion 6, jusqu'au test.</small></a>
+    <a href="../chains/chain-p04-04-pca.html"><b>PCA — diagonaliser la covariance</b><small>Les axes de l'ellipse de la notion 5, en p dimensions.</small></a>
+    <a href="../chains/chain-p05-01-regression-modele-ols.html"><b>Régression linéaire, OLS</b><small>La pente Cov/Var et R² = ρ², démontrés en notion 4.</small></a>
+    <a href="../chains/chain-p07-02-bagging-rf.html"><b>Bagging et forêt aléatoire</b><small>Pourquoi baisser la corrélation entre arbres plutôt qu'ajouter des arbres : le plancher ρσ².</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::covariance</code> (notions 1, 2, 3, 6) · <code>stats::correlation</code> (notions 4, 5).</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l09 · v1 du 10/10/2026 · Brunton 41 et 42 (et 30) · Prérequis : <a href="lesson-00-07-lois-jointes.html">l07 · Lois jointes</a>, <a href="lesson-00-08-esperance-variance.html">l08 · Espérance et variance</a>. Suite : <a href="lesson-00-10-inegalites-lgn.html">l10 · Inégalités et loi des grands nombres</a>.</footer>
+</div>

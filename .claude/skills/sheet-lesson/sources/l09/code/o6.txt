@@ -1,0 +1,5 @@
+shared  : sd(D) = 0.00688 | theory 0.00694
+separate: sd(D) = 0.0141 | theory 0.01417
+Cov(pA_hat, pB_hat), shared  : 7.67e-05 | theory 7.63e-05
+Cov(pA_hat, pB_hat), separate: 1.4e-06
+share of runs with D <= 0: shared 0.0 | separate 0.0214

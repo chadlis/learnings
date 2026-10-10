@@ -1,0 +1,6 @@
+Var(2X - Y): 14.581 | 4v + v = 14.583
+Var(X - Y) : 5.834 | v + v = 5.833 (not v - v = 0)
+Var(X + X) : 11.667 | 4v = 11.667
+Cov of two correlated ones: 0.502
+Var(sum), iid       : 5.996 | k = 6
+Var(sum), correlated: 21.063 | k + k(k-1) rho = 21.0

@@ -1,0 +1,7 @@
+covariance matrix:
+ [[2.499 1.497]
+ [1.497 2.492]]
+rho: 0.6 | theory 0.6
+eigenvalues: [0.999 3.992] | theory sigma2^2 = 1, sigma1^2 = 4
+major axis angle: 44.9 degrees
+regression slope of Y on X: 0.599 | major axis: 1

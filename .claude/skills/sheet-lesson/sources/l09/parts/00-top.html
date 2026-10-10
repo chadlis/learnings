@@ -1,0 +1,51 @@
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 9</div>
+  <h1>Covariance et <span>corrélation</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Deux variables bougent-elles ensemble ? La <b>covariance</b> fait la moyenne du produit de leurs écarts au centre ; c'est exactement le terme qui manquait à Var(X + Y). La <b>corrélation</b> la rend sans unité. La leçon suit Brunton 41 et 42 avec ses images : un nuage de points et son point test, X uniforme sur {−1, 0, 1} avec Y = X², des fléchettes sur une cible gaussienne. Elle finit sur un calcul d'entretien : comparer deux modèles sur le même jeu de test (test set).</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="lesson-00-07-lois-jointes.html#n1">l07 · Loi jointe</a></li>
+    <li><a href="lesson-00-07-lois-jointes.html#n4">l07 · Indépendance = factorisation</a></li>
+    <li><a href="lesson-00-08-esperance-variance.html#n4">l08 · E[XY] sous indépendance</a></li>
+    <li><a href="lesson-00-08-esperance-variance.html#n6">l08 · Variance</a></li>
+    <li><a href="lesson-00-08-esperance-variance.html#n9">l08 · Var(aX + b)</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::covariance</code><code>stats::correlation</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-04-variance-moyenne-correlee.html">Variance d'une moyenne corrélée</a></li>
+  </ol>
+  <h4>Suite</h4>
+  <ol>
+    <li><a href="lesson-00-10-inegalites-lgn.html">l10 · Inégalités et loi des grands nombres</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>Loi jointe.</b> P(X = x, Y = y) décrit le couple, case par case ; une densité jointe f(x, y) en continu (<a href="lesson-00-07-lois-jointes.html#n1">l07, notion 1</a>).</li>
+      <li><b>Indépendance.</b> X et Y sont indépendantes quand la loi jointe est le produit des deux lois, pour toutes les cases (<a href="lesson-00-07-lois-jointes.html#n4">l07, notion 4</a>).</li>
+      <li><b>Espérance.</b> E est linéaire sans aucune hypothèse (<a href="lesson-00-08-esperance-variance.html#n3">l08, notion 3</a>) ; E[XY] = E[X] E[Y] demande l'indépendance (<a href="lesson-00-08-esperance-variance.html#n4">notion 4</a>).</li>
+      <li><b>Variance.</b> Var(X) = E[(X − μ)²] = E[X²] − μ², la moyenne des carrés des écarts au centre (<a href="lesson-00-08-esperance-variance.html#n6">l08, notion 6</a>) ; Var(aX + b) = a² Var(X) (<a href="lesson-00-08-esperance-variance.html#n9">notion 9</a>). Pour un dé, Var = 35/12 = 2,917.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">
+

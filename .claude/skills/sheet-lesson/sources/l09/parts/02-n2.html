@@ -1,0 +1,75 @@
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>Var(X ± Y) : le terme croisé, et les deux rôles d'i.i.d. <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 41 (et 30 pour Var(X + Y) et Var(2X))</p>
+  <div class="idee">
+    <p>Dès la vidéo 30, Brunton prévient : sous indépendance, Var(X + Y) = Var X + Var Y. Et Var(2X), c'est-à-dire Var(X + X), n'est « absolument pas égale à 2 Var X ; je suis presque sûr qu'elle vaut 4 Var X ». En 41, il donne la règle générale en exercice : Var(X + Y) = Var X + Var Y + 2 Cov(X, Y).</p>
+    <p>D'où vient le terme croisé ? L'écart de la somme au centre est la somme des deux écarts, et le carré d'une somme a un double produit : (u + v)² = u² + v² + 2uv. En moyenne, u² donne Var X, v² donne Var Y, et 2uv donne deux fois la moyenne du rectangle signé de la notion 1.</p>
+    <p>Deux dés indépendants : 2,917 + 2,917 + 0 = 5,83. Le même dé compté deux fois : 2,917 + 2,917 + 2 × 2,917 = 11,67. Même espérance 7, deux étalements.</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — deux dés contre un dé doublé</div>
+    <div id="v2plot" class="wide"></div>
+    <p class="cap">Deux mécanismes, même espérance 7 : la moyenne mesurée (trait rouge) tombe sur 7 en haut comme en bas. Les deux histogrammes partent de 300 tirages : écart-type mesuré 2,42 en haut, 3,38 en bas, pour 2,42 et 3,42 en théorie. <b>Tires</b>-en 500 de plus de chaque côté : la moyenne reste collée à 7, les écarts-types restent séparés. En bas, seules les valeurs paires sortent : 2X ne peut pas faire 7, alors que X + Y le fait une fois sur six. L'écart des variances, 35/3 − 35/6 = 35/6 = 5,83, est le terme croisé 2 Cov(X, X) = 2 Var X.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les formules</div>
+    <div class="eq">Var(<i>X</i> ± <i>Y</i>) = Var <i>X</i> + Var <i>Y</i> ± 2 Cov(<i>X</i>, <i>Y</i>) &nbsp;&nbsp;&nbsp;&nbsp; Var(<i>aX</i> + <i>bY</i>) = <i>a</i>² Var <i>X</i> + <i>b</i>² Var <i>Y</i> + 2<i>ab</i> Cov(<i>X</i>, <i>Y</i>)</div>
+    <div class="eq">Var(<i>X</i><sub>1</sub> + … + <i>X<sub>n</sub></i>) = Σ<sub><i>i</i></sub> Var <i>X<sub>i</sub></i> + 2 Σ<sub><i>i</i> &lt; <i>j</i></sub> Cov(<i>X<sub>i</sub></i>, <i>X<sub>j</sub></i>) &nbsp;&nbsp;&nbsp;&nbsp; i.i.d. ⇒ <i>n</i>σ²</div>
+    <ul>
+      <li>Aucune hypothèse : X et Y quelconques, de variances finies ; a et b sont des constantes. Avec a = 1 et b = −1, c'est la différence : le terme croisé change de signe.</li>
+      <li>Le terme croisé est 2ab Cov(X, Y), pas 2ab E[XY] : comme la variance, il doit ignorer un décalage de X ou de Y.</li>
+      <li>Indépendance ⇒ Cov = 0 ⇒ Var(aX + bY) = a² Var X + b² Var Y (Cov = 0 suffit, notion 3). C'est de l'<b>additivité</b>. La variance n'est jamais linéaire : les coefficients sortent au carré.</li>
+      <li>Pour n variables, i.i.d. contient deux hypothèses qui servent à deux endroits : l'<b>indépendance</b> annule les n(n − 1) covariances, la <b>même loi</b> rend les n variances égales au même σ² (preuve plus bas, figure 1).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — la variance d'une somme est la somme de toutes les cases</div>
+    <div id="f1ctl" class="sl-ctl"></div>
+    <div id="f1sl"></div>
+    <div id="f1plot" class="wide"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">La case (i, j) porte Cov(X<sub>i</sub>, X<sub>j</sub>) ; la diagonale porte les variances ; Var(X<sub>1</sub> + … + X<sub>n</sub>) est la somme de <b>toutes</b> les cases. <b>i.i.d.</b> : l'indépendance vide les cases hors diagonale, la même loi met 2,917 sur toute la diagonale, et six dés font 6 × 2,917 = 17,5. <b>Lois différentes</b> (une pièce 1–2, des dés à 4, 6, 8, 10, 12 faces) : toujours rien hors diagonale, mais plus de σ² commun, la somme vaut 29,83. <b>Même loi, corrélés</b> : la diagonale fait encore 17,5, et les 30 autres cases ajoutent 43,75. <b>Le même dé n fois</b> : toutes les cases valent 2,917, et 36 × 2,917 = 105 = Var(6X). Ramène <b>n</b> à 2 : le premier bouton donne X + Y (5,83), le dernier 2X (11,67).</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>le test des constantes, un décalage, une différence, des coefficients, dix dés</small></summary><div class="in">
+    <ol>
+      <li><b>Le test des constantes.</b> X = Y = 1 : aX + bY vaut toujours a + b, sa variance est 0. La bonne formule donne a² · 0 + b² · 0 + 2ab · 0 = 0. Avec 2ab E[XY] à la place, on trouverait 2ab · 1 : pour a = 2 et b = 3, une variance de 12 pour une constante.</li>
+      <li><b>Le test du décalage.</b> Remplacer X par X + 10 décale aX + bY de 10a sans changer sa variance. Cov(X + 10, Y) = Cov(X, Y) passe le test ; E[(X + 10)Y] = E[XY] + 10 E[Y] ne le passe pas.</li>
+      <li><b>Une différence.</b> Deux dés indépendants : Var(X − Y) = 2,917 + 2,917 = 5,83, et non 2,917 − 2,917 = 0. Avec Y = X : X − X = 0, et la formule rend 2,917 + 2,917 − 2 × 2,917 = 0. Avec Y = 7 − X : X − Y = 2X − 7, de variance 11,67.</li>
+      <li><b>Des coefficients.</b> Deux dés indépendants : Var(2X − Y) = 4 × 2,917 + 1 × 2,917 = 14,58. Le −1 sort au carré.</li>
+      <li><b>Dix dés.</b> Indépendants : 10 × 2,917 = 29,17, écart-type 5,40. Un seul dé multiplié par 10 : Var(10X), avec 10X = X + … + X, dix copies du même dé, vaut 100 × 2,917 = 291,7. Même loi dans les deux cas ; dans le second, les 90 covariances valent 2,917 chacune.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>le terme croisé fait apparaître Cov, puis les deux rôles d'i.i.d.</small></summary><div class="in">
+    <div class="drv">
+      <div>Var(<i>aX</i> + <i>bY</i>) = E[(<i>aX</i> + <i>bY</i> − <i>a</i>μ<sub><i>X</i></sub> − <i>b</i>μ<sub><i>Y</i></sub>)²]</div><span>définition ; E[aX + bY] = aμ<sub>X</sub> + bμ<sub>Y</sub> par linéarité</span>
+      <div>= E[(<i>a</i>(<i>X</i> − μ<sub><i>X</i></sub>) + <i>b</i>(<i>Y</i> − μ<sub><i>Y</i></sub>))²]</div><span>l'écart de la combinaison est la combinaison des écarts</span>
+      <div>= <i>a</i>² E[(<i>X</i> − μ<sub><i>X</i></sub>)²] + <i>b</i>² E[(<i>Y</i> − μ<sub><i>Y</i></sub>)²] + 2<i>ab</i> E[(<i>X</i> − μ<sub><i>X</i></sub>)(<i>Y</i> − μ<sub><i>Y</i></sub>)]</div><span>(u + v)² = u² + v² + 2uv, puis linéarité</span>
+      <div>= <i>a</i>² Var <i>X</i> + <i>b</i>² Var <i>Y</i> + 2<i>ab</i> Cov(<i>X</i>, <i>Y</i>)</div><span>définitions de Var (<a href="lesson-00-08-esperance-variance.html#n6">l08, notion 6</a>) et de Cov (notion 1)</span>
+    </div>
+    <p><b>D'où vient l'erreur 2ab E[XY].</b> Partir de la forme de calcul, E[(aX + bY)²] − (E[aX + bY])². Le premier terme apporte 2ab E[XY], le second −2ab μ<sub>X</sub>μ<sub>Y</sub>, le double produit du carré de la moyenne. Ensemble : 2ab (E[XY] − μ<sub>X</sub>μ<sub>Y</sub>) = 2ab Cov(X, Y). Écrire 2ab E[XY], c'est oublier ce second morceau.</p>
+    <p><b>n variables, i.i.d.</b> Chaque ligne n'utilise qu'une hypothèse.</p>
+    <div class="drv">
+      <div>Var(<i>X</i><sub>1</sub> + … + <i>X<sub>n</sub></i>) = Σ<sub><i>i</i></sub> Σ<sub><i>j</i></sub> Cov(<i>X<sub>i</sub></i>, <i>X<sub>j</sub></i>)</div><span>carré de la somme des écarts : toutes les cases de la figure 1 ; aucune hypothèse</span>
+      <div>= Σ<sub><i>i</i></sub> Var <i>X<sub>i</sub></i> + Σ<sub><i>i</i> ≠ <i>j</i></sub> Cov(<i>X<sub>i</sub></i>, <i>X<sub>j</sub></i>)</div><span>séparer la diagonale : Cov(X<sub>i</sub>, X<sub>i</sub>) = Var X<sub>i</sub></span>
+      <div>= Σ<sub><i>i</i></sub> Var <i>X<sub>i</sub></i></div><span><b>indépendance</b> : chaque Cov(X<sub>i</sub>, X<sub>j</sub>), i ≠ j, est nulle (notion 3)</span>
+      <div>= <i>n</i>σ²</div><span><b>même loi</b> : chaque Var X<sub>i</sub> vaut le même σ²</span>
+    </div>
+    <p>Sans la même loi, on s'arrête à Σ σ<sub>i</sub>². Sans l'indépendance, les covariances restent : nσ² + n(n − 1)ρσ² si elles valent toutes ρσ² (<a href="lesson-00-10-inegalites-lgn.html#n6">l10, notion 6</a>, et le <a href="../bridges/bridge-04-variance-moyenne-correlee.html">pont b04</a>).</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>Var(2X − Y), Var(X + X), et une somme corrélée</small></summary><div class="in">
+<pre class="py">{{CODE:c2}}</pre>
+<pre class="out">{{OUT:c2}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Le terme croisé n'est pas 2ab E[XY].</b> E[XY] dépend de l'endroit où se trouve le nuage, Cov non (exemples 1 et 2, et la preuve).</li>
+      <li><b>L'indépendance ne rend pas la variance linéaire.</b> Elle annule le terme croisé : c'est de l'additivité. Même sous indépendance, Var(X − Y) = Var X + Var Y, pas Var X − Var Y ; Var(2X) = 4 Var X, pas 2 Var X.</li>
+      <li><b>i.i.d. n'est pas une hypothèse, c'en sont deux.</b> Lois différentes : on garde Σ σ<sub>i</sub>², pas nσ². Variables corrélées : on garde les covariances, et σ²/n devient faux pour une moyenne (<a href="lesson-00-10-inegalites-lgn.html#n6">l10</a>).</li>
+      <li><b>Une covariance négative fait baisser la variance.</b> Y = 7 − X donne X + Y = 7 : variance nulle, 2,917 + 2,917 − 2 × 2,917 = 0. C'est l'idée des variables antithétiques en simulation Monte Carlo.</li>
+      <li><b>Moyenner des modèles corrélés.</b> Un ensemble de B modèles de même variance σ², corrélés deux à deux par ρ, garde au moins ρσ² quel que soit B : les cases hors diagonale ne disparaissent pas (<a href="../bridges/bridge-04-variance-moyenne-correlee.html">pont b04</a>, <a href="../chains/chain-p07-02-bagging-rf.html">bagging</a>).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (30) dit que l'égalité Var(X + Y) = Var X + Var Y est « vraiment fausse » si X et Y sont dépendantes, et (41) que des variables dépendantes ont « ce terme de covariance en plus ». Pas forcément : il suffit que Cov = 0. X uniforme sur {−1, 0, 1} et Y = X² sont dépendantes, et Var(X + Y) = 8/9 = 2/3 + 2/9 (notion 3).</div>
+  </div></details>
+  <p class="garde">Var(aX + bY) = a² Var X + b² Var Y + 2ab Cov(X, Y), sans hypothèse. Dans Var(X<sub>1</sub> + … + X<sub>n</sub>) = nσ², l'indépendance annule les covariances, la même loi met σ² partout.</p>
+</section>
+

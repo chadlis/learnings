@@ -1,0 +1,7 @@
+rho(X, Y)               : 0.6
+Cov in feet, in inches  : 0.599 86.2
+rho(12X + 5, 12Y - 3)   : 0.6
+rho(2X + 1, -3Y + 5)    : -0.6 <- ac < 0 flips it
+share explained, rho^2  : 0.36
+30 unrelated points     : -0.139
+same + one point (8, 8) : 0.536

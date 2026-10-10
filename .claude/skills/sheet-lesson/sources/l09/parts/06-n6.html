@@ -1,0 +1,61 @@
+<!-- ============================ n6 ============================ -->
+<section class="notion outil" id="n6">
+  <h3>Comparer deux modèles sur le même jeu de test <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 41 (Var(X + Y), ici avec un signe moins), appliquée à l'évaluation de modèles (séance du 09/10)</p>
+  <div class="idee">
+    <p>Deux modèles A et B répondent aux mêmes 1 000 questions de test. Leur taux de bonnes réponses (accuracy) vaut 87,2 % pour A et 90,1 % pour B : B fait 2,9 points de mieux. Est-ce du bruit ? Il faut l'écart-type de la différence D̂ = p̂<sub>B</sub> − p̂<sub>A</sub>, et la notion 2 le donne : Var(D̂) = Var p̂<sub>A</sub> + Var p̂<sub>B</sub> − 2 Cov(p̂<sub>A</sub>, p̂<sub>B</sub>).</p>
+    <p>Sur un jeu de test partagé, les deux modèles butent sur les mêmes questions difficiles. La difficulté joue le rôle de la composante partagée de la notion 1 : elle rend Cov(p̂<sub>A</sub>, p̂<sub>B</sub>) positive, et le terme −2 Cov retire une grande part de la variance.</p>
+    <p>Avec deux jeux de test séparés, les deux scores sont indépendants, Cov = 0, et les variances s'additionnent : écart-type 0,0142. Avec le même jeu de test, où A seul réussit 10 questions et B seul 39 : 0,0069, deux fois moins.</p>
+  </div>
+  <div class="fig vis" id="v6">
+    <div class="lbl">Voir l'idée — refaire l'évaluation, avec un jeu de test ou deux</div>
+    <div id="v6ctl" class="sl-ctl"></div>
+    <div id="v6plot" class="wide"></div>
+    <div class="readouts" id="v6out"></div>
+    <p class="cap">On refait 400 fois l'évaluation de 1 000 questions, en tirant chaque question dans la loi de la chaîne p01-04, prise comme vraie loi : les deux justes 86,2 %, A seul 1,0 %, B seul 3,9 %, les deux faux 8,9 %. Chaque barre compte les D̂ obtenus. <b>Même jeu de test</b> (en haut) : D̂ reste serré autour de 0,029, écart-type mesuré 0,0068, et ne tombe jamais à 0. <b>Deux jeux de test</b> (en bas) : écart-type 0,0144, deux fois plus large, et D̂ ≤ 0 dans 9 évaluations sur 400 (2,2 % en théorie) : un jeu de test malchanceux suffit à effacer l'avantage de B. <b>Refaire</b> relance avec d'autres tirages.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les formules</div>
+    <div class="eq">D̂ = p̂<sub><i>B</i></sub> − p̂<sub><i>A</i></sub> &nbsp;&nbsp;&nbsp;&nbsp; Var(D̂) = Var p̂<sub><i>A</i></sub> + Var p̂<sub><i>B</i></sub> − 2 Cov(p̂<sub><i>A</i></sub>, p̂<sub><i>B</i></sub>)</div>
+    <div class="eq">même jeu de test : Var(D̂) = [<i>p<sub>A</sub></i>(1 − <i>p<sub>A</sub></i>) + <i>p<sub>B</sub></i>(1 − <i>p<sub>B</sub></i>) − 2(<i>p<sub>AB</sub></i> − <i>p<sub>A</sub></i><i>p<sub>B</sub></i>)] / <i>n</i> = [P(désaccord) − (<i>p<sub>B</sub></i> − <i>p<sub>A</sub></i>)²] / <i>n</i></div>
+    <ul>
+      <li>p<sub>A</sub>, p<sub>B</sub> : les vraies accuracies, fixes et inconnues ; p̂<sub>A</sub>, p̂<sub>B</sub> : leurs estimateurs, les moyennes des A<sub>i</sub>, B<sub>i</sub> ∈ {0, 1} (1 si la question i est réussie) sur les n questions. p<sub>AB</sub> = P(A et B justes sur une même question).</li>
+      <li>Les questions sont i.i.d. L'<b>indépendance entre questions</b> annule Cov(A<sub>i</sub>, B<sub>j</sub>) pour i ≠ j : seules les n paires (A<sub>i</sub>, B<sub>i</sub>) comptent. Il reste n termes sur n², d'où le 1/n. La <b>même loi</b> rend ces n termes égaux à Cov(A<sub>1</sub>, B<sub>1</sub>) : la formule ne dépend que de p<sub>A</sub>, p<sub>B</sub>, p<sub>AB</sub>.</li>
+      <li>Deux jeux de test séparés : p̂<sub>A</sub> et p̂<sub>B</sub> sont indépendants, Cov = 0, et Var(D̂) = [p<sub>A</sub>(1 − p<sub>A</sub>) + p<sub>B</sub>(1 − p<sub>B</sub>)]/n.</li>
+      <li>P(désaccord) = P(A<sub>i</sub> ≠ B<sub>i</sub>) : seules les questions où les modèles diffèrent portent la différence ; c'est l'idée du test de McNemar (<a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html">chaîne p01-04</a>). En pratique, les p sont remplacés par leurs estimations : l'écart-type devient une erreur standard estimée.</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux jeux de test, un jeu de test, le même modèle deux fois, des erreurs indépendantes, la composante partagée</small></summary><div class="in">
+    <ol>
+      <li><b>Deux jeux de test de 1 000.</b> Var(D̂) = (0,872 × 0,128 + 0,901 × 0,099)/1 000 = 0,000201 ; écart-type 0,0142. D̂ = 0,029 est à 2,05 écarts-types de 0.</li>
+      <li><b>Le même jeu de test.</b> Par question, P(les deux justes) = 0,862, d'où Cov(A<sub>i</sub>, B<sub>i</sub>) = 0,862 − 0,872 × 0,901 = 0,0763, une corrélation de 0,76. Var(D̂) = (0,1116 + 0,0892 − 2 × 0,0763)/1 000 = 0,0000482 ; écart-type 0,0069. D̂ est à 4,18 écarts-types de 0 : la variance a été divisée par 4,2.</li>
+      <li><b>Le même modèle évalué deux fois.</b> Sur le même jeu de test, D̂ = 0 à chaque fois : Cov = Var, la variance de la différence est nulle. Sur deux jeux de test, écart-type √(2 × 0,872 × 0,128/1 000) = 0,0149 : l'écart-type de la différence apparente entre deux copies du même modèle vaut 1,5 point, par pur hasard.</li>
+      <li><b>Des erreurs indépendantes</b> question par question, P(les deux justes) = p<sub>A</sub> p<sub>B</sub> : Cov = 0, et partager le jeu de test ne gagne rien. Tout le gain vient de la covariance.</li>
+      <li><b>La composante partagée</b> de la notion 1, réécrite X = S + U et Y = S + V : S est la difficulté commune de la question, U et V ce qui est propre à chaque modèle. Var(X − Y) = Var(U − V). La difficulté s'annule dans la différence.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>de Var(D̂) aux désaccords, avec les deux rôles d'i.i.d.</small></summary><div class="in">
+    <div class="drv">
+      <div>Cov(p̂<sub><i>A</i></sub>, p̂<sub><i>B</i></sub>) = (1/<i>n</i>²) Σ<sub><i>i</i></sub> Σ<sub><i>j</i></sub> Cov(<i>A<sub>i</sub></i>, <i>B<sub>j</sub></i>)</div><span>règles de la notion 1 : p̂<sub>A</sub> = (1/n) Σ A<sub>i</sub>, les facteurs 1/n sortent</span>
+      <div>= (1/<i>n</i>²) Σ<sub><i>i</i></sub> Cov(<i>A<sub>i</sub></i>, <i>B<sub>i</sub></i>)</div><span><b>indépendance</b> des questions : Cov(A<sub>i</sub>, B<sub>j</sub>) = 0 si i ≠ j</span>
+      <div>= Cov(<i>A</i><sub>1</sub>, <i>B</i><sub>1</sub>)/<i>n</i> = (<i>p<sub>AB</sub></i> − <i>p<sub>A</sub></i><i>p<sub>B</sub></i>)/<i>n</i></div><span><b>même loi</b> : n termes égaux ; E[A<sub>1</sub>B<sub>1</sub>] = P(A<sub>1</sub> = B<sub>1</sub> = 1) = p<sub>AB</sub></span>
+      <div>Var(D̂) = Var(<i>B</i><sub>1</sub> − <i>A</i><sub>1</sub>)/<i>n</i></div><span>D̂ est la moyenne des n différences B<sub>i</sub> − A<sub>i</sub> ; mêmes deux hypothèses (notion 2)</span>
+      <div>E[(<i>B</i><sub>1</sub> − <i>A</i><sub>1</sub>)²] = P(<i>A</i><sub>1</sub> ≠ <i>B</i><sub>1</sub>)</div><span>B<sub>1</sub> − A<sub>1</sub> ∈ {−1, 0, 1} : son carré vaut 1 exactement sur un désaccord</span>
+      <div>Var(D̂) = [P(<i>A</i><sub>1</sub> ≠ <i>B</i><sub>1</sub>) − (<i>p<sub>B</sub></i> − <i>p<sub>A</sub></i>)²]/<i>n</i></div><span>forme de calcul de la variance (<a href="lesson-00-08-esperance-variance.html#n6">l08</a>)</span>
+    </div>
+    <p>Avec 49 désaccords sur 1 000 et une différence de 0,029 : (0,049 − 0,029²)/1 000 = 0,0000482, écart-type 0,0069.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>10 000 évaluations, deux protocoles</small></summary><div class="in">
+<pre class="py">{{CODE:c6}}</pre>
+<pre class="out">{{OUT:c6}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Deux intervalles qui se chevauchent ne concluent rien.</b> Chacun ignore la covariance des deux scores. Ici, les intervalles à 95 % de A, [0,851 ; 0,893], et de B, [0,882 ; 0,920], se chevauchent, alors que la différence sur le jeu de test partagé est à 4,18 écarts-types de 0 (<a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html">chaîne p01-04</a>).</li>
+      <li><b>Appliquer la formule « deux jeux de test » à un jeu de test partagé</b> ne fait pas conclure à tort tant que Cov ≥ 0, le cas usuel, mais gaspille : elle surestime l'écart-type, ici d'un facteur 2, et le test perd de la puissance. Si les modèles se complètent (Cov &lt; 0), elle devient trop optimiste.</li>
+      <li><b>Des questions dépendantes</b>, plusieurs questions tirées du même document ou plusieurs lignes d'un même utilisateur, ajoutent des covariances entre questions : la vraie variance dépasse la formule, et le test devient trop optimiste (<a href="../bridges/bridge-04-variance-moyenne-correlee.html">pont b04</a>, <a href="lesson-00-10-inegalites-lgn.html#n6">l10</a>).</li>
+      <li><b>Partager le jeu de test ne protège pas de la sélection.</b> Garder le meilleur de 40 modèles évalués sur ce jeu de test gonfle son score : un maximum de variables bruitées est biaisé vers le haut (chaîne p01-04).</li>
+    </ul>
+  </div></details>
+  <p class="garde">Sur un jeu de test partagé, Var(p̂<sub>B</sub> − p̂<sub>A</sub>) = [P(désaccord) − (p<sub>B</sub> − p<sub>A</sub>)²]/n : le terme −2 Cov, avec Cov &gt; 0, retire la difficulté commune, d'où une variance plus faible qu'avec deux jeux de test.</p>
+</section>
+

@@ -1,0 +1,61 @@
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>L'indépendance donne Cov = 0, pas l'inverse <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 41</p>
+  <div class="idee">
+    <p>Si X et Y sont indépendantes, E[XY] = E[X] E[Y] (<a href="lesson-00-08-esperance-variance.html#n4">l08, notion 4</a>), donc la covariance est nulle. Brunton insiste : la réciproque est fausse, et il en donne le contre-exemple le plus simple.</p>
+    <p>X vaut −1, 0 ou 1, avec probabilité ⅓ chacune, et Y = X². Connaître X donne Y exactement. Pourtant le centre est (0, ⅔), et les trois rectangles valent (−1) × ⅓ = −⅓, 0 × (−⅔) = 0 et 1 × ⅓ = ⅓ : ils s'annulent, Cov = 0.</p>
+    <p>La covariance ne voit qu'une tendance linéaire. Sur la parabole, la moitié gauche descend pendant que la moitié droite monte, et les deux se compensent. La dépendance est pourtant là : P(Y = 0 ∣ X = 0) = 1, alors que P(Y = 0) = ⅓.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — des liens exacts, une covariance nulle</div>
+    <div id="v3ctl" class="sl-ctl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">Chaque fois, le lien entre X et Y est exact. <b>{−1, 0, 1} et X²</b> : les trois points de Brunton, leurs rectangles −⅓, 0 et +⅓ autour du centre (0, ⅔). <b>Parabole</b> et <b>cercle</b> : 200 points, autant de violet que de rouge, covariance mesurée −0,003 et 0,003. Passe à la <b>demi-parabole</b>, X entre 0 et 1 : le même lien sans la symétrie, presque tout devient violet ; la covariance vaut 1/12 = 0,083 en théorie (0,084 mesuré) et la corrélation 0,97.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>X</i> ⫫ <i>Y</i> ⇒ Cov(<i>X</i>, <i>Y</i>) = 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cov(<i>X</i>, <i>Y</i>) = 0 ⇏ <i>X</i> ⫫ <i>Y</i></div>
+    <ul>
+      <li>X ⫫ Y : la loi jointe se factorise (<a href="lesson-00-07-lois-jointes.html#n4">l07</a>) ; c'est elle qui donne E[XY] = E[X] E[Y].</li>
+      <li>Cov(X, Y) = 0 se dit « X et Y sont décorrélées ». Cela suffit pour additionner les variances (notion 2), pas pour raisonner comme si X ne disait rien de Y.</li>
+      <li>Le critère complet : X ⫫ Y si et seulement si Cov(g(X), h(Y)) = 0 pour toutes les fonctions bornées g et h. La seule paire (X, Y) ne suffit pas : ici Cov(X², Y) = Var(Y) = 2/9 ≠ 0 trahit le lien.</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux dés, la table de Brunton, un cercle, une demi-parabole, une feature</small></summary><div class="in">
+    <ol>
+      <li><b>Deux dés indépendants.</b> Cov = 12,25 − 3,5 × 3,5 = 0, comme prévu.</li>
+      <li><b>La table de Brunton</b>, trois valeurs de X et deux de Y, six cases. P(X = 0, Y = 0) = ⅓, alors que P(X = 0) P(Y = 0) = ⅓ × ⅓ = 1/9 : la jointe ne se factorise pas. Une seule case suffit à ruiner l'indépendance.</li>
+      <li><b>Un cercle.</b> U uniforme sur [0, 2π], X = cos U, Y = sin U. E[X] = E[Y] = 0 et E[XY] = E[sin 2U]/2 = 0 : Cov = 0, et pourtant X² + Y² = 1 toujours.</li>
+      <li><b>Une demi-parabole.</b> X uniforme sur [0, 1], Y = X². Cov = E[X³] − E[X] E[X²] = ¼ − ½ × ⅓ = 1/12 &gt; 0. Sans la symétrie, la dépendance se voit, et la corrélation vaut 0,97.</li>
+      <li><b>En ML.</b> Sélectionner des features par leur corrélation avec la cible rate une feature x qui la détermine par y = x², quand x est symétrique autour de 0 : corrélation nulle, information totale. Un arbre de décision ou l'information mutuelle la voient.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>le sens direct en une ligne, le contre-exemple, le mécanisme</small></summary><div class="in">
+    <div class="drv">
+      <div><i>X</i> ⫫ <i>Y</i> ⇒ E[<i>XY</i>] = E[<i>X</i>] E[<i>Y</i>]</div><span>la jointe se factorise, la double somme se coupe en deux (<a href="lesson-00-08-esperance-variance.html#n4">l08</a>)</span>
+      <div>⇒ Cov(<i>X</i>, <i>Y</i>) = E[<i>XY</i>] − E[<i>X</i>] E[<i>Y</i>] = 0</div><span>forme développée (notion 1)</span>
+    </div>
+    <p>Le contre-exemple, en trois lignes :</p>
+    <div class="drv">
+      <div>E[<i>X</i>] = (−1 + 0 + 1)/3 = 0 &nbsp;&nbsp; E[<i>Y</i>] = (1 + 0 + 1)/3 = ⅔</div><span>X est symétrique autour de 0</span>
+      <div>E[<i>XY</i>] = E[<i>X</i>³] = (−1 + 0 + 1)/3 = 0</div><span>XY = X · X² = X³</span>
+      <div>Cov(<i>X</i>, <i>Y</i>) = 0 − 0 × ⅔ = 0</div><span>et pourtant P(X = 0, Y = 0) = ⅓ ≠ 1/9</span>
+    </div>
+    <p>Le mécanisme général : si X est symétrique autour de 0 et Y = g(X) avec g paire, alors XY = X g(X) est une fonction impaire de X, donc d'espérance nulle, et E[X] = 0. La covariance est nulle quel que soit le lien.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>corrélation nulle, dépendance totale</small></summary><div class="in">
+<pre class="py">{{CODE:c3}}</pre>
+<pre class="out">{{OUT:c3}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>« Décorrélées » n'est pas « indépendantes ».</b> Sauf pour un couple gaussien, où les deux coïncident (notion 5).</li>
+      <li><b>La covariance mesure un lien linéaire, en moyenne.</b> Elle est nulle pour une parabole symétrique, un cercle, une croix : des liens parfaits qui ne penchent ni d'un côté ni de l'autre.</li>
+      <li><b>L'additivité ne demande que Cov = 0.</b> Dans le contre-exemple, Var(X + Y) = 8/9 = 2/3 + 2/9 : la formule de la notion 2 tient, sur des variables pourtant liées. Mais on ne peut plus multiplier des probabilités comme si X et Y étaient indépendantes.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (41) affirme que « clairement, Y dépend de X » sans le montrer : il suffit d'une case, P(Y = 0 ∣ X = 0) = 1 ≠ P(Y = 0) = ⅓. Il explique l'annulation par « une fonction paire sur un domaine impair » : il veut dire une fonction paire sur un domaine symétrique autour de 0. Et il parle de « la covariance de ces deux matrices » : ce sont deux variables aléatoires.</div>
+  </div></details>
+  <p class="garde">Indépendance ⇒ Cov = 0, mais la réciproque est fausse : X uniforme sur {−1, 0, 1} et Y = X² ont une covariance nulle alors que Y est entièrement déterminé par X. La covariance ne voit que le linéaire.</p>
+</section>
+

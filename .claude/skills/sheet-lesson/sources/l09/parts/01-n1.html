@@ -1,0 +1,66 @@
+<!-- ============================ n1 ============================ -->
+<section class="notion outil" id="n1">
+  <h3>La covariance : la moyenne du rectangle signé <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 41 · Covariance and Correlation in Probability</p>
+  <div class="idee">
+    <p>Brunton dessine un nuage de points allongé et incliné, puis choisit un point test. Son écart horizontal au centre est X − μ<sub>X</sub>, son écart vertical Y − μ<sub>Y</sub>. Sur un nuage qui monte, un grand écart à droite va presque toujours avec un grand écart vers le haut : les deux écarts ont le même signe.</p>
+    <p>La <b>covariance</b> est la moyenne du produit de ces deux écarts. Chaque produit est l'aire signée du rectangle tendu entre le centre et le point : positive en haut à droite et en bas à gauche, négative dans les deux autres coins. Avant de la définir, Brunton pose une exigence : Cov(X, X) doit redonner Var(X).</p>
+    <p>Quatre points équiprobables, (1, 1), (2, 3), (3, 2) et (4, 4). Le centre est (2,5 ; 2,5), les rectangles valent 2,25, −0,25, −0,25 et 2,25. Leur moyenne vaut 1 : les deux grands rectangles positifs l'emportent, Cov = 1.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — un point test, ses deux écarts, et le rectangle signé</div>
+    <div id="v1ctl" class="sl-ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">Les traits rouges pointillés passent par le centre (μ<sub>X</sub>, μ<sub>Y</sub>). Chaque rectangle va du centre à un point : <b>violet</b> si les deux écarts ont le même signe, <b>rouge</b> sinon. <b>Quatre points</b> : les aires 2,25, −0,25, −0,25 et 2,25, de moyenne 1. Puis les trois nuages de Brunton, 250 points chacun, colorés selon le signe de leur produit. <b>Incliné</b> : 82 % de produits positifs, covariance mesurée 2,18. <b>Plus large, moins pentu</b> : 64 %, covariance 1,17. <b>Rond</b> : 45 % de produits positifs et une covariance de 0 à deux décimales : ce sont les aires qui comptent, pas les signes. <b>Point suivant</b> promène le point test.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">Cov(<i>X</i>, <i>Y</i>) = E[(<i>X</i> − μ<sub><i>X</i></sub>)(<i>Y</i> − μ<sub><i>Y</i></sub>)] = E[<i>XY</i>] − E[<i>X</i>] E[<i>Y</i>]</div>
+    <ul>
+      <li>μ<sub>X</sub> = E[X], μ<sub>Y</sub> = E[Y]. En discret, la moyenne se fait sur la loi jointe : Σ<sub>x</sub> Σ<sub>y</sub> (x − μ<sub>X</sub>)(y − μ<sub>Y</sub>) P(X = x, Y = y). Les deux marginales ne suffisent pas (<a href="lesson-00-07-lois-jointes.html#n1">l07</a>).</li>
+      <li>E[X²] et E[Y²] finies : la covariance existe alors, et elle est bornée par σ<sub>X</sub> σ<sub>Y</sub> (notion 4).</li>
+      <li>Cov(X, X) = Var(X), Cov(X, Y) = Cov(Y, X). Son unité est celle de X fois celle de Y.</li>
+      <li>Règles de calcul (preuve plus bas) : Cov(aX + b, cY + d) = ac Cov(X, Y) et Cov(X + Z, Y) = Cov(X, Y) + Cov(Z, Y). Une constante ajoutée ne compte pas, un facteur sort.</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>constante, X avec lui-même, quatre points, trois couplages de dés, une composante partagée</small></summary><div class="in">
+    <ol>
+      <li><b>Une constante.</b> Cov(X, 5) = 0 : la constante n'a aucun écart à sa moyenne, tous les rectangles sont plats.</li>
+      <li><b>X avec lui-même.</b> Cov(X, X) = E[(X − μ)²] = Var(X), et Cov(X, −X) = −Var(X). Pour un dé : 2,917 et −2,917.</li>
+      <li><b>Les quatre points, par l'autre forme.</b> E[XY] = (1 + 6 + 6 + 16)/4 = 7,25 et E[X] E[Y] = 2,5 × 2,5 = 6,25. Cov = 7,25 − 6,25 = 1, comme la moyenne des rectangles.</li>
+      <li><b>Deux dés, mêmes marges, trois couplages.</b> Les E[XY] de <a href="lesson-00-08-esperance-variance.html#n4">l08, notion 4</a> : indépendants, 12,25 − 12,25 = 0 ; Y = X, 15,17 − 12,25 = 2,917 ; Y = 7 − X, 9,33 − 12,25 = −2,917. Chaque fois X et Y sont des dés équilibrés : seule la jointe change, et la covariance avec elle.</li>
+      <li><b>Une composante partagée</b> (séance du 09/10). A, B, C indépendantes, de variance 1 chacune ; X = A + B et Y = A + C. Par la règle de la somme : Cov(X, Y) = Cov(A, A) + Cov(A, C) + Cov(B, A) + Cov(B, C) = 1 + 0 + 0 + 0 = 1. Ce que X et Y ont en commun est exactement leur covariance. En ML, deux variables explicatives (features) qui mesurent la même cause avec des bruits indépendants, deux capteurs de la même température par exemple, sont corrélées par cette cause.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la forme développée, puis les règles de calcul</small></summary><div class="in">
+    <div class="drv">
+      <div>Cov(<i>X</i>, <i>Y</i>) = E[(<i>X</i> − μ<sub><i>X</i></sub>)(<i>Y</i> − μ<sub><i>Y</i></sub>)]</div><span>définition</span>
+      <div>= E[<i>XY</i> − μ<sub><i>X</i></sub><i>Y</i> − μ<sub><i>Y</i></sub><i>X</i> + μ<sub><i>X</i></sub>μ<sub><i>Y</i></sub>]</div><span>développer le produit</span>
+      <div>= E[<i>XY</i>] − μ<sub><i>X</i></sub> E[<i>Y</i>] − μ<sub><i>Y</i></sub> E[<i>X</i>] + μ<sub><i>X</i></sub>μ<sub><i>Y</i></sub></div><span>linéarité, sans hypothèse même si X et Y sont liées (<a href="lesson-00-08-esperance-variance.html#n3">l08</a>) ; μ<sub>X</sub>, μ<sub>Y</sub> sont des constantes</span>
+      <div>= E[<i>XY</i>] − μ<sub><i>X</i></sub>μ<sub><i>Y</i></sub> − μ<sub><i>X</i></sub>μ<sub><i>Y</i></sub> + μ<sub><i>X</i></sub>μ<sub><i>Y</i></sub> = E[<i>XY</i>] − E[<i>X</i>] E[<i>Y</i>]</div><span>« deux moins et un plus » : il en reste un (Brunton)</span>
+    </div>
+    <p>Les règles de calcul se lisent sur les écarts.</p>
+    <div class="drv">
+      <div>Cov(<i>aX</i> + <i>b</i>, <i>cY</i> + <i>d</i>) = E[(<i>aX</i> + <i>b</i> − <i>a</i>μ<sub><i>X</i></sub> − <i>b</i>)(<i>cY</i> + <i>d</i> − <i>c</i>μ<sub><i>Y</i></sub> − <i>d</i>)]</div><span>E[aX + b] = aμ<sub>X</sub> + b</span>
+      <div>= E[<i>a</i>(<i>X</i> − μ<sub><i>X</i></sub>) · <i>c</i>(<i>Y</i> − μ<sub><i>Y</i></sub>)] = <i>ac</i> Cov(<i>X</i>, <i>Y</i>)</div><span>b et d s'annulent, a et c sortent</span>
+      <div>Cov(<i>X</i> + <i>Z</i>, <i>Y</i>) = E[((<i>X</i> − μ<sub><i>X</i></sub>) + (<i>Z</i> − μ<sub><i>Z</i></sub>))(<i>Y</i> − μ<sub><i>Y</i></sub>)]</div><span>l'écart d'une somme est la somme des écarts</span>
+      <div>= Cov(<i>X</i>, <i>Y</i>) + Cov(<i>Z</i>, <i>Y</i>)</div><span>distribuer, puis linéarité</span>
+    </div>
+    <p>Avec Y = X, la première ligne redonne Var(X) = E[X²] − μ² (<a href="lesson-00-08-esperance-variance.html#n6">l08, notion 6</a>) : la covariance généralise la variance, comme Brunton l'exigeait.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>la composante partagée, trois façons de calculer, et np.cov</small></summary><div class="in">
+<pre class="py">{{CODE:c1}}</pre>
+<pre class="out">{{OUT:c1}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Il faut la loi jointe.</b> Les mêmes marges, deux dés équilibrés, donnent Cov = 0, +2,917 ou −2,917 selon le couplage (exemple 4). Deux histogrammes tracés séparément ne disent rien de la covariance.</li>
+      <li><b>Le nombre seul ne dit pas la force du lien.</b> Passer X et Y de pieds en pouces multiplie la covariance par 12 × 12 = 144 sans rien changer au nuage. Et un nuage large mais peu serré peut dépasser un nuage serré : écarts-types 1 et corrélation 0,9 donnent Cov = 0,9 ; écarts-types 2 et corrélation 0,5 donnent Cov = 2. La force se lit sur la corrélation (notion 4).</li>
+      <li><b>La forme E[XY] − E[X]E[Y] trompe la machine.</b> Quand les moyennes sont énormes devant les écarts, c'est la différence de deux nombres presque égaux. Sur un tirage de cent mille couples centrés autour de 10⁹, de vraie covariance 0,5 : le calcul naïf en flottants rend 384, la moyenne des produits d'écarts rend 0,50. Au clavier, on centre d'abord.</li>
+      <li><b>np.cov divise par n − 1, np.var par n.</b> Sur les quatre points, np.cov rend 1,333 et np.cov(…, bias=True) rend 1 (code ci-dessus).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (41) dit qu'un nuage pentu et serré a « une grande covariance », et qu'un nuage plus large et moins pentu en a moins. Il mélange covariance et corrélation. La covariance grandit aussi avec l'étalement : un nuage plus large de même orientation peut en avoir davantage (deuxième point ci-dessus). Le serrage autour d'une droite, c'est la corrélation qui le mesure, et Brunton le dit lui-même quelques minutes plus tard avec les pieds et les pouces.</div>
+  </div></details>
+  <p class="garde">Cov(X, Y) = E[(X − μ<sub>X</sub>)(Y − μ<sub>Y</sub>)] = E[XY] − E[X]E[Y] : la moyenne du rectangle signé tendu entre le centre et le point.</p>
+</section>
+

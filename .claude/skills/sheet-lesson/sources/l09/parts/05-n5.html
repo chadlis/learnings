@@ -1,0 +1,73 @@
+<!-- ============================ n5 ============================ -->
+<section class="notion outil" id="n5">
+  <h3>La gaussienne 2D : cercle, ellipse alignée, ellipse tournée <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 42 · Covariance and Correlation — Example with Gaussian Distributions</p>
+  <div class="idee">
+    <p>Brunton reprend ses nuages comme des impacts de fléchettes sur une cible : une densité gaussienne en deux dimensions, dessinée par ses courbes de niveau. Quand les deux écarts-types sont égaux et que rien ne lie X à Y, ce sont des cercles : la densité ne dépend que de la distance au centre.</p>
+    <p>Étire un axe, σ<sub>X</sub> = 2 et σ<sub>Y</sub> = 1 : les cercles deviennent des ellipses alignées sur les axes. La densité se factorise toujours, X et Y restent indépendantes, Cov = 0.</p>
+    <p>Tourne maintenant cette ellipse de 45°. Chaque variable reçoit un morceau des deux axes : Var X = Var Y = 2,5 et Cov = 1,5, donc ρ = 0,6. C'est la rotation, et elle seule, qui crée la covariance : dans la densité, elle fait apparaître un terme croisé en xy.</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — trois cibles, des fléchettes</div>
+    <div id="v5ctl" class="sl-ctl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">Les ellipses sont deux courbes de niveau de la densité : celle de demi-axes σ<sub>1</sub>, σ<sub>2</sub>, puis celle de demi-axes 2σ<sub>1</sub>, 2σ<sub>2</sub>. Les 300 fléchettes sont les mêmes tirages, déformés d'une cible à l'autre. <b>Cercle</b> puis <b>ellipse alignée</b> : la covariance mesurée reste proche de 0 (0,00 puis 0,01). <b>Ellipse tournée</b> : 1,51 mesuré pour 1,5 en théorie. <b>Lancer 300 fléchettes</b> en ajoute, jusqu'à 3 000 : la mesure fluctue de moins en moins autour de la théorie.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>f</i>(<i>x</i>, <i>y</i>) = 1 / (2π σ<sub><i>X</i></sub> σ<sub><i>Y</i></sub> √(1 − ρ²)) · exp(− (<i>z<sub>x</sub></i>² − 2ρ <i>z<sub>x</sub></i> <i>z<sub>y</sub></i> + <i>z<sub>y</sub></i>²) / (2(1 − ρ²))) &nbsp;&nbsp; <i>z<sub>x</sub></i> = (<i>x</i> − μ<sub><i>X</i></sub>)/σ<sub><i>X</i></sub>, <i>z<sub>y</sub></i> = (<i>y</i> − μ<sub><i>Y</i></sub>)/σ<sub><i>Y</i></sub></div>
+    <div class="eq">matrice de covariance Σ = <span class="mat"><span>σ<sub><i>X</i></sub>²</span><span>ρσ<sub><i>X</i></sub>σ<sub><i>Y</i></sub></span><span>ρσ<sub><i>X</i></sub>σ<sub><i>Y</i></sub></span><span>σ<sub><i>Y</i></sub>²</span></span></div>
+    <div class="eq">ellipse de demi-axes σ<sub>1</sub>, σ<sub>2</sub> tournée de θ : &nbsp; Cov(<i>X</i>, <i>Y</i>) = (σ<sub>1</sub>² − σ<sub>2</sub>²) sin θ cos θ</div>
+    <ul>
+      <li>Hypothèse : (X, Y) est un couple gaussien, c'est-à-dire de densité jointe de cette forme, avec |ρ| &lt; 1. Que X et Y soient chacune gaussiennes ne suffit pas (où ça casse).</li>
+      <li>Les courbes de niveau sont les ellipses z<sub>x</sub>² − 2ρ z<sub>x</sub> z<sub>y</sub> + z<sub>y</sub>² = constante.</li>
+      <li>Le seul terme qui mélange x et y est −2ρ z<sub>x</sub> z<sub>y</sub>. ρ = 0 ⇒ f(x, y) = f<sub>X</sub>(x) f<sub>Y</sub>(y) ⇒ indépendance. Pour un couple gaussien, Cov = 0 ⇔ indépendance.</li>
+      <li>σ<sub>1</sub> et σ<sub>2</sub> sont les écarts-types le long des axes de l'ellipse ; à θ = 0, σ<sub>1</sub> = σ<sub>X</sub> et σ<sub>2</sub> = σ<sub>Y</sub>. Ces axes sont les vecteurs propres de Σ, σ<sub>1</sub>² et σ<sub>2</sub>² ses valeurs propres : les composantes principales de la PCA.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — une ellipse, trois curseurs</div>
+    <div id="f3ctl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Trois courbes de niveau, de demi-axes σ<sub>1</sub>, σ<sub>2</sub>, puis 2σ<sub>1</sub>, 2σ<sub>2</sub> et 3σ<sub>1</sub>, 3σ<sub>2</sub>. <b>σ<sub>1</sub></b> et <b>σ<sub>2</sub></b> règlent les deux demi-axes, <b>θ</b> l'angle. À θ = 0, l'ellipse est alignée : Cov = 0 quels que soient σ<sub>1</sub> et σ<sub>2</sub>. Tourne : Cov = (σ<sub>1</sub>² − σ<sub>2</sub>²) sin θ cos θ, la plus forte à ±45°. Mets σ<sub>1</sub> = σ<sub>2</sub> : le cercle tourne sans rien changer, Cov = 0 à tout angle. Le trait ocre pointillé est le grand axe, le trait bleu la droite de régression de Y sur X : au départ (σ<sub>1</sub> = 2, σ<sub>2</sub> = 1, θ = 45°), pentes 1 et 0,6.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>cercle, ellipse alignée, tournée de 45°, de 30°, de 90°, et la PCA</small></summary><div class="in">
+    <ol>
+      <li><b>Le cercle.</b> σ<sub>X</sub> = σ<sub>Y</sub> = 1, ρ = 0 : f(x, y) = (1/2π) e<sup>−(x² + y²)/2</sup> = (1/2π) e<sup>−r²/2</sup>. Elle ne dépend que de la distance r au centre, et vaut 1/2π = 0,159 au centre : la cible de Brunton.</li>
+      <li><b>L'ellipse alignée.</b> σ<sub>1</sub> = 2, σ<sub>2</sub> = 1, θ = 0 : Σ a 4 et 1 sur la diagonale, 0 ailleurs. Ellipse étirée, variables indépendantes.</li>
+      <li><b>Tournée de 45°.</b> Var X = Var Y = 4 × ½ + 1 × ½ = 2,5 ; Cov = (4 − 1) × ½ = 1,5 ; ρ = 1,5/2,5 = 0,6. Tournée de −45° : ρ = −0,6.</li>
+      <li><b>Tournée de 30°.</b> Var X = 4 × ¾ + 1 × ¼ = 3,25 ; Var Y = 4 × ¼ + 1 × ¾ = 1,75 ; Cov = 3 × (√3/4) = 1,30 ; ρ = 0,54. Tournée de 90° : les axes échangent leurs rôles, Var X = 1, Var Y = 4, Cov = 0 de nouveau.</li>
+      <li><b>Un cercle tourné reste un cercle.</b> σ<sub>1</sub> = σ<sub>2</sub> : Cov = 0 à tout angle.</li>
+      <li><b>En ML, la PCA</b> cherche les axes de cette ellipse : elle tourne le repère pour rendre Σ diagonale, c'est-à-dire des composantes décorrélées (<a href="../chains/chain-p04-04-pca.html">chaîne PCA</a>).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la covariance d'une ellipse tournée, et pourquoi ρ = 0 factorise</small></summary><div class="in">
+    <div class="drv">
+      <div><i>X</i> = <i>U</i> cos θ − <i>V</i> sin θ, &nbsp; <i>Y</i> = <i>U</i> sin θ + <i>V</i> cos θ</div><span>tourner de θ un couple (U, V) indépendant, Var U = σ<sub>1</sub>², Var V = σ<sub>2</sub>²</span>
+      <div>Cov(<i>X</i>, <i>Y</i>) = cos θ sin θ Var <i>U</i> − sin θ cos θ Var <i>V</i></div><span>règles de la notion 1, développées terme à terme ; Cov(U, V) = 0</span>
+      <div>= (σ<sub>1</sub>² − σ<sub>2</sub>²) sin θ cos θ</div><span>nulle si θ = 0, si θ = 90° ou si σ<sub>1</sub> = σ<sub>2</sub></span>
+    </div>
+    <p>Pour ρ = 0, l'exposant se coupe en deux :</p>
+    <div class="drv">
+      <div><i>f</i>(<i>x</i>, <i>y</i>) = 1/(2π σ<sub><i>X</i></sub> σ<sub><i>Y</i></sub>) · e<sup>−<i>z<sub>x</sub></i>²/2</sup> · e<sup>−<i>z<sub>y</sub></i>²/2</sup></div><span>ρ = 0 dans la formule ; e<sup>a + b</sup> = e<sup>a</sup> e<sup>b</sup></span>
+      <div>= [e<sup>−<i>z<sub>x</sub></i>²/2</sup> / (σ<sub><i>X</i></sub>√(2π))] · [e<sup>−<i>z<sub>y</sub></i>²/2</sup> / (σ<sub><i>Y</i></sub>√(2π))] = <i>f<sub>X</sub></i>(<i>x</i>) <i>f<sub>Y</sub></i>(<i>y</i>)</div><span>deux densités normales : la jointe se factorise, donc X ⫫ Y (<a href="lesson-00-07-lois-jointes.html#n4">l07</a>)</span>
+    </div>
+    <p>C'est le raisonnement de Brunton dans le bon sens : on part de la densité jointe, on constate qu'elle se factorise, on en déduit l'indépendance.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>tourner une ellipse, retrouver ses axes</small></summary><div class="in">
+<pre class="py">{{CODE:c5}}</pre>
+<pre class="out">{{OUT:c5}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Des marges gaussiennes ne font pas un couple gaussien.</b> X de loi N(0, 1), S = ±1 à pile ou face indépendamment de X, Y = S X. Y est N(0, 1) elle aussi, Cov(X, Y) = E[S] E[X²] = 0, et pourtant |Y| = |X| toujours. X + Y vaut 0 une fois sur deux, ce qu'aucun couple gaussien de densité ne fait. « Cov = 0 ⇒ indépendance » demande la gaussienne jointe.</li>
+      <li><b>La pente de l'ellipse n'est pas celle de la régression.</b> À σ<sub>1</sub> = 2, σ<sub>2</sub> = 1, θ = 45°, le grand axe a une pente 1, la droite de régression de Y sur X une pente 0,6 (figure 3). La régression ne suit pas l'ellipse : elle prédit la moyenne de Y à x fixé.</li>
+      <li><b>ρ n'est pas un angle.</b> La même rotation de 45° donne ρ = 0 si σ<sub>1</sub> = σ<sub>2</sub>, 0,6 si σ<sub>1</sub> = 2 et σ<sub>2</sub> = 1, 0,98 si σ<sub>1</sub> = 10 et σ<sub>2</sub> = 1.</li>
+      <li><b>|ρ| = 1 : plus de densité.</b> Le facteur √(1 − ρ²) s'annule, tout tombe sur une droite.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (42) veut montrer que la gaussienne ronde a des composantes indépendantes. Il suppose que la densité jointe est le produit f<sub>X</sub> f<sub>Y</sub> (« c'est là qu'intervient l'indépendance »), calcule ce produit, puis conclut que X et Y sont indépendantes : le raisonnement tourne en rond. Il ajoute « si j'ai une gaussienne multivariée en 2D, ses composantes x et y sont indépendantes » : faux dès que ρ ≠ 0, ce que son ellipse tournée montre ensuite. Le bon sens va de la densité jointe, (1/2π) e<sup>−r²/2</sup>, vers sa factorisation, qui prouve l'indépendance (preuve ci-dessus). Il ne dit pas non plus qu'une ellipse alignée, à variances différentes, garde des variables indépendantes ; et il dit « gaussienne multinomiale » pour gaussienne multivariée.</div>
+  </div></details>
+  <p class="garde">Pour un couple gaussien, Cov = 0 ⇔ indépendance : cercle ou ellipse alignée sur les axes. La covariance vient de la rotation : Cov = (σ<sub>1</sub>² − σ<sub>2</sub>²) sin θ cos θ.</p>
+</section>
+

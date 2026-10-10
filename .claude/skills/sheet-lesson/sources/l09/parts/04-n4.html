@@ -1,0 +1,76 @@
+<!-- ============================ n4 ============================ -->
+<section class="notion outil" id="n4">
+  <h3>La corrélation : la covariance sans unité <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 41</p>
+  <div class="idee">
+    <p>Brunton remarque qu'on peut grossir une covariance sans toucher au nuage : il suffit de changer d'unité. Passer X et Y de pieds en pouces multiplie chaque écart par 12, donc chaque rectangle par 144. Pour juger la force du lien, il divise par les deux écarts-types : c'est la <b>corrélation</b>, une covariance normalisée.</p>
+    <p>Sur les quatre points de la notion 1 : Cov = 1 et σ<sub>X</sub> = σ<sub>Y</sub> = √1,25 = 1,118, donc ρ = 1/1,25 = 0,8. En pouces : Cov = 144, σ<sub>X</sub> σ<sub>Y</sub> = 180, et ρ = 144/180 = 0,8 encore.</p>
+    <p>Diviser par les écarts-types revient à standardiser chaque variable avant de faire la moyenne des rectangles. Le résultat est toujours compris entre −1 et 1, et ±1 signifie que les points sont exactement sur une droite.</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — changer d'unité gonfle la covariance, pas la corrélation</div>
+    <div id="v4ctl" class="sl-ctl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">Les quatre points de la notion 1, en pieds, et leurs rectangles. Chaque bouton change les unités : le dessin reste le même, seuls les nombres des axes et des aires changent. <b>En pouces</b> : Cov passe de 1 à 144, σ<sub>X</sub> σ<sub>Y</sub> de 1,25 à 180, ρ reste 0,8. <b>Y seul en pouces</b> : 12 et 15, ρ = 0,8. <b>Décalé</b> de 10 : rien ne change. <b>Y retourné</b> : le nuage se renverse, les rectangles changent de signe, ρ = −0,8.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les formules</div>
+    <div class="eq">ρ(<i>X</i>, <i>Y</i>) = Cov(<i>X</i>, <i>Y</i>) / (σ<sub><i>X</i></sub> σ<sub><i>Y</i></sub>) = E[<i>Z<sub>X</sub></i> <i>Z<sub>Y</sub></i>] &nbsp;&nbsp;&nbsp; avec <i>Z<sub>X</sub></i> = (<i>X</i> − μ<sub><i>X</i></sub>)/σ<sub><i>X</i></sub> &nbsp;&nbsp;&nbsp; −1 ≤ ρ ≤ 1</div>
+    <div class="eq">Cov(<i>aX</i> + <i>b</i>, <i>cY</i> + <i>d</i>) = <i>ac</i> Cov(<i>X</i>, <i>Y</i>) &nbsp;&nbsp;&nbsp;&nbsp; ρ(<i>aX</i> + <i>b</i>, <i>cY</i> + <i>d</i>) = signe(<i>ac</i>) · ρ(<i>X</i>, <i>Y</i>)</div>
+    <ul>
+      <li>σ<sub>X</sub> &gt; 0 et σ<sub>Y</sub> &gt; 0 : ρ n'est pas défini pour une constante. Z<sub>X</sub> et Z<sub>Y</sub> sont les versions standardisées, de moyenne 0 et d'écart-type 1 (<a href="lesson-00-06-fonctions-standardisation.html#n3">l06</a>).</li>
+      <li>|ρ| = 1 si et seulement si Y = aX + b exactement, avec a ≠ 0 ; le signe de ρ est celui de a.</li>
+      <li>a ≠ 0 et c ≠ 0. Un changement d'unité (a, c &gt; 0) ou un décalage (b, d) ne change pas ρ ; retourner une seule des deux variables change son signe.</li>
+      <li>ρ² est la part de la variance de Y expliquée par la meilleure droite : le R² d'une régression linéaire simple (preuve plus bas).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — des nuages à ρ variable</div>
+    <div id="f2ctl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Trois cents points tirés une fois pour toutes ; X a un écart-type 1. Monte <b>ρ</b> : le nuage se resserre autour d'une droite et devient cette droite à ρ = 1 ; à ρ = 0 il est rond, à ρ &lt; 0 il descend. Puis, à ρ fixé, élargis <b>σ<sub>Y</sub></b> : la covariance ρ σ<sub>X</sub> σ<sub>Y</sub> double quand σ<sub>Y</sub> double, ρ ne bouge pas. Le trait plein est la droite de régression de Y sur X, de pente ρ σ<sub>Y</sub>/σ<sub>X</sub> : à ρ = 0,6 et σ<sub>Y</sub> = 2, la pente vaut 1,2. ρ n'est pas une pente.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>des droites, les quatre points, une composante partagée, un R², des dés, des features</small></summary><div class="in">
+    <ol>
+      <li><b>Des droites.</b> Y = 2X + 1 : ρ = 1. Y = −3X : ρ = −1. Y = 5, une constante : ρ n'est pas défini.</li>
+      <li><b>Les quatre points.</b> ρ = 0,8, en pieds comme en pouces ; −0,8 si l'on retourne Y.</li>
+      <li><b>La composante partagée</b> de la notion 1. Cov(A + B, A + C) = 1 et σ<sub>X</sub> = σ<sub>Y</sub> = √2, donc ρ = 1/2. Plus généralement, quand B et C ont la même variance, ρ = Var A / (Var A + Var B) : la part commune de la variance.</li>
+      <li><b>Un R².</b> Les cinq points de la <a href="../chains/chain-p05-01-regression-modele-ols.html">chaîne régression</a>, x = 1 à 5 et y = 2, 4, 5, 4, 5, ont R² = 0,6 : ρ = √0,6 = 0,775.</li>
+      <li><b>Deux dés.</b> Indépendants : ρ = 0. Y = X : ρ = 1. Y = 7 − X : ρ = −1.</li>
+      <li><b>En ML, des features corrélées.</b> En régression linéaire avec deux features de corrélation ρ, la variance de chaque coefficient est multipliée par 1/(1 − ρ²) par rapport à des features décorrélées : c'est le facteur d'inflation de la variance (VIF). À ρ = 0,9, il vaut 5,3 ; une simulation de 4 000 régressions donne 5,35. Les coefficients deviennent instables.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>pourquoi −1 ≤ ρ ≤ 1, le signe de ac, et pourquoi ρ² est une part de variance</small></summary><div class="in">
+    <div class="drv">
+      <div>Cov(<i>Z<sub>X</sub></i>, <i>Z<sub>Y</sub></i>) = Cov(<i>X</i>, <i>Y</i>)/(σ<sub><i>X</i></sub> σ<sub><i>Y</i></sub>) = ρ</div><span>règles de la notion 1 : les constantes −μ disparaissent, les facteurs 1/σ sortent</span>
+      <div>Var(<i>Z<sub>X</sub></i> + <i>Z<sub>Y</sub></i>) = 1 + 1 + 2ρ ≥ 0, donc ρ ≥ −1</div><span>notion 2 ; une variance est positive (<a href="lesson-00-08-esperance-variance.html#n6">l08</a>)</span>
+      <div>Var(<i>Z<sub>X</sub></i> − <i>Z<sub>Y</sub></i>) = 1 + 1 − 2ρ ≥ 0, donc ρ ≤ 1</div><span>même argument, terme croisé changé de signe</span>
+      <div>ρ = 1 ⇔ Var(<i>Z<sub>X</sub></i> − <i>Z<sub>Y</sub></i>) = 0 ⇔ <i>Z<sub>Y</sub></i> = <i>Z<sub>X</sub></i></div><span>variance nulle ⇔ variable constante (avec probabilité 1) ; cette constante est 0, les deux Z étant centrés</span>
+    </div>
+    <p>Donc ρ = 1 donne Y = μ<sub>Y</sub> + σ<sub>Y</sub>(X − μ<sub>X</sub>)/σ<sub>X</sub>, une droite de pente positive ; même raisonnement pour ρ = −1 avec la somme. Pour le signe : ρ(aX + b, cY + d) = ac Cov(X, Y)/(|a| σ<sub>X</sub> · |c| σ<sub>Y</sub>) = signe(ac) ρ, puisque l'écart-type de aX + b est |a| σ<sub>X</sub>.</p>
+    <p>ρ² comme part de variance. On cherche la droite qui laisse le moins de variance à Y :</p>
+    <div class="drv">
+      <div>Var(<i>Y</i> − β<i>X</i>) = σ<sub><i>Y</i></sub>² − 2β Cov(<i>X</i>, <i>Y</i>) + β² σ<sub><i>X</i></sub>²</div><span>notion 2, avec a = 1 et b = −β</span>
+      <div>minimale en β = Cov(<i>X</i>, <i>Y</i>)/σ<sub><i>X</i></sub>²</div><span>dériver en β et annuler : c'est la pente de la régression</span>
+      <div>Var(<i>Y</i> − β<i>X</i>) = σ<sub><i>Y</i></sub>² − Cov(<i>X</i>, <i>Y</i>)²/σ<sub><i>X</i></sub>² = σ<sub><i>Y</i></sub>² (1 − ρ²)</div><span>remplacer β</span>
+    </div>
+    <p>La meilleure droite laisse la part 1 − ρ² de la variance de Y : elle en explique ρ². À ρ = 0,8, elle en explique 64 %, pas 80 %.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>unités, signe, et un seul point aberrant</small></summary><div class="in">
+<pre class="py">{{CODE:c4}}</pre>
+<pre class="out">{{OUT:c4}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>ρ ne voit que le linéaire.</b> ρ = 0 pour Y = X² sur des X symétriques (notion 3).</li>
+      <li><b>ρ n'est pas une pente.</b> La pente de la meilleure droite est ρ σ<sub>Y</sub>/σ<sub>X</sub> (figure 2) : deux nuages de même ρ peuvent avoir des pentes très différentes, et un nuage presque plat peut avoir ρ = 0,99.</li>
+      <li><b>ρ = 0,8 ne veut pas dire « 80 % expliqué ».</b> La droite explique ρ² = 64 % de la variance.</li>
+      <li><b>Un seul point lointain fabrique une corrélation.</b> Trente points tirés sans aucun lien donnent une corrélation mesurée de −0,14 ; ajouter le seul point (8, 8) la porte à 0,54 (code ci-dessus).</li>
+      <li><b>Corrélation n'est pas causalité</b> (Brunton). Deux variables sans effet l'une sur l'autre peuvent être corrélées par une cause commune : c'est la composante partagée A de la notion 1.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (41) dit que Corr(aX + b, cY + d) = Corr(X, Y). C'est vrai seulement si ac &gt; 0. Si ac &lt; 0, le signe s'inverse : dans le code ci-dessus, ρ(2X + 1, −3Y + 5) vaut −0,6 quand ρ(X, Y) vaut 0,6. L'énoncé juste est ρ(aX + b, cY + d) = signe(ac) · ρ(X, Y). Brunton ne montre pas non plus que −1 ≤ ρ ≤ 1 : la preuve ci-dessus n'utilise que la notion 2 et le fait qu'une variance est positive.</div>
+  </div></details>
+  <p class="garde">ρ = Cov(X, Y)/(σ<sub>X</sub> σ<sub>Y</sub>) ∈ [−1, 1], ±1 pour une droite exacte ; ρ(aX + b, cY + d) = signe(ac) ρ(X, Y).</p>
+</section>
+

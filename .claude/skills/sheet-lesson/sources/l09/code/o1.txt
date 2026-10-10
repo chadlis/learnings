@@ -1,0 +1,6 @@
+mean of (X - mx)(Y - my): 1.0003
+E[XY] - E[X]E[Y]        : 1.0003
+np.cov(X, Y)[0, 1]      : 1.0003   (theory: Var A = 1)
+Cov(B, C), nothing shared: -0.0000
+four points, np.cov          : 1.3333
+four points, np.cov bias=True: 1.0

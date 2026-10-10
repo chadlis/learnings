@@ -1,0 +1,1168 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Covariance et corrélation — leçon</title>
+<meta name="sheet" content="series=lesson;part=00;number=09;status=v1">
+<meta name="part" content="00 · Socle probabiliste">
+<meta name="subtitle" content="socle — Brunton 41 et 42 : le terme croisé de Var(X ± Y), Cov = 0 sans indépendance, nuages gaussiens">
+<meta name="prereq" content="l07,l08">
+<meta name="anki" content="stats::covariance,stats::correlation">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- série `coding` : squelette annoté et ruban de SL.trace (inerte hors coding) ---- */
+.skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.skel b{color:var(--pen);font-weight:600}
+.step .card.full,.step .card.casse{grid-column:1 / -1}
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .wide table{min-width:520px}
+.card .wide th:nth-child(2),.card .wide td:nth-child(2),
+.card .wide th:nth-child(3),.card .wide td:nth-child(3){text-align:left}
+.readouts .c1 b{color:var(--pen)}.readouts .c3 b{color:var(--red)}
+.sl-trace{--cw:58px;--cgap:8px;margin:4px 0 2px}
+.sl-cells{display:flex;gap:var(--cgap)}
+.sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
+.sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
+.sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.dim{background:rgba(34,48,43,.07);border-color:rgba(34,48,43,.18);border-style:dashed}
+.sl-cell.dim b,.sl-cell.dim i{color:var(--cardmuted);opacity:.5}
+.sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
+.sl-cell.win{border-color:var(--green);border-width:2.5px}
+.sl-ptrs{position:relative;height:20px;margin-top:5px}
+.sl-ptr{position:absolute;top:0;left:calc(var(--i) * (var(--cw) + var(--cgap)));width:var(--cw);text-align:center;font:600 12px var(--sans);color:var(--pen)}
+.sl-note{font-size:14px;color:var(--cardink);margin-top:10px}
+.sl-inv{font:12.5px/1.55 var(--mono);color:var(--cardmuted);margin-top:6px;border-left:2px solid #B7791F;padding-left:10px}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ===== série `lesson` : le cours autoporteur du socle (10/10/2026) ===== */
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px;color:var(--muted);margin:10px 0 0}
+.legend .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-right:6px}
+.lecon{counter-reset:notion}
+.notion{padding:22px 0 28px;border-top:1.5px dashed var(--line);max-width:900px}
+.notion h3{position:relative;padding-left:44px;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.3;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:2px}
+.notion h3::before{counter-increment:notion;content:counter(notion);position:absolute;left:0;top:-1px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle;text-shadow:none}
+.tag.outil{color:var(--mint)}.tag.culture{color:var(--violet)}
+.src{font-size:12.5px;color:var(--faint);margin:0 0 10px 44px}
+.idee{margin-left:44px;color:var(--chalk);font-size:16px;line-height:1.62;max-width:72ch}
+.idee p{margin:7px 0}
+.idee b{color:var(--yellow);font-weight:600}
+.formule{margin:12px 0 10px 44px;background:var(--card);color:var(--cardink);border-radius:3px;padding:12px 18px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--yellow)}
+.formule .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:4px}
+.formule .eq{font-size:17.5px}
+.formule ul{padding-left:18px;margin-top:6px}.formule li{font-size:14.5px;margin:3px 0;color:var(--cardmuted)}
+.notion .fig{margin-left:44px}
+details{margin:8px 0 0 44px;background:var(--card);color:var(--cardink);border-radius:3px;border-left:4px solid var(--ac,var(--yellow));box-shadow:0 10px 20px -16px rgba(0,0,0,.6)}
+details>summary{cursor:pointer;list-style:none;padding:9px 14px;font:600 13px var(--sans);letter-spacing:.03em;color:var(--cardink)}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸";display:inline-block;width:16px;color:var(--cardmuted)}
+details[open]>summary::before{content:"▾"}
+details>summary small{font-weight:400;color:var(--cardmuted);margin-left:6px;letter-spacing:0}
+details .in{padding:2px 18px 14px}
+details .in p,details .in li{font-size:15px;line-height:1.55;margin:5px 0}
+details .in ol,details .in ul{padding-left:20px}
+details.ex{--ac:var(--teal)}details.preuve{--ac:var(--violet)}details.code{--ac:var(--blue)}details.casse{--ac:var(--pink)}details.loin{--ac:var(--faint)}
+.drv{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:4px 16px;margin:8px 0;align-items:baseline}
+.drv>div{font-family:var(--math);font-size:16px;line-height:1.6}
+.drv>span{font-size:13.5px;color:var(--cardmuted);border-left:2px solid var(--cardline);padding-left:10px}
+@media(max-width:700px){.drv{grid-template-columns:minmax(0,1fr)}.drv>span{margin-bottom:6px}}
+pre.py,pre.out,pre.tri{font:13px/1.6 var(--mono);background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:pre}
+pre.out{background:transparent;border:1px dashed var(--cardline);color:var(--cardmuted)}
+pre.out::before{content:"sortie\A";font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.brunton{margin:10px 0 4px;padding:8px 12px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft);font-size:14.5px}
+.brunton b{display:block;font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:2px}
+.garde{margin:14px 0 0 44px;font-family:var(--serif);font-size:16.5px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--yellow);padding:4px 0 4px 14px;max-width:72ch}
+.garde::before{content:"Ce qu'on garde";display:block;font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);text-shadow:none;margin-bottom:2px}
+.notion.culture .garde{border-left-color:var(--violet)}
+.notion table{background:var(--cardsoft);border-radius:3px}
+.sl-fulcrum{fill:var(--red)}.sl-bar2{fill:var(--red);opacity:.55}.sl-bar3{fill:var(--pen);opacity:.6}
+@media(max-width:600px){.idee,.formule,details,.garde,.src,.notion .fig{margin-left:0}.notion h3{font-size:19px}}
+.sl-seg.sl-c1{stroke:var(--pen);stroke-width:2}.sl-seg.sl-c2{stroke:#6B46C1;stroke-width:2}.sl-seg.sl-c3{stroke:var(--red);stroke-width:2}.sl-seg.sl-c4{stroke:#1F5FA8;stroke-width:2}
+/* ===== v2 (10/10/2026) : vignettes « voir l'idée », sous chaque idée ===== */
+.fig.vis{--ac:var(--teal)}
+.v-row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:center}
+.v-row>div{flex:1 1 280px;min-width:0}.v-row>.v-mini{flex:0 1 220px}
+.v-row .sl-plot{min-width:0}
+.nogrid .sl-grid{display:none}
+.sl-ruler{fill:var(--cardmuted)}
+.sl-mass{fill:#6B46C1;opacity:.85}
+.sl-mass-t{font:600 11px var(--sans);fill:#fff}
+.sl-sq{fill:rgba(107,70,193,.16);stroke:#6B46C1;stroke-width:1.5}
+.sl-sq-t{font:600 12.5px var(--mono);fill:#6B46C1}
+.sl-cellp{fill:#6B46C1}.sl-cello{fill:none;stroke:var(--cardline)}
+.sl-prod{font:12px var(--mono);fill:var(--cardmuted);opacity:.5}.sl-prod.on{font-weight:700;fill:var(--cardink);opacity:1}
+.sl-seg.sl-dash{stroke-dasharray:4 3}.sl-seg.sl-link{stroke:rgba(34,48,43,.28);stroke-dasharray:3 3}
+.sl-seg.sl-c5{stroke:#B7791F;stroke-width:2}
+.sl-orbit{fill:none;stroke:rgba(34,48,43,.3);stroke-dasharray:3 4}
+.sl-stick{stroke:var(--cardmuted);stroke-width:4;stroke-linecap:round}
+.sl-dot.sl-tiny{stroke:none;opacity:.5}
+.sl-k1{fill:var(--pen)}.sl-k2{fill:#6B46C1}.sl-k3{fill:var(--red)}.sl-k4{fill:#1F5FA8}.sl-k5{fill:#B7791F}.sl-k6{fill:var(--green)}.sl-kc{opacity:.5}
+.sl-cell-t{font:600 11px var(--sans);fill:var(--cardink)}
+/* ---- propre à cette leçon ---- */
+.sl-sqn{fill:rgba(184,50,42,.14);stroke:var(--red);stroke-width:1.5}
+.sl-sqn-t{font:600 12.5px var(--mono);fill:var(--red)}
+.sl-quad{font:600 15px var(--sans);fill:var(--cardmuted);opacity:.55}
+.sl-ell{fill:none;stroke:var(--pen);stroke-width:1.6;opacity:.85}
+.sl-ell.k2{opacity:.5;stroke-dasharray:5 4}
+.sl-seg.sl-axisline{stroke:#B7791F;stroke-width:2;stroke-dasharray:6 4}
+.mat{display:inline-grid;grid-template-columns:auto auto;gap:0 14px;padding:0 7px;border-left:1.5px solid currentColor;border-right:1.5px solid currentColor;border-radius:5px;vertical-align:middle;line-height:1.35;text-align:center}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 9</div>
+  <h1>Covariance et <span>corrélation</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Deux variables bougent-elles ensemble ? La <b>covariance</b> fait la moyenne du produit de leurs écarts au centre ; c'est exactement le terme qui manquait à Var(X + Y). La <b>corrélation</b> la rend sans unité. La leçon suit Brunton 41 et 42 avec ses images : un nuage de points et son point test, X uniforme sur {−1, 0, 1} avec Y = X², des fléchettes sur une cible gaussienne. Elle finit sur un calcul d'entretien : comparer deux modèles sur le même jeu de test (test set).</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="lesson-00-07-lois-jointes.html#n1">l07 · Loi jointe</a></li>
+    <li><a href="lesson-00-07-lois-jointes.html#n4">l07 · Indépendance = factorisation</a></li>
+    <li><a href="lesson-00-08-esperance-variance.html#n4">l08 · E[XY] sous indépendance</a></li>
+    <li><a href="lesson-00-08-esperance-variance.html#n6">l08 · Variance</a></li>
+    <li><a href="lesson-00-08-esperance-variance.html#n9">l08 · Var(aX + b)</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::covariance</code><code>stats::correlation</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-04-variance-moyenne-correlee.html">Variance d'une moyenne corrélée</a></li>
+  </ol>
+  <h4>Suite</h4>
+  <ol>
+    <li><a href="lesson-00-10-inegalites-lgn.html">l10 · Inégalités et loi des grands nombres</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>Loi jointe.</b> P(X = x, Y = y) décrit le couple, case par case ; une densité jointe f(x, y) en continu (<a href="lesson-00-07-lois-jointes.html#n1">l07, notion 1</a>).</li>
+      <li><b>Indépendance.</b> X et Y sont indépendantes quand la loi jointe est le produit des deux lois, pour toutes les cases (<a href="lesson-00-07-lois-jointes.html#n4">l07, notion 4</a>).</li>
+      <li><b>Espérance.</b> E est linéaire sans aucune hypothèse (<a href="lesson-00-08-esperance-variance.html#n3">l08, notion 3</a>) ; E[XY] = E[X] E[Y] demande l'indépendance (<a href="lesson-00-08-esperance-variance.html#n4">notion 4</a>).</li>
+      <li><b>Variance.</b> Var(X) = E[(X − μ)²] = E[X²] − μ², la moyenne des carrés des écarts au centre (<a href="lesson-00-08-esperance-variance.html#n6">l08, notion 6</a>) ; Var(aX + b) = a² Var(X) (<a href="lesson-00-08-esperance-variance.html#n9">notion 9</a>). Pour un dé, Var = 35/12 = 2,917.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">
+
+<!-- ============================ n1 ============================ -->
+<section class="notion outil" id="n1">
+  <h3>La covariance : la moyenne du rectangle signé <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 41 · Covariance and Correlation in Probability</p>
+  <div class="idee">
+    <p>Brunton dessine un nuage de points allongé et incliné, puis choisit un point test. Son écart horizontal au centre est X − μ<sub>X</sub>, son écart vertical Y − μ<sub>Y</sub>. Sur un nuage qui monte, un grand écart à droite va presque toujours avec un grand écart vers le haut : les deux écarts ont le même signe.</p>
+    <p>La <b>covariance</b> est la moyenne du produit de ces deux écarts. Chaque produit est l'aire signée du rectangle tendu entre le centre et le point : positive en haut à droite et en bas à gauche, négative dans les deux autres coins. Avant de la définir, Brunton pose une exigence : Cov(X, X) doit redonner Var(X).</p>
+    <p>Quatre points équiprobables, (1, 1), (2, 3), (3, 2) et (4, 4). Le centre est (2,5 ; 2,5), les rectangles valent 2,25, −0,25, −0,25 et 2,25. Leur moyenne vaut 1 : les deux grands rectangles positifs l'emportent, Cov = 1.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — un point test, ses deux écarts, et le rectangle signé</div>
+    <div id="v1ctl" class="sl-ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">Les traits rouges pointillés passent par le centre (μ<sub>X</sub>, μ<sub>Y</sub>). Chaque rectangle va du centre à un point : <b>violet</b> si les deux écarts ont le même signe, <b>rouge</b> sinon. <b>Quatre points</b> : les aires 2,25, −0,25, −0,25 et 2,25, de moyenne 1. Puis les trois nuages de Brunton, 250 points chacun, colorés selon le signe de leur produit. <b>Incliné</b> : 82 % de produits positifs, covariance mesurée 2,18. <b>Plus large, moins pentu</b> : 64 %, covariance 1,17. <b>Rond</b> : 45 % de produits positifs et une covariance de 0 à deux décimales : ce sont les aires qui comptent, pas les signes. <b>Point suivant</b> promène le point test.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">Cov(<i>X</i>, <i>Y</i>) = E[(<i>X</i> − μ<sub><i>X</i></sub>)(<i>Y</i> − μ<sub><i>Y</i></sub>)] = E[<i>XY</i>] − E[<i>X</i>] E[<i>Y</i>]</div>
+    <ul>
+      <li>μ<sub>X</sub> = E[X], μ<sub>Y</sub> = E[Y]. En discret, la moyenne se fait sur la loi jointe : Σ<sub>x</sub> Σ<sub>y</sub> (x − μ<sub>X</sub>)(y − μ<sub>Y</sub>) P(X = x, Y = y). Les deux marginales ne suffisent pas (<a href="lesson-00-07-lois-jointes.html#n1">l07</a>).</li>
+      <li>E[X²] et E[Y²] finies : la covariance existe alors, et elle est bornée par σ<sub>X</sub> σ<sub>Y</sub> (notion 4).</li>
+      <li>Cov(X, X) = Var(X), Cov(X, Y) = Cov(Y, X). Son unité est celle de X fois celle de Y.</li>
+      <li>Règles de calcul (preuve plus bas) : Cov(aX + b, cY + d) = ac Cov(X, Y) et Cov(X + Z, Y) = Cov(X, Y) + Cov(Z, Y). Une constante ajoutée ne compte pas, un facteur sort.</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>constante, X avec lui-même, quatre points, trois couplages de dés, une composante partagée</small></summary><div class="in">
+    <ol>
+      <li><b>Une constante.</b> Cov(X, 5) = 0 : la constante n'a aucun écart à sa moyenne, tous les rectangles sont plats.</li>
+      <li><b>X avec lui-même.</b> Cov(X, X) = E[(X − μ)²] = Var(X), et Cov(X, −X) = −Var(X). Pour un dé : 2,917 et −2,917.</li>
+      <li><b>Les quatre points, par l'autre forme.</b> E[XY] = (1 + 6 + 6 + 16)/4 = 7,25 et E[X] E[Y] = 2,5 × 2,5 = 6,25. Cov = 7,25 − 6,25 = 1, comme la moyenne des rectangles.</li>
+      <li><b>Deux dés, mêmes marges, trois couplages.</b> Les E[XY] de <a href="lesson-00-08-esperance-variance.html#n4">l08, notion 4</a> : indépendants, 12,25 − 12,25 = 0 ; Y = X, 15,17 − 12,25 = 2,917 ; Y = 7 − X, 9,33 − 12,25 = −2,917. Chaque fois X et Y sont des dés équilibrés : seule la jointe change, et la covariance avec elle.</li>
+      <li><b>Une composante partagée</b> (séance du 09/10). A, B, C indépendantes, de variance 1 chacune ; X = A + B et Y = A + C. Par la règle de la somme : Cov(X, Y) = Cov(A, A) + Cov(A, C) + Cov(B, A) + Cov(B, C) = 1 + 0 + 0 + 0 = 1. Ce que X et Y ont en commun est exactement leur covariance. En ML, deux variables explicatives (features) qui mesurent la même cause avec des bruits indépendants, deux capteurs de la même température par exemple, sont corrélées par cette cause.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la forme développée, puis les règles de calcul</small></summary><div class="in">
+    <div class="drv">
+      <div>Cov(<i>X</i>, <i>Y</i>) = E[(<i>X</i> − μ<sub><i>X</i></sub>)(<i>Y</i> − μ<sub><i>Y</i></sub>)]</div><span>définition</span>
+      <div>= E[<i>XY</i> − μ<sub><i>X</i></sub><i>Y</i> − μ<sub><i>Y</i></sub><i>X</i> + μ<sub><i>X</i></sub>μ<sub><i>Y</i></sub>]</div><span>développer le produit</span>
+      <div>= E[<i>XY</i>] − μ<sub><i>X</i></sub> E[<i>Y</i>] − μ<sub><i>Y</i></sub> E[<i>X</i>] + μ<sub><i>X</i></sub>μ<sub><i>Y</i></sub></div><span>linéarité, sans hypothèse même si X et Y sont liées (<a href="lesson-00-08-esperance-variance.html#n3">l08</a>) ; μ<sub>X</sub>, μ<sub>Y</sub> sont des constantes</span>
+      <div>= E[<i>XY</i>] − μ<sub><i>X</i></sub>μ<sub><i>Y</i></sub> − μ<sub><i>X</i></sub>μ<sub><i>Y</i></sub> + μ<sub><i>X</i></sub>μ<sub><i>Y</i></sub> = E[<i>XY</i>] − E[<i>X</i>] E[<i>Y</i>]</div><span>« deux moins et un plus » : il en reste un (Brunton)</span>
+    </div>
+    <p>Les règles de calcul se lisent sur les écarts.</p>
+    <div class="drv">
+      <div>Cov(<i>aX</i> + <i>b</i>, <i>cY</i> + <i>d</i>) = E[(<i>aX</i> + <i>b</i> − <i>a</i>μ<sub><i>X</i></sub> − <i>b</i>)(<i>cY</i> + <i>d</i> − <i>c</i>μ<sub><i>Y</i></sub> − <i>d</i>)]</div><span>E[aX + b] = aμ<sub>X</sub> + b</span>
+      <div>= E[<i>a</i>(<i>X</i> − μ<sub><i>X</i></sub>) · <i>c</i>(<i>Y</i> − μ<sub><i>Y</i></sub>)] = <i>ac</i> Cov(<i>X</i>, <i>Y</i>)</div><span>b et d s'annulent, a et c sortent</span>
+      <div>Cov(<i>X</i> + <i>Z</i>, <i>Y</i>) = E[((<i>X</i> − μ<sub><i>X</i></sub>) + (<i>Z</i> − μ<sub><i>Z</i></sub>))(<i>Y</i> − μ<sub><i>Y</i></sub>)]</div><span>l'écart d'une somme est la somme des écarts</span>
+      <div>= Cov(<i>X</i>, <i>Y</i>) + Cov(<i>Z</i>, <i>Y</i>)</div><span>distribuer, puis linéarité</span>
+    </div>
+    <p>Avec Y = X, la première ligne redonne Var(X) = E[X²] − μ² (<a href="lesson-00-08-esperance-variance.html#n6">l08, notion 6</a>) : la covariance généralise la variance, comme Brunton l'exigeait.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>la composante partagée, trois façons de calculer, et np.cov</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(0)
+n = 1_000_000
+A, B, C = rng.standard_normal((3, n))      # independent, variance 1 each
+X, Y = A + B, A + C                         # A is the shared part
+
+mx, my = X.mean(), Y.mean()
+print(f"mean of (X - mx)(Y - my): {np.mean((X - mx) * (Y - my)):.4f}")
+print(f"E[XY] - E[X]E[Y]        : {np.mean(X * Y) - mx * my:.4f}")
+print(f"np.cov(X, Y)[0, 1]      : {np.cov(X, Y)[0, 1]:.4f}   (theory: Var A = 1)")
+print(f"Cov(B, C), nothing shared: {np.cov(B, C)[0, 1]:.4f}")
+
+# the four points: np.cov divides by n - 1 by default
+x = np.array([1, 2, 3, 4.]); y = np.array([1, 3, 2, 4.])
+print("four points, np.cov          :", np.cov(x, y)[0, 1].round(4))
+print("four points, np.cov bias=True:", np.cov(x, y, bias=True)[0, 1])</pre>
+<pre class="out">mean of (X - mx)(Y - my): 1.0003
+E[XY] - E[X]E[Y]        : 1.0003
+np.cov(X, Y)[0, 1]      : 1.0003   (theory: Var A = 1)
+Cov(B, C), nothing shared: -0.0000
+four points, np.cov          : 1.3333
+four points, np.cov bias=True: 1.0</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Il faut la loi jointe.</b> Les mêmes marges, deux dés équilibrés, donnent Cov = 0, +2,917 ou −2,917 selon le couplage (exemple 4). Deux histogrammes tracés séparément ne disent rien de la covariance.</li>
+      <li><b>Le nombre seul ne dit pas la force du lien.</b> Passer X et Y de pieds en pouces multiplie la covariance par 12 × 12 = 144 sans rien changer au nuage. Et un nuage large mais peu serré peut dépasser un nuage serré : écarts-types 1 et corrélation 0,9 donnent Cov = 0,9 ; écarts-types 2 et corrélation 0,5 donnent Cov = 2. La force se lit sur la corrélation (notion 4).</li>
+      <li><b>La forme E[XY] − E[X]E[Y] trompe la machine.</b> Quand les moyennes sont énormes devant les écarts, c'est la différence de deux nombres presque égaux. Sur un tirage de cent mille couples centrés autour de 10⁹, de vraie covariance 0,5 : le calcul naïf en flottants rend 384, la moyenne des produits d'écarts rend 0,50. Au clavier, on centre d'abord.</li>
+      <li><b>np.cov divise par n − 1, np.var par n.</b> Sur les quatre points, np.cov rend 1,333 et np.cov(…, bias=True) rend 1 (code ci-dessus).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (41) dit qu'un nuage pentu et serré a « une grande covariance », et qu'un nuage plus large et moins pentu en a moins. Il mélange covariance et corrélation. La covariance grandit aussi avec l'étalement : un nuage plus large de même orientation peut en avoir davantage (deuxième point ci-dessus). Le serrage autour d'une droite, c'est la corrélation qui le mesure, et Brunton le dit lui-même quelques minutes plus tard avec les pieds et les pouces.</div>
+  </div></details>
+  <p class="garde">Cov(X, Y) = E[(X − μ<sub>X</sub>)(Y − μ<sub>Y</sub>)] = E[XY] − E[X]E[Y] : la moyenne du rectangle signé tendu entre le centre et le point.</p>
+</section>
+
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>Var(X ± Y) : le terme croisé, et les deux rôles d'i.i.d. <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 41 (et 30 pour Var(X + Y) et Var(2X))</p>
+  <div class="idee">
+    <p>Dès la vidéo 30, Brunton prévient : sous indépendance, Var(X + Y) = Var X + Var Y. Et Var(2X), c'est-à-dire Var(X + X), n'est « absolument pas égale à 2 Var X ; je suis presque sûr qu'elle vaut 4 Var X ». En 41, il donne la règle générale en exercice : Var(X + Y) = Var X + Var Y + 2 Cov(X, Y).</p>
+    <p>D'où vient le terme croisé ? L'écart de la somme au centre est la somme des deux écarts, et le carré d'une somme a un double produit : (u + v)² = u² + v² + 2uv. En moyenne, u² donne Var X, v² donne Var Y, et 2uv donne deux fois la moyenne du rectangle signé de la notion 1.</p>
+    <p>Deux dés indépendants : 2,917 + 2,917 + 0 = 5,83. Le même dé compté deux fois : 2,917 + 2,917 + 2 × 2,917 = 11,67. Même espérance 7, deux étalements.</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — deux dés contre un dé doublé</div>
+    <div id="v2plot" class="wide"></div>
+    <p class="cap">Deux mécanismes, même espérance 7 : la moyenne mesurée (trait rouge) tombe sur 7 en haut comme en bas. Les deux histogrammes partent de 300 tirages : écart-type mesuré 2,42 en haut, 3,38 en bas, pour 2,42 et 3,42 en théorie. <b>Tires</b>-en 500 de plus de chaque côté : la moyenne reste collée à 7, les écarts-types restent séparés. En bas, seules les valeurs paires sortent : 2X ne peut pas faire 7, alors que X + Y le fait une fois sur six. L'écart des variances, 35/3 − 35/6 = 35/6 = 5,83, est le terme croisé 2 Cov(X, X) = 2 Var X.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les formules</div>
+    <div class="eq">Var(<i>X</i> ± <i>Y</i>) = Var <i>X</i> + Var <i>Y</i> ± 2 Cov(<i>X</i>, <i>Y</i>) &nbsp;&nbsp;&nbsp;&nbsp; Var(<i>aX</i> + <i>bY</i>) = <i>a</i>² Var <i>X</i> + <i>b</i>² Var <i>Y</i> + 2<i>ab</i> Cov(<i>X</i>, <i>Y</i>)</div>
+    <div class="eq">Var(<i>X</i><sub>1</sub> + … + <i>X<sub>n</sub></i>) = Σ<sub><i>i</i></sub> Var <i>X<sub>i</sub></i> + 2 Σ<sub><i>i</i> &lt; <i>j</i></sub> Cov(<i>X<sub>i</sub></i>, <i>X<sub>j</sub></i>) &nbsp;&nbsp;&nbsp;&nbsp; i.i.d. ⇒ <i>n</i>σ²</div>
+    <ul>
+      <li>Aucune hypothèse : X et Y quelconques, de variances finies ; a et b sont des constantes. Avec a = 1 et b = −1, c'est la différence : le terme croisé change de signe.</li>
+      <li>Le terme croisé est 2ab Cov(X, Y), pas 2ab E[XY] : comme la variance, il doit ignorer un décalage de X ou de Y.</li>
+      <li>Indépendance ⇒ Cov = 0 ⇒ Var(aX + bY) = a² Var X + b² Var Y (Cov = 0 suffit, notion 3). C'est de l'<b>additivité</b>. La variance n'est jamais linéaire : les coefficients sortent au carré.</li>
+      <li>Pour n variables, i.i.d. contient deux hypothèses qui servent à deux endroits : l'<b>indépendance</b> annule les n(n − 1) covariances, la <b>même loi</b> rend les n variances égales au même σ² (preuve plus bas, figure 1).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — la variance d'une somme est la somme de toutes les cases</div>
+    <div id="f1ctl" class="sl-ctl"></div>
+    <div id="f1sl"></div>
+    <div id="f1plot" class="wide"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">La case (i, j) porte Cov(X<sub>i</sub>, X<sub>j</sub>) ; la diagonale porte les variances ; Var(X<sub>1</sub> + … + X<sub>n</sub>) est la somme de <b>toutes</b> les cases. <b>i.i.d.</b> : l'indépendance vide les cases hors diagonale, la même loi met 2,917 sur toute la diagonale, et six dés font 6 × 2,917 = 17,5. <b>Lois différentes</b> (une pièce 1–2, des dés à 4, 6, 8, 10, 12 faces) : toujours rien hors diagonale, mais plus de σ² commun, la somme vaut 29,83. <b>Même loi, corrélés</b> : la diagonale fait encore 17,5, et les 30 autres cases ajoutent 43,75. <b>Le même dé n fois</b> : toutes les cases valent 2,917, et 36 × 2,917 = 105 = Var(6X). Ramène <b>n</b> à 2 : le premier bouton donne X + Y (5,83), le dernier 2X (11,67).</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>le test des constantes, un décalage, une différence, des coefficients, dix dés</small></summary><div class="in">
+    <ol>
+      <li><b>Le test des constantes.</b> X = Y = 1 : aX + bY vaut toujours a + b, sa variance est 0. La bonne formule donne a² · 0 + b² · 0 + 2ab · 0 = 0. Avec 2ab E[XY] à la place, on trouverait 2ab · 1 : pour a = 2 et b = 3, une variance de 12 pour une constante.</li>
+      <li><b>Le test du décalage.</b> Remplacer X par X + 10 décale aX + bY de 10a sans changer sa variance. Cov(X + 10, Y) = Cov(X, Y) passe le test ; E[(X + 10)Y] = E[XY] + 10 E[Y] ne le passe pas.</li>
+      <li><b>Une différence.</b> Deux dés indépendants : Var(X − Y) = 2,917 + 2,917 = 5,83, et non 2,917 − 2,917 = 0. Avec Y = X : X − X = 0, et la formule rend 2,917 + 2,917 − 2 × 2,917 = 0. Avec Y = 7 − X : X − Y = 2X − 7, de variance 11,67.</li>
+      <li><b>Des coefficients.</b> Deux dés indépendants : Var(2X − Y) = 4 × 2,917 + 1 × 2,917 = 14,58. Le −1 sort au carré.</li>
+      <li><b>Dix dés.</b> Indépendants : 10 × 2,917 = 29,17, écart-type 5,40. Un seul dé multiplié par 10 : Var(10X), avec 10X = X + … + X, dix copies du même dé, vaut 100 × 2,917 = 291,7. Même loi dans les deux cas ; dans le second, les 90 covariances valent 2,917 chacune.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>le terme croisé fait apparaître Cov, puis les deux rôles d'i.i.d.</small></summary><div class="in">
+    <div class="drv">
+      <div>Var(<i>aX</i> + <i>bY</i>) = E[(<i>aX</i> + <i>bY</i> − <i>a</i>μ<sub><i>X</i></sub> − <i>b</i>μ<sub><i>Y</i></sub>)²]</div><span>définition ; E[aX + bY] = aμ<sub>X</sub> + bμ<sub>Y</sub> par linéarité</span>
+      <div>= E[(<i>a</i>(<i>X</i> − μ<sub><i>X</i></sub>) + <i>b</i>(<i>Y</i> − μ<sub><i>Y</i></sub>))²]</div><span>l'écart de la combinaison est la combinaison des écarts</span>
+      <div>= <i>a</i>² E[(<i>X</i> − μ<sub><i>X</i></sub>)²] + <i>b</i>² E[(<i>Y</i> − μ<sub><i>Y</i></sub>)²] + 2<i>ab</i> E[(<i>X</i> − μ<sub><i>X</i></sub>)(<i>Y</i> − μ<sub><i>Y</i></sub>)]</div><span>(u + v)² = u² + v² + 2uv, puis linéarité</span>
+      <div>= <i>a</i>² Var <i>X</i> + <i>b</i>² Var <i>Y</i> + 2<i>ab</i> Cov(<i>X</i>, <i>Y</i>)</div><span>définitions de Var (<a href="lesson-00-08-esperance-variance.html#n6">l08, notion 6</a>) et de Cov (notion 1)</span>
+    </div>
+    <p><b>D'où vient l'erreur 2ab E[XY].</b> Partir de la forme de calcul, E[(aX + bY)²] − (E[aX + bY])². Le premier terme apporte 2ab E[XY], le second −2ab μ<sub>X</sub>μ<sub>Y</sub>, le double produit du carré de la moyenne. Ensemble : 2ab (E[XY] − μ<sub>X</sub>μ<sub>Y</sub>) = 2ab Cov(X, Y). Écrire 2ab E[XY], c'est oublier ce second morceau.</p>
+    <p><b>n variables, i.i.d.</b> Chaque ligne n'utilise qu'une hypothèse.</p>
+    <div class="drv">
+      <div>Var(<i>X</i><sub>1</sub> + … + <i>X<sub>n</sub></i>) = Σ<sub><i>i</i></sub> Σ<sub><i>j</i></sub> Cov(<i>X<sub>i</sub></i>, <i>X<sub>j</sub></i>)</div><span>carré de la somme des écarts : toutes les cases de la figure 1 ; aucune hypothèse</span>
+      <div>= Σ<sub><i>i</i></sub> Var <i>X<sub>i</sub></i> + Σ<sub><i>i</i> ≠ <i>j</i></sub> Cov(<i>X<sub>i</sub></i>, <i>X<sub>j</sub></i>)</div><span>séparer la diagonale : Cov(X<sub>i</sub>, X<sub>i</sub>) = Var X<sub>i</sub></span>
+      <div>= Σ<sub><i>i</i></sub> Var <i>X<sub>i</sub></i></div><span><b>indépendance</b> : chaque Cov(X<sub>i</sub>, X<sub>j</sub>), i ≠ j, est nulle (notion 3)</span>
+      <div>= <i>n</i>σ²</div><span><b>même loi</b> : chaque Var X<sub>i</sub> vaut le même σ²</span>
+    </div>
+    <p>Sans la même loi, on s'arrête à Σ σ<sub>i</sub>². Sans l'indépendance, les covariances restent : nσ² + n(n − 1)ρσ² si elles valent toutes ρσ² (<a href="lesson-00-10-inegalites-lgn.html#n6">l10, notion 6</a>, et le <a href="../bridges/bridge-04-variance-moyenne-correlee.html">pont b04</a>).</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>Var(2X − Y), Var(X + X), et une somme corrélée</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(1)
+n = 1_000_000
+X = rng.integers(1, 7, n); Y = rng.integers(1, 7, n)     # two independent dice
+v = 35 / 12
+print("Var(2X - Y):", np.var(2 * X - Y).round(3), "| 4v + v =", round(5 * v, 3))
+print("Var(X - Y) :", np.var(X - Y).round(3), "| v + v =", round(2 * v, 3), "(not v - v = 0)")
+print("Var(X + X) :", np.var(X + X).round(3), "| 4v =", round(4 * v, 3))
+
+# six variables of variance 1: independent, then pairwise correlated at 0.5
+k, rho = 6, 0.5
+iid = rng.standard_normal((k, n))
+shared = rng.standard_normal(n)              # a common part creates the covariances
+corr = np.sqrt(rho) * shared + np.sqrt(1 - rho) * rng.standard_normal((k, n))
+print("Cov of two correlated ones:", np.cov(corr[0], corr[1])[0, 1].round(3))
+print("Var(sum), iid       :", np.var(iid.sum(0)).round(3), "| k =", k)
+print("Var(sum), correlated:", np.var(corr.sum(0)).round(3),
+      "| k + k(k-1) rho =", k + k * (k - 1) * rho)</pre>
+<pre class="out">Var(2X - Y): 14.581 | 4v + v = 14.583
+Var(X - Y) : 5.834 | v + v = 5.833 (not v - v = 0)
+Var(X + X) : 11.667 | 4v = 11.667
+Cov of two correlated ones: 0.502
+Var(sum), iid       : 5.996 | k = 6
+Var(sum), correlated: 21.063 | k + k(k-1) rho = 21.0</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Le terme croisé n'est pas 2ab E[XY].</b> E[XY] dépend de l'endroit où se trouve le nuage, Cov non (exemples 1 et 2, et la preuve).</li>
+      <li><b>L'indépendance ne rend pas la variance linéaire.</b> Elle annule le terme croisé : c'est de l'additivité. Même sous indépendance, Var(X − Y) = Var X + Var Y, pas Var X − Var Y ; Var(2X) = 4 Var X, pas 2 Var X.</li>
+      <li><b>i.i.d. n'est pas une hypothèse, c'en sont deux.</b> Lois différentes : on garde Σ σ<sub>i</sub>², pas nσ². Variables corrélées : on garde les covariances, et σ²/n devient faux pour une moyenne (<a href="lesson-00-10-inegalites-lgn.html#n6">l10</a>).</li>
+      <li><b>Une covariance négative fait baisser la variance.</b> Y = 7 − X donne X + Y = 7 : variance nulle, 2,917 + 2,917 − 2 × 2,917 = 0. C'est l'idée des variables antithétiques en simulation Monte Carlo.</li>
+      <li><b>Moyenner des modèles corrélés.</b> Un ensemble de B modèles de même variance σ², corrélés deux à deux par ρ, garde au moins ρσ² quel que soit B : les cases hors diagonale ne disparaissent pas (<a href="../bridges/bridge-04-variance-moyenne-correlee.html">pont b04</a>, <a href="../chains/chain-p07-02-bagging-rf.html">bagging</a>).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (30) dit que l'égalité Var(X + Y) = Var X + Var Y est « vraiment fausse » si X et Y sont dépendantes, et (41) que des variables dépendantes ont « ce terme de covariance en plus ». Pas forcément : il suffit que Cov = 0. X uniforme sur {−1, 0, 1} et Y = X² sont dépendantes, et Var(X + Y) = 8/9 = 2/3 + 2/9 (notion 3).</div>
+  </div></details>
+  <p class="garde">Var(aX + bY) = a² Var X + b² Var Y + 2ab Cov(X, Y), sans hypothèse. Dans Var(X<sub>1</sub> + … + X<sub>n</sub>) = nσ², l'indépendance annule les covariances, la même loi met σ² partout.</p>
+</section>
+
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>L'indépendance donne Cov = 0, pas l'inverse <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 41</p>
+  <div class="idee">
+    <p>Si X et Y sont indépendantes, E[XY] = E[X] E[Y] (<a href="lesson-00-08-esperance-variance.html#n4">l08, notion 4</a>), donc la covariance est nulle. Brunton insiste : la réciproque est fausse, et il en donne le contre-exemple le plus simple.</p>
+    <p>X vaut −1, 0 ou 1, avec probabilité ⅓ chacune, et Y = X². Connaître X donne Y exactement. Pourtant le centre est (0, ⅔), et les trois rectangles valent (−1) × ⅓ = −⅓, 0 × (−⅔) = 0 et 1 × ⅓ = ⅓ : ils s'annulent, Cov = 0.</p>
+    <p>La covariance ne voit qu'une tendance linéaire. Sur la parabole, la moitié gauche descend pendant que la moitié droite monte, et les deux se compensent. La dépendance est pourtant là : P(Y = 0 ∣ X = 0) = 1, alors que P(Y = 0) = ⅓.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — des liens exacts, une covariance nulle</div>
+    <div id="v3ctl" class="sl-ctl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">Chaque fois, le lien entre X et Y est exact. <b>{−1, 0, 1} et X²</b> : les trois points de Brunton, leurs rectangles −⅓, 0 et +⅓ autour du centre (0, ⅔). <b>Parabole</b> et <b>cercle</b> : 200 points, autant de violet que de rouge, covariance mesurée −0,003 et 0,003. Passe à la <b>demi-parabole</b>, X entre 0 et 1 : le même lien sans la symétrie, presque tout devient violet ; la covariance vaut 1/12 = 0,083 en théorie (0,084 mesuré) et la corrélation 0,97.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>X</i> ⫫ <i>Y</i> ⇒ Cov(<i>X</i>, <i>Y</i>) = 0 &nbsp;&nbsp;&nbsp;&nbsp;&nbsp; Cov(<i>X</i>, <i>Y</i>) = 0 ⇏ <i>X</i> ⫫ <i>Y</i></div>
+    <ul>
+      <li>X ⫫ Y : la loi jointe se factorise (<a href="lesson-00-07-lois-jointes.html#n4">l07</a>) ; c'est elle qui donne E[XY] = E[X] E[Y].</li>
+      <li>Cov(X, Y) = 0 se dit « X et Y sont décorrélées ». Cela suffit pour additionner les variances (notion 2), pas pour raisonner comme si X ne disait rien de Y.</li>
+      <li>Le critère complet : X ⫫ Y si et seulement si Cov(g(X), h(Y)) = 0 pour toutes les fonctions bornées g et h. La seule paire (X, Y) ne suffit pas : ici Cov(X², Y) = Var(Y) = 2/9 ≠ 0 trahit le lien.</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux dés, la table de Brunton, un cercle, une demi-parabole, une feature</small></summary><div class="in">
+    <ol>
+      <li><b>Deux dés indépendants.</b> Cov = 12,25 − 3,5 × 3,5 = 0, comme prévu.</li>
+      <li><b>La table de Brunton</b>, trois valeurs de X et deux de Y, six cases. P(X = 0, Y = 0) = ⅓, alors que P(X = 0) P(Y = 0) = ⅓ × ⅓ = 1/9 : la jointe ne se factorise pas. Une seule case suffit à ruiner l'indépendance.</li>
+      <li><b>Un cercle.</b> U uniforme sur [0, 2π], X = cos U, Y = sin U. E[X] = E[Y] = 0 et E[XY] = E[sin 2U]/2 = 0 : Cov = 0, et pourtant X² + Y² = 1 toujours.</li>
+      <li><b>Une demi-parabole.</b> X uniforme sur [0, 1], Y = X². Cov = E[X³] − E[X] E[X²] = ¼ − ½ × ⅓ = 1/12 &gt; 0. Sans la symétrie, la dépendance se voit, et la corrélation vaut 0,97.</li>
+      <li><b>En ML.</b> Sélectionner des features par leur corrélation avec la cible rate une feature x qui la détermine par y = x², quand x est symétrique autour de 0 : corrélation nulle, information totale. Un arbre de décision ou l'information mutuelle la voient.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>le sens direct en une ligne, le contre-exemple, le mécanisme</small></summary><div class="in">
+    <div class="drv">
+      <div><i>X</i> ⫫ <i>Y</i> ⇒ E[<i>XY</i>] = E[<i>X</i>] E[<i>Y</i>]</div><span>la jointe se factorise, la double somme se coupe en deux (<a href="lesson-00-08-esperance-variance.html#n4">l08</a>)</span>
+      <div>⇒ Cov(<i>X</i>, <i>Y</i>) = E[<i>XY</i>] − E[<i>X</i>] E[<i>Y</i>] = 0</div><span>forme développée (notion 1)</span>
+    </div>
+    <p>Le contre-exemple, en trois lignes :</p>
+    <div class="drv">
+      <div>E[<i>X</i>] = (−1 + 0 + 1)/3 = 0 &nbsp;&nbsp; E[<i>Y</i>] = (1 + 0 + 1)/3 = ⅔</div><span>X est symétrique autour de 0</span>
+      <div>E[<i>XY</i>] = E[<i>X</i>³] = (−1 + 0 + 1)/3 = 0</div><span>XY = X · X² = X³</span>
+      <div>Cov(<i>X</i>, <i>Y</i>) = 0 − 0 × ⅔ = 0</div><span>et pourtant P(X = 0, Y = 0) = ⅓ ≠ 1/9</span>
+    </div>
+    <p>Le mécanisme général : si X est symétrique autour de 0 et Y = g(X) avec g paire, alors XY = X g(X) est une fonction impaire de X, donc d'espérance nulle, et E[X] = 0. La covariance est nulle quel que soit le lien.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>corrélation nulle, dépendance totale</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(2)
+X = rng.choice([-1, 0, 1], size=600_000)        # uniform on {-1, 0, 1}
+Y = X ** 2                                      # entirely determined by X
+
+print("Cov(X, Y)      :", np.cov(X, Y)[0, 1].round(4))
+print("P(Y = 0)       :", np.mean(Y == 0).round(3))
+print("P(Y = 0 | X = 0):", np.mean(Y[X == 0] == 0))
+print("Cov(X^2, Y)    :", np.cov(X ** 2, Y)[0, 1].round(4), "| Var Y = 2/9 = 0.2222")
+print("Var(X + Y)     :", np.var(X + Y).round(4),
+      "| Var X + Var Y =", (np.var(X) + np.var(Y)).round(4))
+
+# continuous version: a feature that determines the target, with zero correlation
+x = rng.uniform(-1, 1, 100_000); y = x ** 2
+print("corr(x, x^2)   :", np.corrcoef(x, y)[0, 1].round(3))
+print("corr(|x|, x^2) :", np.corrcoef(np.abs(x), y)[0, 1].round(3))</pre>
+<pre class="out">Cov(X, Y)      : 0.0001
+P(Y = 0)       : 0.333
+P(Y = 0 | X = 0): 1.0
+Cov(X^2, Y)    : 0.2222 | Var Y = 2/9 = 0.2222
+Var(X + Y)     : 0.8892 | Var X + Var Y = 0.889
+corr(x, x^2)   : 0.001
+corr(|x|, x^2) : 0.968</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>« Décorrélées » n'est pas « indépendantes ».</b> Sauf pour un couple gaussien, où les deux coïncident (notion 5).</li>
+      <li><b>La covariance mesure un lien linéaire, en moyenne.</b> Elle est nulle pour une parabole symétrique, un cercle, une croix : des liens parfaits qui ne penchent ni d'un côté ni de l'autre.</li>
+      <li><b>L'additivité ne demande que Cov = 0.</b> Dans le contre-exemple, Var(X + Y) = 8/9 = 2/3 + 2/9 : la formule de la notion 2 tient, sur des variables pourtant liées. Mais on ne peut plus multiplier des probabilités comme si X et Y étaient indépendantes.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (41) affirme que « clairement, Y dépend de X » sans le montrer : il suffit d'une case, P(Y = 0 ∣ X = 0) = 1 ≠ P(Y = 0) = ⅓. Il explique l'annulation par « une fonction paire sur un domaine impair » : il veut dire une fonction paire sur un domaine symétrique autour de 0. Et il parle de « la covariance de ces deux matrices » : ce sont deux variables aléatoires.</div>
+  </div></details>
+  <p class="garde">Indépendance ⇒ Cov = 0, mais la réciproque est fausse : X uniforme sur {−1, 0, 1} et Y = X² ont une covariance nulle alors que Y est entièrement déterminé par X. La covariance ne voit que le linéaire.</p>
+</section>
+
+<!-- ============================ n4 ============================ -->
+<section class="notion outil" id="n4">
+  <h3>La corrélation : la covariance sans unité <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 41</p>
+  <div class="idee">
+    <p>Brunton remarque qu'on peut grossir une covariance sans toucher au nuage : il suffit de changer d'unité. Passer X et Y de pieds en pouces multiplie chaque écart par 12, donc chaque rectangle par 144. Pour juger la force du lien, il divise par les deux écarts-types : c'est la <b>corrélation</b>, une covariance normalisée.</p>
+    <p>Sur les quatre points de la notion 1 : Cov = 1 et σ<sub>X</sub> = σ<sub>Y</sub> = √1,25 = 1,118, donc ρ = 1/1,25 = 0,8. En pouces : Cov = 144, σ<sub>X</sub> σ<sub>Y</sub> = 180, et ρ = 144/180 = 0,8 encore.</p>
+    <p>Diviser par les écarts-types revient à standardiser chaque variable avant de faire la moyenne des rectangles. Le résultat est toujours compris entre −1 et 1, et ±1 signifie que les points sont exactement sur une droite.</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — changer d'unité gonfle la covariance, pas la corrélation</div>
+    <div id="v4ctl" class="sl-ctl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">Les quatre points de la notion 1, en pieds, et leurs rectangles. Chaque bouton change les unités : le dessin reste le même, seuls les nombres des axes et des aires changent. <b>En pouces</b> : Cov passe de 1 à 144, σ<sub>X</sub> σ<sub>Y</sub> de 1,25 à 180, ρ reste 0,8. <b>Y seul en pouces</b> : 12 et 15, ρ = 0,8. <b>Décalé</b> de 10 : rien ne change. <b>Y retourné</b> : le nuage se renverse, les rectangles changent de signe, ρ = −0,8.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les formules</div>
+    <div class="eq">ρ(<i>X</i>, <i>Y</i>) = Cov(<i>X</i>, <i>Y</i>) / (σ<sub><i>X</i></sub> σ<sub><i>Y</i></sub>) = E[<i>Z<sub>X</sub></i> <i>Z<sub>Y</sub></i>] &nbsp;&nbsp;&nbsp; avec <i>Z<sub>X</sub></i> = (<i>X</i> − μ<sub><i>X</i></sub>)/σ<sub><i>X</i></sub> &nbsp;&nbsp;&nbsp; −1 ≤ ρ ≤ 1</div>
+    <div class="eq">Cov(<i>aX</i> + <i>b</i>, <i>cY</i> + <i>d</i>) = <i>ac</i> Cov(<i>X</i>, <i>Y</i>) &nbsp;&nbsp;&nbsp;&nbsp; ρ(<i>aX</i> + <i>b</i>, <i>cY</i> + <i>d</i>) = signe(<i>ac</i>) · ρ(<i>X</i>, <i>Y</i>)</div>
+    <ul>
+      <li>σ<sub>X</sub> &gt; 0 et σ<sub>Y</sub> &gt; 0 : ρ n'est pas défini pour une constante. Z<sub>X</sub> et Z<sub>Y</sub> sont les versions standardisées, de moyenne 0 et d'écart-type 1 (<a href="lesson-00-06-fonctions-standardisation.html#n3">l06</a>).</li>
+      <li>|ρ| = 1 si et seulement si Y = aX + b exactement, avec a ≠ 0 ; le signe de ρ est celui de a.</li>
+      <li>a ≠ 0 et c ≠ 0. Un changement d'unité (a, c &gt; 0) ou un décalage (b, d) ne change pas ρ ; retourner une seule des deux variables change son signe.</li>
+      <li>ρ² est la part de la variance de Y expliquée par la meilleure droite : le R² d'une régression linéaire simple (preuve plus bas).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — des nuages à ρ variable</div>
+    <div id="f2ctl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Trois cents points tirés une fois pour toutes ; X a un écart-type 1. Monte <b>ρ</b> : le nuage se resserre autour d'une droite et devient cette droite à ρ = 1 ; à ρ = 0 il est rond, à ρ &lt; 0 il descend. Puis, à ρ fixé, élargis <b>σ<sub>Y</sub></b> : la covariance ρ σ<sub>X</sub> σ<sub>Y</sub> double quand σ<sub>Y</sub> double, ρ ne bouge pas. Le trait plein est la droite de régression de Y sur X, de pente ρ σ<sub>Y</sub>/σ<sub>X</sub> : à ρ = 0,6 et σ<sub>Y</sub> = 2, la pente vaut 1,2. ρ n'est pas une pente.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>des droites, les quatre points, une composante partagée, un R², des dés, des features</small></summary><div class="in">
+    <ol>
+      <li><b>Des droites.</b> Y = 2X + 1 : ρ = 1. Y = −3X : ρ = −1. Y = 5, une constante : ρ n'est pas défini.</li>
+      <li><b>Les quatre points.</b> ρ = 0,8, en pieds comme en pouces ; −0,8 si l'on retourne Y.</li>
+      <li><b>La composante partagée</b> de la notion 1. Cov(A + B, A + C) = 1 et σ<sub>X</sub> = σ<sub>Y</sub> = √2, donc ρ = 1/2. Plus généralement, quand B et C ont la même variance, ρ = Var A / (Var A + Var B) : la part commune de la variance.</li>
+      <li><b>Un R².</b> Les cinq points de la <a href="../chains/chain-p05-01-regression-modele-ols.html">chaîne régression</a>, x = 1 à 5 et y = 2, 4, 5, 4, 5, ont R² = 0,6 : ρ = √0,6 = 0,775.</li>
+      <li><b>Deux dés.</b> Indépendants : ρ = 0. Y = X : ρ = 1. Y = 7 − X : ρ = −1.</li>
+      <li><b>En ML, des features corrélées.</b> En régression linéaire avec deux features de corrélation ρ, la variance de chaque coefficient est multipliée par 1/(1 − ρ²) par rapport à des features décorrélées : c'est le facteur d'inflation de la variance (VIF). À ρ = 0,9, il vaut 5,3 ; une simulation de 4 000 régressions donne 5,35. Les coefficients deviennent instables.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>pourquoi −1 ≤ ρ ≤ 1, le signe de ac, et pourquoi ρ² est une part de variance</small></summary><div class="in">
+    <div class="drv">
+      <div>Cov(<i>Z<sub>X</sub></i>, <i>Z<sub>Y</sub></i>) = Cov(<i>X</i>, <i>Y</i>)/(σ<sub><i>X</i></sub> σ<sub><i>Y</i></sub>) = ρ</div><span>règles de la notion 1 : les constantes −μ disparaissent, les facteurs 1/σ sortent</span>
+      <div>Var(<i>Z<sub>X</sub></i> + <i>Z<sub>Y</sub></i>) = 1 + 1 + 2ρ ≥ 0, donc ρ ≥ −1</div><span>notion 2 ; une variance est positive (<a href="lesson-00-08-esperance-variance.html#n6">l08</a>)</span>
+      <div>Var(<i>Z<sub>X</sub></i> − <i>Z<sub>Y</sub></i>) = 1 + 1 − 2ρ ≥ 0, donc ρ ≤ 1</div><span>même argument, terme croisé changé de signe</span>
+      <div>ρ = 1 ⇔ Var(<i>Z<sub>X</sub></i> − <i>Z<sub>Y</sub></i>) = 0 ⇔ <i>Z<sub>Y</sub></i> = <i>Z<sub>X</sub></i></div><span>variance nulle ⇔ variable constante (avec probabilité 1) ; cette constante est 0, les deux Z étant centrés</span>
+    </div>
+    <p>Donc ρ = 1 donne Y = μ<sub>Y</sub> + σ<sub>Y</sub>(X − μ<sub>X</sub>)/σ<sub>X</sub>, une droite de pente positive ; même raisonnement pour ρ = −1 avec la somme. Pour le signe : ρ(aX + b, cY + d) = ac Cov(X, Y)/(|a| σ<sub>X</sub> · |c| σ<sub>Y</sub>) = signe(ac) ρ, puisque l'écart-type de aX + b est |a| σ<sub>X</sub>.</p>
+    <p>ρ² comme part de variance. On cherche la droite qui laisse le moins de variance à Y :</p>
+    <div class="drv">
+      <div>Var(<i>Y</i> − β<i>X</i>) = σ<sub><i>Y</i></sub>² − 2β Cov(<i>X</i>, <i>Y</i>) + β² σ<sub><i>X</i></sub>²</div><span>notion 2, avec a = 1 et b = −β</span>
+      <div>minimale en β = Cov(<i>X</i>, <i>Y</i>)/σ<sub><i>X</i></sub>²</div><span>dériver en β et annuler : c'est la pente de la régression</span>
+      <div>Var(<i>Y</i> − β<i>X</i>) = σ<sub><i>Y</i></sub>² − Cov(<i>X</i>, <i>Y</i>)²/σ<sub><i>X</i></sub>² = σ<sub><i>Y</i></sub>² (1 − ρ²)</div><span>remplacer β</span>
+    </div>
+    <p>La meilleure droite laisse la part 1 − ρ² de la variance de Y : elle en explique ρ². À ρ = 0,8, elle en explique 64 %, pas 80 %.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>unités, signe, et un seul point aberrant</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(3)
+u, w = rng.standard_normal((2, 100_000))
+X = u; Y = 0.6 * u + 0.8 * w                    # Var Y = 0.36 + 0.64 = 1, rho = 0.6
+r = lambda a, b: np.corrcoef(a, b)[0, 1].round(3)
+
+print("rho(X, Y)               :", r(X, Y))
+print("Cov in feet, in inches  :", np.cov(X, Y)[0, 1].round(3),
+      np.cov(12 * X, 12 * Y)[0, 1].round(1))
+print("rho(12X + 5, 12Y - 3)   :", r(12 * X + 5, 12 * Y - 3))
+print("rho(2X + 1, -3Y + 5)    :", r(2 * X + 1, -3 * Y + 5), "&lt;- ac &lt; 0 flips it")
+print("share explained, rho^2  :", (r(X, Y) ** 2).round(2))
+
+# one far point is enough to manufacture a correlation
+a, b = rng.standard_normal((2, 30))
+print("30 unrelated points     :", r(a, b))
+print("same + one point (8, 8) :", r(np.append(a, 8), np.append(b, 8)))</pre>
+<pre class="out">rho(X, Y)               : 0.6
+Cov in feet, in inches  : 0.599 86.2
+rho(12X + 5, 12Y - 3)   : 0.6
+rho(2X + 1, -3Y + 5)    : -0.6 &lt;- ac &lt; 0 flips it
+share explained, rho^2  : 0.36
+30 unrelated points     : -0.139
+same + one point (8, 8) : 0.536</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>ρ ne voit que le linéaire.</b> ρ = 0 pour Y = X² sur des X symétriques (notion 3).</li>
+      <li><b>ρ n'est pas une pente.</b> La pente de la meilleure droite est ρ σ<sub>Y</sub>/σ<sub>X</sub> (figure 2) : deux nuages de même ρ peuvent avoir des pentes très différentes, et un nuage presque plat peut avoir ρ = 0,99.</li>
+      <li><b>ρ = 0,8 ne veut pas dire « 80 % expliqué ».</b> La droite explique ρ² = 64 % de la variance.</li>
+      <li><b>Un seul point lointain fabrique une corrélation.</b> Trente points tirés sans aucun lien donnent une corrélation mesurée de −0,14 ; ajouter le seul point (8, 8) la porte à 0,54 (code ci-dessus).</li>
+      <li><b>Corrélation n'est pas causalité</b> (Brunton). Deux variables sans effet l'une sur l'autre peuvent être corrélées par une cause commune : c'est la composante partagée A de la notion 1.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (41) dit que Corr(aX + b, cY + d) = Corr(X, Y). C'est vrai seulement si ac &gt; 0. Si ac &lt; 0, le signe s'inverse : dans le code ci-dessus, ρ(2X + 1, −3Y + 5) vaut −0,6 quand ρ(X, Y) vaut 0,6. L'énoncé juste est ρ(aX + b, cY + d) = signe(ac) · ρ(X, Y). Brunton ne montre pas non plus que −1 ≤ ρ ≤ 1 : la preuve ci-dessus n'utilise que la notion 2 et le fait qu'une variance est positive.</div>
+  </div></details>
+  <p class="garde">ρ = Cov(X, Y)/(σ<sub>X</sub> σ<sub>Y</sub>) ∈ [−1, 1], ±1 pour une droite exacte ; ρ(aX + b, cY + d) = signe(ac) ρ(X, Y).</p>
+</section>
+
+<!-- ============================ n5 ============================ -->
+<section class="notion outil" id="n5">
+  <h3>La gaussienne 2D : cercle, ellipse alignée, ellipse tournée <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 42 · Covariance and Correlation — Example with Gaussian Distributions</p>
+  <div class="idee">
+    <p>Brunton reprend ses nuages comme des impacts de fléchettes sur une cible : une densité gaussienne en deux dimensions, dessinée par ses courbes de niveau. Quand les deux écarts-types sont égaux et que rien ne lie X à Y, ce sont des cercles : la densité ne dépend que de la distance au centre.</p>
+    <p>Étire un axe, σ<sub>X</sub> = 2 et σ<sub>Y</sub> = 1 : les cercles deviennent des ellipses alignées sur les axes. La densité se factorise toujours, X et Y restent indépendantes, Cov = 0.</p>
+    <p>Tourne maintenant cette ellipse de 45°. Chaque variable reçoit un morceau des deux axes : Var X = Var Y = 2,5 et Cov = 1,5, donc ρ = 0,6. C'est la rotation, et elle seule, qui crée la covariance : dans la densité, elle fait apparaître un terme croisé en xy.</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — trois cibles, des fléchettes</div>
+    <div id="v5ctl" class="sl-ctl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">Les ellipses sont deux courbes de niveau de la densité : celle de demi-axes σ<sub>1</sub>, σ<sub>2</sub>, puis celle de demi-axes 2σ<sub>1</sub>, 2σ<sub>2</sub>. Les 300 fléchettes sont les mêmes tirages, déformés d'une cible à l'autre. <b>Cercle</b> puis <b>ellipse alignée</b> : la covariance mesurée reste proche de 0 (0,00 puis 0,01). <b>Ellipse tournée</b> : 1,51 mesuré pour 1,5 en théorie. <b>Lancer 300 fléchettes</b> en ajoute, jusqu'à 3 000 : la mesure fluctue de moins en moins autour de la théorie.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>f</i>(<i>x</i>, <i>y</i>) = 1 / (2π σ<sub><i>X</i></sub> σ<sub><i>Y</i></sub> √(1 − ρ²)) · exp(− (<i>z<sub>x</sub></i>² − 2ρ <i>z<sub>x</sub></i> <i>z<sub>y</sub></i> + <i>z<sub>y</sub></i>²) / (2(1 − ρ²))) &nbsp;&nbsp; <i>z<sub>x</sub></i> = (<i>x</i> − μ<sub><i>X</i></sub>)/σ<sub><i>X</i></sub>, <i>z<sub>y</sub></i> = (<i>y</i> − μ<sub><i>Y</i></sub>)/σ<sub><i>Y</i></sub></div>
+    <div class="eq">matrice de covariance Σ = <span class="mat"><span>σ<sub><i>X</i></sub>²</span><span>ρσ<sub><i>X</i></sub>σ<sub><i>Y</i></sub></span><span>ρσ<sub><i>X</i></sub>σ<sub><i>Y</i></sub></span><span>σ<sub><i>Y</i></sub>²</span></span></div>
+    <div class="eq">ellipse de demi-axes σ<sub>1</sub>, σ<sub>2</sub> tournée de θ : &nbsp; Cov(<i>X</i>, <i>Y</i>) = (σ<sub>1</sub>² − σ<sub>2</sub>²) sin θ cos θ</div>
+    <ul>
+      <li>Hypothèse : (X, Y) est un couple gaussien, c'est-à-dire de densité jointe de cette forme, avec |ρ| &lt; 1. Que X et Y soient chacune gaussiennes ne suffit pas (où ça casse).</li>
+      <li>Les courbes de niveau sont les ellipses z<sub>x</sub>² − 2ρ z<sub>x</sub> z<sub>y</sub> + z<sub>y</sub>² = constante.</li>
+      <li>Le seul terme qui mélange x et y est −2ρ z<sub>x</sub> z<sub>y</sub>. ρ = 0 ⇒ f(x, y) = f<sub>X</sub>(x) f<sub>Y</sub>(y) ⇒ indépendance. Pour un couple gaussien, Cov = 0 ⇔ indépendance.</li>
+      <li>σ<sub>1</sub> et σ<sub>2</sub> sont les écarts-types le long des axes de l'ellipse ; à θ = 0, σ<sub>1</sub> = σ<sub>X</sub> et σ<sub>2</sub> = σ<sub>Y</sub>. Ces axes sont les vecteurs propres de Σ, σ<sub>1</sub>² et σ<sub>2</sub>² ses valeurs propres : les composantes principales de la PCA.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — une ellipse, trois curseurs</div>
+    <div id="f3ctl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Trois courbes de niveau, de demi-axes σ<sub>1</sub>, σ<sub>2</sub>, puis 2σ<sub>1</sub>, 2σ<sub>2</sub> et 3σ<sub>1</sub>, 3σ<sub>2</sub>. <b>σ<sub>1</sub></b> et <b>σ<sub>2</sub></b> règlent les deux demi-axes, <b>θ</b> l'angle. À θ = 0, l'ellipse est alignée : Cov = 0 quels que soient σ<sub>1</sub> et σ<sub>2</sub>. Tourne : Cov = (σ<sub>1</sub>² − σ<sub>2</sub>²) sin θ cos θ, la plus forte à ±45°. Mets σ<sub>1</sub> = σ<sub>2</sub> : le cercle tourne sans rien changer, Cov = 0 à tout angle. Le trait ocre pointillé est le grand axe, le trait bleu la droite de régression de Y sur X : au départ (σ<sub>1</sub> = 2, σ<sub>2</sub> = 1, θ = 45°), pentes 1 et 0,6.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>cercle, ellipse alignée, tournée de 45°, de 30°, de 90°, et la PCA</small></summary><div class="in">
+    <ol>
+      <li><b>Le cercle.</b> σ<sub>X</sub> = σ<sub>Y</sub> = 1, ρ = 0 : f(x, y) = (1/2π) e<sup>−(x² + y²)/2</sup> = (1/2π) e<sup>−r²/2</sup>. Elle ne dépend que de la distance r au centre, et vaut 1/2π = 0,159 au centre : la cible de Brunton.</li>
+      <li><b>L'ellipse alignée.</b> σ<sub>1</sub> = 2, σ<sub>2</sub> = 1, θ = 0 : Σ a 4 et 1 sur la diagonale, 0 ailleurs. Ellipse étirée, variables indépendantes.</li>
+      <li><b>Tournée de 45°.</b> Var X = Var Y = 4 × ½ + 1 × ½ = 2,5 ; Cov = (4 − 1) × ½ = 1,5 ; ρ = 1,5/2,5 = 0,6. Tournée de −45° : ρ = −0,6.</li>
+      <li><b>Tournée de 30°.</b> Var X = 4 × ¾ + 1 × ¼ = 3,25 ; Var Y = 4 × ¼ + 1 × ¾ = 1,75 ; Cov = 3 × (√3/4) = 1,30 ; ρ = 0,54. Tournée de 90° : les axes échangent leurs rôles, Var X = 1, Var Y = 4, Cov = 0 de nouveau.</li>
+      <li><b>Un cercle tourné reste un cercle.</b> σ<sub>1</sub> = σ<sub>2</sub> : Cov = 0 à tout angle.</li>
+      <li><b>En ML, la PCA</b> cherche les axes de cette ellipse : elle tourne le repère pour rendre Σ diagonale, c'est-à-dire des composantes décorrélées (<a href="../chains/chain-p04-04-pca.html">chaîne PCA</a>).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la covariance d'une ellipse tournée, et pourquoi ρ = 0 factorise</small></summary><div class="in">
+    <div class="drv">
+      <div><i>X</i> = <i>U</i> cos θ − <i>V</i> sin θ, &nbsp; <i>Y</i> = <i>U</i> sin θ + <i>V</i> cos θ</div><span>tourner de θ un couple (U, V) indépendant, Var U = σ<sub>1</sub>², Var V = σ<sub>2</sub>²</span>
+      <div>Cov(<i>X</i>, <i>Y</i>) = cos θ sin θ Var <i>U</i> − sin θ cos θ Var <i>V</i></div><span>règles de la notion 1, développées terme à terme ; Cov(U, V) = 0</span>
+      <div>= (σ<sub>1</sub>² − σ<sub>2</sub>²) sin θ cos θ</div><span>nulle si θ = 0, si θ = 90° ou si σ<sub>1</sub> = σ<sub>2</sub></span>
+    </div>
+    <p>Pour ρ = 0, l'exposant se coupe en deux :</p>
+    <div class="drv">
+      <div><i>f</i>(<i>x</i>, <i>y</i>) = 1/(2π σ<sub><i>X</i></sub> σ<sub><i>Y</i></sub>) · e<sup>−<i>z<sub>x</sub></i>²/2</sup> · e<sup>−<i>z<sub>y</sub></i>²/2</sup></div><span>ρ = 0 dans la formule ; e<sup>a + b</sup> = e<sup>a</sup> e<sup>b</sup></span>
+      <div>= [e<sup>−<i>z<sub>x</sub></i>²/2</sup> / (σ<sub><i>X</i></sub>√(2π))] · [e<sup>−<i>z<sub>y</sub></i>²/2</sup> / (σ<sub><i>Y</i></sub>√(2π))] = <i>f<sub>X</sub></i>(<i>x</i>) <i>f<sub>Y</sub></i>(<i>y</i>)</div><span>deux densités normales : la jointe se factorise, donc X ⫫ Y (<a href="lesson-00-07-lois-jointes.html#n4">l07</a>)</span>
+    </div>
+    <p>C'est le raisonnement de Brunton dans le bon sens : on part de la densité jointe, on constate qu'elle se factorise, on en déduit l'indépendance.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>tourner une ellipse, retrouver ses axes</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(4)
+s1, s2, theta = 2.0, 1.0, np.radians(45)
+U = s1 * rng.standard_normal(500_000)             # independent axes
+V = s2 * rng.standard_normal(500_000)
+X = U * np.cos(theta) - V * np.sin(theta)         # rotate the cloud by 45 degrees
+Y = U * np.sin(theta) + V * np.cos(theta)
+
+S = np.cov(X, Y)
+print("covariance matrix:\n", S.round(3))
+print("rho:", (S[0, 1] / np.sqrt(S[0, 0] * S[1, 1])).round(3), "| theory 0.6")
+vals, vecs = np.linalg.eigh(S)                    # axes of the ellipse
+print("eigenvalues:", vals.round(3), "| theory sigma2^2 = 1, sigma1^2 = 4")
+angle = np.degrees(np.arctan(vecs[1, 1] / vecs[0, 1]))
+print("major axis angle:", angle.round(1), "degrees")
+print("regression slope of Y on X:", (S[0, 1] / S[0, 0]).round(3), "| major axis: 1")</pre>
+<pre class="out">covariance matrix:
+ [[2.499 1.497]
+ [1.497 2.492]]
+rho: 0.6 | theory 0.6
+eigenvalues: [0.999 3.992] | theory sigma2^2 = 1, sigma1^2 = 4
+major axis angle: 44.9 degrees
+regression slope of Y on X: 0.599 | major axis: 1</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Des marges gaussiennes ne font pas un couple gaussien.</b> X de loi N(0, 1), S = ±1 à pile ou face indépendamment de X, Y = S X. Y est N(0, 1) elle aussi, Cov(X, Y) = E[S] E[X²] = 0, et pourtant |Y| = |X| toujours. X + Y vaut 0 une fois sur deux, ce qu'aucun couple gaussien de densité ne fait. « Cov = 0 ⇒ indépendance » demande la gaussienne jointe.</li>
+      <li><b>La pente de l'ellipse n'est pas celle de la régression.</b> À σ<sub>1</sub> = 2, σ<sub>2</sub> = 1, θ = 45°, le grand axe a une pente 1, la droite de régression de Y sur X une pente 0,6 (figure 3). La régression ne suit pas l'ellipse : elle prédit la moyenne de Y à x fixé.</li>
+      <li><b>ρ n'est pas un angle.</b> La même rotation de 45° donne ρ = 0 si σ<sub>1</sub> = σ<sub>2</sub>, 0,6 si σ<sub>1</sub> = 2 et σ<sub>2</sub> = 1, 0,98 si σ<sub>1</sub> = 10 et σ<sub>2</sub> = 1.</li>
+      <li><b>|ρ| = 1 : plus de densité.</b> Le facteur √(1 − ρ²) s'annule, tout tombe sur une droite.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (42) veut montrer que la gaussienne ronde a des composantes indépendantes. Il suppose que la densité jointe est le produit f<sub>X</sub> f<sub>Y</sub> (« c'est là qu'intervient l'indépendance »), calcule ce produit, puis conclut que X et Y sont indépendantes : le raisonnement tourne en rond. Il ajoute « si j'ai une gaussienne multivariée en 2D, ses composantes x et y sont indépendantes » : faux dès que ρ ≠ 0, ce que son ellipse tournée montre ensuite. Le bon sens va de la densité jointe, (1/2π) e<sup>−r²/2</sup>, vers sa factorisation, qui prouve l'indépendance (preuve ci-dessus). Il ne dit pas non plus qu'une ellipse alignée, à variances différentes, garde des variables indépendantes ; et il dit « gaussienne multinomiale » pour gaussienne multivariée.</div>
+  </div></details>
+  <p class="garde">Pour un couple gaussien, Cov = 0 ⇔ indépendance : cercle ou ellipse alignée sur les axes. La covariance vient de la rotation : Cov = (σ<sub>1</sub>² − σ<sub>2</sub>²) sin θ cos θ.</p>
+</section>
+
+<!-- ============================ n6 ============================ -->
+<section class="notion outil" id="n6">
+  <h3>Comparer deux modèles sur le même jeu de test <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 41 (Var(X + Y), ici avec un signe moins), appliquée à l'évaluation de modèles (séance du 09/10)</p>
+  <div class="idee">
+    <p>Deux modèles A et B répondent aux mêmes 1 000 questions de test. Leur taux de bonnes réponses (accuracy) vaut 87,2 % pour A et 90,1 % pour B : B fait 2,9 points de mieux. Est-ce du bruit ? Il faut l'écart-type de la différence D̂ = p̂<sub>B</sub> − p̂<sub>A</sub>, et la notion 2 le donne : Var(D̂) = Var p̂<sub>A</sub> + Var p̂<sub>B</sub> − 2 Cov(p̂<sub>A</sub>, p̂<sub>B</sub>).</p>
+    <p>Sur un jeu de test partagé, les deux modèles butent sur les mêmes questions difficiles. La difficulté joue le rôle de la composante partagée de la notion 1 : elle rend Cov(p̂<sub>A</sub>, p̂<sub>B</sub>) positive, et le terme −2 Cov retire une grande part de la variance.</p>
+    <p>Avec deux jeux de test séparés, les deux scores sont indépendants, Cov = 0, et les variances s'additionnent : écart-type 0,0142. Avec le même jeu de test, où A seul réussit 10 questions et B seul 39 : 0,0069, deux fois moins.</p>
+  </div>
+  <div class="fig vis" id="v6">
+    <div class="lbl">Voir l'idée — refaire l'évaluation, avec un jeu de test ou deux</div>
+    <div id="v6ctl" class="sl-ctl"></div>
+    <div id="v6plot" class="wide"></div>
+    <div class="readouts" id="v6out"></div>
+    <p class="cap">On refait 400 fois l'évaluation de 1 000 questions, en tirant chaque question dans la loi de la chaîne p01-04, prise comme vraie loi : les deux justes 86,2 %, A seul 1,0 %, B seul 3,9 %, les deux faux 8,9 %. Chaque barre compte les D̂ obtenus. <b>Même jeu de test</b> (en haut) : D̂ reste serré autour de 0,029, écart-type mesuré 0,0068, et ne tombe jamais à 0. <b>Deux jeux de test</b> (en bas) : écart-type 0,0144, deux fois plus large, et D̂ ≤ 0 dans 9 évaluations sur 400 (2,2 % en théorie) : un jeu de test malchanceux suffit à effacer l'avantage de B. <b>Refaire</b> relance avec d'autres tirages.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les formules</div>
+    <div class="eq">D̂ = p̂<sub><i>B</i></sub> − p̂<sub><i>A</i></sub> &nbsp;&nbsp;&nbsp;&nbsp; Var(D̂) = Var p̂<sub><i>A</i></sub> + Var p̂<sub><i>B</i></sub> − 2 Cov(p̂<sub><i>A</i></sub>, p̂<sub><i>B</i></sub>)</div>
+    <div class="eq">même jeu de test : Var(D̂) = [<i>p<sub>A</sub></i>(1 − <i>p<sub>A</sub></i>) + <i>p<sub>B</sub></i>(1 − <i>p<sub>B</sub></i>) − 2(<i>p<sub>AB</sub></i> − <i>p<sub>A</sub></i><i>p<sub>B</sub></i>)] / <i>n</i> = [P(désaccord) − (<i>p<sub>B</sub></i> − <i>p<sub>A</sub></i>)²] / <i>n</i></div>
+    <ul>
+      <li>p<sub>A</sub>, p<sub>B</sub> : les vraies accuracies, fixes et inconnues ; p̂<sub>A</sub>, p̂<sub>B</sub> : leurs estimateurs, les moyennes des A<sub>i</sub>, B<sub>i</sub> ∈ {0, 1} (1 si la question i est réussie) sur les n questions. p<sub>AB</sub> = P(A et B justes sur une même question).</li>
+      <li>Les questions sont i.i.d. L'<b>indépendance entre questions</b> annule Cov(A<sub>i</sub>, B<sub>j</sub>) pour i ≠ j : seules les n paires (A<sub>i</sub>, B<sub>i</sub>) comptent. Il reste n termes sur n², d'où le 1/n. La <b>même loi</b> rend ces n termes égaux à Cov(A<sub>1</sub>, B<sub>1</sub>) : la formule ne dépend que de p<sub>A</sub>, p<sub>B</sub>, p<sub>AB</sub>.</li>
+      <li>Deux jeux de test séparés : p̂<sub>A</sub> et p̂<sub>B</sub> sont indépendants, Cov = 0, et Var(D̂) = [p<sub>A</sub>(1 − p<sub>A</sub>) + p<sub>B</sub>(1 − p<sub>B</sub>)]/n.</li>
+      <li>P(désaccord) = P(A<sub>i</sub> ≠ B<sub>i</sub>) : seules les questions où les modèles diffèrent portent la différence ; c'est l'idée du test de McNemar (<a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html">chaîne p01-04</a>). En pratique, les p sont remplacés par leurs estimations : l'écart-type devient une erreur standard estimée.</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux jeux de test, un jeu de test, le même modèle deux fois, des erreurs indépendantes, la composante partagée</small></summary><div class="in">
+    <ol>
+      <li><b>Deux jeux de test de 1 000.</b> Var(D̂) = (0,872 × 0,128 + 0,901 × 0,099)/1 000 = 0,000201 ; écart-type 0,0142. D̂ = 0,029 est à 2,05 écarts-types de 0.</li>
+      <li><b>Le même jeu de test.</b> Par question, P(les deux justes) = 0,862, d'où Cov(A<sub>i</sub>, B<sub>i</sub>) = 0,862 − 0,872 × 0,901 = 0,0763, une corrélation de 0,76. Var(D̂) = (0,1116 + 0,0892 − 2 × 0,0763)/1 000 = 0,0000482 ; écart-type 0,0069. D̂ est à 4,18 écarts-types de 0 : la variance a été divisée par 4,2.</li>
+      <li><b>Le même modèle évalué deux fois.</b> Sur le même jeu de test, D̂ = 0 à chaque fois : Cov = Var, la variance de la différence est nulle. Sur deux jeux de test, écart-type √(2 × 0,872 × 0,128/1 000) = 0,0149 : l'écart-type de la différence apparente entre deux copies du même modèle vaut 1,5 point, par pur hasard.</li>
+      <li><b>Des erreurs indépendantes</b> question par question, P(les deux justes) = p<sub>A</sub> p<sub>B</sub> : Cov = 0, et partager le jeu de test ne gagne rien. Tout le gain vient de la covariance.</li>
+      <li><b>La composante partagée</b> de la notion 1, réécrite X = S + U et Y = S + V : S est la difficulté commune de la question, U et V ce qui est propre à chaque modèle. Var(X − Y) = Var(U − V). La difficulté s'annule dans la différence.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>de Var(D̂) aux désaccords, avec les deux rôles d'i.i.d.</small></summary><div class="in">
+    <div class="drv">
+      <div>Cov(p̂<sub><i>A</i></sub>, p̂<sub><i>B</i></sub>) = (1/<i>n</i>²) Σ<sub><i>i</i></sub> Σ<sub><i>j</i></sub> Cov(<i>A<sub>i</sub></i>, <i>B<sub>j</sub></i>)</div><span>règles de la notion 1 : p̂<sub>A</sub> = (1/n) Σ A<sub>i</sub>, les facteurs 1/n sortent</span>
+      <div>= (1/<i>n</i>²) Σ<sub><i>i</i></sub> Cov(<i>A<sub>i</sub></i>, <i>B<sub>i</sub></i>)</div><span><b>indépendance</b> des questions : Cov(A<sub>i</sub>, B<sub>j</sub>) = 0 si i ≠ j</span>
+      <div>= Cov(<i>A</i><sub>1</sub>, <i>B</i><sub>1</sub>)/<i>n</i> = (<i>p<sub>AB</sub></i> − <i>p<sub>A</sub></i><i>p<sub>B</sub></i>)/<i>n</i></div><span><b>même loi</b> : n termes égaux ; E[A<sub>1</sub>B<sub>1</sub>] = P(A<sub>1</sub> = B<sub>1</sub> = 1) = p<sub>AB</sub></span>
+      <div>Var(D̂) = Var(<i>B</i><sub>1</sub> − <i>A</i><sub>1</sub>)/<i>n</i></div><span>D̂ est la moyenne des n différences B<sub>i</sub> − A<sub>i</sub> ; mêmes deux hypothèses (notion 2)</span>
+      <div>E[(<i>B</i><sub>1</sub> − <i>A</i><sub>1</sub>)²] = P(<i>A</i><sub>1</sub> ≠ <i>B</i><sub>1</sub>)</div><span>B<sub>1</sub> − A<sub>1</sub> ∈ {−1, 0, 1} : son carré vaut 1 exactement sur un désaccord</span>
+      <div>Var(D̂) = [P(<i>A</i><sub>1</sub> ≠ <i>B</i><sub>1</sub>) − (<i>p<sub>B</sub></i> − <i>p<sub>A</sub></i>)²]/<i>n</i></div><span>forme de calcul de la variance (<a href="lesson-00-08-esperance-variance.html#n6">l08</a>)</span>
+    </div>
+    <p>Avec 49 désaccords sur 1 000 et une différence de 0,029 : (0,049 − 0,029²)/1 000 = 0,0000482, écart-type 0,0069.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>10 000 évaluations, deux protocoles</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(5)
+n, reps = 1000, 10_000
+# law of one question: both right, A only, B only, both wrong (table of chain p01-04)
+probs = [0.862, 0.010, 0.039, 0.089]
+
+counts = rng.multinomial(n, probs, size=reps)              # shared test set
+pA_s = (counts[:, 0] + counts[:, 1]) / n
+pB_s = (counts[:, 0] + counts[:, 2]) / n
+d_shared = pB_s - pA_s                                     # = (B only - A only) / n
+
+pA = rng.binomial(n, 0.872, reps) / n                      # two separate test sets
+pB = rng.binomial(n, 0.901, reps) / n
+d_sep = pB - pA
+
+print("shared  : sd(D) =", d_shared.std().round(5), "| theory 0.00694")
+print("separate: sd(D) =", d_sep.std().round(5), "| theory 0.01417")
+print("Cov(pA_hat, pB_hat), shared  :", np.cov(pA_s, pB_s)[0, 1].round(7), "| theory 7.63e-05")
+print("Cov(pA_hat, pB_hat), separate:", np.cov(pA, pB)[0, 1].round(7))
+print("share of runs with D &lt;= 0: shared", np.mean(d_shared &lt;= 0),
+      "| separate", np.mean(d_sep &lt;= 0))</pre>
+<pre class="out">shared  : sd(D) = 0.00688 | theory 0.00694
+separate: sd(D) = 0.0141 | theory 0.01417
+Cov(pA_hat, pB_hat), shared  : 7.67e-05 | theory 7.63e-05
+Cov(pA_hat, pB_hat), separate: 1.4e-06
+share of runs with D &lt;= 0: shared 0.0 | separate 0.0214</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Deux intervalles qui se chevauchent ne concluent rien.</b> Chacun ignore la covariance des deux scores. Ici, les intervalles à 95 % de A, [0,851 ; 0,893], et de B, [0,882 ; 0,920], se chevauchent, alors que la différence sur le jeu de test partagé est à 4,18 écarts-types de 0 (<a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html">chaîne p01-04</a>).</li>
+      <li><b>Appliquer la formule « deux jeux de test » à un jeu de test partagé</b> ne fait pas conclure à tort tant que Cov ≥ 0, le cas usuel, mais gaspille : elle surestime l'écart-type, ici d'un facteur 2, et le test perd de la puissance. Si les modèles se complètent (Cov &lt; 0), elle devient trop optimiste.</li>
+      <li><b>Des questions dépendantes</b>, plusieurs questions tirées du même document ou plusieurs lignes d'un même utilisateur, ajoutent des covariances entre questions : la vraie variance dépasse la formule, et le test devient trop optimiste (<a href="../bridges/bridge-04-variance-moyenne-correlee.html">pont b04</a>, <a href="lesson-00-10-inegalites-lgn.html#n6">l10</a>).</li>
+      <li><b>Partager le jeu de test ne protège pas de la sélection.</b> Garder le meilleur de 40 modèles évalués sur ce jeu de test gonfle son score : un maximum de variables bruitées est biaisé vers le haut (chaîne p01-04).</li>
+    </ul>
+  </div></details>
+  <p class="garde">Sur un jeu de test partagé, Var(p̂<sub>B</sub> − p̂<sub>A</sub>) = [P(désaccord) − (p<sub>B</sub> − p<sub>A</sub>)²]/n : le terme −2 Cov, avec Cov &gt; 0, retire la difficulté commune, d'où une variance plus faible qu'avec deux jeux de test.</p>
+</section>
+
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Cov(X, Y) = E[(X − μ<sub>X</sub>)(Y − μ<sub>Y</sub>)] = E[XY] − E[X]E[Y] : la moyenne du rectangle signé ; Cov(X, X) = Var X.</li>
+    <li>Var(aX + bY) = a² Var X + b² Var Y + 2ab Cov(X, Y), sans hypothèse ; le terme croisé est en Cov, jamais en E[XY].</li>
+    <li>L'indépendance annule le terme croisé (Cov = 0 suffit, notion 3) : c'est de l'additivité, la variance n'est jamais linéaire.</li>
+    <li>i.i.d. = deux hypothèses : l'indépendance annule les covariances, la même loi donne nσ².</li>
+    <li>Indépendance ⇒ Cov = 0 ; la réciproque est fausse (Y = X²) : la covariance ne voit que le linéaire.</li>
+    <li>ρ = Cov/(σ<sub>X</sub> σ<sub>Y</sub>) ∈ [−1, 1], sans unité, de signe inversé si l'on retourne une variable ; ρ² est la part expliquée par la meilleure droite.</li>
+    <li>Couple gaussien : Cov = 0 ⇔ indépendance ; la covariance vient de la rotation de l'ellipse.</li>
+    <li>Deux modèles sur le même jeu de test : −2 Cov réduit la variance de la différence, seuls les désaccords comptent.</li>
+  </ol>
+</div>
+<div class="phrase">« La covariance est l'espérance du produit des écarts au centre, E[XY] − E[X]E[Y]. C'est le terme croisé de la variance d'une somme, Var(X + Y) = Var X + Var Y + 2 Cov ; l'indépendance l'annule, mais une covariance nulle ne prouve pas l'indépendance, sauf pour un couple gaussien. Normalisée par les écarts-types, elle devient la corrélation, entre −1 et 1. C'est pour ça qu'on compare deux modèles sur le même jeu de test : leurs scores sont corrélés positivement, et −2 Cov réduit la variance de leur différence. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Définis la covariance, puis donne sa forme de calcul.</div><div class="a hid">La moyenne du produit des écarts au centre, E[(X − μ<sub>X</sub>)(Y − μ<sub>Y</sub>)] ; E[XY] − E[X]E[Y].</div></li>
+    <li><div class="q">Développe Var(aX + bY). Pourquoi le terme croisé ne peut-il pas être 2ab E[XY] ?</div><div class="a hid">a² Var X + b² Var Y + 2ab Cov(X, Y). Avec X = Y = 1, la variance vaut 0, alors que 2ab E[XY] vaudrait 2ab.</div></li>
+    <li><div class="q">Que vaut Var(X − Y) pour deux dés indépendants ? Et Var(2X) ?</div><div class="a hid">2,917 + 2,917 = 5,83, pas 0 : l'indépendance donne l'additivité, pas la linéarité. Var(2X) = 4 Var X = 11,67.</div></li>
+    <li><div class="q">Dans Var(X<sub>1</sub> + … + X<sub>n</sub>) = nσ², où sert l'indépendance, où sert la même loi ?</div><div class="a hid">L'indépendance annule les n(n − 1) covariances ; la même loi rend les n variances égales à σ².</div></li>
+    <li><div class="q">Une covariance nulle prouve-t-elle l'indépendance ?</div><div class="a hid">Non : X uniforme sur {−1, 0, 1} et Y = X² ont Cov = 0. Oui seulement pour un couple gaussien.</div></li>
+    <li><div class="q">Que devient ρ(aX + b, cY + d) ?</div><div class="a hid">signe(ac) · ρ(X, Y) : ni les unités ni les décalages ne comptent, mais retourner une seule variable change le signe.</div></li>
+    <li><div class="q">Pourquoi compare-t-on deux modèles sur le même jeu de test ?</div><div class="a hid">Var(D̂) = Var p̂<sub>A</sub> + Var p̂<sub>B</sub> − 2 Cov, et Cov &gt; 0 parce qu'ils ratent les mêmes questions : écart-type 0,0069 contre 0,0142 sur deux jeux de test.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts et chaînes</div>
+  <div class="bridges">
+    <a href="../bridges/bridge-04-variance-moyenne-correlee.html"><b>Variance d'une moyenne corrélée</b><small>La grille de la figure 1 avec toutes les covariances à ρσ² : un plancher que moyenner ne franchit pas.</small></a>
+    <a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html"><b>Comparer deux modèles</b><small>Appariement et McNemar : la notion 6, jusqu'au test.</small></a>
+    <a href="../chains/chain-p04-04-pca.html"><b>PCA — diagonaliser la covariance</b><small>Les axes de l'ellipse de la notion 5, en p dimensions.</small></a>
+    <a href="../chains/chain-p05-01-regression-modele-ols.html"><b>Régression linéaire, OLS</b><small>La pente Cov/Var et R² = ρ², démontrés en notion 4.</small></a>
+    <a href="../chains/chain-p07-02-bagging-rf.html"><b>Bagging et forêt aléatoire</b><small>Pourquoi baisser la corrélation entre arbres plutôt qu'ajouter des arbres : le plancher ρσ².</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::covariance</code> (notions 1, 2, 3, 6) · <code>stats::correlation</code> (notions 4, 5).</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l09 · v1 du 10/10/2026 · Brunton 41 et 42 (et 30) · Prérequis : <a href="lesson-00-07-lois-jointes.html">l07 · Lois jointes</a>, <a href="lesson-00-08-esperance-variance.html">l08 · Espérance et variance</a>. Suite : <a href="lesson-00-10-inegalites-lgn.html">l10 · Inégalités et loi des grands nombres</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* ===== commun à toutes les leçons (kit, étalon l08 v2) ===== */
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc : une entrée par notion, étiquette comprise */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.notion').forEach((s,i)=>{const li=document.createElement('li');const t=s.querySelector('h3').firstChild.textContent.trim();const k=s.classList.contains('culture')?' · culture':'';li.innerHTML=`<a href="#${s.id}">${i+1}. ${t}${k}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.notion').forEach(s=>io.observe(s));
+/* une ancre #nN ouvre la notion visée ; rien n'est replié par défaut hors des blocs */
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outils de dessin ===== */
+function curve(P,f,a,b,cls,ymax){let d='';const n=240;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;let y=f(x);if(!isFinite(y))continue;y=Math.min(y,ymax);d+=(d?' L':'M')+P.sx(x).toFixed(1)+' '+P.sy(y).toFixed(1);}SL.el('path',{d:d,class:'sl-fn '+cls,fill:'none'},P.dyn);}
+function bar(P,x0,x1,y,cls){const a=P.sx(x0),b=P.sx(x1);SL.el('rect',{x:Math.min(a,b),y:P.sy(y),width:Math.max(1.5,Math.abs(b-a)),height:Math.max(0,P.sy(0)-P.sy(y)),class:cls||'sl-bar'},P.dyn);}
+/* SL.plot trace l'axe vertical en x = 0 ; quand 0 porte une barre, on le ramène au bord gauche */
+function leftAxis(P,x0){const ax=P.svg.querySelectorAll('line.sl-axis');if(ax[1]){ax[1].setAttribute('x1',P.sx(x0));ax[1].setAttribute('x2',P.sx(x0));}}
+function rd(host,items){host.innerHTML=items.map(it=>`<div class="${it[2]||''}">${it[0]}<b>${it[1]}</b></div>`).join('');}
+function buttons(host,names,cb){const bs=names.map((n,i)=>{const b=SL.h('button','tb',host,n);b.onclick=()=>{bs.forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');cb(i);};return b;});bs[0].onclick();return bs;}
+
+
+/* ===== v2 : vignettes « voir l'idée », une par notion, juste sous l'idée ===== */
+/* tween : animation 0 → 1 lissée ; runner : un jeton par figure, un nouveau clic tue l'animation en cours */
+function runner(){let t={dead:true};return ()=>{t.dead=true;t={dead:false};return t;};}
+function tween(ms,draw,tk,done){if(SL.reduced){draw(1);if(done)done();return;}const t0=performance.now();const st=t=>{if(tk&&tk.dead)return;let u=Math.min(1,(t-t0)/ms);u=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;draw(u);if(u<1)requestAnimationFrame(st);else if(done)done();};requestAnimationFrame(st);}
+function loop(tk,step){if(SL.reduced){let g=0;while(step()!==false&&g++<1e5);return;}const f=()=>{if(tk.dead)return;if(step()!==false)requestAnimationFrame(f);};requestAnimationFrame(f);}
+function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function pick(r,v,p){let u=r(),a=0;for(let i=0;i<v.length;i++){a+=p[i];if(u<a)return v[i];}return v[v.length-1];}
+function gauss(r){let u=0;while(u===0)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());}
+function fulcrum(P,x){const cx=P.sx(x),cy=P.sy(0);SL.el('path',{d:`M${cx.toFixed(1)} ${(cy+1).toFixed(1)} L${(cx-8).toFixed(1)} ${(cy+16).toFixed(1)} L${(cx+8).toFixed(1)} ${(cy+16).toFixed(1)} Z`,class:'sl-fulcrum'},P.dyn);}
+function median(a){const s=a.slice().sort((x,y)=>x-y),n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;}
+function rect(P,x0,x1,y0,y1,cls,parent){const a=P.sx(x0),b=P.sx(x1),c=P.sy(y0),d=P.sy(y1);return SL.el('rect',{x:Math.min(a,b).toFixed(1),y:Math.min(c,d).toFixed(1),width:Math.abs(b-a).toFixed(1),height:Math.abs(d-c).toFixed(1),class:cls},parent||P.dyn);}
+/* pile de pastilles : une par individu, regroupées par classe de largeur bw */
+function stack(P,vals,bw,r,clsOf,centred){const bins=new Map();vals.forEach((v,i)=>{const b=centred?Math.round(v/bw):Math.floor(v/bw);if(!bins.has(b))bins.set(b,[]);bins.get(b).push(i);});
+  const res=[];bins.forEach((ids,b)=>{const c=centred?b*bw:(b+0.5)*bw,cx=P.sx(c);res.push({c:c,ids:ids});ids.forEach((i,j)=>SL.el('circle',{cx:cx.toFixed(1),cy:(P.sy(0)-r-1-j*(2*r+1)).toFixed(1),r:r,class:'sl-dot '+clsOf(i)},P.dyn));});return res;}
+
+
+/* ===== l09 : outils propres à la leçon ===== */
+/* nombres : vrai signe moins, décimales fixes (fxf) ou zéros de fin retirés (fxm), signe explicite (fxs) */
+function fxm(x,d){const s=SL.fmt(Math.abs(x),d);return (x<0&&s!=='0'?'−':'')+s;}
+function fxs(x,d){const s=SL.fmt(Math.abs(x),d);return s==='0'?'0':(x<0?'−':'+')+s;}
+function fxf(x,d){const s=Math.abs(x).toFixed(d);return (x<0&&parseFloat(s)!==0?'−':'')+s.replace('.',',');}
+/* le dessin dynamique ne sort pas du cadre du graphe */
+function clipTo(P,id){const cp=SL.el('clipPath',{id:id},P.svg);SL.el('rect',{x:44,y:16,width:P.W-58,height:P.H-50},cp);P.dyn.setAttribute('clip-path','url(#'+id+')');}
+/* ellipse de demi-axes k·s1, k·s2, tournée de th (radians), centrée en (cx, cy) */
+function ellipse(P,s1,s2,th,k,cls,cx,cy){cx=cx||0;cy=cy||0;const c=Math.cos(th),s=Math.sin(th);let d='';
+  for(let i=0;i<=96;i++){const t=2*Math.PI*i/96,u=k*s1*Math.cos(t),v=k*s2*Math.sin(t);d+=(i?' L':'M')+P.sx(cx+u*c-v*s).toFixed(1)+' '+P.sy(cy+u*s+v*c).toFixed(1);}
+  return SL.el('path',{d:d+' Z',class:cls},P.dyn);}
+/* moyennes, covariance, variances (divisées par n) et corrélation d'un nuage */
+function stats2(xs,ys){const n=xs.length;let mx=0,my=0;for(let i=0;i<n;i++){mx+=xs[i];my+=ys[i];}mx/=n;my/=n;
+  let c=0,vx=0,vy=0;for(let i=0;i<n;i++){const a=xs[i]-mx,b=ys[i]-my;c+=a*b;vx+=a*a;vy+=b*b;}
+  return {mx:mx,my:my,cov:c/n,vx:vx/n,vy:vy/n,rho:c/Math.sqrt(vx*vy)};}
+/* nuage gaussien : demi-axes s1, s2, tourné de deg degrés, centré en (cx, cy), graine fixe */
+function cloud(seed,s1,s2,deg,n,cx,cy){const r=rng(seed),t=deg*Math.PI/180,c=Math.cos(t),s=Math.sin(t),X=[],Y=[];
+  for(let i=0;i<n;i++){const u=s1*gauss(r),v=s2*gauss(r);X.push(cx+u*c-v*s);Y.push(cy+u*s+v*c);}return {x:X,y:Y};}
+
+/* ===== Figure 1 (n2) : Var d'une somme = somme de toutes les cases ===== */
+(function(){
+  const host=document.getElementById('f1plot'),out=document.getElementById('f1out');
+  const v=35/12,K=[2,4,6,8,10,12],NM=['pièce','d4','d6','d8','d10','d12'],sub='₀₁₂₃₄₅₆';
+  const st={m:0,n:6};
+  host.classList.add('nogrid');
+  const P=SL.plot(host,{x:[0,12.55],y:[0,7],w:560,h:330,xt:[],yt:[]});
+  P.svg.querySelectorAll('line.sl-axis').forEach(l=>l.remove());
+  function cov(i,j){const m=st.m;if(m===0)return i===j?v:0;if(m===1)return i===j?(K[i]*K[i]-1)/12:0;if(m===2)return i===j?v:0.5*v;return v;}
+  function draw(){
+    P.clear();const n=st.n,x0=2.0,y0=6.35;let dg=0,off=0;
+    for(let i=0;i<n;i++){
+      P.text(x0+i+0.5,y0+0.18,'X'+sub[i+1],'','middle');
+      P.text(x0-0.15,y0-i-0.62,'X'+sub[i+1]+(st.m===1?' '+NM[i]:''),'','end');
+      for(let j=0;j<n;j++){const c=cov(i,j);if(i===j)dg+=c;else off+=c;
+        rect(P,x0+j+0.04,x0+j+0.96,y0-i-0.04,y0-i-0.96,c===0?'sl-cello':(i===j?'sl-k2 sl-kc':'sl-k4 sl-kc'));
+        P.text(x0+j+0.5,y0-i-0.62,c===0?'0':SL.fmt(c,2),'sl-cell-t','middle');}}
+    /* barre : la somme des cases, diagonale puis hors diagonale, à l'échelle de n² σ² */
+    const sc=5.6/(n*n*v),bx=9.6,hd=dg*sc,ho=off*sc;
+    rect(P,bx,bx+0.9,0.4,6.0,'sl-cello');
+    rect(P,bx,bx+0.9,0.4,0.4+hd,'sl-k2 sl-kc');if(ho>0)rect(P,bx,bx+0.9,0.4+hd,0.4+hd+ho,'sl-k4 sl-kc');
+    P.seg(bx-0.15,0.4,bx+1.05,0.4,'');
+    P.text(bx+0.45,0.4+hd+ho+0.2,'Var = '+SL.fmt(dg+off,2),'sl-c3','middle');
+    P.text(bx+1.05,0.4+hd/2-0.12,'diag.','','start');if(ho>0.25)P.text(bx+1.05,0.4+hd+ho/2-0.12,'hors diag.','','start');
+    P.text(bx+0.45,0.05,'échelle : toute la barre = n² × 2,917','','middle').setAttribute('class','sl-lbl sl-tick');
+    rd(out,[['Σ diagonale : les variances',SL.fmt(dg,2)],['Σ hors diagonale : les covariances',SL.fmt(off,2)],
+      ['Var(X₁ + … + Xₙ), toutes les cases',SL.fmt(dg+off,2),'c3'],['n σ²',st.m===1?'pas de σ² commun':SL.fmt(n*v,2)]]);
+  }
+  buttons(document.getElementById('f1ctl'),['i.i.d. : n dés','indépendants, lois différentes','même loi, corrélés (ρ = 0,5)','le même dé n fois'],k=>{st.m=k;draw();});
+  SL.slider(document.getElementById('f1sl'),{label:'n variables',min:1,max:6,step:1,value:6,fmt:x=>String(x)},x=>{st.n=x;draw();});
+})();
+
+/* ===== Figure 2 (n4) : des nuages à ρ variable ===== */
+(function(){
+  const out=document.getElementById('f2out'),ctl=document.getElementById('f2ctl');
+  const r=rng(23),N=300,U=[],Wn=[];for(let i=0;i<N;i++){U.push(gauss(r));Wn.push(gauss(r));}
+  const P=SL.plot(document.getElementById('f2plot'),{x:[-6,6],y:[-4.5,4.5],w:560,h:427,xt:[-6,-4,-2,0,2,4,6],yt:[-4,-2,0,2,4],xl:'x',yl:'y'});
+  clipTo(P,'f2clip');
+  const st={rho:0.6,sy:1};
+  function draw(){
+    P.clear();const a=st.rho,b=Math.sqrt(Math.max(0,1-a*a)),Y=U.map((u,i)=>st.sy*(a*u+b*Wn[i])),sl=a*st.sy;
+    U.forEach((u,i)=>P.dot(u,Y[i],'sl-c2 sl-tiny',2.6));
+    P.seg(-6,-6*sl,6,6*sl,'sl-c4');
+    const S=stats2(U,Y);
+    rd(out,[['ρ réglé',fxm(a,2)],['ρ mesuré sur les 300 points',fxf(S.rho,2)],['Cov = ρ σ<sub>X</sub> σ<sub>Y</sub>',fxm(a*st.sy,2),'c3'],['pente de la droite, ρ σ<sub>Y</sub> / σ<sub>X</sub>',fxm(sl,2)]]);
+  }
+  SL.slider(ctl,{label:'ρ',min:-1,max:1,step:0.05,value:0.6,fmt:x=>fxm(x,2)},x=>{st.rho=x;draw();});
+  SL.slider(ctl,{label:'σ de Y',min:0.5,max:2,step:0.1,value:1,fmt:x=>SL.fmt(x,1)},x=>{st.sy=x;draw();});
+})();
+
+/* ===== Figure 3 (n5) : une ellipse, trois curseurs ===== */
+(function(){
+  const out=document.getElementById('f3out'),ctl=document.getElementById('f3ctl');
+  const P=SL.plot(document.getElementById('f3plot'),{x:[-6,6],y:[-4.5,4.5],w:560,h:427,xt:[-6,-4,-2,0,2,4,6],yt:[-4,-2,0,2,4],xl:'x',yl:'y'});
+  clipTo(P,'f3clip');
+  const st={s1:2,s2:1,th:45};
+  function draw(){
+    P.clear();const t=st.th*Math.PI/180,c=Math.cos(t),s=Math.sin(t),a=st.s1*st.s1,b=st.s2*st.s2;
+    const vx=a*c*c+b*s*s,vy=a*s*s+b*c*c,cv=(a-b)*s*c,rho=cv/Math.sqrt(vx*vy),sl=cv/vx;
+    [1,2,3].forEach(k=>ellipse(P,st.s1,st.s2,t,k,'sl-ell'+(k>1?' k2':'')));
+    let maj='—';
+    if(Math.abs(a-b)>1e-9){const g=a>b?t:t+Math.PI/2;P.seg(-12*Math.cos(g),-12*Math.sin(g),12*Math.cos(g),12*Math.sin(g),'sl-axisline');
+      maj=Math.abs(Math.cos(g))<1e-9?'∞':fxm(Math.tan(g),2);}
+    P.seg(-6,-6*sl,6,6*sl,'sl-c4');P.dot(0,0,'sl-c3',4);
+    rd(out,[['Var X ; Var Y',SL.fmt(vx,2)+' ; '+SL.fmt(vy,2)],['Cov = (σ₁² − σ₂²) sin θ cos θ',fxm(cv,2),'c3'],['ρ',fxm(rho,2)],['pente du grand axe ; de la régression',maj+' ; '+fxm(sl,2)]]);
+  }
+  SL.slider(ctl,{label:'σ₁ (axe 1)',min:0.5,max:2.5,step:0.1,value:2,fmt:x=>SL.fmt(x,1)},x=>{st.s1=x;draw();});
+  SL.slider(ctl,{label:'σ₂ (axe 2)',min:0.5,max:2.5,step:0.1,value:1,fmt:x=>SL.fmt(x,1)},x=>{st.s2=x;draw();});
+  SL.slider(ctl,{label:'angle θ',min:-90,max:90,step:5,value:45,fmt:x=>fxm(x,0)+'°'},x=>{st.th=x;draw();});
+})();
+
+/* ===== v1 (n1) : un point test, ses deux écarts, le rectangle signé ===== */
+(function(){
+  const host=document.getElementById('v1plot'),out=document.getElementById('v1out'),ctl=document.getElementById('v1ctl');
+  const M=[{d:{x:[1,2,3,4],y:[1,3,2,4]},X:[0,5],Y:[0,5],xt:[0,1,2,3,4,5],yt:[0,1,2,3,4,5]},
+    {d:cloud(33,2.2,0.45,35,250,5,4),X:[0,10],Y:[0,8],xt:[0,2,4,6,8,10],yt:[0,2,4,6,8]},
+    {d:cloud(7,2.2,1.1,20,250,5,4),X:[0,10],Y:[0,8],xt:[0,2,4,6,8,10],yt:[0,2,4,6,8]},
+    {d:cloud(12,1.4,1.4,0,250,5,4),X:[0,10],Y:[0,8],xt:[0,2,4,6,8,10],yt:[0,2,4,6,8]}];
+  const st={k:0,j:3};
+  /* le point test de départ : en haut à droite du centre, comme celui de Brunton, et loin des bords */
+  function first(k){if(k===0)return 3;const d=M[k].d,S=stats2(d.x,d.y);
+    for(let i=0;i<d.x.length;i++){const a=d.x[i]-S.mx,b=d.y[i]-S.my;if(a>1.2&&a<3&&b>1&&b<2.6)return i;}return 0;}
+  function draw(){
+    host.innerHTML='';const m=M[st.k],d=m.d,n=d.x.length,S=stats2(d.x,d.y);
+    const P=SL.plot(host,{x:m.X,y:m.Y,w:560,h:340,xt:m.xt,yt:m.yt,xl:'x',yl:'y'});clipTo(P,'v1clip');
+    const ex=(m.X[1]-m.X[0])*0.07,ey=(m.Y[1]-m.Y[0])*0.09;
+    P.text(m.X[1]-ex,m.Y[1]-ey,'+','sl-quad','middle');P.text(m.X[0]+ex,m.Y[0]+ey*0.4,'+','sl-quad','middle');
+    P.text(m.X[0]+ex,m.Y[1]-ey,'−','sl-quad','middle');P.text(m.X[1]-ex,m.Y[0]+ey*0.4,'−','sl-quad','middle');
+    let pos=0;const pr=d.x.map((x,i)=>(x-S.mx)*(d.y[i]-S.my));pr.forEach(p=>{if(p>0)pos++;});
+    if(st.k===0)pr.forEach((p,i)=>{rect(P,S.mx,d.x[i],S.my,d.y[i],p>=0?'sl-sq':'sl-sqn');
+      P.text((S.mx+d.x[i])/2,(S.my+d.y[i])/2-0.1,fxs(p,2),p>=0?'sl-sq-t':'sl-sqn-t','middle');});
+    const j=st.j%n,px=d.x[j],py=d.y[j],pp=pr[j];
+    if(st.k>0)rect(P,S.mx,px,S.my,py,pp>=0?'sl-sq':'sl-sqn');
+    P.seg(S.mx,m.Y[0],S.mx,m.Y[1],'sl-mean sl-dash');P.seg(m.X[0],S.my,m.X[1],S.my,'sl-mean sl-dash');
+    d.x.forEach((x,i)=>P.dot(x,d.y[i],st.k===0?'sl-c1':(pr[i]>0?'sl-c2 sl-tiny':'sl-c3 sl-tiny'),st.k===0?6:2.8));
+    const big=st.k>0||(Math.abs(px-S.mx)>=1&&Math.abs(py-S.my)>=1);
+    if(big){P.arrow(S.mx,S.my,px,S.my,'sl-c4');P.arrow(px,S.my,px,py,'sl-c4');}P.dot(px,py,'sl-c4',6.5);
+    const lx=(S.mx+px)/2,ly=S.my+(py>S.my?1:-1)*ey*0.75-(py>S.my?0:ey*0.3);
+    /* quatre points : un écart de 0,5 laisse trop peu de place ; le rectangle et les readouts suffisent */
+    if(big)P.text(lx,ly,'X − μX','sl-c4','middle');
+    if(big)P.text(px+(px>S.mx?ex*0.4:-ex*0.4),(S.my+py)/2,'Y − μY','sl-c4',px>S.mx?'start':'end');
+    rd(out,[['écarts du point test',fxs(px-S.mx,2)+' et '+fxs(py-S.my,2)],['leur produit, l’aire signée',fxs(pp,2)],
+      ['Cov, moyenne des '+n+' produits',fxm(S.cov,2),'c3'],['produits positifs',st.k===0?pos+' sur 4':Math.round(100*pos/n)+' %']]);
+  }
+  buttons(ctl,['quatre points','nuage incliné','plus large, moins pentu','nuage rond'],k=>{st.k=k;st.j=first(k);draw();});
+  SL.h('button','tb',ctl,'point suivant ›').onclick=()=>{st.j++;draw();};
+})();
+
+/* ===== v2 (n2) : deux dés contre un dé doublé (figure existante de p00-02, graine fixée) ===== */
+(function(){
+  const host=document.getElementById('v2plot');
+  const rS=rng(15),rD=rng(1015),dS=()=>1+Math.floor(6*rS()),dD=()=>1+Math.floor(6*rD());
+  const opts=(xl,th)=>({bins:[1.5,12.5,11],xt:[2,4,6,8,10,12],xl:xl,yl:' ',w:560,h:190,
+    marks:[],empty:'Aucun tirage — clique « tirer 500 ».',
+    readout:(n,m,s)=>n+' tirages · moyenne '+SL.fmt(m,2)+' · écart-type mesuré '+SL.fmt(s,2)+'  (théorie : 7 et '+th+')'});
+  const rSum=SL.repeat(SL.h('div','',host),Object.assign(opts('X + Y : deux dés indépendants','2,42'),{draw:()=>dS()+dS()}));
+  const rDbl=SL.repeat(SL.h('div','',host),Object.assign(opts('2X : le même dé compté deux fois','3,42'),{draw:()=>2*dD()}));
+  /* amorce : une figure vide au chargement ne montre rien */
+  for(let i=0;i<300;i++){rSum.stats.push(dS()+dS());rDbl.stats.push(2*dD());}
+  rSum.render();rDbl.render();
+})();
+
+/* ===== v3 (n3) : des liens exacts, une covariance nulle ===== */
+(function(){
+  const out=document.getElementById('v3out'),r=rng(31),N=200;
+  const par={x:[],y:[]},cir={x:[],y:[]},half={x:[],y:[]};
+  for(let i=0;i<N;i++){const u=2*r()-1;par.x.push(u);par.y.push(u*u);}
+  for(let i=0;i<N;i++){const a=2*Math.PI*r();cir.x.push(Math.cos(a));cir.y.push(Math.sin(a));}
+  for(let i=0;i<N;i++){const u=r();half.x.push(u);half.y.push(u*u);}
+  const M=[{x:[-1,0,1],y:[1,0,1]},par,cir,half],LINK=['oui : y = x²','oui : y = x²','oui : x² + y² = 1','oui : y = x²'];
+  const P=SL.plot(document.getElementById('v3plot'),{x:[-1.8,1.8],y:[-1.18,1.19],w:560,h:380,xt:[-1.5,-1,-0.5,0,0.5,1,1.5],yt:[-1,-0.5,0,0.5,1],xl:'x',yl:'y'});
+  function draw(k){
+    P.clear();const d=M[k],S=k===0?{mx:0,my:2/3,cov:0}:stats2(d.x,d.y);
+    if(k===0){
+      rect(P,-1,0,2/3,1,'sl-sqn');rect(P,0,1,2/3,1,'sl-sq');
+      P.text(-0.5,0.8,'−⅓','sl-sqn-t','middle');P.text(0.5,0.8,'+⅓','sl-sq-t','middle');P.text(0.1,0.04,'0','sl-sq-t','start');
+    }
+    P.seg(S.mx,-1.18,S.mx,1.19,'sl-mean sl-dash');P.seg(-1.8,S.my,1.8,S.my,'sl-mean sl-dash');
+    d.x.forEach((x,i)=>{const p=(x-S.mx)*(d.y[i]-S.my);P.dot(x,d.y[i],k===0?'sl-c1':(p>0?'sl-c2 sl-tiny':'sl-c3 sl-tiny'),k===0?7:2.8);});
+    P.text(1.75,1.08,'┆ centre (μX, μY)','sl-c3','end');
+    rd(out,k===0?[['centre (μ<sub>X</sub>, μ<sub>Y</sub>)','(0 ; ⅔)'],['Cov, moyenne des rectangles','0','c3'],['P(Y = 0 ∣ X = 0)','1'],['P(Y = 0)','⅓']]
+      :[['lien exact ?',LINK[k]],['Cov mesurée sur 200 points',fxf(S.cov,3),'c3'],['ρ mesuré',fxf(S.rho,2)]]);
+  }
+  buttons(document.getElementById('v3ctl'),['{−1, 0, 1} et X²','parabole','cercle','demi-parabole'],draw);
+})();
+
+/* ===== v4 (n4) : changer d'unité gonfle la covariance, pas la corrélation ===== */
+(function(){
+  const host=document.getElementById('v4plot'),out=document.getElementById('v4out');
+  const X0=[1,2,3,4],Y0=[1,3,2,4],B=[0,1,2,3,4,5];
+  const T=[[1,0,1,0],[12,0,12,0],[1,0,12,0],[1,10,1,10],[1,0,-1,0]];
+  const UX=['x (pieds)','x (pouces)','x (pieds)','x + 10 (pieds)','x (pieds)'],UY=['y (pieds)','y (pouces)','y (pouces)','y + 10 (pieds)','−y (pieds)'];
+  function draw(k){
+    host.innerHTML='';const [a,b,c,d]=T[k],xs=X0.map(x=>a*x+b),ys=Y0.map(y=>c*y+d);
+    const P=SL.plot(host,{x:[b,5*a+b].sort((p,q)=>p-q),y:[d,5*c+d].sort((p,q)=>p-q),w:560,h:300,xt:B.map(t=>a*t+b),yt:B.map(t=>c*t+d),xl:UX[k],yl:UY[k]});
+    const S=stats2(xs,ys),ey=0.1*Math.abs(c);
+    xs.forEach((x,i)=>{const p=(x-S.mx)*(ys[i]-S.my);rect(P,S.mx,x,S.my,ys[i],p>=0?'sl-sq':'sl-sqn');
+      P.text((S.mx+x)/2,(S.my+ys[i])/2-ey,fxs(p,2),p>=0?'sl-sq-t':'sl-sqn-t','middle');});
+    P.vline(S.mx,'sl-mean sl-dash');P.seg(Math.min(b,5*a+b),S.my,Math.max(b,5*a+b),S.my,'sl-mean sl-dash');
+    xs.forEach((x,i)=>P.dot(x,ys[i],'sl-c1',6));
+    rd(out,[['Cov, moyenne des rectangles',fxm(S.cov,2),'c3'],['σ<sub>X</sub> σ<sub>Y</sub>',SL.fmt(Math.sqrt(S.vx*S.vy),2)],['ρ = Cov / (σ<sub>X</sub> σ<sub>Y</sub>)',fxm(S.rho,2),'c1']]);
+  }
+  buttons(document.getElementById('v4ctl'),['en pieds','X et Y en pouces (× 12)','Y seul en pouces','décalé (+ 10)','Y retourné (× −1)'],draw);
+})();
+
+/* ===== v5 (n5) : trois cibles, des fléchettes ===== */
+(function(){
+  const out=document.getElementById('v5out'),ctl=document.getElementById('v5ctl');
+  const P=SL.plot(document.getElementById('v5plot'),{x:[-6,6],y:[-4,4],w:560,h:385,xt:[-6,-4,-2,0,2,4,6],yt:[-4,-2,0,2,4],xl:'x',yl:'y'});
+  clipTo(P,'v5clip');
+  const G=[],r=rng(193);function add(n){for(let i=0;i<n;i++){const a=gauss(r),b=gauss(r);G.push([a,b]);}}add(300);
+  const C=[[1,1,0],[2,1,0],[2,1,45]];let cur=C[0].slice(),mode=0;const fresh=runner();
+  function draw(p){
+    P.clear();const t=p[2]*Math.PI/180,c=Math.cos(t),s=Math.sin(t);
+    [1,2].forEach(k=>ellipse(P,p[0],p[1],t,k,'sl-ell'+(k>1?' k2':'')));
+    const X=[],Y=[];G.forEach(g=>{const u=p[0]*g[0],v=p[1]*g[1];X.push(u*c-v*s);Y.push(u*s+v*c);});
+    X.forEach((x,i)=>P.dot(x,Y[i],'sl-c2 sl-tiny',2.6));P.dot(0,0,'sl-c3',4);
+    const S=stats2(X,Y),a=p[0]*p[0],b=p[1]*p[1],cv=(a-b)*s*c;
+    rd(out,[['fléchettes',String(G.length)],['Var X ; Var Y, en théorie',SL.fmt(a*c*c+b*s*s,2)+' ; '+SL.fmt(a*s*s+b*c*c,2)],
+      ['Cov en théorie',fxm(cv,2),'c3'],['Cov mesurée sur les fléchettes',fxf(S.cov,2),'c1'],['f(x, y) = f<sub>X</sub>(x) f<sub>Y</sub>(y) ?',Math.abs(cv)<1e-9?'oui':'non']]);
+  }
+  buttons(ctl,['cercle : σ = 1 et 1','ellipse alignée : 2 et 1','ellipse tournée de 45°'],k=>{mode=k;const tk=fresh(),a=cur.slice(),b=C[k];
+    tween(800,u=>{cur=a.map((x,i)=>x+(b[i]-x)*u);draw(cur);},tk);});
+  SL.h('button','tb',ctl,'▶ lancer 300 fléchettes').onclick=()=>{const tk=fresh();let k=0;cur=C[mode].slice();
+    loop(tk,()=>{if(G.length>=3000)return false;add(10);k+=10;draw(cur);return k<300;});};
+})();
+
+/* ===== v6 (n6) : refaire l'évaluation, avec un jeu de test ou deux ===== */
+(function(){
+  const host=document.getElementById('v6plot'),out=document.getElementById('v6out'),ctl=document.getElementById('v6ctl');
+  const n=1000,R=400,lo=-0.03,hi=0.09,bw=0.003,nb=40,xt=[-0.02,0,0.02,0.04,0.06,0.08];
+  const P1=SL.plot(SL.h('div','',host),{x:[lo,hi],y:[0,1.12],w:560,h:150,xt:xt,yt:[],xl:'D̂ = p̂B − p̂A, même jeu de test'});
+  const P2=SL.plot(SL.h('div','',host),{x:[lo,hi],y:[0,1.12],w:560,h:150,xt:xt,yt:[],xl:'D̂ = p̂B − p̂A, deux jeux de test'});
+  [P1,P2].forEach(P=>{P.svg.querySelectorAll('line.sl-axis')[1].remove();});
+  const res=[];const fresh=runner();let seed=62;
+  function once(r){let n11=0,n10=0,n01=0,a=0,b=0;
+    for(let i=0;i<n;i++){const u=r();if(u<0.862)n11++;else if(u<0.872)n10++;else if(u<0.911)n01++;}
+    for(let i=0;i<n;i++)if(r()<0.872)a++;
+    for(let i=0;i<n;i++)if(r()<0.901)b++;
+    return {ds:(n01-n10)/n,dp:(b-a)/n,b:n10,c:n01};}
+  function sd(v){const m=v.reduce((s,x)=>s+x,0)/v.length;return Math.sqrt(v.reduce((s,x)=>s+(x-m)*(x-m),0)/(v.length-1));}
+  function hist(v){const c=new Array(nb).fill(0);v.forEach(x=>{const i=Math.floor((x-lo)/bw+1e-6);if(i>=0&&i<nb)c[i]++;});return c;}
+  function draw(){
+    P1.clear();P2.clear();const A=res.map(e=>e.ds),B=res.map(e=>e.dp),c1=hist(A),c2=hist(B),mx=Math.max(1,...c1,...c2);
+    c1.forEach((k,i)=>{if(k)bar(P1,lo+(i+0.08)*bw,lo+(i+0.92)*bw,k/mx,'sl-bar');});
+    c2.forEach((k,i)=>{if(k)bar(P2,lo+(i+0.08)*bw,lo+(i+0.92)*bw,k/mx,'sl-bar3');});
+    [P1,P2].forEach(P=>{P.vline(0,'sl-dash');P.vline(0.029,'sl-mean');
+      P.text(hi-0.001,1.0,'│ D = 0,029, la vraie différence','sl-c3','end');P.text(hi-0.001,0.8,'┆ D̂ = 0','','end');});
+    const last=res[res.length-1];
+    rd(out,[['évaluations',String(res.length)],['écart-type de D̂, même jeu de test (théorie 0,0069)',res.length>1?fxf(sd(A),4):'—','c1'],
+      ['écart-type de D̂, deux jeux de test (théorie 0,0142)',res.length>1?fxf(sd(B),4):'—'],
+      ['D̂ ≤ 0 : même jeu de test ; deux jeux de test',A.filter(x=>x<=1e-12).length+' ; '+B.filter(x=>x<=1e-12).length],
+      ['dernière évaluation partagée : A seul juste, B seul juste',last?last.b+' et '+last.c:'—']]);
+  }
+  {const r=rng(seed);for(let k=0;k<R;k++)res.push(once(r));draw();}
+  SL.h('button','tb',ctl,'▶ refaire 400 évaluations').onclick=()=>{const tk=fresh(),r=rng(++seed);res.length=0;
+    loop(tk,()=>{for(let j=0;j<8&&res.length<R;j++)res.push(once(r));draw();return res.length<R;});};
+})();
+
+})();
+</script>
+</body>
+</html>
