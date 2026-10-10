@@ -1,0 +1,7 @@
+n=   1  P(|mean - centre| > 1):  Cauchy 0.497   dice 0.670
+n=  10  P(|mean - centre| > 1):  Cauchy 0.500   dice 0.049
+n= 100  P(|mean - centre| > 1):  Cauchy 0.501   dice 0.000
+n=1000  P(|mean - centre| > 1):  Cauchy 0.500   dice 0.000
+n=  10  sd of mean 0.654   iid 0.540   formula 0.650
+n= 100  sd of mean 0.418   iid 0.171   formula 0.417
+n=1000  sd of mean 0.385   iid 0.054   formula 0.385

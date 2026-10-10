@@ -1,0 +1,74 @@
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>La vitesse : symétrie, asymétrie, événements rares <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 36</p>
+  <div class="idee">
+    <p>Le TCL est une limite : il dit que la cloche finira par être là, pas quand. Brunton annonce l'expérience sur ordinateur, n = 100 refait 50 fois. Faite sur trois lois au même n, elle montre que la réponse dépend de la loi de départ.</p>
+    <p>À n = 30, la moyenne de 30 dés colle à la normale. Celle de 30 attentes exponentielles, l'attente entre deux mails, penche encore, avec une queue à droite. Celle de 30 Bernoulli(0,02), la proportion d'un événement rare, n'est même pas une cloche : 54,5 % des échantillons ne contiennent aucun succès.</p>
+    <p>Deux règles le résument. L'asymétrie de la moyenne vaut celle d'une mesure divisée par √n : 2/√30 = 0,37 pour l'exponentielle, et il faut quadrupler n pour la diviser par deux. Pour une proportion, ce qui compte est le nombre de succès attendus, np, et celui des échecs, n(1 − p), pas n : on en demande au moins 10 de chaque.</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — trois lois, le même n</div>
+    <div id="v2ctl" class="sl-ctl"></div>
+    <div id="v2plot"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">Les lois exactes des trois moyennes, standardisées, sur le même axe que N(0, 1) en rouge. À <b>n = 30</b> : les dés collent à la courbe ; les exponentielles montent plus vite à gauche et traînent à droite (asymétrie 0,37) ; les Bernoulli(0,02) ne prennent que quelques valeurs, et la barre de gauche, zéro succès, porte 54,5 % des échantillons. Passe à <b>n = 100</b> puis <b>n = 500</b> : l'asymétrie de l'exponentielle tombe à 0,20 puis 0,09, et la Bernoulli ne ressemble à une cloche qu'à n = 500, quand np atteint 10.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les deux règles</div>
+    <div class="eq">asymétrie(X̄<sub><i>n</i></sub>) = γ₁/√<i>n</i> &nbsp;&nbsp; exponentielle : 2/√<i>n</i> &nbsp;&nbsp; Bernoulli(<i>p</i>) : (1 − 2<i>p</i>)/√(<i>np</i>(1 − <i>p</i>)) &nbsp;&nbsp;&nbsp; proportion : <i>np</i> ≥ 10 et <i>n</i>(1 − <i>p</i>) ≥ 10</div>
+    <ul>
+      <li>γ₁ = E[((X − μ)/σ)³] est l'asymétrie d'une seule mesure (<a href="lesson-00-08-esperance-variance.html#n7">l08, notion 7</a>) : 0 pour un dé ou une pièce équilibrée, 2 pour une exponentielle. La règle demande l'indépendance et un moment d'ordre 3 fini (preuve dépliable).</li>
+      <li>Une loi symétrique part de γ₁ = 0 : sa moyenne est symétrique dès n = 1. Il reste l'épaisseur des queues, qui s'efface plus vite encore, en 1/n, et, pour une loi discrète comme le dé, les marches de la figure 1.</li>
+      <li>np est le nombre de succès attendus. Le seuil varie selon les auteurs, 5 ou 10 ; 10 est le plus prudent, et c'est celui de la suite (<a href="../chains/chain-p01-01-objet-aleatoire.html">p01-01</a>).</li>
+      <li>Culture, l'inégalité de Berry-Esseen : sup<sub><i>z</i></sub> |P(Zₙ ≤ z) − Φ(z)| ≤ C · E|X − μ|³/(σ³√n), avec une constante C inférieure à 0,48. L'erreur décroît en 1/√n, d'autant plus lentement que la loi a de la queue. Pour une Bernoulli(p) avec p petit, E|X − p|³/σ³ ≈ 1/√p, et la borne vaut environ 0,48/√(np) : c'est np qui règle l'erreur, pas n.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — l'exponentielle : l'asymétrie s'efface en 1/√n</div>
+    <div id="f2sl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">La densité exacte de la moyenne de n exponentielles de moyenne 1, une loi Gamma, en bleu, contre la normale N(1, 1/n) que promet le TCL, en pointillé rouge, toutes deux à la même échelle verticale. Les traits verticaux sont μ ± 1,96 SE. Monte <b>n</b> : à n = 2 la densité part de 0 et traîne loin à droite ; à n = 10 son sommet est encore à gauche de 1. À n = 100 l'œil ne voit plus rien, mais les queues, si : 3,0 % des moyennes au-delà de μ + 1,96 SE au lieu de 2,5 %, et 1,9 % en deçà de μ − 1,96 SE. À n = 30, 3,4 % et 1,4 %.</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — un événement rare : c'est np qui compte</div>
+    <div id="f3sl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">La loi exacte de la proportion observée p̂ quand p = 0,02, en barres, contre la normale N(p, p(1 − p)/n), en pointillé rouge. L'axe descend sous 0 pour montrer ce que la normale y met : des proportions négatives. À <b>n = 20</b>, trois barres seulement dans le cadre ; à <b>n = 100</b>, np = 2 : un peigne collé à 0, où 13,3 % des échantillons n'ont aucun succès, et la normale met 7,7 % de sa masse sous 0 ; à <b>n = 500</b>, np = 10 : une cloche encore penchée, d'asymétrie 0,31 ; à <b>n = 5 000</b>, la cloche. Compare avec la figure 2 : au même n = 100, une cloche presque symétrique là-bas, un peigne ici.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>dé, exponentielle, Bernoulli rare, deux pièces, un taux de conversion</small></summary><div class="in">
+    <ol>
+      <li><b>Le dé</b> : γ₁ = 0. À n = 4, la moyenne est déjà symétrique : 2,7 % au-delà de chaque borne ±1,96 SE, au lieu de 2,5 %.</li>
+      <li><b>L'exponentielle</b> : γ₁ = 2. À n = 30, l'asymétrie vaut 0,37 : 3,4 % des moyennes au-delà de μ + 1,96 SE, 1,4 % en deçà de μ − 1,96 SE. À n = 100, 0,20 : 3,0 % et 1,9 %. Le total reste proche de 5 %, mais mal réparti, et c'est un test d'un seul côté qui en pâtit.</li>
+      <li><b>Bernoulli(0,02)</b> : γ₁ = 0,96/√(0,02 × 0,98) = 6,86. À n = 100, np = 2 : asymétrie 0,69, 13,3 % des échantillons sans succès, 7,7 % de la normale sous 0. À n = 500, np = 10 : asymétrie 0,31.</li>
+      <li><b>Deux pièces, n = 30.</b> Équilibrée : asymétrie 0, 15 succès attendus. Truquée à p = 0,1 : asymétrie 0,49, np = 3, et 4,2 % des séries de 30 lancers sans un seul succès.</li>
+      <li><b>Exemple ML : un taux de conversion.</b> 2 %, c'est rare ; mais sur 10 000 visiteurs, cela fait 200 succès attendus. np = 200 dépasse 10 de loin, l'asymétrie de p̂ vaut 0,07 et le TCL s'applique sans souci. Ce n'est pas la rareté qui compte, c'est le nombre de succès.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>culture : pourquoi l'asymétrie se divise par √n</small></summary><div class="in">
+    <p>Pose Yᵢ = Xᵢ − μ : E[Y] = 0, E[Y²] = σ², E[Y³] = γ₁σ³.</p>
+    <div class="drv">
+      <div>E[(Y₁ + … + Yₙ)³]</div><span>la somme centrée, au cube</span>
+      <div>= Σ<sub><i>i</i></sub> E[Y<sub><i>i</i></sub>³] + 3 Σ<sub><i>i</i> ≠ <i>j</i></sub> E[Y<sub><i>i</i></sub>² Y<sub><i>j</i></sub>]</div><span>développer le cube : les cubes, puis les carrés croisés…</span>
+      <div>&nbsp;&nbsp;+ 6 Σ<sub><i>i</i> &lt; <i>j</i> &lt; <i>k</i></sub> E[Y<sub><i>i</i></sub> Y<sub><i>j</i></sub> Y<sub><i>k</i></sub>]</div><span>… et les triples produits</span>
+      <div>= <i>n</i> γ₁ σ³ + 0 + 0</div><span>indépendance : E[Yᵢ² Yⱼ] = E[Yᵢ²] E[Yⱼ] = 0, de même pour le triple produit ; c'est ici qu'elle sert</span>
+      <div>asymétrie(Sₙ) = <i>n</i> γ₁ σ³ / (<i>n</i>σ²)<sup>3/2</sup> = γ₁/√<i>n</i></div><span>Var(Sₙ) = nσ² ; on divise par l'écart-type au cube</span>
+      <div>asymétrie(X̄ₙ) = asymétrie(Sₙ)</div><span>X̄ₙ = Sₙ/n : un moment réduit ne change pas quand on multiplie par une constante positive</span>
+    </div>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>asymétrie et queues de l'exponentielle, Bernoulli rare</small></summary><div class="in">
+<pre class="py">{{CODE:c2}}</pre>
+<pre class="out">{{OUT:c2}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>« n ≥ 30 » n'est pas un théorème.</b> À n = 30, l'exponentielle penche encore et la Bernoulli(0,02) est un peigne. Pour une loi symétrique et bornée, 30 est large ; pour une loi asymétrique ou un événement rare, il ne suffit pas.</li>
+      <li><b>np ≥ 10 porte sur les succès et sur les échecs.</b> Un rappel de 93 % mesuré sur 30 positifs a 28 succès mais 2 échecs : la loi de p̂ est collée à 1, et l'intervalle normal en sort (notion 5).</li>
+      <li><b>Une queue lourde coûte très cher.</b> Le patrimoine log-normal de <a href="lesson-00-08-esperance-variance.html#n2">l08</a> (σ = 1,79) a une asymétrie de 129 : pour ramener celle de la moyenne à 0,2, il faudrait environ 420 000 ménages.</li>
+      <li><b>La vitesse dépend du critère.</b> En écart maximal entre fonctions de répartition, la moyenne de 30 dés (0,021) fait à peine mieux que celle de 30 exponentielles (0,024), parce qu'elle reste un escalier (figure 1). Pour un intervalle, ce sont les queues à ±1,96 qui comptent : 2,4 % de chaque côté pour les dés, 3,4 % et 1,4 % pour les exponentielles.</li>
+    </ul>
+  </div></details>
+  <p class="garde">Pour que p̂ soit approximativement normale, et l'IC de Wald fiable, il faut np ≥ 10 et n(1 − p) ≥ 10 : le nombre de succès et d'échecs, pas n.</p>
+</section>
+

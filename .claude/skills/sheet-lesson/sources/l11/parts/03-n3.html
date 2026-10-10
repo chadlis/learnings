@@ -1,0 +1,56 @@
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>La version somme : Sₙ ≈ N(nμ, nσ²) <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 36</p>
+  <div class="idee">
+    <p>Brunton écrit aussi le théorème sans diviser par n : la somme Sₙ = X₁ + … + Xₙ est approximativement normale, de moyenne nμ et de variance nσ². C'est le même énoncé. Sₙ = n X̄ₙ, et multiplier par n une variable presque normale donne une variable presque normale (<a href="lesson-00-06-fonctions-standardisation.html#n2">l06</a>), dont le centre et l'écart-type sont multipliés par n.</p>
+    <p>Cent dés : la somme est centrée sur 350, d'écart-type 1,708 × √100 = 17,1. D'après la normale, avec la correction de continuité (379,5), P(S ≥ 380) ≈ 4,2 % ; le calcul exact donne aussi 4,2 %. La binomiale est le cas où chaque terme est une Bernoulli : le nombre de piles sur 400 lancers est une somme de 400 termes.</p>
+    <p>La différence avec la moyenne est la largeur. Celle de la somme grandit en σ√n quand celle de la moyenne rétrécit en σ/√n : la somme ne converge vers rien, seule sa forme se stabilise.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — le même tirage, lu en somme et en moyenne</div>
+    <div id="v3sl"></div><div id="v3ctl" class="sl-ctl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">La loi exacte de la somme de n dés en haut, sur un axe de 0 à 420, et celle de leur moyenne en bas, sur un axe de 1 à 6 ; en pointillé rouge, la normale N(nμ, nσ²) sur la somme. Les crochets vont de −σ à +σ. Lance <b>de 1 à 100</b>, ou bouge <b>n</b> : la cloche du haut glisse vers la droite et s'élargit, jusqu'à 17,1 d'écart-type à n = 100 ; celle du bas reste sur 3,5 et se resserre, jusqu'à 0,171. C'est le même tirage, divisé ou non par n. La largeur relative de la somme, σ√n/(nμ) = 0,488/√n, baisse quand même : 4,9 % à n = 100.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">S<sub><i>n</i></sub> = X₁ + … + X<sub><i>n</i></sub> &nbsp;&nbsp; (S<sub><i>n</i></sub> − <i>n</i>μ)/(σ√<i>n</i>) = (X̄<sub><i>n</i></sub> − μ)/(σ/√<i>n</i>) → N(0, 1) &nbsp;&nbsp; à <i>n</i> fixé : S<sub><i>n</i></sub> ≈ N(<i>n</i>μ, <i>n</i>σ²)</div>
+    <ul>
+      <li>Les hypothèses sont celles de la notion 1 : c'est la même variable standardisée, réécrite (preuve dépliable).</li>
+      <li>E[Sₙ] = nμ par linéarité, sans hypothèse ; Var(Sₙ) = nσ² parce que les variances s'ajoutent sous indépendance (<a href="lesson-00-09-covariance-correlation.html#n2">l09, notion 2</a>).</li>
+      <li>Une somme d'entiers (dés, nombres de succès) s'approche mieux avec la correction de continuité : P(S ≥ 380) ≈ P(Y ≥ 379,5), avec Y ~ N(350 ; 17,08²) (<a href="lesson-00-04-variables-binomiale-normale.html#n7">l04, notion 7</a>).</li>
+      <li>Cas binomial : une Binomiale(n, p) est la somme de n Bernoulli(p), d'où B(n, p) ≈ N(np, np(1 − p)).</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux dés, cent dés, 400 pièces, cent spams, un jeu de test</small></summary><div class="in">
+    <ol>
+      <li><b>Deux dés.</b> La somme est un triangle, de 2 à 12. n = 2 est trop petit : la somme garde la forme de ses termes.</li>
+      <li><b>Cent dés.</b> S ≈ N(350 ; 17,08²). P(S ≥ 380) : z = (379,5 − 350)/17,08 = 1,73, d'où 4,21 %, pour 4,20 % exactement.</li>
+      <li><b>400 lancers de pièce</b> (Brunton 16). X ≈ N(200 ; 10²). P(190 ≤ X ≤ 230) = Φ(3) − Φ(−1) = 0,840 sans correction de continuité, 0,852 avec, et 0,852 exactement.</li>
+      <li><b>Cent spams à 4 par heure</b> (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n3">l05</a>). Le temps pour les recevoir tous est une somme de 100 attentes exponentielles de moyenne 15 min : E = 25 h, σ = 15 min × √100 = 2,5 h. P(S &gt; 30 h) ≈ 1 − Φ(2) = 2,3 % ; la loi exacte, une Gamma, donne 2,8 % : l'asymétrie de l'exponentielle se voit encore dans la queue.</li>
+      <li><b>Exemple ML : les erreurs sur un jeu de test (test set).</b> Un modèle qui se trompe 12,8 % du temps fait, sur 1 000 exemples, un nombre d'erreurs qui est une somme de 1 000 Bernoulli : ≈ N(128 ; 10,56²). P(au moins 150 erreurs) ≈ 2,1 % avec la correction de continuité, 2,3 % exactement.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>culture : somme standardisée et moyenne standardisée sont la même variable</small></summary><div class="in">
+    <div class="drv">
+      <div>(S<sub><i>n</i></sub> − <i>n</i>μ)/(σ√<i>n</i>) = (<i>n</i> X̄<sub><i>n</i></sub> − <i>n</i>μ)/(σ√<i>n</i>)</div><span>Sₙ = n X̄ₙ</span>
+      <div>= <i>n</i>(X̄<sub><i>n</i></sub> − μ)/(σ√<i>n</i>) = (X̄<sub><i>n</i></sub> − μ)/(σ/√<i>n</i>)</div><span>on divise le haut et le bas par n : σ√n/n = σ/√n</span>
+    </div>
+    <p>Un seul théorème, donc, et deux façons de l'écrire. Brunton préfère la moyenne parce qu'elle parle d'erreur expérimentale et de taille d'échantillon ; la somme sert dès qu'on compte quelque chose (succès, erreurs, temps total).</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>les queues de la somme de 100 exponentielles, exactes contre normales</small></summary><div class="in">
+<pre class="py">{{CODE:c3}}</pre>
+<pre class="out">{{OUT:c3}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>La somme ne converge pas.</b> Son centre nμ et sa largeur σ√n grandissent avec n : « Sₙ tend vers N(nμ, nσ²) » n'a pas de sens, la cible bouge. C'est une approximation à n fixé (<a href="lesson-00-10-inegalites-lgn.html#n4">l10, notion 4</a> : la somme s'écarte).</li>
+      <li><b>Loin dans les queues, l'erreur relative explose.</b> Le TCL contrôle l'écart absolu entre fonctions de répartition, pas le rapport entre deux petites probabilités. Pour 100 exponentielles, la vraie probabilité de dépasser la moyenne de 3 écarts-types est 2 fois celle que donne la normale ; de 5 écarts-types, 21 fois (code). Pour 100 dés, P(S ≥ 450) vaut 1,5 × 10⁻⁹ ; la normale dit 2,8 × 10⁻⁹ avec la correction de continuité, 2,4 × 10⁻⁹ sans. Les risques extrêmes ne se calculent pas avec le TCL.</li>
+      <li><b>Une somme d'entiers sans correction de continuité.</b> Cent pièces, P(X ≥ 60) = 2,84 % exactement ; la normale donne 2,87 % avec la correction, 2,28 % sans.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (36) écrit « Sₙ est normale, N(nμ, nσ²) » comme une égalité, et (44), où il prend μ = 0, « Sₙ est normale, N(0, nσ²) ». C'est la somme standardisée, (Sₙ − nμ)/(σ√n), qui converge en loi vers N(0, 1). Sₙ ≈ N(nμ, nσ²) est une approximation à n fixé, de plus en plus large quand n grandit.</div>
+  </div></details>
+  <p class="garde">Sous les hypothèses du TCL, Sₙ = X₁ + … + Xₙ ≈ N(nμ, nσ²) à n fixé, puisque Sₙ = n X̄ₙ ; son écart-type σ√n grandit, et l'approximation vaut au centre, pas loin dans les queues.</p>
+</section>
+

@@ -1,0 +1,5 @@
+P(S > mean + 2 sd): exact 2.79e-02  normal 2.28e-02  ratio   1.2
+P(S > mean + 3 sd): exact 2.75e-03  normal 1.35e-03  ratio   2.0
+P(S > mean + 4 sd): exact 1.61e-04  normal 3.17e-05  ratio   5.1
+P(S > mean + 5 sd): exact 5.92e-06  normal 2.87e-07  ratio  20.7
+simulated P(S > mean + 3 sd) = 2.83e-03

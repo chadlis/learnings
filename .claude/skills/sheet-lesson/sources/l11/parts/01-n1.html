@@ -1,0 +1,67 @@
+<!-- ============================ n1 ============================ -->
+<section class="notion outil" id="n1">
+  <h3>L'énoncé exact : la moyenne standardisée devient normale <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 36 · The Central Limit Theorem (énoncés aussi en 01 et 44)</p>
+  <div class="idee">
+    <p>Brunton prend une grandeur difficile à mesurer, la vitesse de la lumière. On refait l'expérience trente fois, on obtient trente valeurs un peu différentes, et on fait leur moyenne. La loi des grands nombres dit où va cette moyenne : vers la vraie valeur μ ; Var(X̄) donne sa largeur, σ/√n. Le <b>théorème central limite</b> dit quelle forme a sa loi : une cloche, quelle que soit la loi d'une seule mesure.</p>
+    <p>Avec des dés, la cloche se fabrique sous nos yeux. Un dé : six barres plates. La moyenne de deux dés : un triangle, où 3,5 sort avec probabilité 6/36. La moyenne de quatre dés : déjà une cloche, qui tombe à moins d'un SE (0,854) de 3,5 dans 68,2 % des cas ; la normale dit 68,3 %.</p>
+    <p>Mais quand n grandit, la cloche s'écrase sur 3,5 et finit en un trait. Pour garder sa forme en vue, il faut <b>zoomer</b> au rythme où elle se resserre : retirer μ, diviser par σ/√n. C'est cette moyenne standardisée qui converge vers N(0, 1).</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — refaire l'expérience : n dés, une moyenne, mille fois</div>
+    <div id="v1sl"></div><div id="v1ctl" class="sl-ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">Chaque expérience lance n dés et garde leur moyenne x̄ ; Brunton annonce cette expérience sur ordinateur (n = 100, refaite 50 fois) ; ici, elle est refaite 1 000 fois. En haut, l'axe brut de 1 à 6 : monte <b>n</b>, la cloche se resserre sur 3,5 jusqu'à n'être plus qu'un trait, c'est la loi des grands nombres. En bas, les mêmes moyennes zoomées, z = (x̄ − 3,5)/(σ/√n) : leur écart-type reste 1, et leur forme rejoint la courbe rouge N(0, 1) (dès n = 10, les valeurs voisines sont regroupées en classes, sinon 1 000 tirages répartis sur 150 barres feraient des dents de scie). À n = 1, six barres plates ; à n = 2, un triangle ; à n = 4, déjà une cloche. <b>Refaire</b> tire 1 000 nouvelles expériences.</p>
+  </div>
+  <div class="formule"><div class="lbl">L'énoncé</div>
+    <div class="eq">Z<sub><i>n</i></sub> = (X̄<sub><i>n</i></sub> − μ)/(σ/√<i>n</i>) &nbsp;&nbsp;&nbsp; P(Z<sub><i>n</i></sub> ≤ <i>z</i>) → Φ(<i>z</i>) pour tout <i>z</i>, quand <i>n</i> → ∞</div>
+    <ul>
+      <li>X₁, …, Xₙ <b>indépendantes</b> : chaque mesure apporte un aléa neuf. C'est ce qui donne Var(X̄ₙ) = σ²/n, et ce qui empêche un aléa commun de survivre à la moyenne (notion 4).</li>
+      <li>de <b>même loi</b> : un seul μ et un seul σ, ceux d'une mesure. C'est ce qui fait de σ/√n la bonne échelle. L'hypothèse peut s'affaiblir (condition de Lindeberg) : des lois différentes conviennent si aucun terme ne domine la somme.</li>
+      <li>de <b>variance σ² finie</b>, et non nulle : sans elle, l'échelle σ/√n n'existe pas et la limite n'est plus normale ; si même la moyenne manque, comme pour la Cauchy, X̄ ne se resserre pas du tout (notion 4).</li>
+      <li>« → » est une <b>convergence en loi</b> : c'est la fonction de répartition de Zₙ qui tend vers Φ (figure 1). Pas une densité : la moyenne de n dés n'en a pas.</li>
+      <li>À n fixé, on s'en sert sous la forme approchée <b>X̄ₙ ≈ N(μ, σ²/n)</b> : « ≈ » et non « = », et la qualité de l'approximation dépend de la loi (notion 2).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — ce qui converge : la fonction de répartition</div>
+    <div id="f1ctl" class="sl-ctl"></div><div id="f1sl"></div>
+    <div id="f1plot" class="wide"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">L'escalier est la fonction de répartition exacte de Zₙ, la moyenne standardisée de n dés ; la courbe rouge est Φ. L'énoncé dit que l'écart entre les deux tend vers 0 partout. Monte <b>n</b> : l'écart maximal, marqué en ocre, vaut 0,143 à n = 1, 0,059 à n = 4, 0,021 à n = 30, 0,012 à n = 100. L'escalier reste un escalier : chaque marche est une probabilité P(Sₙ = s), qui rapetisse sans disparaître ; il n'y a pas de densité à faire converger. Choisis la <b>pièce</b> : deux valeurs par lancer, des marches plus hautes ; à n = 100, l'écart vaut encore 0,040, la moitié de la marche centrale P(S = 50) = 0,080.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>un dé, quatre dés, la vitesse de la lumière, cent pièces, un batch</small></summary><div class="in">
+    <ol>
+      <li><b>Un dé, n = 1.</b> Z = (X − 3,5)/1,708 prend six valeurs, de −1,46 à +1,46, avec la même probabilité. Aucune cloche, et 100 % des valeurs sont dans ±1,96 au lieu de 95 % : le TCL ne dit rien pour un n donné, il parle de la limite.</li>
+      <li><b>Quatre dés.</b> SE = 1,708/√4 = 0,854. P(|X̄ − 3,5| ≤ 0,854) = 0,682 exactement (la somme entre 11 et 17), contre 0,683 pour la normale ; P(|X̄ − 3,5| ≤ 1,96 × 0,854) = 0,946, contre 0,95.</li>
+      <li><b>Trente mesures de la vitesse de la lumière</b> (Brunton). Disons que chaque mesure a un bruit d'écart-type 100 km/s, valeur prise pour l'illustration, la même qu'en <a href="lesson-00-10-inegalites-lgn.html#n4">l10</a>. La moyenne de 30 mesures a pour SE 100/√30 = 18,26 km/s ; elle tombe à moins de 1,96 × 18,26 = 35,8 km/s de la vraie valeur dans environ 95 % des cas, que le bruit soit uniforme, exponentiel ou autre, pourvu que les mesures soient indépendantes, de même loi et de variance finie.</li>
+      <li><b>Cent pièces.</b> X̄ est la proportion de piles : μ = 0,5, σ = 0,5, SE = 0,05, donc Z = (X̄ − 0,5)/0,05. La normale limite de la binomiale (<a href="lesson-00-04-variables-binomiale-normale.html#n5">l04, notion 5</a>) est ce cas particulier du TCL, avec des Bernoulli.</li>
+      <li><b>Exemple ML : la perte d'un batch.</b> Sur un batch de 256 exemples tirés au hasard, la perte est la moyenne de 256 pertes individuelles. Elle fluctue autour de la perte moyenne μ avec un écart-type σ/√256 = σ/16, et sa loi est proche d'une normale même quand la perte d'un exemple est asymétrique, comme une cross-entropy, tant que cette asymétrie reste modérée : celle de la moyenne vaut γ₁/16 (notion 2). C'est l'argument derrière le bruit gaussien qu'on prête souvent au gradient de mini-batch ; il tombe quand les pertes individuelles ont des queues lourdes (notion 4).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Pourquoi ce zoom, et où est la preuve <small>culture : centre et largeur sont fixés, seule la forme reste</small></summary><div class="in">
+    <div class="drv">
+      <div>E[Z<sub><i>n</i></sub>] = (E[X̄<sub><i>n</i></sub>] − μ)/(σ/√<i>n</i>) = 0</div><span>E[X̄ₙ] = μ par linéarité (l10, notion 3)</span>
+      <div>Var(Z<sub><i>n</i></sub>) = Var(X̄<sub><i>n</i></sub>)/(σ²/<i>n</i>) = 1</div><span>Var(aY + b) = a² Var(Y) (l08, notion 9) ; Var(X̄ₙ) = σ²/n sous indépendance</span>
+    </div>
+    <p>Le zoom fixe le centre à 0 et la largeur à 1 pour tout n. Le TCL n'apprend donc rien sur le centre ni sur la largeur, déjà connus : il ne dit que la forme. C'est aussi le seul bon zoom. Zoomer moins, en divisant par σ/n<sup>0,4</sup>, plus grand que σ/√n, laisse une variance n<sup>−0,2</sup> qui tend vers 0 : la loi s'écrase encore. Zoomer plus, avec σ/n<sup>0,6</sup>, donne n<sup>0,2</sup> : elle s'étale sans fin.</p>
+    <p>La preuve que la forme limite est normale passe par la fonction génératrice des moments : c'est l'objet de <a href="lesson-00-12-generatrice-preuve-tcl.html#n6">l12, notion 6</a>.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>100 000 moyennes standardisées, et des données qui restent plates</small></summary><div class="in">
+<pre class="py">{{CODE:c1}}</pre>
+<pre class="out">{{OUT:c1}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>« X̄ devient normale » est mal dit.</b> X̄ₙ tend vers μ, une constante, et N(μ, σ²/n) s'écrase en un trait (vignette, en haut). Ce qui a une loi limite non dégénérée, c'est (X̄ₙ − μ)/(σ/√n). « X̄ₙ ≈ N(μ, σ²/n) » est une approximation à n fixé, pas une limite.</li>
+      <li><b>Ce sont les moyennes qui deviennent normales, pas les données.</b> Les 3 millions de lancers du code restent plats : chaque face sort une fois sur six. Beaucoup de données ne rendent pas une loi gaussienne ; seules une moyenne, une somme ou un estimateur qui se comporte comme elles le deviennent.</li>
+      <li><b>Convergence en loi, pas de densité.</b> La moyenne de n dés reste discrète pour tout n : P(X̄₂ = 3,5) = 6/36, et pour tout n chaque valeur s/n a une probabilité &gt; 0 ; elle n'a pas de densité. Ce qui converge, c'est P(Zₙ ≤ z) (figure 1) ; c'est pour cela que l'énoncé exact s'écrit avec Φ.</li>
+      <li><b>Standardiser ne suffit pas.</b> Une seule exponentielle standardisée a moyenne 0 et écart-type 1, mais reste une exponentielle décalée (<a href="lesson-00-06-fonctions-standardisation.html#n3">l06, notion 3</a>). C'est la moyenne de beaucoup de termes qui fabrique la cloche, pas la standardisation.</li>
+      <li><b>Le TCL ne dit pas à partir de quel n.</b> C'est une limite ; la vitesse dépend de la loi (notion 2).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (01) énonce le TCL comme « la moyenne de variables de même loi devient normale », et (36) écrit « X̄ₙ est normale, de moyenne μ et de variance σ²/n » comme une égalité, sans dire ce qui converge (à l'oral, seulement « quand n grandit, elle commence à être distribuée comme une gaussienne »). C'est : si X₁, …, Xₙ sont indépendantes, de même loi et de variance σ² finie, alors (X̄ₙ − μ)/(σ/√n) converge en loi vers N(0, 1) ; X̄ₙ, elle, tend vers μ. En 44, il donne la bonne forme, avec Φ, mais annonce sa stratégie par « même fonction génératrice, donc même densité » : c'est la fonction de répartition qui converge, comme il le dit en 36 (« techniquement, c'est la fonction de répartition ») et dans sa conclusion.</div>
+  </div></details>
+  <p class="garde">X₁, …, Xₙ indépendantes, de même loi, de variance σ² finie : (X̄ₙ − μ)/(σ/√n) converge en loi vers N(0, 1), et X̄ₙ ≈ N(μ, σ²/n) à n fixé. Ce sont les moyennes qui deviennent normales, pas les données.</p>
+</section>
+

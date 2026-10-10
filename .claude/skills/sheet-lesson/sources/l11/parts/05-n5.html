@@ -1,0 +1,67 @@
+<!-- ============================ n5 ============================ -->
+<section class="notion outil" id="n5">
+  <h3>La brique de l'intervalle de confiance : X̄ ± 1,96 σ/√n <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 36</p>
+  <div class="idee">
+    <p>Brunton finit sur les usages : intervalles de confiance, tests, et « quelle taille de sondage pour connaître l'issue d'une élection ? ». Tout part d'une ligne : la moyenne standardisée est presque N(0, 1), donc elle tombe entre −1,96 et +1,96 avec probabilité 0,95.</p>
+    <p>Isole μ dans cet événement : −1,96 ≤ (X̄ − μ)/(σ/√n) ≤ 1,96 revient à X̄ − 1,96 σ/√n ≤ μ ≤ X̄ + 1,96 σ/√n. L'intervalle bouge avec l'échantillon ; μ, lui, est fixe. La procédure capture μ dans environ 95 % des échantillons.</p>
+    <p>Un sondage de 1 000 électeurs donne 52 % pour A. Une voix est une Bernoulli, d'écart-type √(0,52 × 0,48) ≈ 0,50 : SE = 0,0158, et l'intervalle 0,52 ± 0,031 = [0,489 ; 0,551] contient 50 %. On ne peut pas annoncer A. Pour une marge de ±3 points dans le pire cas, p = ½ et σ = 0,5, il faut n = (1,96 × 0,5/0,03)², soit 1 068 personnes.</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — l'intervalle bouge, la vraie part reste</div>
+    <div id="v5ctl" class="sl-ctl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">Vingt-cinq sondages de 1 000 électeurs, tirés dans une population où la vraie part de A vaut 0,52 (trait rouge). Chaque barre est l'intervalle p̂ ± 1,96 SE d'un sondage. Les barres bougent, le trait rouge non : en moyenne une sur vingt le manque, et elle passe en rouge. Le pointillé est 50 % : environ trois intervalles sur quatre le contiennent aussi (74,6 % en théorie), et ces sondages-là ne départagent pas A et B. <b>25 nouveaux sondages</b> : le compte change, la part des barres qui touchent 0,52 tourne autour de 95 %.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(X̄ − 1,96 σ/√<i>n</i> ≤ μ ≤ X̄ + 1,96 σ/√<i>n</i>) ≈ 0,95 &nbsp;&nbsp; IC à 95 % : <i>x̄</i> ± 1,96 σ/√<i>n</i> &nbsp;&nbsp; taille pour une demi-largeur <i>h</i> : <i>n</i> = (1,96 σ/<i>h</i>)²</div>
+    <ul>
+      <li>X̄, la variable, donne l'intervalle aléatoire, avant les données. x̄ est sa réalisation : une fois calculé, [x̄ ± 1,96 σ/√n] contient μ ou ne le contient pas. Le 95 % qualifie la procédure, pas cet intervalle-là.</li>
+      <li>Il faut que le TCL vaille à ce n et pour cette loi : indépendance, variance finie, n assez grand pour l'asymétrie (notions 2 et 4). Pour une proportion, np ≥ 10 et n(1 − p) ≥ 10.</li>
+      <li>σ est en général inconnu. On le remplace par l'écart-type de l'échantillon, ou, pour une proportion, par √(p̂(1 − p̂)) : c'est l'intervalle de <b>Wald</b>. À grand n, cela ne change presque rien ; à petit n avec des données normales, 1,96 devient un quantile de Student, 2,262 pour n = 10 (<a href="../chains/chain-p01-03-inference-regression.html">p01-03</a>).</li>
+      <li><b>Wilson</b> : on garde p inconnu dans le SE et on résout |p̂ − p| ≤ 1,96 √(p(1 − p)/n) en p ; les bornes restent dans [0, 1] (preuve dépliable).</li>
+      <li>1,96 = Φ⁻¹(0,975). Pour 90 %, 1,645 ; pour 99 %, 2,576.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — un IC sur une proportion : c'est np qui décide, pas p</div>
+    <div id="f4ctl" class="sl-ctl"></div><div id="f4ctl2" class="sl-ctl"></div>
+    <div id="f4plot" class="wide"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">La couverture réelle, calculée exactement, de l'intervalle de Wald « à 95 % » sur une proportion, pour n = 30, 100 et 1 000 ; le trait rouge marque 95 %. Sur l'axe de la <b>prévalence p</b>, les trois courbes se séparent : à la même prévalence p = 0,02 (pointillé), Wald couvre 45 % à n = 30, 87 % à n = 100, 95 % à n = 1 000. Passe à l'axe des <b>succès attendus np</b> : chaque courbe glisse de log n, et les trois se superposent. Ce n'est pas la prévalence qui décide, c'est le nombre de succès. Sous np = 10 (pointillé), Wald couvre mal ; au-dessus, il oscille entre 91 et 96 %. Choisis <b>Wilson</b> : il reste entre 92 et 98 % dès np ≥ 1.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>un dé suspect, le sondage, un taux de bonnes réponses, un test A/B, un rappel</small></summary><div class="in">
+    <ol>
+      <li><b>Un dé suspect.</b> 30 lancers, x̄ = 3,8. Avec σ = 1,708 : 3,8 ± 1,96 × 1,708/√30 = 3,8 ± 0,61, soit [3,19 ; 4,41]. 3,5 est dedans : rien de suspect à ce niveau.</li>
+      <li><b>Le sondage</b> de l'idée : 520 voix sur 1 000, [0,489 ; 0,551]. ±3 points demandent 1 068 personnes ; ±1 point, 9 604 : neuf fois plus pour une marge divisée par trois (<a href="lesson-00-10-inegalites-lgn.html#n5">l10, notion 5</a>).</li>
+      <li><b>Exemple ML : un taux de bonnes réponses (accuracy).</b> 872 bonnes réponses sur 1 000 : SE = √(0,872 × 0,128/1 000) = 0,0106, et l'IC vaut [0,851 ; 0,893]. 872 succès et 128 échecs : le TCL tient.</li>
+      <li><b>Exemple ML : un test A/B.</b> A convertit 200 visiteurs sur 10 000 (2,0 %), B 240 sur 10 000 (2,4 %). Les deux groupes sont indépendants, donc les variances s'ajoutent (<a href="lesson-00-09-covariance-correlation.html#n2">l09, notion 2</a>) : le SE de la différence vaut √(0,02 × 0,98/10 000 + 0,024 × 0,976/10 000) = 0,00207. Différence 0,4 point, z = 1,93, IC [−0,01 ; 0,81] point : il contient 0 de justesse, pas de conclusion à 95 %. Le taux est rare, mais 200 et 240 succès suffisent largement au TCL.</li>
+      <li><b>Exemple ML : un rappel.</b> 28 positifs détectés sur 30, dans un jeu de test de 1 000 lignes. Le rappel est la moyenne de 30 Bernoulli, une par positif : son n vaut 30, pas 1 000. La suite est dans « où ça casse ».</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>culture : isoler μ, et d'où vient Wilson</small></summary><div class="in">
+    <div class="drv">
+      <div>−1,96 ≤ (X̄ − μ)/(σ/√<i>n</i>) ≤ 1,96</div><span>l'événement de probabilité ≈ 0,95 (notion 1)</span>
+      <div>−1,96 σ/√<i>n</i> ≤ X̄ − μ ≤ 1,96 σ/√<i>n</i></div><span>multiplier par σ/√n &gt; 0</span>
+      <div>−X̄ − 1,96 σ/√<i>n</i> ≤ −μ ≤ −X̄ + 1,96 σ/√<i>n</i></div><span>retrancher X̄</span>
+      <div>X̄ − 1,96 σ/√<i>n</i> ≤ μ ≤ X̄ + 1,96 σ/√<i>n</i></div><span>multiplier par −1 : les inégalités se retournent</span>
+    </div>
+    <p>Même événement, donc même probabilité : c'est tout ce qu'est un intervalle de confiance. Pour une proportion, σ = √(p(1 − p)) dépend du p inconnu. Wald y branche p̂. Wilson garde p et résout |p̂ − p| ≤ 1,96 √(p(1 − p)/n) en p : une inéquation du second degré, dont les deux racines sont les bornes. Elles restent dans [0, 1] par construction, et l'intervalle n'est pas centré sur p̂ mais tiré vers ½.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>Wald et Wilson sur 28/30, couvertures exactes</small></summary><div class="in">
+<pre class="py">{{CODE:c5}}</pre>
+<pre class="out">{{OUT:c5}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>« 95 % de chances que la vraie part soit dans [0,489 ; 0,551] » est faux</b> en lecture fréquentiste. La vraie part est fixe ; cet intervalle-là la contient ou ne la contient pas. Ce qui vaut 95 %, c'est la part des intervalles qui la contiennent quand on refait le sondage (vignette).</li>
+      <li><b>Ce n'est pas la prévalence qui casse Wald, c'est le nombre de succès ou d'échecs.</b> Rappel de 28/30 : p̂ = 0,933, SE = √(0,933 × 0,067/30) = 0,0455, et Wald donne [0,844 ; 1,023], qui sort de [0, 1] ; Wilson donne [0,787 ; 0,982]. Il n'y a que 2 échecs. À l'inverse, un taux de 2 % sur 10 000 visiteurs, 200 succès, ne pose aucun problème (figure 4).</li>
+      <li><b>Le rappel est une Bernoulli sur les positifs.</b> Son n est le nombre de positifs, 30, pas la taille du jeu de test, 1 000 : avec n = 1 000, on trouverait un SE de 0,0079, près de six fois trop petit.</li>
+      <li><b>σ estimé à petit n.</b> Avec 10 mesures, l'écart-type de l'échantillon fluctue lui-même, et 1,96 devient 2,262 (Student, <a href="../chains/chain-p01-03-inference-regression.html">p01-03</a>).</li>
+      <li><b>La dépendance rend l'intervalle trop étroit.</b> Avec ρ = 0,05 et n = 1 000 mesures d'écart-type σ = 1,708, celui d'un dé, le vrai SE vaut 0,385 et σ/√n annonce 0,054 : l'intervalle « à 95 % » ne contient μ que 22 % du temps (notion 4).</li>
+    </ul>
+  </div></details>
+  <p class="garde">Si le TCL s'applique, l'intervalle X̄ ± 1,96 σ/√n contient μ pour environ 95 % des échantillons : c'est l'intervalle qui est aléatoire, μ est fixe.</p>
+</section>
+

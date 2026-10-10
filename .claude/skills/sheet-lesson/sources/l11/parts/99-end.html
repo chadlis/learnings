@@ -1,0 +1,57 @@
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>TCL : X₁, …, Xₙ indépendantes, de même loi, de variance finie ⇒ (X̄ₙ − μ)/(σ/√n) → N(0, 1) en loi.</li>
+    <li>X̄ₙ, elle, tend vers μ : X̄ₙ ≈ N(μ, σ²/n) est une approximation à n fixé. Ce sont les moyennes, pas les données, qui deviennent normales.</li>
+    <li>Vitesse : l'asymétrie de la moyenne vaut γ₁/√n (exponentielle : 2/√n) ; pour une proportion, np ≥ 10 et n(1 − p) ≥ 10.</li>
+    <li>Somme : Sₙ ≈ N(nμ, nσ²), le même théorème ; sa largeur σ√n grandit ; fiable au centre, pas dans les queues lointaines.</li>
+    <li>Casse : dépendance (plafond σ√ρ) ; variance infinie (plus de limite normale ; sans moyenne, la Cauchy ne se resserre jamais) ; « n ≥ 30 » pris pour une règle.</li>
+    <li>IC : X̄ ± 1,96 σ/√n capture μ dans environ 95 % des échantillons ; l'intervalle est aléatoire, μ est fixe.</li>
+    <li>Wald casse par le nombre de succès ou d'échecs, pas par la prévalence : 28/30 donne [0,844 ; 1,023] ; Wilson, [0,787 ; 0,982].</li>
+  </ol>
+</div>
+<div class="phrase">« Si les observations sont indépendantes, de même loi et de variance finie, la moyenne standardisée, (X̄ − μ)/(σ/√n), converge en loi vers une normale standard, quelle que soit la loi de départ ; en pratique X̄ ≈ N(μ, σ²/n), d'où l'intervalle X̄ ± 1,96 σ/√n. La vitesse dépend de la loi : lente si elle est asymétrique, et pour une proportion il faut au moins dix succès et dix échecs. Le théorème casse avec la dépendance et les variances infinies. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Énonce le TCL avec ses hypothèses.</div><div class="a hid">X₁, …, Xₙ indépendantes, de même loi, de variance σ² finie : (X̄ₙ − μ)/(σ/√n) converge en loi vers N(0, 1).</div></li>
+    <li><div class="q">Pourquoi ne pas dire « X̄ devient normale » ?</div><div class="a hid">X̄ tend vers μ, une constante ; c'est la version standardisée qui a une loi limite. X̄ ≈ N(μ, σ²/n) n'est qu'une approximation à n fixé.</div></li>
+    <li><div class="q">La moyenne de 30 exponentielles est-elle normale ?</div><div class="a hid">Pas tout à fait : asymétrie 2/√30 = 0,37 ; 3,4 % des moyennes au-delà de μ + 1,96 SE au lieu de 2,5 %, et 1,4 % en deçà de μ − 1,96 SE.</div></li>
+    <li><div class="q">Pourquoi la moyenne de n Cauchy ne se resserre-t-elle pas ?</div><div class="a hid">Elle n'a pas de moyenne : la loi des grands nombres elle-même tombe, et X̄ₙ a la loi d'une seule Cauchy, pour tout n.</div></li>
+    <li><div class="q">Quelle est la loi approchée de la somme de 100 dés ?</div><div class="a hid">N(350 ; 17,08²), puisque nμ = 350 et σ√n = 1,708 × 10 ; P(S ≥ 380) ≈ 4,2 %.</div></li>
+    <li><div class="q">28 bons sur 30 positifs : pourquoi l'intervalle de Wald échoue-t-il ?</div><div class="a hid">Deux échecs seulement, n(1 − p̂) = 2 &lt; 10. Wald donne [0,844 ; 1,023] et sort de [0, 1] ; Wilson donne [0,787 ; 0,982].</div></li>
+    <li><div class="q">Que qualifie le 95 % d'un intervalle de confiance ?</div><div class="a hid">La procédure : la part des échantillons dont l'intervalle contient μ, environ 95 % quand le TCL s'applique. μ est fixe, l'intervalle est aléatoire.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts, chaînes et suite</div>
+  <div class="bridges">
+    <a href="../chains/chain-p01-01-objet-aleatoire.html"><b>L'objet aléatoire (fil A)</b><small>X̄ devient un estimateur, σ/√n le SE d'une proportion, et Wald contre Wilson se rejoue sur le rappel de 28/30 : la notion 5 vue du côté de l'estimation.</small></a>
+    <a href="../chains/chain-p01-02-ic-test-procedure.html"><b>IC et test</b><small>L'intervalle et la p-value posés sur la normale de la notion 5 ; le 95 % qualifie la procédure.</small></a>
+    <a href="../chains/chain-p01-03-inference-regression.html"><b>Inférence en régression</b><small>σ inconnu à petit n : Student remplace 1,96.</small></a>
+    <a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html"><b>Comparer deux modèles</b><small>z = différence sur SE pour deux accuracies mesurées sur le même jeu de test.</small></a>
+    <a href="../chains/chain-p01-05-bootstrap.html"><b>Bootstrap</b><small>La distribution d'échantillonnage sans formule, quand aucun TCL ne donne le SE (médiane, AUC).</small></a>
+    <a href="../bridges/bridge-04-variance-moyenne-correlee.html"><b>Variance d'une moyenne corrélée</b><small>La première cassure de la notion 4, dérivée jusqu'au bout : ρσ² + (1 − ρ)σ²/n.</small></a>
+    <a href="lesson-00-12-generatrice-preuve-tcl.html#n6"><b>l12 · La preuve du TCL</b><small>Pourquoi la forme limite est normale : la fonction génératrice, en six étapes, avec ses trous.</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::tcl</code> (notions 1 à 4) · <code>stats::normale</code> (notion 5).</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l11 · v1 du 10/10/2026 · Brunton 36, avec les énoncés de 01 et 44 · Prérequis : <a href="lesson-00-06-fonctions-standardisation.html">l06</a>, <a href="lesson-00-10-inegalites-lgn.html">l10</a>. Suite : <a href="lesson-00-12-generatrice-preuve-tcl.html">l12 · Fonction génératrice et preuve du TCL</a>.</footer>
+</div>

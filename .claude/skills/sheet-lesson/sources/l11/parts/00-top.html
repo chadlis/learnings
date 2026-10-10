@@ -1,0 +1,48 @@
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 11</div>
+  <h1>Théorème <span>central limite</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">La loi des grands nombres dit où va la moyenne de n mesures : vers μ ; Var(X̄) = σ²/n donne sa largeur, σ/√n. Le <b>théorème central limite</b> dit quelle forme a sa loi en chemin : une cloche, quelle que soit la loi d'une mesure, pourvu que les mesures soient indépendantes, de même loi et de variance finie. La leçon suit Brunton 36, avec ses exemples : mesurer trente fois la vitesse de la lumière, lancer des dés, sonder des électeurs. Elle dit aussi à partir de quel n, où ça casse, et comment on en tire l'intervalle X̄ ± 1,96 σ/√n.</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="lesson-00-06-fonctions-standardisation.html#n3">l06 · Standardiser</a></li>
+    <li><a href="lesson-00-10-inegalites-lgn.html#n3">l10 · X̄, E[X̄], Var(X̄)</a></li>
+    <li><a href="lesson-00-10-inegalites-lgn.html#n4">l10 · Loi des grands nombres</a></li>
+    <li><a href="lesson-00-10-inegalites-lgn.html#n5">l10 · Erreur standard σ/√n</a></li>
+    <li><a href="lesson-00-04-variables-binomiale-normale.html#n6">l04 · La normale et Φ</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::tcl</code><code>stats::normale</code></div>
+  <h4>Ponts et suite</h4>
+  <ol>
+    <li><a href="../bridges/bridge-04-variance-moyenne-correlee.html">Variance d'une moyenne corrélée</a></li>
+    <li><a href="lesson-00-12-generatrice-preuve-tcl.html#n6">l12 · La preuve du TCL</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>La moyenne est une variable aléatoire.</b> X̄ₙ = (X₁ + … + Xₙ)/n change à chaque expérience. E[X̄ₙ] = μ par linéarité ; Var(X̄ₙ) = σ²/n quand les mesures sont indépendantes et de même loi (<a href="lesson-00-10-inegalites-lgn.html#n3">l10, notion 3</a>).</li>
+      <li><b>La loi des grands nombres et l'erreur standard.</b> X̄ₙ tend vers μ ; son écart-type σ/√n s'appelle l'erreur standard (SE). La somme, elle, s'écarte de nμ en σ√n (<a href="lesson-00-10-inegalites-lgn.html#n4">l10, notions 4</a> et <a href="lesson-00-10-inegalites-lgn.html#n5">5</a>).</li>
+      <li><b>Standardiser.</b> Z = (X − μ)/σ a pour moyenne 0 et pour écart-type 1, et garde la forme de X : standardiser ne rend pas normal (<a href="lesson-00-06-fonctions-standardisation.html#n3">l06, notion 3</a>).</li>
+      <li><b>La normale.</b> Z ~ N(0, 1), Φ(z) = P(Z ≤ z), et P(|Z| ≤ 1,96) = 0,95 (<a href="lesson-00-04-variables-binomiale-normale.html#n6">l04, notion 6</a>). La binomiale s'en approche quand n grandit (<a href="lesson-00-04-variables-binomiale-normale.html#n7">l04, notion 7</a>).</li>
+      <li><b>Le dé et l'asymétrie.</b> Un dé : μ = 3,5, σ² = 35/12 = 2,917, σ = 1,708 (<a href="lesson-00-08-esperance-variance.html#n6">l08, notion 6</a>). L'asymétrie γ₁ = E[((X − μ)/σ)³] dit de quel côté traîne la queue (<a href="lesson-00-08-esperance-variance.html#n7">l08, notion 7</a>).</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">

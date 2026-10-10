@@ -1,0 +1,10 @@
+.sl-fn.dashfn{stroke-dasharray:6 4;stroke-width:2}
+.sl-fn.thin{stroke-width:1.6}
+.sl-seg.gap{stroke:#B7791F;stroke-width:4;opacity:.85}
+.sl-seg.bracket{stroke:var(--cardink);stroke-width:1.6}
+.sl-ref{fill:var(--cardmuted);opacity:.32}
+.sl-seg.sl-ci{stroke:var(--pen);stroke-width:2.6}
+.sl-seg.sl-ci.miss{stroke:var(--red);stroke-width:3}
+.v-row.three>div{flex:1 1 210px}
+.v-row.three .sl-lbl{font-size:13px}
+.sl-gridl0{stroke:rgba(34,48,43,.08)}

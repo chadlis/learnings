@@ -1,0 +1,7 @@
+recall 28/30  Wald [0.844 ; 1.023]
+recall 28/30  Wilson [0.787 ; 0.982]
+n=  30 p=0.930  fewest   2.1   Wald 0.883  Wilson 0.945
+n=  30 p=0.020  fewest   0.6   Wald 0.454  Wilson 0.978
+n= 100 p=0.020  fewest   2.0   Wald 0.866  Wilson 0.949
+n=1000 p=0.020  fewest  20.0   Wald 0.950  Wilson 0.947
+n=1000 p=0.872  fewest 128.0   Wald 0.951  Wilson 0.948

@@ -1,0 +1,5 @@
+exponential n= 30: skew 0.36 (theory 0.37)  P(Z>1.96)=0.033  P(Z<-1.96)=0.014
+exponential n=100: skew 0.20 (theory 0.20)  P(Z>1.96)=0.030  P(Z<-1.96)=0.020
+Bernoulli(0.02) n= 30: np= 0.6  no success 54.6%  skew 1.25
+Bernoulli(0.02) n=100: np= 2.0  no success 13.4%  skew 0.68
+Bernoulli(0.02) n=500: np=10.0  no success 0.0%  skew 0.32

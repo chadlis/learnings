@@ -1,0 +1,1097 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Théorème central limite — leçon</title>
+<meta name="sheet" content="series=lesson;part=00;number=11;status=v1">
+<meta name="part" content="00 · Socle probabiliste">
+<meta name="subtitle" content="socle — Brunton 36 : la forme de la moyenne, à quelle vitesse, et où ça casse">
+<meta name="prereq" content="l06,l10">
+<meta name="anki" content="stats::tcl,stats::normale">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- série `coding` : squelette annoté et ruban de SL.trace (inerte hors coding) ---- */
+.skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.skel b{color:var(--pen);font-weight:600}
+.step .card.full,.step .card.casse{grid-column:1 / -1}
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .wide table{min-width:520px}
+.card .wide th:nth-child(2),.card .wide td:nth-child(2),
+.card .wide th:nth-child(3),.card .wide td:nth-child(3){text-align:left}
+.readouts .c1 b{color:var(--pen)}.readouts .c3 b{color:var(--red)}
+.sl-trace{--cw:58px;--cgap:8px;margin:4px 0 2px}
+.sl-cells{display:flex;gap:var(--cgap)}
+.sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
+.sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
+.sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.dim{background:rgba(34,48,43,.07);border-color:rgba(34,48,43,.18);border-style:dashed}
+.sl-cell.dim b,.sl-cell.dim i{color:var(--cardmuted);opacity:.5}
+.sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
+.sl-cell.win{border-color:var(--green);border-width:2.5px}
+.sl-ptrs{position:relative;height:20px;margin-top:5px}
+.sl-ptr{position:absolute;top:0;left:calc(var(--i) * (var(--cw) + var(--cgap)));width:var(--cw);text-align:center;font:600 12px var(--sans);color:var(--pen)}
+.sl-note{font-size:14px;color:var(--cardink);margin-top:10px}
+.sl-inv{font:12.5px/1.55 var(--mono);color:var(--cardmuted);margin-top:6px;border-left:2px solid #B7791F;padding-left:10px}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ===== série `lesson` : le cours autoporteur du socle (10/10/2026) ===== */
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px;color:var(--muted);margin:10px 0 0}
+.legend .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-right:6px}
+.lecon{counter-reset:notion}
+.notion{padding:22px 0 28px;border-top:1.5px dashed var(--line);max-width:900px}
+.notion h3{position:relative;padding-left:44px;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.3;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:2px}
+.notion h3::before{counter-increment:notion;content:counter(notion);position:absolute;left:0;top:-1px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle;text-shadow:none}
+.tag.outil{color:var(--mint)}.tag.culture{color:var(--violet)}
+.src{font-size:12.5px;color:var(--faint);margin:0 0 10px 44px}
+.idee{margin-left:44px;color:var(--chalk);font-size:16px;line-height:1.62;max-width:72ch}
+.idee p{margin:7px 0}
+.idee b{color:var(--yellow);font-weight:600}
+.formule{margin:12px 0 10px 44px;background:var(--card);color:var(--cardink);border-radius:3px;padding:12px 18px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--yellow)}
+.formule .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:4px}
+.formule .eq{font-size:17.5px}
+.formule ul{padding-left:18px;margin-top:6px}.formule li{font-size:14.5px;margin:3px 0;color:var(--cardmuted)}
+.notion .fig{margin-left:44px}
+details{margin:8px 0 0 44px;background:var(--card);color:var(--cardink);border-radius:3px;border-left:4px solid var(--ac,var(--yellow));box-shadow:0 10px 20px -16px rgba(0,0,0,.6)}
+details>summary{cursor:pointer;list-style:none;padding:9px 14px;font:600 13px var(--sans);letter-spacing:.03em;color:var(--cardink)}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸";display:inline-block;width:16px;color:var(--cardmuted)}
+details[open]>summary::before{content:"▾"}
+details>summary small{font-weight:400;color:var(--cardmuted);margin-left:6px;letter-spacing:0}
+details .in{padding:2px 18px 14px}
+details .in p,details .in li{font-size:15px;line-height:1.55;margin:5px 0}
+details .in ol,details .in ul{padding-left:20px}
+details.ex{--ac:var(--teal)}details.preuve{--ac:var(--violet)}details.code{--ac:var(--blue)}details.casse{--ac:var(--pink)}details.loin{--ac:var(--faint)}
+.drv{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:4px 16px;margin:8px 0;align-items:baseline}
+.drv>div{font-family:var(--math);font-size:16px;line-height:1.6}
+.drv>span{font-size:13.5px;color:var(--cardmuted);border-left:2px solid var(--cardline);padding-left:10px}
+@media(max-width:700px){.drv{grid-template-columns:minmax(0,1fr)}.drv>span{margin-bottom:6px}}
+pre.py,pre.out,pre.tri{font:13px/1.6 var(--mono);background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:pre}
+pre.out{background:transparent;border:1px dashed var(--cardline);color:var(--cardmuted)}
+pre.out::before{content:"sortie\A";font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.brunton{margin:10px 0 4px;padding:8px 12px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft);font-size:14.5px}
+.brunton b{display:block;font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:2px}
+.garde{margin:14px 0 0 44px;font-family:var(--serif);font-size:16.5px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--yellow);padding:4px 0 4px 14px;max-width:72ch}
+.garde::before{content:"Ce qu'on garde";display:block;font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);text-shadow:none;margin-bottom:2px}
+.notion.culture .garde{border-left-color:var(--violet)}
+.notion table{background:var(--cardsoft);border-radius:3px}
+.sl-fulcrum{fill:var(--red)}.sl-bar2{fill:var(--red);opacity:.55}.sl-bar3{fill:var(--pen);opacity:.6}
+@media(max-width:600px){.idee,.formule,details,.garde,.src,.notion .fig{margin-left:0}.notion h3{font-size:19px}}
+.sl-seg.sl-c1{stroke:var(--pen);stroke-width:2}.sl-seg.sl-c2{stroke:#6B46C1;stroke-width:2}.sl-seg.sl-c3{stroke:var(--red);stroke-width:2}.sl-seg.sl-c4{stroke:#1F5FA8;stroke-width:2}
+/* ===== v2 (10/10/2026) : vignettes « voir l'idée », sous chaque idée ===== */
+.fig.vis{--ac:var(--teal)}
+.v-row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:center}
+.v-row>div{flex:1 1 280px;min-width:0}.v-row>.v-mini{flex:0 1 220px}
+.v-row .sl-plot{min-width:0}
+.nogrid .sl-grid{display:none}
+.sl-ruler{fill:var(--cardmuted)}
+.sl-mass{fill:#6B46C1;opacity:.85}
+.sl-mass-t{font:600 11px var(--sans);fill:#fff}
+.sl-sq{fill:rgba(107,70,193,.16);stroke:#6B46C1;stroke-width:1.5}
+.sl-sq-t{font:600 12.5px var(--mono);fill:#6B46C1}
+.sl-cellp{fill:#6B46C1}.sl-cello{fill:none;stroke:var(--cardline)}
+.sl-prod{font:12px var(--mono);fill:var(--cardmuted);opacity:.5}.sl-prod.on{font-weight:700;fill:var(--cardink);opacity:1}
+.sl-seg.sl-dash{stroke-dasharray:4 3}.sl-seg.sl-link{stroke:rgba(34,48,43,.28);stroke-dasharray:3 3}
+.sl-seg.sl-c5{stroke:#B7791F;stroke-width:2}
+.sl-orbit{fill:none;stroke:rgba(34,48,43,.3);stroke-dasharray:3 4}
+.sl-stick{stroke:var(--cardmuted);stroke-width:4;stroke-linecap:round}
+.sl-dot.sl-tiny{stroke:none;opacity:.5}
+.sl-k1{fill:var(--pen)}.sl-k2{fill:#6B46C1}.sl-k3{fill:var(--red)}.sl-k4{fill:#1F5FA8}.sl-k5{fill:#B7791F}.sl-k6{fill:var(--green)}.sl-kc{opacity:.5}
+.sl-cell-t{font:600 11px var(--sans);fill:var(--cardink)}
+/* ---- propre à cette leçon ---- */
+.sl-fn.dashfn{stroke-dasharray:6 4;stroke-width:2}
+.sl-fn.thin{stroke-width:1.6}
+.sl-seg.gap{stroke:#B7791F;stroke-width:4;opacity:.85}
+.sl-seg.bracket{stroke:var(--cardink);stroke-width:1.6}
+.sl-ref{fill:var(--cardmuted);opacity:.32}
+.sl-seg.sl-ci{stroke:var(--pen);stroke-width:2.6}
+.sl-seg.sl-ci.miss{stroke:var(--red);stroke-width:3}
+.v-row.three>div{flex:1 1 210px}
+.v-row.three .sl-lbl{font-size:13px}
+.sl-gridl0{stroke:rgba(34,48,43,.08)}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 11</div>
+  <h1>Théorème <span>central limite</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">La loi des grands nombres dit où va la moyenne de n mesures : vers μ ; Var(X̄) = σ²/n donne sa largeur, σ/√n. Le <b>théorème central limite</b> dit quelle forme a sa loi en chemin : une cloche, quelle que soit la loi d'une mesure, pourvu que les mesures soient indépendantes, de même loi et de variance finie. La leçon suit Brunton 36, avec ses exemples : mesurer trente fois la vitesse de la lumière, lancer des dés, sonder des électeurs. Elle dit aussi à partir de quel n, où ça casse, et comment on en tire l'intervalle X̄ ± 1,96 σ/√n.</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="lesson-00-06-fonctions-standardisation.html#n3">l06 · Standardiser</a></li>
+    <li><a href="lesson-00-10-inegalites-lgn.html#n3">l10 · X̄, E[X̄], Var(X̄)</a></li>
+    <li><a href="lesson-00-10-inegalites-lgn.html#n4">l10 · Loi des grands nombres</a></li>
+    <li><a href="lesson-00-10-inegalites-lgn.html#n5">l10 · Erreur standard σ/√n</a></li>
+    <li><a href="lesson-00-04-variables-binomiale-normale.html#n6">l04 · La normale et Φ</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::tcl</code><code>stats::normale</code></div>
+  <h4>Ponts et suite</h4>
+  <ol>
+    <li><a href="../bridges/bridge-04-variance-moyenne-correlee.html">Variance d'une moyenne corrélée</a></li>
+    <li><a href="lesson-00-12-generatrice-preuve-tcl.html#n6">l12 · La preuve du TCL</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>La moyenne est une variable aléatoire.</b> X̄ₙ = (X₁ + … + Xₙ)/n change à chaque expérience. E[X̄ₙ] = μ par linéarité ; Var(X̄ₙ) = σ²/n quand les mesures sont indépendantes et de même loi (<a href="lesson-00-10-inegalites-lgn.html#n3">l10, notion 3</a>).</li>
+      <li><b>La loi des grands nombres et l'erreur standard.</b> X̄ₙ tend vers μ ; son écart-type σ/√n s'appelle l'erreur standard (SE). La somme, elle, s'écarte de nμ en σ√n (<a href="lesson-00-10-inegalites-lgn.html#n4">l10, notions 4</a> et <a href="lesson-00-10-inegalites-lgn.html#n5">5</a>).</li>
+      <li><b>Standardiser.</b> Z = (X − μ)/σ a pour moyenne 0 et pour écart-type 1, et garde la forme de X : standardiser ne rend pas normal (<a href="lesson-00-06-fonctions-standardisation.html#n3">l06, notion 3</a>).</li>
+      <li><b>La normale.</b> Z ~ N(0, 1), Φ(z) = P(Z ≤ z), et P(|Z| ≤ 1,96) = 0,95 (<a href="lesson-00-04-variables-binomiale-normale.html#n6">l04, notion 6</a>). La binomiale s'en approche quand n grandit (<a href="lesson-00-04-variables-binomiale-normale.html#n7">l04, notion 7</a>).</li>
+      <li><b>Le dé et l'asymétrie.</b> Un dé : μ = 3,5, σ² = 35/12 = 2,917, σ = 1,708 (<a href="lesson-00-08-esperance-variance.html#n6">l08, notion 6</a>). L'asymétrie γ₁ = E[((X − μ)/σ)³] dit de quel côté traîne la queue (<a href="lesson-00-08-esperance-variance.html#n7">l08, notion 7</a>).</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">
+<!-- ============================ n1 ============================ -->
+<section class="notion outil" id="n1">
+  <h3>L'énoncé exact : la moyenne standardisée devient normale <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 36 · The Central Limit Theorem (énoncés aussi en 01 et 44)</p>
+  <div class="idee">
+    <p>Brunton prend une grandeur difficile à mesurer, la vitesse de la lumière. On refait l'expérience trente fois, on obtient trente valeurs un peu différentes, et on fait leur moyenne. La loi des grands nombres dit où va cette moyenne : vers la vraie valeur μ ; Var(X̄) donne sa largeur, σ/√n. Le <b>théorème central limite</b> dit quelle forme a sa loi : une cloche, quelle que soit la loi d'une seule mesure.</p>
+    <p>Avec des dés, la cloche se fabrique sous nos yeux. Un dé : six barres plates. La moyenne de deux dés : un triangle, où 3,5 sort avec probabilité 6/36. La moyenne de quatre dés : déjà une cloche, qui tombe à moins d'un SE (0,854) de 3,5 dans 68,2 % des cas ; la normale dit 68,3 %.</p>
+    <p>Mais quand n grandit, la cloche s'écrase sur 3,5 et finit en un trait. Pour garder sa forme en vue, il faut <b>zoomer</b> au rythme où elle se resserre : retirer μ, diviser par σ/√n. C'est cette moyenne standardisée qui converge vers N(0, 1).</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — refaire l'expérience : n dés, une moyenne, mille fois</div>
+    <div id="v1sl"></div><div id="v1ctl" class="sl-ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">Chaque expérience lance n dés et garde leur moyenne x̄ ; Brunton annonce cette expérience sur ordinateur (n = 100, refaite 50 fois) ; ici, elle est refaite 1 000 fois. En haut, l'axe brut de 1 à 6 : monte <b>n</b>, la cloche se resserre sur 3,5 jusqu'à n'être plus qu'un trait, c'est la loi des grands nombres. En bas, les mêmes moyennes zoomées, z = (x̄ − 3,5)/(σ/√n) : leur écart-type reste 1, et leur forme rejoint la courbe rouge N(0, 1) (dès n = 10, les valeurs voisines sont regroupées en classes, sinon 1 000 tirages répartis sur 150 barres feraient des dents de scie). À n = 1, six barres plates ; à n = 2, un triangle ; à n = 4, déjà une cloche. <b>Refaire</b> tire 1 000 nouvelles expériences.</p>
+  </div>
+  <div class="formule"><div class="lbl">L'énoncé</div>
+    <div class="eq">Z<sub><i>n</i></sub> = (X̄<sub><i>n</i></sub> − μ)/(σ/√<i>n</i>) &nbsp;&nbsp;&nbsp; P(Z<sub><i>n</i></sub> ≤ <i>z</i>) → Φ(<i>z</i>) pour tout <i>z</i>, quand <i>n</i> → ∞</div>
+    <ul>
+      <li>X₁, …, Xₙ <b>indépendantes</b> : chaque mesure apporte un aléa neuf. C'est ce qui donne Var(X̄ₙ) = σ²/n, et ce qui empêche un aléa commun de survivre à la moyenne (notion 4).</li>
+      <li>de <b>même loi</b> : un seul μ et un seul σ, ceux d'une mesure. C'est ce qui fait de σ/√n la bonne échelle. L'hypothèse peut s'affaiblir (condition de Lindeberg) : des lois différentes conviennent si aucun terme ne domine la somme.</li>
+      <li>de <b>variance σ² finie</b>, et non nulle : sans elle, l'échelle σ/√n n'existe pas et la limite n'est plus normale ; si même la moyenne manque, comme pour la Cauchy, X̄ ne se resserre pas du tout (notion 4).</li>
+      <li>« → » est une <b>convergence en loi</b> : c'est la fonction de répartition de Zₙ qui tend vers Φ (figure 1). Pas une densité : la moyenne de n dés n'en a pas.</li>
+      <li>À n fixé, on s'en sert sous la forme approchée <b>X̄ₙ ≈ N(μ, σ²/n)</b> : « ≈ » et non « = », et la qualité de l'approximation dépend de la loi (notion 2).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — ce qui converge : la fonction de répartition</div>
+    <div id="f1ctl" class="sl-ctl"></div><div id="f1sl"></div>
+    <div id="f1plot" class="wide"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">L'escalier est la fonction de répartition exacte de Zₙ, la moyenne standardisée de n dés ; la courbe rouge est Φ. L'énoncé dit que l'écart entre les deux tend vers 0 partout. Monte <b>n</b> : l'écart maximal, marqué en ocre, vaut 0,143 à n = 1, 0,059 à n = 4, 0,021 à n = 30, 0,012 à n = 100. L'escalier reste un escalier : chaque marche est une probabilité P(Sₙ = s), qui rapetisse sans disparaître ; il n'y a pas de densité à faire converger. Choisis la <b>pièce</b> : deux valeurs par lancer, des marches plus hautes ; à n = 100, l'écart vaut encore 0,040, la moitié de la marche centrale P(S = 50) = 0,080.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>un dé, quatre dés, la vitesse de la lumière, cent pièces, un batch</small></summary><div class="in">
+    <ol>
+      <li><b>Un dé, n = 1.</b> Z = (X − 3,5)/1,708 prend six valeurs, de −1,46 à +1,46, avec la même probabilité. Aucune cloche, et 100 % des valeurs sont dans ±1,96 au lieu de 95 % : le TCL ne dit rien pour un n donné, il parle de la limite.</li>
+      <li><b>Quatre dés.</b> SE = 1,708/√4 = 0,854. P(|X̄ − 3,5| ≤ 0,854) = 0,682 exactement (la somme entre 11 et 17), contre 0,683 pour la normale ; P(|X̄ − 3,5| ≤ 1,96 × 0,854) = 0,946, contre 0,95.</li>
+      <li><b>Trente mesures de la vitesse de la lumière</b> (Brunton). Disons que chaque mesure a un bruit d'écart-type 100 km/s, valeur prise pour l'illustration, la même qu'en <a href="lesson-00-10-inegalites-lgn.html#n4">l10</a>. La moyenne de 30 mesures a pour SE 100/√30 = 18,26 km/s ; elle tombe à moins de 1,96 × 18,26 = 35,8 km/s de la vraie valeur dans environ 95 % des cas, que le bruit soit uniforme, exponentiel ou autre, pourvu que les mesures soient indépendantes, de même loi et de variance finie.</li>
+      <li><b>Cent pièces.</b> X̄ est la proportion de piles : μ = 0,5, σ = 0,5, SE = 0,05, donc Z = (X̄ − 0,5)/0,05. La normale limite de la binomiale (<a href="lesson-00-04-variables-binomiale-normale.html#n5">l04, notion 5</a>) est ce cas particulier du TCL, avec des Bernoulli.</li>
+      <li><b>Exemple ML : la perte d'un batch.</b> Sur un batch de 256 exemples tirés au hasard, la perte est la moyenne de 256 pertes individuelles. Elle fluctue autour de la perte moyenne μ avec un écart-type σ/√256 = σ/16, et sa loi est proche d'une normale même quand la perte d'un exemple est asymétrique, comme une cross-entropy, tant que cette asymétrie reste modérée : celle de la moyenne vaut γ₁/16 (notion 2). C'est l'argument derrière le bruit gaussien qu'on prête souvent au gradient de mini-batch ; il tombe quand les pertes individuelles ont des queues lourdes (notion 4).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Pourquoi ce zoom, et où est la preuve <small>culture : centre et largeur sont fixés, seule la forme reste</small></summary><div class="in">
+    <div class="drv">
+      <div>E[Z<sub><i>n</i></sub>] = (E[X̄<sub><i>n</i></sub>] − μ)/(σ/√<i>n</i>) = 0</div><span>E[X̄ₙ] = μ par linéarité (l10, notion 3)</span>
+      <div>Var(Z<sub><i>n</i></sub>) = Var(X̄<sub><i>n</i></sub>)/(σ²/<i>n</i>) = 1</div><span>Var(aY + b) = a² Var(Y) (l08, notion 9) ; Var(X̄ₙ) = σ²/n sous indépendance</span>
+    </div>
+    <p>Le zoom fixe le centre à 0 et la largeur à 1 pour tout n. Le TCL n'apprend donc rien sur le centre ni sur la largeur, déjà connus : il ne dit que la forme. C'est aussi le seul bon zoom. Zoomer moins, en divisant par σ/n<sup>0,4</sup>, plus grand que σ/√n, laisse une variance n<sup>−0,2</sup> qui tend vers 0 : la loi s'écrase encore. Zoomer plus, avec σ/n<sup>0,6</sup>, donne n<sup>0,2</sup> : elle s'étale sans fin.</p>
+    <p>La preuve que la forme limite est normale passe par la fonction génératrice des moments : c'est l'objet de <a href="lesson-00-12-generatrice-preuve-tcl.html#n6">l12, notion 6</a>.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>100 000 moyennes standardisées, et des données qui restent plates</small></summary><div class="in">
+<pre class="py">import numpy as np
+from scipy.stats import norm
+
+rng = np.random.default_rng(0)
+mu, sigma = 3.5, np.sqrt(35 / 12)          # one fair die
+reps = 100_000                             # repeat the experiment 100,000 times
+for n in (1, 4, 30):
+    rolls = rng.integers(1, 7, size=(reps, n))
+    z = (rolls.mean(axis=1) - mu) / (sigma / np.sqrt(n))   # standardized mean
+    inside = np.mean(np.abs(z) &lt;= 1.96)
+    print(f"n={n:2d}  mean(Z)={z.mean():+.3f}  sd(Z)={z.std():.3f}  "
+          f"P(Z&lt;=1)={np.mean(z &lt;= 1):.3f}  P(|Z|&lt;=1.96)={inside:.3f}")
+print(f"N(0,1)                          P(Z&lt;=1)={norm.cdf(1):.3f}  "
+      f"P(|Z|&lt;=1.96)={norm.cdf(1.96) - norm.cdf(-1.96):.3f}")
+
+# the data themselves do not become normal: the 3,000,000 rolls of n=30 stay flat
+share = np.bincount(rolls.ravel(), minlength=7)[1:] / rolls.size
+print("share of each face among all rolls:", np.round(share, 3))</pre>
+<pre class="out">n= 1  mean(Z)=-0.001  sd(Z)=0.999  P(Z&lt;=1)=0.835  P(|Z|&lt;=1.96)=1.000
+n= 4  mean(Z)=+0.002  sd(Z)=0.999  P(Z&lt;=1)=0.841  P(|Z|&lt;=1.96)=0.946
+n=30  mean(Z)=+0.004  sd(Z)=1.000  P(Z&lt;=1)=0.844  P(|Z|&lt;=1.96)=0.953
+N(0,1)                          P(Z&lt;=1)=0.841  P(|Z|&lt;=1.96)=0.950
+share of each face among all rolls: [0.167 0.167 0.166 0.167 0.167 0.167]</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>« X̄ devient normale » est mal dit.</b> X̄ₙ tend vers μ, une constante, et N(μ, σ²/n) s'écrase en un trait (vignette, en haut). Ce qui a une loi limite non dégénérée, c'est (X̄ₙ − μ)/(σ/√n). « X̄ₙ ≈ N(μ, σ²/n) » est une approximation à n fixé, pas une limite.</li>
+      <li><b>Ce sont les moyennes qui deviennent normales, pas les données.</b> Les 3 millions de lancers du code restent plats : chaque face sort une fois sur six. Beaucoup de données ne rendent pas une loi gaussienne ; seules une moyenne, une somme ou un estimateur qui se comporte comme elles le deviennent.</li>
+      <li><b>Convergence en loi, pas de densité.</b> La moyenne de n dés reste discrète pour tout n : P(X̄₂ = 3,5) = 6/36, et pour tout n chaque valeur s/n a une probabilité &gt; 0 ; elle n'a pas de densité. Ce qui converge, c'est P(Zₙ ≤ z) (figure 1) ; c'est pour cela que l'énoncé exact s'écrit avec Φ.</li>
+      <li><b>Standardiser ne suffit pas.</b> Une seule exponentielle standardisée a moyenne 0 et écart-type 1, mais reste une exponentielle décalée (<a href="lesson-00-06-fonctions-standardisation.html#n3">l06, notion 3</a>). C'est la moyenne de beaucoup de termes qui fabrique la cloche, pas la standardisation.</li>
+      <li><b>Le TCL ne dit pas à partir de quel n.</b> C'est une limite ; la vitesse dépend de la loi (notion 2).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (01) énonce le TCL comme « la moyenne de variables de même loi devient normale », et (36) écrit « X̄ₙ est normale, de moyenne μ et de variance σ²/n » comme une égalité, sans dire ce qui converge (à l'oral, seulement « quand n grandit, elle commence à être distribuée comme une gaussienne »). C'est : si X₁, …, Xₙ sont indépendantes, de même loi et de variance σ² finie, alors (X̄ₙ − μ)/(σ/√n) converge en loi vers N(0, 1) ; X̄ₙ, elle, tend vers μ. En 44, il donne la bonne forme, avec Φ, mais annonce sa stratégie par « même fonction génératrice, donc même densité » : c'est la fonction de répartition qui converge, comme il le dit en 36 (« techniquement, c'est la fonction de répartition ») et dans sa conclusion.</div>
+  </div></details>
+  <p class="garde">X₁, …, Xₙ indépendantes, de même loi, de variance σ² finie : (X̄ₙ − μ)/(σ/√n) converge en loi vers N(0, 1), et X̄ₙ ≈ N(μ, σ²/n) à n fixé. Ce sont les moyennes qui deviennent normales, pas les données.</p>
+</section>
+
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>La vitesse : symétrie, asymétrie, événements rares <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 36</p>
+  <div class="idee">
+    <p>Le TCL est une limite : il dit que la cloche finira par être là, pas quand. Brunton annonce l'expérience sur ordinateur, n = 100 refait 50 fois. Faite sur trois lois au même n, elle montre que la réponse dépend de la loi de départ.</p>
+    <p>À n = 30, la moyenne de 30 dés colle à la normale. Celle de 30 attentes exponentielles, l'attente entre deux mails, penche encore, avec une queue à droite. Celle de 30 Bernoulli(0,02), la proportion d'un événement rare, n'est même pas une cloche : 54,5 % des échantillons ne contiennent aucun succès.</p>
+    <p>Deux règles le résument. L'asymétrie de la moyenne vaut celle d'une mesure divisée par √n : 2/√30 = 0,37 pour l'exponentielle, et il faut quadrupler n pour la diviser par deux. Pour une proportion, ce qui compte est le nombre de succès attendus, np, et celui des échecs, n(1 − p), pas n : on en demande au moins 10 de chaque.</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — trois lois, le même n</div>
+    <div id="v2ctl" class="sl-ctl"></div>
+    <div id="v2plot"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">Les lois exactes des trois moyennes, standardisées, sur le même axe que N(0, 1) en rouge. À <b>n = 30</b> : les dés collent à la courbe ; les exponentielles montent plus vite à gauche et traînent à droite (asymétrie 0,37) ; les Bernoulli(0,02) ne prennent que quelques valeurs, et la barre de gauche, zéro succès, porte 54,5 % des échantillons. Passe à <b>n = 100</b> puis <b>n = 500</b> : l'asymétrie de l'exponentielle tombe à 0,20 puis 0,09, et la Bernoulli ne ressemble à une cloche qu'à n = 500, quand np atteint 10.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les deux règles</div>
+    <div class="eq">asymétrie(X̄<sub><i>n</i></sub>) = γ₁/√<i>n</i> &nbsp;&nbsp; exponentielle : 2/√<i>n</i> &nbsp;&nbsp; Bernoulli(<i>p</i>) : (1 − 2<i>p</i>)/√(<i>np</i>(1 − <i>p</i>)) &nbsp;&nbsp;&nbsp; proportion : <i>np</i> ≥ 10 et <i>n</i>(1 − <i>p</i>) ≥ 10</div>
+    <ul>
+      <li>γ₁ = E[((X − μ)/σ)³] est l'asymétrie d'une seule mesure (<a href="lesson-00-08-esperance-variance.html#n7">l08, notion 7</a>) : 0 pour un dé ou une pièce équilibrée, 2 pour une exponentielle. La règle demande l'indépendance et un moment d'ordre 3 fini (preuve dépliable).</li>
+      <li>Une loi symétrique part de γ₁ = 0 : sa moyenne est symétrique dès n = 1. Il reste l'épaisseur des queues, qui s'efface plus vite encore, en 1/n, et, pour une loi discrète comme le dé, les marches de la figure 1.</li>
+      <li>np est le nombre de succès attendus. Le seuil varie selon les auteurs, 5 ou 10 ; 10 est le plus prudent, et c'est celui de la suite (<a href="../chains/chain-p01-01-objet-aleatoire.html">p01-01</a>).</li>
+      <li>Culture, l'inégalité de Berry-Esseen : sup<sub><i>z</i></sub> |P(Zₙ ≤ z) − Φ(z)| ≤ C · E|X − μ|³/(σ³√n), avec une constante C inférieure à 0,48. L'erreur décroît en 1/√n, d'autant plus lentement que la loi a de la queue. Pour une Bernoulli(p) avec p petit, E|X − p|³/σ³ ≈ 1/√p, et la borne vaut environ 0,48/√(np) : c'est np qui règle l'erreur, pas n.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — l'exponentielle : l'asymétrie s'efface en 1/√n</div>
+    <div id="f2sl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">La densité exacte de la moyenne de n exponentielles de moyenne 1, une loi Gamma, en bleu, contre la normale N(1, 1/n) que promet le TCL, en pointillé rouge, toutes deux à la même échelle verticale. Les traits verticaux sont μ ± 1,96 SE. Monte <b>n</b> : à n = 2 la densité part de 0 et traîne loin à droite ; à n = 10 son sommet est encore à gauche de 1. À n = 100 l'œil ne voit plus rien, mais les queues, si : 3,0 % des moyennes au-delà de μ + 1,96 SE au lieu de 2,5 %, et 1,9 % en deçà de μ − 1,96 SE. À n = 30, 3,4 % et 1,4 %.</p>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — un événement rare : c'est np qui compte</div>
+    <div id="f3sl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">La loi exacte de la proportion observée p̂ quand p = 0,02, en barres, contre la normale N(p, p(1 − p)/n), en pointillé rouge. L'axe descend sous 0 pour montrer ce que la normale y met : des proportions négatives. À <b>n = 20</b>, trois barres seulement dans le cadre ; à <b>n = 100</b>, np = 2 : un peigne collé à 0, où 13,3 % des échantillons n'ont aucun succès, et la normale met 7,7 % de sa masse sous 0 ; à <b>n = 500</b>, np = 10 : une cloche encore penchée, d'asymétrie 0,31 ; à <b>n = 5 000</b>, la cloche. Compare avec la figure 2 : au même n = 100, une cloche presque symétrique là-bas, un peigne ici.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>dé, exponentielle, Bernoulli rare, deux pièces, un taux de conversion</small></summary><div class="in">
+    <ol>
+      <li><b>Le dé</b> : γ₁ = 0. À n = 4, la moyenne est déjà symétrique : 2,7 % au-delà de chaque borne ±1,96 SE, au lieu de 2,5 %.</li>
+      <li><b>L'exponentielle</b> : γ₁ = 2. À n = 30, l'asymétrie vaut 0,37 : 3,4 % des moyennes au-delà de μ + 1,96 SE, 1,4 % en deçà de μ − 1,96 SE. À n = 100, 0,20 : 3,0 % et 1,9 %. Le total reste proche de 5 %, mais mal réparti, et c'est un test d'un seul côté qui en pâtit.</li>
+      <li><b>Bernoulli(0,02)</b> : γ₁ = 0,96/√(0,02 × 0,98) = 6,86. À n = 100, np = 2 : asymétrie 0,69, 13,3 % des échantillons sans succès, 7,7 % de la normale sous 0. À n = 500, np = 10 : asymétrie 0,31.</li>
+      <li><b>Deux pièces, n = 30.</b> Équilibrée : asymétrie 0, 15 succès attendus. Truquée à p = 0,1 : asymétrie 0,49, np = 3, et 4,2 % des séries de 30 lancers sans un seul succès.</li>
+      <li><b>Exemple ML : un taux de conversion.</b> 2 %, c'est rare ; mais sur 10 000 visiteurs, cela fait 200 succès attendus. np = 200 dépasse 10 de loin, l'asymétrie de p̂ vaut 0,07 et le TCL s'applique sans souci. Ce n'est pas la rareté qui compte, c'est le nombre de succès.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>culture : pourquoi l'asymétrie se divise par √n</small></summary><div class="in">
+    <p>Pose Yᵢ = Xᵢ − μ : E[Y] = 0, E[Y²] = σ², E[Y³] = γ₁σ³.</p>
+    <div class="drv">
+      <div>E[(Y₁ + … + Yₙ)³]</div><span>la somme centrée, au cube</span>
+      <div>= Σ<sub><i>i</i></sub> E[Y<sub><i>i</i></sub>³] + 3 Σ<sub><i>i</i> ≠ <i>j</i></sub> E[Y<sub><i>i</i></sub>² Y<sub><i>j</i></sub>]</div><span>développer le cube : les cubes, puis les carrés croisés…</span>
+      <div>&nbsp;&nbsp;+ 6 Σ<sub><i>i</i> &lt; <i>j</i> &lt; <i>k</i></sub> E[Y<sub><i>i</i></sub> Y<sub><i>j</i></sub> Y<sub><i>k</i></sub>]</div><span>… et les triples produits</span>
+      <div>= <i>n</i> γ₁ σ³ + 0 + 0</div><span>indépendance : E[Yᵢ² Yⱼ] = E[Yᵢ²] E[Yⱼ] = 0, de même pour le triple produit ; c'est ici qu'elle sert</span>
+      <div>asymétrie(Sₙ) = <i>n</i> γ₁ σ³ / (<i>n</i>σ²)<sup>3/2</sup> = γ₁/√<i>n</i></div><span>Var(Sₙ) = nσ² ; on divise par l'écart-type au cube</span>
+      <div>asymétrie(X̄ₙ) = asymétrie(Sₙ)</div><span>X̄ₙ = Sₙ/n : un moment réduit ne change pas quand on multiplie par une constante positive</span>
+    </div>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>asymétrie et queues de l'exponentielle, Bernoulli rare</small></summary><div class="in">
+<pre class="py">import numpy as np
+from scipy.stats import skew
+
+rng = np.random.default_rng(1)
+reps = 100_000
+for n in (30, 100):                        # mean of n Exponential(1): mu = sigma = 1
+    m = rng.exponential(1.0, size=(reps, n)).mean(axis=1)
+    z = (m - 1) / (1 / np.sqrt(n))
+    print(f"exponential n={n:3d}: skew {skew(z):.2f} (theory {2 / np.sqrt(n):.2f})  "
+          f"P(Z&gt;1.96)={np.mean(z &gt; 1.96):.3f}  P(Z&lt;-1.96)={np.mean(z &lt; -1.96):.3f}")
+
+p = 0.02                                   # a rare event: Bernoulli(0.02)
+for n in (30, 100, 500):
+    phat = rng.binomial(n, p, size=reps) / n
+    none = np.mean(phat == 0)              # share of samples without a single success
+    print(f"Bernoulli(0.02) n={n:3d}: np={n * p:4.1f}  "
+          f"no success {none:.1%}  skew {skew(phat):.2f}")</pre>
+<pre class="out">exponential n= 30: skew 0.36 (theory 0.37)  P(Z&gt;1.96)=0.033  P(Z&lt;-1.96)=0.014
+exponential n=100: skew 0.20 (theory 0.20)  P(Z&gt;1.96)=0.030  P(Z&lt;-1.96)=0.020
+Bernoulli(0.02) n= 30: np= 0.6  no success 54.6%  skew 1.25
+Bernoulli(0.02) n=100: np= 2.0  no success 13.4%  skew 0.68
+Bernoulli(0.02) n=500: np=10.0  no success 0.0%  skew 0.32</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>« n ≥ 30 » n'est pas un théorème.</b> À n = 30, l'exponentielle penche encore et la Bernoulli(0,02) est un peigne. Pour une loi symétrique et bornée, 30 est large ; pour une loi asymétrique ou un événement rare, il ne suffit pas.</li>
+      <li><b>np ≥ 10 porte sur les succès et sur les échecs.</b> Un rappel de 93 % mesuré sur 30 positifs a 28 succès mais 2 échecs : la loi de p̂ est collée à 1, et l'intervalle normal en sort (notion 5).</li>
+      <li><b>Une queue lourde coûte très cher.</b> Le patrimoine log-normal de <a href="lesson-00-08-esperance-variance.html#n2">l08</a> (σ = 1,79) a une asymétrie de 129 : pour ramener celle de la moyenne à 0,2, il faudrait environ 420 000 ménages.</li>
+      <li><b>La vitesse dépend du critère.</b> En écart maximal entre fonctions de répartition, la moyenne de 30 dés (0,021) fait à peine mieux que celle de 30 exponentielles (0,024), parce qu'elle reste un escalier (figure 1). Pour un intervalle, ce sont les queues à ±1,96 qui comptent : 2,4 % de chaque côté pour les dés, 3,4 % et 1,4 % pour les exponentielles.</li>
+    </ul>
+  </div></details>
+  <p class="garde">Pour que p̂ soit approximativement normale, et l'IC de Wald fiable, il faut np ≥ 10 et n(1 − p) ≥ 10 : le nombre de succès et d'échecs, pas n.</p>
+</section>
+
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>La version somme : Sₙ ≈ N(nμ, nσ²) <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 36</p>
+  <div class="idee">
+    <p>Brunton écrit aussi le théorème sans diviser par n : la somme Sₙ = X₁ + … + Xₙ est approximativement normale, de moyenne nμ et de variance nσ². C'est le même énoncé. Sₙ = n X̄ₙ, et multiplier par n une variable presque normale donne une variable presque normale (<a href="lesson-00-06-fonctions-standardisation.html#n2">l06</a>), dont le centre et l'écart-type sont multipliés par n.</p>
+    <p>Cent dés : la somme est centrée sur 350, d'écart-type 1,708 × √100 = 17,1. D'après la normale, avec la correction de continuité (379,5), P(S ≥ 380) ≈ 4,2 % ; le calcul exact donne aussi 4,2 %. La binomiale est le cas où chaque terme est une Bernoulli : le nombre de piles sur 400 lancers est une somme de 400 termes.</p>
+    <p>La différence avec la moyenne est la largeur. Celle de la somme grandit en σ√n quand celle de la moyenne rétrécit en σ/√n : la somme ne converge vers rien, seule sa forme se stabilise.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — le même tirage, lu en somme et en moyenne</div>
+    <div id="v3sl"></div><div id="v3ctl" class="sl-ctl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">La loi exacte de la somme de n dés en haut, sur un axe de 0 à 420, et celle de leur moyenne en bas, sur un axe de 1 à 6 ; en pointillé rouge, la normale N(nμ, nσ²) sur la somme. Les crochets vont de −σ à +σ. Lance <b>de 1 à 100</b>, ou bouge <b>n</b> : la cloche du haut glisse vers la droite et s'élargit, jusqu'à 17,1 d'écart-type à n = 100 ; celle du bas reste sur 3,5 et se resserre, jusqu'à 0,171. C'est le même tirage, divisé ou non par n. La largeur relative de la somme, σ√n/(nμ) = 0,488/√n, baisse quand même : 4,9 % à n = 100.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">S<sub><i>n</i></sub> = X₁ + … + X<sub><i>n</i></sub> &nbsp;&nbsp; (S<sub><i>n</i></sub> − <i>n</i>μ)/(σ√<i>n</i>) = (X̄<sub><i>n</i></sub> − μ)/(σ/√<i>n</i>) → N(0, 1) &nbsp;&nbsp; à <i>n</i> fixé : S<sub><i>n</i></sub> ≈ N(<i>n</i>μ, <i>n</i>σ²)</div>
+    <ul>
+      <li>Les hypothèses sont celles de la notion 1 : c'est la même variable standardisée, réécrite (preuve dépliable).</li>
+      <li>E[Sₙ] = nμ par linéarité, sans hypothèse ; Var(Sₙ) = nσ² parce que les variances s'ajoutent sous indépendance (<a href="lesson-00-09-covariance-correlation.html#n2">l09, notion 2</a>).</li>
+      <li>Une somme d'entiers (dés, nombres de succès) s'approche mieux avec la correction de continuité : P(S ≥ 380) ≈ P(Y ≥ 379,5), avec Y ~ N(350 ; 17,08²) (<a href="lesson-00-04-variables-binomiale-normale.html#n7">l04, notion 7</a>).</li>
+      <li>Cas binomial : une Binomiale(n, p) est la somme de n Bernoulli(p), d'où B(n, p) ≈ N(np, np(1 − p)).</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux dés, cent dés, 400 pièces, cent spams, un jeu de test</small></summary><div class="in">
+    <ol>
+      <li><b>Deux dés.</b> La somme est un triangle, de 2 à 12. n = 2 est trop petit : la somme garde la forme de ses termes.</li>
+      <li><b>Cent dés.</b> S ≈ N(350 ; 17,08²). P(S ≥ 380) : z = (379,5 − 350)/17,08 = 1,73, d'où 4,21 %, pour 4,20 % exactement.</li>
+      <li><b>400 lancers de pièce</b> (Brunton 16). X ≈ N(200 ; 10²). P(190 ≤ X ≤ 230) = Φ(3) − Φ(−1) = 0,840 sans correction de continuité, 0,852 avec, et 0,852 exactement.</li>
+      <li><b>Cent spams à 4 par heure</b> (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n3">l05</a>). Le temps pour les recevoir tous est une somme de 100 attentes exponentielles de moyenne 15 min : E = 25 h, σ = 15 min × √100 = 2,5 h. P(S &gt; 30 h) ≈ 1 − Φ(2) = 2,3 % ; la loi exacte, une Gamma, donne 2,8 % : l'asymétrie de l'exponentielle se voit encore dans la queue.</li>
+      <li><b>Exemple ML : les erreurs sur un jeu de test (test set).</b> Un modèle qui se trompe 12,8 % du temps fait, sur 1 000 exemples, un nombre d'erreurs qui est une somme de 1 000 Bernoulli : ≈ N(128 ; 10,56²). P(au moins 150 erreurs) ≈ 2,1 % avec la correction de continuité, 2,3 % exactement.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>culture : somme standardisée et moyenne standardisée sont la même variable</small></summary><div class="in">
+    <div class="drv">
+      <div>(S<sub><i>n</i></sub> − <i>n</i>μ)/(σ√<i>n</i>) = (<i>n</i> X̄<sub><i>n</i></sub> − <i>n</i>μ)/(σ√<i>n</i>)</div><span>Sₙ = n X̄ₙ</span>
+      <div>= <i>n</i>(X̄<sub><i>n</i></sub> − μ)/(σ√<i>n</i>) = (X̄<sub><i>n</i></sub> − μ)/(σ/√<i>n</i>)</div><span>on divise le haut et le bas par n : σ√n/n = σ/√n</span>
+    </div>
+    <p>Un seul théorème, donc, et deux façons de l'écrire. Brunton préfère la moyenne parce qu'elle parle d'erreur expérimentale et de taille d'échantillon ; la somme sert dès qu'on compte quelque chose (succès, erreurs, temps total).</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>les queues de la somme de 100 exponentielles, exactes contre normales</small></summary><div class="in">
+<pre class="py">import numpy as np
+from scipy.stats import gamma, norm
+
+n = 100                                    # sum of 100 Exponential(1): mean 100, sd 10
+S = gamma(a=n)                             # exact law of the sum
+for k in (2, 3, 4, 5):
+    exact, approx = S.sf(n + k * np.sqrt(n)), norm.sf(k)
+    print(f"P(S &gt; mean + {k} sd): exact {exact:.2e}  normal {approx:.2e}  "
+          f"ratio {exact / approx:5.1f}")
+
+rng = np.random.default_rng(3)             # check one line by simulation
+s = rng.exponential(size=(200_000, n)).sum(axis=1)
+print(f"simulated P(S &gt; mean + 3 sd) = {np.mean(s &gt; n + 3 * np.sqrt(n)):.2e}")</pre>
+<pre class="out">P(S &gt; mean + 2 sd): exact 2.79e-02  normal 2.28e-02  ratio   1.2
+P(S &gt; mean + 3 sd): exact 2.75e-03  normal 1.35e-03  ratio   2.0
+P(S &gt; mean + 4 sd): exact 1.61e-04  normal 3.17e-05  ratio   5.1
+P(S &gt; mean + 5 sd): exact 5.92e-06  normal 2.87e-07  ratio  20.7
+simulated P(S &gt; mean + 3 sd) = 2.83e-03</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>La somme ne converge pas.</b> Son centre nμ et sa largeur σ√n grandissent avec n : « Sₙ tend vers N(nμ, nσ²) » n'a pas de sens, la cible bouge. C'est une approximation à n fixé (<a href="lesson-00-10-inegalites-lgn.html#n4">l10, notion 4</a> : la somme s'écarte).</li>
+      <li><b>Loin dans les queues, l'erreur relative explose.</b> Le TCL contrôle l'écart absolu entre fonctions de répartition, pas le rapport entre deux petites probabilités. Pour 100 exponentielles, la vraie probabilité de dépasser la moyenne de 3 écarts-types est 2 fois celle que donne la normale ; de 5 écarts-types, 21 fois (code). Pour 100 dés, P(S ≥ 450) vaut 1,5 × 10⁻⁹ ; la normale dit 2,8 × 10⁻⁹ avec la correction de continuité, 2,4 × 10⁻⁹ sans. Les risques extrêmes ne se calculent pas avec le TCL.</li>
+      <li><b>Une somme d'entiers sans correction de continuité.</b> Cent pièces, P(X ≥ 60) = 2,84 % exactement ; la normale donne 2,87 % avec la correction, 2,28 % sans.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (36) écrit « Sₙ est normale, N(nμ, nσ²) » comme une égalité, et (44), où il prend μ = 0, « Sₙ est normale, N(0, nσ²) ». C'est la somme standardisée, (Sₙ − nμ)/(σ√n), qui converge en loi vers N(0, 1). Sₙ ≈ N(nμ, nσ²) est une approximation à n fixé, de plus en plus large quand n grandit.</div>
+  </div></details>
+  <p class="garde">Sous les hypothèses du TCL, Sₙ = X₁ + … + Xₙ ≈ N(nμ, nσ²) à n fixé, puisque Sₙ = n X̄ₙ ; son écart-type σ√n grandit, et l'approximation vaut au centre, pas loin dans les queues.</p>
+</section>
+
+<!-- ============================ n4 ============================ -->
+<section class="notion outil" id="n4">
+  <h3>Où ça casse : dépendance, variance infinie, « n ≥ 30 » <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 36</p>
+  <div class="idee">
+    <p>Brunton répète que « peu importe la loi des Xᵢ ». C'est vrai de la forme limite, pas des hypothèses, glissées en une phrase : « tant qu'elles sont identiques et indépendantes, avec une moyenne et une variance ». Chacune peut tomber, et chacune casse quelque chose de précis.</p>
+    <p>Sans variance finie, l'échelle σ/√n disparaît et la limite n'est plus normale. La loi de Cauchy n'a même pas de moyenne : la moyenne de n Cauchy a exactement la loi d'une seule. Avec n = 1 000 comme avec n = 1, une moyenne sur deux tombe à plus de 1 de 0 : moyenner n'apporte rien.</p>
+    <p>Côté dépendance, un dé recopié cent fois donne une « moyenne de 100 dés » qui reste plate. Plus réaliste : si toutes les mesures partagent une erreur commune, de corrélation ρ = 0,05, l'écart-type de leur moyenne plafonne à 0,38 (mesures d'écart-type σ = 1,708, celui d'un dé) au lieu de tendre vers 0. Et « n ≥ 30 » n'est qu'un ordre de grandeur (notion 2).</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — une moyenne qui ne se resserre pas</div>
+    <div id="v4ctl" class="sl-ctl"></div><div id="v4sl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">2 000 moyennes de n mesures, simulées et centrées, en violet ; en gris derrière, à la même échelle, la référence : 2 000 moyennes de n dés indépendants, dont le pic, plus concentré, sort du cadre. Choisis un cas, puis monte <b>n</b>. <b>Cauchy</b> : la loi ne bouge pas, à n = 1 000 comme à n = 1, et environ 70 % des moyennes restent à plus de 0,5 de 0 (70,5 % en théorie ; les 15,6 % qui tombent hors du cadre ±4 sont comptés à part). <b>Un dé recopié</b> : six barres plates pour tout n, deux tiers au-delà de 0,5. <b>Corrélées</b>, ρ = 0,05 : la cloche se resserre puis s'arrête, environ 20 % au-delà de 0,5 à n = 1 000. <b>Indépendants</b> : la cloche se resserre, et la part tombe presque à 0 dès n = 100.</p>
+  </div>
+  <div class="formule"><div class="lbl">Ce que chaque hypothèse protège</div>
+    <div class="eq">indépendance ⟶ sinon Var(X̄<sub><i>n</i></sub>) = σ²[ρ + (1 − ρ)/<i>n</i>] → ρσ²<br>variance finie ⟶ sinon plus d'échelle σ/√<i>n</i> ni de limite normale (Pareto α = 1,5 : X̄<sub><i>n</i></sub> − μ en <i>n</i><sup>−1/3</sup>)<br>moyenne finie ⟶ sinon, par exemple (Cauchy), X̄<sub><i>n</i></sub> a la loi de X₁ pour tout <i>n</i><br><i>n</i> assez grand ⟶ se lit sur γ₁/√<i>n</i> et sur <i>np</i> (notion 2)</div>
+    <ul>
+      <li>ρ est la corrélation commune entre deux mesures, par exemple une erreur d'étalonnage partagée : Xᵢ = μ + C + Eᵢ (<a href="lesson-00-10-inegalites-lgn.html#n6">l10, notion 6</a>). La largeur plafonne à σ√ρ ; la moyenne reste centrée sur μ, seule la largeur ment.</li>
+      <li>Culture : quand la dépendance s'éteint avec la distance (une série temporelle dont la corrélation au décalage k, ρₖ, tend vite vers 0), un TCL tient encore, mais σ² y est remplacée par σ²(1 + 2 Σₖ ρₖ).</li>
+      <li>Culture : des lois différentes conviennent si aucun terme ne domine la somme (condition de Lindeberg). Une seule mesure énorme parmi des petites suffit à casser.</li>
+      <li>Culture : moyenne finie mais variance infinie, comme une Pareto d'indice 1 &lt; α &lt; 2. X̄ₙ → μ, la loi des grands nombres tient ; mais ses fluctuations décroissent en n<sup>1/α − 1</sup> au lieu de n<sup>−1/2</sup>, soit n<sup>−1/3</sup> pour α = 1,5, et leur loi limite n'est pas normale (c'est une loi dite stable).</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>copies, erreur commune, Cauchy, Pareto, A/B test par événement</small></summary><div class="in">
+    <ol>
+      <li><b>Copies.</b> X₁ = X₂ = … = Xₙ : un seul dé recopié, ρ = 1. X̄ = X₁ reste plate, d'écart-type 1,708 pour tout n.</li>
+      <li><b>Une erreur commune, ρ = 0,05,</b> pour des mesures d'écart-type σ = 1,708, celui d'un dé : l'écart-type de X̄ plafonne à √(0,05 × 2,917) = 0,382 (<a href="lesson-00-10-inegalites-lgn.html#n6">l10, notion 6</a>). La conséquence pour l'intervalle : à n = 10 000, σ/√n annonce 0,017, et l'intervalle « à 95 % » ne contient μ que 7 % du temps.</li>
+      <li><b>Cauchy.</b> P(|X̄ₙ| &gt; 1) = ½ pour tout n, et 95 % des moyennes sont dans ±12,7, à n = 1 comme à n = 1 000 000.</li>
+      <li><b>Pareto d'indice 1,5</b> (moyenne 3, variance infinie). À n = 100, 70 % des moyennes tombent sous 3 et leur médiane vaut 2,69 (simulation) : de rares tirages énormes tirent la moyenne vers le haut, le reste du temps elle reste en dessous.</li>
+      <li><b>Exemple ML : un A/B test analysé par événement.</b> Le test est randomisé par utilisateur, mais on calcule le SE sur les clics comme s'ils étaient indépendants. Les clics d'un même utilisateur sont corrélés : le SE est trop petit, et les « victoires » se multiplient (<a href="../bridges/bridge-04-variance-moyenne-correlee.html">b04</a>). Même effet avec un jeu de test rempli de quasi-doublons, augmentations ou images d'une même vidéo.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>culture : pourquoi la moyenne de n Cauchy est une Cauchy</small></summary><div class="in">
+    <p>La fonction génératrice de <a href="lesson-00-12-generatrice-preuve-tcl.html">l12</a> n'existe pas pour une Cauchy : E[e<sup>tX</sup>] est infinie pour tout t ≠ 0. On prend sa cousine, la fonction caractéristique φ(t) = E[e<sup>itX</sup>], qui existe toujours, et vaut e<sup>−|t|</sup> pour une Cauchy standard.</p>
+    <div class="drv">
+      <div>φ<sub>Sₙ</sub>(t) = φ(t)<sup><i>n</i></sup> = e<sup>−<i>n</i>|t|</sup></div><span>somme indépendante : produit des fonctions caractéristiques, comme pour les génératrices (l12)</span>
+      <div>φ<sub>X̄ₙ</sub>(t) = φ<sub>Sₙ</sub>(t/<i>n</i>) = e<sup>−<i>n</i>|t|/<i>n</i></sup> = e<sup>−|t|</sup></div><span>X̄ₙ = Sₙ/n : on évalue en t/n</span>
+      <div>X̄<sub><i>n</i></sub> ~ Cauchy(0, 1)</div><span>même fonction caractéristique, même loi</span>
+    </div>
+    <p>Pour une loi d'espérance μ finie, la même opération donne φ(t/n)<sup>n</sup> → e<sup>iμt</sup>, la fonction caractéristique de la constante μ : c'est la loi des grands nombres. Pour la Cauchy, la queue compense exactement la division par n.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>Cauchy contre dés, et le plafond d'une erreur commune</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(2)
+reps, sigma = 10_000, np.sqrt(35 / 12)
+for n in (1, 10, 100, 1000):
+    cauchy = rng.standard_cauchy((reps, n)).mean(axis=1)
+    dice = rng.integers(1, 7, (reps, n)).mean(axis=1)
+    print(f"n={n:4d}  P(|mean - centre| &gt; 1):  Cauchy {np.mean(np.abs(cauchy) &gt; 1):.3f}"
+          f"   dice {np.mean(np.abs(dice - 3.5) &gt; 1):.3f}")
+
+rho = 0.05                                 # a common error C shared by all measurements
+for n in (10, 100, 1000):
+    C = rng.standard_normal((reps, 1))
+    E = rng.standard_normal((reps, n))
+    x = 3.5 + sigma * (np.sqrt(rho) * C + np.sqrt(1 - rho) * E)
+    iid = sigma / np.sqrt(n)               # what sigma/sqrt(n) promises
+    formula = sigma * np.sqrt(rho + (1 - rho) / n)
+    sd = x.mean(axis=1).std()
+    print(f"n={n:4d}  sd of mean {sd:.3f}   iid {iid:.3f}   formula {formula:.3f}")</pre>
+<pre class="out">n=   1  P(|mean - centre| &gt; 1):  Cauchy 0.497   dice 0.670
+n=  10  P(|mean - centre| &gt; 1):  Cauchy 0.500   dice 0.049
+n= 100  P(|mean - centre| &gt; 1):  Cauchy 0.501   dice 0.000
+n=1000  P(|mean - centre| &gt; 1):  Cauchy 0.500   dice 0.000
+n=  10  sd of mean 0.654   iid 0.540   formula 0.650
+n= 100  sd of mean 0.418   iid 0.171   formula 0.417
+n=1000  sd of mean 0.385   iid 0.054   formula 0.385</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Un échantillon a toujours une variance finie.</b> s² se calcule sur n'importe quelles données, même de Cauchy : il ne prouve pas que σ² existe. Les signes d'alerte sont une moyenne courante qui saute à chaque gros tirage (<a href="lesson-00-10-inegalites-lgn.html#n4">l10, notion 4</a>), ou un seul point qui pèse une part visible de la somme.</li>
+      <li><b>La dépendance ne se voit pas dans le centre.</b> E[X̄] = μ reste vrai (<a href="lesson-00-10-inegalites-lgn.html#n3">l10, notion 3</a>) : seule la largeur ment. On la détecte en se demandant quelle est l'unité tirée au hasard (l'utilisateur, le jour, le patient), pas en regardant les lignes.</li>
+      <li><b>Rééchantillonner ne répare pas la dépendance.</b> Un bootstrap qui tire des lignes corrélées comme si elles étaient indépendantes reproduit la même erreur ; il faut rééchantillonner les groupes.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (36) insiste : « peu importe la loi des Xᵢ ». C'est vrai de la forme limite, à condition que les mesures soient indépendantes et de variance finie, ce qu'il ne dit qu'en passant. Et c'est faux pour la vitesse : la loi de départ décide du n nécessaire (notion 2), et une Cauchy n'y arrive jamais.</div>
+  </div></details>
+  <p class="garde">Le TCL casse quand une hypothèse tombe : corrélation commune ρ &gt; 0, l'écart-type de X̄ plafonne à σ√ρ ; variance infinie, plus d'échelle σ/√n ni de limite normale ; pas de moyenne (Cauchy), X̄ ne se resserre jamais.</p>
+</section>
+
+<!-- ============================ n5 ============================ -->
+<section class="notion outil" id="n5">
+  <h3>La brique de l'intervalle de confiance : X̄ ± 1,96 σ/√n <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 36</p>
+  <div class="idee">
+    <p>Brunton finit sur les usages : intervalles de confiance, tests, et « quelle taille de sondage pour connaître l'issue d'une élection ? ». Tout part d'une ligne : la moyenne standardisée est presque N(0, 1), donc elle tombe entre −1,96 et +1,96 avec probabilité 0,95.</p>
+    <p>Isole μ dans cet événement : −1,96 ≤ (X̄ − μ)/(σ/√n) ≤ 1,96 revient à X̄ − 1,96 σ/√n ≤ μ ≤ X̄ + 1,96 σ/√n. L'intervalle bouge avec l'échantillon ; μ, lui, est fixe. La procédure capture μ dans environ 95 % des échantillons.</p>
+    <p>Un sondage de 1 000 électeurs donne 52 % pour A. Une voix est une Bernoulli, d'écart-type √(0,52 × 0,48) ≈ 0,50 : SE = 0,0158, et l'intervalle 0,52 ± 0,031 = [0,489 ; 0,551] contient 50 %. On ne peut pas annoncer A. Pour une marge de ±3 points dans le pire cas, p = ½ et σ = 0,5, il faut n = (1,96 × 0,5/0,03)², soit 1 068 personnes.</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — l'intervalle bouge, la vraie part reste</div>
+    <div id="v5ctl" class="sl-ctl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">Vingt-cinq sondages de 1 000 électeurs, tirés dans une population où la vraie part de A vaut 0,52 (trait rouge). Chaque barre est l'intervalle p̂ ± 1,96 SE d'un sondage. Les barres bougent, le trait rouge non : en moyenne une sur vingt le manque, et elle passe en rouge. Le pointillé est 50 % : environ trois intervalles sur quatre le contiennent aussi (74,6 % en théorie), et ces sondages-là ne départagent pas A et B. <b>25 nouveaux sondages</b> : le compte change, la part des barres qui touchent 0,52 tourne autour de 95 %.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(X̄ − 1,96 σ/√<i>n</i> ≤ μ ≤ X̄ + 1,96 σ/√<i>n</i>) ≈ 0,95 &nbsp;&nbsp; IC à 95 % : <i>x̄</i> ± 1,96 σ/√<i>n</i> &nbsp;&nbsp; taille pour une demi-largeur <i>h</i> : <i>n</i> = (1,96 σ/<i>h</i>)²</div>
+    <ul>
+      <li>X̄, la variable, donne l'intervalle aléatoire, avant les données. x̄ est sa réalisation : une fois calculé, [x̄ ± 1,96 σ/√n] contient μ ou ne le contient pas. Le 95 % qualifie la procédure, pas cet intervalle-là.</li>
+      <li>Il faut que le TCL vaille à ce n et pour cette loi : indépendance, variance finie, n assez grand pour l'asymétrie (notions 2 et 4). Pour une proportion, np ≥ 10 et n(1 − p) ≥ 10.</li>
+      <li>σ est en général inconnu. On le remplace par l'écart-type de l'échantillon, ou, pour une proportion, par √(p̂(1 − p̂)) : c'est l'intervalle de <b>Wald</b>. À grand n, cela ne change presque rien ; à petit n avec des données normales, 1,96 devient un quantile de Student, 2,262 pour n = 10 (<a href="../chains/chain-p01-03-inference-regression.html">p01-03</a>).</li>
+      <li><b>Wilson</b> : on garde p inconnu dans le SE et on résout |p̂ − p| ≤ 1,96 √(p(1 − p)/n) en p ; les bornes restent dans [0, 1] (preuve dépliable).</li>
+      <li>1,96 = Φ⁻¹(0,975). Pour 90 %, 1,645 ; pour 99 %, 2,576.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — un IC sur une proportion : c'est np qui décide, pas p</div>
+    <div id="f4ctl" class="sl-ctl"></div><div id="f4ctl2" class="sl-ctl"></div>
+    <div id="f4plot" class="wide"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">La couverture réelle, calculée exactement, de l'intervalle de Wald « à 95 % » sur une proportion, pour n = 30, 100 et 1 000 ; le trait rouge marque 95 %. Sur l'axe de la <b>prévalence p</b>, les trois courbes se séparent : à la même prévalence p = 0,02 (pointillé), Wald couvre 45 % à n = 30, 87 % à n = 100, 95 % à n = 1 000. Passe à l'axe des <b>succès attendus np</b> : chaque courbe glisse de log n, et les trois se superposent. Ce n'est pas la prévalence qui décide, c'est le nombre de succès. Sous np = 10 (pointillé), Wald couvre mal ; au-dessus, il oscille entre 91 et 96 %. Choisis <b>Wilson</b> : il reste entre 92 et 98 % dès np ≥ 1.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>un dé suspect, le sondage, un taux de bonnes réponses, un test A/B, un rappel</small></summary><div class="in">
+    <ol>
+      <li><b>Un dé suspect.</b> 30 lancers, x̄ = 3,8. Avec σ = 1,708 : 3,8 ± 1,96 × 1,708/√30 = 3,8 ± 0,61, soit [3,19 ; 4,41]. 3,5 est dedans : rien de suspect à ce niveau.</li>
+      <li><b>Le sondage</b> de l'idée : 520 voix sur 1 000, [0,489 ; 0,551]. ±3 points demandent 1 068 personnes ; ±1 point, 9 604 : neuf fois plus pour une marge divisée par trois (<a href="lesson-00-10-inegalites-lgn.html#n5">l10, notion 5</a>).</li>
+      <li><b>Exemple ML : un taux de bonnes réponses (accuracy).</b> 872 bonnes réponses sur 1 000 : SE = √(0,872 × 0,128/1 000) = 0,0106, et l'IC vaut [0,851 ; 0,893]. 872 succès et 128 échecs : le TCL tient.</li>
+      <li><b>Exemple ML : un test A/B.</b> A convertit 200 visiteurs sur 10 000 (2,0 %), B 240 sur 10 000 (2,4 %). Les deux groupes sont indépendants, donc les variances s'ajoutent (<a href="lesson-00-09-covariance-correlation.html#n2">l09, notion 2</a>) : le SE de la différence vaut √(0,02 × 0,98/10 000 + 0,024 × 0,976/10 000) = 0,00207. Différence 0,4 point, z = 1,93, IC [−0,01 ; 0,81] point : il contient 0 de justesse, pas de conclusion à 95 %. Le taux est rare, mais 200 et 240 succès suffisent largement au TCL.</li>
+      <li><b>Exemple ML : un rappel.</b> 28 positifs détectés sur 30, dans un jeu de test de 1 000 lignes. Le rappel est la moyenne de 30 Bernoulli, une par positif : son n vaut 30, pas 1 000. La suite est dans « où ça casse ».</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>culture : isoler μ, et d'où vient Wilson</small></summary><div class="in">
+    <div class="drv">
+      <div>−1,96 ≤ (X̄ − μ)/(σ/√<i>n</i>) ≤ 1,96</div><span>l'événement de probabilité ≈ 0,95 (notion 1)</span>
+      <div>−1,96 σ/√<i>n</i> ≤ X̄ − μ ≤ 1,96 σ/√<i>n</i></div><span>multiplier par σ/√n &gt; 0</span>
+      <div>−X̄ − 1,96 σ/√<i>n</i> ≤ −μ ≤ −X̄ + 1,96 σ/√<i>n</i></div><span>retrancher X̄</span>
+      <div>X̄ − 1,96 σ/√<i>n</i> ≤ μ ≤ X̄ + 1,96 σ/√<i>n</i></div><span>multiplier par −1 : les inégalités se retournent</span>
+    </div>
+    <p>Même événement, donc même probabilité : c'est tout ce qu'est un intervalle de confiance. Pour une proportion, σ = √(p(1 − p)) dépend du p inconnu. Wald y branche p̂. Wilson garde p et résout |p̂ − p| ≤ 1,96 √(p(1 − p)/n) en p : une inéquation du second degré, dont les deux racines sont les bornes. Elles restent dans [0, 1] par construction, et l'intervalle n'est pas centré sur p̂ mais tiré vers ½.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>Wald et Wilson sur 28/30, couvertures exactes</small></summary><div class="in">
+<pre class="py">import numpy as np
+from scipy.stats import binom, norm
+
+z = norm.ppf(0.975)                        # 1.96
+
+def wald(k, n):
+    p = k / n; h = z * np.sqrt(p * (1 - p) / n)
+    return p - h, p + h
+
+def wilson(k, n):
+    p = k / n; c = (p + z**2 / (2 * n)) / (1 + z**2 / n)
+    h = z / (1 + z**2 / n) * np.sqrt(p * (1 - p) / n + z**2 / (4 * n**2))
+    return c - h, c + h
+
+print("recall 28/30  Wald [%.3f ; %.3f]" % wald(28, 30))
+print("recall 28/30  Wilson [%.3f ; %.3f]" % wilson(28, 30))
+
+def coverage(n, p, ci):          # exact: add P(K = k) over the k whose interval holds p
+    k = np.arange(n + 1); lo, hi = ci(k, n)
+    return binom.pmf(k, n, p)[(lo &lt;= p) &amp; (p &lt;= hi)].sum()
+
+for n, p in ((30, 0.93), (30, 0.02), (100, 0.02), (1000, 0.02), (1000, 0.872)):
+    fewest = min(n * p, n * (1 - p))       # expected successes or failures, the fewer
+    cw, cs = coverage(n, p, wald), coverage(n, p, wilson)
+    print(f"n={n:4d} p={p:.3f}  fewest {fewest:5.1f}   Wald {cw:.3f}  Wilson {cs:.3f}")</pre>
+<pre class="out">recall 28/30  Wald [0.844 ; 1.023]
+recall 28/30  Wilson [0.787 ; 0.982]
+n=  30 p=0.930  fewest   2.1   Wald 0.883  Wilson 0.945
+n=  30 p=0.020  fewest   0.6   Wald 0.454  Wilson 0.978
+n= 100 p=0.020  fewest   2.0   Wald 0.866  Wilson 0.949
+n=1000 p=0.020  fewest  20.0   Wald 0.950  Wilson 0.947
+n=1000 p=0.872  fewest 128.0   Wald 0.951  Wilson 0.948</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>« 95 % de chances que la vraie part soit dans [0,489 ; 0,551] » est faux</b> en lecture fréquentiste. La vraie part est fixe ; cet intervalle-là la contient ou ne la contient pas. Ce qui vaut 95 %, c'est la part des intervalles qui la contiennent quand on refait le sondage (vignette).</li>
+      <li><b>Ce n'est pas la prévalence qui casse Wald, c'est le nombre de succès ou d'échecs.</b> Rappel de 28/30 : p̂ = 0,933, SE = √(0,933 × 0,067/30) = 0,0455, et Wald donne [0,844 ; 1,023], qui sort de [0, 1] ; Wilson donne [0,787 ; 0,982]. Il n'y a que 2 échecs. À l'inverse, un taux de 2 % sur 10 000 visiteurs, 200 succès, ne pose aucun problème (figure 4).</li>
+      <li><b>Le rappel est une Bernoulli sur les positifs.</b> Son n est le nombre de positifs, 30, pas la taille du jeu de test, 1 000 : avec n = 1 000, on trouverait un SE de 0,0079, près de six fois trop petit.</li>
+      <li><b>σ estimé à petit n.</b> Avec 10 mesures, l'écart-type de l'échantillon fluctue lui-même, et 1,96 devient 2,262 (Student, <a href="../chains/chain-p01-03-inference-regression.html">p01-03</a>).</li>
+      <li><b>La dépendance rend l'intervalle trop étroit.</b> Avec ρ = 0,05 et n = 1 000 mesures d'écart-type σ = 1,708, celui d'un dé, le vrai SE vaut 0,385 et σ/√n annonce 0,054 : l'intervalle « à 95 % » ne contient μ que 22 % du temps (notion 4).</li>
+    </ul>
+  </div></details>
+  <p class="garde">Si le TCL s'applique, l'intervalle X̄ ± 1,96 σ/√n contient μ pour environ 95 % des échantillons : c'est l'intervalle qui est aléatoire, μ est fixe.</p>
+</section>
+
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>TCL : X₁, …, Xₙ indépendantes, de même loi, de variance finie ⇒ (X̄ₙ − μ)/(σ/√n) → N(0, 1) en loi.</li>
+    <li>X̄ₙ, elle, tend vers μ : X̄ₙ ≈ N(μ, σ²/n) est une approximation à n fixé. Ce sont les moyennes, pas les données, qui deviennent normales.</li>
+    <li>Vitesse : l'asymétrie de la moyenne vaut γ₁/√n (exponentielle : 2/√n) ; pour une proportion, np ≥ 10 et n(1 − p) ≥ 10.</li>
+    <li>Somme : Sₙ ≈ N(nμ, nσ²), le même théorème ; sa largeur σ√n grandit ; fiable au centre, pas dans les queues lointaines.</li>
+    <li>Casse : dépendance (plafond σ√ρ) ; variance infinie (plus de limite normale ; sans moyenne, la Cauchy ne se resserre jamais) ; « n ≥ 30 » pris pour une règle.</li>
+    <li>IC : X̄ ± 1,96 σ/√n capture μ dans environ 95 % des échantillons ; l'intervalle est aléatoire, μ est fixe.</li>
+    <li>Wald casse par le nombre de succès ou d'échecs, pas par la prévalence : 28/30 donne [0,844 ; 1,023] ; Wilson, [0,787 ; 0,982].</li>
+  </ol>
+</div>
+<div class="phrase">« Si les observations sont indépendantes, de même loi et de variance finie, la moyenne standardisée, (X̄ − μ)/(σ/√n), converge en loi vers une normale standard, quelle que soit la loi de départ ; en pratique X̄ ≈ N(μ, σ²/n), d'où l'intervalle X̄ ± 1,96 σ/√n. La vitesse dépend de la loi : lente si elle est asymétrique, et pour une proportion il faut au moins dix succès et dix échecs. Le théorème casse avec la dépendance et les variances infinies. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Énonce le TCL avec ses hypothèses.</div><div class="a hid">X₁, …, Xₙ indépendantes, de même loi, de variance σ² finie : (X̄ₙ − μ)/(σ/√n) converge en loi vers N(0, 1).</div></li>
+    <li><div class="q">Pourquoi ne pas dire « X̄ devient normale » ?</div><div class="a hid">X̄ tend vers μ, une constante ; c'est la version standardisée qui a une loi limite. X̄ ≈ N(μ, σ²/n) n'est qu'une approximation à n fixé.</div></li>
+    <li><div class="q">La moyenne de 30 exponentielles est-elle normale ?</div><div class="a hid">Pas tout à fait : asymétrie 2/√30 = 0,37 ; 3,4 % des moyennes au-delà de μ + 1,96 SE au lieu de 2,5 %, et 1,4 % en deçà de μ − 1,96 SE.</div></li>
+    <li><div class="q">Pourquoi la moyenne de n Cauchy ne se resserre-t-elle pas ?</div><div class="a hid">Elle n'a pas de moyenne : la loi des grands nombres elle-même tombe, et X̄ₙ a la loi d'une seule Cauchy, pour tout n.</div></li>
+    <li><div class="q">Quelle est la loi approchée de la somme de 100 dés ?</div><div class="a hid">N(350 ; 17,08²), puisque nμ = 350 et σ√n = 1,708 × 10 ; P(S ≥ 380) ≈ 4,2 %.</div></li>
+    <li><div class="q">28 bons sur 30 positifs : pourquoi l'intervalle de Wald échoue-t-il ?</div><div class="a hid">Deux échecs seulement, n(1 − p̂) = 2 &lt; 10. Wald donne [0,844 ; 1,023] et sort de [0, 1] ; Wilson donne [0,787 ; 0,982].</div></li>
+    <li><div class="q">Que qualifie le 95 % d'un intervalle de confiance ?</div><div class="a hid">La procédure : la part des échantillons dont l'intervalle contient μ, environ 95 % quand le TCL s'applique. μ est fixe, l'intervalle est aléatoire.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts, chaînes et suite</div>
+  <div class="bridges">
+    <a href="../chains/chain-p01-01-objet-aleatoire.html"><b>L'objet aléatoire (fil A)</b><small>X̄ devient un estimateur, σ/√n le SE d'une proportion, et Wald contre Wilson se rejoue sur le rappel de 28/30 : la notion 5 vue du côté de l'estimation.</small></a>
+    <a href="../chains/chain-p01-02-ic-test-procedure.html"><b>IC et test</b><small>L'intervalle et la p-value posés sur la normale de la notion 5 ; le 95 % qualifie la procédure.</small></a>
+    <a href="../chains/chain-p01-03-inference-regression.html"><b>Inférence en régression</b><small>σ inconnu à petit n : Student remplace 1,96.</small></a>
+    <a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html"><b>Comparer deux modèles</b><small>z = différence sur SE pour deux accuracies mesurées sur le même jeu de test.</small></a>
+    <a href="../chains/chain-p01-05-bootstrap.html"><b>Bootstrap</b><small>La distribution d'échantillonnage sans formule, quand aucun TCL ne donne le SE (médiane, AUC).</small></a>
+    <a href="../bridges/bridge-04-variance-moyenne-correlee.html"><b>Variance d'une moyenne corrélée</b><small>La première cassure de la notion 4, dérivée jusqu'au bout : ρσ² + (1 − ρ)σ²/n.</small></a>
+    <a href="lesson-00-12-generatrice-preuve-tcl.html#n6"><b>l12 · La preuve du TCL</b><small>Pourquoi la forme limite est normale : la fonction génératrice, en six étapes, avec ses trous.</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::tcl</code> (notions 1 à 4) · <code>stats::normale</code> (notion 5).</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l11 · v1 du 10/10/2026 · Brunton 36, avec les énoncés de 01 et 44 · Prérequis : <a href="lesson-00-06-fonctions-standardisation.html">l06</a>, <a href="lesson-00-10-inegalites-lgn.html">l10</a>. Suite : <a href="lesson-00-12-generatrice-preuve-tcl.html">l12 · Fonction génératrice et preuve du TCL</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* ===== commun à toutes les leçons (kit, étalon l08 v2) ===== */
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc : une entrée par notion, étiquette comprise */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.notion').forEach((s,i)=>{const li=document.createElement('li');const t=s.querySelector('h3').firstChild.textContent.trim();const k=s.classList.contains('culture')?' · culture':'';li.innerHTML=`<a href="#${s.id}">${i+1}. ${t}${k}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.notion').forEach(s=>io.observe(s));
+/* une ancre #nN ouvre la notion visée ; rien n'est replié par défaut hors des blocs */
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outils de dessin ===== */
+function curve(P,f,a,b,cls,ymax){let d='';const n=240;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;let y=f(x);if(!isFinite(y))continue;y=Math.min(y,ymax);d+=(d?' L':'M')+P.sx(x).toFixed(1)+' '+P.sy(y).toFixed(1);}SL.el('path',{d:d,class:'sl-fn '+cls,fill:'none'},P.dyn);}
+function bar(P,x0,x1,y,cls){const a=P.sx(x0),b=P.sx(x1);SL.el('rect',{x:Math.min(a,b),y:P.sy(y),width:Math.max(1.5,Math.abs(b-a)),height:Math.max(0,P.sy(0)-P.sy(y)),class:cls||'sl-bar'},P.dyn);}
+/* SL.plot trace l'axe vertical en x = 0 ; quand 0 porte une barre, on le ramène au bord gauche */
+function leftAxis(P,x0){const ax=P.svg.querySelectorAll('line.sl-axis');if(ax[1]){ax[1].setAttribute('x1',P.sx(x0));ax[1].setAttribute('x2',P.sx(x0));}}
+function rd(host,items){host.innerHTML=items.map(it=>`<div class="${it[2]||''}">${it[0]}<b>${it[1]}</b></div>`).join('');}
+function buttons(host,names,cb){const bs=names.map((n,i)=>{const b=SL.h('button','tb',host,n);b.onclick=()=>{bs.forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');cb(i);};return b;});bs[0].onclick();return bs;}
+
+
+/* ===== v2 : vignettes « voir l'idée », une par notion, juste sous l'idée ===== */
+/* tween : animation 0 → 1 lissée ; runner : un jeton par figure, un nouveau clic tue l'animation en cours */
+function runner(){let t={dead:true};return ()=>{t.dead=true;t={dead:false};return t;};}
+function tween(ms,draw,tk,done){if(SL.reduced){draw(1);if(done)done();return;}const t0=performance.now();const st=t=>{if(tk&&tk.dead)return;let u=Math.min(1,(t-t0)/ms);u=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;draw(u);if(u<1)requestAnimationFrame(st);else if(done)done();};requestAnimationFrame(st);}
+function loop(tk,step){if(SL.reduced){let g=0;while(step()!==false&&g++<1e5);return;}const f=()=>{if(tk.dead)return;if(step()!==false)requestAnimationFrame(f);};requestAnimationFrame(f);}
+function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function pick(r,v,p){let u=r(),a=0;for(let i=0;i<v.length;i++){a+=p[i];if(u<a)return v[i];}return v[v.length-1];}
+function gauss(r){let u=0;while(u===0)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());}
+function fulcrum(P,x){const cx=P.sx(x),cy=P.sy(0);SL.el('path',{d:`M${cx.toFixed(1)} ${(cy+1).toFixed(1)} L${(cx-8).toFixed(1)} ${(cy+16).toFixed(1)} L${(cx+8).toFixed(1)} ${(cy+16).toFixed(1)} Z`,class:'sl-fulcrum'},P.dyn);}
+function median(a){const s=a.slice().sort((x,y)=>x-y),n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;}
+function rect(P,x0,x1,y0,y1,cls,parent){const a=P.sx(x0),b=P.sx(x1),c=P.sy(y0),d=P.sy(y1);return SL.el('rect',{x:Math.min(a,b).toFixed(1),y:Math.min(c,d).toFixed(1),width:Math.abs(b-a).toFixed(1),height:Math.abs(d-c).toFixed(1),class:cls},parent||P.dyn);}
+/* pile de pastilles : une par individu, regroupées par classe de largeur bw */
+function stack(P,vals,bw,r,clsOf,centred){const bins=new Map();vals.forEach((v,i)=>{const b=centred?Math.round(v/bw):Math.floor(v/bw);if(!bins.has(b))bins.set(b,[]);bins.get(b).push(i);});
+  const res=[];bins.forEach((ids,b)=>{const c=centred?b*bw:(b+0.5)*bw,cx=P.sx(c);res.push({c:c,ids:ids});ids.forEach((i,j)=>SL.el('circle',{cx:cx.toFixed(1),cy:(P.sy(0)-r-1-j*(2*r+1)).toFixed(1),r:r,class:'sl-dot '+clsOf(i)},P.dyn));});return res;}
+
+
+/* ===== l11 : lois exactes et outils communs ===== */
+const SIGD=Math.sqrt(35/12);                                   /* écart-type d'un dé : 1,708 */
+const LF=new Float64Array(5001);for(let k=1;k<=5000;k++)LF[k]=LF[k-1]+Math.log(k);   /* ln k! */
+function phiN(z){return Math.exp(-z*z/2)/Math.sqrt(2*Math.PI);}
+function PhiN(z){const x=Math.abs(z)/Math.SQRT2,t=1/(1+0.3275911*x);
+  const e=1-(((((1.061405429*t-1.453152027)*t+1.421413741)*t-0.284496736)*t+0.254829592)*t)*Math.exp(-x*x);
+  return z>=0?0.5*(1+e):0.5*(1-e);}
+/* loi exacte de la somme de n dés, par convolution : DICE[n][s] = P(Sₙ = s) */
+const DICE=[new Float64Array([1])];
+function diceLaw(n){while(DICE.length<=n){const a=DICE[DICE.length-1],b=new Float64Array(a.length+6);
+  for(let s=0;s<a.length;s++){const q=a[s]/6;if(q===0)continue;for(let f=1;f<=6;f++)b[s+f]+=q;}DICE.push(b);}return DICE[n];}
+function binomLaw(n,p){const a=new Float64Array(n+1),lp=Math.log(p),lq=Math.log(1-p);
+  for(let k=0;k<=n;k++)a[k]=Math.exp(LF[n]-LF[k]-LF[n-k]+k*lp+(n-k)*lq);return a;}
+/* densité de la moyenne de n Exponentielle(1) : Gamma(n, taux n) */
+function gammaMean(x,n){return x<=0?(n===1?1:0):Math.exp(n*Math.log(n)+(n-1)*Math.log(x)-n*x-LF[n-1]);}
+/* une loi sur un réseau de pas h, en densité (p/h × sc) : des barres si le pas est large, une ligne sinon */
+function lattice(P,xs,ps,h,sc,X,ymax,cls){
+  const px=Math.abs(P.sx(h)-P.sx(0));
+  if(px>=3.2){for(let i=0;i<xs.length;i++){const a=xs[i]-0.42*h,b=xs[i]+0.42*h;if(ps[i]<1e-9||a<X[0]||b>X[1])continue;bar(P,a,b,Math.min(ps[i]/h*sc,ymax),cls||'sl-bar');}}
+  else{let d='';for(let i=0;i<xs.length;i++){if(xs[i]<X[0]||xs[i]>X[1])continue;d+=(d?' L':'M')+P.sx(xs[i]).toFixed(1)+' '+P.sy(Math.min(ps[i]/h*sc,ymax)).toFixed(1);}
+    if(d)SL.el('path',{d:d,class:'sl-fn sl-c2',fill:'none'},P.dyn);}
+}
+/* axe logarithmique : grille et étiquettes posées à la main */
+function logTicksX(P,vals,lab,y0,y1){vals.forEach((v,i)=>{const x=P.sx(Math.log10(v));
+  SL.el('line',{x1:x.toFixed(1),x2:x.toFixed(1),y1:P.sy(y1).toFixed(1),y2:P.sy(y0).toFixed(1),class:'sl-gridl0'},P.dyn);
+  const t=SL.el('text',{x:x.toFixed(1),y:(P.sy(y0)+16).toFixed(1),'text-anchor':'middle',class:'sl-tick'},P.dyn);t.textContent=lab[i];});}
+/* nombres à décimales fixes (SL.fmt retire les zéros finaux) */
+function fixed(x,d){const s=x.toFixed(d).replace('.',',');return /^-0(,0*)?$/.test(s)?s.slice(1):s;}
+function pct(x,d){return fixed(100*x,d===undefined?1:d)+'\u00a0%';}
+
+/* ===== Figure 1 : la fonction de répartition exacte de Zₙ contre Φ ===== */
+(function(){
+  const P=SL.plot(document.getElementById('f1plot'),{x:[-3,3],y:[0,1],w:560,h:270,xt:[-3,-2,-1,0,1,2,3],yt:[0,0.25,0.5,0.75,1],xl:'z',yl:'P(Zₙ ≤ z)'});
+  leftAxis(P,-3);
+  P.fn(PhiN,'sl-c3');
+  const out=document.getElementById('f1out'),st={law:0,n:4};
+  function draw(){
+    P.clear();const n=st.n;let a,m,s;
+    if(st.law===0){a=diceLaw(n);m=3.5*n;s=SIGD*Math.sqrt(n);}else{a=binomLaw(n,0.5);m=n/2;s=Math.sqrt(n)/2;}
+    const zs=[],Fs=[];let F=0,gap=0,gz=0,gF=0,jump=0;
+    for(let v=0;v<a.length;v++){const q=a[v];if(q<1e-15)continue;const z=(v-m)/s,ph=PhiN(z);
+      if(Math.abs(F-ph)>gap){gap=Math.abs(F-ph);gz=z;gF=F;}
+      F+=q;if(Math.abs(F-ph)>gap){gap=Math.abs(F-ph);gz=z;gF=F;}
+      jump=Math.max(jump,q);zs.push(z);Fs.push(F);}
+    let i=0,F0=0;while(i<zs.length&&zs[i]<-3){F0=Fs[i];i++;}
+    let d='M'+P.sx(-3).toFixed(1)+' '+P.sy(F0).toFixed(1);
+    for(;i<zs.length&&zs[i]<=3;i++)d+=' H'+P.sx(zs[i]).toFixed(1)+' V'+P.sy(Fs[i]).toFixed(1);
+    d+=' H'+P.sx(3).toFixed(1);
+    SL.el('path',{d:d,class:'sl-fn sl-c1',fill:'none'},P.dyn);
+    if(Math.abs(gz)<=3)P.seg(gz,gF,gz,PhiN(gz),'gap');
+    P.text(-2.9,0.86,'— Φ(z), la normale','sl-c3','start');
+    P.text(-2.9,0.78,'— Fₙ(z), la fonction de répartition','sl-c1','start');
+    P.text(-2.9,0.71,'   exacte de Zₙ','sl-c1','start');
+    P.text(-2.9,0.62,'▮ l’écart maximal','sl-c5','start');
+    rd(out,[['écart maximal |Fₙ − Φ|',fixed(gap,3),'c3'],['plus haute marche, max P(Sₙ = s)',fixed(jump,3)],['loi, n',(st.law?'pièce':'dé')+', n = '+n]]);
+  }
+  buttons(document.getElementById('f1ctl'),['dé','pièce'],k=>{st.law=k;draw();});
+  SL.slider(document.getElementById('f1sl'),{label:'n (lancers)',min:1,max:100,step:1,value:4,fmt:v=>String(v)},v=>{st.n=v;draw();});
+})();
+
+/* ===== Figure 2 : moyenne de n exponentielles, loi exacte (Gamma) contre normale ===== */
+(function(){
+  const NS=[1,2,5,10,30,100],X=[0,3];
+  const P=SL.plot(document.getElementById('f2plot'),{x:X,y:[0,1.1],w:560,h:250,xt:[0,0.5,1,1.5,2,2.5,3],yt:[],xl:'moyenne x̄ de n attentes (μ = 1)'});
+  const out=document.getElementById('f2out');
+  function simpson(f,a,b){if(b<=a)return 0;const N=4000,h=(b-a)/N;let s=f(a)+f(b);for(let i=1;i<N;i++)s+=(i%2?4:2)*f(a+i*h);return s*h/3;}
+  function draw(k){
+    const n=NS[k],se=1/Math.sqrt(n),g=x=>gammaMean(x,n);P.clear();
+    let M=1/(se*Math.sqrt(2*Math.PI));for(let i=0;i<=900;i++)M=Math.max(M,g(X[1]*i/900));
+    curve(P,x=>g(x)/M,0,X[1],'sl-c4',1.1);
+    curve(P,x=>phiN((x-1)/se)/se/M,0,X[1],'sl-c3 dashfn',1.1);
+    const lo=1-1.96*se,hi=1+1.96*se;
+    if(lo>0)P.seg(lo,0,lo,0.86,'sl-dash');P.seg(hi,0,hi,0.86,'sl-dash');
+    if(hi>2.2)P.text(hi-0.03,0.55,'μ + 1,96 SE','','end');else P.text(hi+0.03,0.55,'μ + 1,96 SE','','start');
+    P.text(2.97,1.02,'— moyenne exacte (loi Gamma)','sl-c4','end');
+    P.text(2.97,0.92,'┄ normale N(1, 1/n)','sl-c3','end');
+    const left=lo>0?simpson(g,0,lo):0,right=1-simpson(g,0,hi);
+    rd(out,[['asymétrie de x̄ = 2/√n',fixed(2/Math.sqrt(n),2)],['au-delà de μ + 1,96 SE (normale : 2,5 %)',pct(right),'c3'],['en deçà de μ − 1,96 SE (normale : 2,5 %)',pct(left)]]);
+  }
+  SL.slider(document.getElementById('f2sl'),{label:'n (attentes)',min:0,max:5,step:1,value:3,fmt:v=>String(NS[v])},draw);
+})();
+
+/* ===== Figure 3 : proportion observée d'un événement rare, p = 0,02 ===== */
+(function(){
+  const NS=[20,100,500,5000],p=0.02,X=[-0.04,0.125];
+  const P=SL.plot(document.getElementById('f3plot'),{x:X,y:[0,1.1],w:560,h:250,xt:[-0.04,-0.02,0,0.02,0.04,0.06,0.08,0.1,0.12],yt:[],xl:'proportion observée p̂'});
+  const out=document.getElementById('f3out');
+  function draw(k){
+    const n=NS[k],q=1-p,se=Math.sqrt(p*q/n),a=binomLaw(n,p),h=1/n;P.clear();
+    let M=1/(se*Math.sqrt(2*Math.PI));const xs=[],ps=[];
+    for(let j=0;j<=n;j++){const x=j/n;if(x>X[1]+h)break;xs.push(x);ps.push(a[j]);M=Math.max(M,a[j]/h);}
+    /* des dents fines tant que le pas est large : la loi de p̂ est un peigne, pas une densité */
+    const w=Math.min(0.42*h,0.0025);
+    if(P.sx(h)-P.sx(0)>=3.2)xs.forEach((x,i)=>{if(x-w>=X[0]&&x+w<=X[1]&&ps[i]>1e-9)bar(P,x-w,x+w,Math.min(ps[i]/h/M,1.1),'sl-bar');});
+    else lattice(P,xs,ps,h,1/M,X,1.1,'sl-bar');
+    curve(P,x=>phiN((x-p)/se)/se/M,X[0],X[1],'sl-c3 dashfn',1.1);
+    P.vline(p,'sl-dash');P.text(p+0.002,1.03,'p = 0,02','','start');
+    const below=PhiN(-p/se);
+    if(below>0.001)P.text(-0.0385,0.93,'p̂ < 0 : impossible','sl-c3','start');
+    P.text(0.123,0.93,'▮ loi exacte de p̂','sl-c2','end');P.text(0.123,0.83,'┄ normale N(p, p(1 − p)/n)','sl-c3','end');
+    rd(out,[['np, succès attendus',SL.fmt(n*p,1)],['P(aucun succès) = 0,98ⁿ',pct(Math.pow(q,n))],['masse de la normale sous 0',pct(below),'c3'],['asymétrie de p̂',fixed((1-2*p)/Math.sqrt(n*p*q),2)]]);
+  }
+  SL.slider(document.getElementById('f3sl'),{label:'n (lignes)',min:0,max:3,step:1,value:1,fmt:v=>NS[v].toLocaleString('fr-FR')},draw);
+})();
+
+/* ===== Figure 4 : couverture exacte de Wald et de Wilson, en fonction de p puis de np ===== */
+(function(){
+  const NS=[30,100,1000],CL=['sl-c1','sl-c2','sl-c5'],Z=1.959963984540054;
+  const host=document.getElementById('f4plot'),out=document.getElementById('f4out');
+  function bounds(n,kind){const lo=new Float64Array(n+1),hi=new Float64Array(n+1);
+    for(let k=0;k<=n;k++){const f=k/n;
+      if(kind===0){const h=Z*Math.sqrt(f*(1-f)/n);lo[k]=f-h;hi[k]=f+h;}
+      else{const c=(f+Z*Z/(2*n))/(1+Z*Z/n),h=Z/(1+Z*Z/n)*Math.sqrt(f*(1-f)/n+Z*Z/(4*n*n));lo[k]=c-h;hi[k]=c+h;}}
+    return [lo,hi];}
+  function cover(n,p,B){const lp=Math.log(p),lq=Math.log(1-p);let c=0;
+    for(let k=0;k<=n;k++)if(B[0][k]<=p&&p<=B[1][k])c+=Math.exp(LF[n]-LF[k]-LF[n-k]+k*lp+(n-k)*lq);return c;}
+  const G=320,L0=Math.log10(0.002),L1=Math.log10(0.5),PS=[];
+  for(let i=0;i<=G;i++)PS.push(Math.pow(10,L0+(L1-L0)*i/G));
+  const B=[[],[]],CV=[[],[]];
+  [0,1].forEach(kind=>NS.forEach((n,j)=>{B[kind][j]=bounds(n,kind);CV[kind][j]=PS.map(p=>cover(n,p,B[kind][j]));}));
+  const RP=[L0,L1],RN=[-1,Math.log10(500)];
+  const TP=[[0.002,0.005,0.01,0.02,0.05,0.1,0.2,0.5],['0,002','0,005','0,01','0,02','0,05','0,1','0,2','0,5']];
+  const TN=[[0.1,0.3,1,3,10,30,100,300],['0,1','0,3','1','3','10','30','100','300']];
+  const st={u:0,kind:0};const fresh=runner();
+  function frame(u){
+    st.u=u;host.innerHTML='';
+    const a=RP[0]+(RN[0]-RP[0])*u,b=RP[1]+(RN[1]-RP[1])*u;
+    const P=SL.plot(host,{x:[a,b],y:[0,1.04],w:560,h:280,xt:[],yt:[0,0.2,0.4,0.6,0.8,1],
+      xl:u<0.5?'prévalence p (échelle log)':'succès attendus np (échelle log)'});
+    leftAxis(P,a);
+    if(u===0||u===1){const T=u?TN:TP;logTicksX(P,T[0],T[1],0,1.04);}
+    if(u===0){const x=Math.log10(0.02);P.seg(x,0,x,1.04,'sl-dash');P.text(x+0.03,0.06,'p = 0,02','','start');}
+    if(u===1){const x=1;P.seg(x,0,x,1.04,'sl-dash');P.text(x+0.03,0.06,'np = 10','','start');}
+    P.seg(a,0.95,b,0.95,'sl-mean');
+    NS.forEach((n,j)=>{const sh=u*Math.log10(n),c=CV[st.kind][j];let d='';
+      for(let i=0;i<=G;i++){const x=Math.log10(PS[i])+sh;if(x<a||x>b)continue;d+=(d?' L':'M')+P.sx(x).toFixed(1)+' '+P.sy(c[i]).toFixed(1);}
+      if(d)SL.el('path',{d:d,class:'sl-fn thin '+CL[j],fill:'none'},P.dyn);});
+    const xr=b-(b-a)*0.01;
+    P.text(xr,0.47,'couverture réelle ('+(st.kind?'Wilson':'Wald')+')','','end');
+    P.text(xr,0.38,'— n = 30','sl-c1','end');P.text(xr,0.29,'— n = 100','sl-c2','end');P.text(xr,0.2,'— n = 1 000','sl-c5','end');
+    const np=u>=0.5;
+    const th=st.kind?1:10;let lo=1,hi=0;NS.forEach((n,j)=>PS.forEach((p,i)=>{if(n*p>=th){lo=Math.min(lo,CV[st.kind][j][i]);hi=Math.max(hi,CV[st.kind][j][i]);}}));
+    rd(out,NS.map((n,j)=>{const p=np?2/n:0.02;return ['n = '+n.toLocaleString('fr-FR')+(np?', np = 2':', p = 0,02'),pct(cover(n,p,B[st.kind][j])),j===0?'c3':''];}).concat([[(st.kind?'Wilson':'Wald')+', min – max dès np ≥ '+th,fixed(100*lo,1)+' – '+fixed(100*hi,1)+' %']]));
+  }
+  buttons(document.getElementById('f4ctl'),['axe : la prévalence p','axe : les succès attendus np'].map(s=>s.replace(' :',' :')),k=>{
+    const tk=fresh(),u0=st.u;if(u0===k){frame(k);return;}tween(900,v=>frame(v<1?u0+(k-u0)*v:k),tk);});
+  buttons(document.getElementById('f4ctl2'),['Wald','Wilson'],k=>{st.kind=k;frame(st.u);});
+})();
+
+/* ===== v1 : n dés, une moyenne, mille fois ; axe brut et axe zoomé ===== */
+(function(){
+  const NS=[1,2,4,10,30,100],R=1000,host=document.getElementById('v1plot'),out=document.getElementById('v1out');
+  const A=SL.plot(SL.h('div','',host),{x:[0.5,6.5],y:[0,2.8],w:560,h:170,xt:[1,2,3,3.5,4,5,6],yt:[0,1,2],xl:'x̄, la moyenne des n dés (axe brut)'});
+  leftAxis(A,0.5);
+  const B=SL.plot(SL.h('div','',host),{x:[-4,4],y:[0,0.52],w:560,h:170,xt:[-4,-3,-2,-1,0,1,2,3,4],yt:[0,0.2,0.4],xl:'z = (x̄ − 3,5)/(σ/√n), l’axe zoomé'});
+  leftAxis(B,-4);
+  const fresh=runner();let n=4,seed=1,S=[];
+  function sample(r,k){const v=[];for(let i=0;i<k;i++){let s=0;for(let j=0;j<n;j++)s+=1+Math.floor(6*r());v.push(s);}return v;}
+  function draw(){
+    A.clear();B.clear();const k=S.length,se=SIGD/Math.sqrt(n),hz=1/(n*se);
+    curve(A,x=>phiN((x-3.5)/se)/se,0.5,6.5,'sl-c3',2.8);curve(B,phiN,-4,4,'sl-c3',0.52);
+    A.text(6.45,2.55,'— normale N(3,5 ; σ²/n)','sl-c3','end');B.text(3.95,0.46,'— N(0, 1)','sl-c3','end');
+    if(!k){rd(out,[['expériences','aucune']]);return;}
+    const cnt=new Map();let sx=0,sxx=0,in1=0;
+    S.forEach(s=>{cnt.set(s,(cnt.get(s)||0)+1);const x=s/n;sx+=x;sxx+=x*x;if(Math.abs((x-3.5)/se)<=1)in1++;});
+    /* classes de g sommes voisines (largeur ≥ 0,25 en z) : sinon 1 000 tirages sur 150 barres font des dents de scie */
+    const g=Math.max(1,Math.ceil(0.25/hz)),grp=new Map();
+    cnt.forEach((c,s)=>{const j=Math.floor((s-n)/g);grp.set(j,(grp.get(j)||0)+c);});
+    grp.forEach((c,j)=>{const s0=n+j*g,xc=(s0+(g-1)/2)/n,q=c/k,w=g/n,z=(xc-3.5)/se,wz=g*hz;
+      bar(A,xc-0.42*w,xc+0.42*w,Math.min(q/w,2.8),'sl-bar');
+      if(Math.abs(z)+0.42*wz<=4)bar(B,z-0.42*wz,z+0.42*wz,Math.min(q/wz,0.52),'sl-bar');});
+    const m=sx/k,sd=Math.sqrt(Math.max(0,sxx/k-m*m)*k/Math.max(1,k-1));
+    rd(out,[['expériences',String(k)],['SE = σ/√n',fixed(se,3)],['écart-type des x̄ tirés',fixed(sd,3)],['écart-type des z tirés',fixed(sd/se,3),'c1'],['z dans ±1 (normale : 68,3 %)',pct(in1/k)]]);
+  }
+  SL.slider(document.getElementById('v1sl'),{label:'n (dés par expérience)',min:0,max:5,step:1,value:2,fmt:v=>String(NS[v])},v=>{fresh();n=NS[v];S=sample(rng(seed),R);draw();});
+  SL.h('button','tb',document.getElementById('v1ctl'),'▶ refaire 1 000 expériences').onclick=()=>{
+    const tk=fresh(),r=rng(++seed);S=[];loop(tk,()=>{S=S.concat(sample(r,25));draw();return S.length<R;});};
+})();
+
+/* ===== v2 : trois lois, le même n, standardisées ===== */
+(function(){
+  const host=document.getElementById('v2plot'),out=document.getElementById('v2out');host.className='v-row three';
+  const X=[-3.6,4.4],Y=0.62,names=['dés','exponentielles','Bernoulli(0,02)'];
+  const Ps=names.map(()=>SL.plot(SL.h('div','',host),{x:X,y:[0,Y],w:300,h:210,xt:[-3,-2,-1,0,1,2,3,4],yt:[],xl:'z'}));
+  Ps.forEach(P=>leftAxis(P,X[0]));
+  function draw(n){
+    Ps.forEach(P=>P.clear());
+    const a=diceLaw(n),m=3.5*n,s=SIGD*Math.sqrt(n),xs=[],ps=[];
+    for(let v=n;v<=6*n;v++){xs.push((v-m)/s);ps.push(a[v]);}
+    lattice(Ps[0],xs,ps,1/s,1,X,Y);
+    const se=1/Math.sqrt(n);curve(Ps[1],z=>se*gammaMean(1+z*se,n),X[0],X[1],'sl-c2',Y);
+    const b=binomLaw(n,0.02),sd=Math.sqrt(n*0.02*0.98),xb=[],pb=[];
+    for(let k=0;k<=n;k++){const z=(k-n*0.02)/sd;if(z>X[1]+1)break;xb.push(z);pb.push(b[k]);}
+    lattice(Ps[2],xb,pb,1/sd,1,X,Y);
+    Ps.forEach((P,i)=>{curve(P,phiN,X[0],X[1],'sl-c3 thin',Y);P.text(X[0]+0.2,0.56,n+' '+names[i],'','start');});
+    rd(out,[['asymétrie, dés','0'],['asymétrie, exponentielles',fixed(2/Math.sqrt(n),2)],['asymétrie, Bernoulli',fixed(0.96/Math.sqrt(n*0.0196),2)],['échantillons sans succès',pct(Math.pow(0.98,n))]]);
+  }
+  buttons(document.getElementById('v2ctl'),['n = 30','n = 100','n = 500'],k=>draw([30,100,500][k]));
+})();
+
+/* ===== v3 : la même loi, lue en somme et en moyenne ===== */
+(function(){
+  const host=document.getElementById('v3plot'),out=document.getElementById('v3out');
+  const A=SL.plot(SL.h('div','',host),{x:[0,420],y:[0,1.18],w:560,h:170,xt:[0,50,100,150,200,250,300,350,400],yt:[],xl:'somme Sₙ des n dés'});
+  const B=SL.plot(SL.h('div','',host),{x:[0.5,6.5],y:[0,1.18],w:560,h:170,xt:[1,2,3,3.5,4,5,6],yt:[],xl:'moyenne X̄ₙ = Sₙ/n'});
+  leftAxis(B,0.5);
+  function brk(P,a,b){P.seg(a,1.08,b,1.08,'bracket');P.seg(a,1.04,a,1.12,'bracket');P.seg(b,1.04,b,1.12,'bracket');}
+  function shape(P,xs,hs,h,X){const px=Math.abs(P.sx(h)-P.sx(0));
+    if(px>=3.2){xs.forEach((x,i)=>bar(P,x-0.42*h,x+0.42*h,hs[i],'sl-bar'));return;}
+    let d='M'+P.sx(xs[0]).toFixed(1)+' '+P.sy(0).toFixed(1);xs.forEach((x,i)=>{d+=' L'+P.sx(x).toFixed(1)+' '+P.sy(hs[i]).toFixed(1);});
+    d+=' L'+P.sx(xs[xs.length-1]).toFixed(1)+' '+P.sy(0).toFixed(1)+' Z';SL.el('path',{d:d,class:'sl-bar'},P.dyn);}
+  function draw(n){
+    A.clear();B.clear();const a=diceLaw(n),xs=[],hs=[],xm=[];let M=0;
+    for(let s=n;s<=6*n;s++)M=Math.max(M,a[s]);
+    for(let s=n;s<=6*n;s++){xs.push(s);xm.push(s/n);hs.push(a[s]/M);}
+    shape(A,xs,hs,1);shape(B,xm,hs,1/n);
+    const m=3.5*n,sd=SIGD*Math.sqrt(n),sm=SIGD/Math.sqrt(n);
+    curve(A,s=>phiN((s-m)/sd)/sd/M,0,420,'sl-c3 dashfn',1.18);
+    brk(A,m-sd,m+sd);brk(B,3.5-sm,3.5+sm);
+    const lx=m>210?6:414,la=m>210?'start':'end';
+    A.text(lx,0.93,'┄ normale N(nμ, nσ²)','sl-c3',la);A.text(lx,0.8,'├┤ de −σ à +σ autour du centre','',la);
+    rd(out,[['n',String(n)],['E[Sₙ] = 3,5 n',SL.fmt(m,1)],['σ(Sₙ) = 1,708 √n',fixed(sd,2),'c1'],['σ(X̄ₙ) = 1,708/√n',fixed(sm,3)],['largeur relative σ(Sₙ)/E[Sₙ]',pct(sd/m)]]);
+  }
+  const sl=SL.slider(document.getElementById('v3sl'),{label:'n (dés)',min:1,max:100,step:1,value:100,fmt:v=>String(v)},v=>draw(v));
+  const fresh=runner();sl.input.addEventListener('input',()=>fresh());
+  SL.h('button','tb',document.getElementById('v3ctl'),'▶ de 1 à 100').onclick=()=>{const tk=fresh();
+    if(SL.reduced){sl.set(100);return;}const t0=performance.now();
+    loop(tk,()=>{const u=Math.min(1,(performance.now()-t0)/4500),v=Math.max(1,Math.round(100*u));if(v!==sl.get())sl.set(v);return u<1;});};
+})();
+
+/* ===== v4 : une moyenne qui ne se resserre pas ===== */
+(function(){
+  const NS=[1,10,100,1000],X=[-4,4],R=2000,host=document.getElementById('v4plot'),out=document.getElementById('v4out');
+  const P=SL.plot(host,{x:X,y:[0,1.14],w:560,h:240,xt:[-4,-3,-2,-1,0,1,2,3,4],yt:[],xl:'moyenne de n mesures, centrée'});
+  leftAxis(P,X[0]);
+  const cache={},st={c:0,k:2};
+  function gen(c,n){const key=c+'_'+n;if(cache[key])return cache[key];const r=rng(1000*c+n+7),v=new Float64Array(R);
+    for(let i=0;i<R;i++){let s=0;
+      if(c===0){for(let j=0;j<n;j++)s+=Math.tan(Math.PI*(r()-0.5));v[i]=s/n;}
+      else if(c===1){v[i]=1+Math.floor(6*r())-3.5;}
+      else if(c===2){const C=gauss(r);for(let j=0;j<n;j++)s+=gauss(r);v[i]=SIGD*(Math.sqrt(0.05)*C+Math.sqrt(0.95)*s/n);}
+      else{for(let j=0;j<n;j++)s+=1+Math.floor(6*r());v[i]=s/n-3.5;}}
+    return cache[key]=v;}
+  /* une échelle commune : le cas choisi monte à 0,9 ; la référence, plus concentrée, peut dépasser le cadre */
+  function hist(v){const h=new Map();let far=0,outside=0,M=0;
+    v.forEach(x=>{if(Math.abs(x)>0.5)far++;if(Math.abs(x)>4){outside++;return;}const b=Math.round(x/0.1);h.set(b,(h.get(b)||0)+1);});
+    h.forEach(c=>M=Math.max(M,c));return {h:h,M:M,far:far/v.length,out:outside/v.length};}
+  function paint(H,sc,cls){H.h.forEach((c,b)=>bar(P,b*0.1-0.045,b*0.1+0.045,Math.min(c*sc,1.14),cls));}
+  function draw(){
+    P.clear();const n=NS[st.k],ref=hist(gen(3,n)),cur=st.c===3?ref:hist(gen(st.c,n)),sc=0.9/cur.M;
+    if(st.c!==3)paint(ref,sc,'sl-ref');paint(cur,sc,'sl-bar');
+    P.vline(0.5,'sl-dash');P.vline(-0.5,'sl-dash');
+    P.text(3.95,1.06,'▮ le cas choisi','sl-c2','end');P.text(3.95,0.96,'▮ référence : dés indépendants','','end');
+    rd(out,[['n',String(n)],['à plus de 0,5 du centre',pct(cur.far),'c3'],['référence i.i.d., même n',pct(ref.far)],['hors du cadre ±4',pct(cur.out)]]);
+  }
+  buttons(document.getElementById('v4ctl'),['Cauchy','un dé recopié','corrélées, ρ = 0,05','indépendants'],c=>{st.c=c;draw();});
+  SL.slider(document.getElementById('v4sl'),{label:'n (mesures)',min:0,max:3,step:1,value:2,fmt:v=>NS[v].toLocaleString('fr-FR')},v=>{st.k=v;draw();});
+})();
+
+/* ===== v5 : 25 sondages, l'intervalle bouge, la vraie part reste ===== */
+(function(){
+  const N=25,n=1000,p=0.52,host=document.getElementById('v5plot'),out=document.getElementById('v5out');
+  const P=SL.plot(host,{x:[0.44,0.6],y:[0,27],w:560,h:300,xt:[0.44,0.46,0.48,0.5,0.52,0.54,0.56,0.58,0.6],yt:[],xl:'part de A dans le sondage'});
+  leftAxis(P,0.44);
+  const fresh=runner();let seed=1;
+  function polls(r){const L=[];for(let i=0;i<N;i++){let k=0;for(let j=0;j<n;j++)if(r()<p)k++;
+    const f=k/n,h=1.96*Math.sqrt(f*(1-f)/n);L.push([f,f-h,f+h]);}return L;}
+  function draw(L,m){
+    P.clear();P.vline(0.5,'sl-dash');P.vline(p,'sl-mean');
+    P.text(p+0.001,26.1,'vraie part 0,52','sl-c3','start');P.text(0.499,26.1,'50 %','','end');
+    let hit=0,c5=0,half=0;
+    for(let i=0;i<m;i++){const f=L[i][0],lo=L[i][1],hi=L[i][2],ok=lo<=p&&p<=hi;if(ok)hit++;if(lo<=0.5&&0.5<=hi)c5++;half+=(hi-lo)/2;
+      P.seg(lo,i+1,hi,i+1,'sl-ci'+(ok?'':' miss'));P.dot(f,i+1,ok?'sl-c1':'sl-c3',3.4);}
+    rd(out,[['contiennent la vraie part 0,52',hit+' / '+m,'c1'],['contiennent 50 %, indécidables',c5+' / '+m],['demi-largeur moyenne 1,96 SE',m?fixed(half/m,3):'—']]);
+  }
+  let L=polls(rng(seed));draw(L,N);
+  SL.h('button','tb',document.getElementById('v5ctl'),'▶ 25 nouveaux sondages').onclick=()=>{const tk=fresh();L=polls(rng(++seed));
+    if(SL.reduced){draw(L,N);return;}const t0=performance.now();
+    loop(tk,()=>{const m=Math.min(N,1+Math.floor((performance.now()-t0)/90));draw(L,m);return m<N;});};
+})();
+
+})();
+</script>
+</body>
+</html>
