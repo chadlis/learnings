@@ -3,8 +3,8 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
-<title>Espérance et variance — leçon</title>
-<meta name="sheet" content="series=lesson;part=00;number=08;status=v1">
+<title>Espérance et variance — leçon · v2</title>
+<meta name="sheet" content="series=lesson;part=00;number=08;status=v2">
 <meta name="part" content="00 · Socle probabiliste">
 <meta name="subtitle" content="socle — Brunton 28 à 32 et 43 : centre de masse, linéarité sans hypothèse, inertie autour du centre">
 <meta name="prereq" content="l04,l05,l07">
@@ -195,6 +195,26 @@ pre.out::before{content:"sortie\A";font:600 10.5px var(--sans);letter-spacing:.0
 .sl-fulcrum{fill:var(--red)}.sl-bar2{fill:var(--red);opacity:.55}.sl-bar3{fill:var(--pen);opacity:.6}
 @media(max-width:600px){.idee,.formule,details,.garde,.src,.notion .fig{margin-left:0}.notion h3{font-size:19px}}
 .sl-seg.sl-c1{stroke:var(--pen);stroke-width:2}.sl-seg.sl-c2{stroke:#6B46C1;stroke-width:2}.sl-seg.sl-c3{stroke:var(--red);stroke-width:2}.sl-seg.sl-c4{stroke:#1F5FA8;stroke-width:2}
+/* ===== v2 (10/10/2026) : vignettes « voir l'idée », sous chaque idée ===== */
+.fig.vis{--ac:var(--teal)}
+.v-row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:center}
+.v-row>div{flex:1 1 280px;min-width:0}.v-row>.v-mini{flex:0 1 220px}
+.v-row .sl-plot{min-width:0}
+.nogrid .sl-grid{display:none}
+.sl-ruler{fill:var(--cardmuted)}
+.sl-mass{fill:#6B46C1;opacity:.85}
+.sl-mass-t{font:600 11px var(--sans);fill:#fff}
+.sl-sq{fill:rgba(107,70,193,.16);stroke:#6B46C1;stroke-width:1.5}
+.sl-sq-t{font:600 12.5px var(--mono);fill:#6B46C1}
+.sl-cellp{fill:#6B46C1}.sl-cello{fill:none;stroke:var(--cardline)}
+.sl-prod{font:12px var(--mono);fill:var(--cardmuted);opacity:.5}.sl-prod.on{font-weight:700;fill:var(--cardink);opacity:1}
+.sl-seg.sl-dash{stroke-dasharray:4 3}.sl-seg.sl-link{stroke:rgba(34,48,43,.28);stroke-dasharray:3 3}
+.sl-seg.sl-c5{stroke:#B7791F;stroke-width:2}
+.sl-orbit{fill:none;stroke:rgba(34,48,43,.3);stroke-dasharray:3 4}
+.sl-stick{stroke:var(--cardmuted);stroke-width:4;stroke-linecap:round}
+.sl-dot.sl-tiny{stroke:none;opacity:.5}
+.sl-k1{fill:var(--pen)}.sl-k2{fill:#6B46C1}.sl-k3{fill:var(--red)}.sl-k4{fill:#1F5FA8}.sl-k5{fill:#B7791F}.sl-k6{fill:var(--green)}.sl-kc{opacity:.5}
+.sl-cell-t{font:600 11px var(--sans);fill:var(--cardink)}
 </style>
 </head>
 <body>
@@ -249,6 +269,13 @@ pre.out::before{content:"sortie\A";font:600 10.5px var(--sans);letter-spacing:.0
     <p>Brunton part d'une question pratique : si je tire beaucoup de valeurs de cette loi et que je fais leur moyenne, quel nombre est-ce que j'attends ? Ce nombre est l'<b>espérance</b>.</p>
     <p>L'image physique la rend immédiate. Pose sur une règle une masse P(X = x) à chaque position x ; la masse totale vaut 1. L'espérance est le point où la règle tient en équilibre sur un doigt. Une valeur lointaine pèse davantage parce qu'elle a un plus grand bras de levier : c'est pour ça qu'on multiplie chaque valeur par sa probabilité avant d'additionner.</p>
     <p>La règle tient en c quand les bras de levier de gauche et de droite se compensent : Σ (x − c) P(X = x) = 0. Développe : Σ x P(X = x) − c = 0, puisque les probabilités somment à 1. Donc <b>c = Σ x P(X = x)</b>, et c'est la définition.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — la règle penche du côté du plus grand bras de levier</div>
+    <div id="v1ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">Trois masses : 0,5 en 1, 0,3 en 2, 0,2 en 6. Déplace le <b>doigt c</b> : la règle penche du côté où la somme masse × bras de levier l'emporte. Elle tient en c = 2,3, à droite des deux masses lourdes, parce que la petite masse en 6 a un bras de levier de 3,7 : 0,2 × 3,7 = 0,5 × 1,3 + 0,3 × 0,3 = 0,74. Puis <b>tire 1 000 valeurs</b> : le doigt suit leur moyenne, et la règle se rapproche de l'horizontale.</p>
   </div>
   <div class="formule"><div class="lbl">La formule</div>
     <div class="eq">E[<i>X</i>] = Σ<sub><i>x</i></sub> <i>x</i> · P(<i>X</i> = <i>x</i>) &nbsp;&nbsp;(discret) &nbsp;&nbsp;&nbsp; E[<i>X</i>] = ∫ <i>x</i> <i>f</i>(<i>x</i>) d<i>x</i> &nbsp;&nbsp;(continu)</div>
@@ -309,6 +336,13 @@ mean number of heads: 50.02</pre>
   <div class="idee">
     <p>Le centre de masse n'est pas le seul centre. La <b>médiane</b> coupe la masse en deux moitiés ; le <b>mode</b> est l'endroit où la masse est la plus haute. Pour une gaussienne les trois coïncident, et c'est ce qui donne la fausse intuition que « la moyenne, c'est la valeur typique ».</p>
     <p>Brunton prend deux contre-exemples. Une loi à deux bosses symétriques a son centre de masse au milieu, là où il n'y a presque rien. Le patrimoine des ménages américains, lui, a quelques fortunes immenses très loin à droite : elles tirent le point d'équilibre bien au-delà du ménage typique, alors que la médiane ne bouge presque pas.</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — deux contre-exemples à « la moyenne est la valeur typique »</div>
+    <div id="v2ctl" class="sl-ctl"></div><div id="v2sl"></div>
+    <div id="v2plot" class="wide"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">Chaque point est un individu, le triangle rouge est le point d'équilibre de la notion 1. <b>Une bosse</b> : les trois centres coïncident. <b>Deux bosses</b> : la moyenne tombe dans le trou, où il n'y a personne, et le mode est double. <b>Patrimoine</b> : ajoute des <b>grosses fortunes</b>. Avec quatre, la moyenne passe de 1,13 à 3 fois le ménage médian de départ ; la médiane, le ménage du milieu en bleu, passe seulement de 1 à 1,11.</p>
   </div>
   <div class="formule"><div class="lbl">Les définitions</div>
     <div class="eq">médiane <i>m</i> : F(<i>m</i>) = ½ &nbsp;&nbsp;&nbsp;&nbsp; mode : la valeur où P(<i>X</i> = <i>x</i>) ou <i>f</i>(<i>x</i>) est maximale</div>
@@ -371,6 +405,13 @@ median      198,524   mean      2,002,263</pre>
     <p>C'est la propriété la plus utile de l'espérance, et elle ne demande rien. Pour additionner des espérances, on n'a pas besoin de savoir comment les variables dépendent l'une de l'autre.</p>
     <p>L'image : chaque tirage du couple donne une somme x + y. Sur beaucoup de tirages, la moyenne des sommes est la somme des moyennes, quelle que soit la façon dont x et y bougent ensemble. Que Y suive X de près ou pas du tout change la <b>forme</b> de la loi de X + Y, jamais son espérance, son centre de masse.</p>
   </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — la dépendance change la forme, pas le centre</div>
+    <div id="v3ctl" class="sl-ctl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">La loi de X + Y pour deux dés, selon la façon dont Y dépend de X. La forme change du tout au tout, le point d'équilibre reste en 7 = 3,5 + 3,5. <b>Lance 300 couples</b> : la moyenne des sommes (point bleu) rejoint 7 dans les trois cas.</p>
+  </div>
   <div class="formule"><div class="lbl">La formule</div>
     <div class="eq">E[<i>aX</i> + <i>bY</i> + <i>c</i>] = <i>a</i> E[<i>X</i>] + <i>b</i> E[<i>Y</i>] + <i>c</i></div>
     <ul><li><b>Aucune hypothèse</b> : X et Y peuvent être dépendantes, et de lois différentes.</li><li>Pour n termes : E[X<sub>1</sub> + … + X<sub>n</sub>] = E[X<sub>1</sub>] + … + E[X<sub>n</sub>].</li></ul>
@@ -427,6 +468,13 @@ E[X] + E[Y] ≈ 6.997</pre>
     <p>Pour un produit, c'est l'inverse : il faut une hypothèse. Si X et Y sont indépendantes, connaître X ne dit rien de Y, et la moyenne du produit se coupe en produit des moyennes.</p>
     <p>Si elles bougent ensemble, les grandes valeurs de X tombent avec les grandes valeurs de Y, et la moyenne du produit dépasse le produit des moyennes. Cet écart E[XY] − E[X]E[Y] a un nom : la <b>covariance</b> (<a href="../../map.html#l09">l09</a>).</p>
   </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — la moyenne des produits, case par case</div>
+    <div id="v4ctl" class="sl-ctl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">Chaque case contient le produit x · y ; plus elle est foncée, plus le couple (x, y) est probable. E[XY] est la moyenne des produits pondérée par ces probabilités. <b>Indépendants</b> : les 36 cases pèsent 1/36 et E[XY] = 3,5 × 3,5. <b>Y = X</b> : seule la diagonale compte, les grands x tombent avec les grands y, et E[XY] monte à 15,17. <b>Y = 7 − X</b> : les grands x tombent avec les petits y, et E[XY] descend à 9,33.</p>
+  </div>
   <div class="formule"><div class="lbl">La formule</div>
     <div class="eq"><i>X</i>, <i>Y</i> indépendantes ⟹ E[<i>XY</i>] = E[<i>X</i>] · E[<i>Y</i>] &nbsp;&nbsp;&nbsp; et plus généralement E[<i>g</i>(<i>X</i>) <i>h</i>(<i>Y</i>)] = E[<i>g</i>(<i>X</i>)] · E[<i>h</i>(<i>Y</i>)]</div>
     <ul><li><b>Indépendance</b> : P(X = x, Y = y) = P(X = x) P(Y = y) pour tous x et y.</li><li>Le sens ⟸ est faux : l'égalité ne prouve pas l'indépendance.</li></ul>
@@ -481,6 +529,13 @@ Y = X² on (-1, 0, 1): E[XY] ≈ 0.001, E[X]E[Y] ≈ 0.001</pre>
   <div class="idee">
     <p>Pour calculer E[g(X)], il paraît naturel de chercher d'abord la loi de Y = g(X), puis d'appliquer la définition. C'est inutile. On garde les probabilités de X et on remplace chaque valeur x par g(x) ; Brunton : « on reprend la formule et on remplace x par g de x ».</p>
     <p>Le nom anglais, <i>law of the unconscious statistician</i> (LOTUS), vient de là : tout le monde le fait sans y penser, et c'est juste. Brunton prévient que ce n'est « pas évident » : c'est un théorème, pas la définition.</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — on garde les masses, on déplace les valeurs</div>
+    <div id="v5ctl" class="sl-ctl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">En haut, les six faces d'un dé, chacune de masse ⅙. Choisis g : chaque masse voyage de x jusqu'à g(x) sans changer de poids, et E[g(X)] est le point d'équilibre en bas (triangle rouge). Avec (x − 3,5)², deux faces arrivent au même point et leurs masses s'additionnent : c'est la preuve de LOTUS. Le rond bleu marque g(E[X]) ; il ne tombe sur E[g(X)] que pour g affine.</p>
   </div>
   <div class="formule"><div class="lbl">La formule</div>
     <div class="eq">E[<i>g</i>(<i>X</i>)] = Σ<sub><i>x</i></sub> <i>g</i>(<i>x</i>) P(<i>X</i> = <i>x</i>) &nbsp;&nbsp;&nbsp;&nbsp; E[<i>g</i>(<i>X</i>)] = ∫ <i>g</i>(<i>x</i>) <i>f</i>(<i>x</i>) d<i>x</i></div>
@@ -540,6 +595,13 @@ print(lotus, direct)</pre>
     <p>Deux lois peuvent avoir le même centre et s'étaler très différemment. Brunton définit la variance comme la <b>moyenne des carrés des écarts à μ</b> : on prend l'écart de chaque valeur à la moyenne, on le met au carré, et on fait la moyenne pondérée par les probabilités.</p>
     <p>Sur deux masses de ½ placées en 1 et 3 : μ = 2, écarts −1 et +1, carrés 1 et 1, variance 1. Écarte-les en 0 et 4 : écarts ±2, carrés 4 et 4, variance 4.</p>
     <p>L'image est celle du <b>moment d'inertie</b>. Tiens un bâton par son centre et fais-le tourner. Des poids près de ta main se lancent facilement ; les mêmes poids aux deux bouts résistent beaucoup plus. À chaque tour, un poids à la distance r parcourt un cercle de rayon r, donc va à une vitesse proportionnelle à r, et l'énergie ½mv² croît comme r². En probabilités, les masses sont les probabilités, l'axe est la moyenne, et la variance est cette inertie : <b>une valeur deux fois plus loin compte quatre fois plus</b>.</p>
+  </div>
+  <div class="fig vis" id="v6">
+    <div class="lbl">Voir l'idée — les carrés des écarts, et le bâton qui tourne</div>
+    <div id="v6ctl"></div>
+    <div id="v6plot" class="wide"></div>
+    <div class="readouts" id="v6out"></div>
+    <p class="cap">Deux masses de ½ en μ − d et μ + d, avec μ = 2. À gauche, chaque écart à μ est le côté d'un carré : la variance est l'aire moyenne de ces carrés. À droite, les mêmes masses sur un bâton tenu par son centre : leur vitesse (flèches) est proportionnelle à d, leur énergie à d². Passe de <b>d = 1</b>, la loi {1, 3}, à <b>d = 2</b>, la loi {0, 4} : les côtés doublent, les aires et l'inertie quadruplent.</p>
   </div>
   <div class="formule"><div class="lbl">La formule</div>
     <div class="eq">définition : Var(<i>X</i>) = E[(<i>X</i> − μ)²] &nbsp;&nbsp;&nbsp; forme de calcul : Var(<i>X</i>) = E[<i>X</i>²] − μ² &nbsp;&nbsp;&nbsp; σ = √Var(<i>X</i>)</div>
@@ -609,6 +671,13 @@ theory 9.0   sample variance 8.924</pre>
     <p>Brunton appelle l'espérance le premier <b>moment</b> et relie la variance au second (28), qu'il écrit ensuite « second moment moins premier au carré » (37). Le mot vient de la physique : un moment est une moyenne pondérée d'une puissance de la distance. Plus la puissance k est grande, plus la masse lointaine écrase le reste. Les moments successifs décrivent donc la forme de la loi, du plus grossier au plus fin.</p>
     <p>Puissance paire (2, 4) : le signe disparaît, seule la distance compte. Puissance impaire (3) : le signe reste, et les écarts à gauche et à droite se compensent, sauf si un côté est plus lourd.</p>
   </div>
+  <div class="fig vis" id="v7">
+    <div class="lbl">Voir l'idée — plus la puissance monte, plus la masse lointaine écrase le reste</div>
+    <div id="v7ctl" class="sl-ctl"></div><div id="v7sl"></div>
+    <div id="v7plot" class="wide"></div>
+    <div class="readouts" id="v7out"></div>
+    <p class="cap">Chaque barre est la contribution p · (x − μ)<sup>k</sup> d'une valeur, à l'échelle de la plus grande ; leur somme est le moment centré d'ordre k. Sur Z, la valeur 10 fait 50 % de la somme des barres en valeur absolue à k = 1, 90 % à k = 2, 99 % à k = 3 et 99,9 % à k = 4. Aux k impairs, la barre de gauche est négative : sur {1, 3} les deux côtés s'annulent exactement, sur Z le côté lourd l'emporte.</p>
+  </div>
   <div class="formule"><div class="lbl">Les formules</div>
     <div class="eq">brut : E[<i>X</i><sup><i>k</i></sup>] &nbsp;&nbsp; centré : E[(<i>X</i> − μ)<sup><i>k</i></sup>] &nbsp;&nbsp; asymétrie : E[(<i>X</i> − μ)³] / σ³ &nbsp;&nbsp; kurtosis : E[(<i>X</i> − μ)⁴] / σ⁴</div>
     <ul><li>Brut = autour de 0, centré = autour de μ. Le moment centré d'ordre 1 vaut toujours 0.</li><li>Var = brut<sub>2</sub> − brut<sub>1</sub>² : la même forme que le théorème de Huygens en mécanique, inertie autour de l'origine = inertie autour du centre + masse × distance².</li><li>Diviser par σ³ et σ⁴ rend l'asymétrie et la kurtosis sans unité : elles décrivent la forme, pas l'échelle.</li></ul>
@@ -667,6 +736,13 @@ default   5.24  (excess = kurtosis - 3)</pre>
     <p>Brunton fait enfin un calcul sur une loi continue (il ne saute que E[T²]) : l'attente T jusqu'au prochain événement d'un flux de taux λ (un mail, un appel, une panne). Le résultat surprend : la moyenne et l'écart-type sont égaux, et la médiane est nettement plus courte que la moyenne.</p>
     <p>La loi est très asymétrique : beaucoup d'attentes courtes, quelques attentes longues qui tirent la moyenne vers la droite. C'est la situation de la figure 2, sur une loi qu'on rencontre partout.</p>
     <p>La moyenne se devine : à λ événements par heure, on attend en moyenne 1/λ heure. À 4 spams par heure, un spam toutes les 15 minutes.</p>
+  </div>
+  <div class="fig vis" id="v8">
+    <div class="lbl">Voir l'idée — huit heures de spams, à 4 par heure</div>
+    <div id="v8ctl" class="sl-ctl"></div>
+    <div id="v8plot" class="wide"></div>
+    <div class="readouts" id="v8out"></div>
+    <p class="cap">En haut, l'heure d'arrivée de chaque spam ; en bas, une pastille par attente entre deux spams. Les attentes courtes s'empilent à gauche, quelques longues s'étirent à droite et tirent la moyenne (rouge) au-delà de la médiane (bleu). En théorie : moyenne 15 min, médiane 10,4 min, et 63 % des attentes plus courtes que la moyenne. <b>Lance une nouvelle journée</b> : les chiffres bougent, la médiane reste presque toujours sous la moyenne.</p>
   </div>
   <div class="formule"><div class="lbl">Les résultats</div>
     <div class="eq"><i>f</i>(<i>t</i>) = λ e<sup>−λ<i>t</i></sup>, <i>t</i> ≥ 0 &nbsp;&nbsp;⟹&nbsp;&nbsp; E[<i>T</i>] = 1/λ, &nbsp; Var(<i>T</i>) = 1/λ², &nbsp; σ = 1/λ, &nbsp; médiane = ln 2 / λ ≈ 0,693 / λ</div>
@@ -733,6 +809,13 @@ median 0.3442   (ln2/λ = 0.3466)</pre>
     <p>Brunton convertit des températures : F = (9/5) C + 32. Faut-il tout recalculer en °F ? Non. Décaler toutes les valeurs de b déplace le centre de b, mais ne change <b>aucun</b> écart au centre : la variance ne bouge pas.</p>
     <p>Multiplier par a multiplie chaque écart par a, donc chaque écart au carré par a². C'est pour ça que la variance n'est pas linéaire : un facteur sort au carré, et une constante disparaît.</p>
   </div>
+  <div class="fig vis" id="v9">
+    <div class="lbl">Voir l'idée — décaler ne touche aucun écart, étirer les multiplie</div>
+    <div id="v9ctl" class="sl-ctl"></div>
+    <div id="v9plot" class="wide"></div>
+    <div class="readouts" id="v9out"></div>
+    <p class="cap">Trois journées à 10, 15 et 20 °C. Chaque écart à la moyenne est le côté d'un carré, et la variance est l'aire moyenne des carrés. <b>+ 32</b> fait glisser le tout : les carrés ne changent pas. <b>× 1,8</b> allonge chaque côté de 1,8, donc chaque aire de 1,8² = 3,24. Les deux ensemble donnent les °F : la variance passe de 16,67 à 16,67 × 3,24 = 54.</p>
+  </div>
   <div class="formule"><div class="lbl">Les formules</div>
     <div class="eq">E[<i>aX</i> + <i>b</i>] = <i>a</i> E[<i>X</i>] + <i>b</i> &nbsp;&nbsp;&nbsp;&nbsp; Var(<i>aX</i> + <i>b</i>) = <i>a</i>² Var(<i>X</i>) &nbsp;&nbsp;&nbsp;&nbsp; σ<sub><i>aX</i> + <i>b</i></sub> = |<i>a</i>| σ<sub><i>X</i></sub></div>
     <ul><li>Aucune hypothèse : a et b sont des constantes, X est quelconque.</li></ul>
@@ -797,6 +880,13 @@ Var(X + X') ≈ 5.812</pre>
     <p>Brunton : « la température n'est que l'énergie cinétique moyenne des molécules ». Il calcule E[½ m V²] avec la loi de Maxwell de la vitesse, au prix d'une intégrale et d'une fonction gamma.</p>
     <p>La linéarité permet de s'en passer. La vitesse d'une molécule est un vecteur (V<sub>x</sub>, V<sub>y</sub>, V<sub>z</sub>) dont chaque composante est normale, centrée, de variance σ² ; son carré est V<sub>x</sub>² + V<sub>y</sub>² + V<sub>z</sub>². La loi de Maxwell qu'utilise Brunton est exactement la loi de la norme |V| quand les trois composantes sont indépendantes N(0, σ²), avec le même σ : les deux calculs portent sur la même chose.</p>
   </div>
+  <div class="fig vis" id="v10">
+    <div class="lbl">Voir l'idée — l'énergie se calcule composante par composante</div>
+    <div id="v10ctl" class="sl-ctl"></div>
+    <div id="v10plot" class="wide"></div>
+    <div class="readouts" id="v10out"></div>
+    <p class="cap">À gauche, les vitesses (V<sub>x</sub>, V<sub>y</sub>) des molécules, σ = 1,3 ; la flèche rouge est la dernière arrivée, et sa troisième composante V<sub>z</sub> n'est pas dessinée. À droite, la moyenne de chaque carré de composante, puis celle de |V|² = V<sub>x</sub>² + V<sub>y</sub>² + V<sub>z</sub>² : la dernière barre est exactement l'empilement des trois autres. <b>Ajoute des molécules</b> : les barres rejoignent σ² = 1,69 et 3σ² = 5,07.</p>
+  </div>
   <div class="formule"><div class="lbl">Le calcul</div>
     <div class="eq">E[½ <i>m</i> (<i>V<sub>x</sub></i>² + <i>V<sub>y</sub></i>² + <i>V<sub>z</sub></i>²)] = ½ <i>m</i> (E[<i>V<sub>x</sub></i>²] + E[<i>V<sub>y</sub></i>²] + E[<i>V<sub>z</sub></i>²]) = (3/2) <i>m</i> σ²</div>
     <ul><li>E[V<sub>x</sub>²] = Var(V<sub>x</sub>) + E[V<sub>x</sub>]² = σ² + 0 (notion 6).</li><li>En physique, σ² = kT/m, d'où E = (3/2) kT.</li></ul>
@@ -832,6 +922,13 @@ print(f"E[KE] ≈ {ke.mean():.3f}   (3/2) m σ² = {1.5 * m * sigma**2:.3f}")</p
   <div class="idee">
     <p>Entre deux vidéos lourdes, Brunton glisse une formule « un peu surprenante » : pour une variable à valeurs entières positives, l'espérance est la somme des probabilités de dépasser chaque seuil.</p>
     <p>Son dessin : écrire k · P(X = k) comme k copies de P(X = k), empilées en colonne, puis lire le tableau par lignes. Chaque ligne est une probabilité de queue.</p>
+  </div>
+  <div class="fig vis" id="v11">
+    <div class="lbl">Voir l'idée — le même tableau, lu par colonnes puis par lignes</div>
+    <div id="v11ctl" class="sl-ctl"></div>
+    <div id="v11plot" class="wide"></div>
+    <div class="readouts" id="v11out"></div>
+    <p class="cap">Un dé : la colonne k empile k copies de P(X = k) = ⅙, soit 21 cases et une aire totale de 21/6 = 3,5 = E[X]. <b>Par lignes</b>, les cases glissent sans changer de nombre : la ligne r contient P<sub>r</sub>, …, P<sub>6</sub>, c'est-à-dire P(X ≥ r). Même aire, seconde formule.</p>
   </div>
   <div class="formule"><div class="lbl">La formule</div>
     <div class="eq"><i>X</i> ∈ {0, 1, 2, …} ⟹ E[<i>X</i>] = Σ<sub><i>k</i> ≥ 1</sub> P(<i>X</i> ≥ <i>k</i>) = Σ<sub><i>k</i> ≥ 0</sub> P(<i>X</i> &gt; <i>k</i>)</div>
@@ -938,7 +1035,7 @@ print(f"{tail:.4f}  {rng.geometric(p, size=200_000).mean():.4f}")   # both ≈ 1
 
 </main>
 </div>
-<footer>leçon l08 · v1 du 10/10/2026 · Brunton 28 à 32 et 43 · Prérequis : <a href="../../map.html#l04">l04</a>, <a href="../../map.html#l05">l05</a>, <a href="../../map.html#l07">l07</a>. Suite : <a href="../../map.html#l09">l09 · Covariance et corrélation</a>.</footer>
+<footer>leçon l08 · v2 du 10/10/2026 (v1 du même jour) · Brunton 28 à 32 et 43 · Prérequis : <a href="../../map.html#l04">l04</a>, <a href="../../map.html#l05">l05</a>, <a href="../../map.html#l07">l07</a>. Suite : <a href="../../map.html#l09">l09 · Covariance et corrélation</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>
@@ -1081,6 +1178,284 @@ function buttons(host,names,cb){const bs=names.map((n,i)=>{const b=SL.h('button'
   }
   buttons(document.getElementById('f6ctl'),['dé','géométrique, p = 1/6'],draw);
 })();
+
+/* ===== v2 : vignettes « voir l'idée », une par notion, juste sous l'idée ===== */
+/* tween : animation 0 → 1 lissée ; runner : un jeton par figure, un nouveau clic tue l'animation en cours */
+function runner(){let t={dead:true};return ()=>{t.dead=true;t={dead:false};return t;};}
+function tween(ms,draw,tk,done){if(SL.reduced){draw(1);if(done)done();return;}const t0=performance.now();const st=t=>{if(tk&&tk.dead)return;let u=Math.min(1,(t-t0)/ms);u=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;draw(u);if(u<1)requestAnimationFrame(st);else if(done)done();};requestAnimationFrame(st);}
+function loop(tk,step){if(SL.reduced){let g=0;while(step()!==false&&g++<1e5);return;}const f=()=>{if(tk.dead)return;if(step()!==false)requestAnimationFrame(f);};requestAnimationFrame(f);}
+function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function pick(r,v,p){let u=r(),a=0;for(let i=0;i<v.length;i++){a+=p[i];if(u<a)return v[i];}return v[v.length-1];}
+function gauss(r){let u=0;while(u===0)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());}
+function fulcrum(P,x){const cx=P.sx(x),cy=P.sy(0);SL.el('path',{d:`M${cx.toFixed(1)} ${(cy+1).toFixed(1)} L${(cx-8).toFixed(1)} ${(cy+16).toFixed(1)} L${(cx+8).toFixed(1)} ${(cy+16).toFixed(1)} Z`,class:'sl-fulcrum'},P.dyn);}
+function median(a){const s=a.slice().sort((x,y)=>x-y),n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;}
+function rect(P,x0,x1,y0,y1,cls,parent){const a=P.sx(x0),b=P.sx(x1),c=P.sy(y0),d=P.sy(y1);return SL.el('rect',{x:Math.min(a,b).toFixed(1),y:Math.min(c,d).toFixed(1),width:Math.abs(b-a).toFixed(1),height:Math.abs(d-c).toFixed(1),class:cls},parent||P.dyn);}
+/* pile de pastilles : une par individu, regroupées par classe de largeur bw */
+function stack(P,vals,bw,r,clsOf,centred){const bins=new Map();vals.forEach((v,i)=>{const b=centred?Math.round(v/bw):Math.floor(v/bw);if(!bins.has(b))bins.set(b,[]);bins.get(b).push(i);});
+  const res=[];bins.forEach((ids,b)=>{const c=centred?b*bw:(b+0.5)*bw,cx=P.sx(c);res.push({c:c,ids:ids});ids.forEach((i,j)=>SL.el('circle',{cx:cx.toFixed(1),cy:(P.sy(0)-r-1-j*(2*r+1)).toFixed(1),r:r,class:'sl-dot '+clsOf(i)},P.dyn));});return res;}
+
+/* ===== v1 : la règle qui penche ===== */
+(function(){
+  const V=[1,2,6],Q=[0.5,0.3,0.2],E=2.3;
+  const ctl=document.getElementById('v1ctl'),out=document.getElementById('v1out');
+  const P=SL.plot(document.getElementById('v1plot'),{x:[0,7],y:[-0.3,1],w:560,h:260,xt:[0,1,2,3,4,5,6,7],yt:[],xl:'position x'});
+  const fresh=runner();let samp=null,sl=null;
+  function draw(c){
+    P.clear();
+    const cx=P.sx(c),cy=P.sy(0.42),net=E-c,th=8*Math.tanh(net/1.0);
+    const g=SL.el('g',{transform:`rotate(${th.toFixed(2)} ${cx.toFixed(1)} ${cy.toFixed(1)})`},P.dyn);
+    SL.el('rect',{x:P.sx(0.3).toFixed(1),y:(cy-5).toFixed(1),width:(P.sx(6.7)-P.sx(0.3)).toFixed(1),height:5,class:'sl-ruler'},g);
+    V.forEach((x,i)=>{const r=34*Math.sqrt(Q[i]);SL.el('circle',{cx:P.sx(x).toFixed(1),cy:(cy-5-r).toFixed(1),r:r.toFixed(1),class:'sl-mass'},g);
+      const t=SL.el('text',{x:P.sx(x).toFixed(1),y:(cy-1-r).toFixed(1),'text-anchor':'middle',class:'sl-mass-t'},g);t.textContent=SL.fmt(Q[i],1);});
+    SL.el('path',{d:`M${cx.toFixed(1)} ${cy.toFixed(1)} L${(cx-10).toFixed(1)} ${(cy+22).toFixed(1)} L${(cx+10).toFixed(1)} ${(cy+22).toFixed(1)} Z`,class:'sl-fulcrum'},P.dyn);
+    let L=0,R=0;V.forEach((x,i)=>{if(x<c)L+=(c-x)*Q[i];else R+=(x-c)*Q[i];});
+    const a=Math.abs(net),state=a<0.03?'équilibre':a<0.25?'presque à l’équilibre':net>0?'penche à droite':'penche à gauche';
+    P.text(6.95,0.92,state,a<0.25?'sl-c1':'sl-c3','end');
+    rd(out,[['doigt c',SL.fmt(c,2)],['masse × bras, à gauche',SL.fmt(L,2)],['masse × bras, à droite',SL.fmt(R,2)],
+      samp?['moyenne de '+samp.n+' tirages',SL.fmt(samp.m,2),'c1']:['tirages','aucun']]);
+  }
+  sl=SL.slider(ctl,{label:'doigt c',min:0.5,max:6.5,step:0.01,value:4,fmt:v=>SL.fmt(v,2)},draw);
+  sl.input.addEventListener('input',()=>{fresh();samp=null;draw(sl.get());});
+  const b=SL.h('button','tb',SL.h('div','sl-ctl',ctl),'▶ tirer 1 000 valeurs');let seed=11;
+  b.onclick=()=>{const tk=fresh(),r=rng(seed++);let n=0,s=0;samp={n:0,m:sl.get()};
+    loop(tk,()=>{const k=n<30?1:n<120?3:8;for(let j=0;j<k&&n<1000;j++){s+=pick(r,V,Q);n++;}samp={n:n,m:s/n};sl.set(Math.min(6.5,Math.max(0.5,s/n)));return n<1000;});};
+})();
+
+/* ===== v2 : deux contre-exemples, un point par individu ===== */
+(function(){
+  const one=[2.74,3.29,3.59,3.81,3.99,4.15,4.29,4.42,4.55,4.66,4.78,4.89,5.00,5.11,5.22,5.34,5.45,5.58,5.71,5.85,6.01,6.19,6.41,6.71,7.26];
+  const two=[1.05,1.37,1.55,1.70,1.82,1.94,2.06,2.18,2.30,2.45,2.63,2.95,7.05,7.37,7.55,7.70,7.82,7.94,8.06,8.18,8.30,8.45,8.63,8.95];
+  const w=[0.36,0.46,0.53,0.58,0.63,0.68,0.72,0.77,0.81,0.86,0.90,0.95,1.00,1.05,1.11,1.17,1.23,1.30,1.38,1.47,1.58,1.72,1.90,2.18,2.79],F=[11,13.5,16,18.5];
+  const host=document.getElementById('v2plot'),out=document.getElementById('v2out'),sdiv=document.getElementById('v2sl');
+  const st={m:0,f:0};
+  function draw(){
+    host.innerHTML='';
+    const wealth=st.m===2,vals=st.m===0?one:st.m===1?two:w.concat(F.slice(0,st.f));
+    const X=wealth?[0,21]:[0,10],bw=0.5;
+    const P=SL.plot(host,{x:X,y:[-0.22,1],w:560,h:230,xt:wealth?[0,2,4,6,8,10,12,14,16,18,20]:[0,1,2,3,4,5,6,7,8,9,10],yt:[],xl:wealth?'patrimoine / médiane de départ':'x'});
+    const n=vals.length,ord=vals.map((v,i)=>i).sort((a,b)=>vals[a]-vals[b]);
+    const mids=n%2?[ord[(n-1)/2]]:[ord[n/2-1],ord[n/2]];
+    const mean=vals.reduce((a,b)=>a+b,0)/n,med=median(vals);
+    const bins=stack(P,vals,bw,4.6,i=>mids.includes(i)?'sl-c4':'sl-c2',true);
+    let top=0;bins.forEach(b=>top=Math.max(top,b.ids.length));
+    const modes=bins.filter(b=>b.ids.length===top).map(b=>b.c).sort((a,b)=>a-b);
+    modes.forEach(x=>P.text(x,0,'▾','sl-c2','middle').setAttribute('y',(P.sy(0)-top*10.2-6).toFixed(1)));
+    P.vline(med,'sl-c4 sl-dash');P.vline(mean,'sl-mean');fulcrum(P,mean);
+    const xr=X[1]-(X[1]-X[0])*0.01;
+    P.text(xr,0.93,'│ moyenne, point d’équilibre','sl-c3','end');P.text(xr,0.82,'┆ médiane, l’individu du milieu','sl-c4','end');P.text(xr,0.71,'▾ mode, la pile la plus haute','sl-c2','end');
+    rd(out,[['moyenne',SL.fmt(mean,2),'c3'],['médiane',SL.fmt(med,2)],['mode',modes.length>1?modes.map(x=>'≈ '+SL.fmt(x,1)).join(' et '):'≈ '+SL.fmt(modes[0],1)],['moyenne / médiane',SL.fmt(mean/med,2)]]);
+  }
+  const s=SL.slider(sdiv,{label:'fortunes',min:0,max:4,step:1,value:0,fmt:v=>String(v)},v=>{st.f=v;if(st.m===2)draw();});
+  buttons(document.getElementById('v2ctl'),['une bosse','deux bosses','patrimoine'],k=>{st.m=k;sdiv.style.display=k===2?'':'none';draw();});
+})();
+
+/* ===== v3 : la dépendance change la forme de X + Y, pas son centre ===== */
+(function(){
+  const out=document.getElementById('v3out'),ctl=document.getElementById('v3ctl');
+  const P=SL.plot(document.getElementById('v3plot'),{x:[1.3,12.7],y:[-0.12,1.06],w:560,h:240,xt:[2,3,4,5,6,7,8,9,10,11,12],yt:[0,0.5,1],xl:'x + y',yl:'P(X + Y = s)'});
+  const M=[{p:s=>(6-Math.abs(s-7))/36,f:'triangle',y:x=>0},{p:s=>s%2===0?1/6:0,f:'six barres paires',y:x=>x},{p:s=>s===7?1:0,f:'une barre en 7',y:x=>7-x}];
+  const S=[2,3,4,5,6,7,8,9,10,11,12];let cur=S.map(s=>M[0].p(s)),mode=0,samp=null;const fresh=runner();
+  function draw(h){
+    P.clear();S.forEach((s,i)=>bar(P,s-0.34,s+0.34,h[i],'sl-bar'));
+    P.vline(7,'sl-mean');fulcrum(P,7);P.text(12.6,0.97,'│ E[X + Y] = 3,5 + 3,5 = 7','sl-c3','end');
+    if(samp)P.dot(samp.m,0,'sl-c4',6);
+    rd(out,[['E[X], E[Y]','3,5 et 3,5'],['forme de la loi de X + Y',M[mode].f],['E[X + Y], centre de masse','7','c3'],samp?['moyenne de '+samp.n+' sommes',SL.fmt(samp.m,2),'c1']:['sommes tirées','aucune']]);
+  }
+  buttons(ctl,['indépendants','Y = X','Y = 7 − X'],k=>{const tk=fresh(),a=cur.slice(),b=S.map(s=>M[k].p(s));mode=k;samp=null;
+    tween(500,u=>{cur=a.map((x,i)=>x+(b[i]-x)*u);draw(cur);},tk);});
+  let seed=5;const go=SL.h('button','tb',ctl,'▶ lancer 300 couples');
+  go.onclick=()=>{const tk=fresh(),r=rng(seed++);let n=0,s=0;cur=S.map(s=>M[mode].p(s));
+    loop(tk,()=>{const k=n<30?1:6;for(let j=0;j<k&&n<300;j++){const x=1+Math.floor(6*r()),y=mode===0?1+Math.floor(6*r()):M[mode].y(x);s+=x+y;n++;}samp={n:n,m:s/n};draw(cur);return n<300;});};
+})();
+
+/* ===== v4 : la moyenne des produits, case par case ===== */
+(function(){
+  const out=document.getElementById('v4out');
+  const P=SL.plot(document.getElementById('v4plot'),{x:[0.5,6.5],y:[0.5,6.5],w:560,h:300,xt:[1,2,3,4,5,6],yt:[1,2,3,4,5,6],xl:'x en colonne, y en ligne'});
+  const M=[(x,y)=>1/36,(x,y)=>x===y?1/6:0,(x,y)=>x+y===7?1/6:0];
+  const lab=['0','+2,92','−2,92'];
+  let cur=[];for(let x=1;x<=6;x++)for(let y=1;y<=6;y++)cur.push(1/36);const fresh=runner();
+  function draw(p,k){
+    P.clear();let E=0,i=0;
+    for(let x=1;x<=6;x++)for(let y=1;y<=6;y++,i++){const q=p[i];E+=x*y*q;
+      rect(P,x-0.47,x+0.47,y-0.47,y+0.47,'sl-cello');
+      if(q>1e-4)rect(P,x-0.47,x+0.47,y-0.47,y+0.47,'sl-cellp').setAttribute('fill-opacity',(0.1+3.9*q).toFixed(3));
+      const t=P.text(x,y-0.14,String(x*y),'sl-prod'+(q>0.02?' on':''),'middle');}
+    rd(out,[['E[XY], moyenne pondérée des produits',SL.fmt(E,2),'c3'],['E[X] · E[Y]','3,5 × 3,5 = 12,25'],['écart, la covariance (l09)',lab[k]]]);
+  }
+  buttons(document.getElementById('v4ctl'),['indépendants','Y = X','Y = 7 − X'],k=>{const tk=fresh(),a=cur.slice(),b=[];
+    for(let x=1;x<=6;x++)for(let y=1;y<=6;y++)b.push(M[k](x,y));
+    tween(450,u=>{cur=a.map((v,i)=>v+(b[i]-v)*u);draw(cur,k);},tk);});
+})();
+
+/* ===== v5 : LOTUS, on garde les masses et on déplace les valeurs ===== */
+(function(){
+  const host=document.getElementById('v5plot'),out=document.getElementById('v5out');host.classList.add('nogrid');
+  const G=[{n:'g(x) = x²',g:x=>x*x,r:[-1,37],t:[0,5,10,15,20,25,30,35]},{n:'g(x) = 2x + 1',g:x=>2*x+1,r:[0,14],t:[0,2,4,6,8,10,12,14]},{n:'g(x) = (x − 3,5)²',g:x=>(x-3.5)**2,r:[-0.5,7],t:[0,1,2,3,4,5,6,7]}];
+  const fresh=runner();let first=true;
+  function show(k){
+    const tk=fresh(),L=G[k];host.innerHTML='';
+    const P=SL.plot(host,{x:L.r,y:[-0.17,1.2],w:560,h:250,xt:L.t,yt:[],xl:'g(x)'});
+    const ax=P.svg.querySelectorAll('line.sl-axis');if(ax[1])ax[1].remove();
+    const ml=44,W=560,tx=x=>ml+(x-0.5)/6*(W-ml-14),ty=P.sy(0.95),by=P.sy(0);
+    SL.el('line',{x1:ml,x2:W-14,y1:ty.toFixed(1),y2:ty.toFixed(1),class:'sl-axis'},P.layer);
+    for(let x=1;x<=6;x++){const t=SL.el('text',{x:tx(x).toFixed(1),y:(ty+16).toFixed(1),'text-anchor':'middle',class:'sl-tick'},P.layer);t.textContent=String(x);}
+    SL.el('text',{x:ml+2,y:(ty-26).toFixed(1),class:'sl-lbl'},P.layer).textContent='X, six masses de ⅙';
+    SL.el('text',{x:W-14,y:(by+13).toFixed(1),'text-anchor':'end',class:'sl-lbl'},P.layer).textContent='g(X), les mêmes masses';
+    const E=[1,2,3,4,5,6].reduce((a,x)=>a+L.g(x)/6,0),gE=L.g(3.5);
+    function frame(u){
+      P.clear();
+      for(let x=1;x<=6;x++){const x0=tx(x),y0=ty-10,x1=P.sx(L.g(x)),y1=by-10,cx=x0+(x1-x0)*u,cy=y0+(y1-y0)*u;
+        SL.el('line',{x1:x0.toFixed(1),y1:y0.toFixed(1),x2:cx.toFixed(1),y2:cy.toFixed(1),class:'sl-seg sl-link'},P.dyn);
+        SL.el('circle',{cx:cx.toFixed(1),cy:cy.toFixed(1),r:10,class:'sl-mass'},P.dyn);
+        const t=SL.el('text',{x:cx.toFixed(1),y:(cy+4).toFixed(1),'text-anchor':'middle',class:'sl-mass-t'},P.dyn);t.textContent='⅙';}
+      if(u>=1){
+        const grp=new Map();for(let x=1;x<=6;x++){const v=+L.g(x).toFixed(6);grp.set(v,(grp.get(v)||0)+1);}
+        grp.forEach((c,v)=>{if(c>1)P.text(v,0,c+'/6','sl-c2','middle').setAttribute('y',(by-26).toFixed(1));});
+        const same=Math.abs(E-gE)<1e-9,dx=(L.r[1]-L.r[0])*0.012,yl=(P.sy(0.42)-6).toFixed(1);
+        if(!same)P.seg(gE,0,gE,0.42,'sl-c4 sl-dash');
+        P.seg(E,0,E,0.42,'sl-mean');fulcrum(P,E);
+        P.dot(gE,0,'hollow sl-c4',6);
+        P.text(same?E:E+(E>gE?dx:-dx),0,'E[g(X)] = '+SL.fmt(E,2)+(same?' = g(E[X])':''),'sl-c3',same?'middle':(E>gE?'start':'end')).setAttribute('y',yl);
+        if(!same)P.text(gE+(E>gE?-dx:dx),0,'g(E[X]) = '+SL.fmt(gE,2),'sl-c4',E>gE?'end':'start').setAttribute('y',yl);
+      }
+    }
+    if(first){first=false;frame(1);}else{frame(0);tween(1100,frame,tk);}
+    rd(out,[['E[g(X)] = Σ g(x) · ⅙',SL.fmt(E,3),'c3'],['g(E[X]) = g(3,5)',SL.fmt(gE,3)],['écart',SL.fmt(E-gE,3)]]);
+  }
+  buttons(document.getElementById('v5ctl'),G.map(g=>g.n),show);
+})();
+
+/* ===== v6 : carrés des écarts et bâton qui tourne ===== */
+(function(){
+  const host=document.getElementById('v6plot'),out=document.getElementById('v6out');
+  const row=SL.h('div','v-row',host),left=SL.h('div','',row),right=SL.h('div','v-mini',row);
+  const P=SL.plot(left,{x:[-0.5,4.5],y:[-0.25,2.35],w:560,h:311,xt:[0,1,2,3,4],yt:[],xl:'x'});
+  leftAxis(P,-0.5);
+  const S=SL.el('svg',{viewBox:'0 0 220 236',class:'sl-plot sl-mini'},right);
+  const orbit=SL.el('circle',{cx:110,cy:110,r:45,class:'sl-orbit'},S),stick=SL.el('line',{class:'sl-stick'},S);
+  const ms=[SL.el('circle',{r:9,class:'sl-mass'},S),SL.el('circle',{r:9,class:'sl-mass'},S)];
+  const vs=[SL.el('line',{class:'sl-seg sl-arrow sl-c3','marker-end':'url(#sl-ah)'},S),SL.el('line',{class:'sl-seg sl-arrow sl-c3','marker-end':'url(#sl-ah)'},S)];
+  SL.el('circle',{cx:110,cy:110,r:4,class:'sl-dot sl-c1'},S);
+  const cap=SL.el('text',{x:110,y:232,'text-anchor':'middle',class:'sl-lbl'},S);cap.textContent='vitesse ∝ d, énergie ∝ d²';
+  let d=1,phi=0.6;
+  function stickAt(){const R=45*d,c=Math.cos(phi),s=Math.sin(phi);orbit.setAttribute('r',R);
+    stick.setAttribute('x1',110-R*c);stick.setAttribute('y1',110-R*s);stick.setAttribute('x2',110+R*c);stick.setAttribute('y2',110+R*s);
+    [1,-1].forEach((g,i)=>{const x=110+g*R*c,y=110+g*R*s;ms[i].setAttribute('cx',x);ms[i].setAttribute('cy',y);const L=0.5*R;
+      vs[i].setAttribute('x1',x);vs[i].setAttribute('y1',y);vs[i].setAttribute('x2',x-g*L*s);vs[i].setAttribute('y2',y+g*L*c);});}
+  function draw(v){
+    d=v;P.clear();const mu=2,xs=[mu-d,mu+d];
+    xs.forEach(x=>{rect(P,Math.min(x,mu),Math.max(x,mu),0,d,'sl-sq');if(d>=0.5)P.text((x+mu)/2,d/2-0.06,SL.fmt(d*d,2),'sl-sq-t','middle');});
+    P.vline(mu,'sl-mean');P.text(mu+0.06,2.2,'μ = 2','sl-c3','start');
+    xs.forEach(x=>SL.el('circle',{cx:P.sx(x).toFixed(1),cy:P.sy(0).toFixed(1),r:12,class:'sl-mass'},P.dyn));
+    xs.forEach(x=>{const t=SL.el('text',{x:P.sx(x).toFixed(1),y:(P.sy(0)+4).toFixed(1),'text-anchor':'middle',class:'sl-mass-t'},P.dyn);t.textContent='½';});
+    stickAt();
+    rd(out,[['les deux valeurs',SL.fmt(mu-d,2)+' et '+SL.fmt(mu+d,2)],['carré de chaque écart',SL.fmt(d*d,4)],['Var, aire moyenne des carrés',SL.fmt(d*d,4),'c3'],['inertie du bâton, Σ p · d²',SL.fmt(d*d,4)]]);
+  }
+  SL.slider(document.getElementById('v6ctl'),{label:'écart d',min:0.25,max:2,step:0.25,value:1,fmt:v=>SL.fmt(v,2)},draw);
+  if(!SL.reduced){let on=false,last=0;const tick=t=>{if(!on)return;if(last)phi+=(t-last)/1000*1.1;last=t;stickAt();requestAnimationFrame(tick);};
+    new IntersectionObserver(es=>es.forEach(e=>{if(e.isIntersecting&&!on){on=true;last=0;requestAnimationFrame(tick);}else if(!e.isIntersecting)on=false;})).observe(host);}
+})();
+
+/* ===== v7 : la puissance k et la masse lointaine ===== */
+(function(){
+  const laws=[{n:'{1, 3}, symétrique',v:[1,3],p:[0.5,0.5]},{n:'Z : 0 ou 10',v:[0,10],p:[0.9,0.1]}];
+  const out=document.getElementById('v7out');
+  const P=SL.plot(document.getElementById('v7plot'),{x:[-1,11],y:[-1.3,1.3],w:560,h:250,xt:[0,1,2,3,4,5,6,7,8,9,10],yt:[-1,0,1],xl:'x'});
+  leftAxis(P,-1);const st={l:0,k:1};
+  function draw(){
+    P.clear();const L=laws[st.l],k=st.k,mu=L.v.reduce((a,x,i)=>a+x*L.p[i],0);
+    const c=L.v.map((x,i)=>L.p[i]*Math.pow(x-mu,k)),A=c.map(Math.abs),M=Math.max(...A),tot=c.reduce((a,b)=>a+b,0);
+    L.v.forEach((x,i)=>{const h=c[i]/M;rect(P,x-0.32,x+0.32,0,h,'sl-bar');P.text(x,h>=0?h+0.07:h-0.16,SL.fmt(c[i],2),'','middle');});
+    P.vline(mu,'sl-mean');P.text(mu-0.15,1.17,'μ = '+SL.fmt(mu,2),'sl-c3','end');
+    const far=L.v.map(x=>Math.abs(x-mu)),j=far.indexOf(Math.max(...far)),share=100*A[j]/A.reduce((a,b)=>a+b,0);
+    rd(out,[['moment centré d’ordre '+k,SL.fmt(tot,2),'c3'],['poids de x = '+L.v[j]+' dans Σ |barres|',SL.fmt(share,1)+' %'],['signe des écarts, k '+(k%2?'impair':'pair'),k%2?'gardé':'effacé']]);
+  }
+  buttons(document.getElementById('v7ctl'),laws.map(l=>l.n),i=>{st.l=i;draw();});
+  SL.slider(document.getElementById('v7sl'),{label:'puissance k',min:1,max:4,step:1,value:1,fmt:v=>String(v)},v=>{st.k=v;draw();});
+})();
+
+/* ===== v8 : huit heures de spams à 4 par heure ===== */
+(function(){
+  const host=document.getElementById('v8plot'),out=document.getElementById('v8out'),lam=4,H=8;
+  const P1=SL.plot(SL.h('div','',host),{x:[0,8],y:[0,1],w:560,h:78,xt:[0,1,2,3,4,5,6,7,8],yt:[],xl:'heure d’arrivée'});
+  const P2=SL.plot(SL.h('div','',host),{x:[0,75],y:[0,1],w:560,h:165,xt:[0,15,30,45,60,75],yt:[],xl:'attente entre deux spams, en minutes'});
+  const fresh=runner();let seed=4;
+  function gen(r){const t=[];let s=0;for(;;){s+=-Math.log(1-r())/lam;if(s>H)break;t.push(s);}return t;}
+  function draw(T,upto){
+    P1.clear();P2.clear();const seen=T.filter(t=>t<=upto),w=seen.map((t,i)=>60*(t-(i?seen[i-1]:0)));
+    seen.forEach(t=>P1.dot(t,0.42,'sl-c1',3.6));if(upto<H)P1.vline(upto,'sl-c5');
+    stack(P2,w.map(x=>Math.min(x,74.9)),2.5,4.6,()=>'sl-c2');
+    if(w.length>1){const m=w.reduce((a,b)=>a+b,0)/w.length,md=median(w),sh=100*w.filter(x=>x<m).length/w.length;
+      P2.vline(m,'sl-mean');P2.vline(md,'sl-c4 sl-dash');P2.text(74,0.9,'│ moyenne','sl-c3','end');P2.text(74,0.78,'┆ médiane','sl-c4','end');
+      rd(out,[['spams reçus',String(w.length)],['attente moyenne (théorie 15)',SL.fmt(m,1)+' min','c3'],['médiane (théorie 10,4)',SL.fmt(md,1)+' min'],['attentes sous la moyenne (théorie 63 %)',SL.fmt(sh,0)+' %']]);}
+    else rd(out,[['spams reçus',String(w.length)]]);
+  }
+  let T=gen(rng(seed));draw(T,H);
+  SL.h('button','tb',document.getElementById('v8ctl'),'▶ une nouvelle journée').onclick=()=>{const tk=fresh();T=gen(rng(++seed));
+    if(SL.reduced){draw(T,H);return;}const t0=performance.now();loop(tk,()=>{const u=Math.min(1,(performance.now()-t0)/4000);draw(T,u*H);return u<1;});};
+})();
+
+/* ===== v9 : décaler ne touche aucun écart, étirer les multiplie ===== */
+(function(){
+  const out=document.getElementById('v9out'),C=[10,15,20],S=[[1,0],[1,32],[1.8,0],[1.8,32]];
+  const P=SL.plot(document.getElementById('v9plot'),{x:[0,72],y:[-3,17.08],w:560,h:190,xt:[0,10,20,30,40,50,60,70],yt:[],xl:'température'});
+  let cur=[1,0];const fresh=runner();
+  function draw(a,b){
+    P.clear();const xs=C.map(c=>a*c+b),mu=15*a+b,dv=5*a;
+    xs.forEach(x=>{const s=Math.abs(x-mu);if(s>0.01){rect(P,Math.min(x,mu),Math.max(x,mu),0,s,'sl-sq');P.text((x+mu)/2,s/2-0.9,SL.fmt(s*s,1),'sl-sq-t','middle');}});
+    P.vline(mu,'sl-mean');fulcrum(P,mu);
+    xs.forEach(x=>{P.dot(x,0,'sl-c2',5);if(Math.abs(x-mu)>0.01)P.text(x,Math.abs(x-mu)+0.9,SL.fmt(x,1),'','middle');});
+    rd(out,[['valeurs',xs.map(x=>SL.fmt(x,1)).join('\u202f; ')],['écarts à la moyenne','−'+SL.fmt(dv,1)+' ; 0 ; +'+SL.fmt(dv,1)],['Var, aire moyenne des carrés',Math.abs(a-1)<1e-9?'16,67':'16,67 × '+SL.fmt(a*a,2)+' = '+SL.fmt(a*a*50/3,2),'c3'],['σ',SL.fmt(a*Math.sqrt(50/3),2)]]);
+  }
+  buttons(document.getElementById('v9ctl'),['°C','+ 32 : décaler','× 1,8 : étirer','× 1,8 + 32 : °F'],k=>{const tk=fresh(),a0=cur.slice(),a1=S[k];
+    tween(700,u=>{cur=[a0[0]+(a1[0]-a0[0])*u,a0[1]+(a1[1]-a0[1])*u];draw(cur[0],cur[1]);},tk);});
+})();
+
+/* ===== v10 : l'énergie d'un gaz, composante par composante ===== */
+(function(){
+  const host=document.getElementById('v10plot'),out=document.getElementById('v10out'),sg=1.3,r=rng(21);
+  const row=SL.h('div','v-row',host),L=SL.h('div','',row),R=SL.h('div','',row);
+  const A=SL.plot(L,{x:[-4.4,4.4],y:[-4.4,4.4],w:300,h:292,xt:[-4,-2,0,2,4],yt:[-4,-2,0,2,4],xl:'Vx',yl:'Vy'});
+  const B=SL.plot(R,{x:[0.4,4.6],y:[-0.9,6.3],w:300,h:292,xt:[],yt:[0,1,2,3,4,5,6],yl:'moyenne'});
+  const pts=SL.el('g',{},A.layer),vx=[],vy=[],vz=[];const fresh=runner();
+  function add(n){for(let i=0;i<n;i++){const a=sg*gauss(r),b=sg*gauss(r),c=sg*gauss(r);vx.push(a);vy.push(b);vz.push(c);
+    SL.el('circle',{cx:A.sx(Math.max(-4.4,Math.min(4.4,a))).toFixed(1),cy:A.sy(Math.max(-4.4,Math.min(4.4,b))).toFixed(1),r:2.2,class:'sl-dot sl-c2 sl-tiny'},pts);}}
+  function draw(){
+    A.clear();B.clear();const n=vx.length,i=n-1,a=vx[i],b=vy[i],c=vz[i];
+    A.seg(a,0,a,b,'sl-dash');A.seg(0,b,a,b,'sl-dash');A.arrow(0,0,a,b,'sl-c3');A.dot(a,b,'sl-c3',4.5);
+    const m=[vx,vy,vz].map(v=>v.reduce((s,x)=>s+x*x,0)/n),cls=['sl-k1 sl-kc','sl-k2 sl-kc','sl-k5 sl-kc'];
+    m.forEach((v,j)=>rect(B,j+1-0.3,j+1+0.3,0,Math.min(v,6.3),cls[j]));
+    let y=0;m.forEach((v,j)=>{rect(B,4-0.3,4+0.3,y,Math.min(y+v,6.3),cls[j]);y+=v;});
+    B.seg(0.5,sg*sg,3.5,sg*sg,'sl-dash');B.seg(3.55,3*sg*sg,4.5,3*sg*sg,'sl-dash');
+    B.text(0.45,sg*sg+0.15,'σ² = 1,69','','start');B.text(4.5,3*sg*sg+0.15,'3σ² = 5,07','','end');
+    ['Vx²','Vy²','Vz²','|V|²'].forEach((t,j)=>B.text(j+1,-0.55,t,'','middle'));
+    rd(out,[['molécules',String(n)],['la dernière, Vx² + Vy² + Vz²',SL.fmt(a*a,2)+' + '+SL.fmt(b*b,2)+' + '+SL.fmt(c*c,2)+' = '+SL.fmt(a*a+b*b+c*c,2)],['moyenne de |V|² (théorie 5,07)',SL.fmt(m[0]+m[1]+m[2],2),'c3']]);
+  }
+  add(30);while(Math.hypot(vx[vx.length-1],vy[vy.length-1])<1.5)add(1);draw();
+  const ctl=document.getElementById('v10ctl');
+  SL.h('button','tb',ctl,'+ 1 molécule').onclick=()=>{fresh();if(vx.length<3030){add(1);draw();}};
+  SL.h('button','tb',ctl,'▶ + 1 000 molécules').onclick=()=>{const tk=fresh();let k=0;loop(tk,()=>{if(vx.length>=3030)return false;add(25);k+=25;draw();return k<1000;});};
+})();
+
+/* ===== v11 : le triangle de Brunton, lu par colonnes puis par lignes ===== */
+(function(){
+  const out=document.getElementById('v11out');
+  const P=SL.plot(document.getElementById('v11plot'),{x:[0.3,6.7],y:[0,1.2],w:560,h:250,xt:[1,2,3,4,5,6],yt:[0,0.5,1]});
+  const sub='₀₁₂₃₄₅₆',cells=[];for(let k=1;k<=6;k++)for(let r=1;r<=k;r++)cells.push({k:k,r:r});
+  let pos=0;const fresh=runner();
+  function frame(u){
+    P.clear();
+    cells.forEach(c=>{const x=c.k+(c.r-c.k)*u,l=c.r+(c.k-c.r+1-c.r)*u;
+      rect(P,x-0.36,x+0.36,(l-1)/6+0.004,l/6-0.004,'sl-k'+c.k+' sl-kc');P.text(x,(l-0.5)/6-0.018,'P'+sub[c.k],'sl-cell-t','middle');});
+    P.text(0.4,1.12,u<0.5?'colonne k : k copies de P(X = k), en abscisse la valeur k':'ligne r : P(X ≥ r) = Pᵣ + … + P₆, en abscisse le seuil r','','start');
+  }
+  buttons(document.getElementById('v11ctl'),['par colonnes : Σ k · P(X = k)','par lignes : Σ P(X ≥ k)'],k=>{const tk=fresh(),a=pos;
+    if(a===k)frame(k);else tween(1200,u=>{pos=a+(k-a)*u;frame(pos);},tk);
+    rd(out,k?[['lecture','par lignes'],['somme des lignes','6/6 + 5/6 + 4/6 + 3/6 + 2/6 + 1/6'],['aire totale = E[X]','21/6 = 3,5','c3']]
+            :[['lecture','par colonnes'],['somme des colonnes','1·⅙ + 2·⅙ + 3·⅙ + 4·⅙ + 5·⅙ + 6·⅙'],['aire totale = E[X]','21 cases × ⅙ = 3,5','c3']]);});
+})();
+
 })();
 </script>
 </body>

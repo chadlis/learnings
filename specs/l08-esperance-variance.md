@@ -167,4 +167,24 @@ Pas de covariance au-delà de son nom (l09), pas de fonction génératrice (l12)
 
 ## Questions pour la revue
 - Relecture en contexte frais (10/10/2026) avant publication, appliquée : facteur λ⁴ (et non λ²) sur la variance quand on passe λ à numpy ; « mode < médiane < moyenne » ramené à une règle des lois usuelles ; σ = moyenne présenté comme conséquence de l'absence de mémoire, non comme coïncidence ; convergence absolue de l'espérance ; médiane du dé = tout [3, 4] ; contre-exemple des constantes pour 2ab E[XY] ajouté en n9 ; additivité contre linéarité dite en une phrase ; exemple chiffré avant la formule de la variance ; σ de la log-normale nommé (écart-type de ln X) ; échelle commune pour la figure 3.
-- L'idée de n6 fait 179 mots (le validateur vise 140) : l'exemple chiffré {1, 3} / {0, 4} y a été ajouté exprès, avant la formule. À trancher à la relecture de Salah.
+- L'idée de n6 fait 179 mots (le validateur vise 140) : l'exemple chiffré {1, 3} / {0, 4} y a été ajouté exprès, avant la formule. Tranché le 10/10 : on garde, dépasser 140 « de pas beaucoup » est accepté ; le validateur tolère jusqu'à 180.
+
+## Révision v2 (10/10/2026)
+
+Demande de Salah, après lecture de la v1 : « pour L8, ce serait bien que la partie intuition soit aussi avec visuel ou animation quand c'est possible, comme là pour voir les exemples donnés. La partie idée on garde, pas grave si ça dépasse de pas beaucoup 140. »
+
+Delta : sous chaque `div.idee`, une vignette `div.fig.vis` « Voir l'idée » qui montre les exemples que l'idée cite. Aucun texte d'idée, de formule, de figure ou de bloc dépliable n'est modifié ; les figures 1 à 6 restent à leur place, sous la formule.
+
+- v1 (n1) — règle à trois masses (0,5 en 1, 0,3 en 2, 0,2 en 6) qui penche autour d'un doigt c ; équilibre en 2,3 ; bouton « tirer 1 000 valeurs », le doigt suit la moyenne des tirages.
+- v2 (n2) — un point par individu : une bosse, deux bosses (moyenne dans le trou, mode double), patrimoine avec 0 à 4 grosses fortunes (moyenne 1,13 → 3 ; médiane 1 → 1,11).
+- v3 (n3) — loi de X + Y pour deux dés indépendants, Y = X, Y = 7 − X : la forme change, le point d'équilibre reste en 7 ; 300 couples tirés.
+- v4 (n4) — grille 6 × 6 des produits x · y pondérés : E[XY] = 12,25 ; 15,17 ; 9,33.
+- v5 (n5) — six masses de ⅙ transportées de x à g(x) pour x², 2x + 1, (x − 3,5)² ; masses fusionnées ; E[g(X)] contre g(E[X]).
+- v6 (n6) — carrés des écarts pour deux masses en 2 ± d, et bâton qui tourne (vitesse ∝ d, énergie ∝ d²).
+- v7 (n7) — contributions p · (x − μ)ᵏ pour {1, 3} et Z, curseur k de 1 à 4 ; part de la valeur 10 : 50, 90, 98,8, 99,9 %.
+- v8 (n8) — huit heures de spams à 4 par heure : arrivées, attentes en pastilles, moyenne contre médiane, part des attentes sous la moyenne (63 % en théorie).
+- v9 (n9) — 10, 15, 20 °C : + 32 fait glisser les carrés, × 1,8 multiplie leurs aires par 3,24 ; variance 16,67 → 54 en °F.
+- v10 (n10) — nuage (Vx, Vy) de molécules σ = 1,3 et moyennes de Vx², Vy², Vz², |V|² empilées vers σ² = 1,69 et 3σ² = 5,07.
+- v11 (n11) — le triangle de Brunton animé : 21 cases lues par colonnes puis par lignes.
+
+Vérifié : chaque chiffre des légendes recalculé (script), chaque vignette manipulée et capturée, 0 erreur JS, pas de débordement à 390 px. Le validateur exige désormais la vignette (WARN si absente, FAIL si elle précède l'idée ou n'a pas de légende) et tolère une idée jusqu'à 180 mots.
