@@ -76,7 +76,17 @@ def check_lesson():
         idee = re.search(r'<div class="idee">(.*?)</div>', body, re.S)
         if idee:
             words = len(re.sub(r'<[^>]+>', ' ', idee.group(1)).split())
-            if words > 160: warn(f'{nid} : {words} mots dans l\'idée (viser < 140)')
+            # 10/10/2026 : Salah accepte de dépasser 140 « de pas beaucoup »
+            if words > 180: warn(f'{nid} : {words} mots dans l\'idée (viser ~140, toléré jusqu\'à 180)')
+        # v2 de l08 (10/10/2026) : sous l'idée, une vignette qui montre les exemples qu'elle cite
+        vis = body.split('<div class="fig vis"')
+        if len(vis) < 2:
+            warn(f'{nid} : pas de vignette « voir l\'idée » (div.fig.vis) sous l\'idée')
+        else:
+            if not idee or body.find('<div class="fig vis"') < body.find('<div class="idee">'):
+                fail(f'{nid} : la vignette div.fig.vis doit suivre l\'idée')
+            seg = re.split(r'<div class="formule"|<details', vis[1])[0]
+            if 'class="cap"' not in seg: fail(f'{nid} : vignette div.fig.vis sans légende .cap')
     figs = re.findall(r'<div class="fig" id="fig\d+">', t)
     if not figs: fail('aucune figure')
     if not re.search(r'SL\.(plot|repeat|descent|trace|plane)\(', t): fail('aucune figure construite avec sheetlib')

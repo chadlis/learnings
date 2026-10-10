@@ -16,9 +16,11 @@ Une leçon est un **cours**, pas un aide-mémoire : c'est la seule source de Sal
 
 ## Gabarit d'une notion
 
-`section.notion.(outil|culture)#nN` › `h3` + `span.tag.outil|culture` › `p.src` (vidéo) › `div.idee` (l'image de Brunton, prose courte, un exemple chiffré avant la formule quand c'est possible) › `div.formule` (définitions, hypothèses et leur rôle) › `div.fig` si une intuition se joue › `details.ex` › `details.preuve` (lignes `div.drv` : expression | règle utilisée) › `details.code` (`pre.py` + `pre.out`) › `details.casse` (+ `div.brunton`) › `p.garde`.
+`section.notion.(outil|culture)#nN` › `h3` + `span.tag.outil|culture` › `p.src` (vidéo) › `div.idee` (l'image de Brunton, prose courte, ~140 mots, 180 au plus, un exemple chiffré avant la formule quand c'est possible) › `div.fig.vis#vN` (« Voir l'idée — … » : la vignette qui **montre les exemples que l'idée cite**, manipulable ou animée ; légende `.cap`) › `div.formule` (définitions, hypothèses et leur rôle) › `div.fig` si une intuition se joue › `details.ex` › `details.preuve` (lignes `div.drv` : expression | règle utilisée) › `details.code` (`pre.py` + `pre.out`) › `details.casse` (+ `div.brunton`) › `p.garde`.
 
-Ids `n1`…`nN` consécutifs, jamais suffixés. Le validateur (`tools/validate_sheet.py`, branche `lesson`) impose ce gabarit.
+Ids `n1`…`nN` consécutifs, jamais suffixés.
+
+**La vignette « Voir l'idée »** (décision du 10/10/2026, révision v2 de l08) : une par notion, même CULTURE. Elle ne redit pas la figure sous la formule, elle rend visibles les exemples de l'idée (les deux bosses et les fortunes de n2, le bâton qui tourne de n6, le triangle de n11). Outils dans l'étalon : `runner`, `tween`, `loop` (animation interruptible, `SL.reduced` respecté), `rng` (graine fixée : l'état initial est toujours le même), `stack` (une pastille par individu), `fulcrum` (le point d'équilibre sous la moyenne), `rect`. L'état initial doit déjà dire quelque chose sans clic ; les animations ne partent qu'au clic, sauf une rotation continue suspendue hors écran. Le validateur (`tools/validate_sheet.py`, branche `lesson`) impose ce gabarit.
 
 ## Règles
 
