@@ -1,0 +1,70 @@
+<!-- ============================ n6 ============================ -->
+<section class="notion outil" id="n6">
+  <h3>La normale centrée réduite, Φ, et 68 / 95 / 99,7 <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 16 · The Standard Unit Normal and Probability Computations</p>
+  <div class="idee">
+    <p>Brunton commence par σ : un grand σ étale la cloche, un petit σ la resserre autour de μ. Le cas de référence est la normale <b>centrée réduite</b> Z, de moyenne 0 et d'écart-type 1. Sa fonction de répartition porte un nom : <b>Φ</b>(z) = P(Z ≤ z).</p>
+    <p>Il calcule ensuite 68 % de tête. Φ(1) ≈ 0,841 : c'est l'aire à gauche de 1, donc il reste environ 16 % à droite de 1. Par symétrie, il y a aussi 16 % à gauche de −1. Entre −1 et 1 : 1 − 0,16 − 0,16 = 0,68. Son devoir, à ±2 écarts-types : 95,4 %.</p>
+    <p>Autrefois, dit-il, on cherchait ces valeurs dans des « tablettes d'argile », écrites pour Z seulement. Pour une autre normale, on la ramenait d'abord à Z par z = (x − μ)/σ. Aujourd'hui, c'est une ligne de scipy.stats.</p>
+  </div>
+  <div class="fig vis" id="v6">
+    <div class="lbl">Voir l'idée — 68 % en quatre temps</div>
+    <div id="v6ctl" class="sl-ctl"></div>
+    <div id="v6sl"></div>
+    <div id="v6plot" class="wide"></div>
+    <div class="readouts" id="v6out"></div>
+    <p class="cap">La densité de Z. Suis le calcul de Brunton : <b>1.</b> Φ(k), l'aire à gauche de k ; <b>2.</b> la queue droite, 1 − Φ(k) ; <b>3.</b> la même queue à gauche de −k, par symétrie ; <b>4.</b> la bande, ce qui reste. À k = 1 : Φ(1) = 0,8413, deux queues de 0,1587, une bande de 68,3 %. Monte <b>k</b> à 2, puis 3 : 95,4 %, puis 99,7 %. À k = 1,96, la bande vaut 95 %.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">φ(<i>z</i>) = e<sup>−<i>z</i>²/2</sup>/√(2π) &nbsp;&nbsp;&nbsp; Φ(<i>z</i>) = P(<i>Z</i> ≤ <i>z</i>) = ∫<sub>−∞</sub><sup><i>z</i></sup> φ(<i>t</i>) d<i>t</i> &nbsp;&nbsp;&nbsp; Φ(−<i>z</i>) = 1 − Φ(<i>z</i>)</div>
+    <div class="eq"><i>X</i> ~ N(μ, σ²) : P(<i>a</i> ≤ <i>X</i> ≤ <i>b</i>) = Φ((<i>b</i> − μ)/σ) − Φ((<i>a</i> − μ)/σ) &nbsp;&nbsp;&nbsp; P(|<i>X</i> − μ| ≤ <i>k</i>σ) = 2Φ(<i>k</i>) − 1</div>
+    <ul>
+      <li>φ est la densité, Φ la fonction de répartition : Φ(0) = ½, mais φ(0) ≈ 0,399.</li>
+      <li>Φ n'a pas de formule close : e<sup>−z²/2</sup> n'a pas de primitive élémentaire. On la lit dans une table, ou avec <code>scipy.stats.norm.cdf</code>.</li>
+      <li>z = (x − μ)/σ compte en écarts-types la distance de x à μ. Que (X − μ)/σ suive N(0, 1) quand X suit N(μ, σ²) est admis ici, et démontré en <a href="lesson-00-06-fonctions-standardisation.html#n3">l06</a> ; il faut σ &gt; 0.</li>
+      <li>Les trois bandes : 68,3 % à ±1σ, 95,4 % à ±2σ, 99,7 % à ±3σ ; et 95 % exactement à ±1,96σ.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — la bande autour de la moyenne ne dépend que de k</div>
+    <div id="f4plot" class="wide"></div>
+    <div id="f4sl"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">En haut, la densité de N(200 ; σ²), les 400 pièces de Brunton quand σ = 10, avec la bande μ ± kσ en violet. En bas, sa fonction de répartition Φ((x − 200)/σ) : l'aire de la bande s'y lit comme l'écart vertical entre les deux points. Pose <b>k</b> sur 1, 2, 3 : 68,3, 95,4, 99,7 %. Puis change <b>σ</b> : la cloche s'étale ou se resserre, la bande la suit, et son aire ne bouge pas. C'est pourquoi une seule table, celle de Z, suffit.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>Φ(1), le devoir, 400 pièces, une taille, un intervalle</small></summary><div class="in">
+    <ol>
+      <li><b>Φ(1) = 0,8413</b>, donc Φ(−1) = 1 − 0,8413 = 0,1587, et P(−1 ≤ Z ≤ 1) = 0,8413 − 0,1587 ≈ 0,683.</li>
+      <li><b>Le devoir de Brunton.</b> P(|Z| ≤ 2) = 2 × 0,9772 − 1 ≈ 0,954 ; à ±3 : 2 × 0,9987 − 1 ≈ 0,997.</li>
+      <li><b>400 pièces.</b> X ≈ N(200 ; 10²) : Brunton dit « plus ou moins 10 piles, environ 68 % du temps ». C'est l'aire de la normale entre 190 et 210. Pour le nombre entier de piles, P(190 ≤ X ≤ 210) vaut 0,706 : la notion 7 explique l'écart.</li>
+      <li><b>« Suis-je normal ? »</b> (Brunton). Avec le modèle de taille N(1,75 ; 0,07²), dépasser 1,89 m, c'est être à z = (1,89 − 1,75)/0,07 = 2 écarts-types au-dessus de la moyenne : P = 1 − Φ(2) = 0,023, une personne sur 44.</li>
+      <li><b>Le cas ML : un intervalle à 95 % pour une accuracy.</b> 872 bonnes réponses sur 1 000 : p̂ vaut 0,872 sur ce jeu de test, son erreur standard estimée √(0,872 × 0,128/1 000) = 0,0106, et 0,872 ± 1,96 × 0,0106 = [0,851 ; 0,893] (<a href="../chains/chain-p01-02-ic-test-procedure.html">IC et test</a>).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>pourquoi une seule table suffit · culture</small></summary><div class="in">
+    <div class="drv">
+      <div>φ(−<i>z</i>) = φ(<i>z</i>)</div><span>φ ne dépend de z que par z²</span>
+      <div>Φ(−<i>z</i>) = P(<i>Z</i> ≤ −<i>z</i>) = P(<i>Z</i> ≥ <i>z</i>)</div><span>symétrie : les deux queues ont la même aire</span>
+      <div>= 1 − Φ(<i>z</i>)</div><span>complément (l02) ; P(Z = z) = 0, donc ≥ et &gt; se valent</span>
+      <div>P(−<i>k</i> ≤ <i>Z</i> ≤ <i>k</i>) = Φ(<i>k</i>) − Φ(−<i>k</i>) = 2Φ(<i>k</i>) − 1</div><span>F(b) − F(a) (notion 2), puis la ligne précédente</span>
+      <div>P(|<i>X</i> − μ| ≤ <i>k</i>σ) = P(|(<i>X</i> − μ)/σ| ≤ <i>k</i>)</div><span>diviser par σ &gt; 0 ne change pas l'événement</span>
+      <div>= P(|<i>Z</i>| ≤ <i>k</i>) = 2Φ(<i>k</i>) − 1</div><span>(X − μ)/σ suit N(0, 1) (l06)</span>
+    </div>
+    <p>La bande ne dépend ni de μ ni de σ : c'est ce que la figure 4 montre quand on bouge σ.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>Φ, les bandes, un million de tirages</small></summary><div class="in">
+<pre class="py">{{CODE:c6}}</pre>
+<pre class="out">{{OUT:c6}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>68 / 95 / 99,7 est une propriété de la normale</b>, pas de σ en général. Pour la variable de l08 qui vaut 0 ou 10 (probabilités 0,9 et 0,1), 90 % de la masse est à moins d'un écart-type (<a href="lesson-00-08-esperance-variance.html#n6">l08</a>).</li>
+      <li><b>Les queues lourdes.</b> Sous une normale, sortir de ±3σ arrive une fois sur 370. Des latences, des rendements financiers ou des tailles de fichiers le font bien plus souvent : la normale sous-estime leurs extrêmes.</li>
+      <li><b>Φ n'est pas φ.</b> Φ(0) = 0,5 est une probabilité ; φ(0) = 0,399 est une hauteur de densité.</li>
+      <li><b>N(μ, σ²) contre scipy.</b> Le second paramètre de N est la variance, mais <code>norm(loc=200, scale=10)</code> prend l'écart-type : écrire <code>scale=100</code> pour « variance 100 » rend la cloche dix fois trop large.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (16) dit que la normale est « paramétrée par la moyenne μ et l'écart-type σ² ». σ est l'écart-type, σ² la variance : N(200 ; 10²) a un écart-type de 10 et une variance de 100.</div>
+  </div></details>
+  <p class="garde">Toute normale : P(|X − μ| ≤ kσ) = 2Φ(k) − 1, avec Φ la répartition de N(0, 1) ; 68,3, 95,4 et 99,7 % à k = 1, 2, 3 ; 95 % à 1,96.</p>
+</section>
+

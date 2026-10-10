@@ -1,0 +1,69 @@
+<!-- ============================ n4 ============================ -->
+<section class="notion outil" id="n4">
+  <h3>La binomiale : la somme de n Bernoulli indépendantes <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 14</p>
+  <div class="idee">
+    <p>Lance n fois la même pièce, ou le même dé, et compte les succès : X = B<sub>1</sub> + B<sub>2</sub> + … + B<sub>n</sub>, où chaque B<sub>i</sub> est une Bernoulli(p) et où les essais sont indépendants. X suit une <b>binomiale</b> de paramètres n et p.</p>
+    <p>Brunton fait n = 2 au tableau, avec S pour succès et É pour échec. Zéro succès, c'est É puis É : q · q = q², parce que l'indépendance change le « et » en produit. Un succès, c'est SÉ ou ÉS : pq + qp = 2pq. Deux succès : p². Les coefficients 1, 2, 1 sont une ligne du triangle de Pascal.</p>
+    <p>En général, une séquence donnée à k succès a la probabilité p<sup>k</sup>q<sup>n−k</sup>, et il y a C(n, k) façons de placer les k succès. Trois 6 en douze lancers : C(12, 3) = 220 séquences, de probabilité (1/6)³(5/6)⁹ chacune, soit 0,197 en tout.</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — deux essais, le carré d'aire 1</div>
+    <div id="v4sl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">Le carré a une aire de 1. Sa largeur est partagée selon le premier essai, S avec probabilité p, É avec q ; sa hauteur selon le second. L'indépendance fait de chaque case un rectangle dont l'aire est le produit : p², pq, qp, q². Les couleurs regroupent les cases par nombre de succès k ; dans le second panneau, P(X = k) est la somme des cases de sa couleur : la barre de 0,278 réunit les deux cases pq et qp, de 0,139 chacune. Au départ p = 1/6, « faire un 6 » : 25/36, 10/36 et 1/36. Déplace <b>p</b> : les cases changent, leur somme reste (p + q)² = 1.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(<i>X</i> = <i>k</i>) = C(<i>n</i>, <i>k</i>) <i>p</i><sup><i>k</i></sup>(1 − <i>p</i>)<sup><i>n</i>−<i>k</i></sup>, <i>k</i> = 0, 1, …, <i>n</i> &nbsp;&nbsp;&nbsp; <i>X</i> ~ Binomiale(<i>n</i>, <i>p</i>) &nbsp;&nbsp;&nbsp; E[<i>X</i>] = <i>np</i>, Var(<i>X</i>) = <i>np</i>(1 − <i>p</i>)</div>
+    <ul>
+      <li><b>n fixé d'avance</b> : on compte les succès d'un nombre d'essais décidé avant de commencer.</li>
+      <li><b>Le même p à chaque essai</b> : c'est ce qui donne à toutes les séquences à k succès la même probabilité p<sup>k</sup>(1 − p)<sup>n−k</sup>.</li>
+      <li><b>Des essais mutuellement indépendants</b> : c'est ce qui change la probabilité d'une séquence en produit (<a href="lesson-00-03-conditionner-bayes-independance.html#n9">l03</a>).</li>
+      <li><b>On compte sans l'ordre</b> : SSÉ, SÉS et ÉSS donnent le même k, d'où le facteur C(n, k) (<a href="lesson-00-01-compter.html#n5">l01</a>).</li>
+      <li>E = np et Var = np(1 − p) sont annoncées ici, comme le fait Brunton. E[X] = E[B<sub>1</sub>] + … + E[B<sub>n</sub>] = np par linéarité, sans aucune hypothèse (<a href="lesson-00-08-esperance-variance.html#n3">l08</a>). Var(X) = n · p(1 − p) en additionnant les variances, ce qui demande des covariances nulles, que l'indépendance garantit (<a href="lesson-00-09-covariance-correlation.html#n2">l09</a>).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — la forme d'une binomiale</div>
+    <div id="f2ctl" class="sl-ctl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div id="f2sl"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Chaque barre est P(X = k) ; la barre rouge est celle du k choisi. Le <b>trait rouge</b> marque E = np, le <b>segment vert</b> couvre E ± σ, avec σ = √(np(1 − p)). Les préréglages reprennent les exemples : <b>quatre pièces</b> (P(X = 2) = 0,375), <b>douze dés</b> (P(X = 3) = 0,197), <b>cent dés</b> (P(X = 10) = 0,021). Pousse p vers ½ : la loi devient symétrique et la plus large ; ramène p vers 0 : elle s'écrase à gauche. Monte n à p fixé : le centre avance comme np, la largeur seulement comme √n.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>n = 2, n = 3, quatre pièces, des 6, un jeu de test</small></summary><div class="in">
+    <ol>
+      <li><b>n = 2, « faire un 6 ».</b> q² = 25/36 ≈ 0,694 ; 2pq = 10/36 ≈ 0,278 ; p² = 1/36 ≈ 0,028. La somme fait 36/36.</li>
+      <li><b>n = 3</b>, le devoir de Brunton. Coefficients 1, 3, 3, 1 ; P(X = 1) = 3pq² compte SÉÉ, ÉSÉ et ÉÉS. Pour un dé : 0,579 ; 0,347 ; 0,069 ; 0,005.</li>
+      <li><b>Quatre pièces.</b> C(4, k)/2⁴ donne 1, 4, 6, 4, 1 seizièmes : la loi de la notion 1 est une Binomiale(4, ½).</li>
+      <li><b>Des 6.</b> Trois 6 en douze lancers : 220 × (1/6)³ × (5/6)⁹ = 220 × 0,00463 × 0,1938 = 0,197. Dix 6 en cent lancers, que Brunton pose sans le calculer : C(100, 10)(1/6)<sup>10</sup>(5/6)<sup>90</sup> = 0,0214.</li>
+      <li><b>Le cas ML : 872 bonnes réponses sur 1 000.</b> Si les exemples de test sont tirés indépendamment et que le modèle a une accuracy vraie π, fixe, le nombre X de bonnes réponses suit Binomiale(1 000, π). 872 est sa réalisation sur ce jeu de test ; p̂ = X/1 000 est l'estimateur de π. Avec π = 0,87 : E[X] = 870 et σ = √(1 000 × 0,87 × 0,13) = 10,6 (<a href="../walkthroughs/walkthrough-p01-04-accuracy-vers-se.html">déroulé de l'accuracy au SE</a>).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>le produit, les placements, et la somme qui vaut 1</small></summary><div class="in">
+    <div class="drv">
+      <div>P(SSÉ) = P(<i>B</i><sub>1</sub> = 1) P(<i>B</i><sub>2</sub> = 1) P(<i>B</i><sub>3</sub> = 0) = <i>p</i> · <i>p</i> · <i>q</i></div><span>indépendance mutuelle des essais : l'intersection devient un produit (l03)</span>
+      <div>toute séquence à <i>k</i> succès : <i>p</i><sup><i>k</i></sup><i>q</i><sup><i>n</i>−<i>k</i></sup></div><span>k facteurs p et n − k facteurs q, seul l'ordre change</span>
+      <div>nombre de séquences à <i>k</i> succès : C(<i>n</i>, <i>k</i>)</div><span>choisir les k places des succès parmi n (l01)</span>
+      <div>P(<i>X</i> = <i>k</i>) = C(<i>n</i>, <i>k</i>) <i>p</i><sup><i>k</i></sup><i>q</i><sup><i>n</i>−<i>k</i></sup></div><span>les séquences sont des événements disjoints : on additionne (axiome 3)</span>
+      <div>Σ<sub><i>k</i></sub> P(<i>X</i> = <i>k</i>) = Σ<sub><i>k</i></sub> C(<i>n</i>, <i>k</i>) <i>p</i><sup><i>k</i></sup><i>q</i><sup><i>n</i>−<i>k</i></sup> = (<i>p</i> + <i>q</i>)<sup><i>n</i></sup></div><span>formule du binôme (l02)</span>
+      <div>= 1<sup><i>n</i></sup> = 1</div><span>p + q = 1 : c'est la vérification que Brunton donne en devoir</span>
+    </div>
+    <p>L'indépendance sert à la première ligne, et seulement là. Sans elle, P(SSÉ) n'est pas un produit et la formule tombe.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>100 000 séries de douze lancers</small></summary><div class="in">
+<pre class="py">{{CODE:c4}}</pre>
+<pre class="out">{{OUT:c4}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Tirages sans remise.</b> Tirer cinq cartes et compter les cœurs : après chaque carte, la probabilité d'un cœur change, les essais ne sont pas indépendants. C'est l'hypergéométrique (<a href="lesson-00-02-espace-axiomes-complement.html#n5">l02</a>).</li>
+      <li><b>Un p qui change d'un lot à l'autre.</b> Un lot de 100 pièces sort, une fois sur deux, d'une machine à 1 % de défauts, sinon d'une machine à 5 %. Le nombre de défauts a une moyenne de 3, mais une variance de 6,87, contre 2,91 pour une Binomiale(100 ; 0,03) de même moyenne : ce n'est pas une binomiale.</li>
+      <li><b>n qui n'est pas fixé.</b> Lancer jusqu'au premier 6 et compter les lancers : le nombre d'essais est aléatoire, c'est la loi géométrique (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n2">l05</a>).</li>
+      <li><b>Le cas ML : des exemples dépendants.</b> Si le même utilisateur apparaît vingt fois dans le jeu de test, les essais ne sont plus indépendants : X n'est plus binomiale et √(nπ(1 − π)) sous-estime l'incertitude (<a href="../bridges/bridge-04-variance-moyenne-correlee.html">pont b04</a>).</li>
+    </ul>
+  </div></details>
+  <p class="garde">Binomiale(n, p) : le nombre de succès en n essais indépendants de même p. P(X = k) = C(n, k)pᵏ(1 − p)ⁿ⁻ᵏ, les placements fois la probabilité d'une séquence ; E = np, Var = np(1 − p).</p>
+</section>
+

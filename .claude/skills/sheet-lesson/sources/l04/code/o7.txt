@@ -1,0 +1,4 @@
+41 terms, exact = 0.8520
+normal from 190 to 230 = 0.8400   from 189.5 to 230.5 = 0.8520
+half of the two end bars = 0.0123
+10 coins, P(X <= 3): exact 0.1719, no correction 0.1030, corrected 0.1714

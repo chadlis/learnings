@@ -1,0 +1,47 @@
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>Bernoulli(p) : un essai, deux issues <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 14 · Bernoulli and Binomial Random Variables</p>
+  <div class="idee">
+    <p>Brunton formalise ce qu'on fait depuis le début avec les pièces. Une variable de <b>Bernoulli</b> ne prend que deux valeurs : 1 si l'événement qu'on surveille se produit, 0 sinon. C'est à nous de dire ce qu'est un succès : pile, « j'ai fait un 6 », « la pièce fabriquée est bonne ».</p>
+    <p>Les deux issues n'ont pas à être également probables. On note p = P(X = 1) et q = 1 − p = P(X = 0). Pour une pièce, p = ½ ; pour « faire un 6 » avec un dé, p = 1/6 et q = 5/6.</p>
+    <p>Brunton s'en sert en programmant : il prend une image et masque chaque pixel, indépendamment des autres, avec probabilité p. C'est un <b>masque de Bernoulli</b> ; en deep learning, le dropout fait la même chose aux neurones d'un réseau.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — le masque de Bernoulli de Brunton</div>
+    <div id="v3ctl" class="sl-ctl"></div>
+    <div id="v3sl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">Une image de 160 pixels. Chaque pixel est une Bernoulli(p) : masqué, donc noirci, avec probabilité p, indépendamment des autres. Monte <b>p</b> : la part masquée suit p sans lui être exactement égale, puisque chaque masque est un tirage. <b>Nouveau masque</b> : un autre tirage, le même p. La part masquée est la moyenne des 160 valeurs 0 ou 1 de ce masque ; en moyenne sur les masques, elle vaut p = E[X]. Au départ, à p = 0,3, ce masque en noircit 44 sur 160, soit 0,275.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(<i>X</i> = 1) = <i>p</i>, P(<i>X</i> = 0) = 1 − <i>p</i> &nbsp;&nbsp;&nbsp; E[<i>X</i>] = <i>p</i>, Var(<i>X</i>) = <i>p</i>(1 − <i>p</i>)</div>
+    <div class="eq">d'un seul trait : P(<i>X</i> = <i>x</i> ; <i>p</i>) = <i>p</i><sup><i>x</i></sup>(1 − <i>p</i>)<sup>1−<i>x</i></sup>, <i>x</i> ∈ {0, 1}</div>
+    <ul>
+      <li>p ∈ [0, 1] est le seul paramètre, et il est fixe : il décrit le mécanisme, pas un tirage.</li>
+      <li>La forme d'un seul trait se lit en remplaçant x : x = 1 donne p<sup>1</sup>(1 − p)<sup>0</sup> = p, x = 0 donne 1 − p. Elle sert à écrire une vraisemblance sans séparer les cas.</li>
+      <li>E[X] = 0 · (1 − p) + 1 · p = p. Var(X) = p(1 − p) est annoncée ici, comme le fait Brunton, et démontrée avec la variance (<a href="lesson-00-08-esperance-variance.html#n6">l08</a>).</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>pièce, un 6, contrôle qualité, label, dropout</small></summary><div class="in">
+    <ol>
+      <li><b>Une pièce.</b> p = ½ : E[X] = ½, Var(X) = ¼, la plus grande variance possible pour une Bernoulli.</li>
+      <li><b>« Faire un 6 ».</b> p = 1/6 ≈ 0,167 : E[X] = 0,167, Var(X) = (1/6)(5/6) = 5/36 ≈ 0,139.</li>
+      <li><b>Contrôle qualité</b> (Brunton). X = 1 si la pièce est bonne. Avec 2 % de pièces défectueuses, p = 0,98. Si l'on code plutôt « défectueuse » = 1, p = 0,02 : les deux codages décrivent le même mécanisme.</li>
+      <li><b>Le cas ML : un label binaire.</b> Le label Y d'un exemple (spam ou non) est une Bernoulli. Un classifieur donne p = P(Y = 1 ∣ x ; θ) ; la probabilité qu'il attribue au vrai label y vaut p<sup>y</sup>(1 − p)<sup>1−y</sup>, et son −log, −[y log p + (1 − y) log(1 − p)], est la log-loss (<a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">fil B</a>).</li>
+      <li><b>Le dropout.</b> Pendant l'entraînement, chaque neurone est coupé selon une Bernoulli(p) indépendante : c'est le masque de Brunton, appliqué à un réseau.</li>
+    </ol>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Un dé n'est pas une Bernoulli.</b> Il a six issues. Il le devient quand on décide ce qui compte comme succès, « un 6 » par exemple.</li>
+      <li><b>« Succès » est une convention, pas un jugement.</b> Dans un dépistage, on code souvent 1 = « malade ».</li>
+      <li><b>E[X] = p n'est pas une valeur possible.</b> X vaut 0 ou 1, jamais 0,3.</li>
+      <li><b>Une suite de Bernoulli demande le même p à chaque essai</b> (notion 4). Des mails venus de deux sources, avec deux taux de spam, ne forment pas une suite de Bernoulli(p) de même p.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (14) écrit d'abord que la probabilité de X = 0 « s'appelle p », puis se corrige. La convention est p = P(X = 1) : la probabilité de l'issue qu'on a codée 1.</div>
+  </div></details>
+  <p class="garde">Bernoulli(p) : un essai à deux issues codées 1 (probabilité p) et 0 ; P(X = x ; p) = pˣ(1 − p)¹⁻ˣ, de moyenne p et de variance p(1 − p).</p>
+</section>
+

@@ -1,0 +1,73 @@
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>Loi discrète, densité, fonction de répartition : évaluer ou intégrer <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 13, et 16 pour la fonction de répartition</p>
+  <div class="idee">
+    <p>Pour une variable discrète, chaque valeur porte une probabilité : les barres 1-4-6-4-1 des quatre pièces, en seizièmes, somment à 1. C'est la loi de probabilité, ou PMF (probability mass function).</p>
+    <p>Pour une variable continue, comme la taille, ça ne marche plus. Prenons, comme Brunton, des tailles en cloche : moyenne 1,75 m, écart-type 7 cm (chiffres d'illustration). Mesurer exactement 1,75 m, avec une précision infinie, a une probabilité nulle. Une classe de 10 cm autour de 1,75 m contient 52,5 % des gens, une classe de 1 cm 5,69 %. La probabilité fond avec la largeur, mais le rapport probabilité / largeur se stabilise vers 5,70 par mètre : c'est la <b>densité</b> f, une probabilité par unité de longueur. Une probabilité devient une aire sous f.</p>
+    <p>Dans les deux cas, la <b>fonction de répartition</b> F(x) = P(X ≤ x) cumule la masse de gauche à droite, de 0 à 1.</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — des barres de probabilité à la densité</div>
+    <div id="v2ctl" class="sl-ctl"></div>
+    <div id="v2ctl2" class="sl-ctl"></div>
+    <div id="v2plot" class="wide"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">Les tailles du modèle, rangées en classes. Choisis la <b>largeur des classes</b>, de 10 cm à 1 cm. En <b>probabilité de chaque classe</b>, les barres s'écrasent : la classe centrale passe de 0,525 à 0,057, et tendrait vers 0 pour une classe réduite à un point. En <b>probabilité ÷ largeur</b>, les barres collent de mieux en mieux à la courbe f, dont le pic vaut 5,70 par mètre : une densité n'est pas bornée par 1.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les trois objets</div>
+    <div class="eq">discret : P(<i>X</i> = <i>x</i>) ≥ 0, Σ<sub><i>x</i></sub> P(<i>X</i> = <i>x</i>) = 1 &nbsp;&nbsp;&nbsp; continu : <i>f</i> ≥ 0, ∫ <i>f</i>(<i>x</i>) d<i>x</i> = 1, P(<i>a</i> ≤ <i>X</i> ≤ <i>b</i>) = ∫<sub><i>a</i></sub><sup><i>b</i></sup> <i>f</i>(<i>x</i>) d<i>x</i></div>
+    <div class="eq">répartition : F(<i>x</i>) = P(<i>X</i> ≤ <i>x</i>) &nbsp;&nbsp;&nbsp; P(<i>a</i> &lt; <i>X</i> ≤ <i>b</i>) = F(<i>b</i>) − F(<i>a</i>) &nbsp;&nbsp;&nbsp; <i>f</i> = F′</div>
+    <ul>
+      <li><b>Deux gestes sur une densité.</b> L'<b>évaluer</b> en un point donne une hauteur f(x) : c'est la <b>vraisemblance</b> de l'observation x, qui sert à comparer des hypothèses et n'a pas à être inférieure à 1. L'<b>intégrer</b> sur un intervalle donne une aire : c'est une <b>probabilité</b>, entre 0 et 1.</li>
+      <li>f a l'unité inverse de x (ici, par mètre) ; F et les probabilités n'ont pas d'unité.</li>
+      <li>En continu, P(X = x) = 0, donc ≤ et &lt; donnent la même probabilité. En discret, non : F est un escalier qui saute de P(X = x) en chaque valeur x.</li>
+      <li>F croît de 0 à 1. Pour une densité symétrique autour de μ, F(μ) = ½ : sous le pic de la normale (Brunton 16). En discret, non : la loi des quatre pièces est symétrique autour de 2, mais F(2) = 11/16.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — la hauteur et l'aire, la densité et sa répartition</div>
+    <div id="f1ctl" class="sl-ctl"></div>
+    <div id="f1plot" class="wide"></div>
+    <div id="f1sl"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">En haut, la densité des tailles ; l'aire violette est P(a &lt; X ≤ b). En bas, la fonction de répartition F : la même probabilité s'y lit comme la <b>différence de hauteur</b> F(b) − F(a). Les deux premiers readouts sont des hauteurs de f, des vraisemblances : au centre, elles dépassent 1. Les deux derniers sont des probabilités. Rapproche <b>a</b> de <b>b</b> : l'aire tend vers 0, les hauteurs ne bougent presque pas. Passe en <b>centimètres</b> : les hauteurs sont divisées par 100, l'aire ne change pas.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>quatre pièces, une aire, une hauteur, une vraisemblance</small></summary><div class="in">
+    <ol>
+      <li><b>Quatre pièces, discret.</b> F(2) = P(X ≤ 2) = (1 + 4 + 6)/16 = 11/16 = 0,6875, mais P(X &lt; 2) = 5/16 = 0,3125 : en discret, ≤ et &lt; diffèrent de P(X = 2) = 6/16.</li>
+      <li><b>Tailles, une probabilité.</b> P(1,70 &lt; X ≤ 1,80) = F(1,80) − F(1,70) = 0,7625 − 0,2375 = 0,525.</li>
+      <li><b>Tailles, une hauteur.</b> f(1,75) = 1/(0,07 · √(2π)) = 5,70 par mètre. En centimètres, la même loi a f(175) = 0,057 par cm. La hauteur dépend de l'unité ; la probabilité 0,525 de l'exemple 2, non.</li>
+      <li><b>Une vraisemblance.</b> On mesure une personne : 1,82 m. Sous le modèle de moyenne 1,75 m, f(1,82) = 3,46 ; sous un modèle de moyenne 1,70 m et de même écart-type, f(1,82) = 1,31. La première hypothèse rend l'observation 2,64 fois plus vraisemblable. On a <b>évalué</b> f ; on n'a rien intégré, et P(X = 1,82) vaut 0 sous les deux modèles.</li>
+      <li><b>Le cas ML.</b> Ajuster un modèle par maximum de vraisemblance, c'est évaluer la densité du modèle en chaque donnée, multiplier les valeurs (indépendance), et chercher le paramètre qui rend ce produit maximal (<a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">fil B</a>). Aucune intégrale n'intervient.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>F(b) − F(a), P(X = x) = 0, f = F′</small></summary><div class="in">
+    <div class="drv">
+      <div>{<i>X</i> ≤ <i>b</i>} = {<i>X</i> ≤ <i>a</i>} ∪ {<i>a</i> &lt; <i>X</i> ≤ <i>b</i>}</div><span>pour a &lt; b ; les deux morceaux sont disjoints</span>
+      <div>F(<i>b</i>) = F(<i>a</i>) + P(<i>a</i> &lt; <i>X</i> ≤ <i>b</i>)</div><span>additivité, axiome 3 (<a href="lesson-00-02-espace-axiomes-complement.html#n2">l02</a>)</span>
+      <div>P(<i>a</i> &lt; <i>X</i> ≤ <i>b</i>) = F(<i>b</i>) − F(<i>a</i>)</div><span>on soustrait F(a)</span>
+      <div>P(<i>X</i> = <i>x</i>) ≤ P(<i>x</i> − <i>h</i> &lt; <i>X</i> ≤ <i>x</i>) = F(<i>x</i>) − F(<i>x</i> − <i>h</i>)</div><span>{X = x} est inclus dans la fenêtre : monotonie</span>
+      <div>P(<i>X</i> = <i>x</i>) = 0</div><span>X a une densité, donc F est continue : la différence tend vers 0 quand h → 0</span>
+      <div>P(<i>x</i> &lt; <i>X</i> ≤ <i>x</i> + <i>h</i>) = ∫<sub><i>x</i></sub><sup><i>x</i>+<i>h</i></sup> <i>f</i> ≈ <i>f</i>(<i>x</i>) · <i>h</i></div><span>sur une fenêtre étroite, f est presque constante</span>
+      <div><i>f</i>(<i>x</i>) = lim<sub><i>h</i>→0</sub> P(<i>x</i> &lt; <i>X</i> ≤ <i>x</i> + <i>h</i>) / <i>h</i> = F′(<i>x</i>)</div><span>une densité est une probabilité par unité de longueur</span>
+    </div>
+    <p>La dernière ligne dit pourquoi f(x) peut dépasser 1 : seul le produit f(x) · h est une probabilité, et h est petit.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>un million de tailles</small></summary><div class="in">
+<pre class="py">{{CODE:c2}}</pre>
+<pre class="out">{{OUT:c2}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Lire f(x) comme une probabilité.</b> « f(1,75) = 5,7, donc 570 % » n'a pas de sens. Seule l'aire en a un.</li>
+      <li><b>Intégrer quand on veut une vraisemblance.</b> La vraisemblance d'une observation x est f évaluée en x, pas une intégrale autour. Intégrer « un peu autour de x » donne une probabilité qui dépend de la largeur choisie et tend vers 0 avec elle.</li>
+      <li><b>La valeur de f dépend de l'unité.</b> 5,70 par mètre, 0,057 par centimètre : deux densités ne se comparent que dans la même unité.</li>
+      <li><b>≤ et &lt; en discret.</b> Pour quatre pièces, P(X ≤ 2) = 11/16 et P(X &lt; 2) = 5/16. La notion 7 en dépend.</li>
+      <li><b>Une variable peut n'être ni discrète, ni à densité.</b> L'attente à un feu : 0 avec probabilité ½ (feu vert), une durée continue sinon. Sa fonction de répartition saute en 0, puis monte continûment. Seule F décrit toujours une loi ; Brunton y revient en 39 (<a href="lesson-00-12-generatrice-preuve-tcl.html#n4">l12</a>).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (13) parle de « la densité de probabilité d'obtenir 20 piles », et (13, 16) de « cumulative density function », qu'il appelle aussi, correctement, « cumulative distribution function ». Pour une variable discrète, c'est une loi de probabilité (PMF) : des probabilités ponctuelles, sans unité. La fonction de répartition est la cumulative distribution function (CDF) : elle cumule la loi, qu'elle soit discrète ou à densité.</div>
+  </div></details>
+  <p class="garde">Variable continue : la densité f est une probabilité par unité de x. Évaluée en un point, c'est une vraisemblance, qui peut dépasser 1 ; seule son intégrale sur un intervalle est une probabilité.</p>
+</section>
+

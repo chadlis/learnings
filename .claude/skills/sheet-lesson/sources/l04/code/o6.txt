@@ -1,0 +1,8 @@
+Phi(1) = 0.8413   P(|Z| <= 1) = 0.6827
+Phi(2) = 0.9772   P(|Z| <= 2) = 0.9545
+Phi(3) = 0.9987   P(|Z| <= 3) = 0.9973
+Phi(-1) = 0.1587 = 1 - Phi(1)
+95% exactly within +-1.960
+share within 1 sigma of 200: 0.6823
+share within 2 sigma of 200: 0.9544
+share within 3 sigma of 200: 0.9973

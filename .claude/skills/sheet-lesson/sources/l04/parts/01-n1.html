@@ -1,0 +1,57 @@
+<!-- ============================ n1 ============================ -->
+<section class="notion outil" id="n1">
+  <h3>Variable aléatoire, réalisation, paramètre fixe <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 13 · Random Variables and Probability Distributions</p>
+  <div class="idee">
+    <p>Brunton part de l'algèbre : une variable x peut valoir 2, 3 ou π. Une <b>variable aléatoire</b> prend elle aussi des valeurs, et l'on attache une probabilité à chacune. Son exemple : lancer une pièce quatre fois. Ω contient 2<sup>4</sup> = 16 séquences, de PPPP à FFFF (P pour pile, F pour face).</p>
+    <p>X = le nombre de piles attache un nombre à chaque séquence : X(PPFP) = 3. X prend les valeurs 0 à 4. Regroupées par valeur, les 16 séquences forment des piles de 1, 4, 6, 4 et 1 : P(X = 2) = 6/16. Ce tableau est la <b>loi</b> de X ; il résume les seize cas.</p>
+    <p>Trois objets, à ne jamais confondre. La probabilité de pile, p = ½, est <b>fixe</b> : c'est une propriété de la pièce. X est <b>aléatoire</b> : avant le lancer on ne connaît pas sa valeur, et elle changerait à chaque nouveau tirage. x = 3 est la valeur <b>réalisée</b> sur ce tirage-ci, notée en minuscule.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — seize séquences, une variable, une réalisation</div>
+    <div id="v1ctl" class="sl-ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">Les 16 séquences de quatre lancers, chacune avec sa valeur de X et une couleur par valeur. <b>Regroupe par X</b> : elles tombent en piles de 1, 4, 6, 4 et 1 ; chaque séquence pèse 1/16, donc la hauteur des piles est la loi de X, en seizièmes. <b>Lance quatre pièces</b> : une séquence s'entoure de rouge ; x et p̂ = x/4 changent d'un lancer à l'autre, p = ½ ne bouge jamais.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les définitions</div>
+    <div class="eq"><i>X</i> : Ω → ℝ, ω ↦ <i>X</i>(ω) &nbsp;&nbsp;&nbsp; P(<i>X</i> = <i>x</i>) = P({ω ∈ Ω : <i>X</i>(ω) = <i>x</i>}) &nbsp;&nbsp;&nbsp; <i>X</i> ~ Binomiale(4, ½)</div>
+    <table class="cols">
+      <tr><th>fixe</th><th>aléatoire</th><th>réalisé</th></tr>
+      <tr><td>ce qui est vrai du monde, indépendamment des données</td><td>ce qui dépend du tirage : changerait à chaque nouveau tirage</td><td>la valeur sur ce tirage-ci, notée en minuscule</td></tr>
+      <tr><td>p = ½, la probabilité de pile</td><td>X, le nombre de piles ; p̂ = X/4, l'estimateur de p</td><td>x = 3 ; p̂ = x/4 = 0,75 sur ce tirage</td></tr>
+      <tr><td>μ = 3,5, la moyenne d'un dé</td><td>X̄, la moyenne de dix lancers</td><td>x̄ = 3,2</td></tr>
+    </table>
+    <ul>
+      <li>ω est l'issue du tirage, ici une séquence. X est une <b>fonction fixe</b> : tout l'aléa est dans le tirage de ω.</li>
+      <li>« X = x » est un événement, un sous-ensemble de Ω : sa probabilité se calcule avec les axiomes (<a href="lesson-00-02-espace-axiomes-complement.html#n2">l02</a>).</li>
+      <li>On écrit X ~ Binomiale(4, ½), « X suit la loi binomiale », jamais « X = Binomiale » (Brunton 14). La formule de cette loi est la notion 4.</li>
+      <li>Un estimateur porte un chapeau : p̂ estime p. Le chapeau sert pour l'estimateur et pour sa valeur sur un tirage ; « sur ce tirage » dit lequel. Quand la loi dépend d'un paramètre fixe, on écrit P(X = x ; p) : la barre « ∣ » est réservée au conditionnement par un événement ou une variable aléatoire.</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>quatre pièces, un dé, dix lancers, cent pièces, une taille</small></summary><div class="in">
+    <ol>
+      <li><b>Quatre pièces.</b> X(PPPP) = 4, X(PFFP) = 2, X(FFFF) = 0. Six séquences ont deux piles : PPFF, PFPF, PFFP, FPPF, FPFP, FFPP. Donc P(X = 2) = 6/16 = 0,375.</li>
+      <li><b>Un dé, deux variables sur le même Ω.</b> Ω = {1, 2, 3, 4, 5, 6}. X = la face : P(X = k) = 1/6 pour chaque k. Y = 1 si la face est un 6, 0 sinon : P(Y = 1) = 1/6, P(Y = 0) = 5/6. Le même tirage, deux fonctions, deux lois.</li>
+      <li><b>Dix lancers de dé.</b> Sur ce tirage : 2, 5, 1, 4, 3, 6, 2, 3, 5, 1. La moyenne réalisée vaut x̄ = 32/10 = 3,2. La moyenne du dé, μ = 3,5, n'a pas bougé : elle est fixe. Dix autres lancers donneraient un autre x̄ ; c'est X̄ qui est aléatoire.</li>
+      <li><b>Cent pièces</b> (Brunton). Ω contient 2<sup>100</sup> ≈ 1,27 · 10<sup>30</sup> séquences, qu'on n'énumérera jamais. Le nombre de piles a une loi qui porte un nom et une formule (notion 4) : elle résume tout ce qui compte pour la question posée.</li>
+      <li><b>La loi est un modèle</b> (Brunton). Dix piles sur dix lancers ont la probabilité (½)<sup>10</sup> = 1/1 024 ≈ 0,001 si la pièce est équilibrée ; Brunton ne fait pas le calcul. Si on l'observe, on doute du modèle « pièce équilibrée » : c'est le test d'hypothèse. Mesurer 100 passants pour régler la moyenne et l'écart-type du modèle des tailles, c'est l'estimation de paramètres.</li>
+      <li><b>Une taille.</b> X = la taille, en mètres, d'une personne tirée au hasard. X peut prendre un continuum de valeurs : c'est une variable <b>continue</b>, et sa loi se décrit autrement (notion 2).</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>énumérer Ω, puis cinq lancers</small></summary><div class="in">
+<pre class="py">{{CODE:c1}}</pre>
+<pre class="out">{{OUT:c1}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Écrire μ = 3,2 pour x̄ = 3,2.</b> μ est un nombre fixe du dé ; 3,2 est la valeur de X̄ sur ce tirage. Même faute avec la pièce : conclure p = 0,75 après x = 3. C'est p̂ qui vaut 0,75 sur ce tirage ; p reste ½.</li>
+      <li><b>« X = 3 » n'est pas une définition de X.</b> C'est un événement : l'ensemble des quatre séquences à trois piles.</li>
+      <li><b>Une variable aléatoire n'est ni une variable, ni aléatoire.</b> C'est une fonction fixe de l'issue. L'aléa vient du tirage de ω.</li>
+      <li><b>Même loi ne veut pas dire même variable.</b> X, le nombre de piles, et 4 − X, le nombre de faces, suivent toutes deux Binomiale(4, ½). Elles ne sont égales que sur les six séquences où X = 2.</li>
+      <li><b>Le cas ML.</b> Le vrai taux de bonnes réponses (accuracy) d'un modèle, π, est fixe ; le nombre X de bonnes réponses sur un jeu de test (test set) tiré au hasard est aléatoire ; 872 sur 1 000 est la réalisation sur ce jeu de test (notion 4).</li>
+    </ul>
+  </div></details>
+  <p class="garde">Trois objets : le paramètre, fixe, vrai du monde (p, μ) ; la variable aléatoire, fonction de l'issue, qui changerait à chaque tirage (X, X̄, p̂) ; sa réalisation sur ce tirage, en minuscule (x, x̄ = 3,2).</p>
+</section>
+

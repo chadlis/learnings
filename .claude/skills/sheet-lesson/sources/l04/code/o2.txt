@@ -1,0 +1,8 @@
+heights exactly equal to 1.75: 0
+width   0.1 m: P = 0.5244   P / width = 5.24
+width  0.01 m: P = 0.0569   P / width = 5.69
+width 0.001 m: P = 0.0057   P / width = 5.71
+density f(1.75) = 5.70 per metre
+same law in cm: f(175) = 0.0570 per cm
+F(1.80) = 0.7625
+share of draws <= 1.80: 0.7617

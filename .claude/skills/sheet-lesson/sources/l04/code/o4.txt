@@ -1,0 +1,4 @@
+P(X = 3) = 0.1974   sum of all P(X = k) = 1.000000
+share of experiments with exactly three sixes: 0.1971
+mean 2.000 (np = 2.000)
+variance 1.666 (np(1 - p) = 1.667)

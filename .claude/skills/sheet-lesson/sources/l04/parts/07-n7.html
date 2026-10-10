@@ -1,0 +1,54 @@
+<!-- ============================ n7 ============================ -->
+<section class="notion outil" id="n7">
+  <h3>L'approximation normale et la correction de continuité <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 16</p>
+  <div class="idee">
+    <p>Brunton lance 400 pièces : X ~ Binomiale(400, ½), μ = 200, σ² = 400 × ½ × ½ = 100, σ = 10. Il veut P(190 ≤ X ≤ 230). Exactement, c'est la somme P(X = 190) + P(X = 191) + … + P(X = 230), 41 termes, « un monstre » à la main : 0,852.</p>
+    <p>Avec la normale, c'est une aire : de 190 à 230, Φ(3) − Φ(−1) = 0,840. Il manque 0,012. Chaque entier k est une barre de largeur 1, qui s'étend de k − ½ à k + ½. L'aire de 190 à 230 coupe en deux la première barre et la dernière : la moitié de P(X = 190) et la moitié de P(X = 230) sont perdues, à peu près 0,012.</p>
+    <p>La <b>correction de continuité</b> élargit l'intervalle d'un demi de chaque côté : de 189,5 à 230,5, Φ(3,05) − Φ(−1,05) = 0,852, la valeur exacte.</p>
+  </div>
+  <div class="fig vis" id="v7">
+    <div class="lbl">Voir l'idée — 400 pièces, les deux demi-barres</div>
+    <div id="v7ctl" class="sl-ctl"></div>
+    <div id="v7plot" class="wide"></div>
+    <div class="readouts" id="v7out"></div>
+    <p class="cap">Les barres sont P(X = k) pour 400 pièces, la courbe est N(200 ; 10²) ; le second panneau zoome sur la borne 190. <b>41 barres</b> : la somme exacte de 190 à 230 vaut 0,852. <b>Aire de 190 à 230</b> : 0,840, et le zoom montre la barre de 190 coupée en son milieu. <b>Aire de 189,5 à 230,5</b> : l'aire reprend les deux demi-barres, 0,852.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>X</i> entière, <i>X</i> ≈ N(μ, σ²) : P(<i>a</i> ≤ <i>X</i> ≤ <i>b</i>) ≈ Φ((<i>b</i> + ½ − μ)/σ) − Φ((<i>a</i> − ½ − μ)/σ)</div>
+    <div class="eq">une seule valeur : P(<i>X</i> = <i>k</i>) ≈ Φ((<i>k</i> + ½ − μ)/σ) − Φ((<i>k</i> − ½ − μ)/σ)</div>
+    <ul>
+      <li>a et b sont des entiers, inclus. Une inégalité stricte se ramène d'abord à une large : P(190 &lt; X &lt; 230) = P(191 ≤ X ≤ 229).</li>
+      <li>Pour la binomiale, μ = np et σ = √(np(1 − p)), sous les conditions de la notion 5.</li>
+      <li>Le ½ vient de la largeur 1 des barres. Il compte d'autant plus que σ est petit, puisque chaque barre pèse alors davantage.</li>
+      <li>Ce que calcule Brunton, Φ((b − μ)/σ) − Φ((a − μ)/σ), est l'approximation sans correction.</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>400 pièces, une barre seule, dix pièces, un jeu de test</small></summary><div class="in">
+    <ol>
+      <li><b>400 pièces.</b> Exact : 0,8520. Sans correction : Φ(3) − Φ(−1) = 0,8400. Avec : Φ(3,05) − Φ(−1,05) = 0,8520.</li>
+      <li><b>Les deux demi-barres.</b> P(X = 190) = 0,0242 et P(X = 230) = 0,0004 ; leurs moitiés font 0,0123, à peu près l'écart 0,012 entre 0,852 et 0,840.</li>
+      <li><b>Une seule valeur.</b> P(X = 200) = 0,0399 exact ; Φ(0,05) − Φ(−0,05) = 0,0399. Sans correction, l'aire de 200 à 200 vaut 0 : il faut une barre pour avoir une probabilité.</li>
+      <li><b>Dix pièces</b>, μ = 5, σ = √2,5 ≈ 1,58. P(X ≤ 3) = 176/1 024 = 0,172 exact ; sans correction, Φ((3 − 5)/1,58) = 0,103 ; avec, Φ((3,5 − 5)/1,58) = 0,171. Quand σ est petit, une demi-barre pèse lourd.</li>
+      <li><b>Inégalités strictes.</b> P(190 &lt; X &lt; 230) = P(191 ≤ X ≤ 229) = 0,827 exact ; avec correction, de 190,5 à 229,5 : Φ(2,95) − Φ(−0,95) = 0,827.</li>
+      <li><b>Le cas ML.</b> Un modèle d'accuracy vraie π = 0,87, testé sur 1 000 exemples : quelle chance d'avoir 850 bonnes réponses ou moins ? Exact : 0,0353. Avec correction : Φ((850,5 − 870)/10,63) = Φ(−1,834) = 0,0334 ; sans : 0,0300. La correction rapproche ; l'asymétrie de la binomiale à p = 0,87 laisse un écart.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>les 41 termes contre les deux aires</small></summary><div class="in">
+<pre class="py">{{CODE:c7}}</pre>
+<pre class="out">{{OUT:c7}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>≤ contre &lt;.</b> La correction se pose sur des inégalités larges entre entiers ; se tromper retire ou ajoute une barre entière à chaque bout (0,852 contre 0,827 ci-dessus).</li>
+      <li><b>Pour une variable continue, elle n'a pas de sens.</b> P(X = x) y vaut 0 : il n'y a pas de barre à reprendre.</li>
+      <li><b>Quand σ est grand, elle ne compte presque plus.</b> Pour 40 000 pièces, σ = 100 et une barre pèse au plus 0,004.</li>
+      <li><b>p loin de ½.</b> La binomiale est asymétrique, la normale ne l'est pas : la correction ne rattrape pas l'asymétrie (le cas ML ci-dessus).</li>
+      <li><b>Aujourd'hui, la somme exacte est une ligne</b> (<code>binom.cdf</code>). L'approximation sert à raisonner, à calculer de tête et à comprendre d'où viennent les intervalles ; avec un ordinateur, on calcule exactement.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (16) annonce « 51 » probabilités à additionner entre 190 et 230 : il y en a 230 − 190 + 1 = 41. Il trouve ensuite « environ 85 % » avec l'aire normale entre 190 et 230. Cette aire vaut Φ(3) − Φ(−1) = 0,840 ; 0,852 est la valeur exacte, que la normale ne rend qu'avec la correction de continuité, qu'il ne nomme pas.</div>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (16) parle de calculer « Φ(230) et Φ(190) ». Φ est la fonction de répartition de Z ; pour N(200 ; 10²), il faut F(230) − F(190), soit Φ((230 − 200)/10) − Φ((190 − 200)/10) = Φ(3) − Φ(−1).</div>
+  </div></details>
+  <p class="garde">Variable entière approchée par N(μ, σ²) : chaque entier est une barre de largeur 1, d'où P(a ≤ X ≤ b) ≈ Φ((b + ½ − μ)/σ) − Φ((a − ½ − μ)/σ).</p>
+</section>
+

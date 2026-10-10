@@ -1,0 +1,7 @@
+16 sequences; X('HHTH') = 3
+law of X, in 16ths: [1, 4, 6, 4, 1]
+draw 0: TTHT  x = 1  p_hat = 0.25  p = 0.5
+draw 1: HHTH  x = 3  p_hat = 0.75  p = 0.5
+draw 2: THTT  x = 1  p_hat = 0.25  p = 0.5
+draw 3: HTHH  x = 3  p_hat = 0.75  p = 0.5
+draw 4: HHHH  x = 4  p_hat = 1.00  p = 0.5

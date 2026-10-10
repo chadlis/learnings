@@ -1,0 +1,1241 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Variables aléatoires, de la binomiale à la normale — leçon</title>
+<meta name="sheet" content="series=lesson;part=00;number=04;status=v1">
+<meta name="part" content="00 · Socle probabiliste">
+<meta name="subtitle" content="socle — Brunton 13 à 16 : v.a. contre réalisation, PMF, densité, répartition, la normale comme limite">
+<meta name="prereq" content="l03">
+<meta name="anki" content="stats::va,stats::densite,stats::binomiale,stats::normale">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- série `coding` : squelette annoté et ruban de SL.trace (inerte hors coding) ---- */
+.skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.skel b{color:var(--pen);font-weight:600}
+.step .card.full,.step .card.casse{grid-column:1 / -1}
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .wide table{min-width:520px}
+.card .wide th:nth-child(2),.card .wide td:nth-child(2),
+.card .wide th:nth-child(3),.card .wide td:nth-child(3){text-align:left}
+.readouts .c1 b{color:var(--pen)}.readouts .c3 b{color:var(--red)}
+.sl-trace{--cw:58px;--cgap:8px;margin:4px 0 2px}
+.sl-cells{display:flex;gap:var(--cgap)}
+.sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
+.sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
+.sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.dim{background:rgba(34,48,43,.07);border-color:rgba(34,48,43,.18);border-style:dashed}
+.sl-cell.dim b,.sl-cell.dim i{color:var(--cardmuted);opacity:.5}
+.sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
+.sl-cell.win{border-color:var(--green);border-width:2.5px}
+.sl-ptrs{position:relative;height:20px;margin-top:5px}
+.sl-ptr{position:absolute;top:0;left:calc(var(--i) * (var(--cw) + var(--cgap)));width:var(--cw);text-align:center;font:600 12px var(--sans);color:var(--pen)}
+.sl-note{font-size:14px;color:var(--cardink);margin-top:10px}
+.sl-inv{font:12.5px/1.55 var(--mono);color:var(--cardmuted);margin-top:6px;border-left:2px solid #B7791F;padding-left:10px}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ===== série `lesson` : le cours autoporteur du socle (10/10/2026) ===== */
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px;color:var(--muted);margin:10px 0 0}
+.legend .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-right:6px}
+.lecon{counter-reset:notion}
+.notion{padding:22px 0 28px;border-top:1.5px dashed var(--line);max-width:900px}
+.notion h3{position:relative;padding-left:44px;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.3;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:2px}
+.notion h3::before{counter-increment:notion;content:counter(notion);position:absolute;left:0;top:-1px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle;text-shadow:none}
+.tag.outil{color:var(--mint)}.tag.culture{color:var(--violet)}
+.src{font-size:12.5px;color:var(--faint);margin:0 0 10px 44px}
+.idee{margin-left:44px;color:var(--chalk);font-size:16px;line-height:1.62;max-width:72ch}
+.idee p{margin:7px 0}
+.idee b{color:var(--yellow);font-weight:600}
+.formule{margin:12px 0 10px 44px;background:var(--card);color:var(--cardink);border-radius:3px;padding:12px 18px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--yellow)}
+.formule .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:4px}
+.formule .eq{font-size:17.5px}
+.formule ul{padding-left:18px;margin-top:6px}.formule li{font-size:14.5px;margin:3px 0;color:var(--cardmuted)}
+.notion .fig{margin-left:44px}
+details{margin:8px 0 0 44px;background:var(--card);color:var(--cardink);border-radius:3px;border-left:4px solid var(--ac,var(--yellow));box-shadow:0 10px 20px -16px rgba(0,0,0,.6)}
+details>summary{cursor:pointer;list-style:none;padding:9px 14px;font:600 13px var(--sans);letter-spacing:.03em;color:var(--cardink)}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸";display:inline-block;width:16px;color:var(--cardmuted)}
+details[open]>summary::before{content:"▾"}
+details>summary small{font-weight:400;color:var(--cardmuted);margin-left:6px;letter-spacing:0}
+details .in{padding:2px 18px 14px}
+details .in p,details .in li{font-size:15px;line-height:1.55;margin:5px 0}
+details .in ol,details .in ul{padding-left:20px}
+details.ex{--ac:var(--teal)}details.preuve{--ac:var(--violet)}details.code{--ac:var(--blue)}details.casse{--ac:var(--pink)}details.loin{--ac:var(--faint)}
+.drv{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:4px 16px;margin:8px 0;align-items:baseline}
+.drv>div{font-family:var(--math);font-size:16px;line-height:1.6}
+.drv>span{font-size:13.5px;color:var(--cardmuted);border-left:2px solid var(--cardline);padding-left:10px}
+@media(max-width:700px){.drv{grid-template-columns:minmax(0,1fr)}.drv>span{margin-bottom:6px}}
+pre.py,pre.out,pre.tri{font:13px/1.6 var(--mono);background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:pre}
+pre.out{background:transparent;border:1px dashed var(--cardline);color:var(--cardmuted)}
+pre.out::before{content:"sortie\A";font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.brunton{margin:10px 0 4px;padding:8px 12px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft);font-size:14.5px}
+.brunton b{display:block;font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:2px}
+.garde{margin:14px 0 0 44px;font-family:var(--serif);font-size:16.5px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--yellow);padding:4px 0 4px 14px;max-width:72ch}
+.garde::before{content:"Ce qu'on garde";display:block;font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);text-shadow:none;margin-bottom:2px}
+.notion.culture .garde{border-left-color:var(--violet)}
+.notion table{background:var(--cardsoft);border-radius:3px}
+.sl-fulcrum{fill:var(--red)}.sl-bar2{fill:var(--red);opacity:.55}.sl-bar3{fill:var(--pen);opacity:.6}
+@media(max-width:600px){.idee,.formule,details,.garde,.src,.notion .fig{margin-left:0}.notion h3{font-size:19px}}
+.sl-seg.sl-c1{stroke:var(--pen);stroke-width:2}.sl-seg.sl-c2{stroke:#6B46C1;stroke-width:2}.sl-seg.sl-c3{stroke:var(--red);stroke-width:2}.sl-seg.sl-c4{stroke:#1F5FA8;stroke-width:2}
+/* ===== v2 (10/10/2026) : vignettes « voir l'idée », sous chaque idée ===== */
+.fig.vis{--ac:var(--teal)}
+.v-row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:center}
+.v-row>div{flex:1 1 280px;min-width:0}.v-row>.v-mini{flex:0 1 220px}
+.v-row .sl-plot{min-width:0}
+.nogrid .sl-grid{display:none}
+.sl-ruler{fill:var(--cardmuted)}
+.sl-mass{fill:#6B46C1;opacity:.85}
+.sl-mass-t{font:600 11px var(--sans);fill:#fff}
+.sl-sq{fill:rgba(107,70,193,.16);stroke:#6B46C1;stroke-width:1.5}
+.sl-sq-t{font:600 12.5px var(--mono);fill:#6B46C1}
+.sl-cellp{fill:#6B46C1}.sl-cello{fill:none;stroke:var(--cardline)}
+.sl-prod{font:12px var(--mono);fill:var(--cardmuted);opacity:.5}.sl-prod.on{font-weight:700;fill:var(--cardink);opacity:1}
+.sl-seg.sl-dash{stroke-dasharray:4 3}.sl-seg.sl-link{stroke:rgba(34,48,43,.28);stroke-dasharray:3 3}
+.sl-seg.sl-c5{stroke:#B7791F;stroke-width:2}
+.sl-orbit{fill:none;stroke:rgba(34,48,43,.3);stroke-dasharray:3 4}
+.sl-stick{stroke:var(--cardmuted);stroke-width:4;stroke-linecap:round}
+.sl-dot.sl-tiny{stroke:none;opacity:.5}
+.sl-k1{fill:var(--pen)}.sl-k2{fill:#6B46C1}.sl-k3{fill:var(--red)}.sl-k4{fill:#1F5FA8}.sl-k5{fill:#B7791F}.sl-k6{fill:var(--green)}.sl-kc{opacity:.5}
+.sl-cell-t{font:600 11px var(--sans);fill:var(--cardink)}
+/* ---- propre à cette leçon ---- */
+.cols th,.cols td{text-align:left;vertical-align:top}
+.cols th{text-transform:uppercase;font-size:11px;letter-spacing:.08em}
+.formule table.cols{margin:8px 0}
+.sl-hl{fill:none;stroke:var(--red);stroke-width:3}
+.sl-area{fill:#6B46C1;opacity:.3}
+.sl-area2{fill:var(--red);opacity:.28}
+.sl-barlite{fill:#6B46C1;opacity:.16}
+.sl-barline{fill:none;stroke:#6B46C1;stroke-width:1.2}
+.sl-pxoff{fill:#22302B}
+.sl-tile{stroke:rgba(34,48,43,.35);stroke-width:1}
+.sl-tile-t{font:600 13px var(--mono);fill:var(--cardink)}
+.sl-tile-x{font:700 14px var(--mono);fill:var(--cardink)}
+.sl-cap-t{font:600 12px var(--sans);fill:var(--cardink)}
+text.sl-gn{fill:var(--green);stroke:var(--green)}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 4</div>
+  <h1>Variables aléatoires, de la binomiale à la <span>normale</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Une <b>variable aléatoire</b> attache un nombre à chaque issue d'un tirage ; sa <b>loi</b> dit avec quelle probabilité elle prend chaque valeur. La leçon suit Brunton 13 à 16, avec ses exemples : seize séquences de quatre pièces, la taille des gens, un masque aléatoire sur une image, trois 6 en douze lancers, son code Python à n = 100, 30, 10 et 5, et 400 pièces entre 190 et 230 piles. Elle va d'une pièce (Bernoulli) à la somme de n pièces (binomiale), puis à la courbe en cloche qui l'approche (normale).</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="lesson-00-03-conditionner-bayes-independance.html#n7">l03 · Indépendance</a></li>
+    <li><a href="lesson-00-03-conditionner-bayes-independance.html#n9">l03 · Indépendance mutuelle</a></li>
+    <li><a href="lesson-00-01-compter.html#n5">l01 · C(n, r)</a></li>
+    <li><a href="lesson-00-02-espace-axiomes-complement.html#n6">l02 · Binôme et Pascal</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::va</code><code>stats::densite</code><code>stats::binomiale</code><code>stats::normale</code></div>
+  <h4>Suite</h4>
+  <ol>
+    <li><a href="lesson-00-05-poisson-exponentielle-attentes.html">l05 · Événements rares et temps d'attente</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>Ω, événements, additivité.</b> Ω est l'ensemble des issues possibles d'un tirage. La probabilité d'une réunion d'événements disjoints est la somme de leurs probabilités (<a href="lesson-00-02-espace-axiomes-complement.html#n2">l02</a>).</li>
+      <li><b>Compter.</b> C(n, r) = n!/(r! (n − r)!) est le nombre de façons de choisir r places parmi n (<a href="lesson-00-01-compter.html#n5">l01</a>). Le binôme : (p + q)<sup>n</sup> = Σ<sub>k</sub> C(n, k) p<sup>k</sup> q<sup>n−k</sup>, ses coefficients forment le triangle de Pascal (<a href="lesson-00-02-espace-axiomes-complement.html#n6">l02</a>).</li>
+      <li><b>Indépendance.</b> A et B sont indépendants quand P(A ∩ B) = P(A) P(B). Pour n essais, il faut l'indépendance mutuelle : la probabilité de n'importe quelle conjonction est le produit des probabilités (<a href="lesson-00-03-conditionner-bayes-independance.html#n7">l03</a> pour deux événements, <a href="lesson-00-03-conditionner-bayes-independance.html#n9">l03</a> pour la mutuelle).</li>
+      <li><b>Moyenne et écart-type, en avance.</b> E[X] = Σ x P(X = x) est la moyenne des valeurs pondérée par leurs probabilités (le centre de masse). Var(X) = E[(X − E[X])²] mesure l'étalement ; σ = √Var(X), l'écart-type, est dans l'unité de X. Brunton s'en sert dès 14 et les construit en 28 à 30 (<a href="lesson-00-08-esperance-variance.html#n1">l08</a>).</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">
+<!-- ============================ n1 ============================ -->
+<section class="notion outil" id="n1">
+  <h3>Variable aléatoire, réalisation, paramètre fixe <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 13 · Random Variables and Probability Distributions</p>
+  <div class="idee">
+    <p>Brunton part de l'algèbre : une variable x peut valoir 2, 3 ou π. Une <b>variable aléatoire</b> prend elle aussi des valeurs, et l'on attache une probabilité à chacune. Son exemple : lancer une pièce quatre fois. Ω contient 2<sup>4</sup> = 16 séquences, de PPPP à FFFF (P pour pile, F pour face).</p>
+    <p>X = le nombre de piles attache un nombre à chaque séquence : X(PPFP) = 3. X prend les valeurs 0 à 4. Regroupées par valeur, les 16 séquences forment des piles de 1, 4, 6, 4 et 1 : P(X = 2) = 6/16. Ce tableau est la <b>loi</b> de X ; il résume les seize cas.</p>
+    <p>Trois objets, à ne jamais confondre. La probabilité de pile, p = ½, est <b>fixe</b> : c'est une propriété de la pièce. X est <b>aléatoire</b> : avant le lancer on ne connaît pas sa valeur, et elle changerait à chaque nouveau tirage. x = 3 est la valeur <b>réalisée</b> sur ce tirage-ci, notée en minuscule.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — seize séquences, une variable, une réalisation</div>
+    <div id="v1ctl" class="sl-ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">Les 16 séquences de quatre lancers, chacune avec sa valeur de X et une couleur par valeur. <b>Regroupe par X</b> : elles tombent en piles de 1, 4, 6, 4 et 1 ; chaque séquence pèse 1/16, donc la hauteur des piles est la loi de X, en seizièmes. <b>Lance quatre pièces</b> : une séquence s'entoure de rouge ; x et p̂ = x/4 changent d'un lancer à l'autre, p = ½ ne bouge jamais.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les définitions</div>
+    <div class="eq"><i>X</i> : Ω → ℝ, ω ↦ <i>X</i>(ω) &nbsp;&nbsp;&nbsp; P(<i>X</i> = <i>x</i>) = P({ω ∈ Ω : <i>X</i>(ω) = <i>x</i>}) &nbsp;&nbsp;&nbsp; <i>X</i> ~ Binomiale(4, ½)</div>
+    <table class="cols">
+      <tr><th>fixe</th><th>aléatoire</th><th>réalisé</th></tr>
+      <tr><td>ce qui est vrai du monde, indépendamment des données</td><td>ce qui dépend du tirage : changerait à chaque nouveau tirage</td><td>la valeur sur ce tirage-ci, notée en minuscule</td></tr>
+      <tr><td>p = ½, la probabilité de pile</td><td>X, le nombre de piles ; p̂ = X/4, l'estimateur de p</td><td>x = 3 ; p̂ = x/4 = 0,75 sur ce tirage</td></tr>
+      <tr><td>μ = 3,5, la moyenne d'un dé</td><td>X̄, la moyenne de dix lancers</td><td>x̄ = 3,2</td></tr>
+    </table>
+    <ul>
+      <li>ω est l'issue du tirage, ici une séquence. X est une <b>fonction fixe</b> : tout l'aléa est dans le tirage de ω.</li>
+      <li>« X = x » est un événement, un sous-ensemble de Ω : sa probabilité se calcule avec les axiomes (<a href="lesson-00-02-espace-axiomes-complement.html#n2">l02</a>).</li>
+      <li>On écrit X ~ Binomiale(4, ½), « X suit la loi binomiale », jamais « X = Binomiale » (Brunton 14). La formule de cette loi est la notion 4.</li>
+      <li>Un estimateur porte un chapeau : p̂ estime p. Le chapeau sert pour l'estimateur et pour sa valeur sur un tirage ; « sur ce tirage » dit lequel. Quand la loi dépend d'un paramètre fixe, on écrit P(X = x ; p) : la barre « ∣ » est réservée au conditionnement par un événement ou une variable aléatoire.</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>quatre pièces, un dé, dix lancers, cent pièces, une taille</small></summary><div class="in">
+    <ol>
+      <li><b>Quatre pièces.</b> X(PPPP) = 4, X(PFFP) = 2, X(FFFF) = 0. Six séquences ont deux piles : PPFF, PFPF, PFFP, FPPF, FPFP, FFPP. Donc P(X = 2) = 6/16 = 0,375.</li>
+      <li><b>Un dé, deux variables sur le même Ω.</b> Ω = {1, 2, 3, 4, 5, 6}. X = la face : P(X = k) = 1/6 pour chaque k. Y = 1 si la face est un 6, 0 sinon : P(Y = 1) = 1/6, P(Y = 0) = 5/6. Le même tirage, deux fonctions, deux lois.</li>
+      <li><b>Dix lancers de dé.</b> Sur ce tirage : 2, 5, 1, 4, 3, 6, 2, 3, 5, 1. La moyenne réalisée vaut x̄ = 32/10 = 3,2. La moyenne du dé, μ = 3,5, n'a pas bougé : elle est fixe. Dix autres lancers donneraient un autre x̄ ; c'est X̄ qui est aléatoire.</li>
+      <li><b>Cent pièces</b> (Brunton). Ω contient 2<sup>100</sup> ≈ 1,27 · 10<sup>30</sup> séquences, qu'on n'énumérera jamais. Le nombre de piles a une loi qui porte un nom et une formule (notion 4) : elle résume tout ce qui compte pour la question posée.</li>
+      <li><b>La loi est un modèle</b> (Brunton). Dix piles sur dix lancers ont la probabilité (½)<sup>10</sup> = 1/1 024 ≈ 0,001 si la pièce est équilibrée ; Brunton ne fait pas le calcul. Si on l'observe, on doute du modèle « pièce équilibrée » : c'est le test d'hypothèse. Mesurer 100 passants pour régler la moyenne et l'écart-type du modèle des tailles, c'est l'estimation de paramètres.</li>
+      <li><b>Une taille.</b> X = la taille, en mètres, d'une personne tirée au hasard. X peut prendre un continuum de valeurs : c'est une variable <b>continue</b>, et sa loi se décrit autrement (notion 2).</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>énumérer Ω, puis cinq lancers</small></summary><div class="in">
+<pre class="py">import itertools
+from collections import Counter
+import numpy as np
+
+omega = ["".join(s) for s in itertools.product("HT", repeat=4)]  # 16 sequences
+X = {w: w.count("H") for w in omega}  # the random variable: a function on omega
+print(len(omega), "sequences; X('HHTH') =", X["HHTH"])
+law = Counter(X.values())
+print("law of X, in 16ths:", [law[k] for k in range(5)])
+
+p = 0.5                                       # fixed: a property of the coin
+rng = np.random.default_rng(1)
+for draw in range(5):
+    flips = "".join("H" if u &lt; p else "T" for u in rng.random(4))  # a new draw
+    x = X[flips]                              # realization of X on this draw
+    print(f"draw {draw}: {flips}  x = {x}  p_hat = {x / 4:.2f}  p = {p}")</pre>
+<pre class="out">16 sequences; X('HHTH') = 3
+law of X, in 16ths: [1, 4, 6, 4, 1]
+draw 0: TTHT  x = 1  p_hat = 0.25  p = 0.5
+draw 1: HHTH  x = 3  p_hat = 0.75  p = 0.5
+draw 2: THTT  x = 1  p_hat = 0.25  p = 0.5
+draw 3: HTHH  x = 3  p_hat = 0.75  p = 0.5
+draw 4: HHHH  x = 4  p_hat = 1.00  p = 0.5</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Écrire μ = 3,2 pour x̄ = 3,2.</b> μ est un nombre fixe du dé ; 3,2 est la valeur de X̄ sur ce tirage. Même faute avec la pièce : conclure p = 0,75 après x = 3. C'est p̂ qui vaut 0,75 sur ce tirage ; p reste ½.</li>
+      <li><b>« X = 3 » n'est pas une définition de X.</b> C'est un événement : l'ensemble des quatre séquences à trois piles.</li>
+      <li><b>Une variable aléatoire n'est ni une variable, ni aléatoire.</b> C'est une fonction fixe de l'issue. L'aléa vient du tirage de ω.</li>
+      <li><b>Même loi ne veut pas dire même variable.</b> X, le nombre de piles, et 4 − X, le nombre de faces, suivent toutes deux Binomiale(4, ½). Elles ne sont égales que sur les six séquences où X = 2.</li>
+      <li><b>Le cas ML.</b> Le vrai taux de bonnes réponses (accuracy) d'un modèle, π, est fixe ; le nombre X de bonnes réponses sur un jeu de test (test set) tiré au hasard est aléatoire ; 872 sur 1 000 est la réalisation sur ce jeu de test (notion 4).</li>
+    </ul>
+  </div></details>
+  <p class="garde">Trois objets : le paramètre, fixe, vrai du monde (p, μ) ; la variable aléatoire, fonction de l'issue, qui changerait à chaque tirage (X, X̄, p̂) ; sa réalisation sur ce tirage, en minuscule (x, x̄ = 3,2).</p>
+</section>
+
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>Loi discrète, densité, fonction de répartition : évaluer ou intégrer <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 13, et 16 pour la fonction de répartition</p>
+  <div class="idee">
+    <p>Pour une variable discrète, chaque valeur porte une probabilité : les barres 1-4-6-4-1 des quatre pièces, en seizièmes, somment à 1. C'est la loi de probabilité, ou PMF (probability mass function).</p>
+    <p>Pour une variable continue, comme la taille, ça ne marche plus. Prenons, comme Brunton, des tailles en cloche : moyenne 1,75 m, écart-type 7 cm (chiffres d'illustration). Mesurer exactement 1,75 m, avec une précision infinie, a une probabilité nulle. Une classe de 10 cm autour de 1,75 m contient 52,5 % des gens, une classe de 1 cm 5,69 %. La probabilité fond avec la largeur, mais le rapport probabilité / largeur se stabilise vers 5,70 par mètre : c'est la <b>densité</b> f, une probabilité par unité de longueur. Une probabilité devient une aire sous f.</p>
+    <p>Dans les deux cas, la <b>fonction de répartition</b> F(x) = P(X ≤ x) cumule la masse de gauche à droite, de 0 à 1.</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — des barres de probabilité à la densité</div>
+    <div id="v2ctl" class="sl-ctl"></div>
+    <div id="v2ctl2" class="sl-ctl"></div>
+    <div id="v2plot" class="wide"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">Les tailles du modèle, rangées en classes. Choisis la <b>largeur des classes</b>, de 10 cm à 1 cm. En <b>probabilité de chaque classe</b>, les barres s'écrasent : la classe centrale passe de 0,525 à 0,057, et tendrait vers 0 pour une classe réduite à un point. En <b>probabilité ÷ largeur</b>, les barres collent de mieux en mieux à la courbe f, dont le pic vaut 5,70 par mètre : une densité n'est pas bornée par 1.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les trois objets</div>
+    <div class="eq">discret : P(<i>X</i> = <i>x</i>) ≥ 0, Σ<sub><i>x</i></sub> P(<i>X</i> = <i>x</i>) = 1 &nbsp;&nbsp;&nbsp; continu : <i>f</i> ≥ 0, ∫ <i>f</i>(<i>x</i>) d<i>x</i> = 1, P(<i>a</i> ≤ <i>X</i> ≤ <i>b</i>) = ∫<sub><i>a</i></sub><sup><i>b</i></sup> <i>f</i>(<i>x</i>) d<i>x</i></div>
+    <div class="eq">répartition : F(<i>x</i>) = P(<i>X</i> ≤ <i>x</i>) &nbsp;&nbsp;&nbsp; P(<i>a</i> &lt; <i>X</i> ≤ <i>b</i>) = F(<i>b</i>) − F(<i>a</i>) &nbsp;&nbsp;&nbsp; <i>f</i> = F′</div>
+    <ul>
+      <li><b>Deux gestes sur une densité.</b> L'<b>évaluer</b> en un point donne une hauteur f(x) : c'est la <b>vraisemblance</b> de l'observation x, qui sert à comparer des hypothèses et n'a pas à être inférieure à 1. L'<b>intégrer</b> sur un intervalle donne une aire : c'est une <b>probabilité</b>, entre 0 et 1.</li>
+      <li>f a l'unité inverse de x (ici, par mètre) ; F et les probabilités n'ont pas d'unité.</li>
+      <li>En continu, P(X = x) = 0, donc ≤ et &lt; donnent la même probabilité. En discret, non : F est un escalier qui saute de P(X = x) en chaque valeur x.</li>
+      <li>F croît de 0 à 1. Pour une densité symétrique autour de μ, F(μ) = ½ : sous le pic de la normale (Brunton 16). En discret, non : la loi des quatre pièces est symétrique autour de 2, mais F(2) = 11/16.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — la hauteur et l'aire, la densité et sa répartition</div>
+    <div id="f1ctl" class="sl-ctl"></div>
+    <div id="f1plot" class="wide"></div>
+    <div id="f1sl"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">En haut, la densité des tailles ; l'aire violette est P(a &lt; X ≤ b). En bas, la fonction de répartition F : la même probabilité s'y lit comme la <b>différence de hauteur</b> F(b) − F(a). Les deux premiers readouts sont des hauteurs de f, des vraisemblances : au centre, elles dépassent 1. Les deux derniers sont des probabilités. Rapproche <b>a</b> de <b>b</b> : l'aire tend vers 0, les hauteurs ne bougent presque pas. Passe en <b>centimètres</b> : les hauteurs sont divisées par 100, l'aire ne change pas.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>quatre pièces, une aire, une hauteur, une vraisemblance</small></summary><div class="in">
+    <ol>
+      <li><b>Quatre pièces, discret.</b> F(2) = P(X ≤ 2) = (1 + 4 + 6)/16 = 11/16 = 0,6875, mais P(X &lt; 2) = 5/16 = 0,3125 : en discret, ≤ et &lt; diffèrent de P(X = 2) = 6/16.</li>
+      <li><b>Tailles, une probabilité.</b> P(1,70 &lt; X ≤ 1,80) = F(1,80) − F(1,70) = 0,7625 − 0,2375 = 0,525.</li>
+      <li><b>Tailles, une hauteur.</b> f(1,75) = 1/(0,07 · √(2π)) = 5,70 par mètre. En centimètres, la même loi a f(175) = 0,057 par cm. La hauteur dépend de l'unité ; la probabilité 0,525 de l'exemple 2, non.</li>
+      <li><b>Une vraisemblance.</b> On mesure une personne : 1,82 m. Sous le modèle de moyenne 1,75 m, f(1,82) = 3,46 ; sous un modèle de moyenne 1,70 m et de même écart-type, f(1,82) = 1,31. La première hypothèse rend l'observation 2,64 fois plus vraisemblable. On a <b>évalué</b> f ; on n'a rien intégré, et P(X = 1,82) vaut 0 sous les deux modèles.</li>
+      <li><b>Le cas ML.</b> Ajuster un modèle par maximum de vraisemblance, c'est évaluer la densité du modèle en chaque donnée, multiplier les valeurs (indépendance), et chercher le paramètre qui rend ce produit maximal (<a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">fil B</a>). Aucune intégrale n'intervient.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>F(b) − F(a), P(X = x) = 0, f = F′</small></summary><div class="in">
+    <div class="drv">
+      <div>{<i>X</i> ≤ <i>b</i>} = {<i>X</i> ≤ <i>a</i>} ∪ {<i>a</i> &lt; <i>X</i> ≤ <i>b</i>}</div><span>pour a &lt; b ; les deux morceaux sont disjoints</span>
+      <div>F(<i>b</i>) = F(<i>a</i>) + P(<i>a</i> &lt; <i>X</i> ≤ <i>b</i>)</div><span>additivité, axiome 3 (<a href="lesson-00-02-espace-axiomes-complement.html#n2">l02</a>)</span>
+      <div>P(<i>a</i> &lt; <i>X</i> ≤ <i>b</i>) = F(<i>b</i>) − F(<i>a</i>)</div><span>on soustrait F(a)</span>
+      <div>P(<i>X</i> = <i>x</i>) ≤ P(<i>x</i> − <i>h</i> &lt; <i>X</i> ≤ <i>x</i>) = F(<i>x</i>) − F(<i>x</i> − <i>h</i>)</div><span>{X = x} est inclus dans la fenêtre : monotonie</span>
+      <div>P(<i>X</i> = <i>x</i>) = 0</div><span>X a une densité, donc F est continue : la différence tend vers 0 quand h → 0</span>
+      <div>P(<i>x</i> &lt; <i>X</i> ≤ <i>x</i> + <i>h</i>) = ∫<sub><i>x</i></sub><sup><i>x</i>+<i>h</i></sup> <i>f</i> ≈ <i>f</i>(<i>x</i>) · <i>h</i></div><span>sur une fenêtre étroite, f est presque constante</span>
+      <div><i>f</i>(<i>x</i>) = lim<sub><i>h</i>→0</sub> P(<i>x</i> &lt; <i>X</i> ≤ <i>x</i> + <i>h</i>) / <i>h</i> = F′(<i>x</i>)</div><span>une densité est une probabilité par unité de longueur</span>
+    </div>
+    <p>La dernière ligne dit pourquoi f(x) peut dépasser 1 : seul le produit f(x) · h est une probabilité, et h est petit.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>un million de tailles</small></summary><div class="in">
+<pre class="py">import numpy as np
+from scipy.stats import norm
+
+mu, sigma = 1.75, 0.07                        # height model, in metres
+rng = np.random.default_rng(0)
+h = rng.normal(mu, sigma, size=1_000_000)
+print("heights exactly equal to 1.75:", (h == 1.75).sum())
+for w in (0.10, 0.01, 0.001):                 # window of width w centred on 1.75
+    prob = np.mean(np.abs(h - mu) &lt; w / 2)
+    print(f"width {w:5} m: P = {prob:.4f}   P / width = {prob / w:.2f}")
+print(f"density f(1.75) = {norm.pdf(mu, mu, sigma):.2f} per metre")
+print(f"same law in cm: f(175) = {norm.pdf(175, 175, 7):.4f} per cm")
+print(f"F(1.80) = {norm.cdf(1.80, mu, sigma):.4f}")
+print(f"share of draws &lt;= 1.80: {np.mean(h &lt;= 1.80):.4f}")</pre>
+<pre class="out">heights exactly equal to 1.75: 0
+width   0.1 m: P = 0.5244   P / width = 5.24
+width  0.01 m: P = 0.0569   P / width = 5.69
+width 0.001 m: P = 0.0057   P / width = 5.71
+density f(1.75) = 5.70 per metre
+same law in cm: f(175) = 0.0570 per cm
+F(1.80) = 0.7625
+share of draws &lt;= 1.80: 0.7617</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Lire f(x) comme une probabilité.</b> « f(1,75) = 5,7, donc 570 % » n'a pas de sens. Seule l'aire en a un.</li>
+      <li><b>Intégrer quand on veut une vraisemblance.</b> La vraisemblance d'une observation x est f évaluée en x, pas une intégrale autour. Intégrer « un peu autour de x » donne une probabilité qui dépend de la largeur choisie et tend vers 0 avec elle.</li>
+      <li><b>La valeur de f dépend de l'unité.</b> 5,70 par mètre, 0,057 par centimètre : deux densités ne se comparent que dans la même unité.</li>
+      <li><b>≤ et &lt; en discret.</b> Pour quatre pièces, P(X ≤ 2) = 11/16 et P(X &lt; 2) = 5/16. La notion 7 en dépend.</li>
+      <li><b>Une variable peut n'être ni discrète, ni à densité.</b> L'attente à un feu : 0 avec probabilité ½ (feu vert), une durée continue sinon. Sa fonction de répartition saute en 0, puis monte continûment. Seule F décrit toujours une loi ; Brunton y revient en 39 (<a href="lesson-00-12-generatrice-preuve-tcl.html#n4">l12</a>).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (13) parle de « la densité de probabilité d'obtenir 20 piles », et (13, 16) de « cumulative density function », qu'il appelle aussi, correctement, « cumulative distribution function ». Pour une variable discrète, c'est une loi de probabilité (PMF) : des probabilités ponctuelles, sans unité. La fonction de répartition est la cumulative distribution function (CDF) : elle cumule la loi, qu'elle soit discrète ou à densité.</div>
+  </div></details>
+  <p class="garde">Variable continue : la densité f est une probabilité par unité de x. Évaluée en un point, c'est une vraisemblance, qui peut dépasser 1 ; seule son intégrale sur un intervalle est une probabilité.</p>
+</section>
+
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>Bernoulli(p) : un essai, deux issues <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 14 · Bernoulli and Binomial Random Variables</p>
+  <div class="idee">
+    <p>Brunton formalise ce qu'on fait depuis le début avec les pièces. Une variable de <b>Bernoulli</b> ne prend que deux valeurs : 1 si l'événement qu'on surveille se produit, 0 sinon. C'est à nous de dire ce qu'est un succès : pile, « j'ai fait un 6 », « la pièce fabriquée est bonne ».</p>
+    <p>Les deux issues n'ont pas à être également probables. On note p = P(X = 1) et q = 1 − p = P(X = 0). Pour une pièce, p = ½ ; pour « faire un 6 » avec un dé, p = 1/6 et q = 5/6.</p>
+    <p>Brunton s'en sert en programmant : il prend une image et masque chaque pixel, indépendamment des autres, avec probabilité p. C'est un <b>masque de Bernoulli</b> ; en deep learning, le dropout fait la même chose aux neurones d'un réseau.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — le masque de Bernoulli de Brunton</div>
+    <div id="v3ctl" class="sl-ctl"></div>
+    <div id="v3sl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">Une image de 160 pixels. Chaque pixel est une Bernoulli(p) : masqué, donc noirci, avec probabilité p, indépendamment des autres. Monte <b>p</b> : la part masquée suit p sans lui être exactement égale, puisque chaque masque est un tirage. <b>Nouveau masque</b> : un autre tirage, le même p. La part masquée est la moyenne des 160 valeurs 0 ou 1 de ce masque ; en moyenne sur les masques, elle vaut p = E[X]. Au départ, à p = 0,3, ce masque en noircit 44 sur 160, soit 0,275.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(<i>X</i> = 1) = <i>p</i>, P(<i>X</i> = 0) = 1 − <i>p</i> &nbsp;&nbsp;&nbsp; E[<i>X</i>] = <i>p</i>, Var(<i>X</i>) = <i>p</i>(1 − <i>p</i>)</div>
+    <div class="eq">d'un seul trait : P(<i>X</i> = <i>x</i> ; <i>p</i>) = <i>p</i><sup><i>x</i></sup>(1 − <i>p</i>)<sup>1−<i>x</i></sup>, <i>x</i> ∈ {0, 1}</div>
+    <ul>
+      <li>p ∈ [0, 1] est le seul paramètre, et il est fixe : il décrit le mécanisme, pas un tirage.</li>
+      <li>La forme d'un seul trait se lit en remplaçant x : x = 1 donne p<sup>1</sup>(1 − p)<sup>0</sup> = p, x = 0 donne 1 − p. Elle sert à écrire une vraisemblance sans séparer les cas.</li>
+      <li>E[X] = 0 · (1 − p) + 1 · p = p. Var(X) = p(1 − p) est annoncée ici, comme le fait Brunton, et démontrée avec la variance (<a href="lesson-00-08-esperance-variance.html#n6">l08</a>).</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>pièce, un 6, contrôle qualité, label, dropout</small></summary><div class="in">
+    <ol>
+      <li><b>Une pièce.</b> p = ½ : E[X] = ½, Var(X) = ¼, la plus grande variance possible pour une Bernoulli.</li>
+      <li><b>« Faire un 6 ».</b> p = 1/6 ≈ 0,167 : E[X] = 0,167, Var(X) = (1/6)(5/6) = 5/36 ≈ 0,139.</li>
+      <li><b>Contrôle qualité</b> (Brunton). X = 1 si la pièce est bonne. Avec 2 % de pièces défectueuses, p = 0,98. Si l'on code plutôt « défectueuse » = 1, p = 0,02 : les deux codages décrivent le même mécanisme.</li>
+      <li><b>Le cas ML : un label binaire.</b> Le label Y d'un exemple (spam ou non) est une Bernoulli. Un classifieur donne p = P(Y = 1 ∣ x ; θ) ; la probabilité qu'il attribue au vrai label y vaut p<sup>y</sup>(1 − p)<sup>1−y</sup>, et son −log, −[y log p + (1 − y) log(1 − p)], est la log-loss (<a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">fil B</a>).</li>
+      <li><b>Le dropout.</b> Pendant l'entraînement, chaque neurone est coupé selon une Bernoulli(p) indépendante : c'est le masque de Brunton, appliqué à un réseau.</li>
+    </ol>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Un dé n'est pas une Bernoulli.</b> Il a six issues. Il le devient quand on décide ce qui compte comme succès, « un 6 » par exemple.</li>
+      <li><b>« Succès » est une convention, pas un jugement.</b> Dans un dépistage, on code souvent 1 = « malade ».</li>
+      <li><b>E[X] = p n'est pas une valeur possible.</b> X vaut 0 ou 1, jamais 0,3.</li>
+      <li><b>Une suite de Bernoulli demande le même p à chaque essai</b> (notion 4). Des mails venus de deux sources, avec deux taux de spam, ne forment pas une suite de Bernoulli(p) de même p.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (14) écrit d'abord que la probabilité de X = 0 « s'appelle p », puis se corrige. La convention est p = P(X = 1) : la probabilité de l'issue qu'on a codée 1.</div>
+  </div></details>
+  <p class="garde">Bernoulli(p) : un essai à deux issues codées 1 (probabilité p) et 0 ; P(X = x ; p) = pˣ(1 − p)¹⁻ˣ, de moyenne p et de variance p(1 − p).</p>
+</section>
+
+<!-- ============================ n4 ============================ -->
+<section class="notion outil" id="n4">
+  <h3>La binomiale : la somme de n Bernoulli indépendantes <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 14</p>
+  <div class="idee">
+    <p>Lance n fois la même pièce, ou le même dé, et compte les succès : X = B<sub>1</sub> + B<sub>2</sub> + … + B<sub>n</sub>, où chaque B<sub>i</sub> est une Bernoulli(p) et où les essais sont indépendants. X suit une <b>binomiale</b> de paramètres n et p.</p>
+    <p>Brunton fait n = 2 au tableau, avec S pour succès et É pour échec. Zéro succès, c'est É puis É : q · q = q², parce que l'indépendance change le « et » en produit. Un succès, c'est SÉ ou ÉS : pq + qp = 2pq. Deux succès : p². Les coefficients 1, 2, 1 sont une ligne du triangle de Pascal.</p>
+    <p>En général, une séquence donnée à k succès a la probabilité p<sup>k</sup>q<sup>n−k</sup>, et il y a C(n, k) façons de placer les k succès. Trois 6 en douze lancers : C(12, 3) = 220 séquences, de probabilité (1/6)³(5/6)⁹ chacune, soit 0,197 en tout.</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — deux essais, le carré d'aire 1</div>
+    <div id="v4sl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">Le carré a une aire de 1. Sa largeur est partagée selon le premier essai, S avec probabilité p, É avec q ; sa hauteur selon le second. L'indépendance fait de chaque case un rectangle dont l'aire est le produit : p², pq, qp, q². Les couleurs regroupent les cases par nombre de succès k ; dans le second panneau, P(X = k) est la somme des cases de sa couleur : la barre de 0,278 réunit les deux cases pq et qp, de 0,139 chacune. Au départ p = 1/6, « faire un 6 » : 25/36, 10/36 et 1/36. Déplace <b>p</b> : les cases changent, leur somme reste (p + q)² = 1.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(<i>X</i> = <i>k</i>) = C(<i>n</i>, <i>k</i>) <i>p</i><sup><i>k</i></sup>(1 − <i>p</i>)<sup><i>n</i>−<i>k</i></sup>, <i>k</i> = 0, 1, …, <i>n</i> &nbsp;&nbsp;&nbsp; <i>X</i> ~ Binomiale(<i>n</i>, <i>p</i>) &nbsp;&nbsp;&nbsp; E[<i>X</i>] = <i>np</i>, Var(<i>X</i>) = <i>np</i>(1 − <i>p</i>)</div>
+    <ul>
+      <li><b>n fixé d'avance</b> : on compte les succès d'un nombre d'essais décidé avant de commencer.</li>
+      <li><b>Le même p à chaque essai</b> : c'est ce qui donne à toutes les séquences à k succès la même probabilité p<sup>k</sup>(1 − p)<sup>n−k</sup>.</li>
+      <li><b>Des essais mutuellement indépendants</b> : c'est ce qui change la probabilité d'une séquence en produit (<a href="lesson-00-03-conditionner-bayes-independance.html#n9">l03</a>).</li>
+      <li><b>On compte sans l'ordre</b> : SSÉ, SÉS et ÉSS donnent le même k, d'où le facteur C(n, k) (<a href="lesson-00-01-compter.html#n5">l01</a>).</li>
+      <li>E = np et Var = np(1 − p) sont annoncées ici, comme le fait Brunton. E[X] = E[B<sub>1</sub>] + … + E[B<sub>n</sub>] = np par linéarité, sans aucune hypothèse (<a href="lesson-00-08-esperance-variance.html#n3">l08</a>). Var(X) = n · p(1 − p) en additionnant les variances, ce qui demande des covariances nulles, que l'indépendance garantit (<a href="lesson-00-09-covariance-correlation.html#n2">l09</a>).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — la forme d'une binomiale</div>
+    <div id="f2ctl" class="sl-ctl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div id="f2sl"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Chaque barre est P(X = k) ; la barre rouge est celle du k choisi. Le <b>trait rouge</b> marque E = np, le <b>segment vert</b> couvre E ± σ, avec σ = √(np(1 − p)). Les préréglages reprennent les exemples : <b>quatre pièces</b> (P(X = 2) = 0,375), <b>douze dés</b> (P(X = 3) = 0,197), <b>cent dés</b> (P(X = 10) = 0,021). Pousse p vers ½ : la loi devient symétrique et la plus large ; ramène p vers 0 : elle s'écrase à gauche. Monte n à p fixé : le centre avance comme np, la largeur seulement comme √n.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>n = 2, n = 3, quatre pièces, des 6, un jeu de test</small></summary><div class="in">
+    <ol>
+      <li><b>n = 2, « faire un 6 ».</b> q² = 25/36 ≈ 0,694 ; 2pq = 10/36 ≈ 0,278 ; p² = 1/36 ≈ 0,028. La somme fait 36/36.</li>
+      <li><b>n = 3</b>, le devoir de Brunton. Coefficients 1, 3, 3, 1 ; P(X = 1) = 3pq² compte SÉÉ, ÉSÉ et ÉÉS. Pour un dé : 0,579 ; 0,347 ; 0,069 ; 0,005.</li>
+      <li><b>Quatre pièces.</b> C(4, k)/2⁴ donne 1, 4, 6, 4, 1 seizièmes : la loi de la notion 1 est une Binomiale(4, ½).</li>
+      <li><b>Des 6.</b> Trois 6 en douze lancers : 220 × (1/6)³ × (5/6)⁹ = 220 × 0,00463 × 0,1938 = 0,197. Dix 6 en cent lancers, que Brunton pose sans le calculer : C(100, 10)(1/6)<sup>10</sup>(5/6)<sup>90</sup> = 0,0214.</li>
+      <li><b>Le cas ML : 872 bonnes réponses sur 1 000.</b> Si les exemples de test sont tirés indépendamment et que le modèle a une accuracy vraie π, fixe, le nombre X de bonnes réponses suit Binomiale(1 000, π). 872 est sa réalisation sur ce jeu de test ; p̂ = X/1 000 est l'estimateur de π. Avec π = 0,87 : E[X] = 870 et σ = √(1 000 × 0,87 × 0,13) = 10,6 (<a href="../walkthroughs/walkthrough-p01-04-accuracy-vers-se.html">déroulé de l'accuracy au SE</a>).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>le produit, les placements, et la somme qui vaut 1</small></summary><div class="in">
+    <div class="drv">
+      <div>P(SSÉ) = P(<i>B</i><sub>1</sub> = 1) P(<i>B</i><sub>2</sub> = 1) P(<i>B</i><sub>3</sub> = 0) = <i>p</i> · <i>p</i> · <i>q</i></div><span>indépendance mutuelle des essais : l'intersection devient un produit (l03)</span>
+      <div>toute séquence à <i>k</i> succès : <i>p</i><sup><i>k</i></sup><i>q</i><sup><i>n</i>−<i>k</i></sup></div><span>k facteurs p et n − k facteurs q, seul l'ordre change</span>
+      <div>nombre de séquences à <i>k</i> succès : C(<i>n</i>, <i>k</i>)</div><span>choisir les k places des succès parmi n (l01)</span>
+      <div>P(<i>X</i> = <i>k</i>) = C(<i>n</i>, <i>k</i>) <i>p</i><sup><i>k</i></sup><i>q</i><sup><i>n</i>−<i>k</i></sup></div><span>les séquences sont des événements disjoints : on additionne (axiome 3)</span>
+      <div>Σ<sub><i>k</i></sub> P(<i>X</i> = <i>k</i>) = Σ<sub><i>k</i></sub> C(<i>n</i>, <i>k</i>) <i>p</i><sup><i>k</i></sup><i>q</i><sup><i>n</i>−<i>k</i></sup> = (<i>p</i> + <i>q</i>)<sup><i>n</i></sup></div><span>formule du binôme (l02)</span>
+      <div>= 1<sup><i>n</i></sup> = 1</div><span>p + q = 1 : c'est la vérification que Brunton donne en devoir</span>
+    </div>
+    <p>L'indépendance sert à la première ligne, et seulement là. Sans elle, P(SSÉ) n'est pas un produit et la formule tombe.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>100 000 séries de douze lancers</small></summary><div class="in">
+<pre class="py">import numpy as np
+from math import comb
+
+n, p = 12, 1 / 6                              # 12 die rolls, success = a six
+pmf = [comb(n, k) * p**k * (1 - p)**(n - k) for k in range(n + 1)]
+print(f"P(X = 3) = {pmf[3]:.4f}   sum of all P(X = k) = {sum(pmf):.6f}")
+
+rng = np.random.default_rng(0)
+rolls = rng.integers(1, 7, size=(100_000, n)) # 100,000 experiments of 12 rolls
+x = (rolls == 6).sum(axis=1)                  # X = B1 + ... + B12
+print(f"share of experiments with exactly three sixes: {np.mean(x == 3):.4f}")
+print(f"mean {x.mean():.3f} (np = {n * p:.3f})")
+print(f"variance {x.var():.3f} (np(1 - p) = {n * p * (1 - p):.3f})")</pre>
+<pre class="out">P(X = 3) = 0.1974   sum of all P(X = k) = 1.000000
+share of experiments with exactly three sixes: 0.1971
+mean 2.000 (np = 2.000)
+variance 1.666 (np(1 - p) = 1.667)</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Tirages sans remise.</b> Tirer cinq cartes et compter les cœurs : après chaque carte, la probabilité d'un cœur change, les essais ne sont pas indépendants. C'est l'hypergéométrique (<a href="lesson-00-02-espace-axiomes-complement.html#n5">l02</a>).</li>
+      <li><b>Un p qui change d'un lot à l'autre.</b> Un lot de 100 pièces sort, une fois sur deux, d'une machine à 1 % de défauts, sinon d'une machine à 5 %. Le nombre de défauts a une moyenne de 3, mais une variance de 6,87, contre 2,91 pour une Binomiale(100 ; 0,03) de même moyenne : ce n'est pas une binomiale.</li>
+      <li><b>n qui n'est pas fixé.</b> Lancer jusqu'au premier 6 et compter les lancers : le nombre d'essais est aléatoire, c'est la loi géométrique (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n2">l05</a>).</li>
+      <li><b>Le cas ML : des exemples dépendants.</b> Si le même utilisateur apparaît vingt fois dans le jeu de test, les essais ne sont plus indépendants : X n'est plus binomiale et √(nπ(1 − π)) sous-estime l'incertitude (<a href="../bridges/bridge-04-variance-moyenne-correlee.html">pont b04</a>).</li>
+    </ul>
+  </div></details>
+  <p class="garde">Binomiale(n, p) : le nombre de succès en n essais indépendants de même p. P(X = k) = C(n, k)pᵏ(1 − p)ⁿ⁻ᵏ, les placements fois la probabilité d'une séquence ; E = np, Var = np(1 − p).</p>
+</section>
+
+<!-- ============================ n5 ============================ -->
+<section class="notion outil" id="n5">
+  <h3>La normale, limite de la binomiale quand n grandit <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 15 · The Normal Distribution: the Limit of the Binomial Distribution for Large n</p>
+  <div class="idee">
+    <p>Brunton écrit la binomiale et, à côté, une courbe qu'il présente sans la justifier : la <b>loi normale</b> de moyenne μ = np et de variance σ² = np(1 − p). Puis il code les deux en Python, la binomiale étiquetée « exacte », la normale « approximation », et les superpose.</p>
+    <p>À n = 100 et p = ½, on ne voit presque pas de différence : l'écart maximal entre une barre et la courbe vaut 0,0002, pour un pic de 0,080. À n = 30, il vaut 0,0012 ; à n = 10, 0,006 ; à n = 5, 0,011 pour un pic de 0,31, et l'approximation ne vaut plus grand-chose. Dernier essai : n = 30 et p = 0,02. La normale met alors 21,7 % de sa masse à gauche de 0, dont 7,6 % sous −0,5, hors de toute barre, sur des nombres de succès négatifs, alors que P(X = 0) vaut 0,545. Pour un p petit à n fixé, donc un np petit, il faudra une autre loi, celle de Poisson.</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — les cinq tracés de Brunton</div>
+    <div id="v5ctl" class="sl-ctl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">Les barres sont la binomiale exacte, la courbe la normale de même moyenne et de même variance. Passe de <b>n = 100</b> à <b>n = 5</b>, à p = ½ : l'écart maximal grimpe de 0,0002 à 0,011, et l'escalier des barres se détache de la courbe. Puis <b>n = 30, p = 0,02</b> : la courbe met 21,7 % de sa masse à gauche de 0, dont 7,6 % sous −0,5, hors de toute barre, et manque la barre P(X = 0) = 0,545 de 0,16.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">densité normale : <i>f</i>(<i>x</i>) = 1/(σ√(2π)) · e<sup>−(<i>x</i> − μ)²/(2σ²)</sup> &nbsp;&nbsp;&nbsp; <i>X</i> ~ N(μ, σ²)</div>
+    <div class="eq"><i>X</i> ~ Binomiale(<i>n</i>, <i>p</i>), <i>n</i> grand : P(<i>X</i> = <i>k</i>) ≈ <i>f</i>(<i>k</i>), avec μ = <i>np</i> et σ² = <i>np</i>(1 − <i>p</i>)</div>
+    <ul>
+      <li>f est une <b>densité</b> (notion 2) : μ place le pic, σ règle la largeur, et σ est hors de la racine (Brunton). Le second paramètre de N(μ, σ²) est la variance.</li>
+      <li>« ≈ f(k) » marche parce que la barre en k a une largeur 1 : sa probabilité vaut à peu près hauteur × 1.</li>
+      <li><b>L'énoncé exact</b> (de Moivre–Laplace) porte sur la variable centrée réduite : P((X − np)/√(np(1 − p)) ≤ z) tend vers P(Z ≤ z) pour tout z, où Z suit N(0, 1) (notion 6).</li>
+      <li><b>p fixe dans ]0, 1[</b> pendant que n grandit. Si p rétrécit comme λ/n, la limite est une loi de Poisson (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n1">l05</a>).</li>
+      <li><b>np(1 − p) pas trop petit</b> : il faut assez de succès et assez d'échecs attendus. Brunton donne n ≈ 30 pour p = ½ ; les règles usuelles demandent np et n(1 − p) au moins 5, ou au moins 10, selon les auteurs.</li>
+      <li><b>Des essais indépendants et de même loi</b>, de variance finie p(1 − p) : c'est le premier cas du théorème central limite (<a href="lesson-00-11-tcl.html#n1">l11</a>), démontré en général en <a href="lesson-00-12-generatrice-preuve-tcl.html#n6">l12</a>. La constante 1/√(2π) fait ∫ f = 1 (<a href="lesson-00-07-lois-jointes.html#n6">l07</a>).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — la binomiale et sa normale, n et p libres</div>
+    <div id="f3ctl" class="sl-ctl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div id="f3sl"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Mêmes objets que la vignette, avec <b>n</b> de 1 à 200 et <b>p</b> libres. Lecture <b>en k</b> : monte n à p = ½, la loi avance (centre np) et s'élargit (σ grandit comme √n), elle ne se fige jamais. Lecture <b>centrée réduite</b> : chaque barre est placée en z = (k − np)/σ et sa hauteur multipliée par σ ; la courbe ne bouge plus, c'est N(0, 1), et les barres viennent s'y coller quand n grandit. C'est cela qui converge. À p = 0,05, il faut n bien plus grand qu'à p = ½ : à n = 200, l'écart maximal vaut encore 0,009.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>les tracés de Brunton chiffrés, un jeu de test</small></summary><div class="in">
+    <ol>
+      <li><b>n = 100, p = ½.</b> μ = 50, σ = √25 = 5. P(X = 50) = 0,0796 ; f(50) = 1/(5√(2π)) = 0,0798.</li>
+      <li><b>Les écarts maximaux</b> entre barres et courbe, à p = ½ : 0,0012 à n = 30 (σ = 2,74) ; 0,006 à n = 10 pour un pic de 0,246 ; 0,011 à n = 5 pour un pic de 0,31.</li>
+      <li><b>Une probabilité « raisonnable, comme 0,35 »</b> (Brunton) : à n = 30, l'écart maximal vaut 0,004.</li>
+      <li><b>n = 30, p = 0,02.</b> μ = 0,6, σ = 0,77. P(X = 0) = 0,98<sup>30</sup> = 0,545, alors que f(0) = 0,383, et 21,7 % de la masse normale tombe à gauche de 0, dont 7,6 % sous −0,5.</li>
+      <li><b>Le cas ML.</b> Sur 1 000 exemples de test à π = 0,87, X ≈ N(870 ; 10,6²). La variance binomiale donne l'erreur standard d'une accuracy, √(π(1 − π)/n) = 0,0106 ; l'approximation normale donne le 1,96 de l'intervalle (notion 6, <a href="../chains/chain-p01-01-objet-aleatoire.html">fil A</a>).</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>le code de Brunton, chiffré</small></summary><div class="in">
+<pre class="py">import numpy as np
+from scipy.special import comb
+from scipy.stats import norm
+
+def compare(n, p):
+    k = np.arange(n + 1)
+    exact = comb(n, k) * p**k * (1 - p)**(n - k)          # binomial PMF ("exact")
+    mu, sigma = n * p, np.sqrt(n * p * (1 - p))
+    # normal density N(np, np(1 - p)) evaluated at each integer k ("approximation")
+    approx = np.exp(-(k - mu)**2 / (2 * sigma**2)) / (sigma * np.sqrt(2 * np.pi))
+    gap = np.abs(exact - approx).max()
+    print(f"n={n:3}, p={p:4}: sigma={sigma:.2f}  peak={exact.max():.4f}  max gap={gap:.4f}")
+
+for n in (100, 30, 10, 5):
+    compare(n, 0.5)
+compare(30, 0.02)
+below = norm.cdf(0, 0.6, np.sqrt(30 * 0.02 * 0.98))   # N(np, np(1 - p)) below 0
+print(f"n=30, p=0.02: normal mass below 0 = {below:.3f}")</pre>
+<pre class="out">n=100, p= 0.5: sigma=5.00  peak=0.0796  max gap=0.0002
+n= 30, p= 0.5: sigma=2.74  peak=0.1445  max gap=0.0012
+n= 10, p= 0.5: sigma=1.58  peak=0.2461  max gap=0.0062
+n=  5, p= 0.5: sigma=1.12  peak=0.3125  max gap=0.0112
+n= 30, p=0.02: sigma=0.77  peak=0.5455  max gap=0.1624
+n=30, p=0.02: normal mass below 0 = 0.217</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>np petit.</b> La normale déborde sous 0, alors qu'un nombre de succès est positif : quand p est de l'ordre de λ/n, c'est le cas de Poisson (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n1">l05</a>). Un p petit ne suffit pas à la faire échouer : à p = 0,02 et n = 10 000, np = 200 et l'écart maximal vaut 0,0005.</li>
+      <li><b>n petit.</b> L'escalier des barres se voit : à n = 5, l'écart vaut 3,6 % du pic.</li>
+      <li><b>Les queues, en relatif.</b> À n = 100 et p = ½, P(X ≥ 70) vaut 3,9 · 10<sup>−5</sup> ; la normale, même avec la correction de la notion 7, donne 4,8 · 10<sup>−5</sup>. L'écart est minuscule en absolu, de 23 % en relatif : une très petite p-value calculée par la normale n'a que son ordre de grandeur.</li>
+      <li><b>« La binomiale converge vers la normale »</b>, mais pas vers une loi fixe : sa moyenne np et son écart-type √(np(1 − p)) grandissent avec n. Ce qui converge, c'est la variable centrée réduite (figure 3).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (15) écrit la normale « P(X = x) = 1/(σ√(2π)) e<sup>…</sup> », et (16) dit encore que f(x) « est la probabilité que X égale x », puis précise « la probabilité infinitésimale ». f(x) est une densité : pour une variable continue, P(X = x) = 0, et c'est f(x) dx, l'aire d'une fenêtre de largeur dx, qui est une probabilité. Ce qui approche P(X = k) pour la binomiale, c'est f(k) × 1, l'aire d'une barre de largeur 1.</div>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (15) dit que la binomiale « converge vers une normale » de moyenne np et de variance npq, et que des variables « indépendantes, identiques », de « presque toute loi », donnent une somme normale « sous des conditions très faibles ». Le premier énoncé exact porte sur (X − np)/√(npq). Au second il manque une condition, la variance finie, et ce qui converge est encore la somme centrée réduite (<a href="lesson-00-11-tcl.html#n1">l11</a>).</div>
+  </div></details>
+  <p class="garde">Binomiale(n, p), n grand et np(1 − p) pas petit : (X − np)/√(np(1 − p)) tend vers N(0, 1), d'où P(X = k) ≈ f(k) pour N(np, np(1 − p)). Si np reste petit, c'est Poisson.</p>
+</section>
+
+<!-- ============================ n6 ============================ -->
+<section class="notion outil" id="n6">
+  <h3>La normale centrée réduite, Φ, et 68 / 95 / 99,7 <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 16 · The Standard Unit Normal and Probability Computations</p>
+  <div class="idee">
+    <p>Brunton commence par σ : un grand σ étale la cloche, un petit σ la resserre autour de μ. Le cas de référence est la normale <b>centrée réduite</b> Z, de moyenne 0 et d'écart-type 1. Sa fonction de répartition porte un nom : <b>Φ</b>(z) = P(Z ≤ z).</p>
+    <p>Il calcule ensuite 68 % de tête. Φ(1) ≈ 0,841 : c'est l'aire à gauche de 1, donc il reste environ 16 % à droite de 1. Par symétrie, il y a aussi 16 % à gauche de −1. Entre −1 et 1 : 1 − 0,16 − 0,16 = 0,68. Son devoir, à ±2 écarts-types : 95,4 %.</p>
+    <p>Autrefois, dit-il, on cherchait ces valeurs dans des « tablettes d'argile », écrites pour Z seulement. Pour une autre normale, on la ramenait d'abord à Z par z = (x − μ)/σ. Aujourd'hui, c'est une ligne de scipy.stats.</p>
+  </div>
+  <div class="fig vis" id="v6">
+    <div class="lbl">Voir l'idée — 68 % en quatre temps</div>
+    <div id="v6ctl" class="sl-ctl"></div>
+    <div id="v6sl"></div>
+    <div id="v6plot" class="wide"></div>
+    <div class="readouts" id="v6out"></div>
+    <p class="cap">La densité de Z. Suis le calcul de Brunton : <b>1.</b> Φ(k), l'aire à gauche de k ; <b>2.</b> la queue droite, 1 − Φ(k) ; <b>3.</b> la même queue à gauche de −k, par symétrie ; <b>4.</b> la bande, ce qui reste. À k = 1 : Φ(1) = 0,8413, deux queues de 0,1587, une bande de 68,3 %. Monte <b>k</b> à 2, puis 3 : 95,4 %, puis 99,7 %. À k = 1,96, la bande vaut 95 %.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">φ(<i>z</i>) = e<sup>−<i>z</i>²/2</sup>/√(2π) &nbsp;&nbsp;&nbsp; Φ(<i>z</i>) = P(<i>Z</i> ≤ <i>z</i>) = ∫<sub>−∞</sub><sup><i>z</i></sup> φ(<i>t</i>) d<i>t</i> &nbsp;&nbsp;&nbsp; Φ(−<i>z</i>) = 1 − Φ(<i>z</i>)</div>
+    <div class="eq"><i>X</i> ~ N(μ, σ²) : P(<i>a</i> ≤ <i>X</i> ≤ <i>b</i>) = Φ((<i>b</i> − μ)/σ) − Φ((<i>a</i> − μ)/σ) &nbsp;&nbsp;&nbsp; P(|<i>X</i> − μ| ≤ <i>k</i>σ) = 2Φ(<i>k</i>) − 1</div>
+    <ul>
+      <li>φ est la densité, Φ la fonction de répartition : Φ(0) = ½, mais φ(0) ≈ 0,399.</li>
+      <li>Φ n'a pas de formule close : e<sup>−z²/2</sup> n'a pas de primitive élémentaire. On la lit dans une table, ou avec <code>scipy.stats.norm.cdf</code>.</li>
+      <li>z = (x − μ)/σ compte en écarts-types la distance de x à μ. Que (X − μ)/σ suive N(0, 1) quand X suit N(μ, σ²) est admis ici, et démontré en <a href="lesson-00-06-fonctions-standardisation.html#n3">l06</a> ; il faut σ &gt; 0.</li>
+      <li>Les trois bandes : 68,3 % à ±1σ, 95,4 % à ±2σ, 99,7 % à ±3σ ; et 95 % exactement à ±1,96σ.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — la bande autour de la moyenne ne dépend que de k</div>
+    <div id="f4plot" class="wide"></div>
+    <div id="f4sl"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">En haut, la densité de N(200 ; σ²), les 400 pièces de Brunton quand σ = 10, avec la bande μ ± kσ en violet. En bas, sa fonction de répartition Φ((x − 200)/σ) : l'aire de la bande s'y lit comme l'écart vertical entre les deux points. Pose <b>k</b> sur 1, 2, 3 : 68,3, 95,4, 99,7 %. Puis change <b>σ</b> : la cloche s'étale ou se resserre, la bande la suit, et son aire ne bouge pas. C'est pourquoi une seule table, celle de Z, suffit.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>Φ(1), le devoir, 400 pièces, une taille, un intervalle</small></summary><div class="in">
+    <ol>
+      <li><b>Φ(1) = 0,8413</b>, donc Φ(−1) = 1 − 0,8413 = 0,1587, et P(−1 ≤ Z ≤ 1) = 0,8413 − 0,1587 ≈ 0,683.</li>
+      <li><b>Le devoir de Brunton.</b> P(|Z| ≤ 2) = 2 × 0,9772 − 1 ≈ 0,954 ; à ±3 : 2 × 0,9987 − 1 ≈ 0,997.</li>
+      <li><b>400 pièces.</b> X ≈ N(200 ; 10²) : Brunton dit « plus ou moins 10 piles, environ 68 % du temps ». C'est l'aire de la normale entre 190 et 210. Pour le nombre entier de piles, P(190 ≤ X ≤ 210) vaut 0,706 : la notion 7 explique l'écart.</li>
+      <li><b>« Suis-je normal ? »</b> (Brunton). Avec le modèle de taille N(1,75 ; 0,07²), dépasser 1,89 m, c'est être à z = (1,89 − 1,75)/0,07 = 2 écarts-types au-dessus de la moyenne : P = 1 − Φ(2) = 0,023, une personne sur 44.</li>
+      <li><b>Le cas ML : un intervalle à 95 % pour une accuracy.</b> 872 bonnes réponses sur 1 000 : p̂ vaut 0,872 sur ce jeu de test, son erreur standard estimée √(0,872 × 0,128/1 000) = 0,0106, et 0,872 ± 1,96 × 0,0106 = [0,851 ; 0,893] (<a href="../chains/chain-p01-02-ic-test-procedure.html">IC et test</a>).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>pourquoi une seule table suffit · culture</small></summary><div class="in">
+    <div class="drv">
+      <div>φ(−<i>z</i>) = φ(<i>z</i>)</div><span>φ ne dépend de z que par z²</span>
+      <div>Φ(−<i>z</i>) = P(<i>Z</i> ≤ −<i>z</i>) = P(<i>Z</i> ≥ <i>z</i>)</div><span>symétrie : les deux queues ont la même aire</span>
+      <div>= 1 − Φ(<i>z</i>)</div><span>complément (l02) ; P(Z = z) = 0, donc ≥ et &gt; se valent</span>
+      <div>P(−<i>k</i> ≤ <i>Z</i> ≤ <i>k</i>) = Φ(<i>k</i>) − Φ(−<i>k</i>) = 2Φ(<i>k</i>) − 1</div><span>F(b) − F(a) (notion 2), puis la ligne précédente</span>
+      <div>P(|<i>X</i> − μ| ≤ <i>k</i>σ) = P(|(<i>X</i> − μ)/σ| ≤ <i>k</i>)</div><span>diviser par σ &gt; 0 ne change pas l'événement</span>
+      <div>= P(|<i>Z</i>| ≤ <i>k</i>) = 2Φ(<i>k</i>) − 1</div><span>(X − μ)/σ suit N(0, 1) (l06)</span>
+    </div>
+    <p>La bande ne dépend ni de μ ni de σ : c'est ce que la figure 4 montre quand on bouge σ.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>Φ, les bandes, un million de tirages</small></summary><div class="in">
+<pre class="py">import numpy as np
+from scipy.stats import norm
+
+for k in (1, 2, 3):
+    print(f"Phi({k}) = {norm.cdf(k):.4f}   P(|Z| &lt;= {k}) = {2 * norm.cdf(k) - 1:.4f}")
+print(f"Phi(-1) = {norm.cdf(-1):.4f} = 1 - Phi(1)")
+print(f"95% exactly within +-{norm.ppf(0.975):.3f}")
+
+rng = np.random.default_rng(0)
+x = rng.normal(200, 10, size=1_000_000)       # N(200, 10^2): numpy and scipy take sigma
+for k in (1, 2, 3):
+    share = np.mean(np.abs(x - 200) &lt;= 10 * k)
+    print(f"share within {k} sigma of 200: {share:.4f}")</pre>
+<pre class="out">Phi(1) = 0.8413   P(|Z| &lt;= 1) = 0.6827
+Phi(2) = 0.9772   P(|Z| &lt;= 2) = 0.9545
+Phi(3) = 0.9987   P(|Z| &lt;= 3) = 0.9973
+Phi(-1) = 0.1587 = 1 - Phi(1)
+95% exactly within +-1.960
+share within 1 sigma of 200: 0.6823
+share within 2 sigma of 200: 0.9544
+share within 3 sigma of 200: 0.9973</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>68 / 95 / 99,7 est une propriété de la normale</b>, pas de σ en général. Pour la variable de l08 qui vaut 0 ou 10 (probabilités 0,9 et 0,1), 90 % de la masse est à moins d'un écart-type (<a href="lesson-00-08-esperance-variance.html#n6">l08</a>).</li>
+      <li><b>Les queues lourdes.</b> Sous une normale, sortir de ±3σ arrive une fois sur 370. Des latences, des rendements financiers ou des tailles de fichiers le font bien plus souvent : la normale sous-estime leurs extrêmes.</li>
+      <li><b>Φ n'est pas φ.</b> Φ(0) = 0,5 est une probabilité ; φ(0) = 0,399 est une hauteur de densité.</li>
+      <li><b>N(μ, σ²) contre scipy.</b> Le second paramètre de N est la variance, mais <code>norm(loc=200, scale=10)</code> prend l'écart-type : écrire <code>scale=100</code> pour « variance 100 » rend la cloche dix fois trop large.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (16) dit que la normale est « paramétrée par la moyenne μ et l'écart-type σ² ». σ est l'écart-type, σ² la variance : N(200 ; 10²) a un écart-type de 10 et une variance de 100.</div>
+  </div></details>
+  <p class="garde">Toute normale : P(|X − μ| ≤ kσ) = 2Φ(k) − 1, avec Φ la répartition de N(0, 1) ; 68,3, 95,4 et 99,7 % à k = 1, 2, 3 ; 95 % à 1,96.</p>
+</section>
+
+<!-- ============================ n7 ============================ -->
+<section class="notion outil" id="n7">
+  <h3>L'approximation normale et la correction de continuité <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 16</p>
+  <div class="idee">
+    <p>Brunton lance 400 pièces : X ~ Binomiale(400, ½), μ = 200, σ² = 400 × ½ × ½ = 100, σ = 10. Il veut P(190 ≤ X ≤ 230). Exactement, c'est la somme P(X = 190) + P(X = 191) + … + P(X = 230), 41 termes, « un monstre » à la main : 0,852.</p>
+    <p>Avec la normale, c'est une aire : de 190 à 230, Φ(3) − Φ(−1) = 0,840. Il manque 0,012. Chaque entier k est une barre de largeur 1, qui s'étend de k − ½ à k + ½. L'aire de 190 à 230 coupe en deux la première barre et la dernière : la moitié de P(X = 190) et la moitié de P(X = 230) sont perdues, à peu près 0,012.</p>
+    <p>La <b>correction de continuité</b> élargit l'intervalle d'un demi de chaque côté : de 189,5 à 230,5, Φ(3,05) − Φ(−1,05) = 0,852, la valeur exacte.</p>
+  </div>
+  <div class="fig vis" id="v7">
+    <div class="lbl">Voir l'idée — 400 pièces, les deux demi-barres</div>
+    <div id="v7ctl" class="sl-ctl"></div>
+    <div id="v7plot" class="wide"></div>
+    <div class="readouts" id="v7out"></div>
+    <p class="cap">Les barres sont P(X = k) pour 400 pièces, la courbe est N(200 ; 10²) ; le second panneau zoome sur la borne 190. <b>41 barres</b> : la somme exacte de 190 à 230 vaut 0,852. <b>Aire de 190 à 230</b> : 0,840, et le zoom montre la barre de 190 coupée en son milieu. <b>Aire de 189,5 à 230,5</b> : l'aire reprend les deux demi-barres, 0,852.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>X</i> entière, <i>X</i> ≈ N(μ, σ²) : P(<i>a</i> ≤ <i>X</i> ≤ <i>b</i>) ≈ Φ((<i>b</i> + ½ − μ)/σ) − Φ((<i>a</i> − ½ − μ)/σ)</div>
+    <div class="eq">une seule valeur : P(<i>X</i> = <i>k</i>) ≈ Φ((<i>k</i> + ½ − μ)/σ) − Φ((<i>k</i> − ½ − μ)/σ)</div>
+    <ul>
+      <li>a et b sont des entiers, inclus. Une inégalité stricte se ramène d'abord à une large : P(190 &lt; X &lt; 230) = P(191 ≤ X ≤ 229).</li>
+      <li>Pour la binomiale, μ = np et σ = √(np(1 − p)), sous les conditions de la notion 5.</li>
+      <li>Le ½ vient de la largeur 1 des barres. Il compte d'autant plus que σ est petit, puisque chaque barre pèse alors davantage.</li>
+      <li>Ce que calcule Brunton, Φ((b − μ)/σ) − Φ((a − μ)/σ), est l'approximation sans correction.</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>400 pièces, une barre seule, dix pièces, un jeu de test</small></summary><div class="in">
+    <ol>
+      <li><b>400 pièces.</b> Exact : 0,8520. Sans correction : Φ(3) − Φ(−1) = 0,8400. Avec : Φ(3,05) − Φ(−1,05) = 0,8520.</li>
+      <li><b>Les deux demi-barres.</b> P(X = 190) = 0,0242 et P(X = 230) = 0,0004 ; leurs moitiés font 0,0123, à peu près l'écart 0,012 entre 0,852 et 0,840.</li>
+      <li><b>Une seule valeur.</b> P(X = 200) = 0,0399 exact ; Φ(0,05) − Φ(−0,05) = 0,0399. Sans correction, l'aire de 200 à 200 vaut 0 : il faut une barre pour avoir une probabilité.</li>
+      <li><b>Dix pièces</b>, μ = 5, σ = √2,5 ≈ 1,58. P(X ≤ 3) = 176/1 024 = 0,172 exact ; sans correction, Φ((3 − 5)/1,58) = 0,103 ; avec, Φ((3,5 − 5)/1,58) = 0,171. Quand σ est petit, une demi-barre pèse lourd.</li>
+      <li><b>Inégalités strictes.</b> P(190 &lt; X &lt; 230) = P(191 ≤ X ≤ 229) = 0,827 exact ; avec correction, de 190,5 à 229,5 : Φ(2,95) − Φ(−0,95) = 0,827.</li>
+      <li><b>Le cas ML.</b> Un modèle d'accuracy vraie π = 0,87, testé sur 1 000 exemples : quelle chance d'avoir 850 bonnes réponses ou moins ? Exact : 0,0353. Avec correction : Φ((850,5 − 870)/10,63) = Φ(−1,834) = 0,0334 ; sans : 0,0300. La correction rapproche ; l'asymétrie de la binomiale à p = 0,87 laisse un écart.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>les 41 termes contre les deux aires</small></summary><div class="in">
+<pre class="py">from scipy.stats import binom, norm
+
+n, p = 400, 0.5
+mu, sigma = n * p, (n * p * (1 - p)) ** 0.5   # 200 and 10
+terms = range(190, 231)
+exact = sum(binom.pmf(k, n, p) for k in terms)   # Brunton's "monster" sum
+print(f"{len(terms)} terms, exact = {exact:.4f}")
+naive = norm.cdf(230, mu, sigma) - norm.cdf(190, mu, sigma)
+cc = norm.cdf(230.5, mu, sigma) - norm.cdf(189.5, mu, sigma)
+print(f"normal from 190 to 230 = {naive:.4f}   from 189.5 to 230.5 = {cc:.4f}")
+print(f"half of the two end bars = {(binom.pmf(190, n, p) + binom.pmf(230, n, p)) / 2:.4f}")
+
+s = 2.5 ** 0.5                                # 10 coins: sigma = sqrt(2.5)
+print(f"10 coins, P(X &lt;= 3): exact {binom.cdf(3, 10, 0.5):.4f}, "
+      f"no correction {norm.cdf(3, 5, s):.4f}, corrected {norm.cdf(3.5, 5, s):.4f}")</pre>
+<pre class="out">41 terms, exact = 0.8520
+normal from 190 to 230 = 0.8400   from 189.5 to 230.5 = 0.8520
+half of the two end bars = 0.0123
+10 coins, P(X &lt;= 3): exact 0.1719, no correction 0.1030, corrected 0.1714</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>≤ contre &lt;.</b> La correction se pose sur des inégalités larges entre entiers ; se tromper retire ou ajoute une barre entière à chaque bout (0,852 contre 0,827 ci-dessus).</li>
+      <li><b>Pour une variable continue, elle n'a pas de sens.</b> P(X = x) y vaut 0 : il n'y a pas de barre à reprendre.</li>
+      <li><b>Quand σ est grand, elle ne compte presque plus.</b> Pour 40 000 pièces, σ = 100 et une barre pèse au plus 0,004.</li>
+      <li><b>p loin de ½.</b> La binomiale est asymétrique, la normale ne l'est pas : la correction ne rattrape pas l'asymétrie (le cas ML ci-dessus).</li>
+      <li><b>Aujourd'hui, la somme exacte est une ligne</b> (<code>binom.cdf</code>). L'approximation sert à raisonner, à calculer de tête et à comprendre d'où viennent les intervalles ; avec un ordinateur, on calcule exactement.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (16) annonce « 51 » probabilités à additionner entre 190 et 230 : il y en a 230 − 190 + 1 = 41. Il trouve ensuite « environ 85 % » avec l'aire normale entre 190 et 230. Cette aire vaut Φ(3) − Φ(−1) = 0,840 ; 0,852 est la valeur exacte, que la normale ne rend qu'avec la correction de continuité, qu'il ne nomme pas.</div>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (16) parle de calculer « Φ(230) et Φ(190) ». Φ est la fonction de répartition de Z ; pour N(200 ; 10²), il faut F(230) − F(190), soit Φ((230 − 200)/10) − Φ((190 − 200)/10) = Φ(3) − Φ(−1).</div>
+  </div></details>
+  <p class="garde">Variable entière approchée par N(μ, σ²) : chaque entier est une barre de largeur 1, d'où P(a ≤ X ≤ b) ≈ Φ((b + ½ − μ)/σ) − Φ((a − ½ − μ)/σ).</p>
+</section>
+
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Une variable aléatoire est une fonction de l'issue du tirage. Fixe : p, μ ; aléatoire : X, X̄, p̂ ; réalisé : x, x̄.</li>
+    <li>Discret : P(X = x) est une probabilité (PMF). Continu : P(X = x) = 0, et la densité f est une probabilité par unité ; P(a &lt; X ≤ b) = F(b) − F(a).</li>
+    <li>Une densité évaluée est une vraisemblance, qui peut dépasser 1 ; intégrée, c'est une probabilité.</li>
+    <li>Bernoulli(p) : P(X = x ; p) = pˣ(1 − p)¹⁻ˣ, de moyenne p.</li>
+    <li>Binomiale(n, p), somme de n Bernoulli indépendantes : C(n, k)pᵏ(1 − p)ⁿ⁻ᵏ, E = np, Var = np(1 − p).</li>
+    <li>n grand et np(1 − p) pas trop petit : Binomiale(n, p) ≈ N(np, np(1 − p)) ; np petit : Poisson.</li>
+    <li>Φ(z) = P(Z ≤ z) ; à ±1, 2, 3σ : 68,3, 95,4, 99,7 % ; 95 % à ±1,96σ.</li>
+    <li>Variable entière : un demi de plus à chaque borne ; 400 pièces entre 190 et 230 : 0,852.</li>
+  </ol>
+</div>
+<div class="phrase">« Une variable aléatoire est une fonction de l'issue du tirage : le paramètre est fixe, la variable changerait à chaque tirage, la réalisation est sa valeur sur ce tirage. En discret, la loi donne des probabilités ponctuelles ; en continu, une densité, que j'évalue pour une vraisemblance et que j'intègre pour une probabilité. Une binomiale est une somme de Bernoulli indépendantes ; pour n grand, je l'approche par N(np, np(1 − p)), avec un demi de correction à chaque borne. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Quatre pièces, X = le nombre de piles : qu'est-ce qui est fixe, aléatoire, réalisé ?</div><div class="a hid">Fixe : p = ½, la pièce. Aléatoire : X, et l'estimateur p̂ = X/4, qui changeraient à chaque tirage. Réalisé : x = 3 sur ce tirage, en minuscule.</div></li>
+    <li><div class="q">Pourquoi P(X = 1,75 m) = 0 pour une taille, et que veut dire f(1,75) = 5,7 ?</div><div class="a hid">Un point n'a pas de largeur. f est une probabilité par mètre : une hauteur, la vraisemblance de l'observation 1,75 ; seule une aire est une probabilité.</div></li>
+    <li><div class="q">D'où vient P(X = k) = C(n, k)pᵏ(1 − p)ⁿ⁻ᵏ ?</div><div class="a hid">Une séquence à k succès vaut pᵏ(1 − p)ⁿ⁻ᵏ par indépendance ; il y en a C(n, k) ; ce sont des événements disjoints, on additionne.</div></li>
+    <li><div class="q">Quand une binomiale ressemble-t-elle à une normale, et à laquelle ?</div><div class="a hid">n grand et np(1 − p) pas trop petit : N(np, np(1 − p)). Ce qui converge est (X − np)/√(np(1 − p)). np petit : Poisson.</div></li>
+    <li><div class="q">Pourquoi 68 % dans ±1σ ?</div><div class="a hid">Φ(1) ≈ 0,841 ; il reste 0,159 à droite de 1, autant à gauche de −1 par symétrie ; 1 − 2 × 0,159 ≈ 0,68.</div></li>
+    <li><div class="q">400 pièces : P(190 ≤ X ≤ 230) ?</div><div class="a hid">μ = 200, σ = 10. Exact, 41 termes : 0,852. Normale avec la correction, de 189,5 à 230,5 : Φ(3,05) − Φ(−1,05) = 0,852 ; sans, Φ(3) − Φ(−1) = 0,840.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts et chaînes</div>
+  <div class="bridges">
+    <a href="../chains/chain-p01-01-objet-aleatoire.html"><b>L'objet aléatoire (fil A)</b><small>FIXE, ALÉATOIRE, RÉALISÉ de la notion 1, appliqués à l'accuracy : X ~ Binomiale(n, π), p̂ = X/n.</small></a>
+    <a href="../walkthroughs/walkthrough-p01-04-accuracy-vers-se.html"><b>De l'accuracy au SE</b><small>872 sur 1 000 : la binomiale de la notion 4, puis l'erreur standard.</small></a>
+    <a href="../chains/chain-p01-02-ic-test-procedure.html"><b>IC et test</b><small>Φ et le 1,96 de la notion 6 : un intervalle à 95 %, une p-value.</small></a>
+    <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html"><b>Du bruit à la loss (fil B)</b><small>La densité évaluée aux données est la vraisemblance (notion 2) ; la Bernoulli donne la log-loss (notion 3).</small></a>
+    <a href="../chains/chain-p05-02-logistique.html"><b>Régression logistique</b><small>Le label est une Bernoulli(p(x)) : la loi de la notion 3, avec un p qui dépend de x.</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::va</code> (notion 1) · <code>stats::densite</code> (notion 2) · <code>stats::binomiale</code> (notions 3, 4) · <code>stats::normale</code> (notions 5, 6, 7).</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l04 · v1 du 10/10/2026 · Brunton 13 à 16 · Prérequis : <a href="lesson-00-03-conditionner-bayes-independance.html">l03 · Conditionner, Bayes, indépendance</a>. Suite : <a href="lesson-00-05-poisson-exponentielle-attentes.html">l05 · Événements rares et temps d'attente</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* ===== commun à toutes les leçons (kit, étalon l08 v2) ===== */
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc : une entrée par notion, étiquette comprise */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.notion').forEach((s,i)=>{const li=document.createElement('li');const t=s.querySelector('h3').firstChild.textContent.trim();const k=s.classList.contains('culture')?' · culture':'';li.innerHTML=`<a href="#${s.id}">${i+1}. ${t}${k}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.notion').forEach(s=>io.observe(s));
+/* une ancre #nN ouvre la notion visée ; rien n'est replié par défaut hors des blocs */
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outils de dessin ===== */
+function curve(P,f,a,b,cls,ymax){let d='';const n=240;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;let y=f(x);if(!isFinite(y))continue;y=Math.min(y,ymax);d+=(d?' L':'M')+P.sx(x).toFixed(1)+' '+P.sy(y).toFixed(1);}SL.el('path',{d:d,class:'sl-fn '+cls,fill:'none'},P.dyn);}
+function bar(P,x0,x1,y,cls){const a=P.sx(x0),b=P.sx(x1);SL.el('rect',{x:Math.min(a,b),y:P.sy(y),width:Math.max(1.5,Math.abs(b-a)),height:Math.max(0,P.sy(0)-P.sy(y)),class:cls||'sl-bar'},P.dyn);}
+/* SL.plot trace l'axe vertical en x = 0 ; quand 0 porte une barre, on le ramène au bord gauche */
+function leftAxis(P,x0){const ax=P.svg.querySelectorAll('line.sl-axis');if(ax[1]){ax[1].setAttribute('x1',P.sx(x0));ax[1].setAttribute('x2',P.sx(x0));}}
+function rd(host,items){host.innerHTML=items.map(it=>`<div class="${it[2]||''}">${it[0]}<b>${it[1]}</b></div>`).join('');}
+function buttons(host,names,cb){const bs=names.map((n,i)=>{const b=SL.h('button','tb',host,n);b.onclick=()=>{bs.forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');cb(i);};return b;});bs[0].onclick();return bs;}
+
+
+/* ===== v2 : vignettes « voir l'idée », une par notion, juste sous l'idée ===== */
+/* tween : animation 0 → 1 lissée ; runner : un jeton par figure, un nouveau clic tue l'animation en cours */
+function runner(){let t={dead:true};return ()=>{t.dead=true;t={dead:false};return t;};}
+function tween(ms,draw,tk,done){if(SL.reduced){draw(1);if(done)done();return;}const t0=performance.now();const st=t=>{if(tk&&tk.dead)return;let u=Math.min(1,(t-t0)/ms);u=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;draw(u);if(u<1)requestAnimationFrame(st);else if(done)done();};requestAnimationFrame(st);}
+function loop(tk,step){if(SL.reduced){let g=0;while(step()!==false&&g++<1e5);return;}const f=()=>{if(tk.dead)return;if(step()!==false)requestAnimationFrame(f);};requestAnimationFrame(f);}
+function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function pick(r,v,p){let u=r(),a=0;for(let i=0;i<v.length;i++){a+=p[i];if(u<a)return v[i];}return v[v.length-1];}
+function gauss(r){let u=0;while(u===0)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());}
+function fulcrum(P,x){const cx=P.sx(x),cy=P.sy(0);SL.el('path',{d:`M${cx.toFixed(1)} ${(cy+1).toFixed(1)} L${(cx-8).toFixed(1)} ${(cy+16).toFixed(1)} L${(cx+8).toFixed(1)} ${(cy+16).toFixed(1)} Z`,class:'sl-fulcrum'},P.dyn);}
+function median(a){const s=a.slice().sort((x,y)=>x-y),n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;}
+function rect(P,x0,x1,y0,y1,cls,parent){const a=P.sx(x0),b=P.sx(x1),c=P.sy(y0),d=P.sy(y1);return SL.el('rect',{x:Math.min(a,b).toFixed(1),y:Math.min(c,d).toFixed(1),width:Math.abs(b-a).toFixed(1),height:Math.abs(d-c).toFixed(1),class:cls},parent||P.dyn);}
+/* pile de pastilles : une par individu, regroupées par classe de largeur bw */
+function stack(P,vals,bw,r,clsOf,centred){const bins=new Map();vals.forEach((v,i)=>{const b=centred?Math.round(v/bw):Math.floor(v/bw);if(!bins.has(b))bins.set(b,[]);bins.get(b).push(i);});
+  const res=[];bins.forEach((ids,b)=>{const c=centred?b*bw:(b+0.5)*bw,cx=P.sx(c);res.push({c:c,ids:ids});ids.forEach((i,j)=>SL.el('circle',{cx:cx.toFixed(1),cy:(P.sy(0)-r-1-j*(2*r+1)).toFixed(1),r:r,class:'sl-dot '+clsOf(i)},P.dyn));});return res;}
+
+
+/* ===== outils numériques communs à la leçon ===== */
+const LG=(function(){const g=7,c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  function lg(x){if(x<0.5)return Math.log(Math.PI/Math.sin(Math.PI*x))-lg(1-x);x-=1;let a=c[0];const t=x+g+0.5;for(let i=1;i<g+2;i++)a+=c[i]/(x+i);return 0.5*Math.log(2*Math.PI)+(x+0.5)*Math.log(t)-t+Math.log(a);}
+  return lg;})();
+function binpmf(n,p,k){if(k<0||k>n)return 0;if(p<=0)return k===0?1:0;if(p>=1)return k===n?1:0;return Math.exp(LG(n+1)-LG(k+1)-LG(n-k+1)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+/* erfc à erreur relative < 1,2e-7 (Chebyshev) : assez pour quatre décimales */
+function erfc(x){const z=Math.abs(x),t=1/(1+0.5*z);const r=t*Math.exp(-z*z-1.26551223+t*(1.00002368+t*(0.37409196+t*(0.09678418+t*(-0.18628806+t*(0.27886807+t*(-1.13520398+t*(1.48851587+t*(-0.82215223+t*0.17087277)))))))));return x>=0?r:2-r;}
+/* nombre à d décimales, zéros gardés, virgule et vrai signe moins */
+const fx=(x,d)=>(x<0&&Math.abs(x)>=0.5*Math.pow(10,-d)?'−':'')+Math.abs(x).toFixed(d).replace('.',',');
+const Phi=z=>0.5*erfc(-z/Math.SQRT2);
+const phi=z=>Math.exp(-z*z/2)/Math.sqrt(2*Math.PI);
+const npdf=(x,m,s)=>phi((x-m)/s)/s;
+/* aire sous f entre a et b, dans la couche dynamique */
+function areaUnder(P,f,a,b,cls){if(b<=a)return null;let s='';const n=160;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;s+=P.sx(x).toFixed(1)+','+P.sy(f(x)).toFixed(1)+' ';}
+  s+=P.sx(b).toFixed(1)+','+P.sy(0).toFixed(1)+' '+P.sx(a).toFixed(1)+','+P.sy(0).toFixed(1);return SL.el('polygon',{points:s.trim(),class:cls},P.dyn);}
+function xticks(a,b,m){const step=Math.max(1,Math.ceil((b-a)/m));const t=[];for(let k=Math.ceil(a);k<=b;k+=step)t.push(k);return t;}
+function yticks(ym){const raw=ym/4,e=Math.pow(10,Math.floor(Math.log10(raw)));const step=[1,2,2.5,5,10].map(f=>f*e).find(s=>s>=raw)||e*10;const t=[0];for(let y=step;y<ym*0.98;y+=step)t.push(+y.toPrecision(6));return t;}
+
+/* ===== Figure 1 : la hauteur et l'aire, la densité et sa répartition ===== */
+(function(){
+  const MU=1.75,SG=0.07,host=document.getElementById('f1plot'),out=document.getElementById('f1out');
+  const st={a:1.70,b:1.82,cm:false};
+  const f=x=>npdf(x,MU,SG),F=x=>Phi((x-MU)/SG);
+  let sA=null,sB=null;
+  const ufmt=v=>st.cm?SL.fmt(v*100,1):SL.fmt(v,3);
+  function draw(){
+    host.innerHTML='';
+    const u=st.cm?100:1,ym=st.cm?0.065:6.5;
+    const xt=[1.5,1.6,1.7,1.8,1.9,2].map(x=>x*u);
+    const P1=SL.plot(SL.h('div','',host),{x:[1.5*u,2*u],y:[0,ym],w:560,h:230,xt:xt,yt:st.cm?[0,0.02,0.04,0.06]:[0,1,2,3,4,5,6],yl:st.cm?'densité f, par cm':'densité f, par m'});
+    const g=x=>f(x/u)/u,a=st.a*u,b=st.b*u;
+    areaUnder(P1,g,a,b,'sl-area');
+    curve(P1,g,1.5*u,2*u,'sl-c1',ym);
+    if(!st.cm){P1.seg(1.5,1,2,1,'chord');P1.text(1.995,1.15,'hauteur 1','sl-c3','end');}
+    P1.seg(a,0,a,g(a),'sl-c3');P1.seg(b,0,b,g(b),'sl-c3');P1.dot(a,g(a),'sl-c3',5);P1.dot(b,g(b),'sl-c3',5);
+    P1.text(2*u-0.002*u,ym*0.9,'│ hauteurs f(a), f(b) : vraisemblances','sl-c3','end');
+    P1.text(2*u-0.002*u,ym*0.79,'■ aire : P(a < X ≤ b)','sl-c2','end');
+    const P2=SL.plot(SL.h('div','',host),{x:[1.5*u,2*u],y:[0,1.05],w:560,h:180,xt:xt,yt:[0,0.5,1],xl:st.cm?'taille x (cm)':'taille x (m)',yl:'F(x) = P(X ≤ x)'});
+    curve(P2,x=>F(x/u),1.5*u,2*u,'sl-c1',1.05);
+    const Fa=F(st.a),Fb=F(st.b);
+    P2.seg(a,Fa,b,Fa,'sl-dash');P2.seg(b,Fa,b,Fb,'gain');
+    P2.dot(a,Fa,'sl-c3',5);P2.dot(b,Fb,'sl-c3',5);
+    P2.text(1.505*u,0.78,'┃ F(b) − F(a) : la même probabilité','sl-gn','start');
+    const unit=st.cm?' par cm':' par m',d=st.cm?4:2;
+    rd(out,[['hauteur f(a), une vraisemblance',fx(g(a),d)+unit],['hauteur f(b), une vraisemblance',fx(g(b),d)+unit],
+      ['aire F(b) − F(a), une probabilité',fx(Fb-Fa,4),'c3'],['P(X = a) exactement','0']]);
+  }
+  const relabel=()=>[sA,sB].forEach((s,i)=>{s.input.parentNode.querySelector('.sl-slab').textContent=(i?'b':'a')+(st.cm?', en cm':', en m');});
+  buttons(document.getElementById('f1ctl'),['en mètres','en centimètres'],k=>{st.cm=k===1;if(sA){relabel();sA.set(st.a);sB.set(st.b);}else draw();});
+  const sl=document.getElementById('f1sl');
+  sA=SL.slider(sl,{label:'a',min:1.55,max:1.95,step:0.005,value:st.a,fmt:ufmt},v=>{st.a=v;if(sB&&st.b<=v+1e-9){sB.set(Math.min(1.95,v+0.005));return;}draw();});
+  sB=SL.slider(sl,{label:'b',min:1.55,max:1.95,step:0.005,value:st.b,fmt:ufmt},v=>{st.b=v;if(st.a>=v-1e-9){sA.set(Math.max(1.55,v-0.005));return;}draw();});
+  relabel();
+})();
+
+/* ===== Figure 2 : la forme d'une binomiale ===== */
+(function(){
+  const host=document.getElementById('f2plot'),out=document.getElementById('f2out');
+  const st={n:12,p:1/6,k:3};let busy=false,sN,sP,sK;
+  function draw(){
+    if(busy)return;
+    const n=st.n,p=st.p,k=Math.min(st.k,n);host.innerHTML='';
+    const pm=[];let ym=0,tot=0;for(let j=0;j<=n;j++){const v=binpmf(n,p,j);pm.push(v);tot+=v;if(v>ym)ym=v;}
+    const Y=ym*1.3;
+    const P=SL.plot(host,{x:[-0.6,n+0.6],y:[0,Y],w:560,h:270,xt:xticks(0,n,10),yt:yticks(Y),xl:'k, nombre de succès',yl:'P(X = k)'});
+    leftAxis(P,-0.6);
+    pm.forEach((v,j)=>{if(v<1e-6)return;bar(P,j-0.4,j+0.4,v,j===k?'sl-bar2':'sl-bar');});
+    const E=n*p,sd=Math.sqrt(n*p*(1-p)),ga=Math.max(-0.6,E-sd),gb=Math.min(n+0.6,E+sd);
+    P.seg(ga,ym*1.14,gb,ym*1.14,'gain');P.seg(E,0,E,ym*1.2,'sl-mean');
+    if(gb<n*0.7)P.text(gb+0.02*(n+1.2),ym*1.14,'E ± σ','','start');else P.text(ga-0.02*(n+1.2),ym*1.14,'E ± σ','','end');
+    rd(out,[['E = np',SL.fmt(E,2)],['σ = √(np(1 − p))',SL.fmt(sd,2)],['P(X = '+k+')',SL.fmt(pm[k],4),'c3'],['somme des barres',SL.fmt(tot,4)]]);
+  }
+  function preset(n,p,k){busy=true;sN.set(n);sP.set(p);sK.input.max=n;sK.set(k);busy=false;draw();}
+  const sl=document.getElementById('f2sl');
+  sN=SL.slider(sl,{label:'n (essais)',min:1,max:100,step:1,value:st.n,fmt:v=>String(v)},v=>{st.n=v;if(sK){sK.input.max=v;if(st.k>v)sK.set(v);}draw();});
+  sP=SL.slider(sl,{label:'p (succès)',min:0.01,max:0.99,value:st.p,fmt:v=>SL.fmt(v,3)},v=>{st.p=v;draw();});
+  sK=SL.slider(sl,{label:'k lu',min:0,max:st.n,step:1,value:st.k,fmt:v=>String(v)},v=>{st.k=v;draw();});
+  const pre=[[4,0.5,2],[12,1/6,3],[100,1/6,10]];
+  buttons(document.getElementById('f2ctl'),['quatre pièces','douze dés','cent dés'],i=>preset(...pre[i]));
+})();
+
+/* ===== Figure 3 : la binomiale et sa normale, n et p libres ===== */
+(function(){
+  const host=document.getElementById('f3plot'),out=document.getElementById('f3out');
+  const st={n:20,p:0.5,z:false};
+  function draw(){
+    host.innerHTML='';
+    const n=st.n,p=st.p,mu=n*p,sd=Math.sqrt(n*p*(1-p));
+    const pm=[];let gap=0,ym=0;for(let k=0;k<=n;k++){const v=binpmf(n,p,k);pm.push(v);gap=Math.max(gap,Math.abs(v-npdf(k,mu,sd)));ym=Math.max(ym,v);}
+    const below=Phi((0-mu)/sd);
+    if(!st.z){
+      const x0=mu-4.5*sd,x1=mu+4.5*sd,Y=Math.max(ym,npdf(mu,mu,sd))*1.22;
+      const P=SL.plot(host,{x:[x0,x1],y:[0,Y],w:560,h:270,xt:xticks(x0,x1,9),yt:yticks(Y),xl:'k, nombre de succès',yl:'probabilité ou densité'});
+      if(x0<0)leftAxis(P,x0);
+      pm.forEach((v,k)=>{if(k-0.4<x0||k+0.4>x1||v<1e-7)return;bar(P,k-0.4,k+0.4,v,'sl-bar');});
+      if(x0<0)areaUnder(P,x=>npdf(x,mu,sd),x0,0,'sl-area2');
+      curve(P,x=>npdf(x,mu,sd),x0,x1,'sl-c1',Y);
+      P.text(x1-(x1-x0)*0.01,Y*0.93,'▮ binomiale exacte','sl-c2','end');
+      P.text(x1-(x1-x0)*0.01,Y*0.83,'— normale N(np, np(1 − p))','sl-c1','end');
+      if(x0<0)P.text(x1-(x1-x0)*0.01,Y*0.73,'■ masse normale sous 0','sl-c3','end');
+    }else{
+      const Y=0.62;
+      const P=SL.plot(host,{x:[-4.5,4.5],y:[0,Y],w:560,h:270,xt:[-4,-3,-2,-1,0,1,2,3,4],yt:[0,0.1,0.2,0.3,0.4,0.5,0.6],xl:'z = (k − np)/σ',yl:'σ · P(X = k), et φ(z)'});
+      leftAxis(P,-4.5);
+      const hw=0.4/sd;
+      pm.forEach((v,k)=>{const z=(k-mu)/sd;if(z-hw<-4.5||z+hw>4.5||v<1e-7)return;bar(P,z-hw,z+hw,Math.min(v*sd,Y),'sl-bar');});
+      curve(P,phi,-4.5,4.5,'sl-c1',Y);
+      P.text(4.45,Y*0.93,'▮ barres centrées réduites','sl-c2','end');
+      P.text(4.45,Y*0.83,'— φ(z), la courbe de N(0, 1), fixe','sl-c1','end');
+    }
+    rd(out,[['μ = np',SL.fmt(mu,2)],['σ = √(np(1 − p))',SL.fmt(sd,2)],['écart maximal |P(X = k) − f(k)|',SL.fmt(gap,4),'c3'],['masse normale sous 0',SL.fmt(100*below,1)+' %']]);
+  }
+  buttons(document.getElementById('f3ctl'),['lecture en k','lecture centrée réduite'],k=>{st.z=k===1;draw();});
+  const sl=document.getElementById('f3sl');
+  SL.slider(sl,{label:'n (essais)',min:1,max:200,step:1,value:st.n,fmt:v=>String(v)},v=>{st.n=v;draw();});
+  SL.slider(sl,{label:'p (succès)',min:0.01,max:0.99,step:0.01,value:st.p,fmt:v=>SL.fmt(v,2)},v=>{st.p=v;draw();});
+})();
+
+/* ===== Figure 4 : la bande μ ± kσ ne dépend que de k ===== */
+(function(){
+  const MU=200,host=document.getElementById('f4plot'),out=document.getElementById('f4out');
+  const st={k:1,s:10};
+  function draw(){
+    host.innerHTML='';
+    const k=st.k,s=st.s,a=MU-k*s,b=MU+k*s,f=x=>npdf(x,MU,s),F=x=>Phi((x-MU)/s);
+    const xt=[140,160,180,200,220,240,260];
+    const P1=SL.plot(SL.h('div','',host),{x:[130,270],y:[0,0.088],w:560,h:220,xt:xt,yt:[0,0.02,0.04,0.06,0.08],yl:'densité de N(200 ; σ²)'});
+    areaUnder(P1,f,Math.max(130,a),Math.min(270,b),'sl-area');
+    curve(P1,f,130,270,'sl-c1',0.088);
+    P1.vline(MU,'sl-mean');
+    P1.text(268,0.079,'■ bande μ ± kσ','sl-c2','end');
+    const P2=SL.plot(SL.h('div','',host),{x:[130,270],y:[0,1.05],w:560,h:180,xt:xt,yt:[0,0.5,1],xl:'x',yl:'F(x) = Φ((x − 200)/σ)'});
+    curve(P2,F,130,270,'sl-c1',1.05);
+    const Fa=F(a),Fb=F(b);
+    if(a>=130&&b<=270){P2.seg(a,Fa,b,Fa,'sl-dash');P2.seg(b,Fa,b,Fb,'gain');P2.dot(a,Fa,'sl-c3',5);P2.dot(b,Fb,'sl-c3',5);}
+    P2.text(132,0.78,'┃ F(b) − F(a) : l’aire de la bande','sl-gn','start');
+    rd(out,[['bande μ ± kσ',SL.fmt(a,1)+' – '+SL.fmt(b,1)],['F(a) et F(b)',SL.fmt(Fa,4)+' et '+SL.fmt(Fb,4)],['aire de la bande, 2Φ(k) − 1',SL.fmt(100*(2*Phi(k)-1),1)+' %','c3']]);
+  }
+  const sl=document.getElementById('f4sl');
+  SL.slider(sl,{label:'k (en σ)',min:0.5,max:3,step:0.05,value:st.k,fmt:v=>SL.fmt(v,2)},v=>{st.k=v;draw();});
+  SL.slider(sl,{label:'σ',min:5,max:20,step:0.5,value:st.s,fmt:v=>SL.fmt(v,1)},v=>{st.s=v;draw();});
+})();
+
+/* ===== v1 : seize séquences, une variable, une réalisation ===== */
+(function(){
+  const host=document.getElementById('v1plot'),out=document.getElementById('v1out'),ctl=document.getElementById('v1ctl');
+  const W=560,H=300,TW=96,TH=34,BASE=268,cx=k=>92+k*104;
+  const svg=SL.el('svg',{viewBox:`0 0 ${W} ${H}`,class:'sl-plot'},host);
+  const COL=['sl-k4','sl-k6','sl-k2','sl-k5','sl-k3'];
+  const seqs=[];for(let i=0;i<16;i++){let s='';for(let b=3;b>=0;b--)s+=((i>>b)&1)?'F':'P';seqs.push(s);}
+  const X=s=>s.split('').filter(c=>c==='P').length;
+  const gO=SL.el('g',{},svg),gX=SL.el('g',{},svg);
+  SL.el('text',{x:64,y:40,class:'sl-lbl'},gO).textContent='Ω : les 16 séquences de quatre lancers (P pile, F face), et leur valeur X';
+  SL.el('line',{x1:40,x2:556,y1:BASE,y2:BASE,class:'sl-axis'},gX);
+  for(let k=0;k<=4;k++)SL.el('text',{x:cx(k),y:BASE+20,'text-anchor':'middle',class:'sl-tick'},gX).textContent='X = '+k;
+  for(let m=1;m<=6;m++){const y=BASE-m*36;SL.el('line',{x1:36,x2:42,y1:y,y2:y,class:'sl-axis'},gX);SL.el('text',{x:33,y:y+4,'text-anchor':'end',class:'sl-tick'},gX).textContent=m+'/16';}
+  SL.el('text',{x:44,y:22,class:'sl-lbl'},gX).textContent='P(X = k), en seizièmes : une séquence pèse 1/16';
+  const A=[],B=[],cnt=[0,0,0,0,0];
+  seqs.forEach((s,i)=>{A.push([64+(i%4)*112,58+Math.floor(i/4)*52]);const k=X(s),j=cnt[k]++;B.push([cx(k)-TW/2,BASE-(j+1)*36+1]);});
+  const tiles=seqs.map((s,i)=>{const g=SL.el('g',{},svg);
+    SL.el('rect',{x:0,y:0,width:TW,height:TH,rx:3,class:COL[X(s)]+' sl-kc sl-tile'},g);
+    SL.el('text',{x:10,y:22,class:'sl-tile-t'},g).textContent=s;
+    SL.el('text',{x:TW-10,y:22,'text-anchor':'end',class:'sl-tile-x'},g).textContent=String(X(s));
+    const hl=SL.el('rect',{x:-3,y:-3,width:TW+6,height:TH+6,rx:4,class:'sl-hl',display:'none'},g);
+    return {g,hl};});
+  let pos=0,real='PPFP',seed=3;const run=runner();
+  function place(u){tiles.forEach((t,i)=>{const x=A[i][0]+(B[i][0]-A[i][0])*u,y=A[i][1]+(B[i][1]-A[i][1])*u;t.g.setAttribute('transform',`translate(${x.toFixed(1)} ${y.toFixed(1)})`);});
+    gO.setAttribute('display',u<0.5?'inline':'none');gX.setAttribute('display',u>=0.5?'inline':'none');}
+  function show(){tiles.forEach((t,i)=>t.hl.setAttribute('display',seqs[i]===real?'inline':'none'));const x=X(real);
+    rd(out,[['p, fixe','0,5'],['X, aléatoire','0, 1, 2, 3 ou 4'],['x, sur ce tirage',x+' ('+real+')','c3'],['p̂ = x/4, sur ce tirage',SL.fmt(x/4,2)]]);}
+  buttons(ctl,['Ω : seize séquences','regrouper par X'],k=>{const tk=run(),a=pos;if(a===k){place(k);return;}tween(900,u=>{pos=a+(k-a)*u;place(pos);},tk);});
+  SL.h('button','tb',ctl,'▶ lancer quatre pièces').onclick=()=>{const r=rng(seed++);let s='';for(let i=0;i<4;i++)s+=r()<0.5?'P':'F';real=s;show();};
+  show();
+})();
+
+/* ===== v2 : des barres de probabilité à la densité ===== */
+(function(){
+  const MU=1.75,SG=0.07,host=document.getElementById('v2plot'),out=document.getElementById('v2out');
+  const WS=[0.10,0.05,0.02,0.01],st={w:0,dens:false};
+  const F=x=>Phi((x-MU)/SG);
+  function draw(){
+    host.innerHTML='';
+    const w=WS[st.w],J=Math.floor((0.25-w/2)/w+1e-9),Y=st.dens?6.5:0.6;
+    const P=SL.plot(host,{x:[1.5,2],y:[0,Y],w:560,h:250,xt:[1.5,1.6,1.7,1.8,1.9,2],yt:st.dens?[0,1,2,3,4,5,6]:[0,0.1,0.2,0.3,0.4,0.5,0.6],xl:'taille (m)',yl:st.dens?'probabilité ÷ largeur, par m':'probabilité de la classe'});
+    let pc=0;
+    for(let j=-J;j<=J;j++){const c=MU+j*w,pr=F(c+w/2)-F(c-w/2);if(j===0)pc=pr;rect(P,c-w/2+0.0008,c+w/2-0.0008,0,st.dens?pr/w:pr,j===0?'sl-bar2':'sl-bar');}
+    if(st.dens){curve(P,x=>npdf(x,MU,SG),1.5,2,'sl-c1',Y);P.seg(1.5,1,2,1,'chord');P.text(1.995,1.15,'hauteur 1','sl-c3','end');P.text(1.995,Y*0.92,'— densité f','sl-c1','end');}
+    const cm=x=>SL.fmt(100*x,1);
+    rd(out,[['classe centrale',cm(MU-w/2)+' – '+cm(MU+w/2)+' cm'],['sa probabilité',SL.fmt(pc,3),st.dens?'':'c3'],['probabilité ÷ largeur',fx(pc/w,2)+' par m',st.dens?'c3':''],['densité f(1,75)',fx(npdf(MU,MU,SG),2)+' par m']]);
+  }
+  buttons(document.getElementById('v2ctl'),['classes de 10 cm','5 cm','2 cm','1 cm'],k=>{st.w=k;draw();});
+  buttons(document.getElementById('v2ctl2'),['probabilité de chaque classe','probabilité ÷ largeur'],k=>{st.dens=k===1;draw();});
+})();
+
+/* ===== v3 : le masque de Bernoulli de Brunton ===== */
+(function(){
+  const host=document.getElementById('v3plot'),out=document.getElementById('v3out');
+  const C=16,R=10,S=30,X0=40,Y0=8;
+  const svg=SL.el('svg',{viewBox:'0 0 560 316',class:'sl-plot'},host);
+  function colour(c,r){if(r>=7)return 'sl-k6 sl-kc';const dx=c-11.5,dy=r-2.5;return dx*dx+dy*dy<=4.5?'sl-k5':'sl-k4 sl-kc';}
+  const cells=[];for(let r=0;r<R;r++)for(let c=0;c<C;c++){const base=colour(c,r);cells.push({e:SL.el('rect',{x:X0+c*S,y:Y0+r*S,width:S-2,height:S-2,class:base},svg),base});}
+  let seed=7,u=[],p=0.3;
+  function fresh(){const g=rng(seed++);u=cells.map(()=>g());}
+  function draw(){let m=0;cells.forEach((c,i)=>{const off=u[i]<p;if(off)m++;c.e.setAttribute('class',off?'sl-pxoff':c.base);});
+    rd(out,[['p, fixe',SL.fmt(p,2)],['pixels masqués, ce masque',m+' / 160'],['part masquée, ce masque',SL.fmt(m/160,3),'c3'],['E[X] = p',SL.fmt(p,2)]]);}
+  fresh();
+  SL.h('button','tb',document.getElementById('v3ctl'),'↻ nouveau masque').onclick=()=>{fresh();draw();};
+  SL.slider(document.getElementById('v3sl'),{label:'p (masquer)',min:0,max:1,step:0.01,value:p,fmt:v=>SL.fmt(v,2)},v=>{p=v;draw();});
+})();
+
+/* ===== v4 : deux essais, le carré d'aire 1 ===== */
+(function(){
+  const host=document.getElementById('v4plot'),out=document.getElementById('v4out');
+  const row=SL.h('div','v-row',host),L=SL.h('div','',row),R=SL.h('div','',row);
+  const A=SL.plot(L,{x:[0,1],y:[0,1],w:330,h:322,xt:[],yt:[],xl:'essai 1, en largeur'});
+  SL.el('text',{x:14,y:152,transform:'rotate(-90 14 152)','text-anchor':'middle',class:'sl-lbl'},A.layer).textContent='essai 2, en hauteur';
+  const B=SL.plot(R,{x:[-0.6,2.6],y:[0,1.1],w:330,h:322,xt:[0,1,2],yt:[0,0.25,0.5,0.75,1],xl:'k succès',yl:'P(X = k)'});
+  leftAxis(B,-0.6);
+  const K=['sl-k4 sl-kc','sl-k2 sl-kc','sl-k3 sl-kc'];
+  function draw(p){
+    const q=1-p;A.clear();B.clear();
+    const cells=[[0,p,0,p,2,'SS','p²',p*p],[0,p,p,1,1,'SÉ','pq',p*q],[p,1,0,p,1,'ÉS','qp',q*p],[p,1,p,1,0,'ÉÉ','q²',q*q]];
+    cells.forEach(c=>{rect(A,c[0],c[1],c[2],c[3],K[c[4]]+' sl-tile');
+      const wpx=A.sx(c[1])-A.sx(c[0]),hpx=A.sy(c[2])-A.sy(c[3]);
+      const mx=(c[0]+c[1])/2,my=(c[2]+c[3])/2;
+      if(wpx>70&&hpx>40){
+        A.text(mx,my,c[5],'sl-cap-t','middle').setAttribute('y',(A.sy(my)-4).toFixed(1));
+        A.text(mx,my,c[6]+' = '+SL.fmt(c[7],3),'sl-cap-t','middle').setAttribute('y',(A.sy(my)+13).toFixed(1));}
+      else if(wpx>=16&&hpx>130){const px=A.sx(mx),py=A.sy(my),t=SL.el('text',{x:px.toFixed(1),y:(py+4).toFixed(1),'text-anchor':'middle',class:'sl-lbl sl-cap-t',transform:`rotate(-90 ${px.toFixed(1)} ${py.toFixed(1)})`},A.dyn);t.textContent=c[5]+' · '+c[6]+' = '+SL.fmt(c[7],3);}
+      else if(hpx>=16&&wpx>130){A.text(mx,my,c[5]+' · '+c[6]+' = '+SL.fmt(c[7],3),'sl-cap-t','middle').setAttribute('y',(A.sy(my)+4).toFixed(1));}});
+    [[p/2,'S'],[(1+p)/2,'É']].forEach(a=>{A.text(a[0],0,a[1],'sl-cap-t','middle').setAttribute('y',(A.sy(0)+16).toFixed(1));
+      A.text(0,a[0],a[1],'sl-cap-t','end').setAttribute('x',(A.sx(0)-8).toFixed(1));});
+    const pk=[q*q,2*p*q,p*p];
+    pk.forEach((v,k)=>{bar(B,k-0.32,k+0.32,v,K[k]);B.text(k,v+0.035,SL.fmt(v,3),'','middle');});
+    rd(out,[['P(X = 0) = q²',SL.fmt(q*q,3)],['P(X = 1) = 2pq',SL.fmt(2*p*q,3)],['P(X = 2) = p²',SL.fmt(p*p,3)],['pq = qp',SL.fmt(p*q,3)],['somme = (p + q)²',SL.fmt(q*q+2*p*q+p*p,4),'c3']]);
+  }
+  SL.slider(document.getElementById('v4sl'),{label:'p (succès)',min:0.02,max:0.98,value:1/6,fmt:v=>SL.fmt(v,3)},draw);
+})();
+
+/* ===== v5 : les cinq tracés de Brunton ===== */
+(function(){
+  const host=document.getElementById('v5plot'),out=document.getElementById('v5out');
+  const C=[{n:100,p:0.5,x:[30,70]},{n:30,p:0.5,x:[3,27]},{n:10,p:0.5,x:[-1,11]},{n:5,p:0.5,x:[-1,6]},{n:30,p:0.02,x:[-3,5]}];
+  function draw(i){
+    const c=C[i],n=c.n,p=c.p,mu=n*p,sd=Math.sqrt(n*p*(1-p)),small=p<0.1;host.innerHTML='';
+    let peak=0,gap=0,kg=0;const pm=[];
+    for(let k=0;k<=n;k++){const v=binpmf(n,p,k);pm.push(v);peak=Math.max(peak,v);const d=Math.abs(v-npdf(k,mu,sd));if(d>gap){gap=d;kg=k;}}
+    const Y=peak*1.32;
+    const P=SL.plot(host,{x:c.x,y:[0,Y],w:560,h:250,xt:xticks(c.x[0],c.x[1],10),yt:yticks(Y),xl:'k, nombre de succès',yl:'probabilité ou densité'});
+    if(c.x[0]<0)leftAxis(P,c.x[0]);
+    pm.forEach((v,k)=>{if(k<c.x[0]||k>c.x[1])return;bar(P,k-0.36,k+0.36,v,'sl-bar');});
+    if(small)areaUnder(P,x=>npdf(x,mu,sd),c.x[0],0,'sl-area2');
+    curve(P,x=>npdf(x,mu,sd),c.x[0],c.x[1],'sl-c1',Y);
+    P.seg(kg,pm[kg],kg,npdf(kg,mu,sd),'sl-c3');
+    const xr=c.x[1]-(c.x[1]-c.x[0])*0.01;
+    P.text(xr,Y*0.93,'▮ binomiale, « exacte »','sl-c2','end');P.text(xr,Y*0.84,'— normale, « approximation »','sl-c1','end');
+    P.text(xr,Y*0.75,'│ écart maximal','sl-c3','end');
+    if(small)P.text(xr,Y*0.66,'■ masse normale sous 0','sl-c3','end');
+    const items=[['μ = np',SL.fmt(mu,2)],['σ = √(np(1 − p))',SL.fmt(sd,2)],['pic de la binomiale',SL.fmt(peak,4)],['écart maximal',SL.fmt(gap,4),'c3']];
+    if(small)items.push(['masse normale sous 0',SL.fmt(100*Phi(-mu/sd),1)+' %'],['dont sous −0,5, hors barre',SL.fmt(100*Phi((-0.5-mu)/sd),1)+' %']);
+    rd(out,items);
+  }
+  buttons(document.getElementById('v5ctl'),['n = 100','n = 30','n = 10','n = 5','n = 30, p = 0,02'],draw);
+})();
+
+/* ===== v6 : 68 % en quatre temps ===== */
+(function(){
+  const host=document.getElementById('v6plot'),out=document.getElementById('v6out');
+  const P=SL.plot(host,{x:[-4,4],y:[0,0.5],w:560,h:250,xt:[-3,-2,-1,0,1,2,3],yt:[0,0.1,0.2,0.3,0.4],xl:'z',yl:'densité φ(z)'});
+  leftAxis(P,-4);
+  const st={k:1,s:0};
+  function draw(){
+    P.clear();const k=st.k,s=st.s,F=Phi(k),t=1-F,band=fx(100*(2*F-1),1)+' %';
+    if(s===0)areaUnder(P,phi,-4,k,'sl-area');
+    if(s>=1)areaUnder(P,phi,k,4,'sl-area2');
+    if(s>=2)areaUnder(P,phi,-4,-k,'sl-area2');
+    if(s===3)areaUnder(P,phi,-k,k,'sl-area');
+    curve(P,phi,-4,4,'sl-c1',0.5);
+    P.seg(k,0,k,0.43,'sl-dash');if(s>=2)P.seg(-k,0,-k,0.43,'sl-dash');
+    const lab=[['■ Φ('+SL.fmt(k,2)+') = '+fx(F,4)+', l’aire à gauche de k','sl-c2'],['■ queue droite : 1 − Φ(k) = '+fx(t,4),'sl-c3'],['■ queue gauche = queue droite = '+fx(t,4),'sl-c3'],['■ bande : 1 − 2 × '+fx(t,4)+' ≈ '+band,'sl-c2']][s];
+    P.text(3.95,0.465,lab[0],lab[1],'end');
+    rd(out,[['Φ(k), à gauche de k',fx(F,4)],['queue droite, 1 − Φ(k)',fx(t,4)],['queue gauche, Φ(−k)',fx(Phi(-k),4)],['bande, 2Φ(k) − 1',band,'c3']]);
+  }
+  buttons(document.getElementById('v6ctl'),['1. Φ(k)','2. queue droite','3. symétrie','4. la bande'],i=>{st.s=i;draw();});
+  SL.slider(document.getElementById('v6sl'),{label:'k',min:0.5,max:3,step:0.01,value:1,fmt:v=>SL.fmt(v,2)},v=>{st.k=v;draw();});
+})();
+
+/* ===== v7 : 400 pièces, les deux demi-barres ===== */
+(function(){
+  const host=document.getElementById('v7plot'),out=document.getElementById('v7out');
+  const row=SL.h('div','v-row',host),L=SL.h('div','',row),R=SL.h('div','v-mini',row);
+  const MU=200,SG=10,f=x=>npdf(x,MU,SG),YM=0.047;
+  const A=SL.plot(L,{x:[175,240],y:[0,YM],w:440,h:260,xt:[180,190,200,210,220,230,240],yt:[0,0.01,0.02,0.03,0.04],xl:'k, nombre de piles'});
+  const Z=SL.plot(R,{x:[186.5,193.5],y:[0,YM],w:220,h:260,xt:[188,190,192],yt:[],xl:'zoom sur 190'});
+  const pm=[];for(let k=0;k<=400;k++)pm.push(binpmf(400,0.5,k));
+  let exact=0;for(let k=190;k<=230;k++)exact+=pm[k];
+  const LO=[190,190,189.5],HI=[230,230,230.5];
+  function paint(P,x0,x1,m){
+    P.clear();
+    if(m>0)areaUnder(P,f,Math.max(x0,LO[m]),Math.min(x1,HI[m]),'sl-area');
+    for(let k=Math.ceil(x0);k<=Math.floor(x1);k++){const inr=k>=190&&k<=230;bar(P,k-0.5,k+0.5,pm[k],m===0?(inr?'sl-bar':'sl-barlite'):'sl-barline');}
+    curve(P,f,x0,x1,'sl-c1',YM);
+    if(m>0){if(LO[m]>=x0&&LO[m]<=x1)P.seg(LO[m],0,LO[m],0.035,'sl-c3');if(HI[m]>=x0&&HI[m]<=x1)P.seg(HI[m],0,HI[m],0.035,'sl-c3');}
+  }
+  function draw(m){
+    paint(A,175,240,m);paint(Z,186.5,193.5,m);
+    A.text(239.5,0.044,'— N(200 ; 10²)','sl-c1','end');A.text(239.5,0.039,'▮ P(X = k), une barre de largeur 1','sl-c2','end');
+    Z.text(193.3,0.044,['P(X = 190) = 0,024','½ barre perdue','barre entière'][m],m===1?'sl-c3':'sl-c2','end');
+    const val=[exact,Phi(3)-Phi(-1),Phi(3.05)-Phi(-1.05)][m],d=val-exact;
+    rd(out,[['μ et σ','200 et 10'],[['somme exacte, 41 termes','aire de 190 à 230','aire de 189,5 à 230,5'][m],fx(val,4),'c3'],['écart à la somme exacte',m?fx(d,4):'—']]);
+  }
+  buttons(document.getElementById('v7ctl'),['41 barres : la somme exacte','aire de 190 à 230','aire de 189,5 à 230,5'],draw);
+})();
+
+})();
+</script>
+</body>
+</html>

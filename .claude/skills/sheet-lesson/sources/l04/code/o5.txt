@@ -1,0 +1,6 @@
+n=100, p= 0.5: sigma=5.00  peak=0.0796  max gap=0.0002
+n= 30, p= 0.5: sigma=2.74  peak=0.1445  max gap=0.0012
+n= 10, p= 0.5: sigma=1.58  peak=0.2461  max gap=0.0062
+n=  5, p= 0.5: sigma=1.12  peak=0.3125  max gap=0.0112
+n= 30, p=0.02: sigma=0.77  peak=0.5455  max gap=0.1624
+n=30, p=0.02: normal mass below 0 = 0.217

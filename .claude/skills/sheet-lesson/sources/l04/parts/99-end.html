@@ -1,0 +1,55 @@
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Une variable aléatoire est une fonction de l'issue du tirage. Fixe : p, μ ; aléatoire : X, X̄, p̂ ; réalisé : x, x̄.</li>
+    <li>Discret : P(X = x) est une probabilité (PMF). Continu : P(X = x) = 0, et la densité f est une probabilité par unité ; P(a &lt; X ≤ b) = F(b) − F(a).</li>
+    <li>Une densité évaluée est une vraisemblance, qui peut dépasser 1 ; intégrée, c'est une probabilité.</li>
+    <li>Bernoulli(p) : P(X = x ; p) = pˣ(1 − p)¹⁻ˣ, de moyenne p.</li>
+    <li>Binomiale(n, p), somme de n Bernoulli indépendantes : C(n, k)pᵏ(1 − p)ⁿ⁻ᵏ, E = np, Var = np(1 − p).</li>
+    <li>n grand et np(1 − p) pas trop petit : Binomiale(n, p) ≈ N(np, np(1 − p)) ; np petit : Poisson.</li>
+    <li>Φ(z) = P(Z ≤ z) ; à ±1, 2, 3σ : 68,3, 95,4, 99,7 % ; 95 % à ±1,96σ.</li>
+    <li>Variable entière : un demi de plus à chaque borne ; 400 pièces entre 190 et 230 : 0,852.</li>
+  </ol>
+</div>
+<div class="phrase">« Une variable aléatoire est une fonction de l'issue du tirage : le paramètre est fixe, la variable changerait à chaque tirage, la réalisation est sa valeur sur ce tirage. En discret, la loi donne des probabilités ponctuelles ; en continu, une densité, que j'évalue pour une vraisemblance et que j'intègre pour une probabilité. Une binomiale est une somme de Bernoulli indépendantes ; pour n grand, je l'approche par N(np, np(1 − p)), avec un demi de correction à chaque borne. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Quatre pièces, X = le nombre de piles : qu'est-ce qui est fixe, aléatoire, réalisé ?</div><div class="a hid">Fixe : p = ½, la pièce. Aléatoire : X, et l'estimateur p̂ = X/4, qui changeraient à chaque tirage. Réalisé : x = 3 sur ce tirage, en minuscule.</div></li>
+    <li><div class="q">Pourquoi P(X = 1,75 m) = 0 pour une taille, et que veut dire f(1,75) = 5,7 ?</div><div class="a hid">Un point n'a pas de largeur. f est une probabilité par mètre : une hauteur, la vraisemblance de l'observation 1,75 ; seule une aire est une probabilité.</div></li>
+    <li><div class="q">D'où vient P(X = k) = C(n, k)pᵏ(1 − p)ⁿ⁻ᵏ ?</div><div class="a hid">Une séquence à k succès vaut pᵏ(1 − p)ⁿ⁻ᵏ par indépendance ; il y en a C(n, k) ; ce sont des événements disjoints, on additionne.</div></li>
+    <li><div class="q">Quand une binomiale ressemble-t-elle à une normale, et à laquelle ?</div><div class="a hid">n grand et np(1 − p) pas trop petit : N(np, np(1 − p)). Ce qui converge est (X − np)/√(np(1 − p)). np petit : Poisson.</div></li>
+    <li><div class="q">Pourquoi 68 % dans ±1σ ?</div><div class="a hid">Φ(1) ≈ 0,841 ; il reste 0,159 à droite de 1, autant à gauche de −1 par symétrie ; 1 − 2 × 0,159 ≈ 0,68.</div></li>
+    <li><div class="q">400 pièces : P(190 ≤ X ≤ 230) ?</div><div class="a hid">μ = 200, σ = 10. Exact, 41 termes : 0,852. Normale avec la correction, de 189,5 à 230,5 : Φ(3,05) − Φ(−1,05) = 0,852 ; sans, Φ(3) − Φ(−1) = 0,840.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts et chaînes</div>
+  <div class="bridges">
+    <a href="../chains/chain-p01-01-objet-aleatoire.html"><b>L'objet aléatoire (fil A)</b><small>FIXE, ALÉATOIRE, RÉALISÉ de la notion 1, appliqués à l'accuracy : X ~ Binomiale(n, π), p̂ = X/n.</small></a>
+    <a href="../walkthroughs/walkthrough-p01-04-accuracy-vers-se.html"><b>De l'accuracy au SE</b><small>872 sur 1 000 : la binomiale de la notion 4, puis l'erreur standard.</small></a>
+    <a href="../chains/chain-p01-02-ic-test-procedure.html"><b>IC et test</b><small>Φ et le 1,96 de la notion 6 : un intervalle à 95 %, une p-value.</small></a>
+    <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html"><b>Du bruit à la loss (fil B)</b><small>La densité évaluée aux données est la vraisemblance (notion 2) ; la Bernoulli donne la log-loss (notion 3).</small></a>
+    <a href="../chains/chain-p05-02-logistique.html"><b>Régression logistique</b><small>Le label est une Bernoulli(p(x)) : la loi de la notion 3, avec un p qui dépend de x.</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::va</code> (notion 1) · <code>stats::densite</code> (notion 2) · <code>stats::binomiale</code> (notions 3, 4) · <code>stats::normale</code> (notions 5, 6, 7).</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l04 · v1 du 10/10/2026 · Brunton 13 à 16 · Prérequis : <a href="lesson-00-03-conditionner-bayes-independance.html">l03 · Conditionner, Bayes, indépendance</a>. Suite : <a href="lesson-00-05-poisson-exponentielle-attentes.html">l05 · Événements rares et temps d'attente</a>.</footer>
+</div>

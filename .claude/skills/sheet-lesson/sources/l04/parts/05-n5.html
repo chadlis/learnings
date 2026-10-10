@@ -1,0 +1,61 @@
+<!-- ============================ n5 ============================ -->
+<section class="notion outil" id="n5">
+  <h3>La normale, limite de la binomiale quand n grandit <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 15 · The Normal Distribution: the Limit of the Binomial Distribution for Large n</p>
+  <div class="idee">
+    <p>Brunton écrit la binomiale et, à côté, une courbe qu'il présente sans la justifier : la <b>loi normale</b> de moyenne μ = np et de variance σ² = np(1 − p). Puis il code les deux en Python, la binomiale étiquetée « exacte », la normale « approximation », et les superpose.</p>
+    <p>À n = 100 et p = ½, on ne voit presque pas de différence : l'écart maximal entre une barre et la courbe vaut 0,0002, pour un pic de 0,080. À n = 30, il vaut 0,0012 ; à n = 10, 0,006 ; à n = 5, 0,011 pour un pic de 0,31, et l'approximation ne vaut plus grand-chose. Dernier essai : n = 30 et p = 0,02. La normale met alors 21,7 % de sa masse à gauche de 0, dont 7,6 % sous −0,5, hors de toute barre, sur des nombres de succès négatifs, alors que P(X = 0) vaut 0,545. Pour un p petit à n fixé, donc un np petit, il faudra une autre loi, celle de Poisson.</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — les cinq tracés de Brunton</div>
+    <div id="v5ctl" class="sl-ctl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">Les barres sont la binomiale exacte, la courbe la normale de même moyenne et de même variance. Passe de <b>n = 100</b> à <b>n = 5</b>, à p = ½ : l'écart maximal grimpe de 0,0002 à 0,011, et l'escalier des barres se détache de la courbe. Puis <b>n = 30, p = 0,02</b> : la courbe met 21,7 % de sa masse à gauche de 0, dont 7,6 % sous −0,5, hors de toute barre, et manque la barre P(X = 0) = 0,545 de 0,16.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">densité normale : <i>f</i>(<i>x</i>) = 1/(σ√(2π)) · e<sup>−(<i>x</i> − μ)²/(2σ²)</sup> &nbsp;&nbsp;&nbsp; <i>X</i> ~ N(μ, σ²)</div>
+    <div class="eq"><i>X</i> ~ Binomiale(<i>n</i>, <i>p</i>), <i>n</i> grand : P(<i>X</i> = <i>k</i>) ≈ <i>f</i>(<i>k</i>), avec μ = <i>np</i> et σ² = <i>np</i>(1 − <i>p</i>)</div>
+    <ul>
+      <li>f est une <b>densité</b> (notion 2) : μ place le pic, σ règle la largeur, et σ est hors de la racine (Brunton). Le second paramètre de N(μ, σ²) est la variance.</li>
+      <li>« ≈ f(k) » marche parce que la barre en k a une largeur 1 : sa probabilité vaut à peu près hauteur × 1.</li>
+      <li><b>L'énoncé exact</b> (de Moivre–Laplace) porte sur la variable centrée réduite : P((X − np)/√(np(1 − p)) ≤ z) tend vers P(Z ≤ z) pour tout z, où Z suit N(0, 1) (notion 6).</li>
+      <li><b>p fixe dans ]0, 1[</b> pendant que n grandit. Si p rétrécit comme λ/n, la limite est une loi de Poisson (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n1">l05</a>).</li>
+      <li><b>np(1 − p) pas trop petit</b> : il faut assez de succès et assez d'échecs attendus. Brunton donne n ≈ 30 pour p = ½ ; les règles usuelles demandent np et n(1 − p) au moins 5, ou au moins 10, selon les auteurs.</li>
+      <li><b>Des essais indépendants et de même loi</b>, de variance finie p(1 − p) : c'est le premier cas du théorème central limite (<a href="lesson-00-11-tcl.html#n1">l11</a>), démontré en général en <a href="lesson-00-12-generatrice-preuve-tcl.html#n6">l12</a>. La constante 1/√(2π) fait ∫ f = 1 (<a href="lesson-00-07-lois-jointes.html#n6">l07</a>).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — la binomiale et sa normale, n et p libres</div>
+    <div id="f3ctl" class="sl-ctl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div id="f3sl"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Mêmes objets que la vignette, avec <b>n</b> de 1 à 200 et <b>p</b> libres. Lecture <b>en k</b> : monte n à p = ½, la loi avance (centre np) et s'élargit (σ grandit comme √n), elle ne se fige jamais. Lecture <b>centrée réduite</b> : chaque barre est placée en z = (k − np)/σ et sa hauteur multipliée par σ ; la courbe ne bouge plus, c'est N(0, 1), et les barres viennent s'y coller quand n grandit. C'est cela qui converge. À p = 0,05, il faut n bien plus grand qu'à p = ½ : à n = 200, l'écart maximal vaut encore 0,009.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>les tracés de Brunton chiffrés, un jeu de test</small></summary><div class="in">
+    <ol>
+      <li><b>n = 100, p = ½.</b> μ = 50, σ = √25 = 5. P(X = 50) = 0,0796 ; f(50) = 1/(5√(2π)) = 0,0798.</li>
+      <li><b>Les écarts maximaux</b> entre barres et courbe, à p = ½ : 0,0012 à n = 30 (σ = 2,74) ; 0,006 à n = 10 pour un pic de 0,246 ; 0,011 à n = 5 pour un pic de 0,31.</li>
+      <li><b>Une probabilité « raisonnable, comme 0,35 »</b> (Brunton) : à n = 30, l'écart maximal vaut 0,004.</li>
+      <li><b>n = 30, p = 0,02.</b> μ = 0,6, σ = 0,77. P(X = 0) = 0,98<sup>30</sup> = 0,545, alors que f(0) = 0,383, et 21,7 % de la masse normale tombe à gauche de 0, dont 7,6 % sous −0,5.</li>
+      <li><b>Le cas ML.</b> Sur 1 000 exemples de test à π = 0,87, X ≈ N(870 ; 10,6²). La variance binomiale donne l'erreur standard d'une accuracy, √(π(1 − π)/n) = 0,0106 ; l'approximation normale donne le 1,96 de l'intervalle (notion 6, <a href="../chains/chain-p01-01-objet-aleatoire.html">fil A</a>).</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>le code de Brunton, chiffré</small></summary><div class="in">
+<pre class="py">{{CODE:c5}}</pre>
+<pre class="out">{{OUT:c5}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>np petit.</b> La normale déborde sous 0, alors qu'un nombre de succès est positif : quand p est de l'ordre de λ/n, c'est le cas de Poisson (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n1">l05</a>). Un p petit ne suffit pas à la faire échouer : à p = 0,02 et n = 10 000, np = 200 et l'écart maximal vaut 0,0005.</li>
+      <li><b>n petit.</b> L'escalier des barres se voit : à n = 5, l'écart vaut 3,6 % du pic.</li>
+      <li><b>Les queues, en relatif.</b> À n = 100 et p = ½, P(X ≥ 70) vaut 3,9 · 10<sup>−5</sup> ; la normale, même avec la correction de la notion 7, donne 4,8 · 10<sup>−5</sup>. L'écart est minuscule en absolu, de 23 % en relatif : une très petite p-value calculée par la normale n'a que son ordre de grandeur.</li>
+      <li><b>« La binomiale converge vers la normale »</b>, mais pas vers une loi fixe : sa moyenne np et son écart-type √(np(1 − p)) grandissent avec n. Ce qui converge, c'est la variable centrée réduite (figure 3).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (15) écrit la normale « P(X = x) = 1/(σ√(2π)) e<sup>…</sup> », et (16) dit encore que f(x) « est la probabilité que X égale x », puis précise « la probabilité infinitésimale ». f(x) est une densité : pour une variable continue, P(X = x) = 0, et c'est f(x) dx, l'aire d'une fenêtre de largeur dx, qui est une probabilité. Ce qui approche P(X = k) pour la binomiale, c'est f(k) × 1, l'aire d'une barre de largeur 1.</div>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (15) dit que la binomiale « converge vers une normale » de moyenne np et de variance npq, et que des variables « indépendantes, identiques », de « presque toute loi », donnent une somme normale « sous des conditions très faibles ». Le premier énoncé exact porte sur (X − np)/√(npq). Au second il manque une condition, la variance finie, et ce qui converge est encore la somme centrée réduite (<a href="lesson-00-11-tcl.html#n1">l11</a>).</div>
+  </div></details>
+  <p class="garde">Binomiale(n, p), n grand et np(1 − p) pas petit : (X − np)/√(np(1 − p)) tend vers N(0, 1), d'où P(X = k) ≈ f(k) pour N(np, np(1 − p)). Si np reste petit, c'est Poisson.</p>
+</section>
+

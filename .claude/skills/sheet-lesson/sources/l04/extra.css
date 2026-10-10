@@ -1,0 +1,14 @@
+.cols th,.cols td{text-align:left;vertical-align:top}
+.cols th{text-transform:uppercase;font-size:11px;letter-spacing:.08em}
+.formule table.cols{margin:8px 0}
+.sl-hl{fill:none;stroke:var(--red);stroke-width:3}
+.sl-area{fill:#6B46C1;opacity:.3}
+.sl-area2{fill:var(--red);opacity:.28}
+.sl-barlite{fill:#6B46C1;opacity:.16}
+.sl-barline{fill:none;stroke:#6B46C1;stroke-width:1.2}
+.sl-pxoff{fill:#22302B}
+.sl-tile{stroke:rgba(34,48,43,.35);stroke-width:1}
+.sl-tile-t{font:600 13px var(--mono);fill:var(--cardink)}
+.sl-tile-x{font:700 14px var(--mono);fill:var(--cardink)}
+.sl-cap-t{font:600 12px var(--sans);fill:var(--cardink)}
+text.sl-gn{fill:var(--green);stroke:var(--green)}
