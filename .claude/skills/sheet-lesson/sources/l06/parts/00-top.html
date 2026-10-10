@@ -1,0 +1,44 @@
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 6</div>
+  <h1>Fonctions d'une <span>variable aléatoire</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">On définit une variable aléatoire pour pouvoir en prendre des fonctions : changer d'unité, élever au carré, standardiser. La loi de <i>Y</i> = g(<i>X</i>) se déduit de celle de <i>X</i>, mais pas en recopiant la densité : on passe par la fonction de répartition. La leçon suit Brunton 23 à 25, avec ses exemples : les degrés Celsius et Fahrenheit, la table de Φ, le carré d'une normale. L'attente entre deux spams sert de loi asymétrique.</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="lesson-00-04-variables-binomiale-normale.html#n2">l04 · Densité et répartition</a></li>
+    <li><a href="lesson-00-04-variables-binomiale-normale.html#n6">l04 · Normale centrée réduite, Φ</a></li>
+    <li><a href="lesson-00-05-poisson-exponentielle-attentes.html#n3">l05 · Loi exponentielle</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::standardisation</code><code>stats::chi2</code></div>
+  <h4>Suite</h4>
+  <ol>
+    <li><a href="lesson-00-07-lois-jointes.html">l07 · Lois jointes</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>Densité et fonction de répartition.</b> Une variable continue <i>X</i> a une densité <i>f</i><sub><i>X</i></sub> ≥ 0 : P(<i>c</i> &lt; <i>X</i> &lt; <i>d</i>) = ∫<sub><i>c</i></sub><sup><i>d</i></sup> <i>f</i><sub><i>X</i></sub>. Sa fonction de répartition (CDF) est F<sub><i>X</i></sub>(<i>x</i>) = P(<i>X</i> ≤ <i>x</i>), et F<sub><i>X</i></sub>′ = <i>f</i><sub><i>X</i></sub> (<a href="lesson-00-04-variables-binomiale-normale.html#n2">l04, notion 2</a>).</li>
+      <li><b>La normale.</b> N(μ, σ²), de moyenne μ et de variance σ². La normale centrée réduite N(0, 1) a la densité φ(<i>x</i>) = e<sup>−<i>x</i>²/2</sup>/√(2π) et la fonction de répartition Φ ; Φ(1) = 0,841 et Φ(−<i>z</i>) = 1 − Φ(<i>z</i>) (<a href="lesson-00-04-variables-binomiale-normale.html#n6">l04, notion 6</a>).</li>
+      <li><b>L'exponentielle.</b> L'attente <i>T</i> d'un flux de taux λ a la densité λe<sup>−λ<i>t</i></sup> pour <i>t</i> ≥ 0, la répartition 1 − e<sup>−λ<i>t</i></sup> et la moyenne 1/λ (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n3">l05, notion 3</a>).</li>
+      <li><b>La règle de la chaîne.</b> La dérivée de F(<i>h</i>(<i>y</i>)) est F′(<i>h</i>(<i>y</i>)) · <i>h</i>′(<i>y</i>). Elle sert dans chaque preuve de la leçon, et c'est elle qui fait apparaître le facteur qu'on oublie.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">

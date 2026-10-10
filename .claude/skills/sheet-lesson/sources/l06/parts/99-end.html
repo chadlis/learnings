@@ -1,0 +1,55 @@
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Une densité est un taux par unité : elle ne se recopie pas. Une fonction de répartition, probabilité d'un événement, se transporte.</li>
+    <li>Méthode : F<sub>Y</sub>(y) = P(g(X) ≤ y), réécrire en événement sur X, puis dériver par la règle de la chaîne.</li>
+    <li>g monotone : f<sub>Y</sub>(y) = f<sub>X</sub>(g⁻¹(y)) · |(g⁻¹)′(y)| ; la densité se divise par l'étirement.</li>
+    <li>Y = aX + b : f<sub>Y</sub>(y) = f<sub>X</sub>((y − b)/a)/|a|, moyenne aμ + b, écart-type |a|σ ; a &lt; 0 retourne l'inégalité.</li>
+    <li>Une normale reste normale : aX + b ~ N(aμ + b, a²σ²).</li>
+    <li>Z = (X − μ)/σ : moyenne 0 et écart-type 1 toujours, N(0, 1) seulement si X est normale ; P(c &lt; X &lt; d) = Φ((d − μ)/σ) − Φ((c − μ)/σ).</li>
+    <li>X ~ N(0, 1) ⇒ X² suit un χ² à 1 degré de liberté : P(X² ≤ y) = 2Φ(√y) − 1, moyenne 1, variance 2, densité infinie en 0.</li>
+  </ol>
+</div>
+<div class="phrase">« Pour la loi d'une fonction d'une variable aléatoire, je ne transforme pas la densité : je passe par la fonction de répartition, P(g(X) ≤ y), que je réécris comme un événement sur X, puis je dérive. Pour une transformation affine, la densité se divise par |a| ; standardiser en est le cas a = 1/σ, et ça ne rend normale qu'une variable déjà normale. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Pourquoi ne peut-on pas simplement remplacer x par g⁻¹(y) dans la densité de X ?</div><div class="a hid">Une densité est un taux par unité de longueur : si g étire, la même probabilité s'étale, il faut diviser par l'étirement |g′|. Uniforme sur [0, 1] étirée par 2 et recopiée : aire 2.</div></li>
+    <li><div class="q">Quelle est la méthode pour trouver la loi de Y = g(X) ?</div><div class="a hid">Écrire F<sub>Y</sub>(y) = P(g(X) ≤ y), le traduire en événement sur X, l'exprimer avec F<sub>X</sub>, puis dériver par la règle de la chaîne.</div></li>
+    <li><div class="q">Densité de aX + b, et ce qui change si a &lt; 0 ?</div><div class="a hid">f<sub>X</sub>((y − b)/a)/|a|. Si a &lt; 0, l'inégalité se retourne : F<sub>Y</sub>(y) = 1 − F<sub>X</sub>((y − b)/a). L'écart-type est |a|σ.</div></li>
+    <li><div class="q">X ~ N(15, 5²). Que vaut P(10 &lt; X &lt; 25) ?</div><div class="a hid">On standardise : z = −1 et 2, donc Φ(2) − Φ(−1) = 0,9772 − 0,1587 ≈ 0,819.</div></li>
+    <li><div class="q">Standardiser une variable explicative exponentielle la rend-elle normale ?</div><div class="a hid">Non : moyenne 0 et écart-type 1, mais la même forme. P(Z &gt; 2) = 0,050, et non les 0,023 de Φ.</div></li>
+    <li><div class="q">Quelle est la loi de X² pour X ~ N(0, 1) ?</div><div class="a hid">P(X² ≤ y) = P(|X| ≤ √y) = 2Φ(√y) − 1 : deux antécédents ±√y. Densité e<sup>−y/2</sup>/√(2πy), moyenne 1 : le χ² à 1 degré de liberté ; 3,84 ≈ 1,96².</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Chaînes</div>
+  <div class="bridges">
+    <a href="../chains/chain-p01-02-ic-test-procedure.html"><b>Intervalle de confiance et test</b><small>z = <span class="hat">β</span>₁/SE et p = 2(1 − Φ(2,26)) : une standardisation lue dans Φ (notion 3).</small></a>
+    <a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html"><b>Comparer deux modèles</b><small>McNemar, (c − b)²/(b + c) : le carré d'une différence standardisée, comparé à un χ² à 1 degré de liberté (notion 4).</small></a>
+    <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html"><b>Du bruit à la loss</b><small>La log-vraisemblance négative gaussienne, ½ Σ (rᵢ/σ)² : une somme de carrés d'erreurs normalisées (notion 4).</small></a>
+    <a href="../chains/chain-p04-04-pca.html"><b>PCA</b><small>Standardiser quand les unités diffèrent, sinon la variance fabrique la composante (notion 3).</small></a>
+    <a href="../chains/chain-p07-04-kmeans.html"><b>k-means</b><small>La distance euclidienne porte les unités : standardiser d'abord (notion 3).</small></a>
+    <a href="../chains/chain-p06-02-cv-leakage.html"><b>Validation croisée et fuite</b><small><span class="hat">μ</span> et <span class="hat">σ</span> de la standardisation se calculent dans le pli d'apprentissage (notion 3).</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::standardisation</code> (notions 1, 2, 3) · <code>stats::chi2</code> (notion 4, culture ici : la carte viendra avec les tests).</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l06 · v1 du 10/10/2026 · Brunton 23 à 25 · Prérequis : <a href="lesson-00-04-variables-binomiale-normale.html">l04</a>, <a href="lesson-00-05-poisson-exponentielle-attentes.html">l05</a>. Suite : <a href="lesson-00-07-lois-jointes.html">l07 · Lois jointes</a>.</footer>
+</div>

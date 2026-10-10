@@ -1,0 +1,8 @@
+Y = 2U, histogram heights: [0.5   0.5   0.499 0.501]
+area of the copied density: 2.0
+P(-ln U <= 0.5): simulated 0.3937, method 0.3935
+P(-ln U <= 1.0): simulated 0.6325, method 0.6321
+P(-ln U <= 2.0): simulated 0.8644, method 0.8647
+P(T <= 0.1 h) = 0.3294
+P(M <= 6 min) = 0.3294
+first minute: 0.0643  exact 0.0645  rate x width = 4/60 = 0.0667

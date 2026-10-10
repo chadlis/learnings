@@ -1,0 +1,73 @@
+<!-- ============================ n1 ============================ -->
+<section class="notion outil" id="n1">
+  <h3>De CDF à CDF, puis dériver : la densité ne se recopie pas <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 23 · Functions of a Random Variable</p>
+  <div class="idee">
+    <p>Brunton pose <i>Y</i> = g(<i>X</i>) : des °F convertis en °C, le carré <i>X</i>² d'une normale, l'énergie cinétique ½<i>mV</i>² d'une molécule. Avant toute formule, il prévient : « brancher » la densité de <i>X</i> dans g ne donne pas une densité.</p>
+    <p>Le plus petit exemple : <i>X</i> uniforme sur [0, 1], de densité 1, et <i>Y</i> = 2<i>X</i>, uniforme sur [0, 2]. Recopier la densité, une hauteur 1 sur [0, 2], donne une aire de 2. La bonne hauteur est ½. Une densité est un taux de probabilité par unité de longueur : quand g étire, la même probabilité s'étale sur une largeur double, donc le taux est divisé par deux.</p>
+    <p>La fonction de répartition, elle, est la probabilité d'un événement, et « <i>Y</i> ≤ <i>y</i> » se réécrit « <i>X</i> ≤ <i>y</i>/2 ». D'où la règle de Brunton : <b>de CDF à CDF, puis dériver</b>. On intègre pour passer de la densité à la CDF, on dérive pour revenir.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — étirer une densité : l'aire se garde, la hauteur baisse</div>
+    <div id="v1ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">En haut, <i>X</i> uniforme sur [0, 1] ; la bande foncée [0,2 ; 0,3] porte une probabilité de 0,1. En bas, <i>Y</i> = <i>aX</i>. Le rectangle violet est la vraie densité, de hauteur 1/<i>a</i> ; le pointillé rouge est la densité recopiée, de hauteur 1, dont l'aire vaut <i>a</i>. Bouge <b>a</b> : la bande devient [0,2<i>a</i> ; 0,3<i>a</i>], plus large et plus basse, et porte toujours 0,1. À <i>a</i> = 2, l'exemple de l'idée : aire recopiée 2, hauteur vraie 0,5.</p>
+  </div>
+  <div class="formule"><div class="lbl">La méthode, puis la formule qu'elle donne</div>
+    <div class="eq">F<sub><i>Y</i></sub>(<i>y</i>) = P(g(<i>X</i>) ≤ <i>y</i>) = P(<i>X</i> dans l'ensemble correspondant) &nbsp;&nbsp; puis &nbsp;&nbsp; <i>f</i><sub><i>Y</i></sub>(<i>y</i>) = F<sub><i>Y</i></sub>′(<i>y</i>)</div>
+    <div class="eq">g strictement monotone : &nbsp; <i>f</i><sub><i>Y</i></sub>(<i>y</i>) = <i>f</i><sub><i>X</i></sub>(g⁻¹(<i>y</i>)) · |(g⁻¹)′(<i>y</i>)|</div>
+    <ul>
+      <li><i>X</i> a une densité, donc P(<i>X</i> = <i>x</i>) = 0 : écrire ≤ ou &lt; ne change rien.</li>
+      <li>g strictement monotone sur l'ensemble des valeurs de <i>X</i> (<i>x</i>² l'est sur [0, 1], pas sur ℝ) : l'événement « g(<i>X</i>) ≤ <i>y</i> » est une demi-droite pour <i>X</i>, « <i>X</i> ≤ g⁻¹(<i>y</i>) » si g croît, « <i>X</i> ≥ g⁻¹(<i>y</i>) » si g décroît. Sinon il a plusieurs morceaux (notion 4).</li>
+      <li>g dérivable, avec g′(<i>x</i>) ≠ 0 : la règle de la chaîne fait sortir (g⁻¹)′(<i>y</i>) = 1/g′(<i>x</i>), l'inverse de l'étirement local. La valeur absolue couvre le cas g décroissante.</li>
+      <li>En discret, rien de tout cela : les masses se transportent telles quelles, P(<i>Y</i> = <i>y</i>) = Σ P(<i>X</i> = <i>x</i>) sur les <i>x</i> tels que g(<i>x</i>) = <i>y</i> (<a href="lesson-00-08-esperance-variance.html#n5">l08, notion 5</a>). C'est la densité, un taux, qui ne se transporte pas.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — dix tranches de probabilité 0,1 : g les étire ou les tasse</div>
+    <div id="f1ctl" class="sl-ctl"></div>
+    <div id="f1plot"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap"><i>X</i> est uniforme sur [0, 1], coupée en dix tranches de largeur 0,1 : chacune porte une probabilité de 0,1. Dans le premier panneau, la courbe <i>y</i> = g(<i>x</i>) envoie chaque tranche sur un intervalle de <i>y</i>, de la même couleur. Dans le second, la densité de <i>Y</i>, couchée le long du même axe <i>y</i> : chaque tranche y devient un rectangle d'aire 0,1, d'autant plus bas qu'il est large. Le trait noir est la densité exacte de la formule. Choisis <b>x²</b> : là où g est plate, près de 0, la première tranche est tassée dans [0 ; 0,01] et monte à 10. Choisis <b>−ln x</b> : on obtient l'exponentielle e<sup>−<i>y</i></sup>.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>uniforme étirée, spams en minutes, une exponentielle, le carré sur [0, 1]</small></summary><div class="in">
+    <ol>
+      <li><b>Uniforme étirée.</b> <i>Y</i> = 2<i>X</i>, <i>X</i> uniforme sur [0, 1]. F<sub><i>Y</i></sub>(<i>y</i>) = P(2<i>X</i> ≤ <i>y</i>) = P(<i>X</i> ≤ <i>y</i>/2) = <i>y</i>/2 pour <i>y</i> dans [0, 2]. Sa dérivée vaut ½ : la densité de <i>Y</i>. La densité recopiée, 1 sur [0, 2], aurait une aire de 2.</li>
+      <li><b>Les spams, en heures puis en minutes.</b> L'attente <i>T</i> suit une exponentielle de taux 4 par heure : <i>f</i><sub><i>T</i></sub>(0) = 4 par heure. En minutes, <i>M</i> = 60<i>T</i>. F<sub><i>M</i></sub>(<i>m</i>) = P(<i>T</i> ≤ <i>m</i>/60) = 1 − e<sup>−4<i>m</i>/60</sup>, dont la dérivée en 0 vaut 4/60 = 0,0667 par minute. Même attente, densité 60 fois plus basse. Mais un même événement garde sa probabilité : P(<i>M</i> ≤ 6 min) = P(<i>T</i> ≤ 0,1 h) = 1 − e<sup>−0,4</sup> = 0,330.</li>
+      <li><b>Fabriquer une exponentielle avec un uniforme.</b> <i>U</i> uniforme sur [0, 1] et <i>Y</i> = −ln <i>U</i>, une fonction décroissante. P(<i>Y</i> ≤ <i>y</i>) = P(ln <i>U</i> ≥ −<i>y</i>) = P(<i>U</i> ≥ e<sup>−<i>y</i></sup>) = 1 − e<sup>−<i>y</i></sup> : <i>Y</i> suit une exponentielle de taux 1, et P(<i>Y</i> ≤ 1) = 0,632. Avec la formule : g⁻¹(<i>y</i>) = e<sup>−<i>y</i></sup>, (g⁻¹)′(<i>y</i>) = −e<sup>−<i>y</i></sup>, donc <i>f</i><sub><i>Y</i></sub>(<i>y</i>) = <i>f</i><sub><i>U</i></sub>(e<sup>−<i>y</i></sup>) · e<sup>−<i>y</i></sup> = e<sup>−<i>y</i></sup>. C'est la méthode d'inversion : la fonction de répartition de l'exponentielle de taux 1 est F(<i>y</i>) = 1 − e<sup>−<i>y</i></sup>, d'inverse F⁻¹(<i>u</i>) = −ln(1 − <i>u</i>), et 1 − <i>U</i> est encore uniforme. À partir d'un générateur uniforme, on simule ainsi toute loi dont on sait inverser la fonction de répartition.</li>
+      <li><b>Le carré sur [0, 1], celui de la figure 1.</b> <i>X</i> uniforme sur [0, 1] et <i>Y</i> = <i>X</i>² : g est croissante sur [0, 1], g⁻¹(<i>y</i>) = √<i>y</i> et (g⁻¹)′(<i>y</i>) = 1/(2√<i>y</i>). Donc <i>f</i><sub><i>Y</i></sub>(<i>y</i>) = 1 · 1/(2√<i>y</i>) = 1/(2√<i>y</i>) sur ]0, 1], la densité exacte de la figure 1. Sur [0 ; 0,01], elle donne P = √0,01 = 0,1 : la première tranche.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la formule de g monotone, en deux cas</small></summary><div class="in">
+    <p><b>g croissante.</b></p>
+    <div class="drv">
+      <div>F<sub><i>Y</i></sub>(<i>y</i>) = P(g(<i>X</i>) ≤ <i>y</i>)</div><span>définition de la fonction de répartition de Y</span>
+      <div>= P(<i>X</i> ≤ g⁻¹(<i>y</i>)) = F<sub><i>X</i></sub>(g⁻¹(<i>y</i>))</div><span>g croissante : g(x) ≤ y équivaut à x ≤ g⁻¹(y)</span>
+      <div><i>f</i><sub><i>Y</i></sub>(<i>y</i>) = <i>f</i><sub><i>X</i></sub>(g⁻¹(<i>y</i>)) · (g⁻¹)′(<i>y</i>)</div><span>dériver : règle de la chaîne, F<sub>X</sub>′ = f<sub>X</sub> ; ici (g⁻¹)′ &gt; 0</span>
+    </div>
+    <p><b>g décroissante.</b></p>
+    <div class="drv">
+      <div>F<sub><i>Y</i></sub>(<i>y</i>) = P(<i>X</i> ≥ g⁻¹(<i>y</i>)) = 1 − F<sub><i>X</i></sub>(g⁻¹(<i>y</i>))</div><span>g décroissante retourne l'inégalité ; P(X = g⁻¹(y)) = 0</span>
+      <div><i>f</i><sub><i>Y</i></sub>(<i>y</i>) = −<i>f</i><sub><i>X</i></sub>(g⁻¹(<i>y</i>)) · (g⁻¹)′(<i>y</i>)</div><span>règle de la chaîne ; le moins vient du « 1 − »</span>
+      <div>= <i>f</i><sub><i>X</i></sub>(g⁻¹(<i>y</i>)) · |(g⁻¹)′(<i>y</i>)|</div><span>(g⁻¹)′ &lt; 0, donc −(g⁻¹)′ = |(g⁻¹)′|</span>
+    </div>
+    <p>Lecture physique : la tranche [<i>x</i>, <i>x</i> + d<i>x</i>] porte la probabilité <i>f</i><sub><i>X</i></sub>(<i>x</i>) d<i>x</i>. Son image a la largeur |d<i>y</i>| = |g′(<i>x</i>)| d<i>x</i> et porte la même probabilité, donc <i>f</i><sub><i>Y</i></sub>(<i>y</i>) |d<i>y</i>| = <i>f</i><sub><i>X</i></sub>(<i>x</i>) d<i>x</i>. Le facteur |(g⁻¹)′| est un jacobien en dimension 1 ; en dimension 2, c'est un déterminant (<a href="lesson-00-07-lois-jointes.html#n6">l07, notion 6</a>).</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>uniforme étirée, −ln U, heures et minutes</small></summary><div class="in">
+<pre class="py">{{CODE:c1}}</pre>
+<pre class="out">{{OUT:c1}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Brancher la densité dans g.</b> C'est l'exercice que propose Brunton : élever au carré la densité de la normale. φ(<i>x</i>)² a une aire de 1/(2√π) = 0,282 : ce n'est pas une densité, et ce n'est pas la loi de <i>X</i>² (notion 4).</li>
+      <li><b>Oublier le facteur.</b> <i>f</i><sub><i>X</i></sub>(g⁻¹(<i>y</i>)) seul : pour <i>Y</i> = <i>aX</i>, son aire vaut <i>a</i> (vignette). Le facteur |(g⁻¹)′(<i>y</i>)| est exactement ce que fait sortir la règle de la chaîne : sauter cette ligne, c'est le perdre.</li>
+      <li><b>g non monotone.</b> Pour g(<i>x</i>) = <i>x</i>² et une <i>X</i> qui prend des valeurs des deux signes, deux valeurs de <i>x</i> donnent le même <i>y</i> : l'événement « g(<i>X</i>) ≤ <i>y</i> » a deux bouts, et la densité deux termes (notion 4).</li>
+      <li><b>La valeur d'une densité dépend de l'unité, une probabilité non.</b> 4 par heure ou 0,0667 par minute : c'est la même attente. On évalue une densité en un point pour une vraisemblance, on l'intègre pour une probabilité (<a href="lesson-00-04-variables-binomiale-normale.html#n2">l04, notion 2</a>) ; seule l'intégrale est indépendante de l'unité.</li>
+      <li><b>En ML : comparer des vraisemblances sur deux échelles.</b> Un modèle de log <i>y</i> donne à <i>y</i> la densité <i>f</i>(log <i>y</i>)/<i>y</i> : sa log-vraisemblance en <i>y</i> perd Σ log <i>y</i><sub><i>i</i></sub>. Comparer sans ce terme les log-vraisemblances d'un modèle de <i>y</i> et d'un modèle de log <i>y</i> n'a pas de sens. Les normalizing flows reposent sur cette formule : log <i>p</i><sub><i>X</i></sub>(<i>x</i>) = log <i>p</i><sub><i>Z</i></sub>(<i>z</i>) + log |det ∂<i>z</i>/∂<i>x</i>|.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (13, 16, 23) dit souvent « cumulative density function ». C'est la fonction de répartition, en anglais cumulative distribution function : une probabilité, sans unité, et non une densité. C'est justement pour ça qu'elle se transporte d'une variable à l'autre, alors que la densité ne le fait pas.</div>
+  </div></details>
+  <p class="garde">X à densité, g strictement monotone sur les valeurs de X, Y = g(X) : f<sub>Y</sub>(y) = f<sub>X</sub>(g⁻¹(y)) · |(g⁻¹)′(y)|. On l'obtient en dérivant F<sub>Y</sub>(y) = P(g(X) ≤ y), jamais en recopiant la densité.</p>
+</section>
+

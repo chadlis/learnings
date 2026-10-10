@@ -1,0 +1,6 @@
+Phi(2) - Phi(-1) = 0.8186   simulated: 0.819
+mean 0.000   sd 1.000
+P(Z > 2): 0.0498   Phi says 0.0228
+P(Z < -1): 0.0   Phi says 0.1587
+raw:      AB 10.0   AC 10000.0
+z-scores: AB 1.0   AC 0.5

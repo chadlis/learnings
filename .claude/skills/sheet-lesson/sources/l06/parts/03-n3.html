@@ -1,0 +1,60 @@
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>Standardiser : Z = (X − μ)/σ, et les intervalles par Φ <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 24 · Rescaling the Normal Distribution to Mean Zero and Variance One</p>
+  <div class="idee">
+    <p>Quand les ordinateurs étaient lents, raconte Brunton, on ne trouvait Φ que pour la normale centrée réduite, dans une table « au fond du livre ». On y ramenait toute autre normale : <i>Z</i> = (<i>X</i> − μ)/σ. C'est la notion 2 avec <i>a</i> = 1/σ et <i>b</i> = −μ/σ : moyenne μ/σ − μ/σ = 0, écart-type σ/σ = 1. On <b>centre</b>, puis on <b>réduit</b>.</p>
+    <p>Les événements se correspondent, donc les probabilités aussi : « <i>X</i> entre μ − σ et μ + σ » est « <i>Z</i> entre −1 et 1 », 68,3 %. Avec nos journées <i>X</i> ~ N(15, 5²) : P(10 &lt; <i>X</i> &lt; 25) = P(−1 &lt; <i>Z</i> &lt; 2) = Φ(2) − Φ(−1) = 0,9772 − 0,1587 ≈ 0,819. Brunton cite P(<i>X</i> &lt; 7) sans paramètres ; ici <i>z</i> = (7 − 15)/5 = −1,6 et Φ(−1,6) = 0,0548.</p>
+    <p>Ce <i>z</i>, le <b>z-score</b>, compte en écarts-types la distance à la moyenne : il est sans unité.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — deux cloches reliées : standardiser change les graduations, pas la forme</div>
+    <div id="v3ctl" class="sl-ctl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">En haut <i>X</i> ~ N(15, 5²) en °C, en bas <i>Z</i> ~ N(0, 1). Les deux axes sont alignés : 15 °C au-dessus de 0, chaque pas de 5 °C au-dessus d'un pas de 1. La cloche est la même ; seules changent les graduations, et les hauteurs, 0,0798 en haut et 0,399 en bas : cinq fois plus, puisqu'une unité de <i>z</i> couvre 5 °C. Choisis un intervalle, la même aire s'ombre en haut et en bas. <b>10 à 20 °C</b> : ±1σ, 68,3 %. <b>X &lt; 7 °C</b>, l'exemple de Brunton : <i>Z</i> &lt; −1,6, 5,48 %. <b>10 à 25 °C</b> : de −1 à 2, 81,9 %.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>Z</i> = (<i>X</i> − μ)/σ &nbsp;&nbsp;&nbsp; E[<i>Z</i>] = 0 &nbsp;&nbsp;&nbsp; σ<sub><i>Z</i></sub> = 1</div>
+    <div class="eq"><i>X</i> ~ N(μ, σ²) : &nbsp; P(<i>c</i> &lt; <i>X</i> &lt; <i>d</i>) = Φ((<i>d</i> − μ)/σ) − Φ((<i>c</i> − μ)/σ)</div>
+    <ul>
+      <li>C'est la preuve promise en l04 (<a href="lesson-00-04-variables-binomiale-normale.html#n6">notion 6</a>) : la notion 2 avec <i>a</i> = 1/σ, <i>b</i> = −μ/σ, et une normale reste normale.</li>
+      <li>Moyenne 0 et écart-type 1 pour toute loi de variance finie : c'est la notion 2 avec <i>a</i> = 1/σ &gt; 0, donc sans retournement.</li>
+      <li><i>Z</i> ~ N(0, 1) seulement si <i>X</i> est normale. Standardiser ne change pas la forme (figure 3).</li>
+      <li><i>c</i> et <i>d</i> sont les bornes de l'intervalle.</li>
+      <li>En pratique μ et σ sont inconnus : on standardise avec <span class="hat">μ</span> et <span class="hat">σ</span>, estimés sur l'apprentissage, et ce n'est plus la standardisation exacte. Pour la moyenne de <i>n</i> variables i.i.d. N(μ, σ²) standardisée par l'écart-type estimé, la loi devient une Student à <i>n</i> − 1 degrés de liberté, pas N(0, 1) (<a href="../chains/chain-p01-03-inference-regression.html">inférence en régression</a>).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — standardiser ne rend pas normal</div>
+    <div id="f3ctl" class="sl-ctl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">La densité de <i>Z</i> = (<i>X</i> − μ)/σ en violet, contre la normale centrée réduite φ en pointillé. Les trois lois, une fois standardisées, ont une moyenne 0 et un écart-type 1, mais seule la normale coïncide avec φ. Choisis <b>exponentielle</b> : <i>Z</i> = <i>T</i> − 1 (taux 1 : μ = σ = 1 ; toute exponentielle donne la même <i>Z</i>) commence à −1 et garde sa queue droite ; la zone ombrée, P(<i>Z</i> &gt; 2) = e<sup>−3</sup> = 0,0498, fait plus du double des 0,0228 que donnerait Φ. Choisis <b>uniforme</b> : <i>Z</i> reste entre −1,73 et 1,73, et P(<i>Z</i> &gt; 2) = 0.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>la règle 68-95-99,7, deux intervalles, les 400 pièces, des variables explicatives</small></summary><div class="in">
+    <ol>
+      <li><b>±1, 2, 3 écarts-types.</b> Pour toute normale : 68,3 %, 95,4 % et 99,7 % (vus en <a href="lesson-00-04-variables-binomiale-normale.html#n6">l04, notion 6</a>). Pour <i>X</i> ~ N(15, 5²), ce sont les intervalles 10 à 20, 5 à 25 et 0 à 30 °C.</li>
+      <li><b>Un intervalle quelconque.</b> P(10 &lt; <i>X</i> &lt; 25) : <i>z</i> = (10 − 15)/5 = −1 et (25 − 15)/5 = 2, donc Φ(2) − Φ(−1) = 0,9772 − 0,1587 ≈ 0,819.</li>
+      <li><b>Une queue.</b> P(<i>X</i> &lt; 7) : <i>z</i> = −1,6, Φ(−1,6) = 0,0548.</li>
+      <li><b>Les 400 pièces de Brunton</b> (<a href="lesson-00-04-variables-binomiale-normale.html#n7">l04, notion 7</a>). Le nombre de piles est approximativement N(200, 10²) ; entre 190 et 230, la normale sans correction donne Φ((230 − 200)/10) − Φ((190 − 200)/10) = Φ(3) − Φ(−1) = 0,840 (la valeur exacte, 0,852, demande la correction de continuité, l04 notion 7). C'était déjà une standardisation.</li>
+      <li><b>En ML : standardiser des variables explicatives (features).</b> Trois clients, A (170 cm, 30 k€), B (180 cm, 30 k€), C (170 cm, 40 k€). En cm et en k€, A est à 10 de B et à 10 de C. Passe le revenu en € : A est toujours à 10 de B, mais à 10 000 de C, et un k-means ne voit plus que le revenu. Divise chaque variable par son écart-type, disons 10 cm et 20 k€ : A est à 1 de B et à 0,5 de C, quelle que soit l'unité de départ.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>Φ contre simulation, une exponentielle standardisée, des z-scores</small></summary><div class="in">
+<pre class="py">{{CODE:c3}}</pre>
+<pre class="out">{{OUT:c3}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Standardiser ne rend pas normal.</b> Une exponentielle standardisée a une moyenne 0 et un écart-type 1, mais P(<i>Z</i> &gt; 2) = 0,0498 au lieu de 0,0228, et P(<i>Z</i> &lt; −1) = 0 au lieu de 0,159 (figure 3). La règle 68-95-99,7 ne vaut que pour une normale ; le TCL dira quand une moyenne standardisée le devient approximativement (<a href="lesson-00-11-tcl.html#n1">l11</a>).</li>
+      <li><b>σ, pas σ².</b> <code>scipy.stats.norm(loc, scale)</code> et <code>np.random.normal(loc, scale)</code> prennent l'écart-type. Passer la variance 25 au lieu de 5 donne une cloche cinq fois trop large : P(10 &lt; <i>X</i> &lt; 25) tombe de 0,819 à 0,235.</li>
+      <li><b>Les statistiques du jeu de test (test set).</b> <span class="hat">μ</span> et <span class="hat">σ</span> se calculent sur le jeu d'apprentissage seul, puis s'appliquent telles quelles au jeu de test. Les recalculer sur tout le jeu fait fuir de l'information (<a href="../chains/chain-p06-02-cv-leakage.html">validation croisée et fuite</a>).</li>
+      <li><b><span class="hat">μ</span> et <span class="hat">σ</span> ne sont pas μ et σ.</b> Une moyenne standardisée par l'écart-type estimé suit une Student si les données sont normales, aux queues plus lourdes que N(0, 1) ; l'écart ne compte qu'à petit <i>n</i>.</li>
+      <li><b>Les arbres n'en ont pas besoin.</b> Standardiser est une transformation croissante : elle ne change l'ordre d'aucune valeur, donc les mêmes partitions, seule la valeur du seuil change (<a href="../chains/chain-p07-01-arbres-impurete.html">arbres</a>). k-means, k-NN, PCA et régression pénalisée, eux, en dépendent.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (24) appelle Φ « la fonction d'erreur standard ». Φ et la fonction d'erreur erf sont parentes mais différentes : Φ(<i>z</i>) = ½[1 + erf(<i>z</i>/√2)], de sorte que erf(0) = 0 alors que Φ(0) = ½. Et il dit tantôt « normale de moyenne μ et d'écart-type σ », tantôt « de variance σ² » : on écrit N(μ, σ²), le second paramètre est la variance. Enfin, il appelle <i>a</i> et <i>b</i> à la fois les coefficients de la notion 2 et les bornes de l'intervalle : ici, les bornes sont <i>c</i> et <i>d</i>.</div>
+  </div></details>
+  <p class="garde">X ~ N(μ, σ²) : P(c &lt; X &lt; d) = Φ((d − μ)/σ) − Φ((c − μ)/σ), parce que Z = (X − μ)/σ suit N(0, 1), ce qui n'est vrai que si X est normale.</p>
+</section>
+

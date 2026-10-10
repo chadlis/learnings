@@ -1,0 +1,5 @@
+Y in F: mean 59.0   sd 8.99   (theory 59 and 9)
+P(Y <= 68) = 0.842   P(X <= 20) = 0.842   Phi(1) = 0.8413
+peak per degree C: 0.0803   per degree F: 0.0444   ratio 1.81
+P(H <= 0) = 0.158   1 - F_X(20) = 0.1587   F_X(20), no flip = 0.8413
+sd of H: 4.99  = |a| sigma; a sigma would be -5

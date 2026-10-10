@@ -1,0 +1,72 @@
+<!-- ============================ n4 ============================ -->
+<section class="notion culture" id="n4">
+  <h3>Le χ² à un degré de liberté : Y = X² <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 25 · The Chi-Squared Distribution: The Square of the Normal Distribution</p>
+  <div class="idee">
+    <p>Brunton prend <i>X</i> ~ N(0, 1) et <i>Y</i> = <i>X</i>², « l'une des lois les plus utiles pour les tests ». Même méthode : « <i>Y</i> ≤ <i>y</i> » veut dire « <i>X</i>² ≤ <i>y</i> », donc « −√<i>y</i> ≤ <i>X</i> ≤ √<i>y</i> ». Les deux queues de <i>X</i>, à gauche et à droite, se replient sur un seul côté de <i>Y</i>. P(<i>Y</i> ≤ 1) = P(−1 ≤ <i>X</i> ≤ 1) = 0,683 ; P(<i>Y</i> ≤ 3,84) = P(|<i>X</i>| ≤ 1,96) = 0,95.</p>
+    <p>Près de 0, le carré écrase. La bande |<i>X</i>| ≤ 0,1 porte 8 % de la masse de <i>X</i>, et elle tombe tout entière dans [0 ; 0,01] : une densité moyenne de 7,97 sur cet intervalle. Plus on s'approche de 0, plus c'est tassé : la densité de <i>Y</i> n'est pas bornée en 0, et son aire vaut pourtant 1. C'est la loi du <b>χ² à un degré de liberté</b>.</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — la bande ±√y de X fait la probabilité de Y ≤ y</div>
+    <div id="v4ctl" class="sl-ctl"></div><div id="v4sl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">En haut, la densité φ de <i>X</i>, et la bande ombrée de −√<i>y</i> à √<i>y</i>. En bas, la densité du χ², et [0, <i>y</i>] ombré : les deux aires sont égales. Bouge <b>y</b> ou choisis un repère. <b>y = 1</b> : la bande ±1, 68,3 %. <b>y = 3,84</b> : la bande ±1,96, 95 %. <b>y = 0,01</b> : la bande ±0,1 porte déjà 8 % de la masse, entassée dans [0 ; 0,01] : densité moyenne 7,97 (valeur affichée).</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">F<sub><i>Y</i></sub>(<i>y</i>) = P(−√<i>y</i> ≤ <i>X</i> ≤ √<i>y</i>) = Φ(√<i>y</i>) − Φ(−√<i>y</i>) = 2Φ(√<i>y</i>) − 1 &nbsp;&nbsp; (<i>y</i> &gt; 0)</div>
+    <div class="eq"><i>f</i><sub><i>Y</i></sub>(<i>y</i>) = φ(√<i>y</i>)/√<i>y</i> = e<sup>−<i>y</i>/2</sup>/√(2π<i>y</i>) &nbsp;&nbsp;&nbsp; E[<i>Y</i>] = 1 &nbsp;&nbsp;&nbsp; Var(<i>Y</i>) = 2</div>
+    <ul>
+      <li><i>X</i> ~ N(0, 1) exactement. Pour <i>X</i> ~ N(μ, σ²), c'est ((<i>X</i> − μ)/σ)² qui suit cette loi : on standardise d'abord (notion 3).</li>
+      <li><i>Y</i> ≥ 0 : F<sub><i>Y</i></sub>(<i>y</i>) = 0 pour <i>y</i> ≤ 0.</li>
+      <li>g(<i>x</i>) = <i>x</i>² n'est pas monotone : chaque <i>y</i> &gt; 0 a deux antécédents, ±√<i>y</i>, d'où les deux termes en Φ.</li>
+      <li>La somme de <i>k</i> carrés de N(0, 1) indépendantes suit un χ² à <i>k</i> degrés de liberté, de moyenne <i>k</i> et de variance 2<i>k</i> : c'est elle qui sert aux tests. Le χ² à un degré est aussi une loi Gamma de forme ½ et de taux ½ (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n7">l05, notion 7</a>).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — les pentes de Φ en ±√y sont égales, et les deux bouts s'ajoutent</div>
+    <div id="f4ctl" class="sl-ctl"></div>
+    <div id="f4plot" class="wide"></div>
+    <div id="f4sl"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">La courbe est Φ. F<sub><i>Y</i></sub>(<i>y</i>) est l'écart vertical entre Φ(√<i>y</i>) et Φ(−√<i>y</i>), le segment rouge. Les deux tangentes ont la même pente, φ(√<i>y</i>), parce que φ est paire : elles sont parallèles. Quand <i>y</i> augmente, le bout droit avance de 1/(2√<i>y</i>) par unité de <i>y</i> et monte ; le bout gauche recule d'autant et descend. La longueur des flèches rouges est proportionnelle à cette vitesse : elles raccourcissent quand <i>y</i> grandit. Les deux mouvements élargissent l'écart : chacun apporte pente × vitesse, φ(√<i>y</i>)/(2√<i>y</i>), et leur somme est <i>f</i><sub><i>Y</i></sub>(<i>y</i>). Clique <b>▶ élargir la bande</b>, ou bouge <b>y</b>. À <i>y</i> = 1 : pente 0,242, chaque bout 0,121, <i>f</i><sub><i>Y</i></sub>(1) = 0,242.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>trois valeurs de y, la densité, la moyenne, une perte</small></summary><div class="in">
+    <ol>
+      <li><b><i>y</i> = 1.</b> 2Φ(1) − 1 = 0,683, et <i>f</i><sub><i>Y</i></sub>(1) = φ(1) = 0,242.</li>
+      <li><b><i>y</i> = 3,84.</b> √3,84 ≈ 1,96, et 2Φ(1,96) − 1 = 0,95. Le seuil 3,84 d'un test du χ² à un degré de liberté est le carré de 1,96, le quantile 97,5 % de la normale.</li>
+      <li><b><i>y</i> = 0,01.</b> P(|<i>X</i>| ≤ 0,1) = 0,0797, sur un intervalle de longueur 0,01.</li>
+      <li><b>La densité en deux points</b> : <i>f</i><sub><i>Y</i></sub>(0,5) = 0,439 et <i>f</i><sub><i>Y</i></sub>(2) = 0,104, les valeurs de <code>scipy.stats.chi2(1).pdf</code>.</li>
+      <li><b>Moyenne et variance.</b> E[<i>Y</i>] = E[<i>X</i>²] = Var(<i>X</i>) + E[<i>X</i>]² = 1. Pour la normale centrée réduite E[<i>X</i>⁴] = 3, donc Var(<i>Y</i>) = 3 − 1 = 2.</li>
+      <li><b>En ML : une perte (loss) est une somme de carrés normalisés.</b> En régression avec un bruit N(0, σ²), la log-vraisemblance négative vaut ½ Σ (<i>r</i><sub><i>i</i></sub>/σ)² plus une constante (<a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">du bruit à la loss</a>). Si les bruits ε<sub><i>i</i></sub> sont indépendants, Σ (ε<sub><i>i</i></sub>/σ)² suit un χ² à <i>n</i> degrés de liberté, de moyenne <i>n</i> ; avec les résidus d'une régression linéaire à <i>p</i> coefficients, il en reste <i>n</i> − <i>p</i>.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>de CDF à CDF avec deux bouts, la dérivée sur laquelle Brunton trébuche</small></summary><div class="in">
+    <div class="drv">
+      <div>F<sub><i>Y</i></sub>(<i>y</i>) = P(<i>X</i>² ≤ <i>y</i>)</div><span>définition, pour y &gt; 0</span>
+      <div>= P(−√<i>y</i> ≤ <i>X</i> ≤ √<i>y</i>)</div><span>x² ≤ y équivaut à |x| ≤ √y : deux bouts</span>
+      <div>= Φ(√<i>y</i>) − Φ(−√<i>y</i>)</div><span>Φ est la CDF de X ; P(X = −√y) = 0</span>
+      <div><i>f</i><sub><i>Y</i></sub>(<i>y</i>) = φ(√<i>y</i>) · 1/(2√<i>y</i>) − φ(−√<i>y</i>) · (−1/(2√<i>y</i>))</div><span>règle de la chaîne sur chaque terme : Φ′ = φ, (√y)′ = 1/(2√y), (−√y)′ = −1/(2√y)</span>
+      <div>= φ(√<i>y</i>)/(2√<i>y</i>) + φ(√<i>y</i>)/(2√<i>y</i>)</div><span>φ paire : φ(−√y) = φ(√y) ; les deux moins se compensent</span>
+      <div>= φ(√<i>y</i>)/√<i>y</i> = e<sup>−<i>y</i>/2</sup>/√(2π<i>y</i>)</div><span>φ(√y) = e<sup>−y/2</sup>/√(2π)</span>
+    </div>
+    <p>Le point délicat est la quatrième ligne : le moins devant Φ(−√<i>y</i>) et celui de la dérivée intérieure de −√<i>y</i> se compensent. Les pentes de Φ, elles, sont égales.</p>
+    <p>Moyenne et variance : E[<i>Y</i>] = E[<i>X</i>²] = Var(<i>X</i>) + E[<i>X</i>]² = 1 (<a href="lesson-00-08-esperance-variance.html#n6">l08, notion 6</a>). Var(<i>Y</i>) = E[<i>X</i>⁴] − E[<i>X</i>²]² = 3 − 1 = 2, où E[<i>X</i>⁴] = 3 est admis ici : on le retrouve en dérivant quatre fois en 0 la fonction génératrice e<sup><i>t</i>²/2</sup> de N(0, 1), dont le terme en <i>t</i>⁴ est <i>t</i>⁴/8 = 3 · <i>t</i>⁴/4! (<a href="lesson-00-12-generatrice-preuve-tcl.html#n3">l12, notion 3</a>).</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>X² contre 2Φ(√y) − 1, la densité, une somme de cinq carrés</small></summary><div class="in">
+<pre class="py">{{CODE:c4}}</pre>
+<pre class="out">{{OUT:c4}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Le carré de la densité.</b> φ(<i>x</i>)² n'est pas la densité de <i>X</i>² : son aire vaut 0,282, et elle vit sur toute la droite alors que <i>X</i>² ≥ 0.</li>
+      <li><b>Une seule branche.</b> Oublier −√<i>y</i> donne φ(√<i>y</i>)/(2√<i>y</i>), d'aire ½ : il manque la masse des <i>X</i> négatifs.</li>
+      <li><b>Une densité infinie n'est pas une probabilité infinie.</b> <i>f</i><sub><i>Y</i></sub>(<i>y</i>) tend vers l'infini quand <i>y</i> tend vers 0, mais P(<i>Y</i> ≤ 0,01) = 0,0797 seulement. Une densité est un taux : elle peut exploser sur un intervalle de plus en plus court.</li>
+      <li><b><i>X</i> non centrée réduite.</b> Si <i>X</i> ~ N(15, 5²), <i>X</i>² n'est pas un χ² : E[<i>X</i>²] = 25 + 15² = 250. C'est ((<i>X</i> − 15)/5)² qui en est un.</li>
+      <li><b>Ce qui est normal, c'est l'erreur standardisée.</b> Une erreur divisée par son écart-type est ≈ N(0, 1), avant tout carré ; c'est la somme des carrés de ces erreurs standardisées qui est ≈ χ². Il faut aussi qu'elles soient indépendantes, et chaque paramètre estimé retire un degré de liberté (parties 1, tests).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (25) écrit d'abord juste : « I'm going to get minus and minus. So plus… ». Puis il doute, « I think this should be a minus here », et justifie ce doute par « les pentes en +√y et −√y sont égales et opposées ». Elles sont égales : φ est paire, φ(−√<i>y</i>) = φ(√<i>y</i>). Le signe vient de la dérivée intérieure de −√<i>y</i>, qui vaut −1/(2√<i>y</i>) et annule le moins placé devant Φ(−√<i>y</i>) : les deux termes s'ajoutent, comme dans sa première ligne (figure 4). Son résultat final, tiré de ses notes, <i>f</i><sub><i>Y</i></sub>(<i>y</i>) = <i>y</i><sup>−1/2</sup> φ(√<i>y</i>), est juste. Au passage, il écrit la densité de N(0, 1) avec e<sup>−<i>x</i>²/σ²</sup> : c'est e<sup>−<i>x</i>²/2</sup>/√(2π). Enfin, pour les tests, il enchaîne « on soustrait le modèle aux données, on élève l'erreur au carré » et « ces erreurs suivent à peu près une normale », sans dire lesquelles : ce sont les erreurs standardisées, avant le carré.</div>
+  </div></details>
+  <p class="garde">Si X ~ N(0, 1), X² suit un χ² à 1 degré de liberté : P(X² ≤ y) = P(|X| ≤ √y) = 2Φ(√y) − 1, moyenne 1, variance 2, et 3,84 ≈ 1,96². Une somme de k carrés indépendants donne un χ² à k degrés de liberté. Pas de carte ici : elle viendra avec les tests.</p>
+</section>
+

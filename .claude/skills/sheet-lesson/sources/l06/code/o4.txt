@@ -1,0 +1,7 @@
+P(Y <= 0.01): simulated 0.0800, exact 0.0797
+P(Y <= 1): simulated 0.6822, exact 0.6827
+P(Y <= 3.84): simulated 0.9500, exact 0.9500
+mean 1.000   variance 1.999   (theory 1 and 2)
+density at 0.5: simulated 0.437 +- 0.009, formula 0.4394
+density at 2.0: simulated 0.101 +- 0.004, formula 0.1038
+k = 5: mean 4.996   variance 10.00   (theory 5 and 10)

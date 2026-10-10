@@ -1,0 +1,969 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fonctions d'une variable aléatoire — leçon</title>
+<meta name="sheet" content="series=lesson;part=00;number=06;status=v1">
+<meta name="part" content="00 · Socle probabiliste">
+<meta name="subtitle" content="socle — Brunton 23 à 25 : de CDF à CDF, aX + b, standardisation, χ²">
+<meta name="prereq" content="l04,l05">
+<meta name="anki" content="stats::standardisation,stats::chi2">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- série `coding` : squelette annoté et ruban de SL.trace (inerte hors coding) ---- */
+.skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.skel b{color:var(--pen);font-weight:600}
+.step .card.full,.step .card.casse{grid-column:1 / -1}
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .wide table{min-width:520px}
+.card .wide th:nth-child(2),.card .wide td:nth-child(2),
+.card .wide th:nth-child(3),.card .wide td:nth-child(3){text-align:left}
+.readouts .c1 b{color:var(--pen)}.readouts .c3 b{color:var(--red)}
+.sl-trace{--cw:58px;--cgap:8px;margin:4px 0 2px}
+.sl-cells{display:flex;gap:var(--cgap)}
+.sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
+.sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
+.sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.dim{background:rgba(34,48,43,.07);border-color:rgba(34,48,43,.18);border-style:dashed}
+.sl-cell.dim b,.sl-cell.dim i{color:var(--cardmuted);opacity:.5}
+.sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
+.sl-cell.win{border-color:var(--green);border-width:2.5px}
+.sl-ptrs{position:relative;height:20px;margin-top:5px}
+.sl-ptr{position:absolute;top:0;left:calc(var(--i) * (var(--cw) + var(--cgap)));width:var(--cw);text-align:center;font:600 12px var(--sans);color:var(--pen)}
+.sl-note{font-size:14px;color:var(--cardink);margin-top:10px}
+.sl-inv{font:12.5px/1.55 var(--mono);color:var(--cardmuted);margin-top:6px;border-left:2px solid #B7791F;padding-left:10px}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ===== série `lesson` : le cours autoporteur du socle (10/10/2026) ===== */
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px;color:var(--muted);margin:10px 0 0}
+.legend .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-right:6px}
+.lecon{counter-reset:notion}
+.notion{padding:22px 0 28px;border-top:1.5px dashed var(--line);max-width:900px}
+.notion h3{position:relative;padding-left:44px;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.3;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:2px}
+.notion h3::before{counter-increment:notion;content:counter(notion);position:absolute;left:0;top:-1px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle;text-shadow:none}
+.tag.outil{color:var(--mint)}.tag.culture{color:var(--violet)}
+.src{font-size:12.5px;color:var(--faint);margin:0 0 10px 44px}
+.idee{margin-left:44px;color:var(--chalk);font-size:16px;line-height:1.62;max-width:72ch}
+.idee p{margin:7px 0}
+.idee b{color:var(--yellow);font-weight:600}
+.formule{margin:12px 0 10px 44px;background:var(--card);color:var(--cardink);border-radius:3px;padding:12px 18px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--yellow)}
+.formule .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:4px}
+.formule .eq{font-size:17.5px}
+.formule ul{padding-left:18px;margin-top:6px}.formule li{font-size:14.5px;margin:3px 0;color:var(--cardmuted)}
+.notion .fig{margin-left:44px}
+details{margin:8px 0 0 44px;background:var(--card);color:var(--cardink);border-radius:3px;border-left:4px solid var(--ac,var(--yellow));box-shadow:0 10px 20px -16px rgba(0,0,0,.6)}
+details>summary{cursor:pointer;list-style:none;padding:9px 14px;font:600 13px var(--sans);letter-spacing:.03em;color:var(--cardink)}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸";display:inline-block;width:16px;color:var(--cardmuted)}
+details[open]>summary::before{content:"▾"}
+details>summary small{font-weight:400;color:var(--cardmuted);margin-left:6px;letter-spacing:0}
+details .in{padding:2px 18px 14px}
+details .in p,details .in li{font-size:15px;line-height:1.55;margin:5px 0}
+details .in ol,details .in ul{padding-left:20px}
+details.ex{--ac:var(--teal)}details.preuve{--ac:var(--violet)}details.code{--ac:var(--blue)}details.casse{--ac:var(--pink)}details.loin{--ac:var(--faint)}
+.drv{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:4px 16px;margin:8px 0;align-items:baseline}
+.drv>div{font-family:var(--math);font-size:16px;line-height:1.6}
+.drv>span{font-size:13.5px;color:var(--cardmuted);border-left:2px solid var(--cardline);padding-left:10px}
+@media(max-width:700px){.drv{grid-template-columns:minmax(0,1fr)}.drv>span{margin-bottom:6px}}
+pre.py,pre.out,pre.tri{font:13px/1.6 var(--mono);background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:pre}
+pre.out{background:transparent;border:1px dashed var(--cardline);color:var(--cardmuted)}
+pre.out::before{content:"sortie\A";font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.brunton{margin:10px 0 4px;padding:8px 12px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft);font-size:14.5px}
+.brunton b{display:block;font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:2px}
+.garde{margin:14px 0 0 44px;font-family:var(--serif);font-size:16.5px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--yellow);padding:4px 0 4px 14px;max-width:72ch}
+.garde::before{content:"Ce qu'on garde";display:block;font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);text-shadow:none;margin-bottom:2px}
+.notion.culture .garde{border-left-color:var(--violet)}
+.notion table{background:var(--cardsoft);border-radius:3px}
+.sl-fulcrum{fill:var(--red)}.sl-bar2{fill:var(--red);opacity:.55}.sl-bar3{fill:var(--pen);opacity:.6}
+@media(max-width:600px){.idee,.formule,details,.garde,.src,.notion .fig{margin-left:0}.notion h3{font-size:19px}}
+.sl-seg.sl-c1{stroke:var(--pen);stroke-width:2}.sl-seg.sl-c2{stroke:#6B46C1;stroke-width:2}.sl-seg.sl-c3{stroke:var(--red);stroke-width:2}.sl-seg.sl-c4{stroke:#1F5FA8;stroke-width:2}
+/* ===== v2 (10/10/2026) : vignettes « voir l'idée », sous chaque idée ===== */
+.fig.vis{--ac:var(--teal)}
+.v-row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:center}
+.v-row>div{flex:1 1 280px;min-width:0}.v-row>.v-mini{flex:0 1 220px}
+.v-row .sl-plot{min-width:0}
+.nogrid .sl-grid{display:none}
+.sl-ruler{fill:var(--cardmuted)}
+.sl-mass{fill:#6B46C1;opacity:.85}
+.sl-mass-t{font:600 11px var(--sans);fill:#fff}
+.sl-sq{fill:rgba(107,70,193,.16);stroke:#6B46C1;stroke-width:1.5}
+.sl-sq-t{font:600 12.5px var(--mono);fill:#6B46C1}
+.sl-cellp{fill:#6B46C1}.sl-cello{fill:none;stroke:var(--cardline)}
+.sl-prod{font:12px var(--mono);fill:var(--cardmuted);opacity:.5}.sl-prod.on{font-weight:700;fill:var(--cardink);opacity:1}
+.sl-seg.sl-dash{stroke-dasharray:4 3}.sl-seg.sl-link{stroke:rgba(34,48,43,.28);stroke-dasharray:3 3}
+.sl-seg.sl-c5{stroke:#B7791F;stroke-width:2}
+.sl-orbit{fill:none;stroke:rgba(34,48,43,.3);stroke-dasharray:3 4}
+.sl-stick{stroke:var(--cardmuted);stroke-width:4;stroke-linecap:round}
+.sl-dot.sl-tiny{stroke:none;opacity:.5}
+.sl-k1{fill:var(--pen)}.sl-k2{fill:#6B46C1}.sl-k3{fill:var(--red)}.sl-k4{fill:#1F5FA8}.sl-k5{fill:#B7791F}.sl-k6{fill:var(--green)}.sl-kc{opacity:.5}
+.sl-cell-t{font:600 11px var(--sans);fill:var(--cardink)}
+/* ---- propre à cette leçon ---- */
+/* l06 : aires sous les courbes, densité recopiée, courbes en pointillé */
+.l6-area{fill:rgba(107,70,193,.26);stroke:none}
+.l6-area2{fill:rgba(34,48,43,.12);stroke:none}
+.l6-area3{fill:rgba(184,50,42,.55);stroke:none}
+.l6-band{fill:rgba(107,70,193,.55);stroke:none}
+.l6-copy{fill:none;stroke:var(--red);stroke-width:2;stroke-dasharray:6 4}
+.sl-fn.l6-dash{stroke-dasharray:6 4;stroke-width:2}
+.sl-fn.l6-gray{stroke:rgba(34,48,43,.5);stroke-width:2;stroke-dasharray:5 4}
+.sl-fn.l6-ink{stroke:var(--cardink);stroke-width:2}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 6</div>
+  <h1>Fonctions d'une <span>variable aléatoire</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">On définit une variable aléatoire pour pouvoir en prendre des fonctions : changer d'unité, élever au carré, standardiser. La loi de <i>Y</i> = g(<i>X</i>) se déduit de celle de <i>X</i>, mais pas en recopiant la densité : on passe par la fonction de répartition. La leçon suit Brunton 23 à 25, avec ses exemples : les degrés Celsius et Fahrenheit, la table de Φ, le carré d'une normale. L'attente entre deux spams sert de loi asymétrique.</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="lesson-00-04-variables-binomiale-normale.html#n2">l04 · Densité et répartition</a></li>
+    <li><a href="lesson-00-04-variables-binomiale-normale.html#n6">l04 · Normale centrée réduite, Φ</a></li>
+    <li><a href="lesson-00-05-poisson-exponentielle-attentes.html#n3">l05 · Loi exponentielle</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::standardisation</code><code>stats::chi2</code></div>
+  <h4>Suite</h4>
+  <ol>
+    <li><a href="lesson-00-07-lois-jointes.html">l07 · Lois jointes</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>Densité et fonction de répartition.</b> Une variable continue <i>X</i> a une densité <i>f</i><sub><i>X</i></sub> ≥ 0 : P(<i>c</i> &lt; <i>X</i> &lt; <i>d</i>) = ∫<sub><i>c</i></sub><sup><i>d</i></sup> <i>f</i><sub><i>X</i></sub>. Sa fonction de répartition (CDF) est F<sub><i>X</i></sub>(<i>x</i>) = P(<i>X</i> ≤ <i>x</i>), et F<sub><i>X</i></sub>′ = <i>f</i><sub><i>X</i></sub> (<a href="lesson-00-04-variables-binomiale-normale.html#n2">l04, notion 2</a>).</li>
+      <li><b>La normale.</b> N(μ, σ²), de moyenne μ et de variance σ². La normale centrée réduite N(0, 1) a la densité φ(<i>x</i>) = e<sup>−<i>x</i>²/2</sup>/√(2π) et la fonction de répartition Φ ; Φ(1) = 0,841 et Φ(−<i>z</i>) = 1 − Φ(<i>z</i>) (<a href="lesson-00-04-variables-binomiale-normale.html#n6">l04, notion 6</a>).</li>
+      <li><b>L'exponentielle.</b> L'attente <i>T</i> d'un flux de taux λ a la densité λe<sup>−λ<i>t</i></sup> pour <i>t</i> ≥ 0, la répartition 1 − e<sup>−λ<i>t</i></sup> et la moyenne 1/λ (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n3">l05, notion 3</a>).</li>
+      <li><b>La règle de la chaîne.</b> La dérivée de F(<i>h</i>(<i>y</i>)) est F′(<i>h</i>(<i>y</i>)) · <i>h</i>′(<i>y</i>). Elle sert dans chaque preuve de la leçon, et c'est elle qui fait apparaître le facteur qu'on oublie.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">
+<!-- ============================ n1 ============================ -->
+<section class="notion outil" id="n1">
+  <h3>De CDF à CDF, puis dériver : la densité ne se recopie pas <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 23 · Functions of a Random Variable</p>
+  <div class="idee">
+    <p>Brunton pose <i>Y</i> = g(<i>X</i>) : des °F convertis en °C, le carré <i>X</i>² d'une normale, l'énergie cinétique ½<i>mV</i>² d'une molécule. Avant toute formule, il prévient : « brancher » la densité de <i>X</i> dans g ne donne pas une densité.</p>
+    <p>Le plus petit exemple : <i>X</i> uniforme sur [0, 1], de densité 1, et <i>Y</i> = 2<i>X</i>, uniforme sur [0, 2]. Recopier la densité, une hauteur 1 sur [0, 2], donne une aire de 2. La bonne hauteur est ½. Une densité est un taux de probabilité par unité de longueur : quand g étire, la même probabilité s'étale sur une largeur double, donc le taux est divisé par deux.</p>
+    <p>La fonction de répartition, elle, est la probabilité d'un événement, et « <i>Y</i> ≤ <i>y</i> » se réécrit « <i>X</i> ≤ <i>y</i>/2 ». D'où la règle de Brunton : <b>de CDF à CDF, puis dériver</b>. On intègre pour passer de la densité à la CDF, on dérive pour revenir.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — étirer une densité : l'aire se garde, la hauteur baisse</div>
+    <div id="v1ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">En haut, <i>X</i> uniforme sur [0, 1] ; la bande foncée [0,2 ; 0,3] porte une probabilité de 0,1. En bas, <i>Y</i> = <i>aX</i>. Le rectangle violet est la vraie densité, de hauteur 1/<i>a</i> ; le pointillé rouge est la densité recopiée, de hauteur 1, dont l'aire vaut <i>a</i>. Bouge <b>a</b> : la bande devient [0,2<i>a</i> ; 0,3<i>a</i>], plus large et plus basse, et porte toujours 0,1. À <i>a</i> = 2, l'exemple de l'idée : aire recopiée 2, hauteur vraie 0,5.</p>
+  </div>
+  <div class="formule"><div class="lbl">La méthode, puis la formule qu'elle donne</div>
+    <div class="eq">F<sub><i>Y</i></sub>(<i>y</i>) = P(g(<i>X</i>) ≤ <i>y</i>) = P(<i>X</i> dans l'ensemble correspondant) &nbsp;&nbsp; puis &nbsp;&nbsp; <i>f</i><sub><i>Y</i></sub>(<i>y</i>) = F<sub><i>Y</i></sub>′(<i>y</i>)</div>
+    <div class="eq">g strictement monotone : &nbsp; <i>f</i><sub><i>Y</i></sub>(<i>y</i>) = <i>f</i><sub><i>X</i></sub>(g⁻¹(<i>y</i>)) · |(g⁻¹)′(<i>y</i>)|</div>
+    <ul>
+      <li><i>X</i> a une densité, donc P(<i>X</i> = <i>x</i>) = 0 : écrire ≤ ou &lt; ne change rien.</li>
+      <li>g strictement monotone sur l'ensemble des valeurs de <i>X</i> (<i>x</i>² l'est sur [0, 1], pas sur ℝ) : l'événement « g(<i>X</i>) ≤ <i>y</i> » est une demi-droite pour <i>X</i>, « <i>X</i> ≤ g⁻¹(<i>y</i>) » si g croît, « <i>X</i> ≥ g⁻¹(<i>y</i>) » si g décroît. Sinon il a plusieurs morceaux (notion 4).</li>
+      <li>g dérivable, avec g′(<i>x</i>) ≠ 0 : la règle de la chaîne fait sortir (g⁻¹)′(<i>y</i>) = 1/g′(<i>x</i>), l'inverse de l'étirement local. La valeur absolue couvre le cas g décroissante.</li>
+      <li>En discret, rien de tout cela : les masses se transportent telles quelles, P(<i>Y</i> = <i>y</i>) = Σ P(<i>X</i> = <i>x</i>) sur les <i>x</i> tels que g(<i>x</i>) = <i>y</i> (<a href="lesson-00-08-esperance-variance.html#n5">l08, notion 5</a>). C'est la densité, un taux, qui ne se transporte pas.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — dix tranches de probabilité 0,1 : g les étire ou les tasse</div>
+    <div id="f1ctl" class="sl-ctl"></div>
+    <div id="f1plot"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap"><i>X</i> est uniforme sur [0, 1], coupée en dix tranches de largeur 0,1 : chacune porte une probabilité de 0,1. Dans le premier panneau, la courbe <i>y</i> = g(<i>x</i>) envoie chaque tranche sur un intervalle de <i>y</i>, de la même couleur. Dans le second, la densité de <i>Y</i>, couchée le long du même axe <i>y</i> : chaque tranche y devient un rectangle d'aire 0,1, d'autant plus bas qu'il est large. Le trait noir est la densité exacte de la formule. Choisis <b>x²</b> : là où g est plate, près de 0, la première tranche est tassée dans [0 ; 0,01] et monte à 10. Choisis <b>−ln x</b> : on obtient l'exponentielle e<sup>−<i>y</i></sup>.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>uniforme étirée, spams en minutes, une exponentielle, le carré sur [0, 1]</small></summary><div class="in">
+    <ol>
+      <li><b>Uniforme étirée.</b> <i>Y</i> = 2<i>X</i>, <i>X</i> uniforme sur [0, 1]. F<sub><i>Y</i></sub>(<i>y</i>) = P(2<i>X</i> ≤ <i>y</i>) = P(<i>X</i> ≤ <i>y</i>/2) = <i>y</i>/2 pour <i>y</i> dans [0, 2]. Sa dérivée vaut ½ : la densité de <i>Y</i>. La densité recopiée, 1 sur [0, 2], aurait une aire de 2.</li>
+      <li><b>Les spams, en heures puis en minutes.</b> L'attente <i>T</i> suit une exponentielle de taux 4 par heure : <i>f</i><sub><i>T</i></sub>(0) = 4 par heure. En minutes, <i>M</i> = 60<i>T</i>. F<sub><i>M</i></sub>(<i>m</i>) = P(<i>T</i> ≤ <i>m</i>/60) = 1 − e<sup>−4<i>m</i>/60</sup>, dont la dérivée en 0 vaut 4/60 = 0,0667 par minute. Même attente, densité 60 fois plus basse. Mais un même événement garde sa probabilité : P(<i>M</i> ≤ 6 min) = P(<i>T</i> ≤ 0,1 h) = 1 − e<sup>−0,4</sup> = 0,330.</li>
+      <li><b>Fabriquer une exponentielle avec un uniforme.</b> <i>U</i> uniforme sur [0, 1] et <i>Y</i> = −ln <i>U</i>, une fonction décroissante. P(<i>Y</i> ≤ <i>y</i>) = P(ln <i>U</i> ≥ −<i>y</i>) = P(<i>U</i> ≥ e<sup>−<i>y</i></sup>) = 1 − e<sup>−<i>y</i></sup> : <i>Y</i> suit une exponentielle de taux 1, et P(<i>Y</i> ≤ 1) = 0,632. Avec la formule : g⁻¹(<i>y</i>) = e<sup>−<i>y</i></sup>, (g⁻¹)′(<i>y</i>) = −e<sup>−<i>y</i></sup>, donc <i>f</i><sub><i>Y</i></sub>(<i>y</i>) = <i>f</i><sub><i>U</i></sub>(e<sup>−<i>y</i></sup>) · e<sup>−<i>y</i></sup> = e<sup>−<i>y</i></sup>. C'est la méthode d'inversion : la fonction de répartition de l'exponentielle de taux 1 est F(<i>y</i>) = 1 − e<sup>−<i>y</i></sup>, d'inverse F⁻¹(<i>u</i>) = −ln(1 − <i>u</i>), et 1 − <i>U</i> est encore uniforme. À partir d'un générateur uniforme, on simule ainsi toute loi dont on sait inverser la fonction de répartition.</li>
+      <li><b>Le carré sur [0, 1], celui de la figure 1.</b> <i>X</i> uniforme sur [0, 1] et <i>Y</i> = <i>X</i>² : g est croissante sur [0, 1], g⁻¹(<i>y</i>) = √<i>y</i> et (g⁻¹)′(<i>y</i>) = 1/(2√<i>y</i>). Donc <i>f</i><sub><i>Y</i></sub>(<i>y</i>) = 1 · 1/(2√<i>y</i>) = 1/(2√<i>y</i>) sur ]0, 1], la densité exacte de la figure 1. Sur [0 ; 0,01], elle donne P = √0,01 = 0,1 : la première tranche.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la formule de g monotone, en deux cas</small></summary><div class="in">
+    <p><b>g croissante.</b></p>
+    <div class="drv">
+      <div>F<sub><i>Y</i></sub>(<i>y</i>) = P(g(<i>X</i>) ≤ <i>y</i>)</div><span>définition de la fonction de répartition de Y</span>
+      <div>= P(<i>X</i> ≤ g⁻¹(<i>y</i>)) = F<sub><i>X</i></sub>(g⁻¹(<i>y</i>))</div><span>g croissante : g(x) ≤ y équivaut à x ≤ g⁻¹(y)</span>
+      <div><i>f</i><sub><i>Y</i></sub>(<i>y</i>) = <i>f</i><sub><i>X</i></sub>(g⁻¹(<i>y</i>)) · (g⁻¹)′(<i>y</i>)</div><span>dériver : règle de la chaîne, F<sub>X</sub>′ = f<sub>X</sub> ; ici (g⁻¹)′ &gt; 0</span>
+    </div>
+    <p><b>g décroissante.</b></p>
+    <div class="drv">
+      <div>F<sub><i>Y</i></sub>(<i>y</i>) = P(<i>X</i> ≥ g⁻¹(<i>y</i>)) = 1 − F<sub><i>X</i></sub>(g⁻¹(<i>y</i>))</div><span>g décroissante retourne l'inégalité ; P(X = g⁻¹(y)) = 0</span>
+      <div><i>f</i><sub><i>Y</i></sub>(<i>y</i>) = −<i>f</i><sub><i>X</i></sub>(g⁻¹(<i>y</i>)) · (g⁻¹)′(<i>y</i>)</div><span>règle de la chaîne ; le moins vient du « 1 − »</span>
+      <div>= <i>f</i><sub><i>X</i></sub>(g⁻¹(<i>y</i>)) · |(g⁻¹)′(<i>y</i>)|</div><span>(g⁻¹)′ &lt; 0, donc −(g⁻¹)′ = |(g⁻¹)′|</span>
+    </div>
+    <p>Lecture physique : la tranche [<i>x</i>, <i>x</i> + d<i>x</i>] porte la probabilité <i>f</i><sub><i>X</i></sub>(<i>x</i>) d<i>x</i>. Son image a la largeur |d<i>y</i>| = |g′(<i>x</i>)| d<i>x</i> et porte la même probabilité, donc <i>f</i><sub><i>Y</i></sub>(<i>y</i>) |d<i>y</i>| = <i>f</i><sub><i>X</i></sub>(<i>x</i>) d<i>x</i>. Le facteur |(g⁻¹)′| est un jacobien en dimension 1 ; en dimension 2, c'est un déterminant (<a href="lesson-00-07-lois-jointes.html#n6">l07, notion 6</a>).</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>uniforme étirée, −ln U, heures et minutes</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(0)
+u = rng.uniform(0, 1, 1_000_000)
+
+# Y = 2U: the histogram of Y sits at height 0.5, not 1
+h, _ = np.histogram(2 * u, bins=4, range=(0, 2), density=True)
+print("Y = 2U, histogram heights:", h.round(3))
+
+# copying the density, f_U(y / 2) = 1 on [0, 2], gives area 2
+y = np.linspace(0, 2, 200_001)
+print("area of the copied density:", round(np.trapezoid(np.ones_like(y), y), 3))
+
+# Y = -ln U: CDF to CDF gives P(Y &lt;= t) = 1 - e^(-t), an Exp(1)
+e = -np.log(u)
+for t in [0.5, 1.0, 2.0]:
+    print(f"P(-ln U &lt;= {t}): simulated {np.mean(e &lt;= t):.4f}, method {1 - np.exp(-t):.4f}")
+
+# hours -&gt; minutes: same event, same probability; the density drops by 60
+T = rng.exponential(1 / 4, 1_000_000)  # hours, rate 4 per hour
+M = 60 * T                             # minutes
+print("P(T &lt;= 0.1 h) =", np.mean(T &lt;= 0.1).round(4))
+print("P(M &lt;= 6 min) =", np.mean(M &lt;= 6).round(4))
+print("first minute:", np.mean(M &lt;= 1).round(4), " exact", round(1 - np.exp(-4 / 60), 4),
+      " rate x width = 4/60 =", round(4 / 60, 4))</pre>
+<pre class="out">Y = 2U, histogram heights: [0.5   0.5   0.499 0.501]
+area of the copied density: 2.0
+P(-ln U &lt;= 0.5): simulated 0.3937, method 0.3935
+P(-ln U &lt;= 1.0): simulated 0.6325, method 0.6321
+P(-ln U &lt;= 2.0): simulated 0.8644, method 0.8647
+P(T &lt;= 0.1 h) = 0.3294
+P(M &lt;= 6 min) = 0.3294
+first minute: 0.0643  exact 0.0645  rate x width = 4/60 = 0.0667</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Brancher la densité dans g.</b> C'est l'exercice que propose Brunton : élever au carré la densité de la normale. φ(<i>x</i>)² a une aire de 1/(2√π) = 0,282 : ce n'est pas une densité, et ce n'est pas la loi de <i>X</i>² (notion 4).</li>
+      <li><b>Oublier le facteur.</b> <i>f</i><sub><i>X</i></sub>(g⁻¹(<i>y</i>)) seul : pour <i>Y</i> = <i>aX</i>, son aire vaut <i>a</i> (vignette). Le facteur |(g⁻¹)′(<i>y</i>)| est exactement ce que fait sortir la règle de la chaîne : sauter cette ligne, c'est le perdre.</li>
+      <li><b>g non monotone.</b> Pour g(<i>x</i>) = <i>x</i>² et une <i>X</i> qui prend des valeurs des deux signes, deux valeurs de <i>x</i> donnent le même <i>y</i> : l'événement « g(<i>X</i>) ≤ <i>y</i> » a deux bouts, et la densité deux termes (notion 4).</li>
+      <li><b>La valeur d'une densité dépend de l'unité, une probabilité non.</b> 4 par heure ou 0,0667 par minute : c'est la même attente. On évalue une densité en un point pour une vraisemblance, on l'intègre pour une probabilité (<a href="lesson-00-04-variables-binomiale-normale.html#n2">l04, notion 2</a>) ; seule l'intégrale est indépendante de l'unité.</li>
+      <li><b>En ML : comparer des vraisemblances sur deux échelles.</b> Un modèle de log <i>y</i> donne à <i>y</i> la densité <i>f</i>(log <i>y</i>)/<i>y</i> : sa log-vraisemblance en <i>y</i> perd Σ log <i>y</i><sub><i>i</i></sub>. Comparer sans ce terme les log-vraisemblances d'un modèle de <i>y</i> et d'un modèle de log <i>y</i> n'a pas de sens. Les normalizing flows reposent sur cette formule : log <i>p</i><sub><i>X</i></sub>(<i>x</i>) = log <i>p</i><sub><i>Z</i></sub>(<i>z</i>) + log |det ∂<i>z</i>/∂<i>x</i>|.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (13, 16, 23) dit souvent « cumulative density function ». C'est la fonction de répartition, en anglais cumulative distribution function : une probabilité, sans unité, et non une densité. C'est justement pour ça qu'elle se transporte d'une variable à l'autre, alors que la densité ne le fait pas.</div>
+  </div></details>
+  <p class="garde">X à densité, g strictement monotone sur les valeurs de X, Y = g(X) : f<sub>Y</sub>(y) = f<sub>X</sub>(g⁻¹(y)) · |(g⁻¹)′(y)|. On l'obtient en dérivant F<sub>Y</sub>(y) = P(g(X) ≤ y), jamais en recopiant la densité.</p>
+</section>
+
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>Y = aX + b : nouvelle moyenne, nouvel écart-type, et le cas a &lt; 0 <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 23 (et 24 pour l'écart-type)</p>
+  <div class="idee">
+    <p>Brunton convertit des températures : de °C en °F, on multiplie par 9/5 et on ajoute 32. Prenons des journées de printemps, <i>X</i> ~ N(15, 5²) en °C. La méthode de la notion 1 donne F<sub><i>Y</i></sub>(<i>y</i>) = P(1,8<i>X</i> + 32 ≤ <i>y</i>) = F<sub><i>X</i></sub>((<i>y</i> − 32)/1,8) : <i>Y</i> suit N(59, 9²) en °F. Un même événement garde sa probabilité, P(<i>Y</i> ≤ 68) = P(<i>X</i> ≤ 20) = 0,841, et la cloche s'étale d'un facteur 1,8, donc son pic baisse de 0,0798 à 0,0443.</p>
+    <p>Brunton suppose <i>a</i> &gt; 0. Prenons <i>Y</i> = 20 − <i>X</i>, les degrés qui manquent pour atteindre 20 °C : <i>a</i> = −1. « <i>Y</i> ≤ 0 » veut dire « <i>X</i> ≥ 20 » : l'inégalité se retourne, et la probabilité vaut 0,159. Sans la retourner, on trouverait 0,841, la probabilité de l'événement contraire.</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — de °C en °F, puis le miroir 20 − X</div>
+    <div id="v2ctl" class="sl-ctl"></div>
+    <div id="v2plot" class="wide"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">La courbe grise est <i>X</i>, la température en °C, N(15, 5²) ; la violette est <i>Y</i> = <i>aX</i> + <i>b</i>, sur le même axe des nombres. Sous chaque courbe, la zone ombrée est l'événement « <i>X</i> ≤ 20 » et son image. <b>°F</b> : la cloche s'étale de 1,8 et son pic baisse d'autant, de 0,0798 à 0,0443 ; « <i>X</i> ≤ 20 » devient « <i>Y</i> ≤ 68 », 84,1 % des deux côtés. <b>20 − X</b> : la transition passe par <i>a</i> = 0, où tout s'écrase sur un point, puis la loi ressort en miroir ; « <i>X</i> ≤ 20 » devient « <i>Y</i> ≥ 0 » et l'ombre change de côté.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les formules</div>
+    <div class="eq"><i>f</i><sub><i>Y</i></sub>(<i>y</i>) = <i>f</i><sub><i>X</i></sub>((<i>y</i> − <i>b</i>)/<i>a</i>) / |<i>a</i>| &nbsp;&nbsp;&nbsp; E[<i>Y</i>] = <i>a</i>μ + <i>b</i> &nbsp;&nbsp;&nbsp; σ<sub><i>Y</i></sub> = |<i>a</i>| σ</div>
+    <div class="eq"><i>X</i> ~ N(μ, σ²) &nbsp;⇒&nbsp; <i>aX</i> + <i>b</i> ~ N(<i>a</i>μ + <i>b</i>, <i>a</i>²σ²)</div>
+    <ul>
+      <li><i>a</i> ≠ 0. Si <i>a</i> = 0, <i>Y</i> = <i>b</i> est constante : toute la probabilité est en un point, il n'y a plus de densité.</li>
+      <li><i>a</i> &gt; 0 : F<sub><i>Y</i></sub>(<i>y</i>) = F<sub><i>X</i></sub>((<i>y</i> − <i>b</i>)/<i>a</i>). <i>a</i> &lt; 0 : diviser par <i>a</i> retourne l'inégalité, F<sub><i>Y</i></sub>(<i>y</i>) = 1 − F<sub><i>X</i></sub>((<i>y</i> − <i>b</i>)/<i>a</i>). Dans les deux cas, la dérivée fait sortir 1/|<i>a</i>|.</li>
+      <li>μ = E[<i>X</i>] et σ est l'écart-type de <i>X</i>. La variance <i>a</i>²σ² vaut pour toute loi, preuve en <a href="lesson-00-08-esperance-variance.html#n9">l08, notion 9</a>. Ce qui est propre à la normale, c'est que <i>Y</i> reste normale.</li>
+      <li>N(μ, σ²) : le second paramètre est la variance.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — une loi asymétrique sous aX + b : le signe de a la retourne</div>
+    <div id="f2plot" class="wide"></div>
+    <div id="f2ctl"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap"><i>X</i> est l'attente entre deux spams, exponentielle de moyenne 15 min (4 par heure). Le trait violet est la densité de <i>aX</i> + <i>b</i>, avec sa moyenne (trait rouge) et ±σ (segment vert). Au départ <i>a</i> = −1 et <i>b</i> = 30 : la loi est retournée, sa queue part à gauche. Le pointillé rouge est ce que donnerait 1/<i>a</i> au lieu de 1/|<i>a</i>| : une « densité » négative, d'aire −1. Bouge <b>a</b> vers les positifs : la queue repasse à droite et le pointillé disparaît ; à <i>a</i> = 0, il n'y a plus de densité. Bouge <b>b</b> : tout glisse, la forme ne change pas.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>°C en °F, le miroir, les degrés manquants, a = 0</small></summary><div class="in">
+    <ol>
+      <li><b>De °C en °F.</b> <i>X</i> ~ N(15, 5²). Moyenne 1,8 × 15 + 32 = 59 °F, écart-type 1,8 × 5 = 9 °F, variance 81. P(<i>Y</i> ≤ 68) = P(<i>X</i> ≤ 20) = Φ(1) = 0,841. Pic : 0,0798 par °C, 0,0798/1,8 = 0,0443 par °F.</li>
+      <li><b>Le miroir</b> <i>Y</i> = −<i>X</i> : <i>f</i><sub><i>Y</i></sub>(<i>y</i>) = <i>f</i><sub><i>X</i></sub>(−<i>y</i>). Une loi symétrique autour de 0 n'en est pas changée ; une exponentielle part vers les négatifs, sa queue à gauche.</li>
+      <li><b>Les degrés manquants</b>, <i>Y</i> = 20 − <i>X</i> : moyenne 20 − 15 = 5, écart-type |−1| × 5 = 5, donc <i>Y</i> ~ N(5, 5²). P(<i>Y</i> ≤ 0) = P(<i>X</i> ≥ 20) = 1 − 0,841 = 0,159.</li>
+      <li><b>Heures en minutes</b>, <i>a</i> = 60 et <i>b</i> = 0 : l'attente des spams garde sa forme exponentielle, sa moyenne passe de 0,25 h à 15 min et sa densité en 0 de 4 à 4/60 (notion 1).</li>
+      <li><b><i>a</i> = 0.</b> <i>Y</i> = <i>b</i> avec probabilité 1 : une variable qui n'a plus de densité, son écart-type est 0.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>de CDF à CDF dans les deux sens, puis le cas normal</small></summary><div class="in">
+    <p><b><i>a</i> &gt; 0.</b></p>
+    <div class="drv">
+      <div>F<sub><i>Y</i></sub>(<i>y</i>) = P(<i>aX</i> + <i>b</i> ≤ <i>y</i>)</div><span>définition</span>
+      <div>= P(<i>X</i> ≤ (<i>y</i> − <i>b</i>)/<i>a</i>) = F<sub><i>X</i></sub>((<i>y</i> − <i>b</i>)/<i>a</i>)</div><span>retrancher b, diviser par a &gt; 0 : le sens reste</span>
+      <div><i>f</i><sub><i>Y</i></sub>(<i>y</i>) = (1/<i>a</i>) <i>f</i><sub><i>X</i></sub>((<i>y</i> − <i>b</i>)/<i>a</i>)</div><span>règle de la chaîne : la dérivée de (y − b)/a est 1/a</span>
+    </div>
+    <p><b><i>a</i> &lt; 0.</b></p>
+    <div class="drv">
+      <div>F<sub><i>Y</i></sub>(<i>y</i>) = P(<i>X</i> ≥ (<i>y</i> − <i>b</i>)/<i>a</i>) = 1 − F<sub><i>X</i></sub>((<i>y</i> − <i>b</i>)/<i>a</i>)</div><span>diviser par a &lt; 0 retourne l'inégalité ; P(X = point) = 0</span>
+      <div><i>f</i><sub><i>Y</i></sub>(<i>y</i>) = −(1/<i>a</i>) <i>f</i><sub><i>X</i></sub>((<i>y</i> − <i>b</i>)/<i>a</i>) = (1/|<i>a</i>|) <i>f</i><sub><i>X</i></sub>((<i>y</i> − <i>b</i>)/<i>a</i>)</div><span>règle de la chaîne ; −1/a = 1/|a| quand a &lt; 0</span>
+    </div>
+    <p><b>Le cas normal.</b> On remplace <i>f</i><sub><i>X</i></sub> par la densité de N(μ, σ²).</p>
+    <div class="drv">
+      <div><i>f</i><sub><i>Y</i></sub>(<i>y</i>) = 1/(|<i>a</i>|σ√(2π)) · exp(−((<i>y</i> − <i>b</i>)/<i>a</i> − μ)² / (2σ²))</div><span>densité de N(μ, σ²) évaluée en (y − b)/a</span>
+      <div>(<i>y</i> − <i>b</i>)/<i>a</i> − μ = (<i>y</i> − (<i>a</i>μ + <i>b</i>))/<i>a</i></div><span>même dénominateur</span>
+      <div><i>f</i><sub><i>Y</i></sub>(<i>y</i>) = 1/(|<i>a</i>|σ√(2π)) · exp(−(<i>y</i> − (<i>a</i>μ + <i>b</i>))² / (2<i>a</i>²σ²))</div><span>c'est la densité de N(aμ + b, a²σ²), d'écart-type |a|σ</span>
+    </div>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>°C en °F, et l'inégalité retournée</small></summary><div class="in">
+<pre class="py">import numpy as np
+from math import erf, sqrt
+
+Phi = lambda z: 0.5 * (1 + erf(z / sqrt(2)))
+rng = np.random.default_rng(1)
+X = rng.normal(15, 5, 1_000_000)  # degrees C; numpy takes the sd (5), not the variance
+
+Y = 1.8 * X + 32                    # degrees F
+print("Y in F: mean", Y.mean().round(2), "  sd", Y.std().round(2), "  (theory 59 and 9)")
+print("P(Y &lt;= 68) =", np.mean(Y &lt;= 68).round(4), "  P(X &lt;= 20) =", np.mean(X &lt;= 20).round(4),
+      "  Phi(1) =", round(Phi(1), 4))
+
+# peak height: share of a 1-degree window around the mean
+pc, pf = np.mean(abs(X - 15) &lt; 0.5), np.mean(abs(Y - 59) &lt; 0.5)
+print("peak per degree C:", pc.round(4), "  per degree F:", pf.round(4),
+      "  ratio", round(pc / pf, 2))
+
+# a &lt; 0: H = 20 - X, the degrees missing to reach 20 C
+H = 20 - X
+print("P(H &lt;= 0) =", np.mean(H &lt;= 0).round(4), "  1 - F_X(20) =", round(1 - Phi(1), 4),
+      "  F_X(20), no flip =", round(Phi(1), 4))
+print("sd of H:", H.std().round(2), " = |a| sigma; a sigma would be -5")</pre>
+<pre class="out">Y in F: mean 59.0   sd 8.99   (theory 59 and 9)
+P(Y &lt;= 68) = 0.842   P(X &lt;= 20) = 0.842   Phi(1) = 0.8413
+peak per degree C: 0.0803   per degree F: 0.0444   ratio 1.81
+P(H &lt;= 0) = 0.158   1 - F_X(20) = 0.1587   F_X(20), no flip = 0.8413
+sd of H: 4.99  = |a| sigma; a sigma would be -5</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Écart-type <i>a</i>σ.</b> Avec <i>a</i> &lt; 0, il serait négatif. C'est |<i>a</i>|σ ; la variance <i>a</i>²σ² n'a pas ce problème.</li>
+      <li><b>1/<i>a</i> au lieu de 1/|<i>a</i>|.</b> Pour <i>a</i> &lt; 0, la « densité » devient négative et son aire vaut −1 (pointillé de la figure 2).</li>
+      <li><b>L'inégalité non retournée.</b> Pour <i>Y</i> = 20 − <i>X</i>, écrire F<sub><i>Y</i></sub>(0) = F<sub><i>X</i></sub>((0 − 20)/(−1)) = F<sub><i>X</i></sub>(20) donne 0,841 au lieu de 1 − 0,841 = 0,159.</li>
+      <li><b><i>a</i> = 0.</b> <i>Y</i> = <i>b</i> n'a plus de densité ; la formule divise par 0.</li>
+      <li><b>Seule une transformation affine garde la famille.</b> <i>aX</i> + <i>b</i> d'une normale est normale. Mais e<sup><i>X</i></sup> d'une normale est log-normale, asymétrique (<a href="lesson-00-08-esperance-variance.html#n2">l08, notion 2</a>), et <i>X</i>² est un χ² (notion 4). Même affine, on peut sortir de la famille : <i>aX</i> + <i>b</i> d'une exponentielle n'est exponentielle que si <i>a</i> &gt; 0 et <i>b</i> = 0 ; sinon le support ne commence plus en 0 ou part vers les négatifs.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (23) dit que l'écart-type de <i>aX</i> + <i>b</i> est « a²σ² » et que le signe de <i>a</i> « ne compte pas tant que ça ». <i>a</i>²σ² est la variance ; l'écart-type est |<i>a</i>|σ. Et le signe compte : avec <i>a</i> &lt; 0, l'inégalité se retourne, F<sub><i>Y</i></sub>(<i>y</i>) = 1 − F<sub><i>X</i></sub>((<i>y</i> − <i>b</i>)/<i>a</i>), et la densité se divise par |<i>a</i>|, pas par <i>a</i>. En 24, il rectifie en « a fois σ », sans la valeur absolue. Enfin, il laisse le cas normal en exercice et en esquisse l'exposant (« e to the minus whatever… et cetera ») sans μ ni le facteur 2 : le calcul complet est dans la preuve.</div>
+  </div></details>
+  <p class="garde">Y = aX + b, a ≠ 0 : f<sub>Y</sub>(y) = f<sub>X</sub>((y − b)/a)/|a| ; si a &lt; 0, l'inégalité se retourne, F<sub>Y</sub>(y) = 1 − F<sub>X</sub>((y − b)/a).</p>
+</section>
+
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>Standardiser : Z = (X − μ)/σ, et les intervalles par Φ <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 24 · Rescaling the Normal Distribution to Mean Zero and Variance One</p>
+  <div class="idee">
+    <p>Quand les ordinateurs étaient lents, raconte Brunton, on ne trouvait Φ que pour la normale centrée réduite, dans une table « au fond du livre ». On y ramenait toute autre normale : <i>Z</i> = (<i>X</i> − μ)/σ. C'est la notion 2 avec <i>a</i> = 1/σ et <i>b</i> = −μ/σ : moyenne μ/σ − μ/σ = 0, écart-type σ/σ = 1. On <b>centre</b>, puis on <b>réduit</b>.</p>
+    <p>Les événements se correspondent, donc les probabilités aussi : « <i>X</i> entre μ − σ et μ + σ » est « <i>Z</i> entre −1 et 1 », 68,3 %. Avec nos journées <i>X</i> ~ N(15, 5²) : P(10 &lt; <i>X</i> &lt; 25) = P(−1 &lt; <i>Z</i> &lt; 2) = Φ(2) − Φ(−1) = 0,9772 − 0,1587 ≈ 0,819. Brunton cite P(<i>X</i> &lt; 7) sans paramètres ; ici <i>z</i> = (7 − 15)/5 = −1,6 et Φ(−1,6) = 0,0548.</p>
+    <p>Ce <i>z</i>, le <b>z-score</b>, compte en écarts-types la distance à la moyenne : il est sans unité.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — deux cloches reliées : standardiser change les graduations, pas la forme</div>
+    <div id="v3ctl" class="sl-ctl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">En haut <i>X</i> ~ N(15, 5²) en °C, en bas <i>Z</i> ~ N(0, 1). Les deux axes sont alignés : 15 °C au-dessus de 0, chaque pas de 5 °C au-dessus d'un pas de 1. La cloche est la même ; seules changent les graduations, et les hauteurs, 0,0798 en haut et 0,399 en bas : cinq fois plus, puisqu'une unité de <i>z</i> couvre 5 °C. Choisis un intervalle, la même aire s'ombre en haut et en bas. <b>10 à 20 °C</b> : ±1σ, 68,3 %. <b>X &lt; 7 °C</b>, l'exemple de Brunton : <i>Z</i> &lt; −1,6, 5,48 %. <b>10 à 25 °C</b> : de −1 à 2, 81,9 %.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>Z</i> = (<i>X</i> − μ)/σ &nbsp;&nbsp;&nbsp; E[<i>Z</i>] = 0 &nbsp;&nbsp;&nbsp; σ<sub><i>Z</i></sub> = 1</div>
+    <div class="eq"><i>X</i> ~ N(μ, σ²) : &nbsp; P(<i>c</i> &lt; <i>X</i> &lt; <i>d</i>) = Φ((<i>d</i> − μ)/σ) − Φ((<i>c</i> − μ)/σ)</div>
+    <ul>
+      <li>C'est la preuve promise en l04 (<a href="lesson-00-04-variables-binomiale-normale.html#n6">notion 6</a>) : la notion 2 avec <i>a</i> = 1/σ, <i>b</i> = −μ/σ, et une normale reste normale.</li>
+      <li>Moyenne 0 et écart-type 1 pour toute loi de variance finie : c'est la notion 2 avec <i>a</i> = 1/σ &gt; 0, donc sans retournement.</li>
+      <li><i>Z</i> ~ N(0, 1) seulement si <i>X</i> est normale. Standardiser ne change pas la forme (figure 3).</li>
+      <li><i>c</i> et <i>d</i> sont les bornes de l'intervalle.</li>
+      <li>En pratique μ et σ sont inconnus : on standardise avec <span class="hat">μ</span> et <span class="hat">σ</span>, estimés sur l'apprentissage, et ce n'est plus la standardisation exacte. Pour la moyenne de <i>n</i> variables i.i.d. N(μ, σ²) standardisée par l'écart-type estimé, la loi devient une Student à <i>n</i> − 1 degrés de liberté, pas N(0, 1) (<a href="../chains/chain-p01-03-inference-regression.html">inférence en régression</a>).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — standardiser ne rend pas normal</div>
+    <div id="f3ctl" class="sl-ctl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">La densité de <i>Z</i> = (<i>X</i> − μ)/σ en violet, contre la normale centrée réduite φ en pointillé. Les trois lois, une fois standardisées, ont une moyenne 0 et un écart-type 1, mais seule la normale coïncide avec φ. Choisis <b>exponentielle</b> : <i>Z</i> = <i>T</i> − 1 (taux 1 : μ = σ = 1 ; toute exponentielle donne la même <i>Z</i>) commence à −1 et garde sa queue droite ; la zone ombrée, P(<i>Z</i> &gt; 2) = e<sup>−3</sup> = 0,0498, fait plus du double des 0,0228 que donnerait Φ. Choisis <b>uniforme</b> : <i>Z</i> reste entre −1,73 et 1,73, et P(<i>Z</i> &gt; 2) = 0.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>la règle 68-95-99,7, deux intervalles, les 400 pièces, des variables explicatives</small></summary><div class="in">
+    <ol>
+      <li><b>±1, 2, 3 écarts-types.</b> Pour toute normale : 68,3 %, 95,4 % et 99,7 % (vus en <a href="lesson-00-04-variables-binomiale-normale.html#n6">l04, notion 6</a>). Pour <i>X</i> ~ N(15, 5²), ce sont les intervalles 10 à 20, 5 à 25 et 0 à 30 °C.</li>
+      <li><b>Un intervalle quelconque.</b> P(10 &lt; <i>X</i> &lt; 25) : <i>z</i> = (10 − 15)/5 = −1 et (25 − 15)/5 = 2, donc Φ(2) − Φ(−1) = 0,9772 − 0,1587 ≈ 0,819.</li>
+      <li><b>Une queue.</b> P(<i>X</i> &lt; 7) : <i>z</i> = −1,6, Φ(−1,6) = 0,0548.</li>
+      <li><b>Les 400 pièces de Brunton</b> (<a href="lesson-00-04-variables-binomiale-normale.html#n7">l04, notion 7</a>). Le nombre de piles est approximativement N(200, 10²) ; entre 190 et 230, la normale sans correction donne Φ((230 − 200)/10) − Φ((190 − 200)/10) = Φ(3) − Φ(−1) = 0,840 (la valeur exacte, 0,852, demande la correction de continuité, l04 notion 7). C'était déjà une standardisation.</li>
+      <li><b>En ML : standardiser des variables explicatives (features).</b> Trois clients, A (170 cm, 30 k€), B (180 cm, 30 k€), C (170 cm, 40 k€). En cm et en k€, A est à 10 de B et à 10 de C. Passe le revenu en € : A est toujours à 10 de B, mais à 10 000 de C, et un k-means ne voit plus que le revenu. Divise chaque variable par son écart-type, disons 10 cm et 20 k€ : A est à 1 de B et à 0,5 de C, quelle que soit l'unité de départ.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>Φ contre simulation, une exponentielle standardisée, des z-scores</small></summary><div class="in">
+<pre class="py">import numpy as np
+from scipy.stats import norm
+rng = np.random.default_rng(2)
+
+# X ~ N(15, 5^2): P(10 &lt; X &lt; 25) by standardising, then by simulation
+X = rng.normal(15, 5, 1_000_000)
+sim = np.mean((10 &lt; X) &amp; (X &lt; 25))
+print("Phi(2) - Phi(-1) =", round(norm.cdf(2) - norm.cdf(-1), 4), "  simulated:", sim.round(4))
+
+# a standardised Exp(1) (mu = sigma = 1) has mean 0 and sd 1, but it is not normal
+Z = rng.exponential(1.0, 1_000_000) - 1.0
+print(f"mean {Z.mean():.3f}   sd {Z.std():.3f}")
+print("P(Z &gt; 2):", np.mean(Z &gt; 2).round(4), "  Phi says", round(norm.sf(2), 4))
+print("P(Z &lt; -1):", np.mean(Z &lt; -1).round(4), "  Phi says", round(norm.cdf(-1), 4))
+# z-scores make distances unit-free: A, B, C = (height in cm, income in euros)
+F, sd = np.array([[170, 30_000], [180, 30_000], [170, 40_000]]), np.array([10, 20_000])
+print("raw:      AB", np.linalg.norm(F[0] - F[1]), "  AC", np.linalg.norm(F[0] - F[2]))
+D = (F - F[0]) / sd  # differences to A, counted in standard deviations
+print("z-scores: AB", np.linalg.norm(D[1]), "  AC", np.linalg.norm(D[2]))</pre>
+<pre class="out">Phi(2) - Phi(-1) = 0.8186   simulated: 0.819
+mean 0.000   sd 1.000
+P(Z &gt; 2): 0.0498   Phi says 0.0228
+P(Z &lt; -1): 0.0   Phi says 0.1587
+raw:      AB 10.0   AC 10000.0
+z-scores: AB 1.0   AC 0.5</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Standardiser ne rend pas normal.</b> Une exponentielle standardisée a une moyenne 0 et un écart-type 1, mais P(<i>Z</i> &gt; 2) = 0,0498 au lieu de 0,0228, et P(<i>Z</i> &lt; −1) = 0 au lieu de 0,159 (figure 3). La règle 68-95-99,7 ne vaut que pour une normale ; le TCL dira quand une moyenne standardisée le devient approximativement (<a href="lesson-00-11-tcl.html#n1">l11</a>).</li>
+      <li><b>σ, pas σ².</b> <code>scipy.stats.norm(loc, scale)</code> et <code>np.random.normal(loc, scale)</code> prennent l'écart-type. Passer la variance 25 au lieu de 5 donne une cloche cinq fois trop large : P(10 &lt; <i>X</i> &lt; 25) tombe de 0,819 à 0,235.</li>
+      <li><b>Les statistiques du jeu de test (test set).</b> <span class="hat">μ</span> et <span class="hat">σ</span> se calculent sur le jeu d'apprentissage seul, puis s'appliquent telles quelles au jeu de test. Les recalculer sur tout le jeu fait fuir de l'information (<a href="../chains/chain-p06-02-cv-leakage.html">validation croisée et fuite</a>).</li>
+      <li><b><span class="hat">μ</span> et <span class="hat">σ</span> ne sont pas μ et σ.</b> Une moyenne standardisée par l'écart-type estimé suit une Student si les données sont normales, aux queues plus lourdes que N(0, 1) ; l'écart ne compte qu'à petit <i>n</i>.</li>
+      <li><b>Les arbres n'en ont pas besoin.</b> Standardiser est une transformation croissante : elle ne change l'ordre d'aucune valeur, donc les mêmes partitions, seule la valeur du seuil change (<a href="../chains/chain-p07-01-arbres-impurete.html">arbres</a>). k-means, k-NN, PCA et régression pénalisée, eux, en dépendent.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (24) appelle Φ « la fonction d'erreur standard ». Φ et la fonction d'erreur erf sont parentes mais différentes : Φ(<i>z</i>) = ½[1 + erf(<i>z</i>/√2)], de sorte que erf(0) = 0 alors que Φ(0) = ½. Et il dit tantôt « normale de moyenne μ et d'écart-type σ », tantôt « de variance σ² » : on écrit N(μ, σ²), le second paramètre est la variance. Enfin, il appelle <i>a</i> et <i>b</i> à la fois les coefficients de la notion 2 et les bornes de l'intervalle : ici, les bornes sont <i>c</i> et <i>d</i>.</div>
+  </div></details>
+  <p class="garde">X ~ N(μ, σ²) : P(c &lt; X &lt; d) = Φ((d − μ)/σ) − Φ((c − μ)/σ), parce que Z = (X − μ)/σ suit N(0, 1), ce qui n'est vrai que si X est normale.</p>
+</section>
+
+<!-- ============================ n4 ============================ -->
+<section class="notion culture" id="n4">
+  <h3>Le χ² à un degré de liberté : Y = X² <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 25 · The Chi-Squared Distribution: The Square of the Normal Distribution</p>
+  <div class="idee">
+    <p>Brunton prend <i>X</i> ~ N(0, 1) et <i>Y</i> = <i>X</i>², « l'une des lois les plus utiles pour les tests ». Même méthode : « <i>Y</i> ≤ <i>y</i> » veut dire « <i>X</i>² ≤ <i>y</i> », donc « −√<i>y</i> ≤ <i>X</i> ≤ √<i>y</i> ». Les deux queues de <i>X</i>, à gauche et à droite, se replient sur un seul côté de <i>Y</i>. P(<i>Y</i> ≤ 1) = P(−1 ≤ <i>X</i> ≤ 1) = 0,683 ; P(<i>Y</i> ≤ 3,84) = P(|<i>X</i>| ≤ 1,96) = 0,95.</p>
+    <p>Près de 0, le carré écrase. La bande |<i>X</i>| ≤ 0,1 porte 8 % de la masse de <i>X</i>, et elle tombe tout entière dans [0 ; 0,01] : une densité moyenne de 7,97 sur cet intervalle. Plus on s'approche de 0, plus c'est tassé : la densité de <i>Y</i> n'est pas bornée en 0, et son aire vaut pourtant 1. C'est la loi du <b>χ² à un degré de liberté</b>.</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — la bande ±√y de X fait la probabilité de Y ≤ y</div>
+    <div id="v4ctl" class="sl-ctl"></div><div id="v4sl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">En haut, la densité φ de <i>X</i>, et la bande ombrée de −√<i>y</i> à √<i>y</i>. En bas, la densité du χ², et [0, <i>y</i>] ombré : les deux aires sont égales. Bouge <b>y</b> ou choisis un repère. <b>y = 1</b> : la bande ±1, 68,3 %. <b>y = 3,84</b> : la bande ±1,96, 95 %. <b>y = 0,01</b> : la bande ±0,1 porte déjà 8 % de la masse, entassée dans [0 ; 0,01] : densité moyenne 7,97 (valeur affichée).</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">F<sub><i>Y</i></sub>(<i>y</i>) = P(−√<i>y</i> ≤ <i>X</i> ≤ √<i>y</i>) = Φ(√<i>y</i>) − Φ(−√<i>y</i>) = 2Φ(√<i>y</i>) − 1 &nbsp;&nbsp; (<i>y</i> &gt; 0)</div>
+    <div class="eq"><i>f</i><sub><i>Y</i></sub>(<i>y</i>) = φ(√<i>y</i>)/√<i>y</i> = e<sup>−<i>y</i>/2</sup>/√(2π<i>y</i>) &nbsp;&nbsp;&nbsp; E[<i>Y</i>] = 1 &nbsp;&nbsp;&nbsp; Var(<i>Y</i>) = 2</div>
+    <ul>
+      <li><i>X</i> ~ N(0, 1) exactement. Pour <i>X</i> ~ N(μ, σ²), c'est ((<i>X</i> − μ)/σ)² qui suit cette loi : on standardise d'abord (notion 3).</li>
+      <li><i>Y</i> ≥ 0 : F<sub><i>Y</i></sub>(<i>y</i>) = 0 pour <i>y</i> ≤ 0.</li>
+      <li>g(<i>x</i>) = <i>x</i>² n'est pas monotone : chaque <i>y</i> &gt; 0 a deux antécédents, ±√<i>y</i>, d'où les deux termes en Φ.</li>
+      <li>La somme de <i>k</i> carrés de N(0, 1) indépendantes suit un χ² à <i>k</i> degrés de liberté, de moyenne <i>k</i> et de variance 2<i>k</i> : c'est elle qui sert aux tests. Le χ² à un degré est aussi une loi Gamma de forme ½ et de taux ½ (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n7">l05, notion 7</a>).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — les pentes de Φ en ±√y sont égales, et les deux bouts s'ajoutent</div>
+    <div id="f4ctl" class="sl-ctl"></div>
+    <div id="f4plot" class="wide"></div>
+    <div id="f4sl"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">La courbe est Φ. F<sub><i>Y</i></sub>(<i>y</i>) est l'écart vertical entre Φ(√<i>y</i>) et Φ(−√<i>y</i>), le segment rouge. Les deux tangentes ont la même pente, φ(√<i>y</i>), parce que φ est paire : elles sont parallèles. Quand <i>y</i> augmente, le bout droit avance de 1/(2√<i>y</i>) par unité de <i>y</i> et monte ; le bout gauche recule d'autant et descend. La longueur des flèches rouges est proportionnelle à cette vitesse : elles raccourcissent quand <i>y</i> grandit. Les deux mouvements élargissent l'écart : chacun apporte pente × vitesse, φ(√<i>y</i>)/(2√<i>y</i>), et leur somme est <i>f</i><sub><i>Y</i></sub>(<i>y</i>). Clique <b>▶ élargir la bande</b>, ou bouge <b>y</b>. À <i>y</i> = 1 : pente 0,242, chaque bout 0,121, <i>f</i><sub><i>Y</i></sub>(1) = 0,242.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>trois valeurs de y, la densité, la moyenne, une perte</small></summary><div class="in">
+    <ol>
+      <li><b><i>y</i> = 1.</b> 2Φ(1) − 1 = 0,683, et <i>f</i><sub><i>Y</i></sub>(1) = φ(1) = 0,242.</li>
+      <li><b><i>y</i> = 3,84.</b> √3,84 ≈ 1,96, et 2Φ(1,96) − 1 = 0,95. Le seuil 3,84 d'un test du χ² à un degré de liberté est le carré de 1,96, le quantile 97,5 % de la normale.</li>
+      <li><b><i>y</i> = 0,01.</b> P(|<i>X</i>| ≤ 0,1) = 0,0797, sur un intervalle de longueur 0,01.</li>
+      <li><b>La densité en deux points</b> : <i>f</i><sub><i>Y</i></sub>(0,5) = 0,439 et <i>f</i><sub><i>Y</i></sub>(2) = 0,104, les valeurs de <code>scipy.stats.chi2(1).pdf</code>.</li>
+      <li><b>Moyenne et variance.</b> E[<i>Y</i>] = E[<i>X</i>²] = Var(<i>X</i>) + E[<i>X</i>]² = 1. Pour la normale centrée réduite E[<i>X</i>⁴] = 3, donc Var(<i>Y</i>) = 3 − 1 = 2.</li>
+      <li><b>En ML : une perte (loss) est une somme de carrés normalisés.</b> En régression avec un bruit N(0, σ²), la log-vraisemblance négative vaut ½ Σ (<i>r</i><sub><i>i</i></sub>/σ)² plus une constante (<a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">du bruit à la loss</a>). Si les bruits ε<sub><i>i</i></sub> sont indépendants, Σ (ε<sub><i>i</i></sub>/σ)² suit un χ² à <i>n</i> degrés de liberté, de moyenne <i>n</i> ; avec les résidus d'une régression linéaire à <i>p</i> coefficients, il en reste <i>n</i> − <i>p</i>.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>de CDF à CDF avec deux bouts, la dérivée sur laquelle Brunton trébuche</small></summary><div class="in">
+    <div class="drv">
+      <div>F<sub><i>Y</i></sub>(<i>y</i>) = P(<i>X</i>² ≤ <i>y</i>)</div><span>définition, pour y &gt; 0</span>
+      <div>= P(−√<i>y</i> ≤ <i>X</i> ≤ √<i>y</i>)</div><span>x² ≤ y équivaut à |x| ≤ √y : deux bouts</span>
+      <div>= Φ(√<i>y</i>) − Φ(−√<i>y</i>)</div><span>Φ est la CDF de X ; P(X = −√y) = 0</span>
+      <div><i>f</i><sub><i>Y</i></sub>(<i>y</i>) = φ(√<i>y</i>) · 1/(2√<i>y</i>) − φ(−√<i>y</i>) · (−1/(2√<i>y</i>))</div><span>règle de la chaîne sur chaque terme : Φ′ = φ, (√y)′ = 1/(2√y), (−√y)′ = −1/(2√y)</span>
+      <div>= φ(√<i>y</i>)/(2√<i>y</i>) + φ(√<i>y</i>)/(2√<i>y</i>)</div><span>φ paire : φ(−√y) = φ(√y) ; les deux moins se compensent</span>
+      <div>= φ(√<i>y</i>)/√<i>y</i> = e<sup>−<i>y</i>/2</sup>/√(2π<i>y</i>)</div><span>φ(√y) = e<sup>−y/2</sup>/√(2π)</span>
+    </div>
+    <p>Le point délicat est la quatrième ligne : le moins devant Φ(−√<i>y</i>) et celui de la dérivée intérieure de −√<i>y</i> se compensent. Les pentes de Φ, elles, sont égales.</p>
+    <p>Moyenne et variance : E[<i>Y</i>] = E[<i>X</i>²] = Var(<i>X</i>) + E[<i>X</i>]² = 1 (<a href="lesson-00-08-esperance-variance.html#n6">l08, notion 6</a>). Var(<i>Y</i>) = E[<i>X</i>⁴] − E[<i>X</i>²]² = 3 − 1 = 2, où E[<i>X</i>⁴] = 3 est admis ici : on le retrouve en dérivant quatre fois en 0 la fonction génératrice e<sup><i>t</i>²/2</sup> de N(0, 1), dont le terme en <i>t</i>⁴ est <i>t</i>⁴/8 = 3 · <i>t</i>⁴/4! (<a href="lesson-00-12-generatrice-preuve-tcl.html#n3">l12, notion 3</a>).</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>X² contre 2Φ(√y) − 1, la densité, une somme de cinq carrés</small></summary><div class="in">
+<pre class="py">import numpy as np
+from scipy import stats
+rng = np.random.default_rng(3)
+Y = rng.normal(0, 1, 1_000_000) ** 2
+# CDF to CDF: P(Y &lt;= y) = P(|X| &lt;= sqrt y) = 2 Phi(sqrt y) - 1
+for y in [0.01, 1, 3.84]:
+    exact = 2 * stats.norm.cdf(y ** 0.5) - 1
+    print(f"P(Y &lt;= {y}): simulated {np.mean(Y &lt;= y):.4f}, exact {exact:.4f}")
+print(f"mean {Y.mean():.3f}   variance {Y.var():.3f}   (theory 1 and 2)")
+
+# density in a window of width 0.02 vs e^(-y/2) / sqrt(2 pi y), +- two standard errors
+for y in [0.5, 2.0]:
+    p = np.mean(abs(Y - y) &lt; 0.01)
+    noise = 2 * np.sqrt(p * (1 - p) / Y.size) / 0.02
+    fy = np.exp(-y / 2) / np.sqrt(2 * np.pi * y)
+    print(f"density at {y}: simulated {p / 0.02:.3f} +- {noise:.3f}, formula {fy:.4f}")
+
+# sum of k = 5 independent squares: chi-square with 5 degrees of freedom
+S = (rng.normal(0, 1, (1_000_000, 5)) ** 2).sum(axis=1)
+print(f"k = 5: mean {S.mean():.3f}   variance {S.var():.2f}   (theory 5 and 10)")</pre>
+<pre class="out">P(Y &lt;= 0.01): simulated 0.0800, exact 0.0797
+P(Y &lt;= 1): simulated 0.6822, exact 0.6827
+P(Y &lt;= 3.84): simulated 0.9500, exact 0.9500
+mean 1.000   variance 1.999   (theory 1 and 2)
+density at 0.5: simulated 0.437 +- 0.009, formula 0.4394
+density at 2.0: simulated 0.101 +- 0.004, formula 0.1038
+k = 5: mean 4.996   variance 10.00   (theory 5 and 10)</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Le carré de la densité.</b> φ(<i>x</i>)² n'est pas la densité de <i>X</i>² : son aire vaut 0,282, et elle vit sur toute la droite alors que <i>X</i>² ≥ 0.</li>
+      <li><b>Une seule branche.</b> Oublier −√<i>y</i> donne φ(√<i>y</i>)/(2√<i>y</i>), d'aire ½ : il manque la masse des <i>X</i> négatifs.</li>
+      <li><b>Une densité infinie n'est pas une probabilité infinie.</b> <i>f</i><sub><i>Y</i></sub>(<i>y</i>) tend vers l'infini quand <i>y</i> tend vers 0, mais P(<i>Y</i> ≤ 0,01) = 0,0797 seulement. Une densité est un taux : elle peut exploser sur un intervalle de plus en plus court.</li>
+      <li><b><i>X</i> non centrée réduite.</b> Si <i>X</i> ~ N(15, 5²), <i>X</i>² n'est pas un χ² : E[<i>X</i>²] = 25 + 15² = 250. C'est ((<i>X</i> − 15)/5)² qui en est un.</li>
+      <li><b>Ce qui est normal, c'est l'erreur standardisée.</b> Une erreur divisée par son écart-type est ≈ N(0, 1), avant tout carré ; c'est la somme des carrés de ces erreurs standardisées qui est ≈ χ². Il faut aussi qu'elles soient indépendantes, et chaque paramètre estimé retire un degré de liberté (parties 1, tests).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (25) écrit d'abord juste : « I'm going to get minus and minus. So plus… ». Puis il doute, « I think this should be a minus here », et justifie ce doute par « les pentes en +√y et −√y sont égales et opposées ». Elles sont égales : φ est paire, φ(−√<i>y</i>) = φ(√<i>y</i>). Le signe vient de la dérivée intérieure de −√<i>y</i>, qui vaut −1/(2√<i>y</i>) et annule le moins placé devant Φ(−√<i>y</i>) : les deux termes s'ajoutent, comme dans sa première ligne (figure 4). Son résultat final, tiré de ses notes, <i>f</i><sub><i>Y</i></sub>(<i>y</i>) = <i>y</i><sup>−1/2</sup> φ(√<i>y</i>), est juste. Au passage, il écrit la densité de N(0, 1) avec e<sup>−<i>x</i>²/σ²</sup> : c'est e<sup>−<i>x</i>²/2</sup>/√(2π). Enfin, pour les tests, il enchaîne « on soustrait le modèle aux données, on élève l'erreur au carré » et « ces erreurs suivent à peu près une normale », sans dire lesquelles : ce sont les erreurs standardisées, avant le carré.</div>
+  </div></details>
+  <p class="garde">Si X ~ N(0, 1), X² suit un χ² à 1 degré de liberté : P(X² ≤ y) = P(|X| ≤ √y) = 2Φ(√y) − 1, moyenne 1, variance 2, et 3,84 ≈ 1,96². Une somme de k carrés indépendants donne un χ² à k degrés de liberté. Pas de carte ici : elle viendra avec les tests.</p>
+</section>
+
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Une densité est un taux par unité : elle ne se recopie pas. Une fonction de répartition, probabilité d'un événement, se transporte.</li>
+    <li>Méthode : F<sub>Y</sub>(y) = P(g(X) ≤ y), réécrire en événement sur X, puis dériver par la règle de la chaîne.</li>
+    <li>g monotone : f<sub>Y</sub>(y) = f<sub>X</sub>(g⁻¹(y)) · |(g⁻¹)′(y)| ; la densité se divise par l'étirement.</li>
+    <li>Y = aX + b : f<sub>Y</sub>(y) = f<sub>X</sub>((y − b)/a)/|a|, moyenne aμ + b, écart-type |a|σ ; a &lt; 0 retourne l'inégalité.</li>
+    <li>Une normale reste normale : aX + b ~ N(aμ + b, a²σ²).</li>
+    <li>Z = (X − μ)/σ : moyenne 0 et écart-type 1 toujours, N(0, 1) seulement si X est normale ; P(c &lt; X &lt; d) = Φ((d − μ)/σ) − Φ((c − μ)/σ).</li>
+    <li>X ~ N(0, 1) ⇒ X² suit un χ² à 1 degré de liberté : P(X² ≤ y) = 2Φ(√y) − 1, moyenne 1, variance 2, densité infinie en 0.</li>
+  </ol>
+</div>
+<div class="phrase">« Pour la loi d'une fonction d'une variable aléatoire, je ne transforme pas la densité : je passe par la fonction de répartition, P(g(X) ≤ y), que je réécris comme un événement sur X, puis je dérive. Pour une transformation affine, la densité se divise par |a| ; standardiser en est le cas a = 1/σ, et ça ne rend normale qu'une variable déjà normale. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Pourquoi ne peut-on pas simplement remplacer x par g⁻¹(y) dans la densité de X ?</div><div class="a hid">Une densité est un taux par unité de longueur : si g étire, la même probabilité s'étale, il faut diviser par l'étirement |g′|. Uniforme sur [0, 1] étirée par 2 et recopiée : aire 2.</div></li>
+    <li><div class="q">Quelle est la méthode pour trouver la loi de Y = g(X) ?</div><div class="a hid">Écrire F<sub>Y</sub>(y) = P(g(X) ≤ y), le traduire en événement sur X, l'exprimer avec F<sub>X</sub>, puis dériver par la règle de la chaîne.</div></li>
+    <li><div class="q">Densité de aX + b, et ce qui change si a &lt; 0 ?</div><div class="a hid">f<sub>X</sub>((y − b)/a)/|a|. Si a &lt; 0, l'inégalité se retourne : F<sub>Y</sub>(y) = 1 − F<sub>X</sub>((y − b)/a). L'écart-type est |a|σ.</div></li>
+    <li><div class="q">X ~ N(15, 5²). Que vaut P(10 &lt; X &lt; 25) ?</div><div class="a hid">On standardise : z = −1 et 2, donc Φ(2) − Φ(−1) = 0,9772 − 0,1587 ≈ 0,819.</div></li>
+    <li><div class="q">Standardiser une variable explicative exponentielle la rend-elle normale ?</div><div class="a hid">Non : moyenne 0 et écart-type 1, mais la même forme. P(Z &gt; 2) = 0,050, et non les 0,023 de Φ.</div></li>
+    <li><div class="q">Quelle est la loi de X² pour X ~ N(0, 1) ?</div><div class="a hid">P(X² ≤ y) = P(|X| ≤ √y) = 2Φ(√y) − 1 : deux antécédents ±√y. Densité e<sup>−y/2</sup>/√(2πy), moyenne 1 : le χ² à 1 degré de liberté ; 3,84 ≈ 1,96².</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Chaînes</div>
+  <div class="bridges">
+    <a href="../chains/chain-p01-02-ic-test-procedure.html"><b>Intervalle de confiance et test</b><small>z = <span class="hat">β</span>₁/SE et p = 2(1 − Φ(2,26)) : une standardisation lue dans Φ (notion 3).</small></a>
+    <a href="../chains/chain-p01-04-comparer-modeles-multiplicite.html"><b>Comparer deux modèles</b><small>McNemar, (c − b)²/(b + c) : le carré d'une différence standardisée, comparé à un χ² à 1 degré de liberté (notion 4).</small></a>
+    <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html"><b>Du bruit à la loss</b><small>La log-vraisemblance négative gaussienne, ½ Σ (rᵢ/σ)² : une somme de carrés d'erreurs normalisées (notion 4).</small></a>
+    <a href="../chains/chain-p04-04-pca.html"><b>PCA</b><small>Standardiser quand les unités diffèrent, sinon la variance fabrique la composante (notion 3).</small></a>
+    <a href="../chains/chain-p07-04-kmeans.html"><b>k-means</b><small>La distance euclidienne porte les unités : standardiser d'abord (notion 3).</small></a>
+    <a href="../chains/chain-p06-02-cv-leakage.html"><b>Validation croisée et fuite</b><small><span class="hat">μ</span> et <span class="hat">σ</span> de la standardisation se calculent dans le pli d'apprentissage (notion 3).</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::standardisation</code> (notions 1, 2, 3) · <code>stats::chi2</code> (notion 4, culture ici : la carte viendra avec les tests).</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l06 · v1 du 10/10/2026 · Brunton 23 à 25 · Prérequis : <a href="lesson-00-04-variables-binomiale-normale.html">l04</a>, <a href="lesson-00-05-poisson-exponentielle-attentes.html">l05</a>. Suite : <a href="lesson-00-07-lois-jointes.html">l07 · Lois jointes</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* ===== commun à toutes les leçons (kit, étalon l08 v2) ===== */
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc : une entrée par notion, étiquette comprise */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.notion').forEach((s,i)=>{const li=document.createElement('li');const t=s.querySelector('h3').firstChild.textContent.trim();const k=s.classList.contains('culture')?' · culture':'';li.innerHTML=`<a href="#${s.id}">${i+1}. ${t}${k}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.notion').forEach(s=>io.observe(s));
+/* une ancre #nN ouvre la notion visée ; rien n'est replié par défaut hors des blocs */
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outils de dessin ===== */
+function curve(P,f,a,b,cls,ymax){let d='';const n=240;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;let y=f(x);if(!isFinite(y))continue;y=Math.min(y,ymax);d+=(d?' L':'M')+P.sx(x).toFixed(1)+' '+P.sy(y).toFixed(1);}SL.el('path',{d:d,class:'sl-fn '+cls,fill:'none'},P.dyn);}
+function bar(P,x0,x1,y,cls){const a=P.sx(x0),b=P.sx(x1);SL.el('rect',{x:Math.min(a,b),y:P.sy(y),width:Math.max(1.5,Math.abs(b-a)),height:Math.max(0,P.sy(0)-P.sy(y)),class:cls||'sl-bar'},P.dyn);}
+/* SL.plot trace l'axe vertical en x = 0 ; quand 0 porte une barre, on le ramène au bord gauche */
+function leftAxis(P,x0){const ax=P.svg.querySelectorAll('line.sl-axis');if(ax[1]){ax[1].setAttribute('x1',P.sx(x0));ax[1].setAttribute('x2',P.sx(x0));}}
+function rd(host,items){host.innerHTML=items.map(it=>`<div class="${it[2]||''}">${it[0]}<b>${it[1]}</b></div>`).join('');}
+function buttons(host,names,cb){const bs=names.map((n,i)=>{const b=SL.h('button','tb',host,n);b.onclick=()=>{bs.forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');cb(i);};return b;});bs[0].onclick();return bs;}
+
+
+/* ===== v2 : vignettes « voir l'idée », une par notion, juste sous l'idée ===== */
+/* tween : animation 0 → 1 lissée ; runner : un jeton par figure, un nouveau clic tue l'animation en cours */
+function runner(){let t={dead:true};return ()=>{t.dead=true;t={dead:false};return t;};}
+function tween(ms,draw,tk,done){if(SL.reduced){draw(1);if(done)done();return;}const t0=performance.now();const st=t=>{if(tk&&tk.dead)return;let u=Math.min(1,(t-t0)/ms);u=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;draw(u);if(u<1)requestAnimationFrame(st);else if(done)done();};requestAnimationFrame(st);}
+function loop(tk,step){if(SL.reduced){let g=0;while(step()!==false&&g++<1e5);return;}const f=()=>{if(tk.dead)return;if(step()!==false)requestAnimationFrame(f);};requestAnimationFrame(f);}
+function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function pick(r,v,p){let u=r(),a=0;for(let i=0;i<v.length;i++){a+=p[i];if(u<a)return v[i];}return v[v.length-1];}
+function gauss(r){let u=0;while(u===0)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());}
+function fulcrum(P,x){const cx=P.sx(x),cy=P.sy(0);SL.el('path',{d:`M${cx.toFixed(1)} ${(cy+1).toFixed(1)} L${(cx-8).toFixed(1)} ${(cy+16).toFixed(1)} L${(cx+8).toFixed(1)} ${(cy+16).toFixed(1)} Z`,class:'sl-fulcrum'},P.dyn);}
+function median(a){const s=a.slice().sort((x,y)=>x-y),n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;}
+function rect(P,x0,x1,y0,y1,cls,parent){const a=P.sx(x0),b=P.sx(x1),c=P.sy(y0),d=P.sy(y1);return SL.el('rect',{x:Math.min(a,b).toFixed(1),y:Math.min(c,d).toFixed(1),width:Math.abs(b-a).toFixed(1),height:Math.abs(d-c).toFixed(1),class:cls},parent||P.dyn);}
+/* pile de pastilles : une par individu, regroupées par classe de largeur bw */
+function stack(P,vals,bw,r,clsOf,centred){const bins=new Map();vals.forEach((v,i)=>{const b=centred?Math.round(v/bw):Math.floor(v/bw);if(!bins.has(b))bins.set(b,[]);bins.get(b).push(i);});
+  const res=[];bins.forEach((ids,b)=>{const c=centred?b*bw:(b+0.5)*bw,cx=P.sx(c);res.push({c:c,ids:ids});ids.forEach((i,j)=>SL.el('circle',{cx:cx.toFixed(1),cy:(P.sy(0)-r-1-j*(2*r+1)).toFixed(1),r:r,class:'sl-dot '+clsOf(i)},P.dyn));});return res;}
+
+
+/* ===== l06 : outils propres à la leçon ===== */
+/* erf (Abramowitz et Stegun 7.1.26, erreur < 1,5e-7), Φ et φ de la normale centrée réduite */
+function erf(x){const s=x<0?-1:1;x=Math.abs(x);const t=1/(1+0.3275911*x);return s*(1-(((((1.061405429*t-1.453152027)*t)+1.421413741)*t-0.284496736)*t+0.254829592)*t*Math.exp(-x*x));}
+const Phi=z=>z===-Infinity?0:z===Infinity?1:0.5*(1+erf(z/Math.SQRT2));
+const phi=z=>Math.exp(-z*z/2)/Math.sqrt(2*Math.PI);
+/* aire sous f entre a et b, écrêtée à ymax (une densité peut être infinie) */
+function area(P,f,a,b,cls,ymax,parent){if(!(b>a))return null;const n=160;let d='M'+P.sx(a).toFixed(1)+' '+P.sy(0).toFixed(1);
+  for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;let y=f(x);if(!isFinite(y))y=ymax;y=Math.max(-ymax,Math.min(y,ymax));d+=' L'+P.sx(x).toFixed(1)+' '+P.sy(y).toFixed(1);}
+  d+=' L'+P.sx(b).toFixed(1)+' '+P.sy(0).toFixed(1)+' Z';return SL.el('path',{d:d,class:cls},parent||P.dyn);}
+/* courbe tracée sur une liste de points [x, y] déjà calculés (sauts et écrêtage compris) */
+function pathXY(P,pts,cls,parent){let d='';pts.forEach(p=>{d+=(d?' L':'M')+P.sx(p[0]).toFixed(1)+' '+P.sy(p[1]).toFixed(1);});return SL.el('path',{d:d,class:'sl-fn '+cls,fill:'none'},parent||P.dyn);}
+/* aire sous une liste de points [x, y] (même tracé que pathXY, sauts compris) */
+function fillXY(P,pts,cls,parent){if(!pts.length)return null;let d='M'+P.sx(pts[0][0]).toFixed(1)+' '+P.sy(0).toFixed(1);pts.forEach(p=>{d+=' L'+P.sx(p[0]).toFixed(1)+' '+P.sy(p[1]).toFixed(1);});d+=' L'+P.sx(pts[pts.length-1][0]).toFixed(1)+' '+P.sy(0).toFixed(1)+' Z';return SL.el('path',{d:d,class:cls},parent||P.dyn);}
+/* SL.fmt avec le vrai signe moins */
+const mf=(x,d)=>SL.fmt(x,d).replace('-','−');
+
+/* ===== Figure 1 : dix tranches de probabilité 0,1, étirées ou tassées par g ===== */
+(function(){
+  const host=document.getElementById('f1plot'),out=document.getElementById('f1out'),D=2.3;
+  const G=[
+    {n:'g(x) = 2x',g:x=>2*x,f:y=>y>=0&&y<=2?0.5:0,Y:[0,2.3],yt:[0,0.5,1,1.5,2],fs:'½ sur [0, 2]'},
+    {n:'g(x) = x²',g:x=>x*x,f:y=>y>0&&y<=1?1/(2*Math.sqrt(y)):0,Y:[0,1.15],yt:[0,0.25,0.5,0.75,1],fs:'1/(2√y)'},
+    {n:'g(x) = √x',g:x=>Math.sqrt(x),f:y=>y>=0&&y<=1?2*y:0,Y:[0,1.15],yt:[0,0.25,0.5,0.75,1],fs:'2y sur [0, 1]'},
+    {n:'g(x) = −ln x',g:x=>-Math.log(x),f:y=>y>=0?Math.exp(-y):0,Y:[0,4.5],yt:[0,1,2,3,4],fs:'e^(−y)'}];
+  function draw(k){
+    const L=G[k],top=L.Y[1];host.innerHTML='';
+    const row=SL.h('div','v-row',host),lh=SL.h('div','',row),rh=SL.h('div','',row);
+    const A=SL.plot(lh,{x:[0,1.05],y:L.Y,w:300,h:300,xt:[0,0.5,1],yt:L.yt,xl:'x'});
+    A.label(0.55,top*0.95,'y = g(x)','sl-c1','middle');
+    const B=SL.plot(rh,{x:[0,D],y:L.Y,w:300,h:300,xt:[0,1,2],yt:L.yt,xl:'densité de Y'});
+    const strip=0.035*(top-L.Y[0]);let hmax=0,imax=0,hmin=Infinity;const clip=[];let clipTop=0;
+    for(let i=0;i<10;i++){
+      const x0=i/10,x1=(i+1)/10,cls='sl-k'+(1+i%5)+' sl-kc';
+      const ya=L.g(x0),yb=L.g(x1),lo=Math.min(ya,yb),hi=Math.max(ya,yb),loC=Math.min(lo,top),hiC=Math.min(hi,top);
+      rect(A,x0,x1,L.Y[0],L.Y[0]+strip,cls);
+      if(hiC>loC)rect(A,0,0.035,loC,hiC,cls);
+      if(isFinite(hi)){const h=0.1/(hi-lo);hmin=Math.min(hmin,h);if(h>hmax){hmax=h;imax=i;}
+        if(hiC>loC)rect(B,0,Math.min(h,D),loC,hiC,cls);
+        if(h>D){clip.push(SL.fmt(h,1));clipTop=Math.max(clipTop,hi);}}
+      else B.text(0.5,top*0.94,'↑ x de 0 à 0,1\u00a0: y > '+SL.fmt(lo,2),'','start');
+    }
+    if(clip.length)B.text(D-0.03,0.3*top,'↓ '+clip.join(' et '),'','end');
+    for(let i=0;i<=10;i++){const x=i/10,y=L.g(x);if(isFinite(y)&&y<=top){A.seg(0,y,x,y,'sl-link');A.dot(x,y,'sl-c1',2.6);}}
+    const pts=[];for(let j=0;j<=300;j++){const x=0.0005+(1-0.0005)*j/300,y=L.g(x);if(y<=top)pts.push([x,y]);}pathXY(A,pts,'sl-c1');
+    const fp=[];for(let j=0;j<=300;j++){const y=L.Y[0]+0.0001+(top-0.0001)*j/300,v=L.f(y);fp.push([Math.min(v,D),y]);}pathXY(B,fp,'l6-ink');
+    const ya=L.g(imax/10),yb=L.g((imax+1)/10),same=hmax/hmin<1.001;
+    rd(out,[['transformation',L.n],['densité exacte de Y',L.fs],['tranche la plus haute',SL.fmt(hmax,3),'c3'],['elle couvre',same?'toutes égales':'y de '+SL.fmt(Math.min(ya,yb),3)+' à '+SL.fmt(Math.max(ya,yb),3)],['aire de chaque tranche','0,1']]);
+  }
+  buttons(document.getElementById('f1ctl'),G.map(g=>g.n.replace('g(x) = ','')),draw);
+})();
+
+/* ===== Figure 2 : aX + b sur une loi asymétrique, l'attente des spams ===== */
+(function(){
+  const P=SL.plot(document.getElementById('f2plot'),{x:[-100,100],y:[-0.15,0.15],w:560,h:280,xt:[-100,-75,-50,-25,0,25,50,75,100],yt:[-0.1,-0.05,0,0.05,0.1],xl:'y = aX + b, en minutes',yl:'densité'});
+  const out=document.getElementById('f2out'),ctl=document.getElementById('f2ctl'),m=15,st={a:-1,b:30};
+  const fX=x=>x<0?0:Math.exp(-x/m)/m;
+  function pts(f,b){const p=[];for(let j=0;j<=400;j++){const y=-100+200*j/400;p.push([y,f(y)]);}
+    if(b>-100&&b<100){p.push([b-1e-9,f(b-1e-6)],[b+1e-9,f(b+1e-6)]);p.sort((u,v)=>u[0]-v[0]);}return p;}
+  function draw(){
+    P.clear();const a=st.a,b=st.b;
+    if(a===0){P.vline(b,'sl-c2');P.text(b+3,0.135,'a = 0\u00a0: Y = b, constante','sl-c2','start');
+      rd(out,[['E[Y] = 15a + b',mf(b,0)+' min','c3'],['σ = 15 |a|','0'],['densité','aucune']]);return;}
+    const f=y=>fX((y-b)/a)/Math.abs(a);
+    const pf=pts(f,b);fillXY(P,pf,'l6-area');pathXY(P,pf,'sl-c2');
+    if(a<0)pathXY(P,pts(y=>-f(y),b),'sl-c3 l6-dash');
+    const E=m*a+b,s=m*Math.abs(a);
+    P.vline(E,'sl-mean');P.seg(E-s,0.142,E+s,0.142,'gain');
+    P.text(-98,-0.14,'│ moyenne','sl-c3','start');
+    if(a<0)P.text(98,-0.14,'┄ avec 1/a au lieu de 1/|a|\u00a0: aire −1','sl-c3','end');
+    rd(out,[['E[Y] = 15a + b',mf(E,1)+' min','c3'],['σ = 15 |a|',SL.fmt(s,1)+' min'],['hauteur en y = b',SL.fmt(1/(m*Math.abs(a)),4)],['la queue part',a>0?'à droite':'à gauche'],['aire de la courbe violette','1']]);
+  }
+  SL.slider(ctl,{label:'a (étire)',min:-2,max:2,step:0.5,value:-1,fmt:v=>SL.fmt(v,1)},v=>{st.a=v;draw();});
+  SL.slider(ctl,{label:'b (décale)',min:-30,max:30,step:5,value:30,fmt:v=>SL.fmt(v,0)},v=>{st.b=v;draw();});
+})();
+
+/* ===== Figure 3 : standardiser ne rend pas normal ===== */
+(function(){
+  const P=SL.plot(document.getElementById('f3plot'),{x:[-3.5,4.5],y:[0,1.05],w:560,h:260,xt:[-3,-2,-1,0,1,2,3,4],yt:[0,0.25,0.5,0.75,1],xl:'z',yl:'densité de Z'});
+  const out=document.getElementById('f3out'),r3=Math.sqrt(3);
+  const L=[
+    {n:'normale',f:phi,p2:1-Phi(2),p1:Phi(1)-Phi(-1)},
+    {n:'exponentielle',f:z=>z<-1?0:Math.exp(-(z+1)),p2:Math.exp(-3),p1:1-Math.exp(-2),jump:-1},
+    {n:'uniforme',f:z=>Math.abs(z)<=r3?1/(2*r3):0,p2:0,p1:1/r3,jump:[-r3,r3]}];
+  P.fn(phi,'l6-gray');
+  P.label(4.45,0.97,'┄ φ, la normale centrée réduite','','end');P.label(4.45,0.88,'— Z = (X − μ)/σ','sl-c2','end');
+  function draw(k){
+    P.clear();const l=L[k],p=[];
+    for(let j=0;j<=480;j++)p.push(-3.5+8*j/480);
+    [].concat(l.jump===undefined?[]:l.jump).forEach(x=>p.push(x-1e-9,x+1e-9));p.sort((u,v)=>u-v);
+    area(P,l.f,2,4.5,'l6-area3',1.05);pathXY(P,p.map(z=>[z,l.f(z)]),'sl-c2');
+    P.seg(2,0,2,0.55,'sl-c3 sl-dash');P.text(2.08,0.5,'Z > 2','sl-c3','start');
+    P.text(2.25,0.16,'aire ombrée\u00a0: '+SL.fmt(l.p2,4),'sl-c3','start');
+    if(l.p2>0)P.arrow(2.6,0.13,2.35,Math.min(l.f(2.35),1)+0.012,'sl-c3');
+    rd(out,[['loi de X',l.n],['P(Z > 2), vraie',SL.fmt(l.p2,4),'c3'],['P(Z > 2) selon Φ',SL.fmt(1-Phi(2),4)],['P(|Z| < 1), vraie',SL.fmt(l.p1,3),'c3'],['P(|Z| < 1) selon Φ',SL.fmt(Phi(1)-Phi(-1),3)]]);
+  }
+  buttons(document.getElementById('f3ctl'),L.map(l=>l.n),draw);
+})();
+
+/* ===== Figure 4 : les pentes de Φ en ±√y ===== */
+(function(){
+  const P=SL.plot(document.getElementById('f4plot'),{x:[-3.2,3.4],y:[-0.12,1.08],w:560,h:300,xt:[-3,-2,-1,0,1,2,3],yt:[0,0.25,0.5,0.75,1],xl:'x',yl:'Φ(x)'});
+  leftAxis(P,-3.2);
+  const out=document.getElementById('f4out'),fresh=runner();
+  P.fn(Phi,'sl-c1');
+  P.label(-3.1,0.97,'— deux tangentes, même pente φ(√y)','sl-c2','start');
+  P.label(-3.1,0.89,'│ P(Y ≤ y) = Φ(√y) − Φ(−√y)','sl-c3','start');
+  function draw(y){
+    P.clear();const r=Math.sqrt(y),s=phi(r),hi=Phi(r),lo=Phi(-r),L=0.55,X=3.25;
+    rect(P,-r,r,-0.035,-0.01,'l6-band');
+    P.text(-r,-0.105,'−√y','','middle');P.text(r,-0.105,'√y','','middle');
+    [[-r,lo],[r,hi]].forEach(q=>P.seg(q[0]-L,q[1]-L*s,q[0]+L,q[1]+L*s,'sl-c2'));
+    const v=0.4/(2*r);P.arrow(r,hi,r+v,hi+v*s,'sl-c3');P.arrow(-r,lo,-r-v,lo-v*s,'sl-c3');
+    P.seg(-r,lo,X,lo,'sl-link');P.seg(r,hi,X,hi,'sl-link');P.seg(X,lo,X,hi,'sl-c3');
+    P.dot(-r,lo,'sl-c2',4.5);P.dot(r,hi,'sl-c2',4.5);
+    rd(out,[['√y',SL.fmt(r,3)],['pente de Φ en ±√y',SL.fmt(s,3)],['vitesse de ±√y','±'+SL.fmt(1/(2*r),3)],['apport de chaque bout',SL.fmt(s/(2*r),3)],['f<sub>Y</sub>(y), les deux bouts',SL.fmt(s/r,3),'c3'],['F<sub>Y</sub>(y), l’écart',SL.fmt(hi-lo,3)]]);
+  }
+  const ctl=document.getElementById('f4ctl'),sl=SL.slider(document.getElementById('f4sl'),{label:'y',min:0.05,max:6,step:0.01,value:1,fmt:v=>SL.fmt(v,2)},v=>{fresh();draw(v);});
+  SL.h('button','tb',ctl,'▶ élargir la bande').onclick=()=>{const tk=fresh();
+    tween(4000,u=>{const v=0.05+5.95*u;sl.input.value=v;sl.input.nextSibling.textContent=SL.fmt(v,2);draw(v);},tk);};
+})();
+
+/* ===== v1 : étirer une densité, l'aire se garde, la hauteur baisse ===== */
+(function(){
+  const host=document.getElementById('v1plot'),out=document.getElementById('v1out');
+  const P1=SL.plot(SL.h('div','',host),{x:[0,4.2],y:[0,1.3],w:560,h:130,xt:[0,1,2,3,4],yt:[0,1],xl:'x',yl:'densité de X'});
+  const P2=SL.plot(SL.h('div','',host),{x:[0,4.2],y:[0,2.25],w:560,h:210,xt:[0,1,2,3,4],yt:[0,0.5,1,1.5,2],xl:'y = ax',yl:'densité de Y'});
+  rect(P1,0,1,0,1,'l6-area2',P1.layer);rect(P1,0.2,0.3,0,1,'l6-band',P1.layer);
+  P1.label(1.12,0.45,'← la bande [0,2 ; 0,3], probabilité 0,1','','start');
+  P2.label(4.15,2.08,'┄ densité recopiée, hauteur 1 : aire a','sl-c3','end');
+  P2.label(4.15,1.88,'▮ vraie densité, hauteur 1/a : aire 1','sl-c2','end');
+  function draw(a){
+    P2.clear();
+    rect(P2,0,a,0,1/a,'l6-area');rect(P2,0.2*a,0.3*a,0,1/a,'l6-band');
+    rect(P2,0,a,0,1,'l6-copy');
+    rd(out,[['étirement a',SL.fmt(a,1)],['aire de la densité recopiée',SL.fmt(a,1),'c3'],['hauteur vraie 1/a',SL.fmt(1/a,3),'c1'],['la bande devient','['+SL.fmt(0.2*a,2)+' ; '+SL.fmt(0.3*a,2)+']'],['sa probabilité','0,1']]);
+  }
+  SL.slider(document.getElementById('v1ctl'),{label:'étirement a',min:0.5,max:4,step:0.1,value:2,fmt:v=>SL.fmt(v,1)},draw);
+})();
+
+/* ===== v2 : °C en °F, puis le miroir 20 − X ===== */
+(function(){
+  const P=SL.plot(document.getElementById('v2plot'),{x:[-25,100],y:[0,0.092],w:560,h:250,xt:[-20,0,20,40,60,80,100],yt:[0,0.02,0.04,0.06,0.08],xl:'valeur',yl:'densité'});
+  leftAxis(P,-25);
+  const out=document.getElementById('v2out'),mu=15,s=5,top=0.092;
+  const fX=x=>Math.exp(-(((x-mu)/s)**2)/2)/(s*Math.sqrt(2*Math.PI));
+  area(P,fX,-25,20,'l6-area2',top,P.layer);P.fn(fX,'l6-gray');
+  P.label(98,0.084,'┄ X, en °C ; zone grise : X ≤ 20','','end');P.label(98,0.075,'— Y = aX + b ; zone violette : son image','sl-c2','end');
+  const S=[[1.8,32],[-1,20],[1,0]];let cur=[1.8,32];const fresh=runner();
+  function draw(a,b){
+    P.clear();const t=20*a+b;
+    if(Math.abs(a)<1e-3){P.vline(b,'sl-c2');}
+    else{const f=y=>fX((y-b)/a)/Math.abs(a);
+      if(a>0)area(P,f,-25,Math.min(t,100),'l6-area',top);else area(P,f,Math.max(t,-25),100,'l6-area',top);
+      curve(P,f,-25,100,'sl-c2',top);P.seg(t,0,t,Math.min(f(t)+0.012,top),'sl-c2 sl-dash');}
+    const ev=Math.abs(a)<1e-3?'Y = '+mf(b,1):(a>0?'Y ≤ ':'Y ≥ ')+mf(t,1);
+    rd(out,[['moyenne aμ + b',mf(a*mu+b,1)],['écart-type |a|σ',SL.fmt(Math.abs(a)*s,2)],['pic de densité',Math.abs(a)<0.05?'→ ∞':SL.fmt(fX(mu)/Math.abs(a),4)],['« X ≤ 20 » devient',ev,'c3'],['probabilité',SL.fmt(Phi(1),3)]]);
+  }
+  buttons(document.getElementById('v2ctl'),['× 1,8 + 32 : °F','20 − X : miroir','Y = X : °C'],k=>{const tk=fresh(),a0=cur.slice(),a1=S[k];
+    tween(1100,u=>{cur=[a0[0]+(a1[0]-a0[0])*u,a0[1]+(a1[1]-a0[1])*u];draw(cur[0],cur[1]);},tk);});
+})();
+
+/* ===== v3 : deux cloches reliées ===== */
+(function(){
+  const host=document.getElementById('v3plot'),out=document.getElementById('v3out');
+  const PX=SL.plot(SL.h('div','',host),{x:[-5,35],y:[0,0.09],w:560,h:165,xt:[-5,0,5,10,15,20,25,30,35],yt:[0,0.04,0.08],xl:'x, en °C',yl:'densité de X'});
+  const PZ=SL.plot(SL.h('div','',host),{x:[-4,4],y:[0,0.45],w:560,h:165,xt:[-4,-3,-2,-1,0,1,2,3,4],yt:[0,0.2,0.4],xl:'z = (x − 15)/5',yl:'densité de Z'});
+  leftAxis(PX,-5);leftAxis(PZ,-4);
+  const fX=x=>phi((x-15)/5)/5;
+  PX.fn(fX,'sl-c1');PZ.fn(phi,'sl-c2');
+  const C=[{n:'10 à 20 °C : ±σ',c:10,d:20},{n:'X < 7 °C (Brunton)',c:-Infinity,d:7},{n:'10 à 25 °C',c:10,d:25}];
+  const f4=x=>SL.fmt(x,4);
+  buttons(document.getElementById('v3ctl'),C.map(c=>c.n),k=>{
+    const c=C[k],zc=(c.c-15)/5,zd=(c.d-15)/5,p=Phi(zd)-Phi(zc);
+    PX.clear();PZ.clear();
+    area(PX,fX,Math.max(c.c,-5),c.d,'l6-area',0.09);area(PZ,phi,Math.max(zc,-4),zd,'l6-area',0.45);
+    [c.c,c.d].forEach((x,i)=>{if(isFinite(x)){PX.vline(x,'sl-c3 sl-dash');PX.text(x+(i?0.4:-0.4),0.08,SL.fmt(x,0)+' °C','sl-c3',i?'start':'end');}});
+    [zc,zd].forEach((z,i)=>{if(isFinite(z)){PZ.vline(z,'sl-c3 sl-dash');PZ.text(z+(i?0.08:-0.08),0.4,'z = '+mf(z,1),'sl-c3',i?'start':'end');}});
+    const inC=isFinite(c.c)?SL.fmt(c.c,0)+' < X < '+SL.fmt(c.d,0):'X < '+SL.fmt(c.d,0);
+    const inZ=isFinite(zc)?mf(zc,1)+' < Z < '+mf(zd,1):'Z < '+mf(zd,1);
+    const ph=isFinite(zc)?f4(Phi(zd))+' − '+f4(Phi(zc)):'Φ('+mf(zd,1)+') = '+f4(Phi(zd));
+    rd(out,[['en °C',inC],['en z',inZ],['avec la table de Φ',ph],['probabilité',SL.fmt(100*p,p<0.1?2:1)+' %','c3']]);
+  });
+})();
+
+/* ===== v4 : la bande ±√y de X fait la probabilité de Y ≤ y ===== */
+(function(){
+  const host=document.getElementById('v4plot'),out=document.getElementById('v4out'),T=1.35;
+  const PX=SL.plot(SL.h('div','',host),{x:[-3.5,3.5],y:[0,0.46],w:560,h:160,xt:[-3,-2,-1,0,1,2,3],yt:[0,0.2,0.4],xl:'x, densité φ'});
+  const PY=SL.plot(SL.h('div','',host),{x:[0,6.5],y:[0,T],w:560,h:190,xt:[0,1,2,3,4,5,6],yt:[0,0.5,1],xl:'y = x²'});
+  leftAxis(PX,-3.5);
+  const fY=y=>y<=0?Infinity:Math.exp(-y/2)/Math.sqrt(2*Math.PI*y);
+  PX.fn(phi,'sl-c1');
+  PY.label(0.3,1.2,'← la densité tend vers ∞ en 0','sl-c2','start');PY.label(6.4,1.2,'densité de Y, χ² à 1 degré de liberté','','end');PY.label(3.84,0.16,'3,84','sl-c3','middle');
+  SL.el('line',{x1:PY.sx(3.84),x2:PY.sx(3.84),y1:PY.sy(0),y2:PY.sy(0.11),class:'sl-seg sl-c3'},PY.layer);
+  function draw(y){
+    PX.clear();PY.clear();const r=Math.sqrt(y);
+    area(PX,phi,-r,r,'l6-area',0.46);PX.vline(-r,'sl-c3 sl-dash');PX.vline(r,'sl-c3 sl-dash');
+    PX.text(r+0.08,0.41,'√y = '+SL.fmt(r,2),'sl-c3','start');PX.text(-r-0.08,0.41,'−√y','sl-c3','end');
+    area(PY,fY,0.0005,y,'l6-area',T);curve(PY,fY,0.002,6.5,'sl-c2',T);PY.seg(y,0,y,Math.min(fY(y)+0.15,T),'sl-c3 sl-dash');
+    const P=2*Phi(r)-1;
+    rd(out,[['√y',SL.fmt(r,3)],['P(|X| ≤ √y) = P(Y ≤ y)',SL.fmt(P,4),'c3'],['densité moyenne sur [0, y]',SL.fmt(P/y),'c1'],['densité du χ² en y',SL.fmt(fY(y),3)]]);
+  }
+  const sl=SL.slider(document.getElementById('v4sl'),{label:'y',min:0.01,max:6,step:0.01,value:1,fmt:v=>SL.fmt(v,2)},draw);
+  const bs=buttons(document.getElementById('v4ctl'),['y = 1','y = 3,84','y = 0,01'],k=>sl.set([1,3.84,0.01][k]));
+  sl.input.addEventListener('input',()=>bs.forEach(b=>b.setAttribute('aria-pressed','false')));
+})();
+
+})();
+</script>
+</body>
+</html>

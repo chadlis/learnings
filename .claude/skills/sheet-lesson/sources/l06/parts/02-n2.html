@@ -1,0 +1,77 @@
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>Y = aX + b : nouvelle moyenne, nouvel écart-type, et le cas a &lt; 0 <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 23 (et 24 pour l'écart-type)</p>
+  <div class="idee">
+    <p>Brunton convertit des températures : de °C en °F, on multiplie par 9/5 et on ajoute 32. Prenons des journées de printemps, <i>X</i> ~ N(15, 5²) en °C. La méthode de la notion 1 donne F<sub><i>Y</i></sub>(<i>y</i>) = P(1,8<i>X</i> + 32 ≤ <i>y</i>) = F<sub><i>X</i></sub>((<i>y</i> − 32)/1,8) : <i>Y</i> suit N(59, 9²) en °F. Un même événement garde sa probabilité, P(<i>Y</i> ≤ 68) = P(<i>X</i> ≤ 20) = 0,841, et la cloche s'étale d'un facteur 1,8, donc son pic baisse de 0,0798 à 0,0443.</p>
+    <p>Brunton suppose <i>a</i> &gt; 0. Prenons <i>Y</i> = 20 − <i>X</i>, les degrés qui manquent pour atteindre 20 °C : <i>a</i> = −1. « <i>Y</i> ≤ 0 » veut dire « <i>X</i> ≥ 20 » : l'inégalité se retourne, et la probabilité vaut 0,159. Sans la retourner, on trouverait 0,841, la probabilité de l'événement contraire.</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — de °C en °F, puis le miroir 20 − X</div>
+    <div id="v2ctl" class="sl-ctl"></div>
+    <div id="v2plot" class="wide"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">La courbe grise est <i>X</i>, la température en °C, N(15, 5²) ; la violette est <i>Y</i> = <i>aX</i> + <i>b</i>, sur le même axe des nombres. Sous chaque courbe, la zone ombrée est l'événement « <i>X</i> ≤ 20 » et son image. <b>°F</b> : la cloche s'étale de 1,8 et son pic baisse d'autant, de 0,0798 à 0,0443 ; « <i>X</i> ≤ 20 » devient « <i>Y</i> ≤ 68 », 84,1 % des deux côtés. <b>20 − X</b> : la transition passe par <i>a</i> = 0, où tout s'écrase sur un point, puis la loi ressort en miroir ; « <i>X</i> ≤ 20 » devient « <i>Y</i> ≥ 0 » et l'ombre change de côté.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les formules</div>
+    <div class="eq"><i>f</i><sub><i>Y</i></sub>(<i>y</i>) = <i>f</i><sub><i>X</i></sub>((<i>y</i> − <i>b</i>)/<i>a</i>) / |<i>a</i>| &nbsp;&nbsp;&nbsp; E[<i>Y</i>] = <i>a</i>μ + <i>b</i> &nbsp;&nbsp;&nbsp; σ<sub><i>Y</i></sub> = |<i>a</i>| σ</div>
+    <div class="eq"><i>X</i> ~ N(μ, σ²) &nbsp;⇒&nbsp; <i>aX</i> + <i>b</i> ~ N(<i>a</i>μ + <i>b</i>, <i>a</i>²σ²)</div>
+    <ul>
+      <li><i>a</i> ≠ 0. Si <i>a</i> = 0, <i>Y</i> = <i>b</i> est constante : toute la probabilité est en un point, il n'y a plus de densité.</li>
+      <li><i>a</i> &gt; 0 : F<sub><i>Y</i></sub>(<i>y</i>) = F<sub><i>X</i></sub>((<i>y</i> − <i>b</i>)/<i>a</i>). <i>a</i> &lt; 0 : diviser par <i>a</i> retourne l'inégalité, F<sub><i>Y</i></sub>(<i>y</i>) = 1 − F<sub><i>X</i></sub>((<i>y</i> − <i>b</i>)/<i>a</i>). Dans les deux cas, la dérivée fait sortir 1/|<i>a</i>|.</li>
+      <li>μ = E[<i>X</i>] et σ est l'écart-type de <i>X</i>. La variance <i>a</i>²σ² vaut pour toute loi, preuve en <a href="lesson-00-08-esperance-variance.html#n9">l08, notion 9</a>. Ce qui est propre à la normale, c'est que <i>Y</i> reste normale.</li>
+      <li>N(μ, σ²) : le second paramètre est la variance.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — une loi asymétrique sous aX + b : le signe de a la retourne</div>
+    <div id="f2plot" class="wide"></div>
+    <div id="f2ctl"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap"><i>X</i> est l'attente entre deux spams, exponentielle de moyenne 15 min (4 par heure). Le trait violet est la densité de <i>aX</i> + <i>b</i>, avec sa moyenne (trait rouge) et ±σ (segment vert). Au départ <i>a</i> = −1 et <i>b</i> = 30 : la loi est retournée, sa queue part à gauche. Le pointillé rouge est ce que donnerait 1/<i>a</i> au lieu de 1/|<i>a</i>| : une « densité » négative, d'aire −1. Bouge <b>a</b> vers les positifs : la queue repasse à droite et le pointillé disparaît ; à <i>a</i> = 0, il n'y a plus de densité. Bouge <b>b</b> : tout glisse, la forme ne change pas.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>°C en °F, le miroir, les degrés manquants, a = 0</small></summary><div class="in">
+    <ol>
+      <li><b>De °C en °F.</b> <i>X</i> ~ N(15, 5²). Moyenne 1,8 × 15 + 32 = 59 °F, écart-type 1,8 × 5 = 9 °F, variance 81. P(<i>Y</i> ≤ 68) = P(<i>X</i> ≤ 20) = Φ(1) = 0,841. Pic : 0,0798 par °C, 0,0798/1,8 = 0,0443 par °F.</li>
+      <li><b>Le miroir</b> <i>Y</i> = −<i>X</i> : <i>f</i><sub><i>Y</i></sub>(<i>y</i>) = <i>f</i><sub><i>X</i></sub>(−<i>y</i>). Une loi symétrique autour de 0 n'en est pas changée ; une exponentielle part vers les négatifs, sa queue à gauche.</li>
+      <li><b>Les degrés manquants</b>, <i>Y</i> = 20 − <i>X</i> : moyenne 20 − 15 = 5, écart-type |−1| × 5 = 5, donc <i>Y</i> ~ N(5, 5²). P(<i>Y</i> ≤ 0) = P(<i>X</i> ≥ 20) = 1 − 0,841 = 0,159.</li>
+      <li><b>Heures en minutes</b>, <i>a</i> = 60 et <i>b</i> = 0 : l'attente des spams garde sa forme exponentielle, sa moyenne passe de 0,25 h à 15 min et sa densité en 0 de 4 à 4/60 (notion 1).</li>
+      <li><b><i>a</i> = 0.</b> <i>Y</i> = <i>b</i> avec probabilité 1 : une variable qui n'a plus de densité, son écart-type est 0.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>de CDF à CDF dans les deux sens, puis le cas normal</small></summary><div class="in">
+    <p><b><i>a</i> &gt; 0.</b></p>
+    <div class="drv">
+      <div>F<sub><i>Y</i></sub>(<i>y</i>) = P(<i>aX</i> + <i>b</i> ≤ <i>y</i>)</div><span>définition</span>
+      <div>= P(<i>X</i> ≤ (<i>y</i> − <i>b</i>)/<i>a</i>) = F<sub><i>X</i></sub>((<i>y</i> − <i>b</i>)/<i>a</i>)</div><span>retrancher b, diviser par a &gt; 0 : le sens reste</span>
+      <div><i>f</i><sub><i>Y</i></sub>(<i>y</i>) = (1/<i>a</i>) <i>f</i><sub><i>X</i></sub>((<i>y</i> − <i>b</i>)/<i>a</i>)</div><span>règle de la chaîne : la dérivée de (y − b)/a est 1/a</span>
+    </div>
+    <p><b><i>a</i> &lt; 0.</b></p>
+    <div class="drv">
+      <div>F<sub><i>Y</i></sub>(<i>y</i>) = P(<i>X</i> ≥ (<i>y</i> − <i>b</i>)/<i>a</i>) = 1 − F<sub><i>X</i></sub>((<i>y</i> − <i>b</i>)/<i>a</i>)</div><span>diviser par a &lt; 0 retourne l'inégalité ; P(X = point) = 0</span>
+      <div><i>f</i><sub><i>Y</i></sub>(<i>y</i>) = −(1/<i>a</i>) <i>f</i><sub><i>X</i></sub>((<i>y</i> − <i>b</i>)/<i>a</i>) = (1/|<i>a</i>|) <i>f</i><sub><i>X</i></sub>((<i>y</i> − <i>b</i>)/<i>a</i>)</div><span>règle de la chaîne ; −1/a = 1/|a| quand a &lt; 0</span>
+    </div>
+    <p><b>Le cas normal.</b> On remplace <i>f</i><sub><i>X</i></sub> par la densité de N(μ, σ²).</p>
+    <div class="drv">
+      <div><i>f</i><sub><i>Y</i></sub>(<i>y</i>) = 1/(|<i>a</i>|σ√(2π)) · exp(−((<i>y</i> − <i>b</i>)/<i>a</i> − μ)² / (2σ²))</div><span>densité de N(μ, σ²) évaluée en (y − b)/a</span>
+      <div>(<i>y</i> − <i>b</i>)/<i>a</i> − μ = (<i>y</i> − (<i>a</i>μ + <i>b</i>))/<i>a</i></div><span>même dénominateur</span>
+      <div><i>f</i><sub><i>Y</i></sub>(<i>y</i>) = 1/(|<i>a</i>|σ√(2π)) · exp(−(<i>y</i> − (<i>a</i>μ + <i>b</i>))² / (2<i>a</i>²σ²))</div><span>c'est la densité de N(aμ + b, a²σ²), d'écart-type |a|σ</span>
+    </div>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>°C en °F, et l'inégalité retournée</small></summary><div class="in">
+<pre class="py">{{CODE:c2}}</pre>
+<pre class="out">{{OUT:c2}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Écart-type <i>a</i>σ.</b> Avec <i>a</i> &lt; 0, il serait négatif. C'est |<i>a</i>|σ ; la variance <i>a</i>²σ² n'a pas ce problème.</li>
+      <li><b>1/<i>a</i> au lieu de 1/|<i>a</i>|.</b> Pour <i>a</i> &lt; 0, la « densité » devient négative et son aire vaut −1 (pointillé de la figure 2).</li>
+      <li><b>L'inégalité non retournée.</b> Pour <i>Y</i> = 20 − <i>X</i>, écrire F<sub><i>Y</i></sub>(0) = F<sub><i>X</i></sub>((0 − 20)/(−1)) = F<sub><i>X</i></sub>(20) donne 0,841 au lieu de 1 − 0,841 = 0,159.</li>
+      <li><b><i>a</i> = 0.</b> <i>Y</i> = <i>b</i> n'a plus de densité ; la formule divise par 0.</li>
+      <li><b>Seule une transformation affine garde la famille.</b> <i>aX</i> + <i>b</i> d'une normale est normale. Mais e<sup><i>X</i></sup> d'une normale est log-normale, asymétrique (<a href="lesson-00-08-esperance-variance.html#n2">l08, notion 2</a>), et <i>X</i>² est un χ² (notion 4). Même affine, on peut sortir de la famille : <i>aX</i> + <i>b</i> d'une exponentielle n'est exponentielle que si <i>a</i> &gt; 0 et <i>b</i> = 0 ; sinon le support ne commence plus en 0 ou part vers les négatifs.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (23) dit que l'écart-type de <i>aX</i> + <i>b</i> est « a²σ² » et que le signe de <i>a</i> « ne compte pas tant que ça ». <i>a</i>²σ² est la variance ; l'écart-type est |<i>a</i>|σ. Et le signe compte : avec <i>a</i> &lt; 0, l'inégalité se retourne, F<sub><i>Y</i></sub>(<i>y</i>) = 1 − F<sub><i>X</i></sub>((<i>y</i> − <i>b</i>)/<i>a</i>), et la densité se divise par |<i>a</i>|, pas par <i>a</i>. En 24, il rectifie en « a fois σ », sans la valeur absolue. Enfin, il laisse le cas normal en exercice et en esquisse l'exposant (« e to the minus whatever… et cetera ») sans μ ni le facteur 2 : le calcul complet est dans la preuve.</div>
+  </div></details>
+  <p class="garde">Y = aX + b, a ≠ 0 : f<sub>Y</sub>(y) = f<sub>X</sub>((y − b)/a)/|a| ; si a &lt; 0, l'inégalité se retourne, F<sub>Y</sub>(y) = 1 − F<sub>X</sub>((y − b)/a).</p>
+</section>
+

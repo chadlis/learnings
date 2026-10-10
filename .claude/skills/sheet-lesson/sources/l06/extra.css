@@ -1,0 +1,9 @@
+/* l06 : aires sous les courbes, densité recopiée, courbes en pointillé */
+.l6-area{fill:rgba(107,70,193,.26);stroke:none}
+.l6-area2{fill:rgba(34,48,43,.12);stroke:none}
+.l6-area3{fill:rgba(184,50,42,.55);stroke:none}
+.l6-band{fill:rgba(107,70,193,.55);stroke:none}
+.l6-copy{fill:none;stroke:var(--red);stroke-width:2;stroke-dasharray:6 4}
+.sl-fn.l6-dash{stroke-dasharray:6 4;stroke-width:2}
+.sl-fn.l6-gray{stroke:rgba(34,48,43,.5);stroke-width:2;stroke-dasharray:5 4}
+.sl-fn.l6-ink{stroke:var(--cardink);stroke-width:2}
