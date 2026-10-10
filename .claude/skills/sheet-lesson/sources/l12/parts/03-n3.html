@@ -1,0 +1,66 @@
+<!-- ============================ n3 ============================ -->
+<section class="notion culture" id="n3">
+  <h3>Les fonctions génératrices de Poisson, de la normale, de l'exponentielle <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 37</p>
+  <div class="idee">
+    <p>Brunton calcule trois fonctions génératrices, chacune avec son astuce. Pour Poisson, on reconnaît la série de l'exponentielle : Σ (λe<sup>t</sup>)<sup>k</sup>/k! = e<sup>λe<sup>t</sup></sup>, d'où M(t) = e<sup>λ(e<sup>t</sup> − 1)</sup>. Pour la normale centrée réduite, on complète le carré : e<sup>tx</sup> e<sup>−x²/2</sup> = e<sup>t²/2</sup> e<sup>−(x − t)²/2</sup>, et le second facteur est une cloche centrée en t. Il reste M(t) = e<sup>t²/2</sup>, « plus simple que la densité » selon Brunton.</p>
+    <p>Pour l'exponentielle, ∫ e<sup>tx</sup> λe<sup>−λx</sup> dx = ∫ λe<sup>−(λ − t)x</sup> dx ne converge que si t &lt; λ : M(t) = λ/(λ − t), infinie au-delà. Avec λ = 1 : M(0,5) = 2, M(0,9) = 10, M(1) = ∞.</p>
+    <p>Le motif commun : multiplier la loi par e<sup>tx</sup> redonne une loi de la même famille, à une constante près, et cette constante est M(t).</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — multiplier la loi par e<sup>tx</sup>, puis mesurer l'aire</div>
+    <div id="v3ctl" class="sl-ctl"></div><div id="v3sl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">La loi de départ en pointillé, la même multipliée par e<sup>tx</sup> en plein ; l'aire de la courbe pleine, ou la somme des barres pleines, est M(t). L'échelle verticale s'adapte. <b>Poisson(2)</b> : à t = 0,5, les barres pleines ont la forme d'une Poisson(2e<sup>0,5</sup>) = Poisson(3,30), et leur somme vaut 3,66. <b>Normale</b> : la cloche glisse en t sans se déformer, et son aire vaut e<sup>t²/2</sup>, 1,13 à t = 0,5. <b>Exponentielle(1)</b> : la pente se couche, l'aire vaut 1/(1 − t), 2 à t = 0,5. Pousse t jusqu'à 1 et au-delà : la courbe ne redescend plus, l'aire est infinie.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les trois formules</div>
+    <div class="eq">Poisson(λ) : e<sup>λ(e<sup><i>t</i></sup> − 1)</sup> &nbsp;&nbsp;&nbsp; N(0, 1) : e<sup><i>t</i>²/2</sup> &nbsp;&nbsp;&nbsp; exponentielle(λ) : λ/(λ − <i>t</i>), pour <i>t</i> &lt; λ</div>
+    <ul><li>Poisson et normale : finies pour tout t. Exponentielle : finie seulement pour t &lt; λ ; le domaine fait partie de la réponse.</li><li>N(μ, σ²) : X = μ + σZ, donc M<sub>X</sub>(t) = e<sup>μt</sup> M<sub>Z</sub>(σt) = e<sup>μt + σ²t²/2</sup>.</li><li>Brunton note s au lieu de t pour l'exponentielle, parce que t y désigne déjà le temps d'attente. C'est le même objet.</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>trois valeurs, une normale quelconque, deux vérifications</small></summary><div class="in">
+    <ol>
+      <li><b>Poisson(2)</b> à t = 0,5 : M = e<sup>2(e<sup>0,5</sup> − 1)</sup> = e<sup>2 × 0,649</sup> = 3,66.</li>
+      <li><b>N(0, 1)</b> à t = 1 : e<sup>0,5</sup> = 1,649. Pour N(3, 4), de moyenne 3 et de variance 4 : M(t) = e<sup>3t + 2t²</sup>.</li>
+      <li><b>Exponentielle(1)</b> : M(0,5) = 2, M(0,9) = 10, M(t) = ∞ pour t ≥ 1.</li>
+      <li><b>Vérification par la notion 2.</b> Pour M(t) = e<sup>t²/2</sup> : M′(t) = t e<sup>t²/2</sup> et M″(t) = (1 + t²) e<sup>t²/2</sup>. En 0 : moyenne 0, E[X²] = 1, variance 1. C'est bien N(0, 1).</li>
+      <li><b>Le quatrième moment de la normale</b>, par les coefficients (notion 1) : e<sup>t²/2</sup> = 1 + t²/2 + t⁴/8 + …, et le coefficient de t⁴ est E[X⁴]/4!. Donc E[X⁴] = 24/8 = 3 : la kurtosis de la normale (<a href="lesson-00-08-esperance-variance.html#n7">l08, notion 7</a>), et le 3 qu'utilise la variance du χ² (<a href="lesson-00-06-fonctions-standardisation.html#n4">l06, notion 4</a>).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>les trois calculs de Brunton</small></summary><div class="in">
+    <p><b>Poisson</b></p>
+    <div class="drv">
+      <div>M(<i>t</i>) = Σ<sub><i>k</i> ≥ 0</sub> e<sup><i>tk</i></sup> λ<sup><i>k</i></sup> e<sup>−λ</sup>/<i>k</i>!</div><span>définition, cas discret</span>
+      <div>= e<sup>−λ</sup> Σ<sub><i>k</i></sub> (λe<sup><i>t</i></sup>)<sup><i>k</i></sup>/<i>k</i>!</div><span>e<sup>−λ</sup> ne dépend pas de k ; e<sup>tk</sup> λ<sup>k</sup> = (λe<sup>t</sup>)<sup>k</sup></span>
+      <div>= e<sup>−λ</sup> e<sup>λe<sup><i>t</i></sup></sup> = e<sup>λ(e<sup><i>t</i></sup> − 1)</sup></div><span>Σ a<sup>k</sup>/k! = e<sup>a</sup>, la série de l'exponentielle</span>
+    </div>
+    <p><b>Normale centrée réduite</b></p>
+    <div class="drv">
+      <div>M(<i>t</i>) = (1/√(2π)) ∫ e<sup><i>tx</i></sup> e<sup>−<i>x</i>²/2</sup> d<i>x</i></div><span>définition, densité de N(0, 1)</span>
+      <div><i>tx</i> − <i>x</i>²/2 = −½(<i>x</i> − <i>t</i>)² + ½<i>t</i>²</div><span>compléter le carré : développer (x − t)²</span>
+      <div>M(<i>t</i>) = e<sup><i>t</i>²/2</sup> · (1/√(2π)) ∫ e<sup>−(<i>x</i> − <i>t</i>)²/2</sup> d<i>x</i></div><span>e<sup>t²/2</sup> ne dépend pas de x</span>
+      <div>= e<sup><i>t</i>²/2</sup></div><span>l'intégrale est celle de la densité de N(t, 1) : elle vaut 1</span>
+    </div>
+    <p><b>Exponentielle</b></p>
+    <div class="drv">
+      <div>M(<i>t</i>) = ∫<sub>0</sub><sup>∞</sup> e<sup><i>tx</i></sup> λe<sup>−λ<i>x</i></sup> d<i>x</i> = λ ∫<sub>0</sub><sup>∞</sup> e<sup>−(λ − <i>t</i>)<i>x</i></sup> d<i>x</i></div><span>définition ; la densité est nulle pour x &lt; 0</span>
+      <div>= λ [−e<sup>−(λ − <i>t</i>)<i>x</i></sup>/(λ − <i>t</i>)]<sub>0</sub><sup>∞</sup></div><span>primitive</span>
+      <div>= λ/(λ − <i>t</i>)</div><span>le terme en ∞ tend vers 0 seulement si t &lt; λ ; sinon l'intégrale diverge</span>
+    </div>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>la moyenne de e<sup>tX</sup> sur un échantillon, et le bord du domaine</small></summary><div class="in">
+<pre class="py">{{CODE:c3}}</pre>
+<pre class="out">{{OUT:c3}}</pre>
+    <p>À t = 0,9, M(0,9) = 10 existe, mais e<sup>0,9X</sup> a une variance infinie, M(1,8) − M(0,9)² : les cinq estimations s'étalent de 6,2 à 8,5, toutes sous la vraie valeur : une bonne part de M(0,9) vient de tirages énormes et rares, que 100 000 tirages contiennent trop peu.</p>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Le domaine.</b> Pour l'exponentielle, M n'existe que pour t &lt; λ. Et elle s'estime mal bien avant le bord : la variance de e<sup>tX</sup> vaut M(2t) − M(t)², finie seulement si 2t &lt; λ (code ci-dessus).</li>
+      <li><b>e<sup>t²/2</sup> est la fonction génératrice de N(0, 1) seulement.</b> Pour N(μ, σ²), c'est e<sup>μt + σ²t²/2</sup>.</li>
+      <li><b>Une forme fermée n'empêche pas les débordements.</b> Pour un dé, e<sup>6t</sup> déborde le float32 dès t = 15 et le float64 dès t = 119 : on calcule ln M, un log-sum-exp (notion 2).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (37) dit que « la loi des probabilités totales dit que cette intégrale vaut 1 ». C'est la normalisation d'une densité, dont l'intégrale vaut 1. La loi des probabilités totales est la formule de partition P(A) = Σ P(A ∣ B<sub>i</sub>) P(B<sub>i</sub>) (<a href="lesson-00-03-conditionner-bayes-independance.html#n3">l03, notion 3</a>).</div>
+  </div></details>
+  <p class="garde">Poisson : e<sup>λ(e<sup>t</sup> − 1)</sup> ; N(0, 1) : e<sup>t²/2</sup> ; exponentielle : λ/(λ − t), pour t &lt; λ seulement. Pour ces trois lois, multiplier par e<sup>tx</sup> redonne la même famille, et la constante est M(t).</p>
+</section>
+

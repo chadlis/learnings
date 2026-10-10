@@ -1,0 +1,63 @@
+<!-- ============================ n2 ============================ -->
+<section class="notion culture" id="n2">
+  <h3>Dériver en 0 donne les moments ; Poisson <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 38 · Example of the Moment Generating Function</p>
+  <div class="idee">
+    <p>Brunton insiste : on dérive par rapport à t, pas par rapport à x. x est alors une constante, et dériver fait descendre un x : d/dt e<sup>tx</sup> = x e<sup>tx</sup>, « pas de règle de la chaîne, pas d'intégration par parties ». Dériver k fois fait descendre x<sup>k</sup> ; en t = 0 l'exponentielle vaut 1, et il reste la moyenne de X<sup>k</sup>.</p>
+    <p>Pièce Bernoulli(p) : M(t) = 1 − p + p e<sup>t</sup> et M′ = M″ = p e<sup>t</sup>, donc E[X] = E[X²] = p et Var = p(1 − p). Poisson, la loi des ampoules qui grillent à un taux donné : M(t) = e<sup>λ(e<sup>t</sup> − 1)</sup> donne E[X] = λ et E[X²] = λ² + λ, donc Var = λ. Moyenne et variance égales, une propriété « drôle et étrange » selon Brunton.</p>
+    <p>Sur le graphe de M : la pente en 0 est la moyenne, la dérivée seconde en 0, la courbure, est E[X²].</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — la pente en 0 est la moyenne, la courbure est E[X²]</div>
+    <div id="v2ctl" class="sl-ctl"></div><div id="v2sl"></div>
+    <div id="v2plot" class="wide"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">La courbe M(t), sa tangente en 0 (rouge) et sa parabole en 0 (pointillé), 1 + E[X] t + E[X²] t²/2. <b>Poisson</b>, λ = 2 : la tangente monte de 2 par unité de t, c'est E[X] = 2 ; la parabole a E[X²] = 6 ; Var = 6 − 4 = 2 = λ. Change <b>λ</b> : la variance suit toujours λ. Passe à la <b>pièce</b> : pente p, E[X²] = p aussi, variance p(1 − p), maximale à p = ½.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">M<sup>(<i>k</i>)</sup>(0) = E[<i>X<sup>k</sup></i>] &nbsp;&nbsp;&nbsp; E[<i>X</i>] = M′(0) &nbsp;&nbsp;&nbsp; Var(<i>X</i>) = M″(0) − M′(0)²</div>
+    <ul><li>M<sup>(k)</sup> est la dérivée k-ième par rapport à t, évaluée en t = 0 seulement.</li><li>Hypothèse : M finie sur un intervalle ouvert autour de 0. C'est elle qui permet de dériver sous le signe somme ou intégrale, l'étape que Brunton ne justifie pas.</li><li>Raccourci : avec K(t) = ln M(t), K′(0) = E[X] et K″(0) = Var(X) directement. Les dérivées de K en 0 s'appellent les cumulants.</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>pièce, Poisson, le devoir de Brunton, exponentielle, ln M</small></summary><div class="in">
+    <ol>
+      <li><b>Une pièce</b> Bernoulli(0,3) : E[X] = 0,3, E[X²] = 0,3, Var = 0,3 − 0,09 = 0,21.</li>
+      <li><b>Poisson</b> (Brunton) : M′(0) = λ, M″(0) = λ² + λ, Var = λ. Les mêmes valeurs qu'en <a href="lesson-00-05-poisson-exponentielle-attentes.html#n1">l05</a>, sans une seule somme à calculer.</li>
+      <li><b>Le devoir de Brunton.</b> Les dérivées suivantes donnent E[X³] = λ³ + 3λ² + λ et E[X⁴] = λ⁴ + 6λ³ + 7λ² + λ. Pour λ = 2 : 22 et 94.</li>
+      <li><b>L'exponentielle</b>(λ) : M(t) = λ/(λ − t) (notion 3), M′(t) = λ/(λ − t)², M″(t) = 2λ/(λ − t)³. Donc E[T] = 1/λ, E[T²] = 2/λ², Var = 1/λ² : le résultat de <a href="lesson-00-08-esperance-variance.html#n8">l08, notion 8</a>, sans intégration par parties.</li>
+      <li><b>Le raccourci ln M sur Poisson.</b> K(t) = λ(e<sup>t</sup> − 1) : toutes ses dérivées en 0 valent λ. Moyenne λ, variance λ, et même troisième moment centré E[(X − λ)³] = λ.</li>
+      <li><b>En ML : log-sum-exp et softmax.</b> Pour une loi discrète de valeurs x<sub>i</sub> et de probabilités p<sub>i</sub>, K(t) = ln Σ p<sub>i</sub> e<sup>t x<sub>i</sub></sup> est un log-sum-exp (<a href="../chains/chain-p08-02-flottants-lse.html">p08-02</a>), et K′(t) = Σ x<sub>i</sub> · softmax(t x + ln p)<sub>i</sub> : la dérivée d'un log-sum-exp est une moyenne pondérée par un softmax. En t = 0, le softmax redonne les p<sub>i</sub>, et K′(0) = E[X].</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>dériver terme à terme, puis le cas Poisson</small></summary><div class="in">
+    <div class="drv">
+      <div>M(<i>t</i>) = Σ<sub><i>x</i></sub> e<sup><i>tx</i></sup> P(<i>X</i> = <i>x</i>)</div><span>définition, cas discret ; le cas continu est identique avec ∫</span>
+      <div>M′(<i>t</i>) = Σ<sub><i>x</i></sub> <i>x</i> e<sup><i>tx</i></sup> P(<i>X</i> = <i>x</i>)</div><span>dériver terme à terme en t : x et P(X = x) sont des constantes</span>
+      <div>M<sup>(<i>k</i>)</sup>(<i>t</i>) = Σ<sub><i>x</i></sub> <i>x<sup>k</sup></i> e<sup><i>tx</i></sup> P(<i>X</i> = <i>x</i>)</div><span>répéter : chaque dérivée fait descendre un x</span>
+      <div>M<sup>(<i>k</i>)</sup>(0) = Σ<sub><i>x</i></sub> <i>x<sup>k</sup></i> P(<i>X</i> = <i>x</i>) = E[<i>X<sup>k</sup></i>]</div><span>e⁰ = 1, puis LOTUS</span>
+    </div>
+    <p>Dériver terme à terme une somme infinie, ou sous une intégrale, est permis quand M est finie autour de 0 : c'est l'hypothèse de la formule. Puis Poisson :</p>
+    <div class="drv">
+      <div>M(<i>t</i>) = e<sup>λ(e<sup><i>t</i></sup> − 1)</sup></div><span>notion 3</span>
+      <div>M′(<i>t</i>) = λe<sup><i>t</i></sup> · e<sup>λ(e<sup><i>t</i></sup> − 1)</sup></div><span>règle de la chaîne, cette fois en t</span>
+      <div>M″(<i>t</i>) = (λe<sup><i>t</i></sup> + (λe<sup><i>t</i></sup>)²) e<sup>λ(e<sup><i>t</i></sup> − 1)</sup></div><span>dérivée d'un produit</span>
+      <div>M′(0) = λ &nbsp;&nbsp; M″(0) = λ + λ²</div><span>e⁰ = 1 et λ(e⁰ − 1) = 0</span>
+      <div>Var(<i>X</i>) = λ + λ² − λ² = λ</div><span>Var = E[X²] − E[X]²</span>
+    </div>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>les dérivées de M en 0, par différences finies</small></summary><div class="in">
+<pre class="py">{{CODE:c2}}</pre>
+<pre class="out">{{OUT:c2}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>M‴(0) est E[X³], pas l'asymétrie.</b> Pour Poisson(2), E[X³] = 22, alors que l'asymétrie, E[((X − μ)/σ)³], vaut 1/√2 = 0,71, et la kurtosis 3 + 1/λ = 3,5 (<a href="lesson-00-08-esperance-variance.html#n7">l08, notion 7</a>).</li>
+      <li><b>Les coefficients de Taylor de M sont E[X<sup>k</sup>]/k!</b>, pas E[X<sup>k</sup>] : M(t) = 1 + E[X] t + E[X²] t²/2 + E[X³] t³/6 + …</li>
+      <li><b>Sans M finie près de 0, pas de dérivées en 0.</b> La log-normale a tous ses moments, mais M = ∞ à droite de 0 : la formule ne s'applique pas, il faut calculer chaque moment directement.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (37) dit que « E[X³] est l'asymétrie » et « E[X⁴] la kurtosis ». Ce sont des moments bruts ; l'asymétrie et la kurtosis sont des moments centrés et réduits, E[((X − μ)/σ)³] et E[((X − μ)/σ)⁴], qui ne dépendent ni de la position ni de l'unité (<a href="lesson-00-08-esperance-variance.html#n7">l08, notion 7</a>). Il se reprend à moitié plus loin dans la même vidéo, puis en 38 : « lié à l'asymétrie ».</div>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (44) dit que « les coefficients de cette série de Taylor sont mes moments ». Le coefficient de t<sup>k</sup> est E[X<sup>k</sup>]/k! : les moments, à un facteur 1/k! près.</div>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (38) prédit, pour le devoir, « quelque chose comme λ³ + λ² + λ ». Le bon résultat est λ³ + 3λ² + λ, puis λ⁴ + 6λ³ + 7λ² + λ : les puissances sont les bonnes, pas les coefficients.</div>
+  </div></details>
+  <p class="garde">Dériver en t fait descendre un x : M<sup>(k)</sup>(0) = E[X<sup>k</sup>], d'où E[X] = M′(0) et Var = M″(0) − M′(0)². Pour Poisson, moyenne et variance valent λ.</p>
+</section>
+

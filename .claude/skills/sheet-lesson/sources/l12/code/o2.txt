@@ -1,0 +1,6 @@
+M'(0)   =  3.000   theory lam                 = 3.0
+M''(0)  = 12.000   theory lam^2 + lam         = 12.0
+M'''(0) = 57.000   theory lam^3 + 3lam^2 + lam = 57.0
+Var = M''(0) - M'(0)^2 = 3.000
+sample E[X], E[X^2], E[X^3]: [3.0, 12.0, 56.98]
+skewness 0.576   theory 1/sqrt(lam) = 0.577

@@ -1,0 +1,1126 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Fonction génératrice et preuve du TCL — leçon</title>
+<meta name="sheet" content="series=lesson;part=00;number=12;status=v1">
+<meta name="part" content="00 · Socle probabiliste">
+<meta name="subtitle" content="socle — Brunton 37 à 40 et 44 : l'empreinte d'une loi, la somme devient produit, six étapes jusqu'à e^(t²/2)">
+<meta name="prereq" content="l08,l11">
+<meta name="anki" content="stats::mgf">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- série `coding` : squelette annoté et ruban de SL.trace (inerte hors coding) ---- */
+.skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.skel b{color:var(--pen);font-weight:600}
+.step .card.full,.step .card.casse{grid-column:1 / -1}
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .wide table{min-width:520px}
+.card .wide th:nth-child(2),.card .wide td:nth-child(2),
+.card .wide th:nth-child(3),.card .wide td:nth-child(3){text-align:left}
+.readouts .c1 b{color:var(--pen)}.readouts .c3 b{color:var(--red)}
+.sl-trace{--cw:58px;--cgap:8px;margin:4px 0 2px}
+.sl-cells{display:flex;gap:var(--cgap)}
+.sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
+.sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
+.sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.dim{background:rgba(34,48,43,.07);border-color:rgba(34,48,43,.18);border-style:dashed}
+.sl-cell.dim b,.sl-cell.dim i{color:var(--cardmuted);opacity:.5}
+.sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
+.sl-cell.win{border-color:var(--green);border-width:2.5px}
+.sl-ptrs{position:relative;height:20px;margin-top:5px}
+.sl-ptr{position:absolute;top:0;left:calc(var(--i) * (var(--cw) + var(--cgap)));width:var(--cw);text-align:center;font:600 12px var(--sans);color:var(--pen)}
+.sl-note{font-size:14px;color:var(--cardink);margin-top:10px}
+.sl-inv{font:12.5px/1.55 var(--mono);color:var(--cardmuted);margin-top:6px;border-left:2px solid #B7791F;padding-left:10px}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ===== série `lesson` : le cours autoporteur du socle (10/10/2026) ===== */
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px;color:var(--muted);margin:10px 0 0}
+.legend .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-right:6px}
+.lecon{counter-reset:notion}
+.notion{padding:22px 0 28px;border-top:1.5px dashed var(--line);max-width:900px}
+.notion h3{position:relative;padding-left:44px;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.3;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:2px}
+.notion h3::before{counter-increment:notion;content:counter(notion);position:absolute;left:0;top:-1px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle;text-shadow:none}
+.tag.outil{color:var(--mint)}.tag.culture{color:var(--violet)}
+.src{font-size:12.5px;color:var(--faint);margin:0 0 10px 44px}
+.idee{margin-left:44px;color:var(--chalk);font-size:16px;line-height:1.62;max-width:72ch}
+.idee p{margin:7px 0}
+.idee b{color:var(--yellow);font-weight:600}
+.formule{margin:12px 0 10px 44px;background:var(--card);color:var(--cardink);border-radius:3px;padding:12px 18px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--yellow)}
+.formule .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:4px}
+.formule .eq{font-size:17.5px}
+.formule ul{padding-left:18px;margin-top:6px}.formule li{font-size:14.5px;margin:3px 0;color:var(--cardmuted)}
+.notion .fig{margin-left:44px}
+details{margin:8px 0 0 44px;background:var(--card);color:var(--cardink);border-radius:3px;border-left:4px solid var(--ac,var(--yellow));box-shadow:0 10px 20px -16px rgba(0,0,0,.6)}
+details>summary{cursor:pointer;list-style:none;padding:9px 14px;font:600 13px var(--sans);letter-spacing:.03em;color:var(--cardink)}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸";display:inline-block;width:16px;color:var(--cardmuted)}
+details[open]>summary::before{content:"▾"}
+details>summary small{font-weight:400;color:var(--cardmuted);margin-left:6px;letter-spacing:0}
+details .in{padding:2px 18px 14px}
+details .in p,details .in li{font-size:15px;line-height:1.55;margin:5px 0}
+details .in ol,details .in ul{padding-left:20px}
+details.ex{--ac:var(--teal)}details.preuve{--ac:var(--violet)}details.code{--ac:var(--blue)}details.casse{--ac:var(--pink)}details.loin{--ac:var(--faint)}
+.drv{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:4px 16px;margin:8px 0;align-items:baseline}
+.drv>div{font-family:var(--math);font-size:16px;line-height:1.6}
+.drv>span{font-size:13.5px;color:var(--cardmuted);border-left:2px solid var(--cardline);padding-left:10px}
+@media(max-width:700px){.drv{grid-template-columns:minmax(0,1fr)}.drv>span{margin-bottom:6px}}
+pre.py,pre.out,pre.tri{font:13px/1.6 var(--mono);background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:pre}
+pre.out{background:transparent;border:1px dashed var(--cardline);color:var(--cardmuted)}
+pre.out::before{content:"sortie\A";font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.brunton{margin:10px 0 4px;padding:8px 12px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft);font-size:14.5px}
+.brunton b{display:block;font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:2px}
+.garde{margin:14px 0 0 44px;font-family:var(--serif);font-size:16.5px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--yellow);padding:4px 0 4px 14px;max-width:72ch}
+.garde::before{content:"Ce qu'on garde";display:block;font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);text-shadow:none;margin-bottom:2px}
+.notion.culture .garde{border-left-color:var(--violet)}
+.notion table{background:var(--cardsoft);border-radius:3px}
+.sl-fulcrum{fill:var(--red)}.sl-bar2{fill:var(--red);opacity:.55}.sl-bar3{fill:var(--pen);opacity:.6}
+@media(max-width:600px){.idee,.formule,details,.garde,.src,.notion .fig{margin-left:0}.notion h3{font-size:19px}}
+.sl-seg.sl-c1{stroke:var(--pen);stroke-width:2}.sl-seg.sl-c2{stroke:#6B46C1;stroke-width:2}.sl-seg.sl-c3{stroke:var(--red);stroke-width:2}.sl-seg.sl-c4{stroke:#1F5FA8;stroke-width:2}
+/* ===== v2 (10/10/2026) : vignettes « voir l'idée », sous chaque idée ===== */
+.fig.vis{--ac:var(--teal)}
+.v-row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:center}
+.v-row>div{flex:1 1 280px;min-width:0}.v-row>.v-mini{flex:0 1 220px}
+.v-row .sl-plot{min-width:0}
+.nogrid .sl-grid{display:none}
+.sl-ruler{fill:var(--cardmuted)}
+.sl-mass{fill:#6B46C1;opacity:.85}
+.sl-mass-t{font:600 11px var(--sans);fill:#fff}
+.sl-sq{fill:rgba(107,70,193,.16);stroke:#6B46C1;stroke-width:1.5}
+.sl-sq-t{font:600 12.5px var(--mono);fill:#6B46C1}
+.sl-cellp{fill:#6B46C1}.sl-cello{fill:none;stroke:var(--cardline)}
+.sl-prod{font:12px var(--mono);fill:var(--cardmuted);opacity:.5}.sl-prod.on{font-weight:700;fill:var(--cardink);opacity:1}
+.sl-seg.sl-dash{stroke-dasharray:4 3}.sl-seg.sl-link{stroke:rgba(34,48,43,.28);stroke-dasharray:3 3}
+.sl-seg.sl-c5{stroke:#B7791F;stroke-width:2}
+.sl-orbit{fill:none;stroke:rgba(34,48,43,.3);stroke-dasharray:3 4}
+.sl-stick{stroke:var(--cardmuted);stroke-width:4;stroke-linecap:round}
+.sl-dot.sl-tiny{stroke:none;opacity:.5}
+.sl-k1{fill:var(--pen)}.sl-k2{fill:#6B46C1}.sl-k3{fill:var(--red)}.sl-k4{fill:#1F5FA8}.sl-k5{fill:#B7791F}.sl-k6{fill:var(--green)}.sl-kc{opacity:.5}
+.sl-cell-t{font:600 11px var(--sans);fill:var(--cardink)}
+/* ---- propre à cette leçon ---- */
+.sl-fn.sl-dash{stroke-dasharray:5 4;stroke-width:1.8}
+.sl-fn.thin{stroke-width:1.7}
+.sl-area{fill:rgba(107,70,193,.2);stroke:#6B46C1;stroke-width:1.6}
+.sl-bar.ghost{fill:none;stroke:var(--cardmuted);stroke-dasharray:3 2;stroke-width:1.2;opacity:1}
+.sl-bar2.hot{opacity:.8}
+.sl-cellsq{stroke:var(--card);stroke-width:1}
+.sl-cellsq.off{opacity:.12}
+.notion h3 .hf::before{content:"· ";color:var(--faint)}
+text.sl-lbl{stroke:none}
+details.casse table{width:auto;margin:6px 0}
+details.casse th,details.casse td{padding:2px 14px;text-align:center}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 12</div>
+  <h1>Fonction génératrice et <span>preuve du TCL</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Brunton termine sa playlist par une démonstration : la somme de variables indépendantes, une fois standardisée, devient normale. Pour y arriver, il construit un outil, la <b>fonction génératrice des moments</b>, qu'il appelle l'empreinte d'une loi. La leçon suit Brunton 37 à 40 et 44, avec ses exemples : Poisson et les ampoules, la normale, l'exponentielle, les tailles déclarées à 6 pieds, des pièces. Toutes les notions sont de culture : elles éclairent le TCL, elles ne donnent pas de cartes.</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="lesson-00-08-esperance-variance.html">l08 · Espérance et variance</a></li>
+    <li><a href="lesson-00-11-tcl.html">l11 · Théorème central limite</a></li>
+  </ol>
+  <h4>Lois utilisées</h4>
+  <ol>
+    <li><a href="lesson-00-05-poisson-exponentielle-attentes.html#n1">Poisson (l05)</a></li>
+    <li><a href="lesson-00-05-poisson-exponentielle-attentes.html#n3">Exponentielle (l05)</a></li>
+    <li><a href="lesson-00-04-variables-binomiale-normale.html#n6">Normale centrée réduite (l04)</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::mgf</code></div>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>L'espérance d'une fonction (LOTUS).</b> E[g(X)] = Σ g(x) P(X = x), ou ∫ g(x) f(x) dx, sans chercher la loi de g(X) (<a href="lesson-00-08-esperance-variance.html#n5">l08, notion 5</a>). Ici, g(x) = e<sup>tx</sup>.</li>
+      <li><b>Les moments.</b> E[X<sup>k</sup>] est le moment brut d'ordre k ; Var(X) = E[X²] − E[X]² (<a href="lesson-00-08-esperance-variance.html#n6">l08, notion 6</a>) ; l'asymétrie et la kurtosis sont des moments centrés et réduits (<a href="lesson-00-08-esperance-variance.html#n7">l08, notion 7</a>).</li>
+      <li><b>L'espérance d'un produit.</b> Si X et Y sont indépendantes, E[g(X) h(Y)] = E[g(X)] E[h(Y)] (<a href="lesson-00-08-esperance-variance.html#n4">l08, notion 4</a>).</li>
+      <li><b>L'énoncé du TCL.</b> X<sub>i</sub> i.i.d., de moyenne μ et de variance σ² finie : P((X̄<sub>n</sub> − μ)/(σ/√n) ≤ x) → Φ(x) (<a href="lesson-00-11-tcl.html#n1">l11, notion 1</a>). Cette leçon le démontre.</li>
+      <li><b>Trois lois.</b> Poisson(λ) : P(X = k) = λ<sup>k</sup> e<sup>−λ</sup>/k! (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n1">l05, notion 1</a>) ; exponentielle(λ) : densité λ e<sup>−λx</sup> pour x ≥ 0 (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n3">l05, notion 3</a>) ; normale centrée réduite : densité φ(x) = e<sup>−x²/2</sup>/√(2π) et fonction de répartition Φ (<a href="lesson-00-04-variables-binomiale-normale.html#n6">l04</a>).</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">
+
+<!-- ============================ n1 ============================ -->
+<section class="notion culture" id="n1">
+  <h3>L'empreinte d'une loi <span class="hf">M(t) = E[e<sup>tX</sup>]</span> <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 37 · The Moment Generating Function</p>
+  <div class="idee">
+    <p>Une loi a une infinité de moments : E[X], E[X²], E[X³]… Brunton les compare aux dérivées d'une fonction dans une série de Taylor : pris ensemble, ils forment l'<b>empreinte</b> de la loi. La fonction génératrice des moments les range tous dans une fonction d'une nouvelle variable t.</p>
+    <p>M(t) est la moyenne de e<sup>tX</sup>. Chaque valeur x pèse e<sup>tx</sup> fois sa probabilité : t est un bouton. À t = 0, e<sup>tx</sup> = 1 : chaque valeur pèse sa probabilité, et la somme vaut 1. Pour un dé à t = 0,5, la face 6 pèse e³/6 = 3,35, la face 1 e<sup>0,5</sup>/6 = 0,27, et M(0,5) = 8,08. Un t positif grossit les grandes valeurs, un t négatif les petites.</p>
+    <p>Pourquoi « des moments » : e<sup>tx</sup> = 1 + tx + t²x²/2 + …, donc M(t) = 1 + t E[X] + t² E[X²]/2 + … Le coefficient de t<sup>k</sup> est E[X<sup>k</sup>]/k! : les moments, divisés par k!, sont les coefficients de Taylor de M.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — chaque face pèse e<sup>tx</sup>, et les moments reconstruisent la courbe</div>
+    <div id="v1ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">Un dé, une barre par face : sa hauteur est P(X = x) · e<sup>tx</sup>, et M(t) est la somme des barres. À <b>t = 0</b>, chaque barre vaut ⅙ et la somme 1. À t = 0,5, la face 6 passe à 3,35 et fait 41 % de M(0,5) = 8,08 ; à t = −0,5, c'est la face 1 qui fait 41 %. À droite, la courbe M(t) et, en pointillé, sa série de Taylor arrêtée à <b>K moments</b> : en t = 0,5, elle donne 4,65 avec 2 moments, 7,16 avec 4, 8,07 avec 8.</p>
+  </div>
+  <div class="formule"><div class="lbl">La définition</div>
+    <div class="eq">M<sub><i>X</i></sub>(<i>t</i>) = E[e<sup><i>tX</i></sup>] = Σ<sub><i>x</i></sub> e<sup><i>tx</i></sup> P(<i>X</i> = <i>x</i>) &nbsp;(discret) &nbsp;&nbsp;&nbsp; ∫ e<sup><i>tx</i></sup> <i>f</i>(<i>x</i>) d<i>x</i> &nbsp;(continu)</div>
+    <ul><li>C'est LOTUS avec g(x) = e<sup>tx</sup> (<a href="lesson-00-08-esperance-variance.html#n5">l08, notion 5</a>) : t est un nombre fixé, X est aléatoire, et M(t) est un nombre pour chaque t.</li><li>M(0) = E[1] = 1 pour toute loi : c'est la masse totale.</li><li>M(t) peut valoir +∞ pour certains t. L'hypothèse utile, partout dans la leçon : M est finie sur un intervalle ouvert autour de 0, (−h, h).</li><li>Sous cette hypothèse, M(t) = Σ<sub>k</sub> E[X<sup>k</sup>] t<sup>k</sup>/k!, et M détermine la loi : deux variables dont les fonctions génératrices coïncident sur un intervalle autour de 0 ont la même fonction de répartition (théorème d'unicité, admis). C'est l'énoncé exact de « l'empreinte ».</li></ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — même moyenne, même variance : même départ, empreintes différentes</div>
+    <div id="f1ctl"></div>
+    <div id="f1plot" class="wide"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Quatre lois de moyenne 0 et de variance 1 : pile ou face à ±1, trois valeurs −√2, 0, √2 de probabilités ¼, ½, ¼, la normale centrée réduite, et une exponentielle(1) décalée de −1. Près de 0, leurs courbes se confondent avec la parabole 1 + t²/2 (pointillé) : en t = 0,25, elles valent toutes entre 1,031 et 1,038. Déplace <b>t</b> : en t = 1, elles valent 1,543, 1,589 et 1,649, et la dernière est infinie (elle n'existe que pour t &lt; 1). Les deux premiers moments fixent le départ, les suivants séparent les lois. La notion 6 se sert exactement de ce départ commun.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>constante, pièce, dé, ±1</small></summary><div class="in">
+    <ol>
+      <li><b>Une constante</b> X = c : M(t) = e<sup>ct</sup>. Pour c = 0, M vaut 1 partout.</li>
+      <li><b>Une pièce</b>, Bernoulli(p) : M(t) = (1 − p) e<sup>0</sup> + p e<sup>t</sup> = 1 − p + p e<sup>t</sup>.</li>
+      <li><b>Un dé</b> : M(t) = (e<sup>t</sup> + e<sup>2t</sup> + … + e<sup>6t</sup>)/6. M(0,5) = 8,08 ; M(−0,5) = 0,244.</li>
+      <li><b>Pile ou face à ±1</b>, gagner ou perdre 1 € : M(t) = ½ e<sup>−t</sup> + ½ e<sup>t</sup> = cosh t. Elle resservira dans la preuve du TCL (notion 6).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>pourquoi les moments sont les coefficients de M</small></summary><div class="in">
+    <div class="drv">
+      <div>e<sup><i>tx</i></sup> = 1 + <i>tx</i> + <i>t</i>²<i>x</i>²/2! + <i>t</i>³<i>x</i>³/3! + …</div><span>série de l'exponentielle, valable pour tout nombre tx</span>
+      <div>M(<i>t</i>) = E[1 + <i>tX</i> + <i>t</i>²<i>X</i>²/2! + …]</div><span>définition de M</span>
+      <div>= 1 + <i>t</i> E[<i>X</i>] + <i>t</i>² E[<i>X</i>²]/2! + <i>t</i>³ E[<i>X</i>³]/3! + …</div><span>linéarité terme à terme ; permuter E et une somme infinie demande M finie près de 0</span>
+      <div>coefficient de <i>t<sup>k</sup></i> : E[<i>X<sup>k</sup></i>]/<i>k</i>!</div><span>identifier les coefficients d'une série entière</span>
+    </div>
+    <p>L'unicité, elle, est admise. L'idée : une M finie sur (−h, h) se prolonge aux nombres complexes ; en t = is, elle devient la fonction caractéristique E[e<sup>isX</sup>], et une formule d'inversion, celle de Fourier, redonne la loi à partir de celle-ci. Ici i² = −1, et e<sup>iθ</sup> = cos θ + i sin θ est un point du cercle de rayon 1 (notion 6, trou 4).</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>les sœurs de la log-normale ont les mêmes moments</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+# Y ~ N(0, 1) and X = exp(Y) is log-normal. Its "sisters" reweight the density
+# of ln X by (1 + a sin(2 pi y)), |a| &lt;= 1.
+y = np.linspace(-12, 16, 400_001)
+dy = y[1] - y[0]
+phi = np.exp(-y**2 / 2) / np.sqrt(2 * np.pi)
+
+for a in (0.0, 0.5, 1.0):
+    w = phi * (1 + a * np.sin(2 * np.pi * y))       # density of ln X for this sister
+    assert w.min() &gt;= 0                             # still a density
+    moments = [np.sum(np.exp(k * y) * w) * dy for k in range(5)]   # E[X^k]
+    cdf2 = np.sum(w[y &lt;= np.log(2)]) * dy           # P(X &lt;= 2)
+    m = "  ".join(f"{v:.3f}" for v in moments)
+    print(f"a = {a}:  E[X^k], k = 0..4: {m}   P(X &lt;= 2) = {cdf2:.4f}")
+
+m = "  ".join(f"{np.exp(k * k / 2):.3f}" for k in range(5))
+print(f"theory e^(k^2/2):          {m}")</pre>
+<pre class="out">a = 0.0:  E[X^k], k = 0..4: 1.000  1.649  7.389  90.017  2980.958   P(X &lt;= 2) = 0.7559
+a = 0.5:  E[X^k], k = 0..4: 1.000  1.649  7.389  90.017  2980.958   P(X &lt;= 2) = 0.7675
+a = 1.0:  E[X^k], k = 0..4: 1.000  1.649  7.389  90.017  2980.958   P(X &lt;= 2) = 0.7791
+theory e^(k^2/2):          1.000  1.649  7.389  90.017  2980.958</pre>
+    <p>Mêmes moments jusqu'à l'ordre 4, et en fait à tous les ordres, mais trois fonctions de répartition différentes : P(X ≤ 2) vaut 0,756, 0,768 ou 0,779.</p>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>M peut être infinie partout sauf en 0.</b> Loi de Cauchy : aucun moment, M(t) = ∞ pour tout t ≠ 0. Loi de Student à 3 degrés de liberté : variance finie (elle vaut 3), et pourtant M(t) = ∞ pour tout t ≠ 0.</li>
+      <li><b>Tous les moments finis ne suffisent pas.</b> La log-normale X = e<sup>Y</sup>, Y ~ N(0, 1), a E[X<sup>k</sup>] = e<sup>k²/2</sup> pour tout k, mais E[e<sup>tX</sup>] = ∞ pour tout t &gt; 0 : e<sup>te<sup>y</sup></sup> écrase la gaussienne. Ses « sœurs », de densité f(x)[1 + a sin(2π ln x)] avec −1 ≤ a ≤ 1, ont exactement les mêmes moments et des lois différentes (code ci-dessus).</li>
+      <li><b>Un seul point ne dit rien.</b> Toutes les lois ont M(0) = 1. C'est l'égalité sur tout un intervalle autour de 0 qui identifie la loi.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (28, 30, 37) dit que les moments sont des « identifiants uniques » de la loi. Pas toujours : la log-normale partage tous ses moments avec des lois différentes. L'énoncé vrai : si M(t) est finie sur un intervalle ouvert autour de 0, elle détermine la loi, et la suite des moments aussi.</div>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (37) dit que M est « la transformée de Laplace de la densité ». C'est la transformée de Laplace bilatérale, prise en −t : la transformée usuelle est ∫<sub>0</sub><sup>∞</sup> e<sup>−sx</sup> f(x) dx, avec un signe moins et pour une variable positive. Même famille d'outils, pas la même formule.</div>
+  </div></details>
+  <p class="garde">M(t) = E[e<sup>tX</sup>] vaut 1 en 0 et a pour coefficients de Taylor E[X<sup>k</sup>]/k!. Finie près de 0, elle identifie la loi ; sans cette condition, même tous les moments ne suffisent pas.</p>
+</section>
+
+<!-- ============================ n2 ============================ -->
+<section class="notion culture" id="n2">
+  <h3>Dériver en 0 donne les moments ; Poisson <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 38 · Example of the Moment Generating Function</p>
+  <div class="idee">
+    <p>Brunton insiste : on dérive par rapport à t, pas par rapport à x. x est alors une constante, et dériver fait descendre un x : d/dt e<sup>tx</sup> = x e<sup>tx</sup>, « pas de règle de la chaîne, pas d'intégration par parties ». Dériver k fois fait descendre x<sup>k</sup> ; en t = 0 l'exponentielle vaut 1, et il reste la moyenne de X<sup>k</sup>.</p>
+    <p>Pièce Bernoulli(p) : M(t) = 1 − p + p e<sup>t</sup> et M′ = M″ = p e<sup>t</sup>, donc E[X] = E[X²] = p et Var = p(1 − p). Poisson, la loi des ampoules qui grillent à un taux donné : M(t) = e<sup>λ(e<sup>t</sup> − 1)</sup> donne E[X] = λ et E[X²] = λ² + λ, donc Var = λ. Moyenne et variance égales, une propriété « drôle et étrange » selon Brunton.</p>
+    <p>Sur le graphe de M : la pente en 0 est la moyenne, la dérivée seconde en 0, la courbure, est E[X²].</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — la pente en 0 est la moyenne, la courbure est E[X²]</div>
+    <div id="v2ctl" class="sl-ctl"></div><div id="v2sl"></div>
+    <div id="v2plot" class="wide"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">La courbe M(t), sa tangente en 0 (rouge) et sa parabole en 0 (pointillé), 1 + E[X] t + E[X²] t²/2. <b>Poisson</b>, λ = 2 : la tangente monte de 2 par unité de t, c'est E[X] = 2 ; la parabole a E[X²] = 6 ; Var = 6 − 4 = 2 = λ. Change <b>λ</b> : la variance suit toujours λ. Passe à la <b>pièce</b> : pente p, E[X²] = p aussi, variance p(1 − p), maximale à p = ½.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">M<sup>(<i>k</i>)</sup>(0) = E[<i>X<sup>k</sup></i>] &nbsp;&nbsp;&nbsp; E[<i>X</i>] = M′(0) &nbsp;&nbsp;&nbsp; Var(<i>X</i>) = M″(0) − M′(0)²</div>
+    <ul><li>M<sup>(k)</sup> est la dérivée k-ième par rapport à t, évaluée en t = 0 seulement.</li><li>Hypothèse : M finie sur un intervalle ouvert autour de 0. C'est elle qui permet de dériver sous le signe somme ou intégrale, l'étape que Brunton ne justifie pas.</li><li>Raccourci : avec K(t) = ln M(t), K′(0) = E[X] et K″(0) = Var(X) directement. Les dérivées de K en 0 s'appellent les cumulants.</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>pièce, Poisson, le devoir de Brunton, exponentielle, ln M</small></summary><div class="in">
+    <ol>
+      <li><b>Une pièce</b> Bernoulli(0,3) : E[X] = 0,3, E[X²] = 0,3, Var = 0,3 − 0,09 = 0,21.</li>
+      <li><b>Poisson</b> (Brunton) : M′(0) = λ, M″(0) = λ² + λ, Var = λ. Les mêmes valeurs qu'en <a href="lesson-00-05-poisson-exponentielle-attentes.html#n1">l05</a>, sans une seule somme à calculer.</li>
+      <li><b>Le devoir de Brunton.</b> Les dérivées suivantes donnent E[X³] = λ³ + 3λ² + λ et E[X⁴] = λ⁴ + 6λ³ + 7λ² + λ. Pour λ = 2 : 22 et 94.</li>
+      <li><b>L'exponentielle</b>(λ) : M(t) = λ/(λ − t) (notion 3), M′(t) = λ/(λ − t)², M″(t) = 2λ/(λ − t)³. Donc E[T] = 1/λ, E[T²] = 2/λ², Var = 1/λ² : le résultat de <a href="lesson-00-08-esperance-variance.html#n8">l08, notion 8</a>, sans intégration par parties.</li>
+      <li><b>Le raccourci ln M sur Poisson.</b> K(t) = λ(e<sup>t</sup> − 1) : toutes ses dérivées en 0 valent λ. Moyenne λ, variance λ, et même troisième moment centré E[(X − λ)³] = λ.</li>
+      <li><b>En ML : log-sum-exp et softmax.</b> Pour une loi discrète de valeurs x<sub>i</sub> et de probabilités p<sub>i</sub>, K(t) = ln Σ p<sub>i</sub> e<sup>t x<sub>i</sub></sup> est un log-sum-exp (<a href="../chains/chain-p08-02-flottants-lse.html">p08-02</a>), et K′(t) = Σ x<sub>i</sub> · softmax(t x + ln p)<sub>i</sub> : la dérivée d'un log-sum-exp est une moyenne pondérée par un softmax. En t = 0, le softmax redonne les p<sub>i</sub>, et K′(0) = E[X].</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>dériver terme à terme, puis le cas Poisson</small></summary><div class="in">
+    <div class="drv">
+      <div>M(<i>t</i>) = Σ<sub><i>x</i></sub> e<sup><i>tx</i></sup> P(<i>X</i> = <i>x</i>)</div><span>définition, cas discret ; le cas continu est identique avec ∫</span>
+      <div>M′(<i>t</i>) = Σ<sub><i>x</i></sub> <i>x</i> e<sup><i>tx</i></sup> P(<i>X</i> = <i>x</i>)</div><span>dériver terme à terme en t : x et P(X = x) sont des constantes</span>
+      <div>M<sup>(<i>k</i>)</sup>(<i>t</i>) = Σ<sub><i>x</i></sub> <i>x<sup>k</sup></i> e<sup><i>tx</i></sup> P(<i>X</i> = <i>x</i>)</div><span>répéter : chaque dérivée fait descendre un x</span>
+      <div>M<sup>(<i>k</i>)</sup>(0) = Σ<sub><i>x</i></sub> <i>x<sup>k</sup></i> P(<i>X</i> = <i>x</i>) = E[<i>X<sup>k</sup></i>]</div><span>e⁰ = 1, puis LOTUS</span>
+    </div>
+    <p>Dériver terme à terme une somme infinie, ou sous une intégrale, est permis quand M est finie autour de 0 : c'est l'hypothèse de la formule. Puis Poisson :</p>
+    <div class="drv">
+      <div>M(<i>t</i>) = e<sup>λ(e<sup><i>t</i></sup> − 1)</sup></div><span>notion 3</span>
+      <div>M′(<i>t</i>) = λe<sup><i>t</i></sup> · e<sup>λ(e<sup><i>t</i></sup> − 1)</sup></div><span>règle de la chaîne, cette fois en t</span>
+      <div>M″(<i>t</i>) = (λe<sup><i>t</i></sup> + (λe<sup><i>t</i></sup>)²) e<sup>λ(e<sup><i>t</i></sup> − 1)</sup></div><span>dérivée d'un produit</span>
+      <div>M′(0) = λ &nbsp;&nbsp; M″(0) = λ + λ²</div><span>e⁰ = 1 et λ(e⁰ − 1) = 0</span>
+      <div>Var(<i>X</i>) = λ + λ² − λ² = λ</div><span>Var = E[X²] − E[X]²</span>
+    </div>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>les dérivées de M en 0, par différences finies</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+lam, h = 3.0, 1e-3
+M = lambda t: np.exp(lam * (np.exp(t) - 1))         # Poisson MGF
+
+d1 = (M(h) - M(-h)) / (2 * h)                       # slope at 0
+d2 = (M(h) - 2 * M(0) + M(-h)) / h**2               # curvature at 0
+d3 = (M(2 * h) - 2 * M(h) + 2 * M(-h) - M(-2 * h)) / (2 * h**3)
+print(f"M'(0)   = {d1:6.3f}   theory lam                 = {lam}")
+print(f"M''(0)  = {d2:6.3f}   theory lam^2 + lam         = {lam**2 + lam}")
+print(f"M'''(0) = {d3:6.3f}   theory lam^3 + 3lam^2 + lam = {lam**3 + 3 * lam**2 + lam}")
+print(f"Var = M''(0) - M'(0)^2 = {d2 - d1**2:.3f}")
+
+x = np.random.default_rng(0).poisson(lam, 1_000_000)
+print("sample E[X], E[X^2], E[X^3]:", [round(float(np.mean(x**k)), 2) for k in (1, 2, 3)])
+mu, sd = x.mean(), x.std()
+print(f"skewness {np.mean(((x - mu) / sd)**3):.3f}   theory 1/sqrt(lam) = {lam**-0.5:.3f}")</pre>
+<pre class="out">M'(0)   =  3.000   theory lam                 = 3.0
+M''(0)  = 12.000   theory lam^2 + lam         = 12.0
+M'''(0) = 57.000   theory lam^3 + 3lam^2 + lam = 57.0
+Var = M''(0) - M'(0)^2 = 3.000
+sample E[X], E[X^2], E[X^3]: [3.0, 12.0, 56.98]
+skewness 0.576   theory 1/sqrt(lam) = 0.577</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>M‴(0) est E[X³], pas l'asymétrie.</b> Pour Poisson(2), E[X³] = 22, alors que l'asymétrie, E[((X − μ)/σ)³], vaut 1/√2 = 0,71, et la kurtosis 3 + 1/λ = 3,5 (<a href="lesson-00-08-esperance-variance.html#n7">l08, notion 7</a>).</li>
+      <li><b>Les coefficients de Taylor de M sont E[X<sup>k</sup>]/k!</b>, pas E[X<sup>k</sup>] : M(t) = 1 + E[X] t + E[X²] t²/2 + E[X³] t³/6 + …</li>
+      <li><b>Sans M finie près de 0, pas de dérivées en 0.</b> La log-normale a tous ses moments, mais M = ∞ à droite de 0 : la formule ne s'applique pas, il faut calculer chaque moment directement.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (37) dit que « E[X³] est l'asymétrie » et « E[X⁴] la kurtosis ». Ce sont des moments bruts ; l'asymétrie et la kurtosis sont des moments centrés et réduits, E[((X − μ)/σ)³] et E[((X − μ)/σ)⁴], qui ne dépendent ni de la position ni de l'unité (<a href="lesson-00-08-esperance-variance.html#n7">l08, notion 7</a>). Il se reprend à moitié plus loin dans la même vidéo, puis en 38 : « lié à l'asymétrie ».</div>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (44) dit que « les coefficients de cette série de Taylor sont mes moments ». Le coefficient de t<sup>k</sup> est E[X<sup>k</sup>]/k! : les moments, à un facteur 1/k! près.</div>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (38) prédit, pour le devoir, « quelque chose comme λ³ + λ² + λ ». Le bon résultat est λ³ + 3λ² + λ, puis λ⁴ + 6λ³ + 7λ² + λ : les puissances sont les bonnes, pas les coefficients.</div>
+  </div></details>
+  <p class="garde">Dériver en t fait descendre un x : M<sup>(k)</sup>(0) = E[X<sup>k</sup>], d'où E[X] = M′(0) et Var = M″(0) − M′(0)². Pour Poisson, moyenne et variance valent λ.</p>
+</section>
+
+<!-- ============================ n3 ============================ -->
+<section class="notion culture" id="n3">
+  <h3>Les fonctions génératrices de Poisson, de la normale, de l'exponentielle <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 37</p>
+  <div class="idee">
+    <p>Brunton calcule trois fonctions génératrices, chacune avec son astuce. Pour Poisson, on reconnaît la série de l'exponentielle : Σ (λe<sup>t</sup>)<sup>k</sup>/k! = e<sup>λe<sup>t</sup></sup>, d'où M(t) = e<sup>λ(e<sup>t</sup> − 1)</sup>. Pour la normale centrée réduite, on complète le carré : e<sup>tx</sup> e<sup>−x²/2</sup> = e<sup>t²/2</sup> e<sup>−(x − t)²/2</sup>, et le second facteur est une cloche centrée en t. Il reste M(t) = e<sup>t²/2</sup>, « plus simple que la densité » selon Brunton.</p>
+    <p>Pour l'exponentielle, ∫ e<sup>tx</sup> λe<sup>−λx</sup> dx = ∫ λe<sup>−(λ − t)x</sup> dx ne converge que si t &lt; λ : M(t) = λ/(λ − t), infinie au-delà. Avec λ = 1 : M(0,5) = 2, M(0,9) = 10, M(1) = ∞.</p>
+    <p>Le motif commun : multiplier la loi par e<sup>tx</sup> redonne une loi de la même famille, à une constante près, et cette constante est M(t).</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — multiplier la loi par e<sup>tx</sup>, puis mesurer l'aire</div>
+    <div id="v3ctl" class="sl-ctl"></div><div id="v3sl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">La loi de départ en pointillé, la même multipliée par e<sup>tx</sup> en plein ; l'aire de la courbe pleine, ou la somme des barres pleines, est M(t). L'échelle verticale s'adapte. <b>Poisson(2)</b> : à t = 0,5, les barres pleines ont la forme d'une Poisson(2e<sup>0,5</sup>) = Poisson(3,30), et leur somme vaut 3,66. <b>Normale</b> : la cloche glisse en t sans se déformer, et son aire vaut e<sup>t²/2</sup>, 1,13 à t = 0,5. <b>Exponentielle(1)</b> : la pente se couche, l'aire vaut 1/(1 − t), 2 à t = 0,5. Pousse t jusqu'à 1 et au-delà : la courbe ne redescend plus, l'aire est infinie.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les trois formules</div>
+    <div class="eq">Poisson(λ) : e<sup>λ(e<sup><i>t</i></sup> − 1)</sup> &nbsp;&nbsp;&nbsp; N(0, 1) : e<sup><i>t</i>²/2</sup> &nbsp;&nbsp;&nbsp; exponentielle(λ) : λ/(λ − <i>t</i>), pour <i>t</i> &lt; λ</div>
+    <ul><li>Poisson et normale : finies pour tout t. Exponentielle : finie seulement pour t &lt; λ ; le domaine fait partie de la réponse.</li><li>N(μ, σ²) : X = μ + σZ, donc M<sub>X</sub>(t) = e<sup>μt</sup> M<sub>Z</sub>(σt) = e<sup>μt + σ²t²/2</sup>.</li><li>Brunton note s au lieu de t pour l'exponentielle, parce que t y désigne déjà le temps d'attente. C'est le même objet.</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>trois valeurs, une normale quelconque, deux vérifications</small></summary><div class="in">
+    <ol>
+      <li><b>Poisson(2)</b> à t = 0,5 : M = e<sup>2(e<sup>0,5</sup> − 1)</sup> = e<sup>2 × 0,649</sup> = 3,66.</li>
+      <li><b>N(0, 1)</b> à t = 1 : e<sup>0,5</sup> = 1,649. Pour N(3, 4), de moyenne 3 et de variance 4 : M(t) = e<sup>3t + 2t²</sup>.</li>
+      <li><b>Exponentielle(1)</b> : M(0,5) = 2, M(0,9) = 10, M(t) = ∞ pour t ≥ 1.</li>
+      <li><b>Vérification par la notion 2.</b> Pour M(t) = e<sup>t²/2</sup> : M′(t) = t e<sup>t²/2</sup> et M″(t) = (1 + t²) e<sup>t²/2</sup>. En 0 : moyenne 0, E[X²] = 1, variance 1. C'est bien N(0, 1).</li>
+      <li><b>Le quatrième moment de la normale</b>, par les coefficients (notion 1) : e<sup>t²/2</sup> = 1 + t²/2 + t⁴/8 + …, et le coefficient de t⁴ est E[X⁴]/4!. Donc E[X⁴] = 24/8 = 3 : la kurtosis de la normale (<a href="lesson-00-08-esperance-variance.html#n7">l08, notion 7</a>), et le 3 qu'utilise la variance du χ² (<a href="lesson-00-06-fonctions-standardisation.html#n4">l06, notion 4</a>).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>les trois calculs de Brunton</small></summary><div class="in">
+    <p><b>Poisson</b></p>
+    <div class="drv">
+      <div>M(<i>t</i>) = Σ<sub><i>k</i> ≥ 0</sub> e<sup><i>tk</i></sup> λ<sup><i>k</i></sup> e<sup>−λ</sup>/<i>k</i>!</div><span>définition, cas discret</span>
+      <div>= e<sup>−λ</sup> Σ<sub><i>k</i></sub> (λe<sup><i>t</i></sup>)<sup><i>k</i></sup>/<i>k</i>!</div><span>e<sup>−λ</sup> ne dépend pas de k ; e<sup>tk</sup> λ<sup>k</sup> = (λe<sup>t</sup>)<sup>k</sup></span>
+      <div>= e<sup>−λ</sup> e<sup>λe<sup><i>t</i></sup></sup> = e<sup>λ(e<sup><i>t</i></sup> − 1)</sup></div><span>Σ a<sup>k</sup>/k! = e<sup>a</sup>, la série de l'exponentielle</span>
+    </div>
+    <p><b>Normale centrée réduite</b></p>
+    <div class="drv">
+      <div>M(<i>t</i>) = (1/√(2π)) ∫ e<sup><i>tx</i></sup> e<sup>−<i>x</i>²/2</sup> d<i>x</i></div><span>définition, densité de N(0, 1)</span>
+      <div><i>tx</i> − <i>x</i>²/2 = −½(<i>x</i> − <i>t</i>)² + ½<i>t</i>²</div><span>compléter le carré : développer (x − t)²</span>
+      <div>M(<i>t</i>) = e<sup><i>t</i>²/2</sup> · (1/√(2π)) ∫ e<sup>−(<i>x</i> − <i>t</i>)²/2</sup> d<i>x</i></div><span>e<sup>t²/2</sup> ne dépend pas de x</span>
+      <div>= e<sup><i>t</i>²/2</sup></div><span>l'intégrale est celle de la densité de N(t, 1) : elle vaut 1</span>
+    </div>
+    <p><b>Exponentielle</b></p>
+    <div class="drv">
+      <div>M(<i>t</i>) = ∫<sub>0</sub><sup>∞</sup> e<sup><i>tx</i></sup> λe<sup>−λ<i>x</i></sup> d<i>x</i> = λ ∫<sub>0</sub><sup>∞</sup> e<sup>−(λ − <i>t</i>)<i>x</i></sup> d<i>x</i></div><span>définition ; la densité est nulle pour x &lt; 0</span>
+      <div>= λ [−e<sup>−(λ − <i>t</i>)<i>x</i></sup>/(λ − <i>t</i>)]<sub>0</sub><sup>∞</sup></div><span>primitive</span>
+      <div>= λ/(λ − <i>t</i>)</div><span>le terme en ∞ tend vers 0 seulement si t &lt; λ ; sinon l'intégrale diverge</span>
+    </div>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>la moyenne de e<sup>tX</sup> sur un échantillon, et le bord du domaine</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(1)
+n, t = 100_000, 0.3
+cases = {"Poisson(2)": (rng.poisson(2, n), np.exp(2 * (np.exp(t) - 1))),
+         "N(0, 1)":    (rng.standard_normal(n), np.exp(t**2 / 2)),
+         "Exp(1)":     (rng.exponential(1, n), 1 / (1 - t))}
+for name, (x, exact) in cases.items():
+    est = np.mean(np.exp(t * x))
+    print(f"{name:10s}  mean of e^(tX) = {est:.4f}   formula = {exact:.4f}")
+
+# Exp(1) near the edge (t -&gt; 1): Var(e^(tX)) = M(2t) - M(t)^2 is infinite once 2t &gt;= 1
+x = rng.exponential(1, (5, n))                      # five independent samples
+for t in (0.3, 0.9):
+    est = np.mean(np.exp(t * x), axis=1)
+    print(f"t = {t}: five estimates {np.round(est, 2)}   formula {1 / (1 - t):.2f}")</pre>
+<pre class="out">Poisson(2)  mean of e^(tX) = 2.0104   formula = 2.0132
+N(0, 1)     mean of e^(tX) = 1.0452   formula = 1.0460
+Exp(1)      mean of e^(tX) = 1.4326   formula = 1.4286
+t = 0.3: five estimates [1.42 1.43 1.43 1.43 1.43]   formula 1.43
+t = 0.9: five estimates [6.22 7.64 8.46 7.22 7.83]   formula 10.00</pre>
+    <p>À t = 0,9, M(0,9) = 10 existe, mais e<sup>0,9X</sup> a une variance infinie, M(1,8) − M(0,9)² : les cinq estimations s'étalent de 6,2 à 8,5, toutes sous la vraie valeur : une bonne part de M(0,9) vient de tirages énormes et rares, que 100 000 tirages contiennent trop peu.</p>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Le domaine.</b> Pour l'exponentielle, M n'existe que pour t &lt; λ. Et elle s'estime mal bien avant le bord : la variance de e<sup>tX</sup> vaut M(2t) − M(t)², finie seulement si 2t &lt; λ (code ci-dessus).</li>
+      <li><b>e<sup>t²/2</sup> est la fonction génératrice de N(0, 1) seulement.</b> Pour N(μ, σ²), c'est e<sup>μt + σ²t²/2</sup>.</li>
+      <li><b>Une forme fermée n'empêche pas les débordements.</b> Pour un dé, e<sup>6t</sup> déborde le float32 dès t = 15 et le float64 dès t = 119 : on calcule ln M, un log-sum-exp (notion 2).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (37) dit que « la loi des probabilités totales dit que cette intégrale vaut 1 ». C'est la normalisation d'une densité, dont l'intégrale vaut 1. La loi des probabilités totales est la formule de partition P(A) = Σ P(A ∣ B<sub>i</sub>) P(B<sub>i</sub>) (<a href="lesson-00-03-conditionner-bayes-independance.html#n3">l03, notion 3</a>).</div>
+  </div></details>
+  <p class="garde">Poisson : e<sup>λ(e<sup>t</sup> − 1)</sup> ; N(0, 1) : e<sup>t²/2</sup> ; exponentielle : λ/(λ − t), pour t &lt; λ seulement. Pour ces trois lois, multiplier par e<sup>tx</sup> redonne la même famille, et la constante est M(t).</p>
+</section>
+
+<!-- ============================ n4 ============================ -->
+<section class="notion culture" id="n4">
+  <h3>Fonction de répartition plutôt que densité : le pic à 6 pieds <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 39 · The Lebesgue Measure in Probability</p>
+  <div class="idee">
+    <p>En 37, Brunton a dit que M détermine la fonction de répartition F(x) = P(X ≤ x), et non la densité. Il l'explique sur un exemple réel : les tailles déclarées des hommes américains, sur les permis de conduire ou les applis de rencontre. La courbe est presque une cloche, avec une pile à exactement 6 pieds (183 cm) : dès 5 pieds 10 et demi, on s'arrondit à 6.</p>
+    <p>Une pile de gens sur une valeur exacte est une <b>masse ponctuelle</b>. Une densité ne peut pas la porter : sur une classe de largeur w, la barre vaut masse/w, infinie quand w → 0. La fonction de répartition, elle, fait un saut. Dans un modèle jouet (taille vraie N(69, 3²) pouces ; la moitié de ceux entre 70,5 et 72 déclarent 72 ; Brunton ne donne aucun chiffre), 7,5 % déclarent 72 pouces, et F passe de 0,766 juste avant 72 à 0,841 en 72.</p>
+    <p>D'où le slogan de Brunton : intégrer lisse, dériver abîme. F, l'intégrale, existe toujours ; la densité, sa dérivée, pas toujours.</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — plus la classe est fine, plus la barre de 6 pieds monte</div>
+    <div id="v4ctl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">Les tailles déclarées du modèle : taille vraie normale (pointillé), et la moitié de ceux qui mesurent entre 70,5 et 72 pouces déclarent 72, soit 6 pieds. Les barres sont en échelle de densité : hauteur = part des hommes dans la classe / largeur. Réduis la <b>largeur des classes</b> : les barres ordinaires se calent sur la courbe, de sommet 0,133, et la barre de 72 monte comme 0,075/w + 0,06, la hauteur ordinaire autour de 72, creux compris : 0,21 à w = 0,5, 0,36 à 0,25, 0,81 à 0,1. Élargis à 2 pouces : le pic disparaît, noyé avec le creux juste en dessous.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">F(<i>x</i>) = P(<i>X</i> ≤ <i>x</i>) &nbsp;&nbsp;&nbsp; avec une densité : F(<i>x</i>) = ∫<sub>−∞</sub><sup><i>x</i></sup> <i>f</i>(<i>u</i>) d<i>u</i> &nbsp;&nbsp;&nbsp; saut en <i>a</i> : F(<i>a</i>) − F(<i>a</i><sup>−</sup>) = P(<i>X</i> = <i>a</i>)</div>
+    <ul><li>F existe pour toute variable : croissante, de 0 à 1, continue à droite. La densité f = F′ n'existe que si F est assez lisse.</li><li>F(a<sup>−</sup>) est la limite de F juste avant a. Un saut de F en a est une masse P(X = a) &gt; 0 ; une variable à densité a P(X = a) = 0 partout.</li><li>Une loi mixte, cloche plus pile : F = (1 − m) F<sub>c</sub> + m · 𝟙{x ≥ a}, avec m la masse ponctuelle et F<sub>c</sub> une fonction de répartition continue.</li><li>C'est sur F que portent l'unicité de la notion 1 et la conclusion du TCL, P(Z<sub>n</sub> ≤ x) → Φ(x) : la <b>convergence en loi</b> (convergence in distribution).</li></ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — la densité ne peut pas porter le pic, la fonction de répartition le porte par un saut</div>
+    <div id="f2ctl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Modèle jouet, pas des données : taille vraie normale de moyenne 69 pouces (175 cm) et d'écart-type 3 pouces (7,6 cm). En haut, la partie continue des tailles déclarées : un creux entre 70,5 et 72 pouces, ceux qui sont partis à 72 ; la flèche est la masse ponctuelle, qu'aucune hauteur de courbe ne représente. En bas, la fonction de répartition : lisse partout, sauf un saut en 72 égal à la masse. Monte la <b>part arrondie</b>, celle de la zone qui déclare 72 : à ½, le saut vaut 7,5 %, de 0,766 à 0,841 ; à 1, il vaut 15 % et F reste plate sur tout le creux. F(72) reste 0,841 = Φ(1) : l'arrondi déplace des gens sans changer qui est sous 6 pieds.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>dé, tailles, somme de pièces, ReLU</small></summary><div class="in">
+    <ol>
+      <li><b>Un dé.</b> F est un escalier de six marches de ⅙, en 1, 2, …, 6. Pas de densité du tout : toute la masse est ponctuelle.</li>
+      <li><b>Les tailles déclarées</b> (modèle) : P(70,5 ≤ H &lt; 72) = 0,150 ; la moitié s'arrondit, masse 0,075 en 72 ; F(72<sup>−</sup>) = 0,691 + 0,075 = 0,766 et F(72) = 0,841.</li>
+      <li><b>Une somme de pièces.</b> Pour n pièces à ±1, S<sub>n</sub> ne prend que les valeurs −n, −n + 2, …, n : sa fonction de répartition est un escalier, sans densité, pour tout n. Celle de la somme standardisée Z<sub>n</sub> = S<sub>n</sub>/√n, un escalier elle aussi, converge pourtant vers Φ, qui a une densité. Le TCL ne peut porter que sur F (figure 3, notion 6).</li>
+      <li><b>En ML : la ReLU.</b> Si la pré-activation suit N(0, 1), la sortie max(0, Z) vaut exactement 0 avec probabilité ½ : une masse en 0, plus une demi-cloche. F saute de 0 à ½ en 0. De même, un temps de réponse coupé par un délai d'expiration (timeout) de 30 s empile toutes les requêtes lentes à exactement 30 s.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>le saut est la masse, et une densité n'a pas de masse</small></summary><div class="in">
+    <div class="drv">
+      <div>F(<i>a</i>) − F(<i>a</i> − <i>h</i>) = P(<i>a</i> − <i>h</i> &lt; <i>X</i> ≤ <i>a</i>)</div><span>définition de F</span>
+      <div>→ P(<i>X</i> = <i>a</i>) quand <i>h</i> → 0</div><span>les intervalles ]a − h, a] se resserrent sur le point a</span>
+      <div>avec une densité : P(<i>X</i> = <i>a</i>) = ∫<sub><i>a</i></sub><sup><i>a</i></sup> <i>f</i>(<i>u</i>) d<i>u</i> = 0</div><span>une intégrale sur un seul point est nulle</span>
+    </div>
+    <p>Une variable qui a une masse en a n'a donc pas de densité. Une densité « avec un pic » est ce que les physiciens appellent une fonction delta : un objet que la théorie de la mesure, celle de Lebesgue qui donne son titre à la vidéo, sait manier, mais qui n'est pas une fonction. Brunton ne fait que la nommer.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>200 000 tailles déclarées</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(6)
+h = rng.normal(69, 3, 200_000)                      # true heights, inches
+zone = (h &gt;= 70.5) &amp; (h &lt; 72)                       # from 5'10.5" to just under 6'
+bump = zone &amp; (rng.random(h.size) &lt; 0.5)            # half of them say "6 feet"
+r = np.where(bump, 72.0, h)                         # reported heights
+print(f"share reporting exactly 72 in: {np.mean(r == 72):.4f}")
+
+for w in (2, 1, 0.5, 0.1):
+    edges = 72 + w * (np.arange(-150, 151) - 0.5)   # bins centred on 72 (bin 150)
+    dens, _ = np.histogram(r, edges, density=True)
+    other = np.delete(dens, 150).max()
+    print(f"bin width {w:&gt;3}: bar at 72 = {dens[150]:.3f}   tallest other = {other:.3f}")
+
+F = lambda x: np.mean(r &lt;= x)                       # empirical CDF
+print(f"F(71.999) = {F(71.999):.4f}   F(72) = {F(72):.4f}   jump = {F(72) - F(71.999):.4f}")</pre>
+<pre class="out">share reporting exactly 72 in: 0.0749
+bin width   2: bar at 72 = 0.094   tallest other = 0.124
+bin width   1: bar at 72 = 0.133   tallest other = 0.134
+bin width 0.5: bar at 72 = 0.210   tallest other = 0.134
+bin width 0.1: bar at 72 = 0.811   tallest other = 0.137
+F(71.999) = 0.7668   F(72) = 0.8417   jump = 0.0749</pre>
+    <p>La hauteur de la classe de 72 dépend de la largeur choisie, celle des autres non : le signe qu'il n'y a pas de densité en 72. Le saut de la fonction de répartition, lui, ne dépend d'aucun choix.</p>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>En Europe, un pic à 1,80 m ?</b> Le mécanisme est général : dans toute donnée auto-déclarée, les réponses s'entassent sur des valeurs rondes (en anglais heaping, ou digit preference). Aucun chiffre n'est vérifié ici pour un pic à 1,80 m précisément. Deux faits mesurés. En Suisse, dans les enquêtes sur la santé de 1992 à 2002 (47 192 personnes), les francophones et les italophones déclarent plus souvent une taille finissant par 0 ou 5, les germanophones un chiffre pair autre que 0, soit 2, 4, 6 ou 8 (Faeh et Bopp, BMC Public Health, 2008). En France, l'Étude nationale nutrition santé trouve une taille déclarée supérieure de 0,79 cm en moyenne à la taille mesurée (629 adultes ; BEH 2010, n° 8). 1,80 m finit par 0 : un candidat naturel au pic, à vérifier sur des données.</li>
+      <li><b>Un histogramme, ou une densité estimée par lissage, étale le pic.</b> Selon la largeur, il disparaît (w = 2) ou devient une bosse : l'estimateur suppose une densité qui n'existe pas.</li>
+      <li><b>P(X = a) = 0 pour une variable à densité.</b> P(taille vraie = 180 cm exactement) = 0 ; P(taille déclarée = 180 cm) ne l'est pas.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (39) écrit F(x) = ∫<sub>−∞</sub><sup>x</sup> f(x) dx, la même lettre pour la borne et pour la variable d'intégration : on écrit ∫<sub>−∞</sub><sup>x</sup> f(u) du. Il appelle la fonction de répartition normale « la fonction d'erreur » : c'est Φ(x) = ½[1 + erf(x/√2)], une parente, pas la même fonction.</div>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (39) annonce qu'on prouvera le TCL en montrant que « les moments de la somme convergent vers ceux d'une gaussienne ». La preuve de 44 montre que les fonctions génératrices convergent, et la conclusion porte sur les fonctions de répartition : c'est la convergence en loi, qu'il ne nomme pas.</div>
+  </div></details>
+  <p class="garde">Une masse ponctuelle n'a pas de densité ; la fonction de répartition la montre par un saut égal à cette masse. C'est pourquoi l'unicité de M et le TCL portent sur F.</p>
+</section>
+
+<!-- ============================ n5 ============================ -->
+<section class="notion culture" id="n5">
+  <h3>Somme indépendante : produit des fonctions génératrices <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 40 · Additive Property of the Moment Generating Function</p>
+  <div class="idee">
+    <p>Brunton donne la propriété dont la preuve du TCL a besoin : si X et Y sont indépendantes, la fonction génératrice de X + Y est le produit des deux. Deux faits se combinent. L'exponentielle change une somme en produit, e<sup>t(x + y)</sup> = e<sup>tx</sup> e<sup>ty</sup> ; l'indépendance change l'espérance d'un produit en produit des espérances.</p>
+    <p>Deux pièces Bernoulli(½) : (½ + ½e<sup>t</sup>)² = ¼ + ½e<sup>t</sup> + ¼e<sup>2t</sup>. Le coefficient de e<sup>kt</sup> est P(X + Y = k) : ¼, ½, ¼. Deux dés : le produit développe 36 termes e<sup>t(x + y)</sup>/36, et ceux de même somme se regroupent. Six termes ont x + y = 7, donc P(S = 7) = 6/36.</p>
+    <p>Brunton fait le lien avec Laplace : en équations différentielles, la transformée change la convolution de deux signaux en produit. Ici, la loi d'une somme est la convolution des deux lois, pénible à calculer, et M la change en produit.</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — les 36 termes du produit, regroupés par x + y</div>
+    <div id="v5ctl" class="sl-ctl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">Le produit M<sub>X</sub>(t) · M<sub>Y</sub>(t) de deux dés développe 36 termes e<sup>t(x + y)</sup>/36, un par case (x, y) ; chaque case porte sa somme x + y. <b>Regroupe par x + y</b> : les cases de même somme forment une colonne, et la hauteur de la colonne est 36 × P(S = s), le triangle 1, 2, …, 6, …, 1. Puis <b>Y = X</b> : seules les six cases de la diagonale gardent une masse, ⅙ chacune, la somme ne prend que des valeurs paires, et le produit ne marche plus. En t = 0,2, M<sub>2X</sub>(0,2) vaut 5,07 au lieu de M<sub>X</sub>(0,2)² = 4,55.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>X</i>, <i>Y</i> indépendantes ⇒ M<sub><i>X</i>+<i>Y</i></sub>(<i>t</i>) = M<sub><i>X</i></sub>(<i>t</i>) · M<sub><i>Y</i></sub>(<i>t</i>) &nbsp;&nbsp;&nbsp; <i>S<sub>n</sub></i> = <i>X</i><sub>1</sub> + … + <i>X<sub>n</sub></i> i.i.d. ⇒ M<sub><i>S<sub>n</sub></i></sub>(<i>t</i>) = M(<i>t</i>)<sup><i>n</i></sup></div>
+    <ul><li>L'indépendance sert une seule fois, pour factoriser E[e<sup>tX</sup> e<sup>tY</sup>]. Les deux lois peuvent être différentes, Brunton y insiste.</li><li>La même loi ne sert qu'à écrire M<sub>X₁</sub>(t) ⋯ M<sub>Xₙ</sub>(t) = M(t)<sup>n</sup>.</li><li>L'égalité vaut pour tout t où M<sub>X</sub> et M<sub>Y</sub> sont finies.</li><li>Avec l'unicité (notion 1), reconnaître le produit, c'est reconnaître la loi de la somme.</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>pièces, binomiale, flux de requêtes, normales, cumulants</small></summary><div class="in">
+    <ol>
+      <li><b>Deux pièces</b> : ¼, ½, ¼, la binomiale(2, ½).</li>
+      <li><b>n pièces</b> Bernoulli(p) : (1 − p + p e<sup>t</sup>)<sup>n</sup> = Σ<sub>k</sub> C(n, k) p<sup>k</sup> (1 − p)<sup>n − k</sup> e<sup>kt</sup>, par le binôme de Newton (<a href="lesson-00-02-espace-axiomes-complement.html#n6">l02</a>). Le coefficient de e<sup>kt</sup> est la loi binomiale (<a href="lesson-00-04-variables-binomiale-normale.html#n4">l04</a>).</li>
+      <li><b>Deux Poisson indépendantes</b> : e<sup>λ₁(e<sup>t</sup> − 1)</sup> · e<sup>λ₂(e<sup>t</sup> − 1)</sup> = e<sup>(λ₁ + λ₂)(e<sup>t</sup> − 1)</sup>, la fonction génératrice de Poisson(λ₁ + λ₂). En ML : deux services envoient des requêtes à la même API, 2 et 3 par seconde en moyenne, indépendamment. Le flux fusionné est Poisson(5) : P(aucune requête dans une seconde) = e<sup>−5</sup> = 0,0067 (code). C'est la superposition des processus de Poisson (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n6">l05, notion 6</a>).</li>
+      <li><b>Deux normales indépendantes</b> : e<sup>μ₁t + σ₁²t²/2</sup> · e<sup>μ₂t + σ₂²t²/2</sup> = e<sup>(μ₁ + μ₂)t + (σ₁² + σ₂²)t²/2</sup>. La somme est N(μ₁ + μ₂, σ₁² + σ₂²).</li>
+      <li><b>Avec le logarithme</b>, le produit devient une somme : ln M<sub>X+Y</sub> = ln M<sub>X</sub> + ln M<sub>Y</sub>. Les dérivées de ln M en 0, les cumulants (notion 2), s'additionnent donc. Le premier est la moyenne, le deuxième la variance, le troisième le moment centré d'ordre 3 : pour une somme de pertes indépendantes, ces trois-là s'additionnent. D'où Var(X + Y) = Var X + Var Y sous indépendance (<a href="lesson-00-09-covariance-correlation.html#n2">l09, notion 2</a>).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>l'exponentielle, puis l'indépendance</small></summary><div class="in">
+    <div class="drv">
+      <div>M<sub><i>X</i>+<i>Y</i></sub>(<i>t</i>) = E[e<sup><i>t</i>(<i>X</i>+<i>Y</i>)</sup>]</div><span>définition</span>
+      <div>= E[e<sup><i>tX</i></sup> · e<sup><i>tY</i></sup>]</div><span>e<sup>a + b</sup> = e<sup>a</sup> e<sup>b</sup></span>
+      <div>= E[e<sup><i>tX</i></sup>] · E[e<sup><i>tY</i></sup>]</div><span>X et Y indépendantes, donc e<sup>tX</sup> et e<sup>tY</sup> aussi (fonctions de variables indépendantes), et E[UV] = E[U] E[V] (<a href="lesson-00-08-esperance-variance.html#n4">l08, notion 4</a>) : l'hypothèse sert ici</span>
+      <div>= M<sub><i>X</i></sub>(<i>t</i>) · M<sub><i>Y</i></sub>(<i>t</i>)</div><span>définition</span>
+    </div>
+    <p>La version « soigneuse » que Brunton évoque sans l'écrire, en discret :</p>
+    <div class="drv">
+      <div>Σ<sub><i>x</i></sub> Σ<sub><i>y</i></sub> e<sup><i>t</i>(<i>x</i>+<i>y</i>)</sup> P(<i>X</i> = <i>x</i>, <i>Y</i> = <i>y</i>)</div><span>LOTUS sur le couple</span>
+      <div>= Σ<sub><i>x</i></sub> Σ<sub><i>y</i></sub> e<sup><i>tx</i></sup> P(<i>X</i> = <i>x</i>) · e<sup><i>ty</i></sup> P(<i>Y</i> = <i>y</i>)</div><span>la loi jointe se factorise (<a href="lesson-00-07-lois-jointes.html#n4">l07, notion 4</a>)</span>
+      <div>= (Σ<sub><i>x</i></sub> e<sup><i>tx</i></sup> P(<i>X</i> = <i>x</i>)) · (Σ<sub><i>y</i></sub> e<sup><i>ty</i></sup> P(<i>Y</i> = <i>y</i>))</div><span>une double somme d'un produit se coupe en produit de sommes</span>
+    </div>
+    <p>Pour n variables, on recommence : M<sub>S<sub>n</sub></sub> = M<sub>S<sub>n−1</sub></sub> · M<sub>X<sub>n</sub></sub>, puisque X<sub>n</sub> est indépendante de S<sub>n−1</sub> : il faut l'indépendance mutuelle, deux à deux ne suffit pas (<a href="lesson-00-03-conditionner-bayes-independance.html#n9">l03, notion 9</a>). X et Y à ±1, indépendantes, et Z = XY sont indépendantes deux à deux, et pourtant M<sub>X+Y+Z</sub>(1) = 5,30 contre cosh(1)³ = 3,67.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>deux flux de requêtes fusionnés</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(2)
+n = 1_000_000                                       # one-second windows
+a = rng.poisson(2.0, n)                             # requests from service A
+b = rng.poisson(3.0, n)                             # requests from service B, independent
+s = a + b                                           # merged stream
+print(f"merged:     mean {s.mean():.3f}  var {s.var():.3f}  P(0) {np.mean(s == 0):.5f}")
+print(f"Poisson(5): mean 5      var 5      P(0) {np.exp(-5):.5f}")
+
+t = 0.3
+m = lambda x: np.mean(np.exp(t * x))                # empirical MGF at t
+exact = np.exp(5 * (np.exp(t) - 1))
+print(f"M_A * M_B = {m(a) * m(b):.4f}   M_(A+B) = {m(s):.4f}   exact = {exact:.4f}")
+print(f"dependent, B = A:  M_(2A) = {m(2 * a):.4f}   but M_A^2 = {m(a)**2:.4f}")</pre>
+<pre class="out">merged:     mean 5.005  var 4.998  P(0) 0.00661
+Poisson(5): mean 5      var 5      P(0) 0.00674
+M_A * M_B = 5.7599   M_(A+B) = 5.7590   exact = 5.7505
+dependent, B = A:  M_(2A) = 5.1836   but M_A^2 = 4.0575</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Sans indépendance, le produit peut être faux.</b> Y = X : M<sub>2X</sub>(t) = M<sub>X</sub>(2t). Pour deux dés à t = 0,2 : 5,07 contre M<sub>X</sub>(0,2)² = 4,55.</li>
+      <li><b>La réciproque est fausse.</b> M<sub>X+Y</sub> = M<sub>X</sub> M<sub>Y</sub> n'implique pas l'indépendance. X et Y à valeurs dans {0, 1, 2}, de loi jointe, en dix-huitièmes :
+        <table><tr><th></th><th>y = 0</th><th>y = 1</th><th>y = 2</th></tr><tr><th>x = 0</th><td>2</td><td>3</td><td>1</td></tr><tr><th>x = 1</th><td>1</td><td>2</td><td>3</td></tr><tr><th>x = 2</th><td>3</td><td>1</td><td>2</td></tr></table>
+        Les marges sont uniformes, et la loi de X + Y est 1, 2, 3, 2, 1 neuvièmes, exactement comme sous indépendance : M<sub>X+Y</sub> = M<sub>X</sub> M<sub>Y</sub>. Pourtant P(X = 0, Y = 1) = 3/18 = 1/6 ≠ 1/9. Le produit est une conséquence de l'indépendance, pas un test.</li>
+      <li><b>La famille ne se conserve pas toujours.</b> Deux exponentielles(λ) indépendantes donnent (λ/(λ − t))², qui n'est pas de la forme λ′/(λ′ − t) : la somme suit une loi Gamma(2, λ) (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n7">l05, notion 7</a>), pas une exponentielle.</li>
+      <li><b>Une somme n'est pas un mélange.</b> « X avec probabilité ½, Y sinon » a pour fonction génératrice ½M<sub>X</sub> + ½M<sub>Y</sub>, pas le produit. Les tailles de la notion 4, cloche plus pile, sont un mélange.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (40) compare aux fonctions de transfert : « si on additionne des blocs, la fonction de transfert est le produit ». Ce sont les blocs en série dont les fonctions de transfert se multiplient ; en parallèle, elles s'additionnent. Le fait sous-jacent, qu'il ne dit pas : la densité de X + Y est la convolution f<sub>X</sub> * f<sub>Y</sub>, et la transformée change une convolution en produit.</div>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (40) écrit M<sub>S<sub>n</sub></sub>(t) = M<sub>X</sub>(t)<sup>n</sup> pour « un ensemble de variables » indépendantes. La puissance n demande en plus qu'elles aient la même loi : il le dit en ouvrant la vidéo (« identical independent »), mais ne le rappelle pas au moment d'écrire la puissance.</div>
+  </div></details>
+  <p class="garde">X et Y indépendantes : M<sub>X+Y</sub> = M<sub>X</sub> · M<sub>Y</sub> ; i.i.d. : M<sub>S<sub>n</sub></sub> = M<sup>n</sup>. L'exponentielle change la somme en produit, l'indépendance factorise l'espérance ; la réciproque est fausse.</p>
+</section>
+
+<!-- ============================ n6 ============================ -->
+<section class="notion culture" id="n6">
+  <h3>La preuve du TCL en six étapes, avec ses trous <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 44 · Proof of the Central Limit Theorem</p>
+  <div class="idee">
+    <p>La preuve de Brunton enchaîne tout ce qui précède. Les X<sub>i</sub> sont i.i.d., de moyenne 0 et de variance σ², et Z<sub>n</sub> = S<sub>n</sub>/(σ√n) est leur somme standardisée. Il suffit de montrer que M<sub>Z<sub>n</sub></sub>(t) tend vers e<sup>t²/2</sup>, la fonction génératrice de N(0, 1).</p>
+    <p>Le cœur tient en une ligne. Le produit (notion 5) donne M<sub>Z<sub>n</sub></sub>(t) = M(t/(σ√n))<sup>n</sup>. Près de 0, M(u) ≈ 1 + σ²u²/2 (notion 2 : moyenne 0, E[X²] = σ²). Donc M<sub>Z<sub>n</sub></sub>(t) ≈ (1 + t²/(2n))<sup>n</sup> → e<sup>t²/2</sup>. Les moments au-delà du deuxième disparaissent dans la limite : c'est pour ça que la loi de départ ne compte pas.</p>
+    <p>Pour pile ou face à ±1 (σ = 1), M = cosh, et M<sub>Z<sub>n</sub></sub>(1) = cosh(1/√n)<sup>n</sup> vaut 1,543 pour n = 1, 1,635 pour n = 10, 1,647 pour n = 100, contre e<sup>0,5</sup> = 1,649. La preuve dépliable donne les six étapes, et quatre trous.</p>
+  </div>
+  <div class="fig vis" id="v6">
+    <div class="lbl">Voir l'idée — M<sub>Z<sub>n</sub></sub> se rapproche de e<sup>t²/2</sup></div>
+    <div id="v6ctl" class="sl-ctl"></div><div id="v6sl"></div>
+    <div id="v6plot" class="wide"></div>
+    <div class="readouts" id="v6out"></div>
+    <p class="cap">En rouge la cible e<sup>t²/2</sup>, en bleu M<sub>Z<sub>n</sub></sub>(t) = M(t/√n)<sup>n</sup>. <b>Pile ou face à ±1</b> : à n = 1 la courbe est cosh t, déjà proche près de 0 ; monte <b>n</b> : en t = 1, elle passe de 1,543 à 1,635 (n = 10), puis 1,647 (n = 100), contre 1,649. <b>Exponentielle centrée</b>, Exp(1) − 1, asymétrique : à n = 1 elle n'existe que pour t &lt; 1 et devient infinie au trait vertical t = √n ; ce domaine s'élargit comme √n, et l'approche est plus lente, 1,895 à n = 10 et 1,709 à n = 100.</p>
+  </div>
+  <div class="formule"><div class="lbl">Le théorème démontré</div>
+    <div class="eq"><i>X<sub>i</sub></i> i.i.d., E[<i>X<sub>i</sub></i>] = 0, Var(<i>X<sub>i</sub></i>) = σ² ∈ ]0, ∞[ &nbsp;⇒&nbsp; P(<i>S<sub>n</sub></i>/(σ√<i>n</i>) ≤ <i>x</i>) → Φ(<i>x</i>) pour tout <i>x</i></div>
+    <ul><li>Indépendance : le produit, étape 2. Même loi : la puissance n.</li><li>Moyenne 0 : le terme en t disparaît, étape 3. Si E[X<sub>i</sub>] = μ, on applique la preuve à X<sub>i</sub> − μ : Z<sub>n</sub> = (S<sub>n</sub> − nμ)/(σ√n) = (X̄<sub>n</sub> − μ)/(σ/√n), l'énoncé de <a href="lesson-00-11-tcl.html#n1">l11, notion 1</a>.</li><li>Variance finie : le terme en t² existe et ne dépend que de σ².</li><li>Hypothèse en plus, propre à cette preuve : M finie près de 0. Le théorème est vrai sans elle (où ça casse).</li><li>La conclusion porte sur les fonctions de répartition (notion 4) : une convergence en loi.</li></ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — la conclusion porte sur F : l'escalier de Z<sub>n</sub> épouse Φ</div>
+    <div id="f3ctl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">La fonction de répartition de Z<sub>n</sub> = S<sub>n</sub>/√n pour n pièces à ±1 (escalier bleu) et Φ (rouge). Z<sub>n</sub> est discrète : elle n'a pas de densité, quel que soit n. Monte <b>n</b> : les marches rétrécissent, et le plus grand écart vertical entre l'escalier et Φ tombe de 0,341 (n = 1) à 0,123 (n = 10), 0,040 (n = 100) et 0,020 (n = 400), à peu près 0,4/√n. C'est cette convergence que démontre la preuve, une fois complétée par le théorème de continuité.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>la preuve en chiffres, pourquoi √n, une loi asymétrique, μ ≠ 0</small></summary><div class="in">
+    <ol>
+      <li><b>Pile ou face à ±1, en chiffres.</b> M = cosh, σ = 1. À t = 1, l'étape 6 sans ε<sub>n</sub>, (1 + 0,5/n)<sup>n</sup>, vaut 1,629 pour n = 10 et 1,647 pour n = 100 ; la vraie M<sub>Z<sub>n</sub></sub>(1) vaut 1,635 et 1,647 : le terme négligé ε<sub>n</sub> pèse de moins en moins.</li>
+      <li><b>Pourquoi diviser par √n.</b> Sans normalisation, M<sub>S<sub>n</sub></sub>(t) = cosh(t)<sup>n</sup> → ∞ pour tout t ≠ 0 : la somme s'étale sans limite. En divisant par n, c'est-à-dire pour la moyenne X̄<sub>n</sub>, cosh(t/n)<sup>n</sup> → 1, la fonction génératrice de la constante 0 : c'est la loi des grands nombres (<a href="lesson-00-10-inegalites-lgn.html#n4">l10, notion 4</a>). √n est la seule échelle où la limite n'est ni plate ni infinie.</li>
+      <li><b>Une loi asymétrique, l'exponentielle centrée.</b> Le terme négligé, n · ε<sub>n</sub>, vaut 0,160 à n = 10, 0,037 à n = 100, 0,011 à n = 1 000, à peu près t³/(3√n) pour n grand (0,160 contre 0,105 à n = 10) : il vient du troisième moment, et c'est l'asymétrie qui ralentit la convergence (<a href="lesson-00-11-tcl.html#n2">l11, notion 2</a>).</li>
+      <li><b>μ ≠ 0</b>, le devoir de Brunton : appliquer la preuve à Y<sub>i</sub> = X<sub>i</sub> − μ, de moyenne 0 et de variance σ². Rien d'autre ne change.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>les six étapes de Brunton, la règle de chacune, puis ses quatre trous</small></summary><div class="in">
+    <div class="drv">
+      <div>1. Montrer M<sub><i>Z<sub>n</sub></i></sub>(<i>t</i>) → e<sup><i>t</i>²/2</sup> pour tout <i>t</i> près de 0</div><span>e<sup>t²/2</sup> est la fonction génératrice de N(0, 1) (notion 3) ; conclure demandera un théorème de continuité (trou 1)</span>
+      <div>2. M<sub><i>S<sub>n</sub></i></sub>(<i>t</i>) = M(<i>t</i>)<sup><i>n</i></sup></div><span>produit (notion 5) : l'indépendance, puis la même loi</span>
+      <div>3. M(<i>u</i>) = 1 + 0 · <i>u</i> + σ²<i>u</i>²/2 + <i>r</i>(<i>u</i>), avec <i>r</i>(<i>u</i>)/<i>u</i>² → 0</div><span>Taylor en 0 (notion 2) : M(0) = 1, M′(0) = E[X] = 0, M″(0) = E[X²] = σ² (trou 2)</span>
+      <div>4. M<sub><i>Z<sub>n</sub></i></sub>(<i>t</i>) = M<sub><i>S<sub>n</sub></i></sub>(<i>t</i>/(σ√<i>n</i>)) = M(<i>t</i>/(σ√<i>n</i>))<sup><i>n</i></sup></div><span>changement d'échelle : M<sub>bY</sub>(t) = E[e<sup>(bt)Y</sup>] = M<sub>Y</sub>(bt), avec b = 1/(σ√n), puis l'étape 2</span>
+      <div>5. M(<i>t</i>/(σ√<i>n</i>)) = 1 + <i>t</i>²/(2<i>n</i>) + ε<sub><i>n</i></sub>, avec ε<sub><i>n</i></sub> = <i>r</i>(<i>t</i>/(σ√<i>n</i>))</div><span>substituer u = t/(σ√n) dans l'étape 3 ; les σ² se simplifient (trou 3)</span>
+      <div>6. M<sub><i>Z<sub>n</sub></i></sub>(<i>t</i>) = (1 + (<i>t</i>²/2 + <i>n</i>ε<sub><i>n</i></sub>)/<i>n</i>)<sup><i>n</i></sup> → e<sup><i>t</i>²/2</sup></div><span>(1 + a<sub>n</sub>/n)<sup>n</sup> → e<sup>a</sup> quand a<sub>n</sub> → a ; ici a<sub>n</sub> = t²/2 + nε<sub>n</sub> → t²/2 ; en passant au ln, n ln(1 + a<sub>n</sub>/n) = a<sub>n</sub> + O(a<sub>n</sub>²/n) → a</span>
+      <div>donc P(<i>Z<sub>n</sub></i> ≤ <i>x</i>) → Φ(<i>x</i>) ∎</div><span>théorème de continuité (trou 1)</span>
+    </div>
+    <p><b>Les quatre trous.</b></p>
+    <ol>
+      <li><b>Unicité au lieu de continuité.</b> L'unicité (notion 1) dit que deux lois de même M sont égales ; elle ne suffit pas ici, puisque M<sub>Z<sub>n</sub></sub> n'est jamais égale à e<sup>t²/2</sup>, elle s'en approche. Il faut un théorème de continuité : si M<sub>n</sub>(t) → M(t) sur un intervalle autour de 0, et M est la fonction génératrice d'une loi, alors les fonctions de répartition convergent, en tout point où la limite est continue (Curtiss, 1942). Ce théorème s'appuie sur l'unicité pour identifier la limite.</li>
+      <li><b>Le reste.</b> Écrire le reste « ε d'ordre t³ » suppose un troisième moment. C'est acquis ici, puisque M est finie près de 0. Avec seulement une variance finie (trou 4), on sait seulement que le reste est négligeable devant u², et cela suffit.</li>
+      <li><b>n · ε<sub>n</sub> → 0, pas seulement ε<sub>n</sub> → 0.</b> Dans (1 + t²/(2n) + ε<sub>n</sub>)<sup>n</sup>, un ε<sub>n</sub> de l'ordre de 1/n changerait la limite. Il ne suffit donc pas que ε<sub>n</sub> → 0, il faut savoir à quelle vitesse. C'est vrai ici : n · ε<sub>n</sub> = (t²/σ²) · r(u)/u², qui tend vers 0 avec u.</li>
+      <li><b>L'hypothèse ajoutée : M finie près de 0.</b> Elle exclut des lois de variance finie pour lesquelles le TCL est vrai, comme la loi de Student à 3 degrés de liberté. La preuve générale refait les mêmes six étapes avec la <b>fonction caractéristique</b> φ(t) = E[e<sup>itX</sup>], qui existe toujours : i² = −1, et e<sup>iθ</sup> = cos θ + i sin θ est un point du cercle de rayon 1, d'où |e<sup>itX</sup>| = 1 et une espérance toujours finie. Pour N(0, 1), φ(t) = M(it) = e<sup>−t²/2</sup>. On obtient φ<sub>Z<sub>n</sub></sub>(t) → e<sup>−t²/2</sup>, et le théorème de continuité de Lévy conclut. Seule la variance finie sert alors.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>M<sub>Z<sub>n</sub></sub>(1) vers e<sup>0,5</sup>, et le terme négligé</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+t = 1.0
+coin = lambda u: np.cosh(u)                         # X = +1 or -1: mean 0, sigma 1
+cexp = lambda u: np.exp(-u) / (1 - u)               # Exp(1) - 1: mean 0, sigma 1, skewed
+print("     n   coin M_Zn(1)   exp M_Zn(1)   n * eps_n (exp)")
+for n in (2, 10, 100, 1000, 10_000):
+    u = t / np.sqrt(n)                              # step 4: M at t / (sigma sqrt n)
+    eps = cexp(u) - 1 - t**2 / (2 * n)              # step 5: left after 1 + t^2/(2n)
+    print(f"{n:6d}   {coin(u)**n:.5f}        {cexp(u)**n:.5f}       {n * eps:.5f}")
+print(f"limit e^(t^2/2) = {np.exp(t**2 / 2):.5f}")
+
+# Monte Carlo: standardized sums of 100 exponentials
+rng = np.random.default_rng(3)
+z = (rng.exponential(1, (200_000, 100)).sum(axis=1) - 100) / np.sqrt(100)
+print(f"E[e^Z] = {np.mean(np.exp(z)):.4f}   (exact {cexp(0.1)**100:.4f})")
+print(f"P(Z &lt;= 1) = {np.mean(z &lt;= 1):.4f}   (Phi(1) = 0.8413)")</pre>
+<pre class="out">     n   coin M_Zn(1)   exp M_Zn(1)   n * eps_n (exp)
+     2   1.58909        2.83398       0.86688
+    10   1.63539        1.89464       0.15989
+   100   1.64735        1.70924       0.03749
+  1000   1.64858        1.66662       0.01093
+ 10000   1.64871        1.65427       0.00337
+limit e^(t^2/2) = 1.64872
+E[e^Z] = 1.7160   (exact 1.7092)
+P(Z &lt;= 1) = 0.8410   (Phi(1) = 0.8413)</pre>
+    <p>La pièce converge vite, l'exponentielle lentement, et n · ε<sub>n</sub> décroît comme 1/√n : à n = 100, il vaut 0,037, près de 1/(3√100) = 0,033.</p>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Pas de fonction génératrice : preuve inapplicable, TCL intact.</b> Student à 3 degrés de liberté : variance 3, M(t) = ∞ pour t ≠ 0. La somme standardisée devient normale quand même ; la preuve par la fonction caractéristique le montre.</li>
+      <li><b>Variance infinie : plus de TCL classique.</b> Pour une loi de Cauchy, φ(t) = e<sup>−|t|</sup> et φ(t/n)<sup>n</sup> = e<sup>−|t|</sup> : la moyenne de n variables de Cauchy est encore une Cauchy, quel que soit n (<a href="lesson-00-11-tcl.html#n4">l11, notion 4</a>).</li>
+      <li><b>Sans indépendance, l'étape 2 tombe.</b> M<sub>S<sub>n</sub></sub> n'est plus forcément M<sup>n</sup> (notion 5), et, s'il y a corrélation, la variance de la somme n'est plus nσ² (<a href="lesson-00-09-covariance-correlation.html#n2">l09, notion 2</a>).</li>
+      <li><b>Pour n fixé, c'est une approximation.</b> S<sub>n</sub> ≈ N(nμ, nσ²), en général pas « = » (exact seulement si les X<sub>i</sub> sont normales) ; pour des pièces, S<sub>n</sub> est discrète. La vitesse dépend de l'asymétrie (exemple 3).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (44) conclut : « la fonction génératrice identifie la loi de façon unique, donc même fonction génératrice, même loi ». Trois corrections. M<sub>Z<sub>n</sub></sub> n'atteint jamais e<sup>t²/2</sup>, elle s'en approche : il faut un théorème de continuité (Curtiss pour les fonctions génératrices, Lévy pour les fonctions caractéristiques), pas l'unicité. Pour le terme négligé, il dit qu'ε<sub>n</sub> tend vers 0 « assez vite pour être négligé », sans dire à quelle vitesse : il faut n · ε<sub>n</sub> → 0. Et la preuve suppose M finie près de 0, ce que le théorème n'exige pas.</div>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (44) dit que les deux lois auront « la même densité ». Une somme de pièces n'a pas de densité : la conclusion porte sur la fonction de répartition (notion 4), comme son propre énoncé avec Φ. Et ses formes « S<sub>n</sub> est normale N(0, nσ²) » (36, 44) sont des approximations pour n grand, exactes seulement si les X<sub>i</sub> sont normales.</div>
+  </div></details>
+  <p class="garde">M<sub>Z<sub>n</sub></sub>(t) = M(t/(σ√n))<sup>n</sup> = (1 + t²/(2n) + ε<sub>n</sub>)<sup>n</sup> → e<sup>t²/2</sup> : seules la moyenne et la variance survivent. La preuve demande en plus M finie près de 0, n · ε<sub>n</sub> → 0 et un théorème de continuité ; la fonction caractéristique E[e<sup>itX</sup>] lève la première hypothèse.</p>
+</section>
+
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>M(t) = E[e<sup>tX</sup>] ; ses coefficients de Taylor sont E[X<sup>k</sup>]/k! ; finie près de 0, elle détermine la loi.</li>
+    <li>Les moments seuls ne déterminent pas toujours la loi : la log-normale a des sœurs aux mêmes moments.</li>
+    <li>M<sup>(k)</sup>(0) = E[X<sup>k</sup>] et Var = M″(0) − M′(0)² ; pour Poisson, moyenne = variance = λ.</li>
+    <li>Poisson : e<sup>λ(e<sup>t</sup> − 1)</sup> ; N(0, 1) : e<sup>t²/2</sup> ; exponentielle : λ/(λ − t), pour t &lt; λ.</li>
+    <li>Une masse ponctuelle n'a pas de densité, F la montre par un saut : l'unicité et le TCL portent sur F.</li>
+    <li>Indépendance ⇒ M<sub>X+Y</sub> = M<sub>X</sub> M<sub>Y</sub> ; la réciproque est fausse.</li>
+    <li>TCL : M(t/(σ√n))<sup>n</sup> → e<sup>t²/2</sup>. Les trous : M supposée finie, n · ε<sub>n</sub> → 0 à montrer, continuité plutôt qu'unicité.</li>
+  </ol>
+</div>
+<div class="phrase">« La fonction génératrice M(t) = E[e<sup>tX</sup>] range tous les moments dans une fonction : ses dérivées en 0 sont les moments et, quand elle est finie près de 0, elle détermine la loi. Sous indépendance, la fonction génératrice d'une somme est le produit des fonctions génératrices. Pour le TCL, celle de la somme standardisée vaut M(t/(σ√n))<sup>n</sup> ≈ (1 + t²/(2n))<sup>n</sup>, qui tend vers e<sup>t²/2</sup>, celle de la normale ; la preuve rigoureuse passe par la fonction caractéristique et le théorème de continuité de Lévy. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Qu'est-ce que M(t), et que vaut M(0) ?</div><div class="a hid">La moyenne de e<sup>tX</sup>, un nombre pour chaque t fixé ; M(0) = E[1] = 1 pour toute loi.</div></li>
+    <li><div class="q">Comment obtient-on E[X] et Var(X) à partir de M ?</div><div class="a hid">E[X] = M′(0), E[X²] = M″(0), Var = M″(0) − M′(0)² : dériver en t fait descendre un x, et e⁰ = 1.</div></li>
+    <li><div class="q">Les moments déterminent-ils toujours la loi ?</div><div class="a hid">Non : la log-normale partage tous ses moments avec d'autres lois. Si M est finie sur un intervalle autour de 0, oui.</div></li>
+    <li><div class="q">Pourquoi l'unicité parle-t-elle de la fonction de répartition, et pas de la densité ?</div><div class="a hid">Une loi peut avoir des masses ponctuelles, comme les tailles déclarées à 6 pieds : pas de densité, mais F existe toujours, avec un saut égal à la masse.</div></li>
+    <li><div class="q">Que vaut M<sub>X+Y</sub>, et sous quelle hypothèse ?</div><div class="a hid">M<sub>X</sub> · M<sub>Y</sub>, si X et Y sont indépendantes : e<sup>t(x+y)</sup> = e<sup>tx</sup> e<sup>ty</sup>, puis l'espérance du produit est le produit des espérances.</div></li>
+    <li><div class="q">Résume la preuve du TCL en une ligne, puis donne un de ses trous.</div><div class="a hid">M<sub>Z<sub>n</sub></sub>(t) = M(t/(σ√n))<sup>n</sup> = (1 + t²/(2n) + ε<sub>n</sub>)<sup>n</sup> → e<sup>t²/2</sup>. Trous : M supposée finie (la fonction caractéristique l'évite), n · ε<sub>n</sub> → 0 à montrer, et un théorème de continuité au lieu de l'unicité.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts et chaînes</div>
+  <div class="bridges">
+    <a href="../chains/chain-p01-01-objet-aleatoire.html"><b>L'objet aléatoire</b><small>La distribution d'échantillonnage de p̂ devient normale par le TCL démontré ici, et ne le devient pas quand les succès ou les échecs sont trop peu nombreux.</small></a>
+    <a href="../chains/chain-p01-02-ic-test-procedure.html"><b>Intervalle de confiance et test</b><small>X̄ ± 1,96 σ/√n repose sur la conclusion de la notion 6, P(Z<sub>n</sub> ≤ x) → Φ(x), une convergence de fonctions de répartition.</small></a>
+    <a href="../chains/chain-p01-05-bootstrap.html"><b>Bootstrap</b><small>Médiane, AUC : aucune formule toute faite pour leur loi. On simule la distribution d'échantillonnage au lieu de la supposer normale.</small></a>
+    <a href="../bridges/bridge-04-variance-moyenne-correlee.html"><b>Variance d'une moyenne corrélée</b><small>Avec des termes corrélés, l'étape 2 de la preuve tombe, et Var(X̄) n'est plus σ²/n.</small></a>
+    <a href="../chains/chain-p08-02-flottants-lse.html"><b>Flottants et log-sum-exp</b><small>ln M(t) d'une loi discrète est un log-sum-exp, et sa dérivée une moyenne pondérée par un softmax (notion 2).</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::mgf</code> : les six notions sont de culture, cette leçon ne donne pas de carte. Elle sert de référence quand une carte du TCL (<a href="lesson-00-11-tcl.html">l11</a>) demande « pourquoi ».</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l12 · v1 du 10/10/2026 · Brunton 37 à 40 et 44 · Prérequis : <a href="lesson-00-08-esperance-variance.html">l08</a>, <a href="lesson-00-11-tcl.html">l11</a>. Dernière leçon du socle probabiliste : retour à l'<a href="../../index.html">index</a> ou à la <a href="../../map.html">carte</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* ===== commun à toutes les leçons (kit, étalon l08 v2) ===== */
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc : une entrée par notion, étiquette comprise */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.notion').forEach((s,i)=>{const li=document.createElement('li');const t=s.querySelector('h3').firstChild.textContent.trim();const k=s.classList.contains('culture')?' · culture':'';li.innerHTML=`<a href="#${s.id}">${i+1}. ${t}${k}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.notion').forEach(s=>io.observe(s));
+/* une ancre #nN ouvre la notion visée ; rien n'est replié par défaut hors des blocs */
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outils de dessin ===== */
+function curve(P,f,a,b,cls,ymax){let d='';const n=240;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;let y=f(x);if(!isFinite(y))continue;y=Math.min(y,ymax);d+=(d?' L':'M')+P.sx(x).toFixed(1)+' '+P.sy(y).toFixed(1);}SL.el('path',{d:d,class:'sl-fn '+cls,fill:'none'},P.dyn);}
+function bar(P,x0,x1,y,cls){const a=P.sx(x0),b=P.sx(x1);SL.el('rect',{x:Math.min(a,b),y:P.sy(y),width:Math.max(1.5,Math.abs(b-a)),height:Math.max(0,P.sy(0)-P.sy(y)),class:cls||'sl-bar'},P.dyn);}
+/* SL.plot trace l'axe vertical en x = 0 ; quand 0 porte une barre, on le ramène au bord gauche */
+function leftAxis(P,x0){const ax=P.svg.querySelectorAll('line.sl-axis');if(ax[1]){ax[1].setAttribute('x1',P.sx(x0));ax[1].setAttribute('x2',P.sx(x0));}}
+function rd(host,items){host.innerHTML=items.map(it=>`<div class="${it[2]||''}">${it[0]}<b>${it[1]}</b></div>`).join('');}
+function buttons(host,names,cb){const bs=names.map((n,i)=>{const b=SL.h('button','tb',host,n);b.onclick=()=>{bs.forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');cb(i);};return b;});bs[0].onclick();return bs;}
+
+
+/* ===== v2 : vignettes « voir l'idée », une par notion, juste sous l'idée ===== */
+/* tween : animation 0 → 1 lissée ; runner : un jeton par figure, un nouveau clic tue l'animation en cours */
+function runner(){let t={dead:true};return ()=>{t.dead=true;t={dead:false};return t;};}
+function tween(ms,draw,tk,done){if(SL.reduced){draw(1);if(done)done();return;}const t0=performance.now();const st=t=>{if(tk&&tk.dead)return;let u=Math.min(1,(t-t0)/ms);u=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;draw(u);if(u<1)requestAnimationFrame(st);else if(done)done();};requestAnimationFrame(st);}
+function loop(tk,step){if(SL.reduced){let g=0;while(step()!==false&&g++<1e5);return;}const f=()=>{if(tk.dead)return;if(step()!==false)requestAnimationFrame(f);};requestAnimationFrame(f);}
+function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function pick(r,v,p){let u=r(),a=0;for(let i=0;i<v.length;i++){a+=p[i];if(u<a)return v[i];}return v[v.length-1];}
+function gauss(r){let u=0;while(u===0)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());}
+function fulcrum(P,x){const cx=P.sx(x),cy=P.sy(0);SL.el('path',{d:`M${cx.toFixed(1)} ${(cy+1).toFixed(1)} L${(cx-8).toFixed(1)} ${(cy+16).toFixed(1)} L${(cx+8).toFixed(1)} ${(cy+16).toFixed(1)} Z`,class:'sl-fulcrum'},P.dyn);}
+function median(a){const s=a.slice().sort((x,y)=>x-y),n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;}
+function rect(P,x0,x1,y0,y1,cls,parent){const a=P.sx(x0),b=P.sx(x1),c=P.sy(y0),d=P.sy(y1);return SL.el('rect',{x:Math.min(a,b).toFixed(1),y:Math.min(c,d).toFixed(1),width:Math.abs(b-a).toFixed(1),height:Math.abs(d-c).toFixed(1),class:cls},parent||P.dyn);}
+/* pile de pastilles : une par individu, regroupées par classe de largeur bw */
+function stack(P,vals,bw,r,clsOf,centred){const bins=new Map();vals.forEach((v,i)=>{const b=centred?Math.round(v/bw):Math.floor(v/bw);if(!bins.has(b))bins.set(b,[]);bins.get(b).push(i);});
+  const res=[];bins.forEach((ids,b)=>{const c=centred?b*bw:(b+0.5)*bw,cx=P.sx(c);res.push({c:c,ids:ids});ids.forEach((i,j)=>SL.el('circle',{cx:cx.toFixed(1),cy:(P.sy(0)-r-1-j*(2*r+1)).toFixed(1),r:r,class:'sl-dot '+clsOf(i)},P.dyn));});return res;}
+
+
+/* ===== outils propres à l12 ===== */
+/* courbe coupée aux bords [y0, y1] au lieu d'être écrasée contre eux */
+function ccurve(P,f,a,b,cls,y0,y1,n){n=n||300;let d='',prev=null;
+  const edge=(p,q)=>{if(!isFinite(q.y))return [p.x,y1];const yb=q.y>y1?y1:y0;return [p.x+(q.x-p.x)*(yb-p.y)/(q.y-p.y),yb];};
+  const pt=(x,y)=>P.sx(x).toFixed(1)+' '+P.sy(y).toFixed(1);
+  for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x),cur={x:x,y:y,ok:isFinite(y)&&y>=y0&&y<=y1};
+    if(cur.ok){if(prev&&prev.ok)d+=' L'+pt(x,y);else if(prev&&isFinite(prev.y)){const e=edge(cur,prev);d+=' M'+pt(e[0],e[1])+' L'+pt(x,y);}else d+=' M'+pt(x,y);}
+    else if(prev&&prev.ok){const e=edge(prev,cur);d+=' L'+pt(e[0],e[1]);}
+    prev=cur;}
+  if(d)SL.el('path',{d:d.trim(),class:'sl-fn '+cls,fill:'none'},P.dyn);}
+/* aire sous une courbe positive, fermée sur l'axe y = 0 */
+function area(P,f,a,b,cls,ymax,n){n=n||240;let d='M'+P.sx(a).toFixed(1)+' '+P.sy(0).toFixed(1);
+  for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;d+=' L'+P.sx(x).toFixed(1)+' '+P.sy(Math.min(f(x),ymax)).toFixed(1);}
+  d+=' L'+P.sx(b).toFixed(1)+' '+P.sy(0).toFixed(1)+' Z';return SL.el('path',{d:d,class:cls},P.dyn);}
+/* Φ par Abramowitz et Stegun 7.1.26 (erreur < 2·10⁻⁷) */
+function Phi(z){const s=z<0?-1:1,x=Math.abs(z)/Math.SQRT2,k=1/(1+0.3275911*x);
+  const y=1-(((((1.061405429*k-1.453152027)*k)+1.421413741)*k-0.284496736)*k+0.254829592)*k*Math.exp(-x*x);return 0.5*(1+s*y);}
+const phi=z=>Math.exp(-z*z/2)/Math.sqrt(2*Math.PI);
+const fmtInf=(v,d)=>isFinite(v)?SL.fmt(v,d):'∞';
+const fmtS=(v,d)=>SL.fmt(v,d).replace(/^-/,'−'); /* vrai signe moins */
+/* le modèle des tailles déclarées (notion 4), en pouces */
+const HT={mu:69,sd:3,a:70.5,b:72};
+HT.F=x=>Phi((x-HT.mu)/HT.sd);HT.f=x=>phi((x-HT.mu)/HT.sd)/HT.sd;HT.zone=HT.F(HT.b)-HT.F(HT.a);
+/* masse continue des déclarations dans [lo, hi), quand une part q de la zone part à 72 */
+HT.cont=(lo,hi,q)=>{let s=0;[[-1e9,HT.a,1],[HT.a,HT.b,1-q],[HT.b,1e9,1]].forEach(([u,v,c])=>{const L=Math.max(lo,u),H=Math.min(hi,v);if(H>L)s+=c*(HT.F(H)-HT.F(L));});return s;};
+
+/* ===== Figure 1 : quatre lois de moyenne 0 et de variance 1 ===== */
+(function(){
+  const L=[{n:'±1, cosh t',f:t=>Math.cosh(t),c:'sl-c1'},{n:'−√2, 0, √2',f:t=>0.5+0.5*Math.cosh(Math.SQRT2*t),c:'sl-c2'},
+           {n:'N(0, 1), e^(t²/2)',f:t=>Math.exp(t*t/2),c:'sl-c3'},{n:'Exp(1) − 1',f:t=>t<1?Math.exp(-t)/(1-t):Infinity,c:'sl-c5'}];
+  const P=SL.plot(document.getElementById('f1plot'),{x:[-1.6,1.6],y:[0.8,3.3],w:560,h:290,xt:[-1.5,-1,-0.5,0,0.5,1,1.5],yt:[1,1.5,2,2.5,3],xl:'t'});
+  const out=document.getElementById('f1out');
+  function draw(t){
+    P.clear();
+    ccurve(P,u=>1+u*u/2,-1.6,1.6,'sl-c4 sl-dash',0.8,3.3);
+    L.forEach(l=>ccurve(P,l.f,-1.6,1.6,l.c+' thin',0.8,3.3,400));
+    P.vline(t,'sl-dash');
+    L.forEach(l=>{const v=l.f(t);if(isFinite(v)&&v<=3.3)P.dot(t,v,l.c,4);});
+    L.forEach((l,i)=>P.text(-1.05,3.15-0.2*i,'— '+l.n,l.c,'start'));
+    P.text(-1.05,3.15-0.8,'-- 1 + t²/2','sl-c4','start');
+    rd(out,L.map(l=>[l.n,fmtInf(l.f(t),3),l.c==='sl-c3'?'c3':'']).concat([['parabole 1 + t²/2',SL.fmt(1+t*t/2,3)]]));
+  }
+  SL.slider(document.getElementById('f1ctl'),{label:'t',min:-1.5,max:1.5,step:0.05,value:0.25,fmt:v=>SL.fmt(v,2)},draw);
+})();
+
+/* ===== Figure 2 : densité avec masse, fonction de répartition avec saut ===== */
+(function(){
+  const host=document.getElementById('f2plot'),out=document.getElementById('f2out');
+  const P1=SL.plot(SL.h('div','',host),{x:[60,78],y:[0,0.165],w:560,h:210,xt:[60,63,66,69,72,75,78],yt:[0,0.05,0.1,0.15]});
+  const P2=SL.plot(SL.h('div','',host),{x:[60,78],y:[0,1.05],w:560,h:230,xt:[60,63,66,69,72,75,78],yt:[0,0.25,0.5,0.75,1],xl:'taille déclarée, pouces (72 = 6 pieds = 183 cm)'});
+  function draw(q){
+    P1.clear();P2.clear();
+    const m=q*HT.zone;
+    ccurve(P1,HT.f,60,78,'sl-c4 sl-dash',0,0.165);
+    area(P1,x=>(x>=HT.a&&x<HT.b?1-q:1)*HT.f(x),60,78,'sl-area',0.165,1800);
+    if(m>0.0005){P1.arrow(72,0,72,0.155,'sl-c3');P1.text(72.4,0.148,'masse '+SL.fmt(100*m,1)+'\u00a0% en 72','sl-c3','start');}
+    P1.text(60.3,0.15,'-- densité des tailles vraies','sl-c4','start');P1.text(60.3,0.13,'▮ déclarées, partie continue','sl-c2','start');
+    const Fm=HT.F(HT.a)+(1-q)*HT.zone,Fb=HT.F(HT.b);
+    ccurve(P2,x=>HT.F(x),60,78,'sl-c4 sl-dash thin',0,1.05);
+    ccurve(P2,x=>x<HT.a?HT.F(x):HT.F(HT.a)+(1-q)*(HT.F(x)-HT.F(HT.a)),60,HT.b-1e-6,'sl-c1',0,1.05,300);
+    ccurve(P2,x=>HT.F(x),HT.b,78,'sl-c1',0,1.05,120);
+    if(m>0.0005){P2.seg(72,Fm,72,Fb,'sl-c3 sl-dash');P2.dot(72,Fm,'hollow sl-c1',4.5);}
+    P2.dot(72,Fb,'sl-c1',4.5);
+    P2.text(60.3,0.93,'— F, tailles déclarées','sl-c1','start');P2.text(60.3,0.81,'-- F, tailles vraies','sl-c4','start');
+    if(m>0.0005)P2.text(72.4,(Fm+Fb)/2-0.02,'saut '+SL.fmt(m,3),'sl-c3','start');
+    rd(out,[['masse en 72 = saut de F',SL.fmt(100*m,1)+'\u202f%','c3'],['F(72⁻), juste avant',SL.fmt(Fm,3)],['F(72)',SL.fmt(Fb,3)],['densité en 72',m>0.0005?'aucune':SL.fmt(HT.f(72),3)]]);
+  }
+  SL.slider(document.getElementById('f2ctl'),{label:'part arrondie',min:0,max:1,step:0.05,value:0.5,fmt:v=>SL.fmt(v,2)},draw);
+})();
+
+/* ===== Figure 3 : l'escalier de Z_n contre Φ ===== */
+(function(){
+  const N=[1,2,4,10,25,100,400],out=document.getElementById('f3out');
+  const P=SL.plot(document.getElementById('f3plot'),{x:[-3.5,3.5],y:[0,1.05],w:560,h:270,xt:[-3,-2,-1,0,1,2,3],yt:[0,0.25,0.5,0.75,1],xl:'x'});
+  leftAxis(P,-3.5);
+  function draw(i){
+    P.clear();const n=N[i],sq=Math.sqrt(n);
+    const p=[Math.pow(2,-n)];for(let k=0;k<n;k++)p.push(p[k]*(n-k)/(k+1));
+    let F=0,d='',best={g:-1},Fprev=0;const z0=-3.5;
+    for(let k=0;k<=n;k++){const z=(2*k-n)/sq;Fprev=F;F+=p[k];const Pz=Phi(z);
+      [Math.abs(F-Pz),Math.abs(Fprev-Pz)].forEach((g,j)=>{if(g>best.g)best={g:g,z:z,a:j?Fprev:F,b:Pz};});
+      if(z<z0||z>3.5)continue;
+      if(!d)d='M'+P.sx(z0).toFixed(1)+' '+P.sy(Fprev).toFixed(1);
+      d+=' L'+P.sx(z).toFixed(1)+' '+P.sy(Fprev).toFixed(1)+' L'+P.sx(z).toFixed(1)+' '+P.sy(F).toFixed(1);}
+    d+=' L'+P.sx(3.5).toFixed(1)+' '+P.sy(F).toFixed(1);
+    curve(P,Phi,-3.5,3.5,'sl-c3',1.05);
+    SL.el('path',{d:d,class:'sl-fn sl-c4 thin',fill:'none'},P.dyn);
+    P.seg(best.z,best.a,best.z,best.b,'sl-c5');
+    P.text(-3.4,0.95,'— Φ, la limite','sl-c3','start');P.text(-3.4,0.84,'— P(Zₙ ≤ x), Zₙ = Sₙ/√n, n pièces ±1','sl-c4','start');P.text(-3.4,0.73,'│ plus grand écart','sl-c5','start');
+    rd(out,[['n',String(n)],['valeurs possibles de Zₙ',String(n+1)],['plus grand écart à Φ',best.g.toFixed(3).replace('.',','),'c3'],['0,4/√n, pour comparer',(0.3989/sq).toFixed(3).replace('.',',')]]);
+  }
+  SL.slider(document.getElementById('f3ctl'),{label:'n pièces',min:0,max:N.length-1,step:1,value:0,fmt:v=>String(N[v])},draw);
+})();
+
+/* ===== v1 : chaque face pèse e^(tx), et les moments reconstruisent M ===== */
+(function(){
+  const X=[1,2,3,4,5,6],mom=[];for(let k=0;k<=10;k++)mom.push(X.reduce((a,x)=>a+Math.pow(x,k)/6,0));
+  const fact=k=>k<2?1:k*fact(k-1);
+  const M=t=>X.reduce((a,x)=>a+Math.exp(t*x)/6,0),T=(t,K)=>{let s=0;for(let k=0;k<=K;k++)s+=mom[k]*Math.pow(t,k)/fact(k);return s;};
+  const host=document.getElementById('v1plot'),out=document.getElementById('v1out'),ctl=document.getElementById('v1ctl');
+  const row=SL.h('div','v-row',host),left=SL.h('div','',row),right=SL.h('div','',row);
+  const R=SL.plot(right,{x:[-0.5,0.5],y:[0,8.6],w:300,h:260,xt:[-0.5,-0.25,0,0.25,0.5],yt:[0,2,4,6,8],xl:'t'});
+  const st={t:0.5,K:2};
+  function draw(){
+    const t=st.t,K=st.K,c=X.map(x=>Math.exp(t*x)/6),m=M(t),top=Math.max(0.25,1.18*Math.max(...c));
+    left.innerHTML='';
+    const L=SL.plot(left,{x:[0.3,6.7],y:[0,top],w:300,h:260,xt:[1,2,3,4,5,6],yt:[],xl:'face x',yl:'P(X = x) · e^(tx)'});
+    c.forEach((v,i)=>{bar(L,X[i]-0.33,X[i]+0.33,v,'sl-bar');L.text(X[i],v+top*0.02,SL.fmt(v,v<1?3:2),'','middle');});
+    R.clear();
+    ccurve(R,u=>T(u,K),-0.5,0.5,'sl-c3 sl-dash',0,8.6);
+    ccurve(R,M,-0.5,0.5,'sl-c1',0,8.6);
+    R.vline(t,'sl-dash');R.dot(t,m,'sl-c1',5);
+    R.text(-0.48,8.0,'— M(t)','sl-c1','start');R.text(-0.48,7.1,'-- Taylor, '+K+' moment'+(K>1?'s':''),'sl-c3','start');
+    const j=t>0?5:0,share=Math.abs(t)<1e-9?'toutes ⅙':SL.fmt(100*c[j]/m,0)+'\u202f%';
+    rd(out,[['M(t), somme des barres',SL.fmt(m,3),'c1'],[t>0?'part de la face 6':t<0?'part de la face 1':'part de chaque face',share],['Taylor avec '+K+' moment'+(K>1?'s':''),SL.fmt(T(t,K),3),'c3'],['écart',fmtS(m-T(t,K),3)]]);
+  }
+  SL.slider(ctl,{label:'t',min:-0.5,max:0.5,step:0.05,value:0.5,fmt:v=>SL.fmt(v,2)},v=>{st.t=v;draw();});
+  SL.slider(ctl,{label:'K moments',min:0,max:10,step:1,value:2,fmt:v=>String(v)},v=>{st.K=v;draw();});
+})();
+
+/* ===== v2 : la pente en 0 est la moyenne, la courbure est E[X²] ===== */
+(function(){
+  const host=document.getElementById('v2plot'),out=document.getElementById('v2out'),sdiv=document.getElementById('v2sl');
+  const st={m:0,lam:2,p:0.3};
+  function draw(){
+    host.innerHTML='';
+    const pois=st.m===0,m1=pois?st.lam:st.p,m2=pois?st.lam*st.lam+st.lam:st.p;
+    const M=pois?(t=>Math.exp(st.lam*(Math.exp(t)-1))):(t=>1-st.p+st.p*Math.exp(t));
+    const Y=pois?[0,4]:[0.6,1.5];
+    const P=SL.plot(host,{x:[-0.5,0.5],y:Y,w:560,h:260,xt:[-0.5,-0.25,0,0.25,0.5],yt:pois?[0,1,2,3,4]:[0.6,0.8,1,1.2,1.4],xl:'t'});
+    ccurve(P,t=>1+m1*t+m2*t*t/2,-0.5,0.5,'sl-c2 sl-dash',Y[0],Y[1]);
+    ccurve(P,t=>1+m1*t,-0.5,0.5,'sl-c3 thin',Y[0],Y[1]);
+    ccurve(P,M,-0.5,0.5,'sl-c1',Y[0],Y[1]);
+    P.dot(0,1,'sl-c3',4.5);
+    const yy=k=>Y[1]-(Y[1]-Y[0])*(0.07+0.1*k);
+    P.text(-0.48,yy(0),'— M(t)','sl-c1','start');P.text(-0.48,yy(1),'— tangente en 0, pente E[X]','sl-c3','start');P.text(-0.48,yy(2),'-- parabole 1 + E[X] t + E[X²] t²/2','sl-c2','start');
+    rd(out,[['M′(0) = E[X]',SL.fmt(m1,3),'c1'],['M″(0) = E[X²]',SL.fmt(m2,3)],['Var = M″(0) − M′(0)²',SL.fmt(m2-m1*m1,3),'c3']]);
+  }
+  const sl1=SL.h('div','',sdiv),sl2=SL.h('div','',sdiv);
+  SL.slider(sl1,{label:'λ',min:0.5,max:4,step:0.1,value:2,fmt:v=>SL.fmt(v,1)},v=>{st.lam=v;if(st.m===0)draw();});
+  SL.slider(sl2,{label:'p',min:0.05,max:0.95,step:0.05,value:0.3,fmt:v=>SL.fmt(v,2)},v=>{st.p=v;if(st.m===1)draw();});
+  buttons(document.getElementById('v2ctl'),['Poisson(λ)','pièce Bernoulli(p)'],k=>{st.m=k;sl1.style.display=k===0?'':'none';sl2.style.display=k===1?'':'none';draw();});
+})();
+
+/* ===== v3 : multiplier la loi par e^(tx), puis mesurer l'aire ===== */
+(function(){
+  const host=document.getElementById('v3plot'),out=document.getElementById('v3out'),st={m:0,t:0.5};
+  const fac=[1];for(let k=1;k<=40;k++)fac.push(fac[k-1]*k);
+  const pois=(k,l)=>Math.exp(-l)*Math.pow(l,k)/fac[k];
+  function draw(){
+    host.innerHTML='';const t=st.t;
+    if(st.m===0){
+      const lam=2,K=[];for(let k=0;k<=14;k++)K.push(k);
+      const g=K.map(k=>pois(k,lam)),h=K.map(k=>Math.exp(t*k)*pois(k,lam)),top=1.15*Math.max(...g,...h);
+      const P=SL.plot(host,{x:[-0.6,14.6],y:[0,top],w:560,h:250,xt:[0,2,4,6,8,10,12,14],yt:[],xl:'k'});leftAxis(P,-0.6);
+      K.forEach((k,i)=>{bar(P,k-0.34,k+0.34,h[i],'sl-bar');rect(P,k-0.34,k+0.34,0,g[i],'sl-bar ghost');});
+      P.text(14.5,top*0.92,'▭ P(X = k), Poisson(2)','','end');P.text(14.5,top*0.82,'▮ e^(tk) · P(X = k)','sl-c2','end');
+      rd(out,[['M(t), somme des barres pleines',SL.fmt(Math.exp(lam*(Math.exp(t)-1)),3),'c3'],['forme des barres pleines','Poisson('+(lam*Math.exp(t)).toFixed(2).replace('.',',')+')']]);
+    }else if(st.m===1){
+      const top=1.15*Math.max(phi(0),Math.exp(t*t/2)*phi(0));
+      const P=SL.plot(host,{x:[-4,5],y:[0,top],w:560,h:250,xt:[-4,-3,-2,-1,0,1,2,3,4,5],yt:[],xl:'x'});
+      area(P,x=>Math.exp(t*x)*phi(x),-4,5,'sl-area',top);
+      ccurve(P,phi,-4,5,'sl-c4 sl-dash',0,top);
+      P.vline(t,'sl-dash');
+      P.text(4.9,top*0.92,'-- φ(x), N(0, 1)','sl-c4','end');P.text(4.9,top*0.82,'▮ e^(tx) · φ(x)','sl-c2','end');
+      rd(out,[['M(t), aire pleine',SL.fmt(Math.exp(t*t/2),3),'c3'],['forme de la courbe pleine','N('+fmtS(t,2)+', 1)']]);
+    }else{
+      const f=x=>Math.exp((t-1)*x),top=1.45*Math.max(1,f(0),f(8));
+      const P=SL.plot(host,{x:[0,8],y:[0,top],w:560,h:250,xt:[0,1,2,3,4,5,6,7,8],yt:[],xl:'x'});
+      area(P,f,0,8,'sl-area',top);
+      ccurve(P,x=>Math.exp(-x),0,8,'sl-c4 sl-dash',0,top);
+      P.text(4,top*0.92,'-- e^(−x), Exp(1)','sl-c4','middle');P.text(4,top*0.82,'▮ e^(tx) · e^(−x)','sl-c2','middle');
+      rd(out,[['M(t), aire pleine',t<1?SL.fmt(1/(1-t),3):'∞','c3'],['forme de la courbe pleine',t<1?'Exp('+SL.fmt(1-t,2)+')':'aucune, aire infinie']]);
+    }
+  }
+  SL.slider(document.getElementById('v3sl'),{label:'t',min:-1,max:1.2,step:0.05,value:0.5,fmt:v=>SL.fmt(v,2)},v=>{st.t=v;draw();});
+  buttons(document.getElementById('v3ctl'),['Poisson(2)','N(0, 1)','Exp(1)'],k=>{st.m=k;draw();});
+})();
+
+/* ===== v4 : plus la classe est fine, plus la barre de 6 pieds monte ===== */
+(function(){
+  const W=[2,1,0.5,0.25,0.1],q=0.5,top=0.42,out=document.getElementById('v4out');
+  const P=SL.plot(document.getElementById('v4plot'),{x:[60,78],y:[0,top],w:560,h:260,xt:[60,63,66,69,72,75,78],yt:[0,0.1,0.2,0.3,0.4],xl:'taille déclarée, pouces (72 = 6 pieds)',yl:'part / largeur'});
+  function draw(i){
+    P.clear();const w=W[i];let other=0,h72=0;
+    for(let k=-Math.ceil(12/w);k<=Math.ceil(6/w);k++){const c=72+k*w,lo=c-w/2,hi=c+w/2;if(hi<60||lo>78)continue;
+      const h=(HT.cont(lo,hi,q)+(k===0?q*HT.zone:0))/w;
+      if(k===0)h72=h;else other=Math.max(other,h);
+      bar(P,Math.max(60,lo+w*0.06),Math.min(78,hi-w*0.06),Math.min(h,top*0.95),k===0?'sl-bar2 hot':'sl-bar');}
+    if(h72>top*0.95)P.text(72.4,top*0.72,SL.fmt(h72,2)+' ↑','sl-c3','start');
+    ccurve(P,HT.f,60,78,'sl-c4 sl-dash',0,top);
+    P.text(77.8,top*0.9,'-- taille vraie','sl-c4','end');P.text(77.8,top*0.8,'▮ classe de 72','sl-c3','end');
+    rd(out,[['largeur des classes',SL.fmt(w,2)+(w>=2?' pouces':' pouce')],['barre de 72',SL.fmt(h72,3),'c3'],['plus haute autre barre',SL.fmt(other,3)],['masse en 72',SL.fmt(100*q*HT.zone,1)+'\u202f%']]);
+  }
+  SL.slider(document.getElementById('v4ctl'),{label:'largeur w',min:0,max:W.length-1,step:1,value:2,fmt:v=>SL.fmt(W[v],2)},draw);
+})();
+
+/* ===== v5 : les 36 termes du produit, regroupés par x + y ===== */
+(function(){
+  const out=document.getElementById('v5out');
+  const P=SL.plot(document.getElementById('v5plot'),{x:[0.3,12.7],y:[0,6.6],w:560,h:300,xt:[1,2,3,4,5,6,7,8,9,10,11,12],yt:[0,1,2,3,4,5,6]});
+  const cells=[],rank={};
+  for(let x=1;x<=6;x++)for(let y=1;y<=6;y++){const s=x+y;rank[s]=(rank[s]||0)+1;cells.push({x:x,y:y,s:s,j:rank[s]});}
+  cells.sort((a,b)=>(a.x===a.y)-(b.x===b.y)); /* la diagonale en dernier, au-dessus */
+  const G=[c=>({cx:c.x,cy:c.y-0.5,hh:0.45,op:1}),c=>({cx:c.s,cy:c.j-0.5,hh:0.45,op:1}),
+           c=>c.x===c.y?{cx:c.s,cy:3,hh:2.95,op:1}:{cx:c.s,cy:c.j-0.5,hh:0.45,op:0.1}];
+  const M=t=>[1,2,3,4,5,6].reduce((a,x)=>a+Math.exp(t*x)/6,0);
+  let cur=cells.map(G[0]),mode=0;const fresh=runner();
+  function frame(S){
+    P.clear();
+    cells.forEach((c,i)=>{const g=S[i];const r=rect(P,g.cx-0.45,g.cx+0.45,g.cy-g.hh,g.cy+g.hh,'sl-cellsq sl-k'+(1+c.s%6));r.setAttribute('style','opacity:'+(0.55*g.op).toFixed(3));
+      if(g.op>0.5)P.text(g.cx,g.cy-0.16,String(c.s),'sl-cell-t','middle');});
+    P.text(12.6,6.25,mode===0?'case (x, y)\u00a0: le terme e^(t(x+y))/36, marqué x + y':mode===1?'colonne s\u00a0: 36 × P(S = s)':'Y = X\u00a0: 6 cases de masse ⅙, sommes paires','','end');
+  }
+  function show(k){
+    const tk=fresh(),a=cur.slice(),b=cells.map(G[k]);mode=k;
+    tween(900,u=>{cur=a.map((g,i)=>({cx:g.cx+(b[i].cx-g.cx)*u,cy:g.cy+(b[i].cy-g.cy)*u,hh:g.hh+(b[i].hh-g.hh)*u,op:g.op+(b[i].op-g.op)*u}));frame(cur);},tk);
+    const t=0.2,ind=k<2;
+    rd(out,[['termes de somme 7',ind?'6 sur 36':'0'],['P(S = 7)',ind?'6/36 = 0,167':'0'],['M<sub>X</sub>(0,2)²',SL.fmt(M(t)**2,3)],[ind?'M<sub>X+Y</sub>(0,2)':'M<sub>2X</sub>(0,2)',SL.fmt(ind?M(t)**2:M(2*t),3),'c3']]);
+  }
+  buttons(document.getElementById('v5ctl'),['le produit\u00a0: 36 termes','regrouper par x + y','Y = X'],show);
+})();
+
+/* ===== v6 : M_Zn se rapproche de e^(t²/2) ===== */
+(function(){
+  const N=[1,2,3,5,10,20,50,100,1000],out=document.getElementById('v6out'),st={m:0,i:0};
+  const Ms=[u=>Math.cosh(u),u=>u<1?Math.exp(-u)/(1-u):Infinity];
+  const P=SL.plot(document.getElementById('v6plot'),{x:[-2,2],y:[0,8],w:560,h:270,xt:[-2,-1.5,-1,-0.5,0,0.5,1,1.5,2],yt:[0,2,4,6,8],xl:'t'});
+  function draw(){
+    P.clear();const n=N[st.i],sq=Math.sqrt(n),M=Ms[st.m],Mz=t=>Math.pow(M(t/sq),n);
+    curve(P,t=>Math.exp(t*t/2),-2,2,'sl-c3',8);
+    ccurve(P,Mz,-2,2,'sl-c4',0,8,400);
+    if(st.m===1&&sq<2){P.vline(sq,'sl-c5 sl-dash');P.text(sq+0.04,7.5,'t = √n','sl-c5','start');}
+    P.text(-1.45,7.4,'— e^(t²/2), la cible','sl-c3','start');P.text(-1.45,6.6,'— M(t/√n)ⁿ, la fonction de Zₙ','sl-c4','start');
+    const v=Mz(1);
+    rd(out,[['n',String(n)],['M<sub>Z<sub>n</sub></sub>(1)',fmtInf(v,3),'c1'],['e<sup>0,5</sup>, la cible','1,649','c3'],['écart en t = 1',isFinite(v)?fmtS(v-Math.exp(0.5),3):'∞']]);
+  }
+  SL.slider(document.getElementById('v6sl'),{label:'n',min:0,max:N.length-1,step:1,value:0,fmt:v=>String(N[v])},v=>{st.i=v;draw();});
+  buttons(document.getElementById('v6ctl'),['pile ou face ±1','exponentielle centrée'],k=>{st.m=k;draw();});
+})();
+
+})();
+</script>
+</body>
+</html>

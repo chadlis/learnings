@@ -1,0 +1,11 @@
+.sl-fn.sl-dash{stroke-dasharray:5 4;stroke-width:1.8}
+.sl-fn.thin{stroke-width:1.7}
+.sl-area{fill:rgba(107,70,193,.2);stroke:#6B46C1;stroke-width:1.6}
+.sl-bar.ghost{fill:none;stroke:var(--cardmuted);stroke-dasharray:3 2;stroke-width:1.2;opacity:1}
+.sl-bar2.hot{opacity:.8}
+.sl-cellsq{stroke:var(--card);stroke-width:1}
+.sl-cellsq.off{opacity:.12}
+.notion h3 .hf::before{content:"· ";color:var(--faint)}
+text.sl-lbl{stroke:none}
+details.casse table{width:auto;margin:6px 0}
+details.casse th,details.casse td{padding:2px 14px;text-align:center}

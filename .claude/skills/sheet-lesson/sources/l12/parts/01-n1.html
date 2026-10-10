@@ -1,0 +1,61 @@
+<!-- ============================ n1 ============================ -->
+<section class="notion culture" id="n1">
+  <h3>L'empreinte d'une loi <span class="hf">M(t) = E[e<sup>tX</sup>]</span> <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 37 · The Moment Generating Function</p>
+  <div class="idee">
+    <p>Une loi a une infinité de moments : E[X], E[X²], E[X³]… Brunton les compare aux dérivées d'une fonction dans une série de Taylor : pris ensemble, ils forment l'<b>empreinte</b> de la loi. La fonction génératrice des moments les range tous dans une fonction d'une nouvelle variable t.</p>
+    <p>M(t) est la moyenne de e<sup>tX</sup>. Chaque valeur x pèse e<sup>tx</sup> fois sa probabilité : t est un bouton. À t = 0, e<sup>tx</sup> = 1 : chaque valeur pèse sa probabilité, et la somme vaut 1. Pour un dé à t = 0,5, la face 6 pèse e³/6 = 3,35, la face 1 e<sup>0,5</sup>/6 = 0,27, et M(0,5) = 8,08. Un t positif grossit les grandes valeurs, un t négatif les petites.</p>
+    <p>Pourquoi « des moments » : e<sup>tx</sup> = 1 + tx + t²x²/2 + …, donc M(t) = 1 + t E[X] + t² E[X²]/2 + … Le coefficient de t<sup>k</sup> est E[X<sup>k</sup>]/k! : les moments, divisés par k!, sont les coefficients de Taylor de M.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — chaque face pèse e<sup>tx</sup>, et les moments reconstruisent la courbe</div>
+    <div id="v1ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">Un dé, une barre par face : sa hauteur est P(X = x) · e<sup>tx</sup>, et M(t) est la somme des barres. À <b>t = 0</b>, chaque barre vaut ⅙ et la somme 1. À t = 0,5, la face 6 passe à 3,35 et fait 41 % de M(0,5) = 8,08 ; à t = −0,5, c'est la face 1 qui fait 41 %. À droite, la courbe M(t) et, en pointillé, sa série de Taylor arrêtée à <b>K moments</b> : en t = 0,5, elle donne 4,65 avec 2 moments, 7,16 avec 4, 8,07 avec 8.</p>
+  </div>
+  <div class="formule"><div class="lbl">La définition</div>
+    <div class="eq">M<sub><i>X</i></sub>(<i>t</i>) = E[e<sup><i>tX</i></sup>] = Σ<sub><i>x</i></sub> e<sup><i>tx</i></sup> P(<i>X</i> = <i>x</i>) &nbsp;(discret) &nbsp;&nbsp;&nbsp; ∫ e<sup><i>tx</i></sup> <i>f</i>(<i>x</i>) d<i>x</i> &nbsp;(continu)</div>
+    <ul><li>C'est LOTUS avec g(x) = e<sup>tx</sup> (<a href="lesson-00-08-esperance-variance.html#n5">l08, notion 5</a>) : t est un nombre fixé, X est aléatoire, et M(t) est un nombre pour chaque t.</li><li>M(0) = E[1] = 1 pour toute loi : c'est la masse totale.</li><li>M(t) peut valoir +∞ pour certains t. L'hypothèse utile, partout dans la leçon : M est finie sur un intervalle ouvert autour de 0, (−h, h).</li><li>Sous cette hypothèse, M(t) = Σ<sub>k</sub> E[X<sup>k</sup>] t<sup>k</sup>/k!, et M détermine la loi : deux variables dont les fonctions génératrices coïncident sur un intervalle autour de 0 ont la même fonction de répartition (théorème d'unicité, admis). C'est l'énoncé exact de « l'empreinte ».</li></ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — même moyenne, même variance : même départ, empreintes différentes</div>
+    <div id="f1ctl"></div>
+    <div id="f1plot" class="wide"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Quatre lois de moyenne 0 et de variance 1 : pile ou face à ±1, trois valeurs −√2, 0, √2 de probabilités ¼, ½, ¼, la normale centrée réduite, et une exponentielle(1) décalée de −1. Près de 0, leurs courbes se confondent avec la parabole 1 + t²/2 (pointillé) : en t = 0,25, elles valent toutes entre 1,031 et 1,038. Déplace <b>t</b> : en t = 1, elles valent 1,543, 1,589 et 1,649, et la dernière est infinie (elle n'existe que pour t &lt; 1). Les deux premiers moments fixent le départ, les suivants séparent les lois. La notion 6 se sert exactement de ce départ commun.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>constante, pièce, dé, ±1</small></summary><div class="in">
+    <ol>
+      <li><b>Une constante</b> X = c : M(t) = e<sup>ct</sup>. Pour c = 0, M vaut 1 partout.</li>
+      <li><b>Une pièce</b>, Bernoulli(p) : M(t) = (1 − p) e<sup>0</sup> + p e<sup>t</sup> = 1 − p + p e<sup>t</sup>.</li>
+      <li><b>Un dé</b> : M(t) = (e<sup>t</sup> + e<sup>2t</sup> + … + e<sup>6t</sup>)/6. M(0,5) = 8,08 ; M(−0,5) = 0,244.</li>
+      <li><b>Pile ou face à ±1</b>, gagner ou perdre 1 € : M(t) = ½ e<sup>−t</sup> + ½ e<sup>t</sup> = cosh t. Elle resservira dans la preuve du TCL (notion 6).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>pourquoi les moments sont les coefficients de M</small></summary><div class="in">
+    <div class="drv">
+      <div>e<sup><i>tx</i></sup> = 1 + <i>tx</i> + <i>t</i>²<i>x</i>²/2! + <i>t</i>³<i>x</i>³/3! + …</div><span>série de l'exponentielle, valable pour tout nombre tx</span>
+      <div>M(<i>t</i>) = E[1 + <i>tX</i> + <i>t</i>²<i>X</i>²/2! + …]</div><span>définition de M</span>
+      <div>= 1 + <i>t</i> E[<i>X</i>] + <i>t</i>² E[<i>X</i>²]/2! + <i>t</i>³ E[<i>X</i>³]/3! + …</div><span>linéarité terme à terme ; permuter E et une somme infinie demande M finie près de 0</span>
+      <div>coefficient de <i>t<sup>k</sup></i> : E[<i>X<sup>k</sup></i>]/<i>k</i>!</div><span>identifier les coefficients d'une série entière</span>
+    </div>
+    <p>L'unicité, elle, est admise. L'idée : une M finie sur (−h, h) se prolonge aux nombres complexes ; en t = is, elle devient la fonction caractéristique E[e<sup>isX</sup>], et une formule d'inversion, celle de Fourier, redonne la loi à partir de celle-ci. Ici i² = −1, et e<sup>iθ</sup> = cos θ + i sin θ est un point du cercle de rayon 1 (notion 6, trou 4).</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>les sœurs de la log-normale ont les mêmes moments</small></summary><div class="in">
+<pre class="py">{{CODE:c1}}</pre>
+<pre class="out">{{OUT:c1}}</pre>
+    <p>Mêmes moments jusqu'à l'ordre 4, et en fait à tous les ordres, mais trois fonctions de répartition différentes : P(X ≤ 2) vaut 0,756, 0,768 ou 0,779.</p>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>M peut être infinie partout sauf en 0.</b> Loi de Cauchy : aucun moment, M(t) = ∞ pour tout t ≠ 0. Loi de Student à 3 degrés de liberté : variance finie (elle vaut 3), et pourtant M(t) = ∞ pour tout t ≠ 0.</li>
+      <li><b>Tous les moments finis ne suffisent pas.</b> La log-normale X = e<sup>Y</sup>, Y ~ N(0, 1), a E[X<sup>k</sup>] = e<sup>k²/2</sup> pour tout k, mais E[e<sup>tX</sup>] = ∞ pour tout t &gt; 0 : e<sup>te<sup>y</sup></sup> écrase la gaussienne. Ses « sœurs », de densité f(x)[1 + a sin(2π ln x)] avec −1 ≤ a ≤ 1, ont exactement les mêmes moments et des lois différentes (code ci-dessus).</li>
+      <li><b>Un seul point ne dit rien.</b> Toutes les lois ont M(0) = 1. C'est l'égalité sur tout un intervalle autour de 0 qui identifie la loi.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (28, 30, 37) dit que les moments sont des « identifiants uniques » de la loi. Pas toujours : la log-normale partage tous ses moments avec des lois différentes. L'énoncé vrai : si M(t) est finie sur un intervalle ouvert autour de 0, elle détermine la loi, et la suite des moments aussi.</div>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (37) dit que M est « la transformée de Laplace de la densité ». C'est la transformée de Laplace bilatérale, prise en −t : la transformée usuelle est ∫<sub>0</sub><sup>∞</sup> e<sup>−sx</sup> f(x) dx, avec un signe moins et pour une variable positive. Même famille d'outils, pas la même formule.</div>
+  </div></details>
+  <p class="garde">M(t) = E[e<sup>tX</sup>] vaut 1 en 0 et a pour coefficients de Taylor E[X<sup>k</sup>]/k!. Finie près de 0, elle identifie la loi ; sans cette condition, même tous les moments ne suffisent pas.</p>
+</section>
+

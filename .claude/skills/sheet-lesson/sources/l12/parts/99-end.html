@@ -1,0 +1,53 @@
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>M(t) = E[e<sup>tX</sup>] ; ses coefficients de Taylor sont E[X<sup>k</sup>]/k! ; finie près de 0, elle détermine la loi.</li>
+    <li>Les moments seuls ne déterminent pas toujours la loi : la log-normale a des sœurs aux mêmes moments.</li>
+    <li>M<sup>(k)</sup>(0) = E[X<sup>k</sup>] et Var = M″(0) − M′(0)² ; pour Poisson, moyenne = variance = λ.</li>
+    <li>Poisson : e<sup>λ(e<sup>t</sup> − 1)</sup> ; N(0, 1) : e<sup>t²/2</sup> ; exponentielle : λ/(λ − t), pour t &lt; λ.</li>
+    <li>Une masse ponctuelle n'a pas de densité, F la montre par un saut : l'unicité et le TCL portent sur F.</li>
+    <li>Indépendance ⇒ M<sub>X+Y</sub> = M<sub>X</sub> M<sub>Y</sub> ; la réciproque est fausse.</li>
+    <li>TCL : M(t/(σ√n))<sup>n</sup> → e<sup>t²/2</sup>. Les trous : M supposée finie, n · ε<sub>n</sub> → 0 à montrer, continuité plutôt qu'unicité.</li>
+  </ol>
+</div>
+<div class="phrase">« La fonction génératrice M(t) = E[e<sup>tX</sup>] range tous les moments dans une fonction : ses dérivées en 0 sont les moments et, quand elle est finie près de 0, elle détermine la loi. Sous indépendance, la fonction génératrice d'une somme est le produit des fonctions génératrices. Pour le TCL, celle de la somme standardisée vaut M(t/(σ√n))<sup>n</sup> ≈ (1 + t²/(2n))<sup>n</sup>, qui tend vers e<sup>t²/2</sup>, celle de la normale ; la preuve rigoureuse passe par la fonction caractéristique et le théorème de continuité de Lévy. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">6 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Qu'est-ce que M(t), et que vaut M(0) ?</div><div class="a hid">La moyenne de e<sup>tX</sup>, un nombre pour chaque t fixé ; M(0) = E[1] = 1 pour toute loi.</div></li>
+    <li><div class="q">Comment obtient-on E[X] et Var(X) à partir de M ?</div><div class="a hid">E[X] = M′(0), E[X²] = M″(0), Var = M″(0) − M′(0)² : dériver en t fait descendre un x, et e⁰ = 1.</div></li>
+    <li><div class="q">Les moments déterminent-ils toujours la loi ?</div><div class="a hid">Non : la log-normale partage tous ses moments avec d'autres lois. Si M est finie sur un intervalle autour de 0, oui.</div></li>
+    <li><div class="q">Pourquoi l'unicité parle-t-elle de la fonction de répartition, et pas de la densité ?</div><div class="a hid">Une loi peut avoir des masses ponctuelles, comme les tailles déclarées à 6 pieds : pas de densité, mais F existe toujours, avec un saut égal à la masse.</div></li>
+    <li><div class="q">Que vaut M<sub>X+Y</sub>, et sous quelle hypothèse ?</div><div class="a hid">M<sub>X</sub> · M<sub>Y</sub>, si X et Y sont indépendantes : e<sup>t(x+y)</sup> = e<sup>tx</sup> e<sup>ty</sup>, puis l'espérance du produit est le produit des espérances.</div></li>
+    <li><div class="q">Résume la preuve du TCL en une ligne, puis donne un de ses trous.</div><div class="a hid">M<sub>Z<sub>n</sub></sub>(t) = M(t/(σ√n))<sup>n</sup> = (1 + t²/(2n) + ε<sub>n</sub>)<sup>n</sup> → e<sup>t²/2</sup>. Trous : M supposée finie (la fonction caractéristique l'évite), n · ε<sub>n</sub> → 0 à montrer, et un théorème de continuité au lieu de l'unicité.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts et chaînes</div>
+  <div class="bridges">
+    <a href="../chains/chain-p01-01-objet-aleatoire.html"><b>L'objet aléatoire</b><small>La distribution d'échantillonnage de p̂ devient normale par le TCL démontré ici, et ne le devient pas quand les succès ou les échecs sont trop peu nombreux.</small></a>
+    <a href="../chains/chain-p01-02-ic-test-procedure.html"><b>Intervalle de confiance et test</b><small>X̄ ± 1,96 σ/√n repose sur la conclusion de la notion 6, P(Z<sub>n</sub> ≤ x) → Φ(x), une convergence de fonctions de répartition.</small></a>
+    <a href="../chains/chain-p01-05-bootstrap.html"><b>Bootstrap</b><small>Médiane, AUC : aucune formule toute faite pour leur loi. On simule la distribution d'échantillonnage au lieu de la supposer normale.</small></a>
+    <a href="../bridges/bridge-04-variance-moyenne-correlee.html"><b>Variance d'une moyenne corrélée</b><small>Avec des termes corrélés, l'étape 2 de la preuve tombe, et Var(X̄) n'est plus σ²/n.</small></a>
+    <a href="../chains/chain-p08-02-flottants-lse.html"><b>Flottants et log-sum-exp</b><small>ln M(t) d'une loi discrète est un log-sum-exp, et sa dérivée une moyenne pondérée par un softmax (notion 2).</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::mgf</code> : les six notions sont de culture, cette leçon ne donne pas de carte. Elle sert de référence quand une carte du TCL (<a href="lesson-00-11-tcl.html">l11</a>) demande « pourquoi ».</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l12 · v1 du 10/10/2026 · Brunton 37 à 40 et 44 · Prérequis : <a href="lesson-00-08-esperance-variance.html">l08</a>, <a href="lesson-00-11-tcl.html">l11</a>. Dernière leçon du socle probabiliste : retour à l'<a href="../../index.html">index</a> ou à la <a href="../../map.html">carte</a>.</footer>
+</div>

@@ -1,0 +1,60 @@
+<!-- ============================ n4 ============================ -->
+<section class="notion culture" id="n4">
+  <h3>Fonction de répartition plutôt que densité : le pic à 6 pieds <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 39 · The Lebesgue Measure in Probability</p>
+  <div class="idee">
+    <p>En 37, Brunton a dit que M détermine la fonction de répartition F(x) = P(X ≤ x), et non la densité. Il l'explique sur un exemple réel : les tailles déclarées des hommes américains, sur les permis de conduire ou les applis de rencontre. La courbe est presque une cloche, avec une pile à exactement 6 pieds (183 cm) : dès 5 pieds 10 et demi, on s'arrondit à 6.</p>
+    <p>Une pile de gens sur une valeur exacte est une <b>masse ponctuelle</b>. Une densité ne peut pas la porter : sur une classe de largeur w, la barre vaut masse/w, infinie quand w → 0. La fonction de répartition, elle, fait un saut. Dans un modèle jouet (taille vraie N(69, 3²) pouces ; la moitié de ceux entre 70,5 et 72 déclarent 72 ; Brunton ne donne aucun chiffre), 7,5 % déclarent 72 pouces, et F passe de 0,766 juste avant 72 à 0,841 en 72.</p>
+    <p>D'où le slogan de Brunton : intégrer lisse, dériver abîme. F, l'intégrale, existe toujours ; la densité, sa dérivée, pas toujours.</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — plus la classe est fine, plus la barre de 6 pieds monte</div>
+    <div id="v4ctl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">Les tailles déclarées du modèle : taille vraie normale (pointillé), et la moitié de ceux qui mesurent entre 70,5 et 72 pouces déclarent 72, soit 6 pieds. Les barres sont en échelle de densité : hauteur = part des hommes dans la classe / largeur. Réduis la <b>largeur des classes</b> : les barres ordinaires se calent sur la courbe, de sommet 0,133, et la barre de 72 monte comme 0,075/w + 0,06, la hauteur ordinaire autour de 72, creux compris : 0,21 à w = 0,5, 0,36 à 0,25, 0,81 à 0,1. Élargis à 2 pouces : le pic disparaît, noyé avec le creux juste en dessous.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">F(<i>x</i>) = P(<i>X</i> ≤ <i>x</i>) &nbsp;&nbsp;&nbsp; avec une densité : F(<i>x</i>) = ∫<sub>−∞</sub><sup><i>x</i></sup> <i>f</i>(<i>u</i>) d<i>u</i> &nbsp;&nbsp;&nbsp; saut en <i>a</i> : F(<i>a</i>) − F(<i>a</i><sup>−</sup>) = P(<i>X</i> = <i>a</i>)</div>
+    <ul><li>F existe pour toute variable : croissante, de 0 à 1, continue à droite. La densité f = F′ n'existe que si F est assez lisse.</li><li>F(a<sup>−</sup>) est la limite de F juste avant a. Un saut de F en a est une masse P(X = a) &gt; 0 ; une variable à densité a P(X = a) = 0 partout.</li><li>Une loi mixte, cloche plus pile : F = (1 − m) F<sub>c</sub> + m · 𝟙{x ≥ a}, avec m la masse ponctuelle et F<sub>c</sub> une fonction de répartition continue.</li><li>C'est sur F que portent l'unicité de la notion 1 et la conclusion du TCL, P(Z<sub>n</sub> ≤ x) → Φ(x) : la <b>convergence en loi</b> (convergence in distribution).</li></ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — la densité ne peut pas porter le pic, la fonction de répartition le porte par un saut</div>
+    <div id="f2ctl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Modèle jouet, pas des données : taille vraie normale de moyenne 69 pouces (175 cm) et d'écart-type 3 pouces (7,6 cm). En haut, la partie continue des tailles déclarées : un creux entre 70,5 et 72 pouces, ceux qui sont partis à 72 ; la flèche est la masse ponctuelle, qu'aucune hauteur de courbe ne représente. En bas, la fonction de répartition : lisse partout, sauf un saut en 72 égal à la masse. Monte la <b>part arrondie</b>, celle de la zone qui déclare 72 : à ½, le saut vaut 7,5 %, de 0,766 à 0,841 ; à 1, il vaut 15 % et F reste plate sur tout le creux. F(72) reste 0,841 = Φ(1) : l'arrondi déplace des gens sans changer qui est sous 6 pieds.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>dé, tailles, somme de pièces, ReLU</small></summary><div class="in">
+    <ol>
+      <li><b>Un dé.</b> F est un escalier de six marches de ⅙, en 1, 2, …, 6. Pas de densité du tout : toute la masse est ponctuelle.</li>
+      <li><b>Les tailles déclarées</b> (modèle) : P(70,5 ≤ H &lt; 72) = 0,150 ; la moitié s'arrondit, masse 0,075 en 72 ; F(72<sup>−</sup>) = 0,691 + 0,075 = 0,766 et F(72) = 0,841.</li>
+      <li><b>Une somme de pièces.</b> Pour n pièces à ±1, S<sub>n</sub> ne prend que les valeurs −n, −n + 2, …, n : sa fonction de répartition est un escalier, sans densité, pour tout n. Celle de la somme standardisée Z<sub>n</sub> = S<sub>n</sub>/√n, un escalier elle aussi, converge pourtant vers Φ, qui a une densité. Le TCL ne peut porter que sur F (figure 3, notion 6).</li>
+      <li><b>En ML : la ReLU.</b> Si la pré-activation suit N(0, 1), la sortie max(0, Z) vaut exactement 0 avec probabilité ½ : une masse en 0, plus une demi-cloche. F saute de 0 à ½ en 0. De même, un temps de réponse coupé par un délai d'expiration (timeout) de 30 s empile toutes les requêtes lentes à exactement 30 s.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>le saut est la masse, et une densité n'a pas de masse</small></summary><div class="in">
+    <div class="drv">
+      <div>F(<i>a</i>) − F(<i>a</i> − <i>h</i>) = P(<i>a</i> − <i>h</i> &lt; <i>X</i> ≤ <i>a</i>)</div><span>définition de F</span>
+      <div>→ P(<i>X</i> = <i>a</i>) quand <i>h</i> → 0</div><span>les intervalles ]a − h, a] se resserrent sur le point a</span>
+      <div>avec une densité : P(<i>X</i> = <i>a</i>) = ∫<sub><i>a</i></sub><sup><i>a</i></sup> <i>f</i>(<i>u</i>) d<i>u</i> = 0</div><span>une intégrale sur un seul point est nulle</span>
+    </div>
+    <p>Une variable qui a une masse en a n'a donc pas de densité. Une densité « avec un pic » est ce que les physiciens appellent une fonction delta : un objet que la théorie de la mesure, celle de Lebesgue qui donne son titre à la vidéo, sait manier, mais qui n'est pas une fonction. Brunton ne fait que la nommer.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>200 000 tailles déclarées</small></summary><div class="in">
+<pre class="py">{{CODE:c4}}</pre>
+<pre class="out">{{OUT:c4}}</pre>
+    <p>La hauteur de la classe de 72 dépend de la largeur choisie, celle des autres non : le signe qu'il n'y a pas de densité en 72. Le saut de la fonction de répartition, lui, ne dépend d'aucun choix.</p>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>En Europe, un pic à 1,80 m ?</b> Le mécanisme est général : dans toute donnée auto-déclarée, les réponses s'entassent sur des valeurs rondes (en anglais heaping, ou digit preference). Aucun chiffre n'est vérifié ici pour un pic à 1,80 m précisément. Deux faits mesurés. En Suisse, dans les enquêtes sur la santé de 1992 à 2002 (47 192 personnes), les francophones et les italophones déclarent plus souvent une taille finissant par 0 ou 5, les germanophones un chiffre pair autre que 0, soit 2, 4, 6 ou 8 (Faeh et Bopp, BMC Public Health, 2008). En France, l'Étude nationale nutrition santé trouve une taille déclarée supérieure de 0,79 cm en moyenne à la taille mesurée (629 adultes ; BEH 2010, n° 8). 1,80 m finit par 0 : un candidat naturel au pic, à vérifier sur des données.</li>
+      <li><b>Un histogramme, ou une densité estimée par lissage, étale le pic.</b> Selon la largeur, il disparaît (w = 2) ou devient une bosse : l'estimateur suppose une densité qui n'existe pas.</li>
+      <li><b>P(X = a) = 0 pour une variable à densité.</b> P(taille vraie = 180 cm exactement) = 0 ; P(taille déclarée = 180 cm) ne l'est pas.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (39) écrit F(x) = ∫<sub>−∞</sub><sup>x</sup> f(x) dx, la même lettre pour la borne et pour la variable d'intégration : on écrit ∫<sub>−∞</sub><sup>x</sup> f(u) du. Il appelle la fonction de répartition normale « la fonction d'erreur » : c'est Φ(x) = ½[1 + erf(x/√2)], une parente, pas la même fonction.</div>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (39) annonce qu'on prouvera le TCL en montrant que « les moments de la somme convergent vers ceux d'une gaussienne ». La preuve de 44 montre que les fonctions génératrices convergent, et la conclusion porte sur les fonctions de répartition : c'est la convergence en loi, qu'il ne nomme pas.</div>
+  </div></details>
+  <p class="garde">Une masse ponctuelle n'a pas de densité ; la fonction de répartition la montre par un saut égal à cette masse. C'est pourquoi l'unicité de M et le TCL portent sur F.</p>
+</section>
+

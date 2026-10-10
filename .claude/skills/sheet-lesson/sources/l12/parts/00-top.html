@@ -1,0 +1,47 @@
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 12</div>
+  <h1>Fonction génératrice et <span>preuve du TCL</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Brunton termine sa playlist par une démonstration : la somme de variables indépendantes, une fois standardisée, devient normale. Pour y arriver, il construit un outil, la <b>fonction génératrice des moments</b>, qu'il appelle l'empreinte d'une loi. La leçon suit Brunton 37 à 40 et 44, avec ses exemples : Poisson et les ampoules, la normale, l'exponentielle, les tailles déclarées à 6 pieds, des pièces. Toutes les notions sont de culture : elles éclairent le TCL, elles ne donnent pas de cartes.</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="lesson-00-08-esperance-variance.html">l08 · Espérance et variance</a></li>
+    <li><a href="lesson-00-11-tcl.html">l11 · Théorème central limite</a></li>
+  </ol>
+  <h4>Lois utilisées</h4>
+  <ol>
+    <li><a href="lesson-00-05-poisson-exponentielle-attentes.html#n1">Poisson (l05)</a></li>
+    <li><a href="lesson-00-05-poisson-exponentielle-attentes.html#n3">Exponentielle (l05)</a></li>
+    <li><a href="lesson-00-04-variables-binomiale-normale.html#n6">Normale centrée réduite (l04)</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::mgf</code></div>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>L'espérance d'une fonction (LOTUS).</b> E[g(X)] = Σ g(x) P(X = x), ou ∫ g(x) f(x) dx, sans chercher la loi de g(X) (<a href="lesson-00-08-esperance-variance.html#n5">l08, notion 5</a>). Ici, g(x) = e<sup>tx</sup>.</li>
+      <li><b>Les moments.</b> E[X<sup>k</sup>] est le moment brut d'ordre k ; Var(X) = E[X²] − E[X]² (<a href="lesson-00-08-esperance-variance.html#n6">l08, notion 6</a>) ; l'asymétrie et la kurtosis sont des moments centrés et réduits (<a href="lesson-00-08-esperance-variance.html#n7">l08, notion 7</a>).</li>
+      <li><b>L'espérance d'un produit.</b> Si X et Y sont indépendantes, E[g(X) h(Y)] = E[g(X)] E[h(Y)] (<a href="lesson-00-08-esperance-variance.html#n4">l08, notion 4</a>).</li>
+      <li><b>L'énoncé du TCL.</b> X<sub>i</sub> i.i.d., de moyenne μ et de variance σ² finie : P((X̄<sub>n</sub> − μ)/(σ/√n) ≤ x) → Φ(x) (<a href="lesson-00-11-tcl.html#n1">l11, notion 1</a>). Cette leçon le démontre.</li>
+      <li><b>Trois lois.</b> Poisson(λ) : P(X = k) = λ<sup>k</sup> e<sup>−λ</sup>/k! (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n1">l05, notion 1</a>) ; exponentielle(λ) : densité λ e<sup>−λx</sup> pour x ≥ 0 (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n3">l05, notion 3</a>) ; normale centrée réduite : densité φ(x) = e<sup>−x²/2</sup>/√(2π) et fonction de répartition Φ (<a href="lesson-00-04-variables-binomiale-normale.html#n6">l04</a>).</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">
+

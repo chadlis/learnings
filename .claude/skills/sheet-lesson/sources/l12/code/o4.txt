@@ -1,0 +1,6 @@
+share reporting exactly 72 in: 0.0749
+bin width   2: bar at 72 = 0.094   tallest other = 0.124
+bin width   1: bar at 72 = 0.133   tallest other = 0.134
+bin width 0.5: bar at 72 = 0.210   tallest other = 0.134
+bin width 0.1: bar at 72 = 0.811   tallest other = 0.137
+F(71.999) = 0.7668   F(72) = 0.8417   jump = 0.0749

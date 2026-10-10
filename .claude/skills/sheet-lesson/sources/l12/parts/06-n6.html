@@ -1,0 +1,71 @@
+<!-- ============================ n6 ============================ -->
+<section class="notion culture" id="n6">
+  <h3>La preuve du TCL en six étapes, avec ses trous <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 44 · Proof of the Central Limit Theorem</p>
+  <div class="idee">
+    <p>La preuve de Brunton enchaîne tout ce qui précède. Les X<sub>i</sub> sont i.i.d., de moyenne 0 et de variance σ², et Z<sub>n</sub> = S<sub>n</sub>/(σ√n) est leur somme standardisée. Il suffit de montrer que M<sub>Z<sub>n</sub></sub>(t) tend vers e<sup>t²/2</sup>, la fonction génératrice de N(0, 1).</p>
+    <p>Le cœur tient en une ligne. Le produit (notion 5) donne M<sub>Z<sub>n</sub></sub>(t) = M(t/(σ√n))<sup>n</sup>. Près de 0, M(u) ≈ 1 + σ²u²/2 (notion 2 : moyenne 0, E[X²] = σ²). Donc M<sub>Z<sub>n</sub></sub>(t) ≈ (1 + t²/(2n))<sup>n</sup> → e<sup>t²/2</sup>. Les moments au-delà du deuxième disparaissent dans la limite : c'est pour ça que la loi de départ ne compte pas.</p>
+    <p>Pour pile ou face à ±1 (σ = 1), M = cosh, et M<sub>Z<sub>n</sub></sub>(1) = cosh(1/√n)<sup>n</sup> vaut 1,543 pour n = 1, 1,635 pour n = 10, 1,647 pour n = 100, contre e<sup>0,5</sup> = 1,649. La preuve dépliable donne les six étapes, et quatre trous.</p>
+  </div>
+  <div class="fig vis" id="v6">
+    <div class="lbl">Voir l'idée — M<sub>Z<sub>n</sub></sub> se rapproche de e<sup>t²/2</sup></div>
+    <div id="v6ctl" class="sl-ctl"></div><div id="v6sl"></div>
+    <div id="v6plot" class="wide"></div>
+    <div class="readouts" id="v6out"></div>
+    <p class="cap">En rouge la cible e<sup>t²/2</sup>, en bleu M<sub>Z<sub>n</sub></sub>(t) = M(t/√n)<sup>n</sup>. <b>Pile ou face à ±1</b> : à n = 1 la courbe est cosh t, déjà proche près de 0 ; monte <b>n</b> : en t = 1, elle passe de 1,543 à 1,635 (n = 10), puis 1,647 (n = 100), contre 1,649. <b>Exponentielle centrée</b>, Exp(1) − 1, asymétrique : à n = 1 elle n'existe que pour t &lt; 1 et devient infinie au trait vertical t = √n ; ce domaine s'élargit comme √n, et l'approche est plus lente, 1,895 à n = 10 et 1,709 à n = 100.</p>
+  </div>
+  <div class="formule"><div class="lbl">Le théorème démontré</div>
+    <div class="eq"><i>X<sub>i</sub></i> i.i.d., E[<i>X<sub>i</sub></i>] = 0, Var(<i>X<sub>i</sub></i>) = σ² ∈ ]0, ∞[ &nbsp;⇒&nbsp; P(<i>S<sub>n</sub></i>/(σ√<i>n</i>) ≤ <i>x</i>) → Φ(<i>x</i>) pour tout <i>x</i></div>
+    <ul><li>Indépendance : le produit, étape 2. Même loi : la puissance n.</li><li>Moyenne 0 : le terme en t disparaît, étape 3. Si E[X<sub>i</sub>] = μ, on applique la preuve à X<sub>i</sub> − μ : Z<sub>n</sub> = (S<sub>n</sub> − nμ)/(σ√n) = (X̄<sub>n</sub> − μ)/(σ/√n), l'énoncé de <a href="lesson-00-11-tcl.html#n1">l11, notion 1</a>.</li><li>Variance finie : le terme en t² existe et ne dépend que de σ².</li><li>Hypothèse en plus, propre à cette preuve : M finie près de 0. Le théorème est vrai sans elle (où ça casse).</li><li>La conclusion porte sur les fonctions de répartition (notion 4) : une convergence en loi.</li></ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — la conclusion porte sur F : l'escalier de Z<sub>n</sub> épouse Φ</div>
+    <div id="f3ctl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">La fonction de répartition de Z<sub>n</sub> = S<sub>n</sub>/√n pour n pièces à ±1 (escalier bleu) et Φ (rouge). Z<sub>n</sub> est discrète : elle n'a pas de densité, quel que soit n. Monte <b>n</b> : les marches rétrécissent, et le plus grand écart vertical entre l'escalier et Φ tombe de 0,341 (n = 1) à 0,123 (n = 10), 0,040 (n = 100) et 0,020 (n = 400), à peu près 0,4/√n. C'est cette convergence que démontre la preuve, une fois complétée par le théorème de continuité.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>la preuve en chiffres, pourquoi √n, une loi asymétrique, μ ≠ 0</small></summary><div class="in">
+    <ol>
+      <li><b>Pile ou face à ±1, en chiffres.</b> M = cosh, σ = 1. À t = 1, l'étape 6 sans ε<sub>n</sub>, (1 + 0,5/n)<sup>n</sup>, vaut 1,629 pour n = 10 et 1,647 pour n = 100 ; la vraie M<sub>Z<sub>n</sub></sub>(1) vaut 1,635 et 1,647 : le terme négligé ε<sub>n</sub> pèse de moins en moins.</li>
+      <li><b>Pourquoi diviser par √n.</b> Sans normalisation, M<sub>S<sub>n</sub></sub>(t) = cosh(t)<sup>n</sup> → ∞ pour tout t ≠ 0 : la somme s'étale sans limite. En divisant par n, c'est-à-dire pour la moyenne X̄<sub>n</sub>, cosh(t/n)<sup>n</sup> → 1, la fonction génératrice de la constante 0 : c'est la loi des grands nombres (<a href="lesson-00-10-inegalites-lgn.html#n4">l10, notion 4</a>). √n est la seule échelle où la limite n'est ni plate ni infinie.</li>
+      <li><b>Une loi asymétrique, l'exponentielle centrée.</b> Le terme négligé, n · ε<sub>n</sub>, vaut 0,160 à n = 10, 0,037 à n = 100, 0,011 à n = 1 000, à peu près t³/(3√n) pour n grand (0,160 contre 0,105 à n = 10) : il vient du troisième moment, et c'est l'asymétrie qui ralentit la convergence (<a href="lesson-00-11-tcl.html#n2">l11, notion 2</a>).</li>
+      <li><b>μ ≠ 0</b>, le devoir de Brunton : appliquer la preuve à Y<sub>i</sub> = X<sub>i</sub> − μ, de moyenne 0 et de variance σ². Rien d'autre ne change.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>les six étapes de Brunton, la règle de chacune, puis ses quatre trous</small></summary><div class="in">
+    <div class="drv">
+      <div>1. Montrer M<sub><i>Z<sub>n</sub></i></sub>(<i>t</i>) → e<sup><i>t</i>²/2</sup> pour tout <i>t</i> près de 0</div><span>e<sup>t²/2</sup> est la fonction génératrice de N(0, 1) (notion 3) ; conclure demandera un théorème de continuité (trou 1)</span>
+      <div>2. M<sub><i>S<sub>n</sub></i></sub>(<i>t</i>) = M(<i>t</i>)<sup><i>n</i></sup></div><span>produit (notion 5) : l'indépendance, puis la même loi</span>
+      <div>3. M(<i>u</i>) = 1 + 0 · <i>u</i> + σ²<i>u</i>²/2 + <i>r</i>(<i>u</i>), avec <i>r</i>(<i>u</i>)/<i>u</i>² → 0</div><span>Taylor en 0 (notion 2) : M(0) = 1, M′(0) = E[X] = 0, M″(0) = E[X²] = σ² (trou 2)</span>
+      <div>4. M<sub><i>Z<sub>n</sub></i></sub>(<i>t</i>) = M<sub><i>S<sub>n</sub></i></sub>(<i>t</i>/(σ√<i>n</i>)) = M(<i>t</i>/(σ√<i>n</i>))<sup><i>n</i></sup></div><span>changement d'échelle : M<sub>bY</sub>(t) = E[e<sup>(bt)Y</sup>] = M<sub>Y</sub>(bt), avec b = 1/(σ√n), puis l'étape 2</span>
+      <div>5. M(<i>t</i>/(σ√<i>n</i>)) = 1 + <i>t</i>²/(2<i>n</i>) + ε<sub><i>n</i></sub>, avec ε<sub><i>n</i></sub> = <i>r</i>(<i>t</i>/(σ√<i>n</i>))</div><span>substituer u = t/(σ√n) dans l'étape 3 ; les σ² se simplifient (trou 3)</span>
+      <div>6. M<sub><i>Z<sub>n</sub></i></sub>(<i>t</i>) = (1 + (<i>t</i>²/2 + <i>n</i>ε<sub><i>n</i></sub>)/<i>n</i>)<sup><i>n</i></sup> → e<sup><i>t</i>²/2</sup></div><span>(1 + a<sub>n</sub>/n)<sup>n</sup> → e<sup>a</sup> quand a<sub>n</sub> → a ; ici a<sub>n</sub> = t²/2 + nε<sub>n</sub> → t²/2 ; en passant au ln, n ln(1 + a<sub>n</sub>/n) = a<sub>n</sub> + O(a<sub>n</sub>²/n) → a</span>
+      <div>donc P(<i>Z<sub>n</sub></i> ≤ <i>x</i>) → Φ(<i>x</i>) ∎</div><span>théorème de continuité (trou 1)</span>
+    </div>
+    <p><b>Les quatre trous.</b></p>
+    <ol>
+      <li><b>Unicité au lieu de continuité.</b> L'unicité (notion 1) dit que deux lois de même M sont égales ; elle ne suffit pas ici, puisque M<sub>Z<sub>n</sub></sub> n'est jamais égale à e<sup>t²/2</sup>, elle s'en approche. Il faut un théorème de continuité : si M<sub>n</sub>(t) → M(t) sur un intervalle autour de 0, et M est la fonction génératrice d'une loi, alors les fonctions de répartition convergent, en tout point où la limite est continue (Curtiss, 1942). Ce théorème s'appuie sur l'unicité pour identifier la limite.</li>
+      <li><b>Le reste.</b> Écrire le reste « ε d'ordre t³ » suppose un troisième moment. C'est acquis ici, puisque M est finie près de 0. Avec seulement une variance finie (trou 4), on sait seulement que le reste est négligeable devant u², et cela suffit.</li>
+      <li><b>n · ε<sub>n</sub> → 0, pas seulement ε<sub>n</sub> → 0.</b> Dans (1 + t²/(2n) + ε<sub>n</sub>)<sup>n</sup>, un ε<sub>n</sub> de l'ordre de 1/n changerait la limite. Il ne suffit donc pas que ε<sub>n</sub> → 0, il faut savoir à quelle vitesse. C'est vrai ici : n · ε<sub>n</sub> = (t²/σ²) · r(u)/u², qui tend vers 0 avec u.</li>
+      <li><b>L'hypothèse ajoutée : M finie près de 0.</b> Elle exclut des lois de variance finie pour lesquelles le TCL est vrai, comme la loi de Student à 3 degrés de liberté. La preuve générale refait les mêmes six étapes avec la <b>fonction caractéristique</b> φ(t) = E[e<sup>itX</sup>], qui existe toujours : i² = −1, et e<sup>iθ</sup> = cos θ + i sin θ est un point du cercle de rayon 1, d'où |e<sup>itX</sup>| = 1 et une espérance toujours finie. Pour N(0, 1), φ(t) = M(it) = e<sup>−t²/2</sup>. On obtient φ<sub>Z<sub>n</sub></sub>(t) → e<sup>−t²/2</sup>, et le théorème de continuité de Lévy conclut. Seule la variance finie sert alors.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>M<sub>Z<sub>n</sub></sub>(1) vers e<sup>0,5</sup>, et le terme négligé</small></summary><div class="in">
+<pre class="py">{{CODE:c6}}</pre>
+<pre class="out">{{OUT:c6}}</pre>
+    <p>La pièce converge vite, l'exponentielle lentement, et n · ε<sub>n</sub> décroît comme 1/√n : à n = 100, il vaut 0,037, près de 1/(3√100) = 0,033.</p>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Pas de fonction génératrice : preuve inapplicable, TCL intact.</b> Student à 3 degrés de liberté : variance 3, M(t) = ∞ pour t ≠ 0. La somme standardisée devient normale quand même ; la preuve par la fonction caractéristique le montre.</li>
+      <li><b>Variance infinie : plus de TCL classique.</b> Pour une loi de Cauchy, φ(t) = e<sup>−|t|</sup> et φ(t/n)<sup>n</sup> = e<sup>−|t|</sup> : la moyenne de n variables de Cauchy est encore une Cauchy, quel que soit n (<a href="lesson-00-11-tcl.html#n4">l11, notion 4</a>).</li>
+      <li><b>Sans indépendance, l'étape 2 tombe.</b> M<sub>S<sub>n</sub></sub> n'est plus forcément M<sup>n</sup> (notion 5), et, s'il y a corrélation, la variance de la somme n'est plus nσ² (<a href="lesson-00-09-covariance-correlation.html#n2">l09, notion 2</a>).</li>
+      <li><b>Pour n fixé, c'est une approximation.</b> S<sub>n</sub> ≈ N(nμ, nσ²), en général pas « = » (exact seulement si les X<sub>i</sub> sont normales) ; pour des pièces, S<sub>n</sub> est discrète. La vitesse dépend de l'asymétrie (exemple 3).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (44) conclut : « la fonction génératrice identifie la loi de façon unique, donc même fonction génératrice, même loi ». Trois corrections. M<sub>Z<sub>n</sub></sub> n'atteint jamais e<sup>t²/2</sup>, elle s'en approche : il faut un théorème de continuité (Curtiss pour les fonctions génératrices, Lévy pour les fonctions caractéristiques), pas l'unicité. Pour le terme négligé, il dit qu'ε<sub>n</sub> tend vers 0 « assez vite pour être négligé », sans dire à quelle vitesse : il faut n · ε<sub>n</sub> → 0. Et la preuve suppose M finie près de 0, ce que le théorème n'exige pas.</div>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (44) dit que les deux lois auront « la même densité ». Une somme de pièces n'a pas de densité : la conclusion porte sur la fonction de répartition (notion 4), comme son propre énoncé avec Φ. Et ses formes « S<sub>n</sub> est normale N(0, nσ²) » (36, 44) sont des approximations pour n grand, exactes seulement si les X<sub>i</sub> sont normales.</div>
+  </div></details>
+  <p class="garde">M<sub>Z<sub>n</sub></sub>(t) = M(t/(σ√n))<sup>n</sup> = (1 + t²/(2n) + ε<sub>n</sub>)<sup>n</sup> → e<sup>t²/2</sup> : seules la moyenne et la variance survivent. La preuve demande en plus M finie près de 0, n · ε<sub>n</sub> → 0 et un théorème de continuité ; la fonction caractéristique E[e<sup>itX</sup>] lève la première hypothèse.</p>
+</section>
+

@@ -1,0 +1,63 @@
+<!-- ============================ n5 ============================ -->
+<section class="notion culture" id="n5">
+  <h3>Somme indépendante : produit des fonctions génératrices <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 40 · Additive Property of the Moment Generating Function</p>
+  <div class="idee">
+    <p>Brunton donne la propriété dont la preuve du TCL a besoin : si X et Y sont indépendantes, la fonction génératrice de X + Y est le produit des deux. Deux faits se combinent. L'exponentielle change une somme en produit, e<sup>t(x + y)</sup> = e<sup>tx</sup> e<sup>ty</sup> ; l'indépendance change l'espérance d'un produit en produit des espérances.</p>
+    <p>Deux pièces Bernoulli(½) : (½ + ½e<sup>t</sup>)² = ¼ + ½e<sup>t</sup> + ¼e<sup>2t</sup>. Le coefficient de e<sup>kt</sup> est P(X + Y = k) : ¼, ½, ¼. Deux dés : le produit développe 36 termes e<sup>t(x + y)</sup>/36, et ceux de même somme se regroupent. Six termes ont x + y = 7, donc P(S = 7) = 6/36.</p>
+    <p>Brunton fait le lien avec Laplace : en équations différentielles, la transformée change la convolution de deux signaux en produit. Ici, la loi d'une somme est la convolution des deux lois, pénible à calculer, et M la change en produit.</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — les 36 termes du produit, regroupés par x + y</div>
+    <div id="v5ctl" class="sl-ctl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">Le produit M<sub>X</sub>(t) · M<sub>Y</sub>(t) de deux dés développe 36 termes e<sup>t(x + y)</sup>/36, un par case (x, y) ; chaque case porte sa somme x + y. <b>Regroupe par x + y</b> : les cases de même somme forment une colonne, et la hauteur de la colonne est 36 × P(S = s), le triangle 1, 2, …, 6, …, 1. Puis <b>Y = X</b> : seules les six cases de la diagonale gardent une masse, ⅙ chacune, la somme ne prend que des valeurs paires, et le produit ne marche plus. En t = 0,2, M<sub>2X</sub>(0,2) vaut 5,07 au lieu de M<sub>X</sub>(0,2)² = 4,55.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>X</i>, <i>Y</i> indépendantes ⇒ M<sub><i>X</i>+<i>Y</i></sub>(<i>t</i>) = M<sub><i>X</i></sub>(<i>t</i>) · M<sub><i>Y</i></sub>(<i>t</i>) &nbsp;&nbsp;&nbsp; <i>S<sub>n</sub></i> = <i>X</i><sub>1</sub> + … + <i>X<sub>n</sub></i> i.i.d. ⇒ M<sub><i>S<sub>n</sub></i></sub>(<i>t</i>) = M(<i>t</i>)<sup><i>n</i></sup></div>
+    <ul><li>L'indépendance sert une seule fois, pour factoriser E[e<sup>tX</sup> e<sup>tY</sup>]. Les deux lois peuvent être différentes, Brunton y insiste.</li><li>La même loi ne sert qu'à écrire M<sub>X₁</sub>(t) ⋯ M<sub>Xₙ</sub>(t) = M(t)<sup>n</sup>.</li><li>L'égalité vaut pour tout t où M<sub>X</sub> et M<sub>Y</sub> sont finies.</li><li>Avec l'unicité (notion 1), reconnaître le produit, c'est reconnaître la loi de la somme.</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>pièces, binomiale, flux de requêtes, normales, cumulants</small></summary><div class="in">
+    <ol>
+      <li><b>Deux pièces</b> : ¼, ½, ¼, la binomiale(2, ½).</li>
+      <li><b>n pièces</b> Bernoulli(p) : (1 − p + p e<sup>t</sup>)<sup>n</sup> = Σ<sub>k</sub> C(n, k) p<sup>k</sup> (1 − p)<sup>n − k</sup> e<sup>kt</sup>, par le binôme de Newton (<a href="lesson-00-02-espace-axiomes-complement.html#n6">l02</a>). Le coefficient de e<sup>kt</sup> est la loi binomiale (<a href="lesson-00-04-variables-binomiale-normale.html#n4">l04</a>).</li>
+      <li><b>Deux Poisson indépendantes</b> : e<sup>λ₁(e<sup>t</sup> − 1)</sup> · e<sup>λ₂(e<sup>t</sup> − 1)</sup> = e<sup>(λ₁ + λ₂)(e<sup>t</sup> − 1)</sup>, la fonction génératrice de Poisson(λ₁ + λ₂). En ML : deux services envoient des requêtes à la même API, 2 et 3 par seconde en moyenne, indépendamment. Le flux fusionné est Poisson(5) : P(aucune requête dans une seconde) = e<sup>−5</sup> = 0,0067 (code). C'est la superposition des processus de Poisson (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n6">l05, notion 6</a>).</li>
+      <li><b>Deux normales indépendantes</b> : e<sup>μ₁t + σ₁²t²/2</sup> · e<sup>μ₂t + σ₂²t²/2</sup> = e<sup>(μ₁ + μ₂)t + (σ₁² + σ₂²)t²/2</sup>. La somme est N(μ₁ + μ₂, σ₁² + σ₂²).</li>
+      <li><b>Avec le logarithme</b>, le produit devient une somme : ln M<sub>X+Y</sub> = ln M<sub>X</sub> + ln M<sub>Y</sub>. Les dérivées de ln M en 0, les cumulants (notion 2), s'additionnent donc. Le premier est la moyenne, le deuxième la variance, le troisième le moment centré d'ordre 3 : pour une somme de pertes indépendantes, ces trois-là s'additionnent. D'où Var(X + Y) = Var X + Var Y sous indépendance (<a href="lesson-00-09-covariance-correlation.html#n2">l09, notion 2</a>).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>l'exponentielle, puis l'indépendance</small></summary><div class="in">
+    <div class="drv">
+      <div>M<sub><i>X</i>+<i>Y</i></sub>(<i>t</i>) = E[e<sup><i>t</i>(<i>X</i>+<i>Y</i>)</sup>]</div><span>définition</span>
+      <div>= E[e<sup><i>tX</i></sup> · e<sup><i>tY</i></sup>]</div><span>e<sup>a + b</sup> = e<sup>a</sup> e<sup>b</sup></span>
+      <div>= E[e<sup><i>tX</i></sup>] · E[e<sup><i>tY</i></sup>]</div><span>X et Y indépendantes, donc e<sup>tX</sup> et e<sup>tY</sup> aussi (fonctions de variables indépendantes), et E[UV] = E[U] E[V] (<a href="lesson-00-08-esperance-variance.html#n4">l08, notion 4</a>) : l'hypothèse sert ici</span>
+      <div>= M<sub><i>X</i></sub>(<i>t</i>) · M<sub><i>Y</i></sub>(<i>t</i>)</div><span>définition</span>
+    </div>
+    <p>La version « soigneuse » que Brunton évoque sans l'écrire, en discret :</p>
+    <div class="drv">
+      <div>Σ<sub><i>x</i></sub> Σ<sub><i>y</i></sub> e<sup><i>t</i>(<i>x</i>+<i>y</i>)</sup> P(<i>X</i> = <i>x</i>, <i>Y</i> = <i>y</i>)</div><span>LOTUS sur le couple</span>
+      <div>= Σ<sub><i>x</i></sub> Σ<sub><i>y</i></sub> e<sup><i>tx</i></sup> P(<i>X</i> = <i>x</i>) · e<sup><i>ty</i></sup> P(<i>Y</i> = <i>y</i>)</div><span>la loi jointe se factorise (<a href="lesson-00-07-lois-jointes.html#n4">l07, notion 4</a>)</span>
+      <div>= (Σ<sub><i>x</i></sub> e<sup><i>tx</i></sup> P(<i>X</i> = <i>x</i>)) · (Σ<sub><i>y</i></sub> e<sup><i>ty</i></sup> P(<i>Y</i> = <i>y</i>))</div><span>une double somme d'un produit se coupe en produit de sommes</span>
+    </div>
+    <p>Pour n variables, on recommence : M<sub>S<sub>n</sub></sub> = M<sub>S<sub>n−1</sub></sub> · M<sub>X<sub>n</sub></sub>, puisque X<sub>n</sub> est indépendante de S<sub>n−1</sub> : il faut l'indépendance mutuelle, deux à deux ne suffit pas (<a href="lesson-00-03-conditionner-bayes-independance.html#n9">l03, notion 9</a>). X et Y à ±1, indépendantes, et Z = XY sont indépendantes deux à deux, et pourtant M<sub>X+Y+Z</sub>(1) = 5,30 contre cosh(1)³ = 3,67.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>deux flux de requêtes fusionnés</small></summary><div class="in">
+<pre class="py">{{CODE:c5}}</pre>
+<pre class="out">{{OUT:c5}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Sans indépendance, le produit peut être faux.</b> Y = X : M<sub>2X</sub>(t) = M<sub>X</sub>(2t). Pour deux dés à t = 0,2 : 5,07 contre M<sub>X</sub>(0,2)² = 4,55.</li>
+      <li><b>La réciproque est fausse.</b> M<sub>X+Y</sub> = M<sub>X</sub> M<sub>Y</sub> n'implique pas l'indépendance. X et Y à valeurs dans {0, 1, 2}, de loi jointe, en dix-huitièmes :
+        <table><tr><th></th><th>y = 0</th><th>y = 1</th><th>y = 2</th></tr><tr><th>x = 0</th><td>2</td><td>3</td><td>1</td></tr><tr><th>x = 1</th><td>1</td><td>2</td><td>3</td></tr><tr><th>x = 2</th><td>3</td><td>1</td><td>2</td></tr></table>
+        Les marges sont uniformes, et la loi de X + Y est 1, 2, 3, 2, 1 neuvièmes, exactement comme sous indépendance : M<sub>X+Y</sub> = M<sub>X</sub> M<sub>Y</sub>. Pourtant P(X = 0, Y = 1) = 3/18 = 1/6 ≠ 1/9. Le produit est une conséquence de l'indépendance, pas un test.</li>
+      <li><b>La famille ne se conserve pas toujours.</b> Deux exponentielles(λ) indépendantes donnent (λ/(λ − t))², qui n'est pas de la forme λ′/(λ′ − t) : la somme suit une loi Gamma(2, λ) (<a href="lesson-00-05-poisson-exponentielle-attentes.html#n7">l05, notion 7</a>), pas une exponentielle.</li>
+      <li><b>Une somme n'est pas un mélange.</b> « X avec probabilité ½, Y sinon » a pour fonction génératrice ½M<sub>X</sub> + ½M<sub>Y</sub>, pas le produit. Les tailles de la notion 4, cloche plus pile, sont un mélange.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (40) compare aux fonctions de transfert : « si on additionne des blocs, la fonction de transfert est le produit ». Ce sont les blocs en série dont les fonctions de transfert se multiplient ; en parallèle, elles s'additionnent. Le fait sous-jacent, qu'il ne dit pas : la densité de X + Y est la convolution f<sub>X</sub> * f<sub>Y</sub>, et la transformée change une convolution en produit.</div>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (40) écrit M<sub>S<sub>n</sub></sub>(t) = M<sub>X</sub>(t)<sup>n</sup> pour « un ensemble de variables » indépendantes. La puissance n demande en plus qu'elles aient la même loi : il le dit en ouvrant la vidéo (« identical independent »), mais ne le rappelle pas au moment d'écrire la puissance.</div>
+  </div></details>
+  <p class="garde">X et Y indépendantes : M<sub>X+Y</sub> = M<sub>X</sub> · M<sub>Y</sub> ; i.i.d. : M<sub>S<sub>n</sub></sub> = M<sup>n</sup>. L'exponentielle change la somme en produit, l'indépendance factorise l'espérance ; la réciproque est fausse.</p>
+</section>
+
