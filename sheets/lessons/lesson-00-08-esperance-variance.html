@@ -1,0 +1,1087 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Espérance et variance — leçon</title>
+<meta name="sheet" content="series=lesson;part=00;number=08;status=v1">
+<meta name="part" content="00 · Socle probabiliste">
+<meta name="subtitle" content="socle — Brunton 28 à 32 et 43 : centre de masse, linéarité sans hypothèse, inertie autour du centre">
+<meta name="prereq" content="l04,l05,l07">
+<meta name="anki" content="stats::esperance,stats::mediane,stats::lotus,stats::variance,stats::moments">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- série `coding` : squelette annoté et ruban de SL.trace (inerte hors coding) ---- */
+.skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.skel b{color:var(--pen);font-weight:600}
+.step .card.full,.step .card.casse{grid-column:1 / -1}
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .wide table{min-width:520px}
+.card .wide th:nth-child(2),.card .wide td:nth-child(2),
+.card .wide th:nth-child(3),.card .wide td:nth-child(3){text-align:left}
+.readouts .c1 b{color:var(--pen)}.readouts .c3 b{color:var(--red)}
+.sl-trace{--cw:58px;--cgap:8px;margin:4px 0 2px}
+.sl-cells{display:flex;gap:var(--cgap)}
+.sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
+.sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
+.sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.dim{background:rgba(34,48,43,.07);border-color:rgba(34,48,43,.18);border-style:dashed}
+.sl-cell.dim b,.sl-cell.dim i{color:var(--cardmuted);opacity:.5}
+.sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
+.sl-cell.win{border-color:var(--green);border-width:2.5px}
+.sl-ptrs{position:relative;height:20px;margin-top:5px}
+.sl-ptr{position:absolute;top:0;left:calc(var(--i) * (var(--cw) + var(--cgap)));width:var(--cw);text-align:center;font:600 12px var(--sans);color:var(--pen)}
+.sl-note{font-size:14px;color:var(--cardink);margin-top:10px}
+.sl-inv{font:12.5px/1.55 var(--mono);color:var(--cardmuted);margin-top:6px;border-left:2px solid #B7791F;padding-left:10px}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ===== série `lesson` : le cours autoporteur du socle (10/10/2026) ===== */
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px;color:var(--muted);margin:10px 0 0}
+.legend .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-right:6px}
+.lecon{counter-reset:notion}
+.notion{padding:22px 0 28px;border-top:1.5px dashed var(--line);max-width:900px}
+.notion h3{position:relative;padding-left:44px;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.3;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:2px}
+.notion h3::before{counter-increment:notion;content:counter(notion);position:absolute;left:0;top:-1px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle;text-shadow:none}
+.tag.outil{color:var(--mint)}.tag.culture{color:var(--violet)}
+.src{font-size:12.5px;color:var(--faint);margin:0 0 10px 44px}
+.idee{margin-left:44px;color:var(--chalk);font-size:16px;line-height:1.62;max-width:72ch}
+.idee p{margin:7px 0}
+.idee b{color:var(--yellow);font-weight:600}
+.formule{margin:12px 0 10px 44px;background:var(--card);color:var(--cardink);border-radius:3px;padding:12px 18px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--yellow)}
+.formule .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:4px}
+.formule .eq{font-size:17.5px}
+.formule ul{padding-left:18px;margin-top:6px}.formule li{font-size:14.5px;margin:3px 0;color:var(--cardmuted)}
+.notion .fig{margin-left:44px}
+details{margin:8px 0 0 44px;background:var(--card);color:var(--cardink);border-radius:3px;border-left:4px solid var(--ac,var(--yellow));box-shadow:0 10px 20px -16px rgba(0,0,0,.6)}
+details>summary{cursor:pointer;list-style:none;padding:9px 14px;font:600 13px var(--sans);letter-spacing:.03em;color:var(--cardink)}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸";display:inline-block;width:16px;color:var(--cardmuted)}
+details[open]>summary::before{content:"▾"}
+details>summary small{font-weight:400;color:var(--cardmuted);margin-left:6px;letter-spacing:0}
+details .in{padding:2px 18px 14px}
+details .in p,details .in li{font-size:15px;line-height:1.55;margin:5px 0}
+details .in ol,details .in ul{padding-left:20px}
+details.ex{--ac:var(--teal)}details.preuve{--ac:var(--violet)}details.code{--ac:var(--blue)}details.casse{--ac:var(--pink)}details.loin{--ac:var(--faint)}
+.drv{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:4px 16px;margin:8px 0;align-items:baseline}
+.drv>div{font-family:var(--math);font-size:16px;line-height:1.6}
+.drv>span{font-size:13.5px;color:var(--cardmuted);border-left:2px solid var(--cardline);padding-left:10px}
+@media(max-width:700px){.drv{grid-template-columns:minmax(0,1fr)}.drv>span{margin-bottom:6px}}
+pre.py,pre.out,pre.tri{font:13px/1.6 var(--mono);background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:pre}
+pre.out{background:transparent;border:1px dashed var(--cardline);color:var(--cardmuted)}
+pre.out::before{content:"sortie\A";font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.brunton{margin:10px 0 4px;padding:8px 12px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft);font-size:14.5px}
+.brunton b{display:block;font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:2px}
+.garde{margin:14px 0 0 44px;font-family:var(--serif);font-size:16.5px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--yellow);padding:4px 0 4px 14px;max-width:72ch}
+.garde::before{content:"Ce qu'on garde";display:block;font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);text-shadow:none;margin-bottom:2px}
+.notion.culture .garde{border-left-color:var(--violet)}
+.notion table{background:var(--cardsoft);border-radius:3px}
+.sl-fulcrum{fill:var(--red)}.sl-bar2{fill:var(--red);opacity:.55}.sl-bar3{fill:var(--pen);opacity:.6}
+@media(max-width:600px){.idee,.formule,details,.garde,.src,.notion .fig{margin-left:0}.notion h3{font-size:19px}}
+.sl-seg.sl-c1{stroke:var(--pen);stroke-width:2}.sl-seg.sl-c2{stroke:#6B46C1;stroke-width:2}.sl-seg.sl-c3{stroke:var(--red);stroke-width:2}.sl-seg.sl-c4{stroke:#1F5FA8;stroke-width:2}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 8</div>
+  <h1>Espérance et <span>variance</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Une loi entière, c'est trop d'information. On la résume par deux nombres : son <b>centre de masse</b>, l'espérance, et son <b>inertie autour de ce centre</b>, la variance. La leçon suit Brunton 28 à 32 et 43, avec ses exemples : cent pièces, le patrimoine des ménages, l'attente entre deux mails, un gaz. Un dé sert aux calculs à la main.</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="../../map.html#l04">l04 · Variables aléatoires</a></li>
+    <li><a href="../../map.html#l05">l05 · Événements rares et attentes</a></li>
+    <li><a href="../../map.html#l07">l07 · Lois jointes</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::esperance</code><code>stats::mediane</code><code>stats::lotus</code><code>stats::variance</code><code>stats::moments</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-04-variance-moyenne-correlee.html">Variance d'une moyenne corrélée</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>Variable aléatoire et loi.</b> X attache un nombre à chaque issue du tirage. Sa loi donne P(X = x) pour une variable discrète, une densité f pour une variable continue (<a href="../../map.html#l04">l04</a>).</li>
+      <li><b>Loi jointe, marginale, indépendance.</b> P(X = x, Y = y) décrit le couple. Sommer sur y redonne P(X = x). X et Y sont indépendantes quand la jointe est le produit des deux lois (<a href="../../map.html#l07">l07</a>).</li>
+      <li><b>Loi exponentielle.</b> L'attente T d'un flux de taux λ a la densité λ e<sup>−λt</sup> pour t ≥ 0 (<a href="../../map.html#l05">l05</a>).</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">
+
+<!-- ============================ n1 ============================ -->
+<section class="notion outil" id="n1">
+  <h3>L'espérance est le centre de masse <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 28 · The Expected Value (Mean) of a Probability Distribution</p>
+  <div class="idee">
+    <p>Brunton part d'une question pratique : si je tire beaucoup de valeurs de cette loi et que je fais leur moyenne, quel nombre est-ce que j'attends ? Ce nombre est l'<b>espérance</b>.</p>
+    <p>L'image physique la rend immédiate. Pose sur une règle une masse P(X = x) à chaque position x ; la masse totale vaut 1. L'espérance est le point où la règle tient en équilibre sur un doigt. Une valeur lointaine pèse davantage parce qu'elle a un plus grand bras de levier : c'est pour ça qu'on multiplie chaque valeur par sa probabilité avant d'additionner.</p>
+    <p>La règle tient en c quand les bras de levier de gauche et de droite se compensent : Σ (x − c) P(X = x) = 0. Développe : Σ x P(X = x) − c = 0, puisque les probabilités somment à 1. Donc <b>c = Σ x P(X = x)</b>, et c'est la définition.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">E[<i>X</i>] = Σ<sub><i>x</i></sub> <i>x</i> · P(<i>X</i> = <i>x</i>) &nbsp;&nbsp;(discret) &nbsp;&nbsp;&nbsp; E[<i>X</i>] = ∫ <i>x</i> <i>f</i>(<i>x</i>) d<i>x</i> &nbsp;&nbsp;(continu)</div>
+    <ul><li>La somme ou l'intégrale doit converger <b>absolument</b> : Σ |x| P(X = x) &lt; ∞. Sinon l'espérance n'existe pas.</li><li>On la note aussi μ, ou μ<sub><i>X</i></sub> quand il y a plusieurs variables.</li></ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — un dé pipé en équilibre sur son espérance</div>
+    <div id="f1plot" class="wide"></div>
+    <div id="f1ctl"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Monte le <b>poids du 6</b> : la masse glisse vers la droite et le point d'appui rouge suit. À 1/6 le dé est équilibré et le point d'appui est en 3,5, entre deux faces. Le triangle est le doigt qui tient la règle.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>pièce, dé, cent pièces, uniforme</small></summary><div class="in">
+    <ol>
+      <li><b>Une pièce.</b> X = 1 si pile, 0 sinon, P(X = 1) = p. E[X] = 0 × (1 − p) + 1 × p = p.</li>
+      <li><b>Un dé équilibré.</b> E[X] = (1 + 2 + 3 + 4 + 5 + 6)/6 = 21/6 = 3,5. Le centre de masse n'est pas une face : on ne tirera jamais 3,5.</li>
+      <li><b>Cent pièces</b> (l'exemple de Brunton). X = nombre de piles. Avec les probabilités du triangle de Pascal, Σ k · C(100, k)/2<sup>100</sup> = 50. La notion 3 l'obtient en une ligne.</li>
+      <li><b>Continu, uniforme sur [0, 1].</b> La densité vaut 1 sur l'intervalle : E[X] = ∫<sub>0</sub><sup>1</sup> x dx = ½.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Pourquoi la moyenne des tirages tend vers E[X] <small>l'argument, la preuve est en l10</small></summary><div class="in">
+    <p>Tire N valeurs. La valeur x sort à peu près N · P(X = x) fois, si N est grand. La moyenne des tirages vaut alors :</p>
+    <div class="drv">
+      <div>(1/N) Σ<sub>tirages</sub> valeur</div><span>la moyenne qu'on calcule</span>
+      <div>≈ (1/N) Σ<sub><i>x</i></sub> <i>x</i> · N P(<i>X</i> = <i>x</i>)</div><span>on regroupe les tirages par valeur</span>
+      <div>= Σ<sub><i>x</i></sub> <i>x</i> P(<i>X</i> = <i>x</i>) = E[<i>X</i>]</div><span>les N se simplifient</span>
+    </div>
+    <p>Le « à peu près » est exactement ce que la loi des grands nombres rend précis (<a href="../../map.html#l10">l10</a>).</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>la moyenne de 100 000 lancers</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(0)
+rolls = rng.integers(1, 7, size=100_000)    # 100,000 fair die rolls
+print(f"mean of rolls: {rolls.mean():.3f}")  # close to E[X] = 3.5
+
+heads = rng.integers(0, 2, size=(10_000, 100)).sum(axis=1)  # 10,000 runs of 100 coins
+print(f"mean number of heads: {heads.mean():.2f}")           # close to 50</pre>
+<pre class="out">mean of rolls: 3.498
+mean number of heads: 50.02</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>E[X] n'est pas forcément une valeur possible.</b> 3,5 pour un dé, 0,3 pour une pièce de biais 0,3.</li>
+      <li><b>Elle peut ne pas exister.</b> Pour une loi de Cauchy, les queues sont si lourdes que ∫ |x| f(x) dx diverge. La symétrie ferait croire à une moyenne nulle, puisque ∫ de −a à a de x f(x) dx vaut 0 ; mais une moyenne d'échantillon ne s'y stabilise jamais (<a href="../../map.html#l10">l10</a>).</li>
+      <li><b>E[X] est un nombre fixe, pas une variable aléatoire.</b> C'est une propriété de la loi. La moyenne de dix lancers, elle, change à chaque série : c'est une réalisation x̄ de la variable X̄ (<a href="../../map.html#l10">l10</a>). Écrire « μ = 3,2 » pour « x̄ = 3,2 sur ce tirage » mélange les deux.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (28) dit que l'espérance, premier moment, est « un peu comme le moment d'inertie ». C'est le centre de masse ; le moment d'inertie autour du centre correspond à la variance (notion 6).</div>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (28) dit aussi que « la variance autour de μ se réduit » quand on tire plus de valeurs. Ce qui se réduit, c'est la variance de la moyenne X̄ des tirages ; celle de X ne bouge pas, c'est une propriété de la loi (<a href="../../map.html#l10">l10</a>).</div>
+  </div></details>
+  <p class="garde">E[X] = Σ x · P(X = x) : le point d'équilibre de la loi. C'est un nombre, pas une variable aléatoire.</p>
+</section>
+
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>Moyenne, médiane, mode : trois centres <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 28</p>
+  <div class="idee">
+    <p>Le centre de masse n'est pas le seul centre. La <b>médiane</b> coupe la masse en deux moitiés ; le <b>mode</b> est l'endroit où la masse est la plus haute. Pour une gaussienne les trois coïncident, et c'est ce qui donne la fausse intuition que « la moyenne, c'est la valeur typique ».</p>
+    <p>Brunton prend deux contre-exemples. Une loi à deux bosses symétriques a son centre de masse au milieu, là où il n'y a presque rien. Le patrimoine des ménages américains, lui, a quelques fortunes immenses très loin à droite : elles tirent le point d'équilibre bien au-delà du ménage typique, alors que la médiane ne bouge presque pas.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les définitions</div>
+    <div class="eq">médiane <i>m</i> : F(<i>m</i>) = ½ &nbsp;&nbsp;&nbsp;&nbsp; mode : la valeur où P(<i>X</i> = <i>x</i>) ou <i>f</i>(<i>x</i>) est maximale</div>
+    <ul><li>F est la fonction de répartition, F(x) = P(X ≤ x).</li><li>Cas général, discret compris : m est médiane si P(X ≤ m) ≥ ½ et P(X ≥ m) ≥ ½.</li></ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — une loi asymétrique écarte ses trois centres</div>
+    <div id="f2plot" class="wide"></div>
+    <div id="f2ctl"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Une log-normale, l'axe des x en multiples de la médiane. Augmente <b>σ</b>, l'écart-type de ln X, qui règle l'asymétrie : la médiane reste en 1, le mode recule et finit collé à 0, la moyenne part à droite. Vers σ = 1,79, la moyenne vaut <b>5 fois</b> la médiane, le rapport du patrimoine américain que cite Brunton.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>dé, deux bosses, attente, patrimoine</small></summary><div class="in">
+    <ol>
+      <li><b>Un dé.</b> Moyenne 3,5. Médiane : tout m de [3, 4] coupe la masse en deux, on prend 3,5 par convention. Pas de mode unique : les six faces ont la même probabilité.</li>
+      <li><b>Deux bosses en −1 et +1, de même poids.</b> La moyenne vaut 0, une valeur qu'on n'observe presque jamais.</li>
+      <li><b>Une attente exponentielle</b> de taux λ : moyenne 1/λ, médiane ln 2/λ ≈ 0,69/λ (preuve en notion 8). Pour des spams à 4 par heure : 15 min de moyenne, 10,4 min de médiane.</li>
+      <li><b>Le patrimoine</b>, avec les chiffres cités par Brunton : médiane ≈ 200 k$, moyenne ≈ 1 M$. Une log-normale de médiane 200 k$ a ce rapport 5 quand σ ≈ 1,79 ; son mode est alors vers 8 k$. Attention, ce σ est l'écart-type de ln X, pas celui du patrimoine.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Ce que chaque centre minimise <small>moyenne et erreur quadratique, médiane et erreur absolue</small></summary><div class="in">
+    <p>Cherchons le nombre c qui résume le mieux X. Si l'erreur est mesurée au carré, c'est la moyenne :</p>
+    <div class="drv">
+      <div>E[(<i>X</i> − <i>c</i>)²] = E[((<i>X</i> − μ) + (μ − <i>c</i>))²]</div><span>on intercale μ</span>
+      <div>= E[(<i>X</i> − μ)²] + 2(μ − <i>c</i>) E[<i>X</i> − μ] + (μ − <i>c</i>)²</div><span>développer, linéarité (notion 3)</span>
+      <div>= E[(<i>X</i> − μ)²] + (μ − <i>c</i>)²</div><span>E[X − μ] = 0 ; le premier terme est la variance (notion 6)</span>
+    </div>
+    <p>Le premier terme ne dépend pas de c, le second est nul seulement en c = μ. Si l'erreur est mesurée en valeur absolue, E[|X − c|] a pour dérivée en c la quantité P(X &lt; c) − P(X &gt; c), nulle quand c coupe la masse en deux : c'est la médiane. Et pour une variable discrète, si l'on compte seulement « juste ou faux », P(X ≠ c) est minimale là où P(X = c) est maximale : c'est le mode.</p>
+    <p>C'est la raison pour laquelle une régression en erreur quadratique estime une moyenne conditionnelle, et une régression en erreur absolue une médiane conditionnelle.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>un milliardaire dans 100 000 ménages</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(0)
+# 100,000 household wealths, right-skewed, median $200k
+wealth = rng.lognormal(mean=np.log(200_000), sigma=1.79, size=100_000)
+print(f"median {np.median(wealth):&gt;12,.0f}   mean {wealth.mean():&gt;14,.0f}")
+
+wealth = np.append(wealth, 100e9)            # one $100B fortune joins the sample
+print(f"median {np.median(wealth):&gt;12,.0f}   mean {wealth.mean():&gt;14,.0f}")</pre>
+<pre class="out">median      198,521   mean      1,002,283
+median      198,524   mean      2,002,263</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>La médiane peut ne pas être unique.</b> Pour une loi à trou, toute valeur du trou coupe la masse en deux. Pour un dé, tout m entre 3 et 4 convient.</li>
+      <li><b>« La moyenne est représentative » est faux en queue lourde.</b> Une seule fortune de 100 milliards double la moyenne de 100 000 ménages et laisse la médiane intacte (code ci-dessus).</li>
+      <li><b>Le mode est le centre le plus fragile.</b> Sur un histogramme, il dépend de la largeur des classes.</li>
+      <li><b>« mode &lt; médiane &lt; moyenne » n'est pas un théorème.</b> L'ordre vaut pour la log-normale, l'exponentielle ou la gamma, mais une loi légèrement asymétrique à droite peut avoir l'ordre inverse (une Weibull de forme 3,5, par exemple).</li>
+    </ul>
+  </div></details>
+  <p class="garde">Pour les lois asymétriques à droite usuelles (log-normale, exponentielle, gamma) : mode &lt; médiane &lt; moyenne, une règle et non un théorème. La moyenne minimise l'erreur quadratique, la médiane l'erreur absolue, et seule la médiane résiste aux extrêmes.</p>
+</section>
+
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>L'espérance est linéaire, sans aucune hypothèse <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 29 · Properties of the Expected Value</p>
+  <div class="idee">
+    <p>C'est la propriété la plus utile de l'espérance, et elle ne demande rien. Pour additionner des espérances, on n'a pas besoin de savoir comment les variables dépendent l'une de l'autre.</p>
+    <p>L'image : chaque tirage du couple donne une somme x + y. Sur beaucoup de tirages, la moyenne des sommes est la somme des moyennes, quelle que soit la façon dont x et y bougent ensemble. Que Y suive X de près ou pas du tout change la <b>forme</b> de la loi de X + Y, jamais son espérance, son centre de masse.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">E[<i>aX</i> + <i>bY</i> + <i>c</i>] = <i>a</i> E[<i>X</i>] + <i>b</i> E[<i>Y</i>] + <i>c</i></div>
+    <ul><li><b>Aucune hypothèse</b> : X et Y peuvent être dépendantes, et de lois différentes.</li><li>Pour n termes : E[X<sub>1</sub> + … + X<sub>n</sub>] = E[X<sub>1</sub>] + … + E[X<sub>n</sub>].</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux dés, dépendance totale, cent pièces, anniversaires</small></summary><div class="in">
+    <ol>
+      <li><b>Deux dés.</b> E[X + Y] = 3,5 + 3,5 = 7.</li>
+      <li><b>Dépendance totale : Y = X.</b> E[X + Y] = E[2X] = 7 aussi. La dépendance change la loi de la somme, pas son espérance.</li>
+      <li><b>Cent pièces, sans Pascal.</b> X = B<sub>1</sub> + … + B<sub>100</sub>, où B<sub>i</sub> vaut 1 si la pièce i tombe sur pile. E[X] = 100 × ½ = 50 : le résultat de la notion 1, en une ligne.</li>
+      <li><b>Anniversaires.</b> Parmi 23 personnes il y a C(23, 2) = 253 paires, et chacune partage un anniversaire avec probabilité 1/365. Le nombre moyen de paires qui partagent vaut 253/365 = 0,69. Les paires ne sont pas mutuellement indépendantes (si 1–2 et 2–3 partagent, 1–3 partage forcément), et la linéarité s'en moque.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>discrète, sur la loi jointe : on somme, on ne factorise jamais</small></summary><div class="in">
+    <p>Notation : P(x, y) abrège P(X = x, Y = y).</p>
+    <div class="drv">
+      <div>E[<i>X</i> + <i>Y</i>] = Σ<sub><i>x</i></sub> Σ<sub><i>y</i></sub> (<i>x</i> + <i>y</i>) P(<i>x</i>, <i>y</i>)</div><span>espérance d'une fonction du couple (notion 5)</span>
+      <div>= Σ<sub><i>x</i></sub> Σ<sub><i>y</i></sub> <i>x</i> P(<i>x</i>, <i>y</i>) + Σ<sub><i>x</i></sub> Σ<sub><i>y</i></sub> <i>y</i> P(<i>x</i>, <i>y</i>)</div><span>distribuer</span>
+      <div>= Σ<sub><i>x</i></sub> <i>x</i> Σ<sub><i>y</i></sub> P(<i>x</i>, <i>y</i>) + Σ<sub><i>y</i></sub> <i>y</i> Σ<sub><i>x</i></sub> P(<i>x</i>, <i>y</i>)</div><span>sortir x de la somme en y, et y de la somme en x</span>
+      <div>= Σ<sub><i>x</i></sub> <i>x</i> P(<i>X</i> = <i>x</i>) + Σ<sub><i>y</i></sub> <i>y</i> P(<i>Y</i> = <i>y</i>)</div><span>marginaliser (l07)</span>
+      <div>= E[<i>X</i>] + E[<i>Y</i>]</div><span>définition</span>
+    </div>
+    <p><b>L'indépendance n'apparaît à aucune ligne</b> : on a sommé une variable, jamais factorisé la jointe. Pour les constantes : E[aX + c] = Σ (ax + c) P(x) = a Σ x P(x) + c Σ P(x) = a E[X] + c, puisque les probabilités somment à 1.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>deux variables très dépendantes</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(0)
+n = 100_000
+x = rng.integers(1, 7, size=n)
+# y copies x 90% of the time: x and y are strongly dependent
+y = np.where(rng.random(n) &lt; 0.9, x, rng.integers(1, 7, size=n))
+
+print(f"E[X + Y]    ≈ {(x + y).mean():.3f}")
+print(f"E[X] + E[Y] ≈ {x.mean() + y.mean():.3f}")   # same: no independence needed</pre>
+<pre class="out">E[X + Y]    ≈ 6.997
+E[X] + E[Y] ≈ 6.997</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Pas à travers une fonction non linéaire.</b> E[X²] ≠ E[X]² (dé : 15,17 contre 12,25), E[1/X] ≠ 1/E[X].</li>
+      <li><b>Pas à travers un produit sans hypothèse</b> (notion 4).</li>
+      <li><b>C'est une propriété de l'espérance, pas de la variance.</b> Var(X + Y) n'est pas toujours Var X + Var Y (<a href="../../map.html#l09">l09</a>), et Var(2X) = 4 Var X (notion 9).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (35) justifie E[X̄] = μ « parce que les X sont indépendants ». La linéarité suffit ; l'indépendance ne sert qu'à calculer Var(X̄).</div>
+  </div></details>
+  <p class="garde">L'espérance d'une somme est la somme des espérances, sans aucune hypothèse.</p>
+</section>
+
+<!-- ============================ n4 ============================ -->
+<section class="notion outil" id="n4">
+  <h3>L'espérance d'un produit, seulement sous indépendance <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 29</p>
+  <div class="idee">
+    <p>Pour un produit, c'est l'inverse : il faut une hypothèse. Si X et Y sont indépendantes, connaître X ne dit rien de Y, et la moyenne du produit se coupe en produit des moyennes.</p>
+    <p>Si elles bougent ensemble, les grandes valeurs de X tombent avec les grandes valeurs de Y, et la moyenne du produit dépasse le produit des moyennes. Cet écart E[XY] − E[X]E[Y] a un nom : la <b>covariance</b> (<a href="../../map.html#l09">l09</a>).</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>X</i>, <i>Y</i> indépendantes ⟹ E[<i>XY</i>] = E[<i>X</i>] · E[<i>Y</i>] &nbsp;&nbsp;&nbsp; et plus généralement E[<i>g</i>(<i>X</i>) <i>h</i>(<i>Y</i>)] = E[<i>g</i>(<i>X</i>)] · E[<i>h</i>(<i>Y</i>)]</div>
+    <ul><li><b>Indépendance</b> : P(X = x, Y = y) = P(X = x) P(Y = y) pour tous x et y.</li><li>Le sens ⟸ est faux : l'égalité ne prouve pas l'indépendance.</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux dés, un dé compté deux fois, Y = X²</small></summary><div class="in">
+    <ol>
+      <li><b>Deux dés indépendants.</b> E[XY] = 3,5 × 3,5 = 12,25.</li>
+      <li><b>Le même dé compté deux fois</b> (Y = X). E[XY] = E[X²] = 91/6 = 15,17. L'écart 15,17 − 12,25 = 2,92 est la variance du dé (notion 6).</li>
+      <li><b>Dépendance totale, égalité quand même.</b> X uniforme sur {−1, 0, 1} et Y = X². E[XY] = E[X³] = (−1 + 0 + 1)/3 = 0, et E[X] E[Y] = 0 × ⅔ = 0. Pourtant Y est entièrement déterminée par X.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la preuve de Brunton : c'est ici, et seulement ici, que l'indépendance sert</small></summary><div class="in">
+    <div class="drv">
+      <div>E[<i>XY</i>] = Σ<sub><i>x</i></sub> Σ<sub><i>y</i></sub> <i>x</i> <i>y</i> P(<i>x</i>, <i>y</i>)</div><span>espérance d'une fonction du couple</span>
+      <div>= Σ<sub><i>x</i></sub> Σ<sub><i>y</i></sub> <i>x</i> <i>y</i> P(<i>X</i> = <i>x</i>) P(<i>Y</i> = <i>y</i>)</div><span><b>indépendance</b> : la jointe est un produit</span>
+      <div>= (Σ<sub><i>x</i></sub> <i>x</i> P(<i>X</i> = <i>x</i>)) · (Σ<sub><i>y</i></sub> <i>y</i> P(<i>Y</i> = <i>y</i>))</div><span>la double somme se factorise</span>
+      <div>= E[<i>X</i>] · E[<i>Y</i>]</div><span>définition</span>
+    </div>
+    <p>Compare avec la notion 3. Là, on sommait sur y pour retrouver une loi marginale, ce qui marche toujours. Ici, on factorise la jointe, ce qui demande l'indépendance. Remplacer x y par g(x) h(y) donne la version générale.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>les trois cas</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(0)
+n = 200_000
+x = rng.integers(1, 7, size=n)
+y = rng.integers(1, 7, size=n)               # independent of x
+print(f"independent dice: E[XY] ≈ {(x * y).mean():.2f}, E[X]E[Y] ≈ {x.mean() * y.mean():.2f}")
+print(f"same die (Y = X): E[XY] ≈ {(x * x).mean():.2f}, E[X]E[Y] ≈ {x.mean() ** 2:.2f}")
+
+u = rng.choice([-1, 0, 1], size=n)
+v = u ** 2                                   # v is a function of u: fully dependent
+print(f"Y = X² on (-1, 0, 1): E[XY] ≈ {(u * v).mean():.3f}, E[X]E[Y] ≈ {u.mean() * v.mean():.3f}")</pre>
+<pre class="out">independent dice: E[XY] ≈ 12.24, E[X]E[Y] ≈ 12.25
+same die (Y = X): E[XY] ≈ 15.17, E[X]E[Y] ≈ 12.25
+Y = X² on (-1, 0, 1): E[XY] ≈ 0.001, E[X]E[Y] ≈ 0.001</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>La réciproque est fausse</b> (exemple 3). E[XY] = E[X]E[Y] équivaut à une covariance nulle, pas à l'indépendance.</li>
+      <li><b>Ne pas déplacer l'hypothèse.</b> C'est l'espérance d'un <b>produit</b> qui demande l'indépendance, pas l'espérance d'une somme.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (29) affirme que si X et Y sont dépendantes, l'espérance du produit n'est pas le produit des espérances. Pas forcément : l'exemple 3 donne l'égalité avec une dépendance totale.</div>
+  </div></details>
+  <p class="garde">E[XY] = E[X] · E[Y] sous indépendance. La réciproque est fausse.</p>
+</section>
+
+<!-- ============================ n5 ============================ -->
+<section class="notion outil" id="n5">
+  <h3>L'espérance d'une fonction de X <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 29</p>
+  <div class="idee">
+    <p>Pour calculer E[g(X)], il paraît naturel de chercher d'abord la loi de Y = g(X), puis d'appliquer la définition. C'est inutile. On garde les probabilités de X et on remplace chaque valeur x par g(x) ; Brunton : « on reprend la formule et on remplace x par g de x ».</p>
+    <p>Le nom anglais, <i>law of the unconscious statistician</i> (LOTUS), vient de là : tout le monde le fait sans y penser, et c'est juste. Brunton prévient que ce n'est « pas évident » : c'est un théorème, pas la définition.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">E[<i>g</i>(<i>X</i>)] = Σ<sub><i>x</i></sub> <i>g</i>(<i>x</i>) P(<i>X</i> = <i>x</i>) &nbsp;&nbsp;&nbsp;&nbsp; E[<i>g</i>(<i>X</i>)] = ∫ <i>g</i>(<i>x</i>) <i>f</i>(<i>x</i>) d<i>x</i></div>
+    <ul><li>Même condition de convergence que pour E[X].</li><li>Vaut aussi pour un couple : E[g(X, Y)] = Σ<sub>x</sub> Σ<sub>y</sub> g(x, y) P(x, y). C'est ce qu'utilisent les preuves des notions 3 et 4.</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>le carré, un gain, l'écart à la moyenne</small></summary><div class="in">
+    <ol>
+      <li><b>E[X²] pour un dé.</b> (1 + 4 + 9 + 16 + 25 + 36)/6 = 91/6 = 15,17. C'est le « second moment » de Brunton.</li>
+      <li><b>Un gain g(x) = 2x + 1.</b> E[g(X)] = Σ (2x + 1)/6 = 48/6 = 8.</li>
+      <li><b>L'écart au carré à la moyenne</b>, g(x) = (x − 3,5)². Les six valeurs sont 6,25 ; 2,25 ; 0,25 ; 0,25 ; 2,25 ; 6,25, de moyenne 17,5/6 = 35/12 = 2,917. C'est déjà la variance du dé.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>discrète : regrouper les x qui donnent le même y</small></summary><div class="in">
+    <div class="drv">
+      <div>E[<i>Y</i>] = Σ<sub><i>y</i></sub> <i>y</i> P(<i>Y</i> = <i>y</i>)</div><span>définition, sur la loi de Y = g(X)</span>
+      <div>= Σ<sub><i>y</i></sub> <i>y</i> Σ<sub><i>x</i> : <i>g</i>(<i>x</i>) = <i>y</i></sub> P(<i>X</i> = <i>x</i>)</div><span>{Y = y} est la réunion disjointe des {X = x} tels que g(x) = y</span>
+      <div>= Σ<sub><i>y</i></sub> Σ<sub><i>x</i> : <i>g</i>(<i>x</i>) = <i>y</i></sub> <i>g</i>(<i>x</i>) P(<i>X</i> = <i>x</i>)</div><span>dans chaque groupe, y = g(x)</span>
+      <div>= Σ<sub><i>x</i></sub> <i>g</i>(<i>x</i>) P(<i>X</i> = <i>x</i>)</div><span>chaque x est dans exactement un groupe</span>
+    </div>
+    <p>Brunton admet LOTUS dans les deux cas. La preuve discrète ci-dessus est courte ; en continu, elle demande un changement de variable (<a href="../../map.html#l06">l06</a>).</p>
+  </div></details>
+  <details class="code"><summary>Calculer en Python <small>LOTUS contre la loi de g(X) construite à la main</small></summary><div class="in">
+<pre class="py">from collections import Counter
+from fractions import Fraction
+
+pmf = {x: Fraction(1, 6) for x in range(1, 7)}       # fair die
+g = lambda x: (x - Fraction(7, 2)) ** 2               # squared distance to the mean
+
+# LOTUS: reweight g(x) by P(X = x), no need for the law of g(X)
+lotus = sum(g(x) * p for x, p in pmf.items())
+
+# the long way: build the law of Y = g(X) first
+law_y = Counter()
+for x, p in pmf.items():
+    law_y[g(x)] += p
+direct = sum(y * p for y, p in law_y.items())
+
+print(dict(law_y))
+print(lotus, direct)</pre>
+<pre class="out">{Fraction(25, 4): Fraction(1, 3), Fraction(9, 4): Fraction(1, 3), Fraction(1, 4): Fraction(1, 3)}
+35/12 35/12</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>E[g(X)] ≠ g(E[X]) en général.</b> Pour un dé, E[X²] = 15,17 contre 3,5² = 12,25. Pour g convexe, E[g(X)] ≥ g(E[X]) (inégalité de Jensen) ; pour le carré, l'écart est exactement la variance (notion 6).</li>
+      <li><b>LOTUS donne l'espérance, pas la loi.</b> Brancher la densité de X dans g ne donne pas la densité de g(X) ; pour la loi, il faut la méthode de Brunton 23 (<a href="../../map.html#l06">l06</a>).</li>
+    </ul>
+  </div></details>
+  <p class="garde">E[g(X)] = Σ g(x) · P(X = x) : on repondère les g(x) par les probabilités de X, sans chercher la loi de g(X).</p>
+</section>
+
+<!-- ============================ n6 ============================ -->
+<section class="notion outil" id="n6">
+  <h3>La variance est l'inertie autour du centre <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 30 · Variance and Standard Deviation</p>
+  <div class="idee">
+    <p>Deux lois peuvent avoir le même centre et s'étaler très différemment. Brunton définit la variance comme la <b>moyenne des carrés des écarts à μ</b> : on prend l'écart de chaque valeur à la moyenne, on le met au carré, et on fait la moyenne pondérée par les probabilités.</p>
+    <p>Sur deux masses de ½ placées en 1 et 3 : μ = 2, écarts −1 et +1, carrés 1 et 1, variance 1. Écarte-les en 0 et 4 : écarts ±2, carrés 4 et 4, variance 4.</p>
+    <p>L'image est celle du <b>moment d'inertie</b>. Tiens un bâton par son centre et fais-le tourner. Des poids près de ta main se lancent facilement ; les mêmes poids aux deux bouts résistent beaucoup plus. À chaque tour, un poids à la distance r parcourt un cercle de rayon r, donc va à une vitesse proportionnelle à r, et l'énergie ½mv² croît comme r². En probabilités, les masses sont les probabilités, l'axe est la moyenne, et la variance est cette inertie : <b>une valeur deux fois plus loin compte quatre fois plus</b>.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">définition : Var(<i>X</i>) = E[(<i>X</i> − μ)²] &nbsp;&nbsp;&nbsp; forme de calcul : Var(<i>X</i>) = E[<i>X</i>²] − μ² &nbsp;&nbsp;&nbsp; σ = √Var(<i>X</i>)</div>
+    <ul><li>μ = E[X]. La forme de calcul s'appelle la formule de König-Huygens (preuve dépliable plus bas).</li><li>E[X²] doit être finie.</li><li>σ, l'écart-type, est dans l'unité de X ; la variance est dans l'unité au carré.</li><li>Le carré est un choix : on pourrait mesurer l'étalement par E[|X − μ|]. On garde le carré parce que, sous indépendance, les variances s'additionnent : c'est de l'additivité, pas de la linéarité (<a href="../../map.html#l09">l09</a>, et notion 9).</li></ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — d'où vient la variance, valeur par valeur</div>
+    <div id="f3ctl" class="sl-ctl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">En haut la loi P(X = x), en bas la contribution de chaque valeur à la variance, p · (x − μ)². La variance est la <b>somme des barres du bas</b>. Les trois premières lois partagent la même échelle : passe de {1, 3} à {0, 4}, la distance double et les barres du bas quadruplent. Puis choisis <b>Z</b> (l'échelle change) : la valeur 10, qui ne pèse que 10 %, fait 90 % de la variance.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>constante, deux masses, Bernoulli, dé, Z</small></summary><div class="in">
+    <ol>
+      <li><b>Une constante</b> X = 5 : aucun écart, Var = 0.</li>
+      <li><b>Deux masses.</b> X ∈ {1, 3} avec probabilité ½ chacune : μ = 2, écarts ±1, Var = 1. Y ∈ {0, 4} : même centre, écarts ±2, Var = 4.</li>
+      <li><b>Bernoulli(p).</b> X² = X puisque X vaut 0 ou 1, donc E[X²] = p et Var = p − p² = p(1 − p). Elle est maximale à p = ½, là où l'issue est la plus incertaine.</li>
+      <li><b>Un dé.</b> 91/6 − 3,5² = 35/12 = 2,917 ; σ = 1,708.</li>
+      <li><b>Z = 0 avec probabilité 0,9, ou 10 avec probabilité 0,1.</b> μ = 1, écarts −1 et +9, Var = 0,9 × 1 + 0,1 × 81 = 9, σ = 3.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la forme de calcul, et pourquoi Var ≥ 0</small></summary><div class="in">
+    <div class="drv">
+      <div>Var(<i>X</i>) = E[(<i>X</i> − μ)²]</div><span>définition</span>
+      <div>= E[<i>X</i>² − 2μ<i>X</i> + μ²]</div><span>développer le carré</span>
+      <div>= E[<i>X</i>²] − 2μ E[<i>X</i>] + μ²</div><span>linéarité (notion 3) ; μ est une constante et E[μ²] = μ²</span>
+      <div>= E[<i>X</i>²] − 2μ² + μ² = E[<i>X</i>²] − μ²</div><span>E[X] = μ</span>
+    </div>
+    <p><b>Var(X) ≥ 0</b>, c'est le devoir que donne Brunton : la variance est l'espérance d'un carré, donc d'une quantité positive. Conséquence : E[X²] ≥ E[X]², avec égalité seulement si X est constante.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>la part de chaque valeur, et np.var</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+values = np.array([0, 10])
+probs = np.array([0.9, 0.1])
+mu = (values * probs).sum()
+contrib = probs * (values - mu) ** 2          # each value's share of the variance
+var = contrib.sum()
+print(f"mean {mu}, variance {var}, sd {np.sqrt(var)}")
+print("share of each value:", contrib / var)
+
+rng = np.random.default_rng(0)
+z = rng.choice(values, p=probs, size=100_000)
+print(f"theory {var}   sample variance {np.var(z):.3f}")   # sampling error, not a formula error</pre>
+<pre class="out">mean 1.0, variance 9.0, sd 3.0
+share of each value: [0.1 0.9]
+theory 9.0   sample variance 8.924</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>L'unité est au carré.</b> Une variance en cm² ne se compare pas à une longueur : on rapporte l'écart-type.</li>
+      <li><b>Une valeur lointaine domine</b> (exemple 5). Un seul point aberrant dans un jeu de test peut gonfler la variance.</li>
+      <li><b>« 68 % dans ±1σ » est une propriété de la normale, pas une signification générale de σ.</b> Pour Z, 90 % de la masse est à moins de 1σ et 10 % est à 3σ, sans rien entre.</li>
+      <li><b>La variance peut être infinie</b> (Pareto d'indice ≤ 2) : l'écart-type d'un échantillon ne se stabilise alors jamais.</li>
+      <li><b>La variance n'est pas linéaire.</b> Var(2X) = 4 Var X, pas 2 Var X (notion 9), et Var(X + Y) a un terme croisé (<a href="../../map.html#l09">l09</a>).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (28, 30) dit que la suite des moments, comme une série de Taylor, « identifie de façon unique » la loi. Pas toujours : il existe des lois différentes qui ont tous leurs moments égaux, la log-normale en est l'exemple classique. L'énoncé vrai passe par la fonction génératrice (<a href="../../map.html#l12">l12</a>).</div>
+  </div></details>
+  <p class="garde">Var(X) = E[(X − μ)²] = E[X²] − μ² : l'inertie autour du centre, où la distance compte au carré.</p>
+</section>
+
+<!-- ============================ n7 ============================ -->
+<section class="notion culture" id="n7">
+  <h3>Moments bruts, centrés, asymétrie, kurtosis <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 28, 30 et 37</p>
+  <div class="idee">
+    <p>Brunton appelle l'espérance le premier <b>moment</b> et relie la variance au second (28), qu'il écrit ensuite « second moment moins premier au carré » (37). Le mot vient de la physique : un moment est une moyenne pondérée d'une puissance de la distance. Plus la puissance k est grande, plus la masse lointaine écrase le reste. Les moments successifs décrivent donc la forme de la loi, du plus grossier au plus fin.</p>
+    <p>Puissance paire (2, 4) : le signe disparaît, seule la distance compte. Puissance impaire (3) : le signe reste, et les écarts à gauche et à droite se compensent, sauf si un côté est plus lourd.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les formules</div>
+    <div class="eq">brut : E[<i>X</i><sup><i>k</i></sup>] &nbsp;&nbsp; centré : E[(<i>X</i> − μ)<sup><i>k</i></sup>] &nbsp;&nbsp; asymétrie : E[(<i>X</i> − μ)³] / σ³ &nbsp;&nbsp; kurtosis : E[(<i>X</i> − μ)⁴] / σ⁴</div>
+    <ul><li>Brut = autour de 0, centré = autour de μ. Le moment centré d'ordre 1 vaut toujours 0.</li><li>Var = brut<sub>2</sub> − brut<sub>1</sub>² : la même forme que le théorème de Huygens en mécanique, inertie autour de l'origine = inertie autour du centre + masse × distance².</li><li>Diviser par σ³ et σ⁴ rend l'asymétrie et la kurtosis sans unité : elles décrivent la forme, pas l'échelle.</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>les deux lois de la séance du 10/10</small></summary><div class="in">
+    <table>
+      <tr><th>Ordre</th><th>Ce qu'il mesure</th><th>X ∈ {1, 3}</th><th>Z ∈ {0, 10}</th></tr>
+      <tr><td>1 (brut)</td><td>position</td><td>2</td><td>1</td></tr>
+      <tr><td>2 (centré)</td><td>étalement</td><td>1</td><td>9</td></tr>
+      <tr><td>3 (standardisé)</td><td>asymétrie</td><td>0</td><td>2,67</td></tr>
+      <tr><td>4 (standardisé)</td><td>poids des queues</td><td>1</td><td>8,11</td></tr>
+    </table>
+    <p>Repère : une normale a une asymétrie 0 et une kurtosis 3. On parle souvent d'<b>excès de kurtosis</b>, kurtosis − 3, nul pour la normale. Pour X ∈ {1, 3}, la kurtosis vaut 1, le minimum possible : deux masses, aucune queue.</p>
+    <p>En ML : Adam garde deux moyennes mobiles du gradient, m (moment brut d'ordre 1, la direction) et v (moment brut d'ordre 2, l'échelle). Certaines activations de LLM ont des queues extrêmes, et ces valeurs aberrantes cassent une quantification uniforme (LLM.int8).</p>
+  </div></details>
+  <details class="preuve"><summary>Le calcul sur Z <small>μ = 1, σ = 3, écarts −1 et +9</small></summary><div class="in">
+    <div class="drv">
+      <div>E[(<i>Z</i> − μ)³] = 0,9 × (−1)³ + 0,1 × 9³ = −0,9 + 72,9 = 72</div><span>cubes des écarts, pondérés</span>
+      <div>asymétrie = 72 / 3³ = 72 / 27 ≈ 2,67</div><span>positive : la queue est à droite</span>
+      <div>E[(<i>Z</i> − μ)⁴] = 0,9 × 1 + 0,1 × 9⁴ = 0,9 + 656,1 = 657</div><span>puissances 4</span>
+      <div>kurtosis = 657 / 3⁴ = 657 / 81 ≈ 8,11</div><span>bien plus que 3 : queues lourdes</span>
+    </div>
+    <p>Pour X ∈ {1, 3}, les cubes des écarts ±1 s'annulent (asymétrie 0) et E[(X − μ)⁴] = σ⁴ = 1 (kurtosis 1).</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>scipy, et le piège de l'excès</small></summary><div class="in">
+<pre class="py">import numpy as np
+from scipy import stats
+
+rng = np.random.default_rng(0)
+z = rng.choice([0, 10], p=[0.9, 0.1], size=200_000)
+
+print(f"skewness  {stats.skew(z):.2f}")                       # theory: 2.67
+print(f"kurtosis  {stats.kurtosis(z, fisher=False):.2f}")      # theory: 8.11
+print(f"default   {stats.kurtosis(z):.2f}  (excess = kurtosis - 3)")</pre>
+<pre class="out">skewness  2.69
+kurtosis  8.24
+default   5.24  (excess = kurtosis - 3)</pre>
+    <p>L'échantillon donne 2,69 et 8,24 au lieu de 2,67 et 8,11 : la proportion de 10 tirée n'est pas exactement 0,1, et les moments d'ordre élevé amplifient cet écart.</p>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>La kurtosis ne mesure pas l'« aplatissement ».</b> Beaucoup de manuels le disent, et le nom français « coefficient d'aplatissement » porte le même mythe. Les valeurs à moins de 1σ du centre contribuent au plus 1 à la kurtosis (0,11 sur 3 pour une normale) : tout le reste vient des queues (Westfall, 2014).</li>
+      <li><b>Asymétrie nulle n'implique pas symétrie.</b> L'implication ne vaut que dans l'autre sens.</li>
+      <li><b>scipy.stats.kurtosis renvoie l'excès par défaut</b> (fisher=True) : 5,24 au lieu de 8,24 sur le même échantillon.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (37) dit que « E[X³] est l'asymétrie » et « E[X⁴] la kurtosis ». Ce sont des moments bruts ; l'asymétrie et la kurtosis sont des moments centrés, divisés par σ³ et σ⁴ pour ne dépendre ni de la position ni de l'unité.</div>
+  </div></details>
+  <p class="garde">Ordre 3 : de quel côté est la queue. Ordre 4 : à quel point les queues pèsent.</p>
+</section>
+
+<!-- ============================ n8 ============================ -->
+<section class="notion outil" id="n8">
+  <h3>L'exponentielle : espérance, variance, médiane <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 31 · Example of Computing the Expectation and Variance of an Exponential Distribution</p>
+  <div class="idee">
+    <p>Brunton fait enfin un calcul sur une loi continue (il ne saute que E[T²]) : l'attente T jusqu'au prochain événement d'un flux de taux λ (un mail, un appel, une panne). Le résultat surprend : la moyenne et l'écart-type sont égaux, et la médiane est nettement plus courte que la moyenne.</p>
+    <p>La loi est très asymétrique : beaucoup d'attentes courtes, quelques attentes longues qui tirent la moyenne vers la droite. C'est la situation de la figure 2, sur une loi qu'on rencontre partout.</p>
+    <p>La moyenne se devine : à λ événements par heure, on attend en moyenne 1/λ heure. À 4 spams par heure, un spam toutes les 15 minutes.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les résultats</div>
+    <div class="eq"><i>f</i>(<i>t</i>) = λ e<sup>−λ<i>t</i></sup>, <i>t</i> ≥ 0 &nbsp;&nbsp;⟹&nbsp;&nbsp; E[<i>T</i>] = 1/λ, &nbsp; Var(<i>T</i>) = 1/λ², &nbsp; σ = 1/λ, &nbsp; médiane = ln 2 / λ ≈ 0,693 / λ</div>
+    <ul><li>T ≥ 0 : toutes les intégrales vont de 0 à l'infini, pas de −∞.</li></ul>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — l'attente exponentielle et ses deux centres</div>
+    <div id="f4plot" class="wide"></div>
+    <div id="f4ctl"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">Fais varier le <b>taux λ</b> (événements par heure). La courbe part de la hauteur λ ; la moyenne et la médiane se déplacent ensemble, proportionnellement à 1/λ, et la médiane reste toujours à 69 % de la moyenne.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>λ = 2, une ampoule, des spams</small></summary><div class="in">
+    <ol>
+      <li><b>λ = 2 par heure.</b> Attente moyenne 0,5 h, écart-type 0,5 h, médiane 0,347 h, soit 21 min.</li>
+      <li><b>Une ampoule de durée moyenne 100 h</b> (λ = 1/100). La moitié des ampoules meurt avant 100 ln 2 = 69,3 h.</li>
+      <li><b>Des spams à 4 par heure.</b> Attente moyenne 15 min, médiane 60 ln 2/4 = 10,4 min.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>deux intégrations par parties ; Brunton fait la première</small></summary><div class="in">
+    <p><b>Espérance.</b> Par parties avec u = t et dv = λ e<sup>−λt</sup> dt, donc v = −e<sup>−λt</sup> :</p>
+    <div class="drv">
+      <div>E[<i>T</i>] = ∫<sub>0</sub><sup>∞</sup> <i>t</i> λ e<sup>−λ<i>t</i></sup> d<i>t</i></div><span>définition</span>
+      <div>= [−<i>t</i> e<sup>−λ<i>t</i></sup>]<sub>0</sub><sup>∞</sup> + ∫<sub>0</sub><sup>∞</sup> e<sup>−λ<i>t</i></sup> d<i>t</i></div><span>parties ; le crochet vaut 0 aux deux bornes, l'exponentielle écrase t</span>
+      <div>= [−e<sup>−λ<i>t</i></sup>/λ]<sub>0</sub><sup>∞</sup> = 1/λ</div><span>primitive de l'exponentielle</span>
+    </div>
+    <p><b>Second moment</b>, le calcul que Brunton laisse : par parties avec u = t².</p>
+    <div class="drv">
+      <div>E[<i>T</i>²] = ∫<sub>0</sub><sup>∞</sup> <i>t</i>² λ e<sup>−λ<i>t</i></sup> d<i>t</i> = [−<i>t</i>² e<sup>−λ<i>t</i></sup>]<sub>0</sub><sup>∞</sup> + ∫<sub>0</sub><sup>∞</sup> 2<i>t</i> e<sup>−λ<i>t</i></sup> d<i>t</i></div><span>LOTUS (notion 5), puis parties</span>
+      <div>= (2/λ) ∫<sub>0</sub><sup>∞</sup> <i>t</i> λ e<sup>−λ<i>t</i></sup> d<i>t</i> = (2/λ) · (1/λ) = 2/λ²</div><span>on retrouve E[T]</span>
+      <div>Var(<i>T</i>) = 2/λ² − 1/λ² = 1/λ²</div><span>forme de calcul (notion 6)</span>
+    </div>
+    <p><b>Médiane.</b> F(m) = 1 − e<sup>−λm</sup> = ½, donc e<sup>−λm</sup> = ½, donc m = ln 2/λ.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>et le piège du paramètre de numpy</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(0)
+lam = 2.0
+t = rng.exponential(scale=1 / lam, size=200_000)   # numpy takes the mean 1/λ, not λ
+
+print(f"mean   {t.mean():.4f}   (1/λ = {1/lam})")
+print(f"sd     {t.std():.4f}   (1/λ = {1/lam})")
+print(f"median {np.median(t):.4f}   (ln2/λ = {np.log(2)/lam:.4f})")</pre>
+<pre class="out">mean   0.4993   (1/λ = 0.5)
+sd     0.5012   (1/λ = 0.5)
+median 0.3442   (ln2/λ = 0.3466)</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Les bornes.</b> La densité est nulle pour t &lt; 0 ; intégrer depuis −∞ la formule λe<sup>−λt</sup> fait diverger le calcul.</li>
+      <li><b>numpy prend la moyenne, pas le taux.</b> rng.exponential(scale=…) attend 1/λ ; lui passer λ se trompe d'un facteur λ² sur la moyenne et l'écart-type, λ⁴ sur la variance.</li>
+      <li><b>« σ = moyenne » n'explique pas l'absence de mémoire.</b> Brunton pose la question. C'est l'inverse : l'absence de mémoire, P(T &gt; s + t | T &gt; s) = e<sup>−λt</sup> (<a href="../../map.html#l05">l05</a>), force la loi exponentielle, qui force σ = moyenne. La réciproque est fausse : une log-normale avec σ² = ln 2 (pour ln T) a aussi un écart-type égal à sa moyenne, 1,414, et elle a de la mémoire.</li>
+    </ul>
+  </div></details>
+  <p class="garde">Exponentielle(λ) : moyenne = écart-type = 1/λ, et la médiane ln 2/λ est plus courte que la moyenne.</p>
+</section>
+
+<!-- ============================ n9 ============================ -->
+<section class="notion outil" id="n9">
+  <h3>Changer d'unité : Var(aX + b) = a² Var(X) <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 32 (et 30 pour Var(2X))</p>
+  <div class="idee">
+    <p>Brunton convertit des températures : F = (9/5) C + 32. Faut-il tout recalculer en °F ? Non. Décaler toutes les valeurs de b déplace le centre de b, mais ne change <b>aucun</b> écart au centre : la variance ne bouge pas.</p>
+    <p>Multiplier par a multiplie chaque écart par a, donc chaque écart au carré par a². C'est pour ça que la variance n'est pas linéaire : un facteur sort au carré, et une constante disparaît.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les formules</div>
+    <div class="eq">E[<i>aX</i> + <i>b</i>] = <i>a</i> E[<i>X</i>] + <i>b</i> &nbsp;&nbsp;&nbsp;&nbsp; Var(<i>aX</i> + <i>b</i>) = <i>a</i>² Var(<i>X</i>) &nbsp;&nbsp;&nbsp;&nbsp; σ<sub><i>aX</i> + <i>b</i></sub> = |<i>a</i>| σ<sub><i>X</i></sub></div>
+    <ul><li>Aucune hypothèse : a et b sont des constantes, X est quelconque.</li></ul>
+  </div>
+  <div class="fig" id="fig5">
+    <div class="lbl">Figure 5 — transformer un dé : b déplace, a étire</div>
+    <div id="f5plot" class="wide"></div>
+    <div id="f5ctl"></div>
+    <div class="readouts" id="f5out"></div>
+    <p class="cap">La loi de aX + b pour un dé, avec sa moyenne (trait rouge) et ±σ (segment vert). Bouge <b>b</b> : tout glisse, la variance ne change pas. Bouge <b>a</b> : les barres s'écartent, l'écart-type suit |a| et la variance a². À a = 0, tout tombe sur b et la variance s'annule.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>constante, signe, un gain, des températures</small></summary><div class="in">
+    <ol>
+      <li><b>Var(5) = 0</b> et <b>Var(X + 5) = Var(X)</b>.</li>
+      <li><b>Var(−X) = Var(X).</b> Retourner la loi ne change pas son étalement.</li>
+      <li><b>Un gain G = 2X + 1 sur un dé.</b> E[G] = 2 × 3,5 + 1 = 8 ; Var(G) = 4 × 2,917 = 11,67 ; écart-type 3,42.</li>
+      <li><b>De °C en °F.</b> E<sub>F</sub> = 1,8 E<sub>C</sub> + 32 ; la variance est multipliée par 1,8² = 3,24 et l'écart-type par 1,8. Un écart-type de 5 °C devient 9 °F.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la ligne de Brunton : les b s'annulent</small></summary><div class="in">
+    <div class="drv">
+      <div>Var(<i>aX</i> + <i>b</i>) = E[(<i>aX</i> + <i>b</i> − E[<i>aX</i> + <i>b</i>])²]</div><span>définition</span>
+      <div>= E[(<i>aX</i> + <i>b</i> − <i>a</i>μ − <i>b</i>)²]</div><span>E[aX + b] = aμ + b (notion 3)</span>
+      <div>= E[<i>a</i>² (<i>X</i> − μ)²]</div><span>b s'annule, a se factorise</span>
+      <div>= <i>a</i>² E[(<i>X</i> − μ)²] = <i>a</i>² Var(<i>X</i>)</div><span>linéarité</span>
+    </div>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>Var(X + 5), Var(2X), et deux dés</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(0)
+x = rng.integers(1, 7, size=200_000)
+x2 = rng.integers(1, 7, size=200_000)        # a second, independent die
+
+print(f"Var(X)      ≈ {x.var():.3f}")         # 35/12 ≈ 2.917
+print(f"Var(X + 5)  ≈ {(x + 5).var():.3f}")   # unchanged
+print(f"Var(2X)     ≈ {(2 * x).var():.3f}")   # 4 Var(X) ≈ 11.67, not 2 Var(X)
+print(f"Var(X + X') ≈ {(x + x2).var():.3f}")  # two independent dice: 2 Var(X) ≈ 5.83</pre>
+<pre class="out">Var(X)      ≈ 2.918
+Var(X + 5)  ≈ 2.918
+Var(2X)     ≈ 11.674
+Var(X + X') ≈ 5.812</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>La variance n'est pas linéaire.</b> Var(2X) = 4 Var(X), pas 2 Var(X). Écrire Var(aX + bY) = a Var X + b Var Y fait deux erreurs : les coefficients sortent au carré, et il manque le terme croisé en Cov(X, Y) (<a href="../../map.html#l09">l09</a>).</li>
+      <li><b>2X n'est pas X + X'.</b> Doubler un dé donne une variance de 11,67 ; additionner deux dés indépendants donne 5,83 (code ci-dessus). La différence 11,67 − 5,83 = 5,83 est le terme croisé 2 Cov(X, X) = 2 Var X.</li>
+      <li><b>Le terme croisé n'est pas 2ab E[XY].</b> Teste avec deux constantes, X = Y = 1 : Var(X + Y) = 0, mais a² · 0 + b² · 0 + 2ab E[XY] donnerait 2ab ≠ 0. Comme la variance, le terme croisé doit ignorer un décalage : c'est 2ab E[(X − μ<sub>X</sub>)(Y − μ<sub>Y</sub>)] = 2ab Cov(X, Y), pas 2ab E[XY] (<a href="../../map.html#l09">l09</a>).</li>
+      <li><b>Additivité n'est pas linéarité.</b> L'indépendance donne l'additivité, Var(X + Y) = Var X + Var Y, et avec des coefficients Var(aX + bY) = a² Var X + b² Var Y. Même sous indépendance, la variance n'est jamais linéaire.</li>
+      <li><b>a &lt; 0.</b> L'écart-type est |a| σ, jamais a σ.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (23) dit que le nouvel écart-type est « a²σ² ». C'est la variance ; l'écart-type est |a| σ. Il le corrige lui-même dans la vidéo 24.</div>
+  </div></details>
+  <p class="garde">Var(aX + b) = a² Var(X) : b disparaît, a sort au carré. La variance n'est pas linéaire.</p>
+</section>
+
+<!-- ============================ n10 ============================ -->
+<section class="notion culture" id="n10">
+  <h3>L'énergie cinétique d'un gaz <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 32</p>
+  <div class="idee">
+    <p>Brunton : « la température n'est que l'énergie cinétique moyenne des molécules ». Il calcule E[½ m V²] avec la loi de Maxwell de la vitesse, au prix d'une intégrale et d'une fonction gamma.</p>
+    <p>La linéarité permet de s'en passer. La vitesse d'une molécule est un vecteur (V<sub>x</sub>, V<sub>y</sub>, V<sub>z</sub>) dont chaque composante est normale, centrée, de variance σ² ; son carré est V<sub>x</sub>² + V<sub>y</sub>² + V<sub>z</sub>². La loi de Maxwell qu'utilise Brunton est exactement la loi de la norme |V| quand les trois composantes sont indépendantes N(0, σ²), avec le même σ : les deux calculs portent sur la même chose.</p>
+  </div>
+  <div class="formule"><div class="lbl">Le calcul</div>
+    <div class="eq">E[½ <i>m</i> (<i>V<sub>x</sub></i>² + <i>V<sub>y</sub></i>² + <i>V<sub>z</sub></i>²)] = ½ <i>m</i> (E[<i>V<sub>x</sub></i>²] + E[<i>V<sub>y</sub></i>²] + E[<i>V<sub>z</sub></i>²]) = (3/2) <i>m</i> σ²</div>
+    <ul><li>E[V<sub>x</sub>²] = Var(V<sub>x</sub>) + E[V<sub>x</sub>]² = σ² + 0 (notion 6).</li><li>En physique, σ² = kT/m, d'où E = (3/2) kT.</li></ul>
+  </div>
+  <details class="ex"><summary>Exemple <small>m = 2, σ = 1,3</small></summary><div class="in">
+    <p>(3/2) × 2 × 1,3² = 3 × 1,69 = 5,07.</p>
+  </div></details>
+  <details class="preuve"><summary>Pourquoi aucune intégrale n'est nécessaire</summary><div class="in">
+    <p>La linéarité s'applique à la somme des trois carrés, sans même demander l'indépendance des composantes. Il ne reste que E[V<sub>x</sub>²], qui se lit sur la variance d'une composante. L'intégrale de Brunton calcule la même chose par un chemin plus long : elle passe par la loi de la norme de V, alors que l'espérance n'en a pas besoin.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>un million de molécules</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(0)
+m, sigma = 2.0, 1.3
+v = rng.normal(0, sigma, size=(1_000_000, 3))   # three independent velocity components
+ke = 0.5 * m * (v ** 2).sum(axis=1)
+
+print(f"E[KE] ≈ {ke.mean():.3f}   (3/2) m σ² = {1.5 * m * sigma**2:.3f}")</pre>
+<pre class="out">E[KE] ≈ 5.068   (3/2) m σ² = 5.070</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul><li><b>On obtient l'espérance de l'énergie, pas sa loi.</b> Pour la loi, il faut la méthode de Brunton 23 (<a href="../../map.html#l06">l06</a>) ; il dit lui-même que « c'est toute une affaire ».</li></ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (32) conclut : « c'est la température de ton gaz ». C'est proportionnel à la température : E = (3/2) kT.</div>
+  </div></details>
+  <p class="garde">La linéarité évite des intégrales entières : une espérance de somme se calcule terme à terme.</p>
+</section>
+
+<!-- ============================ n11 ============================ -->
+<section class="notion culture" id="n11">
+  <h3>La somme des queues <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 43 · The Tail Sum Formula in Probability</p>
+  <div class="idee">
+    <p>Entre deux vidéos lourdes, Brunton glisse une formule « un peu surprenante » : pour une variable à valeurs entières positives, l'espérance est la somme des probabilités de dépasser chaque seuil.</p>
+    <p>Son dessin : écrire k · P(X = k) comme k copies de P(X = k), empilées en colonne, puis lire le tableau par lignes. Chaque ligne est une probabilité de queue.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>X</i> ∈ {0, 1, 2, …} ⟹ E[<i>X</i>] = Σ<sub><i>k</i> ≥ 1</sub> P(<i>X</i> ≥ <i>k</i>) = Σ<sub><i>k</i> ≥ 0</sub> P(<i>X</i> &gt; <i>k</i>)</div>
+    <ul><li>X doit être positive et entière.</li><li>P(X ≥ k) = 1 − F(k − 1), où F est la fonction de répartition.</li></ul>
+  </div>
+  <div class="fig" id="fig6">
+    <div class="lbl">Figure 6 — l'espérance comme aire sous l'escalier de survie</div>
+    <div id="f6ctl" class="sl-ctl"></div>
+    <div id="f6plot" class="wide"></div>
+    <div class="readouts" id="f6out"></div>
+    <p class="cap">Chaque marche a pour hauteur P(X ≥ k) et pour largeur 1 : <b>l'aire totale est E[X]</b>. Pour un dé, 21/6 = 3,5. Pour la géométrique (nombre de lancers jusqu'au premier 6), chaque marche est multipliée par 5/6 et l'aire vaut 6. La marche k occupe l'intervalle [k − 1, k].</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>un dé, la géométrique</small></summary><div class="in">
+    <ol>
+      <li><b>Un dé.</b> P(X ≥ k) = (7 − k)/6, donc E[X] = (6 + 5 + 4 + 3 + 2 + 1)/6 = 21/6 = 3,5.</li>
+      <li><b>La géométrique</b>, nombre d'essais jusqu'au premier succès (<a href="../../map.html#l05">l05</a>). P(X ≥ k) = q<sup>k − 1</sup>, avec q = 1 − p, puisque les k − 1 premiers essais doivent échouer. E[X] = 1 + q + q² + … = 1/(1 − q) = 1/p : six lancers en moyenne pour obtenir un 6.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>le triangle de Brunton</small></summary><div class="in">
+<pre class="tri">E[X] = 1·P₁ + 2·P₂ + 3·P₃ + … + n·Pₙ
+
+     = P₁ + P₂ + P₃ + … + Pₙ     → P(X ≥ 1)
+          + P₂ + P₃ + … + Pₙ     → P(X ≥ 2)
+               + P₃ + … + Pₙ     → P(X ≥ 3)
+                          …
+                        + Pₙ     → P(X ≥ n)</pre>
+    <p>Notons P<sub>k</sub> = P(X = k). La colonne de P<sub>k</sub> le contient exactement k fois : on retrouve Σ k P<sub>k</sub>. La ligne r somme P<sub>r</sub> + P<sub>r+1</sub> + …, c'est-à-dire P(X ≥ r). Pour une variable non bornée, réordonner une série de termes positifs est permis ; Brunton ne le dit pas.</p>
+  </div></details>
+  <details class="code"><summary>Calculer en Python <small>le dé, et la géométrique simulée</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+# fair die: sum of P(X &gt;= k) for k = 1..6
+survival = [(7 - k) / 6 for k in range(1, 7)]
+print(sum(survival))                       # 3.5
+
+# geometric(p): number of rolls until the first six
+p = 1 / 6
+tail = sum((1 - p) ** (k - 1) for k in range(1, 10_000))   # P(X &gt;= k) = q^(k-1)
+rng = np.random.default_rng(0)
+print(f"{tail:.4f}  {rng.geometric(p, size=200_000).mean():.4f}")   # both ≈ 1/p = 6</pre>
+<pre class="out">3.5
+6.0000  5.9926</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Le décalage d'un cran.</b> 1 − F(k) = P(X &gt; k), pas P(X ≥ k).</li>
+      <li><b>La version continue</b>, que Brunton ne donne pas : pour X ≥ 0, E[X] = ∫<sub>0</sub><sup>∞</sup> P(X &gt; x) dx.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (43) dit que P(X ≥ k) est « 1 moins la fonction de répartition en k ». C'est 1 − F(k − 1).</div>
+  </div></details>
+  <p class="garde">Une espérance est la somme des probabilités de survie.</p>
+</section>
+
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>E[X] = Σ x P(X = x) : le centre de masse, un nombre fixe de la loi.</li>
+    <li>La médiane résiste aux extrêmes, pas la moyenne ; pour les lois usuelles asymétriques à droite, mode &lt; médiane &lt; moyenne.</li>
+    <li>E est linéaire sans aucune hypothèse.</li>
+    <li>E[XY] = E[X]E[Y] demande l'indépendance ; la réciproque est fausse.</li>
+    <li>E[g(X)] = Σ g(x) P(X = x), et E[g(X)] ≠ g(E[X]).</li>
+    <li>Var(X) = E[(X − μ)²] = E[X²] − μ² : l'inertie autour du centre ; une valeur lointaine domine.</li>
+    <li>Var(aX + b) = a² Var(X) : la variance n'est pas linéaire.</li>
+    <li>Exponentielle(λ) : moyenne = écart-type = 1/λ, médiane ln 2/λ.</li>
+  </ol>
+</div>
+<div class="phrase">« L'espérance est le centre de masse de la loi. Elle est linéaire sans aucune hypothèse, mais l'espérance d'un produit ne se factorise que sous indépendance. La variance est l'inertie autour de ce centre, E[X²] − E[X]² ; elle n'est pas linéaire : un facteur a sort au carré et une constante disparaît. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">E[X] et la moyenne de dix lancers : lequel des deux est aléatoire ?</div><div class="a hid">La moyenne des dix lancers, réalisation x̄ de la variable X̄ ; E[X] est un nombre fixe de la loi.</div></li>
+    <li><div class="q">Que vaut E[X + Y], et sous quelle hypothèse ?</div><div class="a hid">E[X] + E[Y], sans aucune hypothèse : la linéarité somme, elle ne factorise pas.</div></li>
+    <li><div class="q">Quand a-t-on E[XY] = E[X] E[Y] ?</div><div class="a hid">Sous indépendance. La réciproque est fausse : X sur {−1, 0, 1} et Y = X² donnent l'égalité.</div></li>
+    <li><div class="q">Définis la variance, puis donne sa forme de calcul.</div><div class="a hid">La moyenne des carrés des écarts à μ, E[(X − μ)²] ; E[X²] − μ².</div></li>
+    <li><div class="q">Que valent Var(2X) et Var(X + 5) ?</div><div class="a hid">4 Var(X) et Var(X) : a sort au carré, b disparaît.</div></li>
+    <li><div class="q">Pourquoi le terme croisé de Var(aX + bY) ne peut-il pas être 2ab E[XY] ?</div><div class="a hid">Avec X = Y = 1, la variance vaut 0 mais 2ab E[XY] vaut 2ab ; le terme croisé ignore les décalages : 2ab Cov(X, Y).</div></li>
+    <li><div class="q">Z vaut 0 (probabilité 0,9) ou 10 (probabilité 0,1). Pourquoi sa variance vaut-elle 9 ?</div><div class="a hid">μ = 1 ; 0,9 × 1 + 0,1 × 81 = 9 : la valeur rare fait 90 % de la variance.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts et chaînes</div>
+  <div class="bridges">
+    <a href="../bridges/bridge-04-variance-moyenne-correlee.html"><b>Variance d'une moyenne corrélée</b><small>Var d'une somme, avec le terme croisé que la notion 9 annonce.</small></a>
+    <a href="../chains/chain-p01-01-objet-aleatoire.html"><b>L'objet aléatoire (fil A)</b><small>E[X] est fixe, x̄ est une réalisation de X̄ : le « où ça casse » de la notion 1.</small></a>
+    <a href="../chains/chain-p06-01-biais-variance.html"><b>Biais et variance</b><small>E[(X − c)²] = Var + (μ − c)², la décomposition de la notion 2, appliquée à un estimateur.</small></a>
+    <a href="../chains/chain-p08-03-cross-entropy-entropie-kl.html"><b>Cross-entropy, entropie, KL</b><small>L'entropie est l'espérance de la surprise, − E[log p(X)] : LOTUS (notion 5).</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::esperance</code> (notions 1, 3, 4) · <code>stats::mediane</code> (notion 2) · <code>stats::lotus</code> (notion 5) · <code>stats::variance</code> (notions 6, 8, 9) · <code>stats::moments</code> (notion 7, sans carte).</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l08 · v1 du 10/10/2026 · Brunton 28 à 32 et 43 · Prérequis : <a href="../../map.html#l04">l04</a>, <a href="../../map.html#l05">l05</a>, <a href="../../map.html#l07">l07</a>. Suite : <a href="../../map.html#l09">l09 · Covariance et corrélation</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc : une entrée par notion, étiquette comprise */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.notion').forEach((s,i)=>{const li=document.createElement('li');const t=s.querySelector('h3').firstChild.textContent.trim();const k=s.classList.contains('culture')?' · culture':'';li.innerHTML=`<a href="#${s.id}">${i+1}. ${t}${k}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.notion').forEach(s=>io.observe(s));
+/* une ancre #nN ouvre la notion visée ; rien n'est replié par défaut hors des blocs */
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outils de dessin ===== */
+function curve(P,f,a,b,cls,ymax){let d='';const n=240;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;let y=f(x);if(!isFinite(y))continue;y=Math.min(y,ymax);d+=(d?' L':'M')+P.sx(x).toFixed(1)+' '+P.sy(y).toFixed(1);}SL.el('path',{d:d,class:'sl-fn '+cls,fill:'none'},P.dyn);}
+function bar(P,x0,x1,y,cls){const a=P.sx(x0),b=P.sx(x1);SL.el('rect',{x:Math.min(a,b),y:P.sy(y),width:Math.max(1.5,Math.abs(b-a)),height:Math.max(0,P.sy(0)-P.sy(y)),class:cls||'sl-bar'},P.dyn);}
+/* SL.plot trace l'axe vertical en x = 0 ; quand 0 porte une barre, on le ramène au bord gauche */
+function leftAxis(P,x0){const ax=P.svg.querySelectorAll('line.sl-axis');if(ax[1]){ax[1].setAttribute('x1',P.sx(x0));ax[1].setAttribute('x2',P.sx(x0));}}
+function rd(host,items){host.innerHTML=items.map(it=>`<div class="${it[2]||''}">${it[0]}<b>${it[1]}</b></div>`).join('');}
+function buttons(host,names,cb){const bs=names.map((n,i)=>{const b=SL.h('button','tb',host,n);b.onclick=()=>{bs.forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');cb(i);};return b;});bs[0].onclick();return bs;}
+
+/* ===== Figure 1 : dé pipé et point d'appui ===== */
+(function(){
+  const P=SL.plot(document.getElementById('f1plot'),{x:[0.3,6.7],y:[-0.14,1.1],w:560,h:260,xt:[1,2,3,4,5,6],yt:[0,0.25,0.5,0.75,1],xl:'face x',yl:'P(X = x)'});
+  const out=document.getElementById('f1out');
+  function draw(w6){
+    P.clear();
+    const p=[1,2,3,4,5,6].map(x=>x===6?w6:(1-w6)/5);
+    let E=0;p.forEach((q,i)=>E+=(i+1)*q);
+    p.forEach((q,i)=>bar(P,i+1-0.32,i+1+0.32,q,'sl-bar'));
+    const cx=P.sx(E),cy=P.sy(0),cb=P.sy(-0.12);
+    SL.el('path',{d:`M${cx.toFixed(1)} ${cy.toFixed(1)} L${(cx-10).toFixed(1)} ${cb.toFixed(1)} L${(cx+10).toFixed(1)} ${cb.toFixed(1)} Z`,class:'sl-fulcrum'},P.dyn);
+    P.text(E,1.02,'E[X] = '+SL.fmt(E,2),'sl-c3','middle');
+    rd(out,[['P(X = 6)',SL.fmt(w6,2)],['P(chaque autre face)',SL.fmt((1-w6)/5,3)],['E[X], le point d’appui',SL.fmt(E,2),'c3']]);
+  }
+  SL.slider(document.getElementById('f1ctl'),{label:'poids du 6',min:0.1667,max:0.9,step:0.0033,value:0.1667,fmt:v=>SL.fmt(v,2)},draw);
+})();
+
+/* ===== Figure 2 : log-normale, trois centres ===== */
+(function(){
+  const P=SL.plot(document.getElementById('f2plot'),{x:[0,8],y:[0,1.5],w:560,h:260,xt:[0,1,2,3,4,5,6,7,8],yt:[0,0.5,1,1.5],xl:'x / médiane',yl:'densité'});
+  const out=document.getElementById('f2out');
+  function draw(s){
+    P.clear();
+    const f=x=>x<=0?0:Math.exp(-(Math.log(x)**2)/(2*s*s))/(x*s*Math.sqrt(2*Math.PI));
+    curve(P,f,0.001,8,'sl-c1',1.5);
+    const mode=Math.exp(-s*s),med=1,mean=Math.exp(s*s/2);
+    [[mode,'mode','sl-c2',1.4],[med,'médiane','sl-c4',1.27],[mean,'moyenne','sl-c3',1.14]].forEach(m=>{if(m[0]<=8)P.vline(m[0],m[2]);P.text(7.9,m[3],'│ '+m[1],m[2],'end');});
+    rd(out,[['mode',SL.fmt(mode,3)],['médiane',SL.fmt(med,2)],['moyenne (= moyenne / médiane)',SL.fmt(mean,2),'c3']]);
+  }
+  SL.slider(document.getElementById('f2ctl'),{label:'σ de ln X',min:0.3,max:1.9,step:0.01,value:1,fmt:v=>SL.fmt(v,2)},draw);
+})();
+
+/* ===== Figure 3 : contributions à la variance ===== */
+(function(){
+  const laws=[
+    {n:'dé',v:[1,2,3,4,5,6],p:[1/6,1/6,1/6,1/6,1/6,1/6]},
+    {n:'{1, 3}',v:[1,3],p:[0.5,0.5]},
+    {n:'{0, 4}',v:[0,4],p:[0.5,0.5]},
+    {n:'Z : 0 ou 10',v:[0,10],p:[0.9,0.1]}];
+  const host=document.getElementById('f3plot'),out=document.getElementById('f3out');
+  function draw(k){
+    const L=laws[k];host.innerHTML='';
+    const mu=L.v.reduce((a,x,i)=>a+x*L.p[i],0);
+    const c=L.v.map((x,i)=>L.p[i]*(x-mu)**2),V=c.reduce((a,b)=>a+b,0);
+    const cmax=Math.max(...c),ym=k===3?9.7:2.4; /* même échelle pour dé, {1, 3}, {0, 4} : le ×4 se voit */
+    const P1=SL.plot(SL.h('div','',host),{x:[-0.6,10.6],y:[0,1],w:560,h:170,xt:[0,1,2,3,4,5,6,7,8,9,10],yt:[0,0.5,1]});
+    leftAxis(P1,-0.6);
+    L.v.forEach((x,i)=>bar(P1,x-0.3,x+0.3,L.p[i],'sl-bar'));
+    P1.vline(mu,'sl-mean');P1.text(mu+0.12,0.9,'μ = '+SL.fmt(mu,2),'sl-c3','start');
+    const step=ym>4?2:0.5,yt=[];for(let t=0;t<=ym+1e-9;t+=step)yt.push(+t.toFixed(2));
+    const P2=SL.plot(SL.h('div','',host),{x:[-0.6,10.6],y:[0,ym],w:560,h:190,xt:[0,1,2,3,4,5,6,7,8,9,10],yt:yt,xl:'x'});
+    leftAxis(P2,-0.6);
+    L.v.forEach((x,i)=>{bar(P2,x-0.3,x+0.3,c[i],'sl-bar2');if(c[i]>0)P2.text(x,c[i]+ym*0.04,SL.fmt(c[i],2),'','middle');});
+    P2.vline(mu,'sl-mean');
+    const big=c.indexOf(cmax);
+    rd(out,[['μ',SL.fmt(mu,2)],['Var = somme des barres du bas',SL.fmt(V,3),'c3'],['σ',SL.fmt(Math.sqrt(V),3)],['part de la plus haute barre',SL.fmt(100*cmax/V,1)+' %']]);
+  }
+  buttons(document.getElementById('f3ctl'),laws.map(l=>l.n),draw);
+})();
+
+/* ===== Figure 4 : exponentielle ===== */
+(function(){
+  const P=SL.plot(document.getElementById('f4plot'),{x:[0,3],y:[0,4.2],w:560,h:250,xt:[0,0.5,1,1.5,2,2.5,3],yt:[0,1,2,3,4],xl:'attente t (heures)',yl:'densité'});
+  const out=document.getElementById('f4out');
+  function draw(l){
+    P.clear();
+    curve(P,t=>l*Math.exp(-l*t),0,3,'sl-c1',4.2);
+    const mean=1/l,med=Math.log(2)/l;
+    if(mean<=3)P.vline(mean,'sl-mean');
+    if(med<=3)P.vline(med,'sl-c4');
+    P.text(2.95,3.9,'│ moyenne','sl-c3','end');P.text(2.95,3.5,'│ médiane','sl-c4','end');
+    rd(out,[['E[T] = 1/λ',SL.fmt(mean,3)+' h','c3'],['σ = 1/λ',SL.fmt(mean,3)+' h'],['médiane = ln 2/λ',SL.fmt(med,3)+' h'],['f(0) = λ',SL.fmt(l,2)]]);
+  }
+  SL.slider(document.getElementById('f4ctl'),{label:'taux λ par h',min:0.5,max:4,step:0.1,value:2,fmt:v=>SL.fmt(v,1)},draw);
+})();
+
+/* ===== Figure 5 : aX + b sur un dé ===== */
+(function(){
+  const P=SL.plot(document.getElementById('f5plot'),{x:[-24,24],y:[0,1.08],w:560,h:240,xt:[-20,-10,0,10,20],yt:[0,0.5,1],xl:'valeur de aX + b',yl:'probabilité'});
+  const out=document.getElementById('f5out'),ctl=document.getElementById('f5ctl');
+  const st={a:1,b:0},V=35/12;
+  function draw(){
+    P.clear();
+    const m=new Map();for(let x=1;x<=6;x++){const y=st.a*x+st.b;m.set(y,(m.get(y)||0)+1/6);}
+    const w=Math.max(0.12,Math.min(0.8,0.8*Math.abs(st.a)));
+    m.forEach((q,y)=>bar(P,y-w/2,y+w/2,q,'sl-bar'));
+    const E=3.5*st.a+st.b,s=Math.abs(st.a)*Math.sqrt(V);
+    P.vline(E,'sl-mean');
+    if(s>0)P.seg(E-s,0.95,E+s,0.95,'gain');
+    P.text(E+0.8,1.01,'moyenne '+SL.fmt(E,2),'sl-c3','start');
+    rd(out,[['E = 3,5a + b',SL.fmt(E,2),'c3'],['Var = a² × 2,917',SL.fmt(st.a*st.a*V,3)],['σ = |a| × 1,708',SL.fmt(s,3)]]);
+  }
+  SL.slider(ctl,{label:'a (étire)',min:-3,max:3,step:0.25,value:1,fmt:v=>SL.fmt(v,2)},v=>{st.a=v;draw();});
+  SL.slider(ctl,{label:'b (décale)',min:-5,max:5,step:1,value:0,fmt:v=>SL.fmt(v,0)},v=>{st.b=v;draw();});
+})();
+
+/* ===== Figure 6 : escalier de survie ===== */
+(function(){
+  const host=document.getElementById('f6plot'),out=document.getElementById('f6out');
+  function draw(k){
+    host.innerHTML='';
+    if(k===0){
+      const P=SL.plot(SL.h('div','',host),{x:[0,7],y:[0,1.15],w:560,h:230,xt:[0,1,2,3,4,5,6,7],yt:[0,0.5,1],xl:'k'});
+      P.text(6.9,1.06,'marche k : P(X ≥ k)','','end');
+      let s=0;for(let j=1;j<=6;j++){const q=(7-j)/6;s+=q;bar(P,j-1+0.02,j-0.02,q,'sl-bar3');P.text(j-0.5,q+0.04,SL.fmt(q,2),'','middle');}
+      rd(out,[['somme des marches',SL.fmt(s,3),'c3'],['E[X] d’un dé','3,5']]);
+    }else{
+      const p=1/6,q=1-p;const P=SL.plot(SL.h('div','',host),{x:[0,30],y:[0,1.15],w:560,h:230,xt:[0,5,10,15,20,25,30],yt:[0,0.5,1],xl:'k'});
+      P.text(29.6,1.06,'marche k : P(X ≥ k) = (5/6)ᵏ⁻¹','','end');
+      let s=0;for(let j=1;j<=30;j++){const v=Math.pow(q,j-1);s+=v;bar(P,j-1+0.05,j-0.05,v,'sl-bar3');}
+      rd(out,[['30 premières marches',SL.fmt(s,3),'c3'],['série complète = 1/p','6']]);
+    }
+  }
+  buttons(document.getElementById('f6ctl'),['dé','géométrique, p = 1/6'],draw);
+})();
+})();
+</script>
+</body>
+</html>
