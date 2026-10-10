@@ -95,7 +95,7 @@ ml::logistique;b05;Escalier vs sensible;https://learnings-ek5.pages.dev/sheets/b
 ml::logistique;p02-01;Du bruit à la loss;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-01-bruit-vraisemblance-loss.html;
 ml::logistique;p03-01;Critère en escalier vs critère sensible;https://learnings-ek5.pages.dev/sheets/chains/chain-p03-01-critere-escalier-vs-sensible.html;
 ml::logistique;p05-02;Régression logistique : logit, odds ratio, effet marginal;https://learnings-ek5.pages.dev/sheets/chains/chain-p05-02-logistique.html;
-ml::metriques;p00-03;Conditionnement et Bayes;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-03-conditionnement-bayes.html#s8;s8
+ml::metriques;l03;Conditionner, Bayes, indépendance;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-03-conditionner-bayes-independance.html;
 ml::metriques;p06-03;Seuil, matrice de confusion, ROC, PR;https://learnings-ek5.pages.dev/sheets/chains/chain-p06-03-seuil-roc-pr.html;
 ml::odds-ratio;p05-02;Régression logistique : logit, odds ratio, effet marginal;https://learnings-ek5.pages.dev/sheets/chains/chain-p05-02-logistique.html#s4;s4
 ml::ols;p05-01;Régression linéaire, OLS, ce que R² ne dit pas;https://learnings-ek5.pages.dev/sheets/chains/chain-p05-01-regression-modele-ols.html;
@@ -139,32 +139,39 @@ python::flottants;p08-02;Flottants et log-sum-exp;https://learnings-ek5.pages.de
 python::keepdim;p08-04;Tenseurs : ruban, strides, vue vs copie, broadcasting;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-04-tenseurs-ruban-strides-broadcasting.html;
 python::strides;p08-04;Tenseurs : ruban, strides, vue vs copie, broadcasting;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-04-tenseurs-ruban-strides-broadcasting.html;
 python::tenseurs;p08-04;Tenseurs : ruban, strides, vue vs copie, broadcasting;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-04-tenseurs-ruban-strides-broadcasting.html;
-stats::base-rate;p00-03;Conditionnement et Bayes;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-03-conditionnement-bayes.html;
-stats::bayes;p00-03;Conditionnement et Bayes;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-03-conditionnement-bayes.html#s5;s5
+stats::axiomes;l02;Ω, axiomes, complément, triangle de Pascal;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-02-espace-axiomes-complement.html#n2;n2
+stats::base-rate;l03;Conditionner, Bayes, indépendance;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-03-conditionner-bayes-independance.html;
+stats::bayes;l03;Conditionner, Bayes, indépendance;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-03-conditionner-bayes-independance.html#n4;n4
 stats::bayes;p02-03;Le posterior entier;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-03-conjugues-posterior.html;
 stats::bessel;p01-03;Inférence en régression;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-03-inference-regression.html;
 stats::beta;p02-03;Le posterior entier;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-03-conjugues-posterior.html;
-stats::binomiale;p00-01;Lois usuelles — quelle situation déclenche quelle loi;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-01-lois-quand-laquelle.html#s3;s3
+stats::binomiale;l04;Variables aléatoires, de la binomiale à la normale;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-04-variables-binomiale-normale.html;
 stats::binomiale;p01-01;L'objet aléatoire;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-01-objet-aleatoire.html;
 stats::bootstrap;b04;La variance d'une moyenne corrélée;https://learnings-ek5.pages.dev/sheets/bridges/bridge-04-variance-moyenne-correlee.html;
 stats::bootstrap;p01-05;Bootstrap, la distribution d'échantillonnage sans formule;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-05-bootstrap.html;
+stats::chebyshev;l10;Inégalités et loi des grands nombres;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-10-inegalites-lgn.html#n2;n2
+stats::chi2;l06;Fonctions d'une variable aléatoire;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-06-fonctions-standardisation.html;
 stats::comparaison;p01-04;Comparer deux modèles, et pourquoi le max ment;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-04-comparer-modeles-multiplicite.html;
 stats::comparaison;w01-02;Comparer deux modèles sur le même tirage;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p01-02-comparer-deux-modeles.html;
-stats::conditionnement;p00-03;Conditionnement et Bayes;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-03-conditionnement-bayes.html;
-stats::covariance;p00-02;Espérance, variance, masse vs densité;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-02-esperance-variance-densite.html;
-stats::densite;p00-02;Espérance, variance, masse vs densité;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-02-esperance-variance-densite.html#s7;s7
+stats::complement;l02;Ω, axiomes, complément, triangle de Pascal;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-02-espace-axiomes-complement.html;
+stats::conditionnement;l03;Conditionner, Bayes, indépendance;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-03-conditionner-bayes-independance.html;
+stats::correlation;l09;Covariance et corrélation;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-09-covariance-correlation.html#n4;n4
+stats::covariance;l09;Covariance et corrélation;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-09-covariance-correlation.html;
+stats::denombrement;l01;Compter;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-01-compter.html;
+stats::densite;l04;Variables aléatoires, de la binomiale à la normale;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-04-variables-binomiale-normale.html#n2;n2
 stats::entropie;p08-03;Cross-entropy, entropie, KL;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-03-cross-entropy-entropie-kl.html#s4;s4
 stats::esperance;l08;Espérance et variance;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-08-esperance-variance.html;
-stats::esperance;p00-02;Espérance, variance, masse vs densité;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-02-esperance-variance-densite.html;
 stats::estimation;b03;Biais et variance partout;https://learnings-ek5.pages.dev/sheets/bridges/bridge-03-biais-variance-partout.html#s5;s5
 stats::estimation;p01-01;L'objet aléatoire;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-01-objet-aleatoire.html;
 stats::estimation;p01-03;Inférence en régression;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-03-inference-regression.html;
 stats::estimation;w01-04;De l'accuracy au SE en quatre maillons;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p01-04-accuracy-vers-se.html;
 stats::estimation;w01-05;La chaîne du test en régression, hypothèse par hypothèse;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p01-05-chaine-test-regression-hypotheses.html;
-stats::exponentielle;p00-01;Lois usuelles — quelle situation déclenche quelle loi;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-01-lois-quand-laquelle.html#s5;s5
+stats::exponentielle;l05;Événements rares et temps d'attente;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-05-poisson-exponentielle-attentes.html#n3;n3
+stats::geometrique;l05;Événements rares et temps d'attente;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-05-poisson-exponentielle-attentes.html#n2;n2
 stats::h0;p01-02;Intervalle de confiance et test;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-02-ic-test-procedure.html;
 stats::ic;p01-02;Intervalle de confiance et test;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-02-ic-test-procedure.html;
 stats::ic;w01-01;L’intervalle porte sur la procédure;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p01-01-intervalle-procedure.html;
+stats::independance;l03;Conditionner, Bayes, indépendance;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-03-conditionner-bayes-independance.html;
 stats::inference;p01-01;L'objet aléatoire;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-01-objet-aleatoire.html;
 stats::inference;p01-02;Intervalle de confiance et test;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-02-ic-test-procedure.html;
 stats::inference;p01-03;Inférence en régression;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-03-inference-regression.html;
@@ -172,21 +179,24 @@ stats::inference;p01-04;Comparer deux modèles, et pourquoi le max ment;https://
 stats::inference;p01-05;Bootstrap, la distribution d'échantillonnage sans formule;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-05-bootstrap.html;
 stats::inference;w01-05;La chaîne du test en régression, hypothèse par hypothèse;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p01-05-chaine-test-regression-hypotheses.html;
 stats::kl;p08-03;Cross-entropy, entropie, KL;https://learnings-ek5.pages.dev/sheets/chains/chain-p08-03-cross-entropy-entropie-kl.html;
-stats::lgn;p00-04;Moyenne, loi des grands nombres, théorème central limite;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-04-moyenne-lgn-tcl.html;
-stats::lois;p00-01;Lois usuelles — quelle situation déclenche quelle loi;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-01-lois-quand-laquelle.html;
+stats::lgn;l10;Inégalités et loi des grands nombres;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-10-inegalites-lgn.html;
+stats::loi-jointe;l07;Lois jointes, marginales, conditionnelles;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-07-lois-jointes.html#n1;n1
+stats::lois;l05;Événements rares et temps d'attente;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-05-poisson-exponentielle-attentes.html;
 stats::lotus;l08;Espérance et variance;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-08-esperance-variance.html;
 stats::map;p02-02;Du prior à la pénalité;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-02-prior-penalite.html;
 stats::map;p02-03;Le posterior entier;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-03-conjugues-posterior.html;
+stats::marginale;l07;Lois jointes, marginales, conditionnelles;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-07-lois-jointes.html#n2;n2
 stats::mediane;l08;Espérance et variance;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-08-esperance-variance.html;
+stats::mgf;l12;Fonction génératrice et preuve du TCL;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-12-generatrice-preuve-tcl.html;
 stats::mle;p02-01;Du bruit à la loss;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-01-bruit-vraisemblance-loss.html;
 stats::mle-map;p02-03;Le posterior entier;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-03-conjugues-posterior.html;
 stats::moments;l08;Espérance et variance;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-08-esperance-variance.html#n7;n7
 stats::multiplicite;b02;Le témoin atteignable;https://learnings-ek5.pages.dev/sheets/bridges/bridge-02-temoin-atteignable.html;
 stats::multiplicite;p01-04;Comparer deux modèles, et pourquoi le max ment;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-04-comparer-modeles-multiplicite.html;
 stats::multiplicite;w01-03;Le biais du max;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p01-03-biais-du-max.html;
-stats::normale;p00-01;Lois usuelles — quelle situation déclenche quelle loi;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-01-lois-quand-laquelle.html#s6;s6
-stats::normale;p00-04;Moyenne, loi des grands nombres, théorème central limite;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-04-moyenne-lgn-tcl.html#s6;s6
-stats::poisson;p00-01;Lois usuelles — quelle situation déclenche quelle loi;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-01-lois-quand-laquelle.html#s4;s4
+stats::normale;l04;Variables aléatoires, de la binomiale à la normale;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-04-variables-binomiale-normale.html;
+stats::normale;l11;Théorème central limite;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-11-tcl.html#n1;n1
+stats::poisson;l05;Événements rares et temps d'attente;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-05-poisson-exponentielle-attentes.html;
 stats::procedure;w01-05;La chaîne du test en régression, hypothèse par hypothèse;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p01-05-chaine-test-regression-hypotheses.html;
 stats::pvalue;p01-02;Intervalle de confiance et test;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-02-ic-test-procedure.html;
 stats::pvalue;w01-05;La chaîne du test en régression, hypothèse par hypothèse;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p01-05-chaine-test-regression-hypotheses.html;
@@ -195,11 +205,12 @@ stats::regularisation;p02-02;Du prior à la pénalité;https://learnings-ek5.pag
 stats::regularisation;p03-01;Critère en escalier vs critère sensible;https://learnings-ek5.pages.dev/sheets/chains/chain-p03-01-critere-escalier-vs-sensible.html;
 stats::regularisation;w02-01;Une chaîne, trois exemples;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html;
 stats::residus;p05-01;Régression linéaire, OLS, ce que R² ne dit pas;https://learnings-ek5.pages.dev/sheets/chains/chain-p05-01-regression-modele-ols.html#s5;s5
-stats::se;p00-04;Moyenne, loi des grands nombres, théorème central limite;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-04-moyenne-lgn-tcl.html;
-stats::tcl;p00-04;Moyenne, loi des grands nombres, théorème central limite;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-04-moyenne-lgn-tcl.html;
+stats::se;l10;Inégalités et loi des grands nombres;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-10-inegalites-lgn.html;
+stats::standardisation;l06;Fonctions d'une variable aléatoire;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-06-fonctions-standardisation.html;
+stats::tcl;l11;Théorème central limite;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-11-tcl.html;
 stats::tcl;p01-01;L'objet aléatoire;https://learnings-ek5.pages.dev/sheets/chains/chain-p01-01-objet-aleatoire.html;
+stats::va;l04;Variables aléatoires, de la binomiale à la normale;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-04-variables-binomiale-normale.html;
 stats::variance;b04;La variance d'une moyenne corrélée;https://learnings-ek5.pages.dev/sheets/bridges/bridge-04-variance-moyenne-correlee.html;
 stats::variance;l08;Espérance et variance;https://learnings-ek5.pages.dev/sheets/lessons/lesson-00-08-esperance-variance.html;
-stats::variance;p00-02;Espérance, variance, masse vs densité;https://learnings-ek5.pages.dev/sheets/chains/chain-p00-02-esperance-variance-densite.html;
 stats::vraisemblance;p02-01;Du bruit à la loss;https://learnings-ek5.pages.dev/sheets/chains/chain-p02-01-bruit-vraisemblance-loss.html;
 stats::vraisemblance;w02-01;Une chaîne, trois exemples;https://learnings-ek5.pages.dev/sheets/walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html;
