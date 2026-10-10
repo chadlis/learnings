@@ -1,0 +1,1115 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Lois jointes, marginales, conditionnelles — leçon</title>
+<meta name="sheet" content="series=lesson;part=00;number=07;status=v1">
+<meta name="part" content="00 · Socle probabiliste">
+<meta name="subtitle" content="socle — Brunton 26 et 27 : intégrer pour marginaliser, factoriser pour l'indépendance">
+<meta name="prereq" content="l03,l06">
+<meta name="anki" content="stats::loi-jointe,stats::marginale">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- série `coding` : squelette annoté et ruban de SL.trace (inerte hors coding) ---- */
+.skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.skel b{color:var(--pen);font-weight:600}
+.step .card.full,.step .card.casse{grid-column:1 / -1}
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .wide table{min-width:520px}
+.card .wide th:nth-child(2),.card .wide td:nth-child(2),
+.card .wide th:nth-child(3),.card .wide td:nth-child(3){text-align:left}
+.readouts .c1 b{color:var(--pen)}.readouts .c3 b{color:var(--red)}
+.sl-trace{--cw:58px;--cgap:8px;margin:4px 0 2px}
+.sl-cells{display:flex;gap:var(--cgap)}
+.sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
+.sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
+.sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.dim{background:rgba(34,48,43,.07);border-color:rgba(34,48,43,.18);border-style:dashed}
+.sl-cell.dim b,.sl-cell.dim i{color:var(--cardmuted);opacity:.5}
+.sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
+.sl-cell.win{border-color:var(--green);border-width:2.5px}
+.sl-ptrs{position:relative;height:20px;margin-top:5px}
+.sl-ptr{position:absolute;top:0;left:calc(var(--i) * (var(--cw) + var(--cgap)));width:var(--cw);text-align:center;font:600 12px var(--sans);color:var(--pen)}
+.sl-note{font-size:14px;color:var(--cardink);margin-top:10px}
+.sl-inv{font:12.5px/1.55 var(--mono);color:var(--cardmuted);margin-top:6px;border-left:2px solid #B7791F;padding-left:10px}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ===== série `lesson` : le cours autoporteur du socle (10/10/2026) ===== */
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px;color:var(--muted);margin:10px 0 0}
+.legend .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-right:6px}
+.lecon{counter-reset:notion}
+.notion{padding:22px 0 28px;border-top:1.5px dashed var(--line);max-width:900px}
+.notion h3{position:relative;padding-left:44px;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.3;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:2px}
+.notion h3::before{counter-increment:notion;content:counter(notion);position:absolute;left:0;top:-1px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle;text-shadow:none}
+.tag.outil{color:var(--mint)}.tag.culture{color:var(--violet)}
+.src{font-size:12.5px;color:var(--faint);margin:0 0 10px 44px}
+.idee{margin-left:44px;color:var(--chalk);font-size:16px;line-height:1.62;max-width:72ch}
+.idee p{margin:7px 0}
+.idee b{color:var(--yellow);font-weight:600}
+.formule{margin:12px 0 10px 44px;background:var(--card);color:var(--cardink);border-radius:3px;padding:12px 18px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--yellow)}
+.formule .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:4px}
+.formule .eq{font-size:17.5px}
+.formule ul{padding-left:18px;margin-top:6px}.formule li{font-size:14.5px;margin:3px 0;color:var(--cardmuted)}
+.notion .fig{margin-left:44px}
+details{margin:8px 0 0 44px;background:var(--card);color:var(--cardink);border-radius:3px;border-left:4px solid var(--ac,var(--yellow));box-shadow:0 10px 20px -16px rgba(0,0,0,.6)}
+details>summary{cursor:pointer;list-style:none;padding:9px 14px;font:600 13px var(--sans);letter-spacing:.03em;color:var(--cardink)}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸";display:inline-block;width:16px;color:var(--cardmuted)}
+details[open]>summary::before{content:"▾"}
+details>summary small{font-weight:400;color:var(--cardmuted);margin-left:6px;letter-spacing:0}
+details .in{padding:2px 18px 14px}
+details .in p,details .in li{font-size:15px;line-height:1.55;margin:5px 0}
+details .in ol,details .in ul{padding-left:20px}
+details.ex{--ac:var(--teal)}details.preuve{--ac:var(--violet)}details.code{--ac:var(--blue)}details.casse{--ac:var(--pink)}details.loin{--ac:var(--faint)}
+.drv{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:4px 16px;margin:8px 0;align-items:baseline}
+.drv>div{font-family:var(--math);font-size:16px;line-height:1.6}
+.drv>span{font-size:13.5px;color:var(--cardmuted);border-left:2px solid var(--cardline);padding-left:10px}
+@media(max-width:700px){.drv{grid-template-columns:minmax(0,1fr)}.drv>span{margin-bottom:6px}}
+pre.py,pre.out,pre.tri{font:13px/1.6 var(--mono);background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:pre}
+pre.out{background:transparent;border:1px dashed var(--cardline);color:var(--cardmuted)}
+pre.out::before{content:"sortie\A";font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.brunton{margin:10px 0 4px;padding:8px 12px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft);font-size:14.5px}
+.brunton b{display:block;font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:2px}
+.garde{margin:14px 0 0 44px;font-family:var(--serif);font-size:16.5px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--yellow);padding:4px 0 4px 14px;max-width:72ch}
+.garde::before{content:"Ce qu'on garde";display:block;font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);text-shadow:none;margin-bottom:2px}
+.notion.culture .garde{border-left-color:var(--violet)}
+.notion table{background:var(--cardsoft);border-radius:3px}
+.sl-fulcrum{fill:var(--red)}.sl-bar2{fill:var(--red);opacity:.55}.sl-bar3{fill:var(--pen);opacity:.6}
+@media(max-width:600px){.idee,.formule,details,.garde,.src,.notion .fig{margin-left:0}.notion h3{font-size:19px}}
+.sl-seg.sl-c1{stroke:var(--pen);stroke-width:2}.sl-seg.sl-c2{stroke:#6B46C1;stroke-width:2}.sl-seg.sl-c3{stroke:var(--red);stroke-width:2}.sl-seg.sl-c4{stroke:#1F5FA8;stroke-width:2}
+/* ===== v2 (10/10/2026) : vignettes « voir l'idée », sous chaque idée ===== */
+.fig.vis{--ac:var(--teal)}
+.v-row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:center}
+.v-row>div{flex:1 1 280px;min-width:0}.v-row>.v-mini{flex:0 1 220px}
+.v-row .sl-plot{min-width:0}
+.nogrid .sl-grid{display:none}
+.sl-ruler{fill:var(--cardmuted)}
+.sl-mass{fill:#6B46C1;opacity:.85}
+.sl-mass-t{font:600 11px var(--sans);fill:#fff}
+.sl-sq{fill:rgba(107,70,193,.16);stroke:#6B46C1;stroke-width:1.5}
+.sl-sq-t{font:600 12.5px var(--mono);fill:#6B46C1}
+.sl-cellp{fill:#6B46C1}.sl-cello{fill:none;stroke:var(--cardline)}
+.sl-prod{font:12px var(--mono);fill:var(--cardmuted);opacity:.5}.sl-prod.on{font-weight:700;fill:var(--cardink);opacity:1}
+.sl-seg.sl-dash{stroke-dasharray:4 3}.sl-seg.sl-link{stroke:rgba(34,48,43,.28);stroke-dasharray:3 3}
+.sl-seg.sl-c5{stroke:#B7791F;stroke-width:2}
+.sl-orbit{fill:none;stroke:rgba(34,48,43,.3);stroke-dasharray:3 4}
+.sl-stick{stroke:var(--cardmuted);stroke-width:4;stroke-linecap:round}
+.sl-dot.sl-tiny{stroke:none;opacity:.5}
+.sl-k1{fill:var(--pen)}.sl-k2{fill:#6B46C1}.sl-k3{fill:var(--red)}.sl-k4{fill:#1F5FA8}.sl-k5{fill:#B7791F}.sl-k6{fill:var(--green)}.sl-kc{opacity:.5}
+.sl-cell-t{font:600 11px var(--sans);fill:var(--cardink)}
+/* ---- propre à cette leçon ---- */
+.sl-band{fill:rgba(183,121,31,.17);stroke:none}
+.sl-frame{fill:none;stroke:rgba(34,48,43,.28)}
+.sl-court{fill:none;stroke:rgba(34,48,43,.62);stroke-width:1.4}
+.sl-region{fill:none;stroke:var(--red);stroke-width:2.4}
+.sl-cellA{fill:var(--red)}
+.sl-fn.sl-dash{stroke-dasharray:6 4}
+.sl-fn.sl-thin{stroke-width:1.7}
+.sl-area{fill:rgba(107,70,193,.16);stroke:none}
+.sl-ring1{fill:none;stroke:var(--red);stroke-width:1.6;stroke-dasharray:5 3}
+.sl-dot.sl-hot{stroke:none;opacity:.9}
+#v2sl .sl-slider,#v6sl .sl-slider{grid-template-columns:110px 1fr 96px}
+.sl-halo{paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 7</div>
+  <h1>Lois <span>jointes</span>, marginales, conditionnelles</h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Deux variables observées ensemble ont une loi sur le plan, la <b>loi jointe</b>. On en tire trois gestes : intégrer l'autre variable pour la <b>marginale</b>, couper une tranche et la renormaliser pour la <b>conditionnelle</b>, factoriser pour reconnaître l'<b>indépendance</b>. La leçon suit Brunton 26 et 27, avec ses exemples : un joueur de basket filmé une saison, une gaussienne ronde, des fléchettes. Deux dés servent aux calculs à la main.</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="lesson-00-03-conditionner-bayes-independance.html#n1">l03 · Conditionner, Bayes, indépendance</a></li>
+    <li><a href="lesson-00-06-fonctions-standardisation.html#n1">l06 · Fonctions d'une variable aléatoire</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::loi-jointe</code><code>stats::marginale</code></div>
+  <h4>Suite</h4>
+  <ol>
+    <li><a href="lesson-00-08-esperance-variance.html">l08 · Espérance et variance</a></li>
+    <li><a href="lesson-00-09-covariance-correlation.html">l09 · Covariance et corrélation</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>Conditionner, c'est zoomer.</b> P(A ∣ B) = P(A ∩ B)/P(B) : on ne garde que B et on renormalise par sa probabilité (<a href="lesson-00-03-conditionner-bayes-independance.html#n1">l03, notion 1</a>). Les probabilités totales, P(A) = Σ P(A ∩ B<sub><i>k</i></sub>) pour une partition (<a href="lesson-00-03-conditionner-bayes-independance.html#n3">notion 3</a>), et Bayes (<a href="lesson-00-03-conditionner-bayes-independance.html#n4">notion 4</a>).</li>
+      <li><b>Indépendance d'événements.</b> P(A ∩ B) = P(A) P(B), autrement dit P(A ∣ B) = P(A) (<a href="lesson-00-03-conditionner-bayes-independance.html#n7">l03, notion 7</a>).</li>
+      <li><b>Densité.</b> f ≥ 0, ∫ f = 1, P(a ≤ X ≤ b) = ∫<sub><i>a</i></sub><sup><i>b</i></sup> f ; f(x) dx est la probabilité d'un petit intervalle, et f peut dépasser 1 (<a href="lesson-00-04-variables-binomiale-normale.html#n2">l04, notion 2</a>). La normale centrée réduite a la densité φ(x) = (1/√(2π)) e<sup>−x²/2</sup> (<a href="lesson-00-04-variables-binomiale-normale.html#n6">l04, notion 6</a>).</li>
+      <li><b>Changer de variable par la CDF.</b> On écrit P(Y ≤ y) en fonction de X, puis on dérive ; la densité se multiplie par |dx/dy| (<a href="lesson-00-06-fonctions-standardisation.html#n1">l06, notion 1</a>). Sert en notion 6.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">
+
+<!-- ============================ n1 ============================ -->
+<section class="notion outil" id="n1">
+  <h3>La loi jointe : une loi sur le plan <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 26 · Joint Probability Distributions</p>
+  <div class="idee">
+    <p>Deux variables observées ensemble, X et Y, ont une loi sur le plan : la <b>loi jointe</b> P(X = x, Y = y), la probabilité que les deux valeurs sortent à la fois. Brunton pense aux trois composantes de la vitesse dans un fluide turbulent.</p>
+    <p>Pour deux dés, la loi jointe est un tableau de 36 cases de 1/36. Un événement est une région du tableau, et sa probabilité est la somme de ses cases : « X + Y = 7 » occupe une diagonale de 6 cases, soit 6/36.</p>
+    <p>Brunton passe au continu avec un joueur de basket filmé toute une saison : une <b>densité jointe</b> f(x, y) de sa position, haute là où il traîne souvent. f(x, y) dx dy est la probabilité de le trouver dans une minuscule case dx × dy ; la probabilité d'une zone, la raquette par exemple, est la somme de ces cases, l'intégrale double de f sur la zone.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — un événement est une région du tableau</div>
+    <div id="v1ctl" class="sl-ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">Les 36 cases des deux dés, chacune de probabilité 1/36. Choisis un événement : ses cases se colorent et sa probabilité est leur somme. <b>X + Y = 7</b> : la diagonale, 6/36. <b>X &gt; Y</b> : les 15 cases sous la diagonale, 15/36 = 0,417. <b>X ≤ 2 et Y ≥ 5</b> : un rectangle de 4 cases, 4/36. Puis <b>lance 360 paires</b> : chaque paire tombe dans sa case, et la part des paires dans la région approche la somme des cases.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">discret : P((<i>X</i>, <i>Y</i>) ∈ <i>A</i>) = Σ<sub>(<i>x</i>, <i>y</i>) ∈ <i>A</i></sub> P(<i>X</i> = <i>x</i>, <i>Y</i> = <i>y</i>) &nbsp;&nbsp;&nbsp; continu : P((<i>X</i>, <i>Y</i>) ∈ <i>A</i>) = ∬<sub><i>A</i></sub> <i>f</i>(<i>x</i>, <i>y</i>) d<i>x</i> d<i>y</i></div>
+    <ul><li>Discret : chaque case vaut P(X = x, Y = y) ≥ 0, et toutes les cases somment à 1. Continu : f(x, y) ≥ 0 et ∬ f = 1 sur tout le plan.</li><li>f(x, y) dx dy ≈ P(X ∈ [x, x + dx], Y ∈ [y, y + dy]). f est une probabilité <b>par unité d'aire</b>, pas une probabilité : elle peut dépasser 1.</li><li>X et Y n'ont pas à suivre la même loi, ni à être toutes deux discrètes ou toutes deux continues (la notion 5 couple une classe et un score).</li></ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — l'intégrale double est une somme de petites cases</div>
+    <div id="f1ctl" class="sl-ctl"></div><div id="f1ctl2" class="sl-ctl"></div>
+    <div id="f1plot" class="wide"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Un demi-terrain de 15 m × 14 m, et une densité de présence inventée pour l'exemple : beaucoup près du panier, un peu en haut de la raquette, un peu dans le corner droit. Plus la case est foncée, plus f y est haute. Chaque case pèse f × aire de la case ; celles de la région choisie sont en rouge. Avec des <b>cases de 1 m</b>, le terrain est un tableau de 210 cases, comme celui des dés, et la raquette pèse 0,610. Affine à <b>0,5 m</b> puis <b>0,25 m</b> : la somme tend vers l'intégrale, 0,608. Le corner droit pèse 0,143, et <b>tout le terrain</b> 1.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux pièces, deux dés, le carré, une densité qui vaut 4, le terrain</small></summary><div class="in">
+    <ol>
+      <li><b>Deux pièces.</b> Quatre cases, (P, P), (P, F), (F, P), (F, F), de ¼ chacune.</li>
+      <li><b>Deux dés.</b> P(X + Y = 7) = 6/36 = 1/6. P(X &gt; Y) = 15/36 = 0,417, les cases sous la diagonale. P(X = Y) = 6/36, la diagonale.</li>
+      <li><b>Uniforme sur le carré [0 ; 1]².</b> f = 1 sur le carré : la probabilité d'une région est son aire. P(X + Y ≤ 1) = ½, l'aire du triangle sous la diagonale.</li>
+      <li><b>Une densité qui vaut 4.</b> Uniforme sur [0 ; ½]² : l'aire vaut ¼, donc f = 4 pour que la masse fasse 1. La valeur 4 n'est pas une probabilité.</li>
+      <li><b>Le terrain</b> (figure 1). Avec la densité de la figure, P(raquette) = 0,608 et P(corner droit) = 0,143. Brunton ne donne pas de chiffres : ces valeurs viennent de la densité inventée.</li>
+      <li><b>En ML.</b> Un jeu de données étiqueté (x<sub><i>i</i></sub>, y<sub><i>i</i></sub>) est un échantillon de la loi jointe p(x, y) des variables explicatives (features) et de l'étiquette. Les caméras de Brunton font la même chose : leurs positions approchent la densité du joueur.</li>
+    </ol>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>f(x, y) n'est pas une probabilité.</b> En continu, P(X = x, Y = y) = 0 pour chaque point ; seule une région d'aire non nulle a une probabilité.</li>
+      <li><b>La valeur de f dépend de l'unité.</b> La densité du joueur culmine à 0,081 par m² ; par cm², elle vaudrait 10 000 fois moins. La probabilité de la raquette, elle, ne change pas.</li>
+      <li><b>Les deux lois séparées ne suffisent pas.</b> Deux dés indépendants et « le même dé lu deux fois » (Y = X) donnent chacun six faces de 1/6 en X comme en Y. Leurs jointes diffèrent : 36 cases de 1/36 d'un côté, 6 cases de 1/6 sur la diagonale de l'autre (notions 2 et 4).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (26) dit que la PCA suppose une loi jointe gaussienne. La PCA calcule les directions de plus grande variance de n'importe quel nuage, sans hypothèse de loi. La gaussienne ne sert qu'à aller plus loin : pour une gaussienne jointe, des composantes décorrélées sont indépendantes, ce qui est faux en général (<a href="lesson-00-09-covariance-correlation.html#n3">l09</a>).</div>
+  </div></details>
+  <p class="garde">La loi jointe d'un couple (X, Y) donne la probabilité de chaque case, P(X = x, Y = y), ou une densité f(x, y) ; une région A pèse la somme de ses cases, ou ∬<sub>A</sub> f dx dy.</p>
+</section>
+
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>La marginale : intégrer l'autre variable <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 26, et 27 · Marginal and Conditional Densities</p>
+  <div class="idee">
+    <p>La <b>marginale</b> de X est la loi de X seule, quelle que soit Y. Dans le tableau des deux dés, P(X = 3) est la somme de la colonne x = 3 : six cases de 1/36, donc 1/6. On écrivait ces sommes dans la marge, d'où le nom. En continu, on intègre l'autre variable : f<sub>X</sub>(x) = ∫ f(x, y) dy.</p>
+    <p>Brunton dit que la gaussienne 2D est « une gaussienne en x et une gaussienne en y ». Le nuage de points paraît pourtant presque uniforme. D'abord, au cœur du nuage la densité baisse lentement : à distance 1 du centre, elle n'a perdu que 39 %, une pente que l'œil ne voit pas. Ensuite, « gaussienne en x » ne décrit pas l'aspect du nuage mais sa marginale, le compte des points de chaque bande verticale. La bande du centre traverse tout le nuage, celle du bord n'en touche qu'un bout clairsemé : ces comptes dessinent une cloche. Sur un carré uniforme, chaque bande compte autant de points : la marginale est plate.</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — la marginale compte les points bande par bande</div>
+    <div id="v2ctl" class="sl-ctl"></div><div id="v2ctl2" class="sl-ctl"></div><div id="v2sl"></div>
+    <div id="v2plot" class="wide"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">Chaque point est un couple (x, y). En haut, le nombre de points de chaque bande verticale de largeur 0,5 : c'est la marginale de X. À droite, celui de chaque bande horizontale : la marginale de Y. Les tirets donnent la loi théorique. Déplace la <b>bande</b> : dans le nuage gaussien, la bande [0 ; 0,5] contient 19,1 % des points, la bande [1,5 ; 2] seulement 4,4 %. <b>Uniforme sur un carré</b> : 12,5 % dans chaque bande, la marginale est plate. <b>Uniforme sur un disque</b> : la densité est la même partout, mais les bandes du centre sont plus longues, et la marginale fait un dôme (15,7 % contre 7,2 %). Compare au disque : les deux cœurs paraissent aussi remplis, mais le gaussien s'effiloche au bord, et sa marginale a des queues. <b>Ajoute des points</b> : les histogrammes se remplissent vers les tirets.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">discret : P(<i>X</i> = <i>x</i>) = Σ<sub><i>y</i></sub> P(<i>X</i> = <i>x</i>, <i>Y</i> = <i>y</i>) &nbsp;&nbsp;&nbsp; continu : <i>f<sub>X</sub></i>(<i>x</i>) = ∫<sub>−∞</sub><sup>+∞</sup> <i>f</i>(<i>x</i>, <i>y</i>) d<i>y</i></div>
+    <ul><li>On somme sur <b>toutes</b> les valeurs de y. Les événements {Y = y} forment une partition : c'est la formule des probabilités totales (<a href="lesson-00-03-conditionner-bayes-independance.html#n3">l03</a>). « Il faut bien que y prenne une valeur », dit Brunton.</li><li>C'est une somme, pas une moyenne : on ne divise par rien.</li><li>Même geste pour Y : f<sub>Y</sub>(y) = ∫ f(x, y) dx.</li><li>La marginale est une vraie loi : positive, de masse 1 (preuve plus bas).</li></ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — les marges du tableau</div>
+    <div id="f2ctl" class="sl-ctl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">La loi jointe en trente-sixièmes, x en colonne et l'autre variable en ligne. En haut, la somme de chaque colonne : la loi de X. À droite, la somme de chaque ligne. <b>Deux dés</b> : toutes les marges valent 6/36. <b>Premier dé et maximum</b> : M = max(X, Y) n'est jamais sous X, donc le triangle sous la diagonale est vide. La marge de X reste uniforme ; celle de M monte : P(M = m) = (2m − 1)/36. Les deux tableaux ont la même marge en X, et pourtant ils ne décrivent pas la même chose : la marge seule ne dit pas comment X est liée à l'autre variable.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux dés, le maximum, la gaussienne, le carré, le disque, un mélange</small></summary><div class="in">
+    <ol>
+      <li><b>Deux dés.</b> Chaque colonne somme à 6/36 = 1/6, chaque ligne aussi : les deux marginales sont uniformes.</li>
+      <li><b>Le premier dé X et le maximum M.</b> P(M = 1) = 1/36 (les deux dés à 1), P(M = 6) = 11/36 ; en général (2m − 1)/36, soit 1, 3, 5, 7, 9, 11 trente-sixièmes. Le maximum penche vers 6 : E[M] = 161/36 = 4,47 (<a href="lesson-00-08-esperance-variance.html#n1">l08</a>).</li>
+      <li><b>La gaussienne 2D standard</b> f(x, y) = (1/(2π)) e<sup>−(x² + y²)/2</sup> : sa marginale est la normale centrée réduite φ(x) (preuve).</li>
+      <li><b>Uniforme sur le carré [−2 ; 2]².</b> f = 1/16 ; à x fixé, y parcourt un segment de longueur 4 : f<sub>X</sub>(x) = 4 × 1/16 = 1/4. Plate.</li>
+      <li><b>Uniforme sur le disque de rayon 2.</b> f = 1/(4π) ; à x fixé, y parcourt une corde de longueur 2√(4 − x²) : f<sub>X</sub>(x) = √(4 − x²)/(2π). Un dôme : 1/π = 0,318 en 0, nul en ±2.</li>
+      <li><b>En ML, un mélange gaussien.</b> Une variable cachée Z donne le groupe de chaque point. La densité des données est la marginale p(x) = Σ<sub><i>k</i></sub> P(Z = k) f(x ∣ Z = k) : on somme sur la variable qu'on ne voit pas. C'est elle, la « vraisemblance marginale », qu'on maximise.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la marginale est une loi ; la marginale de la gaussienne 2D</small></summary><div class="in">
+    <div class="drv">
+      <div>∫ <i>f<sub>X</sub></i>(<i>x</i>) d<i>x</i> = ∫ ( ∫ <i>f</i>(<i>x</i>, <i>y</i>) d<i>y</i> ) d<i>x</i></div><span>définition de la marginale</span>
+      <div>= ∬ <i>f</i>(<i>x</i>, <i>y</i>) d<i>x</i> d<i>y</i> = 1</div><span>la jointe est une densité ; f<sub>X</sub> ≥ 0 puisque f ≥ 0</span>
+    </div>
+    <p>En discret, c'est la formule des probabilités totales : {X = x} est la réunion disjointe des {X = x} ∩ {Y = y}, donc P(X = x) = Σ<sub><i>y</i></sub> P(X = x, Y = y).</p>
+    <div class="drv">
+      <div><i>f<sub>X</sub></i>(<i>x</i>) = ∫ (1/(2π)) e<sup>−(<i>x</i>² + <i>y</i>²)/2</sup> d<i>y</i></div><span>définition, gaussienne 2D standard</span>
+      <div>= (1/√(2π)) e<sup>−<i>x</i>²/2</sup> · ∫ (1/√(2π)) e<sup>−<i>y</i>²/2</sup> d<i>y</i></div><span>e<sup>a + b</sup> = e<sup>a</sup> e<sup>b</sup>, et 1/(2π) = (1/√(2π))² ; le facteur en x sort de l'intégrale en y</span>
+      <div>= (1/√(2π)) e<sup>−<i>x</i>²/2</sup> = φ(<i>x</i>)</div><span>la densité normale intègre à 1</span>
+    </div>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>trois nuages, leurs marginales bande par bande</small></summary><div class="in">
+<pre class="py">import numpy as np
+from math import erf, sqrt
+
+rng = np.random.default_rng(0)
+n = 100_000
+clouds = {
+    "gaussian": rng.standard_normal((n, 2)),
+    "uniform square": rng.uniform(-2, 2, (n, 2)),
+}
+disk = rng.uniform(-2, 2, (2 * n, 2))
+clouds["uniform disk"] = disk[(disk ** 2).sum(axis=1) &lt; 4][:n]   # keep points inside radius 2
+
+bands = [(0, 0.5), (0.5, 1), (1, 1.5), (1.5, 2)]
+row = lambda shares: "".join(f"{100 * s:9.1f} %" for s in shares)
+print(f"{'band of x':15s}" + "".join(f"{str([a, b]):&gt;11s}" for a, b in bands))
+for name, pts in clouds.items():
+    x = pts[:, 0]                  # marginal of X: forget y, count points band by band
+    print(f"{name:15s}" + row([np.mean((x &gt;= a) &amp; (x &lt; b)) for a, b in bands]))
+
+Phi = lambda t: 0.5 * (1 + erf(t / sqrt(2)))
+print(f"{'gaussian, exact':15s}" + row([Phi(b) - Phi(a) for a, b in bands]))</pre>
+<pre class="out">band of x         [0, 0.5]   [0.5, 1]   [1, 1.5]   [1.5, 2]
+gaussian            19.0 %     15.1 %      9.1 %      4.5 %
+uniform square      12.3 %     12.5 %     12.5 %     12.6 %
+uniform disk        15.6 %     14.8 %     12.3 %      7.2 %
+gaussian, exact     19.1 %     15.0 %      9.2 %      4.4 %</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Les marginales ne déterminent pas la jointe.</b> Deux dés indépendants et le même dé lu deux fois (Y = X) ont les mêmes marginales, uniformes sur 1 à 6, et des jointes différentes (notion 1) ; la figure 4 donnera des gaussiennes de marginales N(0, 1) en x et en y, pour n'importe quelle corrélation.</li>
+      <li><b>« Uniforme » ne veut pas dire « marginale plate ».</b> Le disque uniforme a une marginale en dôme (exemple 5). La marginale mélange deux choses : la densité dans la bande et la longueur de la bande.</li>
+      <li><b>Même mot, autre chose.</b> Le coût marginal en économie, ou l'effet marginal de la <a href="../chains/chain-p05-02-logistique.html">régression logistique</a>, sont des dérivées. La loi marginale vient de la marge du tableau.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (27) décrit la marginale comme « la probabilité de x conditionnée sur quelque chose en y ». C'est l'inverse : la marginale est la loi de X quelle que soit Y, sans aucune condition ; conditionner, c'est fixer Y (notion 3). Il dit aussi qu'on « moyenne » y (average out) : on somme ou on intègre, sans diviser. Enfin, sa gaussienne 2D, écrite de mémoire avec la constante 1/√(2π), ne somme pas à 1 : sa masse totale vaut √(2π) ≈ 2,51. La bonne constante est 1/(2π) = (1/√(2π))², un facteur par coordonnée.</div>
+  </div></details>
+  <p class="garde">f<sub>X</sub>(x) = ∫ f(x, y) dy, en discret Σ<sub>y</sub> P(X = x, Y = y) : la loi de X quelle que soit Y, obtenue en sommant l'autre variable. Ce n'est pas une loi conditionnelle.</p>
+</section>
+
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>La conditionnelle : la tranche renormalisée <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 27</p>
+  <div class="idee">
+    <p>Conditionner sur X = x, c'est ne garder que la <b>tranche</b> de la jointe à cet x, puis la diviser par sa masse : le zoom de <a href="lesson-00-03-conditionner-bayes-independance.html#n1">l03</a>, P(A ∣ B) = P(A ∩ B)/P(B), case par case. Premier dé X et maximum M, sachant X = 2 : il reste la colonne x = 2, M = 2 avec 2/36, puis 3, 4, 5 ou 6 avec 1/36 chacun. La colonne pèse 6/36, la marginale ; on divise : P(M = 2 ∣ X = 2) = 1/3, et 1/6 pour les autres valeurs.</p>
+    <p>En continu, on divise la tranche f(x, ·) par f<sub>X</sub>(x). Brunton (26) cite la probabilité d'une maladie cardiaque sachant qu'on est un homme de 40 ans, d'une taille et d'un poids donnés. Dans un nuage où Y = 0,8 X + 0,6 Z, avec X et Z normales centrées réduites indépendantes, la tranche x = 1,5 est une cloche centrée en 1,2, d'écart-type 0,6 ; la marginale de Y a un écart-type de 1. Savoir x resserre y.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — une bande du nuage, à x fixé</div>
+    <div id="v3ctl" class="sl-ctl"></div><div id="v3sl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">3 000 points du nuage Y = 0,8 X + 0,6 Z, X et Z normales centrées réduites indépendantes. Les points rouges sont ceux de la bande verticale de largeur 0,3 autour de <b>x fixé</b> ; à droite, l'histogramme de leurs y, mis à l'échelle d'une densité. Les tirets rouges sont la conditionnelle théorique, une normale de centre 0,8 x et d'écart-type 0,6 ; les tirets bleus, la marginale de Y, d'écart-type 1. Déplace <b>x fixé</b> : la bande monte avec x, sa largeur en y ne change pas, et elle reste plus étroite que la marginale. Au bord, la bande contient peu de points : la marginale de X y est faible.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">discret : P(<i>Y</i> = <i>y</i> ∣ <i>X</i> = <i>x</i>) = P(<i>X</i> = <i>x</i>, <i>Y</i> = <i>y</i>) / P(<i>X</i> = <i>x</i>) &nbsp;&nbsp;&nbsp; continu : <i>f</i>(<i>y</i> ∣ <i>x</i>) = <i>f</i>(<i>x</i>, <i>y</i>) / <i>f<sub>X</sub></i>(<i>x</i>)</div>
+    <ul><li>Défini seulement là où f<sub>X</sub>(x) &gt; 0 : on ne conditionne pas sur une valeur que X ne prend pas.</li><li>À x fixé, f(y ∣ x) est une densité en y : ∫ f(y ∣ x) dy = f<sub>X</sub>(x)/f<sub>X</sub>(x) = 1. Ce n'est pas une densité en x.</li><li>En continu, P(X = x) = 0 : la formule est la limite du conditionnement sur une bande [x, x + h] quand h tend vers 0. La vignette le fait avec une bande de largeur 0,3.</li><li><b>Notation.</b> La barre est juste ici : on conditionne sur la variable aléatoire X, prise en x. Le fil B écrit p(y ∣ x ; θ) : x derrière la barre, la valeur observée d'une variable sur laquelle on conditionne ; θ derrière le point-virgule, un paramètre fixe et inconnu, qui n'est pas une variable aléatoire et sur lequel on ne conditionne donc pas.</li></ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — couper la jointe, puis diviser par la marginale</div>
+    <div id="f3ctl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">La jointe du nuage Y = 0,8 X + 0,6 Z (X et Z normales centrées réduites indépendantes), coupée à x₀ fixé. En violet, la tranche brute f(x₀, y) : son aire vaut f<sub>X</sub>(x₀), 0,130 pour x₀ = 1,5. En rouge, la même tranche divisée par f<sub>X</sub>(x₀) : son aire vaut 1, c'est la conditionnelle f(y ∣ x₀). En tirets bleus, la marginale de Y. Déplace <b>x₀</b> : vers le bord, la tranche brute s'écrase (aire 0,054 en x₀ = 2), mais la conditionnelle garde sa forme, un pic de 0,665 et un écart-type de 0,6, et glisse avec son centre 0,8 x₀.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux dés, le maximum, le nuage, un classifieur</small></summary><div class="in">
+    <ol>
+      <li><b>Deux dés.</b> Sachant X = 3, la colonne contient six cases de 1/36 et pèse 6/36. Divisée, chaque case vaut 1/6 : connaître le premier dé ne change rien au second.</li>
+      <li><b>Le maximum.</b> Sachant X = 2 : M = 2 avec 1/3, puis 1/6 pour chaque valeur de 3 à 6. Sachant X = 5 : la colonne contient 5/36 en M = 5 et 1/36 en M = 6 ; divisée par 6/36, M = 5 avec 5/6 et M = 6 avec 1/6.</li>
+      <li><b>Le nuage.</b> Sachant X = x, Y = 0,8 x + 0,6 Z est une normale de moyenne 0,8 x et d'écart-type 0,6. La tranche x = 0 est centrée en 0, la tranche x = 1,5 en 1,2 ; leur largeur est la même.</li>
+      <li><b>En ML.</b> Un modèle discriminatif, régression logistique ou classifieur softmax, apprend directement p(y ∣ x), la tranche en y à x fixé, sans jamais modéliser p(x). Un modèle génératif apprend la jointe, et retrouve p(y ∣ x) par Bayes (notion 5).</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>conditionner par une bande étroite, puis par comptage</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(0)
+n = 2_000_000
+x = rng.standard_normal(n)
+y = 0.8 * x + 0.6 * rng.standard_normal(n)       # the cloud of the vignette
+
+band = np.abs(x - 1.5) &lt; 0.02                     # a thin slice around X = 1.5
+print(f"points in the slice: {band.sum()}")
+print(f"slice : mean {y[band].mean():.3f} (theory 1.2), sd {y[band].std():.3f} (theory 0.6)")
+print(f"all y : mean {y.mean():.3f} (theory 0),   sd {y.std():.3f} (theory 1)")
+
+# discrete: first die X and maximum M; condition on X = 2 by keeping that column only
+d1, d2 = rng.integers(1, 7, n), rng.integers(1, 7, n)
+col = np.maximum(d1, d2)[d1 == 2]
+print("P(M = m | X = 2), m = 1..6:", [round(float(np.mean(col == v)), 3) for v in range(1, 7)])</pre>
+<pre class="out">points in the slice: 10304
+slice : mean 1.196 (theory 1.2), sd 0.604 (theory 0.6)
+all y : mean -0.000 (theory 0),   sd 1.000 (theory 1)
+P(M = m | X = 2), m = 1..6: [0.0, 0.333, 0.167, 0.167, 0.167, 0.166]</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>f(y ∣ x) n'est pas f(x ∣ y).</b> P(M = 2 ∣ X = 2) = 1/3, mais P(X = 2 ∣ M = 2) = 2/3. Passer de l'une à l'autre, c'est Bayes (notion 5).</li>
+      <li><b>Une densité en y, pas en x.</b> Dans le nuage, à y = 1 fixé, ∫ f(1 ∣ x) dx = 1/0,8 = 1,25. Vue comme fonction de x, f(y ∣ x) est une vraisemblance (notion 5).</li>
+      <li><b>Hors du support, rien.</b> « Sachant que le dé a donné 7 » n'a pas de sens : P(X = 7) = 0.</li>
+      <li><b>Une bande trop large mélange plusieurs tranches.</b> À x = 1,5, la bande ±0,15 de la vignette donne en moyenne 1,191 et non 1,2 : la densité de X décroît dans la bande, qui contient plus de petits x que de grands ; une bande ±0,5 donne 1,107. Avec les 117 points de la vignette, le hasard (± 0,06) masque cet écart.</li>
+    </ul>
+  </div></details>
+  <p class="garde">f(y ∣ x) = f(x, y)/f<sub>X</sub>(x) : la tranche de la jointe à x fixé, divisée par sa masse f<sub>X</sub>(x). C'est une densité en y, définie là où f<sub>X</sub>(x) &gt; 0.</p>
+</section>
+
+<!-- ============================ n4 ============================ -->
+<section class="notion outil" id="n4">
+  <h3>L'indépendance : la jointe se factorise <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 26</p>
+  <div class="idee">
+    <p>X et Y sont <b>indépendantes</b> quand savoir x ne change rien à la loi de y : toutes les tranches f(y ∣ x) sont la même loi. Sur la jointe, cela veut dire qu'elle est le produit de ses marginales, f(x, y) = f<sub>X</sub>(x) f<sub>Y</sub>(y). Deux dés : chaque case vaut 1/36 = 1/6 × 1/6. Premier dé et maximum : la case X = 1, M = 1 vaut 1/36, mais P(X = 1) P(M = 1) = 1/216 : X et M sont liées.</p>
+    <p>Brunton compare à la séparation des variables : sur un rectangle, la solution de l'équation de la chaleur s'écrit souvent fonction de x fois fonction de y. Puis il lance des fléchettes : un bon joueur dessine une gaussienne ronde autour du centre. Pour tester l'indépendance sur un nuage, on mélange les y entre les fléchettes : chaque x reçoit le y d'une autre fléchette, ce qui fabrique le produit des marginales. Une jointe déjà produit n'en est pas changée.</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — mélanger les y fabrique le produit des marginales</div>
+    <div id="v4ctl" class="sl-ctl"></div><div id="v4ctl2" class="sl-ctl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">400 fléchettes. <b>Viser le centre</b> : x et y sont deux normales centrées réduites indépendantes. <b>Mélange les y</b> : chaque point glisse à la verticale jusqu'au y d'une autre fléchette, tirée au hasard. Le nuage reste le même nuage rond, avec environ 39 % des fléchettes dans le cercle de rayon 1 (tirets rouges) avant comme après : la jointe était déjà le produit de ses marginales, elle est séparable en x, y. <b>Viser l'anneau</b> (un joueur qui vise une couronne à distance 2) : le nuage est rond lui aussi, mais le mélange le détruit : les points glissent vers les quatre coins, et le centre se remplit, de 0 % à environ 9 % dans le cercle de rayon 1. Rond, et pourtant non séparable.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>X</i>, <i>Y</i> indépendantes ⟺ <i>f</i>(<i>x</i>, <i>y</i>) = <i>f<sub>X</sub></i>(<i>x</i>) · <i>f<sub>Y</sub></i>(<i>y</i>) pour tous <i>x</i>, <i>y</i> ⟺ <i>f</i>(<i>y</i> ∣ <i>x</i>) = <i>f<sub>Y</sub></i>(<i>y</i>) partout où <i>f<sub>X</sub></i>(<i>x</i>) &gt; 0</div>
+    <div class="eq">gaussienne 2D standard : (1/(2π)) e<sup>−(<i>x</i>² + <i>y</i>²)/2</sup> = (1/√(2π)) e<sup>−<i>x</i>²/2</sup> · (1/√(2π)) e<sup>−<i>y</i>²/2</sup> = φ(<i>x</i>) φ(<i>y</i>)</div>
+    <ul><li>Discret : P(X = x, Y = y) = P(X = x) P(Y = y) pour toutes les cases. C'est l'indépendance d'événements de <a href="lesson-00-03-conditionner-bayes-independance.html#n7">l03</a>, appliquée à chaque paire {X = x}, {Y = y}.</li><li>« Pour tous x, y » : une case égale au produit ne prouve rien, il les faut toutes.</li><li>Avec une corrélation ρ, l'exposant devient −(x² − 2ρxy + y²)/(2(1 − ρ²)). Le terme croisé en xy ne se coupe pas en fonction de x fois fonction de y (figure 4). La covariance, qui mesure ce lien, est en <a href="lesson-00-09-covariance-correlation.html#n1">l09</a>.</li></ul>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — mêmes marginales, la jointe ne se factorise que sans corrélation</div>
+    <div id="f4ctl"></div>
+    <div id="f4plot" class="wide"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">La gaussienne standard à corrélation ρ, f(x, y) = e<sup>−(x² − 2ρxy + y²)/(2(1 − ρ²))</sup> / (2π√(1 − ρ²)). Ses marginales sont N(0, 1) pour tout ρ : le produit des marginales est donc toujours la même gaussienne ronde, en tirets. En traits pleins, les courbes de niveau de la jointe, aux mêmes hauteurs. À <b>ρ = 0</b>, les deux se confondent : la jointe est le produit. Monte <b>ρ</b> à 0,8 : la jointe s'allonge sur la diagonale. En (1, 1), elle vaut 0,152, 2,6 fois le produit 0,0585 ; en (1, −1), 0,0018, 33 fois moins.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux dés, un rectangle, le maximum, un triangle, les fléchettes, une permutation</small></summary><div class="in">
+    <ol>
+      <li><b>Deux dés.</b> Chaque case vaut 1/36 = 1/6 × 1/6 : indépendants.</li>
+      <li><b>Un rectangle se factorise.</b> P(X ≤ 2, Y ≥ 5) = 4/36 = 1/9 = P(X ≤ 2) P(Y ≥ 5) = 1/3 × 1/3.</li>
+      <li><b>Le maximum.</b> P(X = 6, M = 6) = 6/36 = 1/6, alors que P(X = 6) P(M = 6) = 1/6 × 11/36 = 11/216 = 0,051. Aucune case du tableau (X, M) n'est égale au produit de ses marges.</li>
+      <li><b>Un support en triangle.</b> Uniforme sur 0 &lt; y &lt; x &lt; 1, l'aire vaut ½ et f = 2. f<sub>X</sub>(x) = 2x, f<sub>Y</sub>(y) = 2(1 − y). Au point (0,2 ; 0,8), hors du triangle, f = 0, mais f<sub>X</sub>(0,2) f<sub>Y</sub>(0,8) = 0,4 × 0,4 = 0,16. Un support qui n'est pas un produit A × B (un rectangle, dans les cas simples) suffit à prouver la dépendance ; le disque uniforme est dans ce cas.</li>
+      <li><b>Les fléchettes</b> de la vignette : viser le centre donne une jointe séparable, viser l'anneau non.</li>
+      <li><b>En ML, l'importance par permutation.</b> Mélanger une colonne de variables explicatives, comme la vignette mélange les y, remplace la jointe par le produit de la marginale de cette colonne et de la loi du reste. Ce que le modèle perd alors mesure ce qu'il tirait du lien.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>produit et tranches, la gaussienne, le test du support</small></summary><div class="in">
+    <div class="drv">
+      <div><i>f</i>(<i>y</i> ∣ <i>x</i>) = <i>f</i>(<i>x</i>, <i>y</i>) / <i>f<sub>X</sub></i>(<i>x</i>)</div><span>définition de la conditionnelle (notion 3)</span>
+      <div>= <i>f<sub>X</sub></i>(<i>x</i>) <i>f<sub>Y</sub></i>(<i>y</i>) / <i>f<sub>X</sub></i>(<i>x</i>) = <i>f<sub>Y</sub></i>(<i>y</i>)</div><span>si la jointe est un produit : ⟹</span>
+      <div><i>f</i>(<i>x</i>, <i>y</i>) = <i>f</i>(<i>y</i> ∣ <i>x</i>) <i>f<sub>X</sub></i>(<i>x</i>) = <i>f<sub>Y</sub></i>(<i>y</i>) <i>f<sub>X</sub></i>(<i>x</i>)</div><span>si toutes les tranches valent f<sub>Y</sub> : ⟸</span>
+    </div>
+    <p><b>La gaussienne.</b> e<sup>−(x² + y²)/2</sup> = e<sup>−x²/2</sup> · e<sup>−y²/2</sup>, et 1/(2π) = (1/√(2π))². Chaque facteur est φ, et la notion 2 a montré que φ est la marginale : la jointe est le produit de ses marginales.</p>
+    <p><b>Le support.</b> Si f<sub>X</sub>(x) &gt; 0 et f<sub>Y</sub>(y) &gt; 0 mais f(x, y) = 0, le produit est strictement positif et ne peut pas valoir f : X et Y sont dépendantes.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>l'écart au produit, et le test du mélange</small></summary><div class="in">
+<pre class="py">import numpy as np
+from math import pi
+
+def joint(x, y, rho):                   # standard bivariate normal with correlation rho
+    q = (x**2 - 2 * rho * x * y + y**2) / (1 - rho**2)
+    return np.exp(-q / 2) / (2 * pi * np.sqrt(1 - rho**2))
+phi = lambda t: np.exp(-t**2 / 2) / np.sqrt(2 * pi)   # both marginals are N(0, 1), for any rho
+
+g = np.linspace(-3, 3, 301)
+X, Y = np.meshgrid(g, g)
+for rho in (0.0, 0.8):
+    gap = np.abs(joint(X, Y, rho) - phi(X) * phi(Y)).max()
+    print(f"rho = {rho}: max |f(x, y) - fX(x) fY(y)| on the grid = {gap:.4f}")
+
+rng = np.random.default_rng(0)
+n = 1_000_000
+r, t = 2 + 0.2 * rng.standard_normal(n), rng.uniform(0, 2 * pi, n)
+clouds = {"centre": rng.standard_normal((2, n)), "ring": (r * np.cos(t), r * np.sin(t))}
+for name, (x, y) in clouds.items():
+    ys = rng.permutation(y)             # shuffle the y's: builds the product of the marginals
+    before, after = np.mean(x**2 + y**2 &lt; 1), np.mean(x**2 + ys**2 &lt; 1)
+    print(f"{name:6s}: share with r &lt; 1 before {before:.3f}, after shuffling {after:.3f}")</pre>
+<pre class="out">rho = 0.0: max |f(x, y) - fX(x) fY(y)| on the grid = 0.0000
+rho = 0.8: max |f(x, y) - fX(x) fY(y)| on the grid = 0.1071
+centre: share with r &lt; 1 before 0.394, after shuffling 0.394
+ring  : share with r &lt; 1 before 0.000, after shuffling 0.087</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Mêmes marginales, jointes différentes</b> (figure 4). L'indépendance est une propriété de la jointe, invisible sur les marginales.</li>
+      <li><b>Rond ne veut pas dire indépendant.</b> L'anneau de la vignette et le disque uniforme sont ronds et non séparables. La gaussienne est la seule loi invariante par rotation dont les coordonnées sont indépendantes (théorème de Herschel–Maxwell).</li>
+      <li><b>Une covariance nulle ne suffit pas.</b> L'anneau est symétrique, sa covariance est nulle, et ses coordonnées sont pourtant liées (<a href="lesson-00-09-covariance-correlation.html#n3">l09</a>).</li>
+      <li><b>Indépendance conditionnelle n'est pas indépendance.</b> Naive Bayes suppose que les variables explicatives se factorisent sachant la classe, p(x<sub>1</sub>, …, x<sub><i>d</i></sub> ∣ c) = Π<sub><i>j</i></sub> p(x<sub><i>j</i></sub> ∣ c). Sans connaître la classe, elles restent liées par elle (notion 5).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (26) dit que la gaussienne 2D des fléchettes n'est pas séparable en x, y, seulement en r, θ. Elle l'est : e<sup>−(x² + y²)/2</sup> = e<sup>−x²/2</sup> · e<sup>−y²/2</sup>. Il l'avait construite plus tôt, ronde, à partir d'une gaussienne en x et d'une gaussienne en y ; ronde avec des marginales N(0, 1), elle a forcément ρ = 0, donc elle est séparable. Ce qui est rond sans être séparable, c'est un anneau ou un disque uniforme. Si la gravité ne fait que décaler ou étirer le nuage à la verticale, il reste séparable : aucun terme en xy n'apparaît. Enfin, « séparable en r, θ » demande un facteur r (notion 6).</div>
+  </div></details>
+  <p class="garde">X et Y indépendantes ⟺ f(x, y) = f<sub>X</sub>(x) f<sub>Y</sub>(y) pour tous x, y ⟺ toutes les tranches f(y ∣ x) sont la même loi f<sub>Y</sub>.</p>
+</section>
+
+<!-- ============================ n5 ============================ -->
+<section class="notion outil" id="n5">
+  <h3>Bayes pour les densités <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 27</p>
+  <div class="idee">
+    <p>La jointe se lit dans les deux sens : f(x, y) = f(y ∣ x) f<sub>X</sub>(x) = f(x ∣ y) f<sub>Y</sub>(y). Égaliser les deux écritures et diviser donne <b>Bayes pour les densités</b> : f(x ∣ y) = f(y ∣ x) f<sub>X</sub>(x)/f<sub>Y</sub>(y). C'est la page que Brunton demande d'écrire en 27, en la reliant à <a href="lesson-00-03-conditionner-bayes-independance.html#n4">l03</a> : les mêmes formules, des densités à la place des probabilités, et une intégrale à la place de la somme au dénominateur.</p>
+    <p>Reprenons le dépistage de l03, avec un score continu au lieu d'un résultat positif ou négatif. Chez les sains, le score suit N(0, 1) ; chez les malades, N(2, 1) ; 1 % de la population est malade. La densité du score en 2 est 7,4 fois plus haute chez un malade que chez un sain. Pourtant P(malade ∣ score = 2) ne vaut que 6,9 % : la cote a priori, 1 contre 99, écrase le rapport.</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — ce que dit le score, et ce qu'il faut en croire</div>
+    <div id="v5ctl" class="sl-ctl"></div><div id="v5sl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">En haut, les deux vraisemblances du score : N(0, 1) chez les sains, en bleu, N(2, 1) chez les malades, en rouge. En bas, P(malade ∣ y) donnée par Bayes. Déplace le <b>score y</b> : à y = 2, la courbe rouge est 7,4 fois plus haute que la bleue, mais avec une <b>prévalence de 1 %</b> la probabilité a posteriori n'est que de 6,9 %, et il faut y = 3,3 pour passer ½. À <b>10 %</b>, le même score de 2 donne 45 % ; à <b>50 %</b>, 88 %, et le seuil ½ tombe en y = 1, à mi-chemin des deux centres. La courbe du bas est une sigmoïde de y, la forme de la régression logistique.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>f</i>(<i>x</i> ∣ <i>y</i>) = <i>f</i>(<i>y</i> ∣ <i>x</i>) <i>f<sub>X</sub></i>(<i>x</i>) / <i>f<sub>Y</sub></i>(<i>y</i>), &nbsp; avec &nbsp; <i>f<sub>Y</sub></i>(<i>y</i>) = ∫ <i>f</i>(<i>y</i> ∣ <i>x</i>) <i>f<sub>X</sub></i>(<i>x</i>) d<i>x</i></div>
+    <div class="eq">une classe et un score : P(<i>C</i> = <i>k</i> ∣ <i>Y</i> = <i>y</i>) = <i>f</i>(<i>y</i> ∣ <i>k</i>) P(<i>C</i> = <i>k</i>) / Σ<sub><i>j</i></sub> <i>f</i>(<i>y</i> ∣ <i>j</i>) P(<i>C</i> = <i>j</i>)</div>
+    <ul><li>f<sub>Y</sub>(y) &gt; 0 : on ne conditionne pas sur un score impossible.</li><li>Le dénominateur est la marginale de Y (notion 2), écrite avec la conditionnelle : les probabilités totales, version intégrale. Il ne dépend pas de x, il ne fait que renormaliser.</li><li>Vue comme fonction de x, f(y ∣ x) est une vraisemblance : elle ne somme pas à 1 en général (notion 3).</li><li>Le mélange est permis : une variable discrète, la classe C, avec P, et une continue, le score Y, avec f.</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>le maximum, le score, la sigmoïde, Naive Bayes</small></summary><div class="in">
+    <ol>
+      <li><b>Discret, le maximum.</b> P(X = 2 ∣ M = 2) = P(M = 2 ∣ X = 2) P(X = 2)/P(M = 2) = (1/3 × 1/6)/(3/36) = 2/3. Vérification directe : M = 2 correspond à (1, 2), (2, 1) et (2, 2), et X = 2 dans deux cas sur trois.</li>
+      <li><b>Le score, en cotes</b> (<a href="lesson-00-03-conditionner-bayes-independance.html#n5">l03</a>). Cote a posteriori = rapport de vraisemblance × cote a priori. À y = 2 : 7,39 × 1/99 = 0,075, soit 6,9 %. À y = 3 : rapport e<sup>4</sup> = 54,6, cote 0,55, soit 35,5 %. À y = 4 : rapport 403, soit 80,3 %.</li>
+      <li><b>Pourquoi une sigmoïde.</b> ln du rapport = (y² − (y − 2)²)/2 = 2y − 2, donc logit P(malade ∣ y), le ln de la cote a posteriori, vaut 2y − 2 + ln(p/(1 − p)), avec p la prévalence : affine en y. Deux gaussiennes de même écart-type donnent toujours une a posteriori logistique ; ce modèle génératif et une régression logistique ont la même forme de frontière.</li>
+      <li><b>En ML, Naive Bayes.</b> P(c ∣ x<sub>1</sub>, …, x<sub><i>d</i></sub>) ∝ P(c) Π<sub><i>j</i></sub> f(x<sub><i>j</i></sub> ∣ c) : Bayes, plus la factorisation de la notion 4 appliquée sachant la classe. Le dénominateur, le même pour toutes les classes, n'est pas calculé : on compare les numérateurs.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>la formule, puis une bande autour de y = 2</small></summary><div class="in">
+<pre class="py">import numpy as np
+from math import exp, pi, sqrt
+
+pdf = lambda y, mu: exp(-(y - mu) ** 2 / 2) / sqrt(2 * pi)   # N(mu, 1) density
+prev = 0.01
+for y in (2, 3):
+    num = pdf(y, 2) * prev
+    den = num + pdf(y, 0) * (1 - prev)          # f_Y(y), the marginal of the score
+    ratio = pdf(y, 2) / pdf(y, 0)               # likelihood ratio, sick vs healthy
+    print(f"score {y}: likelihood ratio {ratio:.2f}, P(sick | score) = {num / den:.4f}")
+
+rng = np.random.default_rng(0)
+n = 2_000_000
+sick = rng.random(n) &lt; prev
+score = rng.standard_normal(n) + 2 * sick       # N(0, 1) if healthy, N(2, 1) if sick
+band = np.abs(score - 2) &lt; 0.05                 # condition on Y ≈ 2 with a thin band
+print(f"people with a score near 2: {band.sum()}")
+print(f"share of sick among them:   {sick[band].mean():.4f}")</pre>
+<pre class="out">score 2: likelihood ratio 7.39, P(sick | score) = 0.0695
+score 3: likelihood ratio 54.60, P(sick | score) = 0.3555
+people with a score near 2: 11647
+share of sick among them:   0.0705</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Oublier le taux de base.</b> f(y ∣ malade) élevée ne dit pas que P(malade ∣ y) l'est : 6,9 % à y = 2. C'est l'erreur de l03, en continu.</li>
+      <li><b>Prendre la vraisemblance pour une loi sur x.</b> f(y ∣ x) en fonction de x ne somme pas à 1 en général ; il faut multiplier par f<sub>X</sub> et renormaliser.</li>
+      <li><b>Le dénominateur coûte.</b> f<sub>Y</sub>(y) = ∫ f(y ∣ x) f<sub>X</sub>(x) dx n'a souvent pas de forme fermée en grande dimension. C'est pour l'éviter qu'existent MCMC et l'inférence variationnelle (<a href="../chains/chain-p02-03-conjugues-posterior.html">le posterior entier</a>).</li>
+      <li><b>Notation.</b> En fréquentiste, θ est fixe et la loi des données s'écrit p(y ; θ) : pas de Bayes sur θ. En bayésien, θ devient une variable aléatoire munie d'une loi a priori, et f(θ ∣ y) est une vraie conditionnelle, cette notion appliquée à θ.</li>
+    </ul>
+  </div></details>
+  <p class="garde">Bayes pour les densités, là où f<sub>Y</sub>(y) &gt; 0 : f(x ∣ y) = f(y ∣ x) f<sub>X</sub>(x)/f<sub>Y</sub>(y), le dénominateur étant la marginale ∫ f(y ∣ x) f<sub>X</sub>(x) dx.</p>
+</section>
+
+<!-- ============================ n6 ============================ -->
+<section class="notion culture" id="n6">
+  <h3>Coordonnées polaires et jacobien <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 26 et 27</p>
+  <div class="idee">
+    <p>Brunton parle de « bonnes coordonnées » : un nuage rond se décrit mieux par la distance au centre r et l'angle θ. Réécrire f en fonction de r et θ est permis. Mais pour obtenir la densité du couple (R, Θ), il faut un facteur r : une case dr × dθ a une aire r dr dθ, et les cases loin du centre sont plus grandes. Pour la gaussienne ronde, f<sub>R,Θ</sub>(r, θ) = r e<sup>−r²/2</sup> · 1/(2π) : R suit une loi de Rayleigh, Θ est uniforme, et les deux sont indépendants.</p>
+    <p>D'où un chiffre qui surprend : 39,3 % seulement des fléchettes tombent à moins d'un écart-type du centre, contre 68,3 % pour |X| ≤ 1 sur une seule coordonnée. La densité est maximale au centre, mais l'anneau le plus peuplé est vers r = 1 : là encore, la densité se lit par unité d'aire, le compte par anneau, et l'aire d'un anneau croît avec r.</p>
+  </div>
+  <div class="fig vis" id="v6">
+    <div class="lbl">Voir l'idée — dense au centre, peuplé sur les anneaux</div>
+    <div id="v6ctl" class="sl-ctl"></div><div id="v6sl"></div>
+    <div id="v6plot" class="wide"></div>
+    <div class="readouts" id="v6out"></div>
+    <p class="cap">1 000 fléchettes d'une gaussienne ronde. Dans le second panneau, la part des fléchettes dans chaque anneau de largeur 0,25, et en tirets la loi de Rayleigh. Choisis un <b>anneau</b> : il se colore sur la cible et dans l'histogramme. Le disque central [0 ; 0,25) reçoit 3,1 % des fléchettes, l'anneau [1 ; 1,25) 14,9 %, presque cinq fois plus, alors que la densité y est presque deux fois plus faible : 0,084 par unité d'aire contre 0,157. L'anneau est simplement 9 fois plus grand. <b>Ajoute des fléchettes</b> : l'histogramme se cale sur les tirets.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>f</i><sub><i>R</i>,Θ</sub>(<i>r</i>, θ) = <i>r</i> · <i>f</i><sub><i>X</i>,<i>Y</i></sub>(<i>r</i> cos θ, <i>r</i> sin θ) &nbsp;&nbsp;&nbsp; gaussienne : <i>f</i><sub><i>R</i>,Θ</sub>(<i>r</i>, θ) = <i>r</i> e<sup>−<i>r</i>²/2</sup> · 1/(2π), &nbsp; <i>r</i> &gt; 0, θ ∈ [0, 2π)</div>
+    <ul><li>Le facteur r est le jacobien : pour x = r cos θ, y = r sin θ, |det J| = r. C'est la version 2D du |dx/dy| de <a href="lesson-00-06-fonctions-standardisation.html#n1">l06</a>.</li><li>Cas général, pour un changement de variables bijectif et dérivable : f<sub>U,V</sub>(u, v) = f<sub>X,Y</sub>(x(u, v), y(u, v)) · |det ∂(x, y)/∂(u, v)|.</li><li>La jointe se factorise en une fonction de r fois une fonction de θ : R et Θ sont indépendants (notion 4). R a la densité r e<sup>−r²/2</sup> (Rayleigh), Θ est uniforme sur [0, 2π).</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>un, deux, trois écarts-types ; la distance moyenne</small></summary><div class="in">
+    <ol>
+      <li><b>Dans le cercle de rayon 1</b> : P(R ≤ 1) = 1 − e<sup>−1/2</sup> = 0,393. Sur une coordonnée, P(|X| ≤ 1) = 0,683.</li>
+      <li><b>Rayon 2</b> : 1 − e<sup>−2</sup> = 0,865. <b>Rayon 3</b> : 1 − e<sup>−4,5</sup> = 0,989.</li>
+      <li><b>La distance typique.</b> Le mode de R est 1, sa médiane √(2 ln 2) = 1,18, sa moyenne √(π/2) = 1,25. Aucune n'est 0, là où la densité du nuage est maximale.</li>
+      <li><b>Le disque et l'anneau</b> de la vignette : 3,1 % des fléchettes sur une aire de 0,196 pour [0 ; 0,25), 14,9 % sur une aire de 1,767 pour [1 ; 1,25).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la loi de R par la CDF, et la constante 1/(2π)</small></summary><div class="in">
+    <div class="drv">
+      <div>P(<i>R</i> ≤ <i>r</i>) = ∬<sub><i>x</i>² + <i>y</i>² ≤ <i>r</i>²</sub> (1/(2π)) e<sup>−(<i>x</i>² + <i>y</i>²)/2</sup> d<i>x</i> d<i>y</i></div><span>la probabilité d'une région (notion 1)</span>
+      <div>= ∫<sub>0</sub><sup>2π</sup> ∫<sub>0</sub><sup><i>r</i></sup> (1/(2π)) e<sup>−<i>s</i>²/2</sup> <i>s</i> d<i>s</i> dθ</div><span>polaires : d<i>x</i> d<i>y</i> devient <i>s</i> d<i>s</i> dθ, l'aire d'une case</span>
+      <div>= ∫<sub>0</sub><sup><i>r</i></sup> <i>s</i> e<sup>−<i>s</i>²/2</sup> d<i>s</i> = 1 − e<sup>−<i>r</i>²/2</sup></div><span>l'intégrale en θ vaut 2π ; −e<sup>−s²/2</sup> est une primitive</span>
+      <div><i>f<sub>R</sub></i>(<i>r</i>) = d/d<i>r</i> (1 − e<sup>−<i>r</i>²/2</sup>) = <i>r</i> e<sup>−<i>r</i>²/2</sup></div><span>de CDF à densité : dériver (l06)</span>
+    </div>
+    <p><b>L'aire d'une case.</b> Entre les rayons r et r + dr, sur un angle dθ : (r + dr)² dθ/2 − r² dθ/2 = r dr dθ + dr² dθ/2 ≈ r dr dθ.</p>
+    <p><b>La constante.</b> Soit I = ∫ e<sup>−x²/2</sup> dx. Alors I² = ∬ e<sup>−(x² + y²)/2</sup> dx dy = ∫<sub>0</sub><sup>2π</sup> ∫<sub>0</sub><sup>∞</sup> e<sup>−r²/2</sup> r dr dθ = 2π × 1, donc I = √(2π). D'où 1/√(2π) devant la normale en dimension 1, et 1/(2π) = (1/√(2π))² en dimension 2 : la constante de la notion 2.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>Box–Muller, et la coquille en grande dimension</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(0)
+n = 1_000_000
+# Box-Muller: draw the polar coordinates first, then go back to x, y
+r = np.sqrt(-2 * np.log(1 - rng.random(n)))      # Rayleigh, since P(R &lt;= r) = 1 - exp(-r^2 / 2)
+theta = 2 * np.pi * rng.random(n)                 # uniform angle, independent of r
+x, y = r * np.cos(theta), r * np.sin(theta)
+print(f"sd of x {x.std():.3f}, sd of y {y.std():.3f}, corr(x, y) {np.corrcoef(x, y)[0, 1]:.3f}")
+print(f"P(R &lt;= 1)  = {np.mean(r &lt;= 1):.4f}   exact 1 - exp(-1/2) = {1 - np.exp(-0.5):.4f}")
+print(f"P(|X| &lt;= 1) = {np.mean(np.abs(x) &lt;= 1):.4f}   one coordinate only")
+print(f"E[R] = {r.mean():.4f}   exact sqrt(pi/2) = {np.sqrt(np.pi / 2):.4f}")
+
+for d in (2, 10, 100):                            # norm of a d-dimensional standard gaussian
+    norm = np.linalg.norm(rng.standard_normal((20_000, d)), axis=1)
+    print(f"d = {d:3d}: norm {norm.mean():5.2f} ± {norm.std():.2f}, P(norm &lt; 1) = {np.mean(norm &lt; 1):.4f}")</pre>
+<pre class="out">sd of x 1.001, sd of y 1.000, corr(x, y) -0.000
+P(R &lt;= 1)  = 0.3931   exact 1 - exp(-1/2) = 0.3935
+P(|X| &lt;= 1) = 0.6826   one coordinate only
+E[R] = 1.2539   exact sqrt(pi/2) = 1.2533
+d =   2: norm  1.25 ± 0.66, P(norm &lt; 1) = 0.3939
+d =  10: norm  3.08 ± 0.69, P(norm &lt; 1) = 0.0001
+d = 100: norm  9.97 ± 0.71, P(norm &lt; 1) = 0.0000</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Oublier r.</b> (1/(2π)) e<sup>−r²/2</sup> intégrée sur r &gt; 0 et θ ∈ [0, 2π) donne √(π/2) ≈ 1,253, pas 1 : ce n'est pas une densité de (R, Θ).</li>
+      <li><b>Densité maximale n'est pas distance la plus probable.</b> La densité du nuage culmine en (0, 0) ; la distance au centre la plus probable est 1.</li>
+      <li><b>En grande dimension, la masse est sur une coquille.</b> En dimension 100, la norme d'une gaussienne standard vaut environ 10, à ± 0,7 près, et presque aucun point n'est près du centre (code ci-dessus). Pour un espace latent gaussien, le centre est un endroit où l'on ne tombe jamais.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (27) écrit sa gaussienne puis ajoute qu'on pourrait l'écrire f(r, θ), « c'est juste r² ». Comme réécriture de la même fonction, c'est juste. Comme densité du couple (R, Θ), il manque le facteur r : f<sub>R,Θ</sub>(r, θ) = (r/(2π)) e<sup>−r²/2</sup>. Même chose pour « séparable en r, θ » en 26 : elle l'est, une fois le jacobien compté.</div>
+  </div></details>
+  <p class="garde">Changer de coordonnées multiplie la densité par le jacobien ; en polaires, f<sub>R,Θ</sub>(r, θ) = r f(r cos θ, r sin θ). La gaussienne ronde donne R de Rayleigh et Θ uniforme, indépendants.</p>
+</section>
+
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>La loi jointe, P(X = x, Y = y) ou f(x, y), décrit le couple ; une région se mesure par une somme de cases ou une intégrale double.</li>
+    <li>Marginale : sommer ou intégrer l'autre variable. C'est la loi de X quelle que soit Y, pas une conditionnelle.</li>
+    <li>Conditionnelle : f(y ∣ x) = f(x, y)/f<sub>X</sub>(x), la tranche à x fixé divisée par sa masse.</li>
+    <li>Indépendance : f(x, y) = f<sub>X</sub>(x) f<sub>Y</sub>(y) pour tous x, y ⟺ toutes les tranches ont la même loi.</li>
+    <li>Les marginales ne déterminent pas la jointe : N(0, 1) en x et en y va avec n'importe quelle corrélation.</li>
+    <li>La gaussienne 2D standard, (1/(2π)) e<sup>−(x² + y²)/2</sup>, est ronde et se factorise.</li>
+    <li>Bayes : f(x ∣ y) = f(y ∣ x) f<sub>X</sub>(x)/f<sub>Y</sub>(y), avec une marginale au dénominateur.</li>
+    <li>Changer de coordonnées multiplie la densité par le jacobien : r en polaires.</li>
+  </ol>
+</div>
+<div class="phrase">« La loi jointe décrit le couple. La marginale s'obtient en intégrant l'autre variable, la conditionnelle en coupant une tranche à x fixé puis en la divisant par la marginale. X et Y sont indépendantes quand la jointe est le produit des marginales, c'est-à-dire quand toutes les tranches ont la même forme ; les marginales seules ne disent rien de la dépendance. Bayes pour les densités inverse une conditionnelle, avec une marginale au dénominateur. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Comment obtient-on f<sub>X</sub> à partir de f(x, y) ?</div><div class="a hid">On intègre y : f<sub>X</sub>(x) = ∫ f(x, y) dy ; en discret, la somme de la colonne x.</div></li>
+    <li><div class="q">La marginale de X est-elle conditionnée par Y ?</div><div class="a hid">Non : c'est la loi de X quelle que soit Y. Conditionner, c'est fixer Y et renormaliser.</div></li>
+    <li><div class="q">Définis f(y ∣ x) et dis ce qu'elle représente.</div><div class="a hid">f(x, y)/f<sub>X</sub>(x) : la tranche à x fixé divisée par sa masse ; une densité en y, définie là où f<sub>X</sub>(x) &gt; 0.</div></li>
+    <li><div class="q">Quand X et Y sont-elles indépendantes ?</div><div class="a hid">Quand f(x, y) = f<sub>X</sub>(x) f<sub>Y</sub>(y) pour tous x, y ; de façon équivalente, quand f(y ∣ x) = f<sub>Y</sub>(y) pour tout x tel que f<sub>X</sub>(x) &gt; 0.</div></li>
+    <li><div class="q">La gaussienne 2D ronde est-elle séparable en x, y ? Et avec une corrélation ρ ?</div><div class="a hid">Oui : e<sup>−(x² + y²)/2</sup> = e<sup>−x²/2</sup> e<sup>−y²/2</sup>. Avec ρ ≠ 0, le terme croisé −2ρxy l'en empêche, alors que les marginales restent N(0, 1).</div></li>
+    <li><div class="q">La densité d'un score est 7,4 fois plus haute chez un malade que chez un sain. Pourquoi P(malade ∣ score) ne vaut-elle que 6,9 % ?</div><div class="a hid">Bayes en cotes : avec 1 % de prévalence, la cote a priori 1/99 multiplie le rapport 7,4, ce qui donne une cote de 0,075.</div></li>
+    <li><div class="q">Que devient la densité gaussienne ronde en coordonnées polaires ?</div><div class="a hid">f<sub>R,Θ</sub>(r, θ) = r f(r cos θ, r sin θ) = r e<sup>−r²/2</sup> · 1/(2π) : le jacobien r ; R suit une Rayleigh, Θ une uniforme, indépendants.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Leçons, ponts et chaînes</div>
+  <div class="bridges">
+    <a href="lesson-00-08-esperance-variance.html#n3"><b>Espérance et variance (l08)</b><small>La linéarité de E se prouve en marginalisant la jointe (notion 2), E[XY] = E[X] E[Y] en la factorisant (notion 4).</small></a>
+    <a href="lesson-00-09-covariance-correlation.html#n1"><b>Covariance et corrélation (l09)</b><small>Le lien que mesure le ρ de la figure 4, et les ellipses de la gaussienne 2D.</small></a>
+    <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html"><b>Du bruit à la loss</b><small>La vraisemblance de n observations indépendantes est un produit de p(y<sub>i</sub> ∣ x<sub>i</sub> ; θ) : la factorisation (notion 4) et la notation (notion 3).</small></a>
+    <a href="../chains/chain-p02-02-prior-penalite.html"><b>Du prior à la pénalité</b><small>Un prior à coordonnées indépendantes a une densité jointe produit, donc un −log en somme.</small></a>
+    <a href="../chains/chain-p02-03-conjugues-posterior.html"><b>Le posterior entier</b><small>Bayes pour les densités, et le dénominateur intraitable qui motive MCMC et VI (notion 5).</small></a>
+    <a href="../chains/chain-p04-04-pca.html"><b>PCA, diagonaliser la covariance</b><small>Les directions d'un nuage 2D, sans hypothèse gaussienne (notion 1).</small></a>
+    <a href="../chains/chain-p05-02-logistique.html"><b>Régression logistique</b><small>Un modèle discriminatif de p(y ∣ x), la sigmoïde de la notion 5 ; et l'« effet marginal », qui n'est pas une marginale.</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::loi-jointe</code> (notions 1, 3, 4) · <code>stats::marginale</code> (notions 2, 5). La notion 6 est culture, sans carte.</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l07 · v1 du 10/10/2026 · Brunton 26 et 27 · Prérequis : <a href="lesson-00-03-conditionner-bayes-independance.html">l03</a>, <a href="lesson-00-06-fonctions-standardisation.html">l06</a>. Suite : <a href="lesson-00-08-esperance-variance.html">l08 · Espérance et variance</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* ===== commun à toutes les leçons (kit, étalon l08 v2) ===== */
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc : une entrée par notion, étiquette comprise */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.notion').forEach((s,i)=>{const li=document.createElement('li');const t=s.querySelector('h3').firstChild.textContent.trim();const k=s.classList.contains('culture')?' · culture':'';li.innerHTML=`<a href="#${s.id}">${i+1}. ${t}${k}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.notion').forEach(s=>io.observe(s));
+/* une ancre #nN ouvre la notion visée ; rien n'est replié par défaut hors des blocs */
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outils de dessin ===== */
+function curve(P,f,a,b,cls,ymax){let d='';const n=240;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;let y=f(x);if(!isFinite(y))continue;y=Math.min(y,ymax);d+=(d?' L':'M')+P.sx(x).toFixed(1)+' '+P.sy(y).toFixed(1);}SL.el('path',{d:d,class:'sl-fn '+cls,fill:'none'},P.dyn);}
+function bar(P,x0,x1,y,cls){const a=P.sx(x0),b=P.sx(x1);SL.el('rect',{x:Math.min(a,b),y:P.sy(y),width:Math.max(1.5,Math.abs(b-a)),height:Math.max(0,P.sy(0)-P.sy(y)),class:cls||'sl-bar'},P.dyn);}
+/* SL.plot trace l'axe vertical en x = 0 ; quand 0 porte une barre, on le ramène au bord gauche */
+function leftAxis(P,x0){const ax=P.svg.querySelectorAll('line.sl-axis');if(ax[1]){ax[1].setAttribute('x1',P.sx(x0));ax[1].setAttribute('x2',P.sx(x0));}}
+function rd(host,items){host.innerHTML=items.map(it=>`<div class="${it[2]||''}">${it[0]}<b>${it[1]}</b></div>`).join('');}
+function buttons(host,names,cb){const bs=names.map((n,i)=>{const b=SL.h('button','tb',host,n);b.onclick=()=>{bs.forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');cb(i);};return b;});bs[0].onclick();return bs;}
+
+
+/* ===== v2 : vignettes « voir l'idée », une par notion, juste sous l'idée ===== */
+/* tween : animation 0 → 1 lissée ; runner : un jeton par figure, un nouveau clic tue l'animation en cours */
+function runner(){let t={dead:true};return ()=>{t.dead=true;t={dead:false};return t;};}
+function tween(ms,draw,tk,done){if(SL.reduced){draw(1);if(done)done();return;}const t0=performance.now();const st=t=>{if(tk&&tk.dead)return;let u=Math.min(1,(t-t0)/ms);u=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;draw(u);if(u<1)requestAnimationFrame(st);else if(done)done();};requestAnimationFrame(st);}
+function loop(tk,step){if(SL.reduced){let g=0;while(step()!==false&&g++<1e5);return;}const f=()=>{if(tk.dead)return;if(step()!==false)requestAnimationFrame(f);};requestAnimationFrame(f);}
+function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function pick(r,v,p){let u=r(),a=0;for(let i=0;i<v.length;i++){a+=p[i];if(u<a)return v[i];}return v[v.length-1];}
+function gauss(r){let u=0;while(u===0)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());}
+function fulcrum(P,x){const cx=P.sx(x),cy=P.sy(0);SL.el('path',{d:`M${cx.toFixed(1)} ${(cy+1).toFixed(1)} L${(cx-8).toFixed(1)} ${(cy+16).toFixed(1)} L${(cx+8).toFixed(1)} ${(cy+16).toFixed(1)} Z`,class:'sl-fulcrum'},P.dyn);}
+function median(a){const s=a.slice().sort((x,y)=>x-y),n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;}
+function rect(P,x0,x1,y0,y1,cls,parent){const a=P.sx(x0),b=P.sx(x1),c=P.sy(y0),d=P.sy(y1);return SL.el('rect',{x:Math.min(a,b).toFixed(1),y:Math.min(c,d).toFixed(1),width:Math.abs(b-a).toFixed(1),height:Math.abs(d-c).toFixed(1),class:cls},parent||P.dyn);}
+/* pile de pastilles : une par individu, regroupées par classe de largeur bw */
+function stack(P,vals,bw,r,clsOf,centred){const bins=new Map();vals.forEach((v,i)=>{const b=centred?Math.round(v/bw):Math.floor(v/bw);if(!bins.has(b))bins.set(b,[]);bins.get(b).push(i);});
+  const res=[];bins.forEach((ids,b)=>{const c=centred?b*bw:(b+0.5)*bw,cx=P.sx(c);res.push({c:c,ids:ids});ids.forEach((i,j)=>SL.el('circle',{cx:cx.toFixed(1),cy:(P.sy(0)-r-1-j*(2*r+1)).toFixed(1),r:r,class:'sl-dot '+clsOf(i)},P.dyn));});return res;}
+
+
+/* ===== outils propres à l07 ===== */
+/* nombres à décimales fixes, virgule et vrai signe moins */
+function fx(x,d){const s=Math.abs(x).toFixed(d).replace('.',',');return (x<0&&+s.replace(',','.')!==0?'−':'')+s;}
+/* très petit nombre : notation scientifique, 1,7·10⁻⁵ */
+function sci(x){if(x>=0.001||x<=0)return fx(x,4);const e=Math.floor(Math.log10(x)),S='⁰¹²³⁴⁵⁶⁷⁸⁹';
+  return fx(x/Math.pow(10,e),1)+'·10'+(e<0?'⁻':'')+String(Math.abs(e)).split('').map(d=>S[+d]).join('');}
+/* trois chiffres significatifs environ */
+function sig(x){return x>=100?fx(x,0):x>=10?fx(x,1):x>=1?fx(x,2):x>=0.01?fx(x,3):sci(x);}
+function pc(x,d){return fx(100*x,d===undefined?1:d)+' %';}
+const SQ2PI=Math.sqrt(2*Math.PI);
+function phi(t){return Math.exp(-t*t/2)/SQ2PI;}
+/* Φ par Abramowitz-Stegun 7.1.26 (erreur < 1,5e-7) */
+function Phi(t){const z=Math.abs(t)/Math.SQRT2,k=1/(1+0.3275911*z);
+  const e=1-(((((1.061405429*k-1.453152027)*k)+1.421413741)*k-0.284496736)*k+0.254829592)*k*Math.exp(-z*z);return t>=0?0.5*(1+e):0.5*(1-e);}
+/* 1,5 · 2 · 0,25 : décimales utiles seulement */
+function nf(v){return fx(v,2).replace(/,?0+$/,'');}
+/* path d'une courbe dans un repère quelconque : pts = [[px,py],…] */
+function pathOf(pts){return pts.map((p,i)=>(i?'L':'M')+p[0].toFixed(1)+' '+p[1].toFixed(1)).join(' ');}
+
+/* nuage carré, avec en option un histogramme marginal en haut (T px) et à droite (R px) */
+function jointPanel(host,o){
+  const L=o.lim,S=o.size||330,T=o.top||0,R=o.right||0,ml=40,mt=12,gT=T?10:0,gR=R?10:0,mr=12,mb=32;
+  const W=ml+S+gR+R+mr,H=mt+T+gT+S+mb,X0=ml,Y0=mt+T+gT;
+  const svg=SL.el('svg',{viewBox:`0 0 ${W} ${H}`,class:'sl-plot'},host);
+  const sx=x=>X0+(x-L[0])/(L[1]-L[0])*S,sy=y=>Y0+S-(y-L[0])/(L[1]-L[0])*S;
+  const g=SL.el('g',{class:'sl-grid'},svg);
+  for(let t=Math.ceil(L[0]);t<=L[1];t++){
+    SL.el('line',{x1:sx(t),x2:sx(t),y1:Y0,y2:Y0+S},g);SL.el('line',{x1:X0,x2:X0+S,y1:sy(t),y2:sy(t)},g);
+    SL.el('text',{x:sx(t),y:Y0+S+16,'text-anchor':'middle',class:'sl-tick'},svg).textContent=SL.fmt(t);
+    SL.el('text',{x:X0-6,y:sy(t)+4,'text-anchor':'end',class:'sl-tick'},svg).textContent=SL.fmt(t);}
+  SL.el('rect',{x:X0,y:Y0,width:S,height:S,class:'sl-frame'},svg);
+  if(o.xl)SL.el('text',{x:X0+S,y:H-4,'text-anchor':'end',class:'sl-lbl'},svg).textContent=o.xl;
+  const back=SL.el('g',{},svg),pts=SL.el('g',{},svg),dyn=SL.el('g',{},svg);
+  const J={svg,sx,sy,S,T,R,X0,Y0,W,H,back,pts,dyn,L};
+  const tb=mt+T,rb=X0+S+gR;            /* base de l'histogramme du haut, bord gauche de celui de droite */
+  if(T){SL.el('line',{x1:X0,x2:X0+S,y1:tb,y2:tb,class:'sl-axis'},svg);if(o.tl)SL.el('text',{x:X0+S-2,y:mt+10,'text-anchor':'end',class:'sl-lbl'},svg).textContent=o.tl;}
+  if(R){SL.el('line',{x1:rb,x2:rb,y1:Y0,y2:Y0+S,class:'sl-axis'},svg);if(o.rl)SL.el('text',{x:rb+R,y:Y0-3,'text-anchor':'end',class:'sl-lbl'},svg).textContent=o.rl;}
+  J.clear=()=>{while(dyn.firstChild)dyn.removeChild(dyn.firstChild);while(back.firstChild)back.removeChild(back.firstChild);};
+  J.vband=(a,b,cls)=>SL.el('rect',{x:sx(a).toFixed(1),y:Y0,width:(sx(b)-sx(a)).toFixed(1),height:S,class:cls||'sl-band'},back);
+  J.topBar=(a,b,v,vm,cls)=>{const h=Math.min(T,T*v/vm);return SL.el('rect',{x:(sx(a)+0.6).toFixed(1),y:(tb-h).toFixed(1),width:Math.max(0.5,sx(b)-sx(a)-1.2).toFixed(1),height:h.toFixed(1),class:cls||'sl-bar'},dyn);};
+  J.rightBar=(a,b,v,vm,cls)=>{const w=Math.min(R,R*v/vm);return SL.el('rect',{x:rb,y:(sy(b)+0.6).toFixed(1),width:w.toFixed(1),height:Math.max(0.5,sy(a)-sy(b)-1.2).toFixed(1),class:cls||'sl-bar'},dyn);};
+  J.topCurve=(f,vm,cls)=>{const p=[];for(let i=0;i<=240;i++){const x=L[0]+(L[1]-L[0])*i/240;p.push([sx(x),tb-Math.min(T,T*f(x)/vm)]);}return SL.el('path',{d:pathOf(p),class:'sl-fn '+cls,fill:'none'},dyn);};
+  J.rightCurve=(f,vm,cls)=>{const p=[];for(let i=0;i<=240;i++){const y=L[0]+(L[1]-L[0])*i/240;p.push([rb+Math.min(R,R*f(y)/vm),sy(y)]);}return SL.el('path',{d:pathOf(p),class:'sl-fn '+cls,fill:'none'},dyn);};
+  return J;
+}
+
+/* ===== Figure 1 : le terrain, l'intégrale double comme somme de cases ===== */
+(function(){
+  /* densité inventée : trois bosses gaussiennes, tronquées au demi-terrain 15 × 14 m (check/c02_court.py) */
+  const B=[[0.55,7.5,2.2,1.1,1.0],[0.30,7.5,6.6,1.8,1.0],[0.15,13.6,1.2,0.6,0.7]],Z=0.9844495913993935;
+  const f=(x,y)=>{let s=0;B.forEach(b=>{s+=b[0]*Math.exp(-0.5*(((x-b[1])/b[3])**2+((y-b[2])/b[4])**2))/(2*Math.PI*b[3]*b[4]);});return s/Z;};
+  const REG=[{n:'la raquette',t:(x,y)=>x>=5&&x<=10&&y<=6,box:[5,10,0,6],ex:'0,608'},
+             {n:'le corner droit',t:(x,y)=>x>=12&&y<=3,box:[12,15,0,3],ex:'0,143'},
+             {n:'tout le terrain',t:()=>true,box:null,ex:'1'}];
+  const SIZES=[1,0.5,0.25],FMAX=0.0809;
+  const P=SL.plot(document.getElementById('f1plot'),{x:[0,15],y:[0,14],w:480,h:444,xt:[0,3,6,9,12,15],yt:[0,2,4,6,8,10,12,14],xl:'x (m)'});
+  P.svg.querySelector('.sl-grid').style.display='none';
+  const top=SL.el('g',{},P.svg),out=document.getElementById('f1out');
+  /* les lignes du terrain, au-dessus des cases */
+  const ln=(a,b,c,d)=>SL.el('line',{x1:P.sx(a),y1:P.sy(b),x2:P.sx(c),y2:P.sy(d),class:'sl-court'},top);
+  SL.el('rect',{x:P.sx(0),y:P.sy(14),width:P.sx(15)-P.sx(0),height:P.sy(0)-P.sy(14),class:'sl-court'},top);
+  SL.el('rect',{x:P.sx(5),y:P.sy(6),width:P.sx(10)-P.sx(5),height:P.sy(0)-P.sy(6),class:'sl-court'},top);
+  SL.el('circle',{cx:P.sx(7.5),cy:P.sy(1.575),r:P.sx(0.225)-P.sx(0),class:'sl-court'},top);ln(6.6,1.2,8.4,1.2);
+  const yc=1.575+Math.sqrt(6.75*6.75-6.6*6.6),arc=[];ln(0.9,0,0.9,yc);ln(14.1,0,14.1,yc);
+  const a0=Math.atan2(yc-1.575,-6.6),a1=Math.atan2(yc-1.575,6.6);
+  for(let i=0;i<=80;i++){const a=a0+(a1-a0)*i/80;arc.push([P.sx(7.5+6.75*Math.cos(a)),P.sy(1.575+6.75*Math.sin(a))]);}
+  SL.el('path',{d:pathOf(arc),class:'sl-court'},top);
+  const reg=SL.el('rect',{class:'sl-region'},top);
+  const st={r:0,c:0};
+  function draw(){
+    P.clear();const c=SIZES[st.c],R=REG[st.r];let k=0,s=0,n=0;
+    for(let x=c/2;x<15;x+=c)for(let y=c/2;y<14;y+=c){
+      const v=f(x,y),inA=R.t(x,y);n++;if(inA){k++;s+=v*c*c;}
+      rect(P,x-c/2,x+c/2,y-c/2,y+c/2,inA?'sl-cellA':'sl-cellp').setAttribute('fill-opacity',(0.04+0.8*v/FMAX).toFixed(3));}
+    if(R.box){reg.style.display='';reg.setAttribute('x',P.sx(R.box[0]));reg.setAttribute('y',P.sy(R.box[3]));
+      reg.setAttribute('width',P.sx(R.box[1])-P.sx(R.box[0]));reg.setAttribute('height',P.sy(R.box[2])-P.sy(R.box[3]));}else reg.style.display='none';
+    rd(out,[['cases de '+fx(c,c<1?(c<0.5?2:1):0)+' m de côté',String(n)],['cases dans la région',String(k)],['Σ f · dx dy sur la région',fx(s,3),'c3'],['intégrale exacte',R.ex]]);
+  }
+  buttons(document.getElementById('f1ctl'),REG.map(r=>r.n),i=>{st.r=i;draw();});
+  buttons(document.getElementById('f1ctl2'),['cases de 1 m','0,5 m','0,25 m'],i=>{st.c=i;draw();});
+})();
+
+/* ===== Figure 2 : les marges du tableau ===== */
+(function(){
+  const P=SL.plot(document.getElementById('f2plot'),{x:[0.4,7.6],y:[0.4,7.95],w:500,h:470,xt:[1,2,3,4,5,6],yt:[1,2,3,4,5,6],xl:'x, premier dé'});
+  P.svg.querySelector('.sl-grid').style.display='none';
+  const out=document.getElementById('f2out');
+  const M=[(x,y)=>1,(x,m)=>m===x?x:m>x?1:0];          /* en trente-sixièmes */
+  const NAME=['Y, second dé','M, maximum'],YL=['y, second dé','m, maximum'];
+  const yl=SL.el('text',{x:48,y:26,class:'sl-lbl'},P.svg);
+  let cur=[];for(let x=1;x<=6;x++)for(let y=1;y<=6;y++)cur.push(1);const fresh=runner();let K=0;
+  function draw(p){
+    P.clear();const col=[0,0,0,0,0,0],row=[0,0,0,0,0,0];let i=0;
+    for(let x=1;x<=6;x++)for(let y=1;y<=6;y++,i++){const q=p[i];col[x-1]+=q;row[y-1]+=q;
+      rect(P,x-0.46,x+0.46,y-0.46,y+0.46,'sl-cello');
+      if(q>0.02)rect(P,x-0.46,x+0.46,y-0.46,y+0.46,'sl-cellp').setAttribute('fill-opacity',(0.06+0.075*q).toFixed(3));
+      const r=Math.round(q);P.text(x,y-0.1,r?r+'/36':'0',r?'sl-cell-t':'sl-prod','middle');}
+    for(let j=0;j<6;j++){
+      rect(P,j+1-0.46,j+1+0.46,7-0.42,7+0.42,'sl-k5 sl-kc');P.text(j+1,6.9,Math.round(col[j])+'/36','sl-cell-t','middle');
+      rect(P,7-0.42,7+0.42,j+1-0.46,j+1+0.46,'sl-k5 sl-kc');P.text(7,j+0.9,Math.round(row[j])+'/36','sl-cell-t','middle');}
+    P.text(7,6.9,'Σ = 1','sl-cell-t','middle');yl.textContent=YL[K];
+    rd(out,[['en haut, la loi de X',col.every(v=>Math.round(v)===6)?'6/36 partout':'?'],
+      ['à droite, la loi de '+NAME[K],row.every(v=>Math.round(v)===6)?'6/36 partout':row.map(v=>Math.round(v)).join(', ')+' /36'],
+      ['cases vides',String(p.filter(q=>q<0.5).length)]]);
+  }
+  buttons(document.getElementById('f2ctl'),['deux dés : (X, Y)','premier dé et maximum : (X, M)'],k=>{const tk=fresh(),a=cur.slice(),b=[];K=k;
+    for(let x=1;x<=6;x++)for(let y=1;y<=6;y++)b.push(M[k](x,y));
+    tween(500,u=>{cur=a.map((v,i)=>v+(b[i]-v)*u);draw(cur);},tk);});
+})();
+
+/* ===== Figure 3 : couper la jointe, puis diviser par la marginale ===== */
+(function(){
+  const a=0.8,s=0.6;
+  const P=SL.plot(document.getElementById('f3plot'),{x:[-3.5,4],y:[0,1],w:560,h:270,xt:[-3,-2,-1,0,1,2,3,4],yt:[0,0.25,0.5,0.75,1],xl:'y',yl:'densité'});
+  leftAxis(P,-3.5);
+  const out=document.getElementById('f3out');
+  function draw(x0){
+    P.clear();const fx0=phi(x0),slice=y=>fx0*phi((y-a*x0)/s)/s,cond=y=>phi((y-a*x0)/s)/s;
+    const pts=[[P.sx(-3.5),P.sy(0)]];for(let i=0;i<=240;i++){const y=-3.5+7.5*i/240;pts.push([P.sx(y),P.sy(slice(y))]);}pts.push([P.sx(4),P.sy(0)]);
+    SL.el('path',{d:pathOf(pts)+' Z',class:'sl-area'},P.dyn);
+    curve(P,phi,-3.5,4,'sl-c4 sl-dash',1);curve(P,slice,-3.5,4,'sl-c2',1);curve(P,cond,-3.5,4,'sl-c3',1);
+    P.text(3.95,0.95,'│ tranche brute f(x₀, y)','sl-c2','end');P.text(3.95,0.87,'│ f(y ∣ x₀), la tranche divisée par son aire','sl-c3','end');P.text(3.95,0.79,'┆ marginale de Y','sl-c4','end');
+    rd(out,[['aire de la tranche = f<sub>X</sub>(x₀)',fx(fx0,3),'c3'],['centre de f(y ∣ x₀) = 0,8 x₀',fx(a*x0,2)],['écart-type de f(y ∣ x₀)','0,6'],['pic de f(y ∣ x₀)',fx(1/(s*SQ2PI),3)]]);
+  }
+  SL.slider(document.getElementById('f3ctl'),{label:'x₀',min:-2.5,max:2.5,step:0.1,value:1.5,fmt:v=>fx(v,1)},draw);
+})();
+
+/* ===== Figure 4 : la jointe gaussienne à corrélation ρ contre le produit de ses marginales ===== */
+(function(){
+  const P=SL.plot(document.getElementById('f4plot'),{x:[-3,3],y:[-3,3],w:420,h:412,xt:[-3,-2,-1,0,1,2,3],yt:[-3,-2,-1,0,1,2,3],xl:'x'});
+  const out=document.getElementById('f4out'),LV=[0.14,0.1,0.06,0.02];
+  const cp=SL.el('clipPath',{id:'f4clip'},SL.el('defs',{},P.svg));
+  SL.el('rect',{x:P.sx(-3),y:P.sy(3),width:P.sx(3)-P.sx(-3),height:P.sy(-3)-P.sy(3)},cp);
+  const g=SL.el('g',{'clip-path':'url(#f4clip)'},P.svg),pr=SL.el('g',{},g),jt=SL.el('g',{},g),mk=SL.el('g',{},P.svg);
+  const ell=(k,r)=>{const p=[];for(let i=0;i<=120;i++){const t=2*Math.PI*i/120,u=Math.sqrt(1+r)*Math.cos(t),v=Math.sqrt(1-r)*Math.sin(t);p.push([P.sx(k*(u+v)/Math.SQRT2),P.sy(k*(u-v)/Math.SQRT2)]);}return pathOf(p)+' Z';};
+  LV.forEach(c=>SL.el('path',{d:ell(Math.sqrt(-2*Math.log(2*Math.PI*c)),0),class:'sl-fn sl-c3 sl-dash sl-thin',fill:'none'},pr));
+  const jf=(x,y,r)=>Math.exp(-(x*x-2*r*x*y+y*y)/(2*(1-r*r)))/(2*Math.PI*Math.sqrt(1-r*r));
+  [[1,1],[1,-1]].forEach(q=>{SL.el('circle',{cx:P.sx(q[0]),cy:P.sy(q[1]),r:4.5,class:'sl-dot sl-c5'},mk);
+    SL.el('text',{x:P.sx(q[0])+10,y:P.sy(q[1])+4,class:'sl-lbl sl-halo'},mk).textContent=q[1]>0?'(1, 1)':'(1, −1)';});
+  function draw(r){
+    while(jt.firstChild)jt.removeChild(jt.firstChild);
+    LV.forEach(c=>SL.el('path',{d:ell(Math.sqrt(-2*Math.log(2*Math.PI*c*Math.sqrt(1-r*r))),r),class:'sl-fn sl-c1',fill:'none'},jt));
+    const p=phi(1)*phi(1),a=jf(1,1,r),b=jf(1,-1,r);
+    rd(out,[['jointe en (1, 1)',sci(a),'c1'],['produit f<sub>X</sub>(1) f<sub>Y</sub>(1)',fx(p,4)],['jointe / produit en (1, 1)',sig(a/p),'c3'],['jointe / produit en (1, −1)',sig(b/p)]]);
+  }
+  SL.slider(document.getElementById('f4ctl'),{label:'corrélation ρ',min:-0.9,max:0.9,step:0.05,value:0,fmt:v=>fx(v,2)},draw);
+})();
+
+/* ===== v1 : un événement est une région du tableau des deux dés ===== */
+(function(){
+  const P=SL.plot(document.getElementById('v1plot'),{x:[0.4,6.6],y:[0.4,6.95],w:460,h:430,xt:[1,2,3,4,5,6],yt:[1,2,3,4,5,6],xl:'x, premier dé',yl:'y, second dé'});
+  P.svg.querySelector('.sl-grid').style.display='none';
+  const out=document.getElementById('v1out'),ctl=document.getElementById('v1ctl');
+  const EV=[{n:'X + Y = 7',t:(x,y)=>x+y===7},{n:'X > Y',t:(x,y)=>x>y},{n:'X ≤ 2 et Y ≥ 5',t:(x,y)=>x<=2&&y>=5}];
+  for(let x=1;x<=6;x++)for(let y=1;y<=6;y++)rect(P,x-0.46,x+0.46,y-0.46,y+0.46,'sl-cello',P.layer);
+  const dots=SL.el('g',{},P.svg);const fresh=runner();
+  let ev=0,thr=[],seed=21;
+  function draw(){
+    P.clear();const E=EV[ev];let k=0;
+    for(let x=1;x<=6;x++)for(let y=1;y<=6;y++){const on=E.t(x,y);if(on){k++;rect(P,x-0.46,x+0.46,y-0.46,y+0.46,'sl-cellp').setAttribute('fill-opacity','0.42');}
+      P.text(x,y-0.1,'1/36',on?'sl-cell-t':'sl-prod','middle');}
+    const hit=thr.filter(p=>E.t(p[0],p[1])).length;
+    rd(out,[['cases dans l’événement',String(k)],['P = somme des cases',k+'/36 = '+fx(k/36,3),'c3'],
+      thr.length?['part des '+thr.length+' paires lancées',pc(hit/thr.length,1),'c1']:['paires lancées','aucune']]);
+  }
+  buttons(ctl,EV.map(e=>e.n),i=>{ev=i;draw();});
+  SL.h('button','tb',ctl,'▶ lancer 360 paires').onclick=()=>{const tk=fresh(),r=rng(seed++);thr=[];while(dots.firstChild)dots.removeChild(dots.firstChild);
+    loop(tk,()=>{for(let j=0;j<6&&thr.length<360;j++){const x=1+Math.floor(6*r()),y=1+Math.floor(6*r());thr.push([x,y]);
+      SL.el('circle',{cx:P.sx(x-0.38+0.76*r()).toFixed(1),cy:P.sy(y+0.12+0.28*r()).toFixed(1),r:2.2,class:'sl-dot sl-c4 sl-hot'},dots);}
+      draw();return thr.length<360;});};
+})();
+
+/* ===== v2 : la marginale compte les points bande par bande ===== */
+(function(){
+  const host=document.getElementById('v2plot'),out=document.getElementById('v2out');
+  const J=jointPanel(host,{lim:[-3.5,3.5],size:330,top:90,right:90,xl:'x',tl:'marginale de X',rl:'marginale de Y'});
+  const DF=x=>{const t=Math.max(-2,Math.min(2,x));return (t*Math.sqrt(4-t*t)+4*Math.asin(t/2))/(4*Math.PI);};
+  const LAW=[
+    {n:'gaussien',gen:r=>[gauss(r),gauss(r)],f:phi,band:a=>Phi(a+0.5)-Phi(a)},
+    {n:'uniforme sur un carré',gen:r=>[-2+4*r(),-2+4*r()],f:x=>Math.abs(x)<=2?0.25:0,band:a=>Math.max(0,Math.min(a+0.5,2)-Math.max(a,-2))/4},
+    {n:'uniforme sur un disque',gen:r=>{for(;;){const x=-2+4*r(),y=-2+4*r();if(x*x+y*y<4)return [x,y];}},f:x=>Math.abs(x)<2?Math.sqrt(4-x*x)/(2*Math.PI):0,band:a=>DF(a+0.5)-DF(a)}];
+  const st={k:0,a:0,seed:3163},X=[],Y=[],D=[];let r=null;const fresh=runner();
+  function add(n){const L=LAW[st.k];for(let i=0;i<n&&X.length<6200;i++){const p=L.gen(r);X.push(p[0]);Y.push(p[1]);
+    D.push(Math.abs(p[0])<3.5&&Math.abs(p[1])<3.5?SL.el('circle',{cx:J.sx(p[0]).toFixed(1),cy:J.sy(p[1]).toFixed(1),r:2,class:'sl-dot sl-c2 sl-tiny'},J.pts):null);}}
+  function reset(){fresh();X.length=0;Y.length=0;D.length=0;while(J.pts.firstChild)J.pts.removeChild(J.pts.firstChild);r=rng(st.seed+100*st.k);add(800);}
+  function draw(){
+    J.clear();const L=LAW[st.k],a=st.a,n=X.length,cx=new Array(14).fill(0),cy=new Array(14).fill(0);let k=0;
+    J.vband(a,a+0.5);
+    for(let i=0;i<n;i++){const ix=Math.floor((X[i]+3.5)/0.5),iy=Math.floor((Y[i]+3.5)/0.5);if(ix>=0&&ix<14)cx[ix]++;if(iy>=0&&iy<14)cy[iy]++;
+      const on=X[i]>=a&&X[i]<a+0.5;if(on)k++;if(D[i])D[i].setAttribute('class',on?'sl-dot sl-c3 sl-hot':'sl-dot sl-c2 sl-tiny');}
+    let pm=0;for(let j=0;j<14;j++)pm=Math.max(pm,L.band(-3.5+0.5*j));
+    const vm=1.1*Math.max(...cx,...cy,n*pm),sel=Math.round((a+3.5)/0.5);
+    for(let j=0;j<14;j++){const e=-3.5+0.5*j;J.topBar(e,e+0.5,cx[j],vm,j===sel?'sl-bar2':'sl-bar');J.rightBar(e,e+0.5,cy[j],vm,'sl-bar');}
+    J.topCurve(x=>n*0.5*L.f(x),vm,'sl-c1 sl-dash');J.rightCurve(y=>n*0.5*L.f(y),vm,'sl-c1 sl-dash');
+    rd(out,[['points',String(n)],['dans la bande ['+nf(a)+' ; '+nf(a+0.5)+']',k+' · '+pc(n?k/n:0,1),'c3'],['théorie pour cette bande',pc(L.band(a),1)]]);
+  }
+  buttons(document.getElementById('v2ctl'),LAW.map(l=>l.n),i=>{st.k=i;reset();draw();});
+  const c2=document.getElementById('v2ctl2');
+  SL.h('button','tb',c2,'+ 300 points').onclick=()=>{fresh();add(300);draw();};
+  SL.h('button','tb',c2,'▶ + 3 000 points').onclick=()=>{const tk=fresh();let m=0;loop(tk,()=>{if(X.length>=6200)return false;add(100);m+=100;draw();return m<3000;});};
+  SL.h('button','tb',c2,'↺ autre tirage').onclick=()=>{st.seed++;reset();draw();};
+  SL.slider(document.getElementById('v2sl'),{label:'bande de x',min:-3.5,max:3,step:0.5,value:0,fmt:v=>nf(v)+' à '+nf(v+0.5)},v=>{st.a=v;draw();});
+})();
+
+/* ===== v3 : une bande du nuage à x fixé ===== */
+(function(){
+  const host=document.getElementById('v3plot'),out=document.getElementById('v3out'),a=0.8,s=0.6,N=3000,H=0.15;
+  const J=jointPanel(host,{lim:[-3.5,3.5],size:330,right:110,xl:'x',rl:'y dans la bande'});
+  const X=[],Y=[],D=[];let seed=41,x0=1.5;
+  function gen(){X.length=0;Y.length=0;D.length=0;while(J.pts.firstChild)J.pts.removeChild(J.pts.firstChild);const r=rng(seed);
+    for(let i=0;i<N;i++){const x=gauss(r),y=a*x+s*gauss(r);X.push(x);Y.push(y);
+      D.push(Math.abs(x)<3.5&&Math.abs(y)<3.5?SL.el('circle',{cx:J.sx(x).toFixed(1),cy:J.sy(y).toFixed(1),r:2,class:'sl-dot sl-c2 sl-tiny'},J.pts):null);}}
+  function draw(){
+    J.clear();J.vband(x0-H,x0+H);const c=new Array(28).fill(0);let nb=0,m=0,q=0,ma=0,qa=0;
+    for(let i=0;i<N;i++){const on=Math.abs(X[i]-x0)<H;ma+=Y[i];qa+=Y[i]*Y[i];
+      if(on){nb++;m+=Y[i];q+=Y[i]*Y[i];const j=Math.floor((Y[i]+3.5)/0.25);if(j>=0&&j<28)c[j]++;}
+      if(D[i])D[i].setAttribute('class',on?'sl-dot sl-c3 sl-hot':'sl-dot sl-c2 sl-tiny');}
+    for(let j=0;j<28;j++)if(c[j]&&nb)J.rightBar(-3.5+0.25*j,-3.25+0.25*j,c[j]/(nb*0.25),1,'sl-bar2');
+    J.rightCurve(y=>phi((y-a*x0)/s)/s,1,'sl-c3 sl-dash');J.rightCurve(phi,1,'sl-c4 sl-dash');
+    const mb=nb?m/nb:0,sb=nb>1?Math.sqrt(Math.max(0,q/nb-mb*mb)):0,mA=ma/N;
+    rd(out,[['points dans la bande',String(nb)],['moyenne des y (théorie '+fx(a*x0,2)+')',fx(mb,2),'c3'],
+      ['écart-type des y (théorie 0,6)',fx(sb,2),'c3'],['écart-type de tous les y (théorie 1)',fx(Math.sqrt(qa/N-mA*mA),2)]]);
+  }
+  gen();
+  SL.slider(document.getElementById('v3sl'),{label:'x fixé',min:-2.5,max:2.5,step:0.1,value:1.5,fmt:v=>fx(v,1)},v=>{x0=v;draw();});
+  SL.h('button','tb',document.getElementById('v3ctl'),'↺ autre tirage').onclick=()=>{seed++;gen();draw();};
+})();
+
+/* ===== v4 : mélanger les y entre les fléchettes ===== */
+(function(){
+  const P=SL.plot(document.getElementById('v4plot'),{x:[-3.6,3.6],y:[-3.6,3.6],w:420,h:412,xt:[-3,-2,-1,0,1,2,3],yt:[-3,-2,-1,0,1,2,3],xl:'x'});
+  P.svg.querySelector('.sl-grid').style.display='none';
+  const cx=P.sx(0),cy=P.sy(0),u1=P.sx(1)-P.sx(0),out=document.getElementById('v4out');
+  [0.5,1.5,2,2.5,3,3.4].forEach(R=>SL.el('circle',{cx:cx,cy:cy,r:R*u1,class:'sl-orbit'},P.layer));
+  for(let k=0;k<20;k++){const t=2*Math.PI*(k+0.5)/20;SL.el('line',{x1:cx+0.5*u1*Math.cos(t),y1:cy-0.5*u1*Math.sin(t),x2:cx+3.4*u1*Math.cos(t),y2:cy-3.4*u1*Math.sin(t),class:'sl-orbit'},P.layer);}
+  SL.el('circle',{cx:cx,cy:cy,r:u1,class:'sl-ring1'},P.layer);
+  const g=SL.el('g',{},P.svg),N=400,X=[],Y=[],Ys=[],D=[];
+  for(let i=0;i<N;i++)D.push(SL.el('circle',{r:2.6,class:'sl-dot sl-c2 sl-hot'},g));
+  const TH=['39,3 / 39,3 %','0 / 8,7 %'];
+  let mode=0,seed=47,u=0;const fresh=runner();
+  const clamp=v=>Math.max(-3.55,Math.min(3.55,v));
+  function gen(){const r=rng(seed+50*mode);X.length=0;Y.length=0;
+    for(let i=0;i<N;i++){if(mode===0){X.push(gauss(r));Y.push(gauss(r));}else{const R=2+0.2*gauss(r),t=2*Math.PI*r();X.push(R*Math.cos(t));Y.push(R*Math.sin(t));}}
+    const p=[...Array(N).keys()];for(let i=N-1;i>0;i--){const j=Math.floor(r()*(i+1));[p[i],p[j]]=[p[j],p[i]];}
+    for(let i=0;i<N;i++)Ys[i]=Y[p[i]];}
+  function place(){for(let i=0;i<N;i++){D[i].setAttribute('cx',P.sx(clamp(X[i])).toFixed(1));D[i].setAttribute('cy',P.sy(clamp(Y[i]+(Ys[i]-Y[i])*u)).toFixed(1));}}
+  function stats(){let b=0,a=0;for(let i=0;i<N;i++){if(X[i]*X[i]+Y[i]*Y[i]<1)b++;if(X[i]*X[i]+Ys[i]*Ys[i]<1)a++;}
+    rd(out,[['fléchettes',String(N)],['dans le cercle r < 1, avant',pc(b/N,1)],['après le mélange des y',pc(a/N,1),'c3'],['théorie, avant / après',TH[mode]]]);}
+  const mix=SL.h('button','tb',null,'mélanger les y');
+  buttons(document.getElementById('v4ctl'),['viser le centre','viser l’anneau'],k=>{fresh();mode=k;u=0;mix.textContent='mélanger les y';gen();place();stats();});
+  const c2=document.getElementById('v4ctl2');c2.appendChild(mix);
+  mix.onclick=()=>{const tk=fresh(),a=u,b=u<0.5?1:0;mix.textContent=b?'remettre les y':'mélanger les y';tween(900,t=>{u=a+(b-a)*t;place();},tk);};
+  SL.h('button','tb',c2,'↺ autre tirage').onclick=()=>{fresh();seed++;u=0;mix.textContent='mélanger les y';gen();place();stats();};
+})();
+
+/* ===== v5 : ce que dit le score, et ce qu'il faut en croire ===== */
+(function(){
+  const host=document.getElementById('v5plot'),out=document.getElementById('v5out'),XT=[-3,-2,-1,0,1,2,3,4,5];
+  const A=SL.plot(SL.h('div','',host),{x:[-3,5.5],y:[0,0.46],w:560,h:200,xt:XT,yt:[0,0.2,0.4],yl:'f(y ∣ classe)'});
+  const B=SL.plot(SL.h('div','',host),{x:[-3,5.5],y:[0,1],w:560,h:170,xt:XT,yt:[0,0.5,1],xl:'score y',yl:'P(malade ∣ y)'});
+  leftAxis(A,-3);leftAxis(B,-3);
+  A.fn(phi,'sl-c4');A.fn(t=>phi(t-2),'sl-c3');
+  A.label(5.45,0.42,'│ sains, N(0, 1)','sl-c4','end');A.label(5.45,0.36,'│ malades, N(2, 1)','sl-c3','end');
+  const st={p:0.01,y:2},PR=[0.01,0.1,0.5];
+  function draw(){
+    A.clear();B.clear();const p=st.p,y=st.y,post=t=>{const m=phi(t-2)*p,h=phi(t)*(1-p);return m/(m+h);};
+    A.vline(y,'sl-c5');A.dot(y,phi(y),'sl-c4',5);A.dot(y,phi(y-2),'sl-c3',5);
+    B.seg(-3,0.5,5.5,0.5,'sl-dash');curve(B,post,-3,5.5,'sl-c3',1);B.vline(y,'sl-c5');B.dot(y,post(y),'sl-c3',5);
+    rd(out,[['f(y ∣ malade)',fx(phi(y-2),3)],['f(y ∣ sain)',fx(phi(y),3)],['rapport malade / sain',sig(phi(y-2)/phi(y))],
+      ['P(malade ∣ y)',pc(post(y),1),'c3']]);
+  }
+  buttons(document.getElementById('v5ctl'),['prévalence 1 %','10 %','50 %'],i=>{st.p=PR[i];draw();});
+  SL.slider(document.getElementById('v5sl'),{label:'score y',min:-2,max:5,step:0.1,value:2,fmt:v=>fx(v,1)},v=>{st.y=v;draw();});
+})();
+
+/* ===== v6 : dense au centre, peuplé sur les anneaux ===== */
+(function(){
+  const host=document.getElementById('v6plot'),out=document.getElementById('v6out');
+  const row=SL.h('div','v-row',host),Lh=SL.h('div','',row),Rh=SL.h('div','',row);
+  const A=SL.plot(Lh,{x:[-3.4,3.4],y:[-3.4,3.4],w:300,h:292,xt:[-3,-2,-1,0,1,2,3],yt:[-3,-2,-1,0,1,2,3]});
+  A.svg.querySelector('.sl-grid').style.display='none';
+  const B=SL.plot(Rh,{x:[0,3.25],y:[0,0.19],w:300,h:292,xt:[0,1,2,3],yt:[0,0.05,0.1,0.15],xl:'distance r au centre',yl:'part des fléchettes'});
+  const cx=A.sx(0),cy=A.sy(0),u1=A.sx(1)-A.sx(0);
+  [0.5,1,1.5,2,2.5,3].forEach(R=>SL.el('circle',{cx:cx,cy:cy,r:R*u1,class:'sl-orbit'},A.layer));
+  const ring=SL.el('path',{class:'sl-band','fill-rule':'evenodd'},A.layer),g=SL.el('g',{},A.svg);
+  const circ=R=>`M${(cx+R).toFixed(1)} ${cy.toFixed(1)} A${R.toFixed(1)} ${R.toFixed(1)} 0 1 0 ${(cx-R).toFixed(1)} ${cy.toFixed(1)} A${R.toFixed(1)} ${R.toFixed(1)} 0 1 0 ${(cx+R).toFixed(1)} ${cy.toFixed(1)} Z`;
+  const X=[],Y=[],RR=[],D=[];let r=null,seed=5,a0=1;const fresh=runner();
+  function add(n){for(let i=0;i<n&&X.length<6000;i++){const x=gauss(r),y=gauss(r);X.push(x);Y.push(y);RR.push(Math.hypot(x,y));
+    D.push(Math.abs(x)<3.4&&Math.abs(y)<3.4?SL.el('circle',{cx:A.sx(x).toFixed(1),cy:A.sy(y).toFixed(1),r:1.8,class:'sl-dot sl-c2 sl-tiny'},g):null);}}
+  function reset(){fresh();X.length=0;Y.length=0;RR.length=0;D.length=0;while(g.firstChild)g.removeChild(g.firstChild);r=rng(seed);add(1000);}
+  function draw(){
+    B.clear();const b0=a0+0.25,n=X.length,c=new Array(13).fill(0);let k=0;
+    ring.setAttribute('d',circ(b0*u1)+' '+(a0>0?circ(a0*u1):''));
+    for(let i=0;i<n;i++){const j=Math.floor(RR[i]/0.25);if(j<13)c[j]++;const on=RR[i]>=a0&&RR[i]<b0;if(on)k++;
+      if(D[i])D[i].setAttribute('class',on?'sl-dot sl-c3 sl-hot':'sl-dot sl-c2 sl-tiny');}
+    const sel=Math.round(a0/0.25);for(let j=0;j<13;j++)bar(B,0.25*j+0.012,0.25*j+0.238,c[j]/n,j===sel?'sl-bar2':'sl-bar');
+    curve(B,t=>0.25*t*Math.exp(-t*t/2),0,3.25,'sl-c1 sl-dash',0.19);
+    const th=Math.exp(-a0*a0/2)-Math.exp(-b0*b0/2),ar=Math.PI*(b0*b0-a0*a0);
+    rd(out,[['fléchettes',String(n)],['anneau','['+nf(a0)+' ; '+nf(b0)+')'],['part des fléchettes (théorie '+pc(th,1)+')',pc(k/n,1),'c3'],
+      ['par unité d’aire (théorie '+fx(th/ar,3)+')',fx(k/n/ar,3)]]);
+  }
+  const ctl=document.getElementById('v6ctl');
+  SL.h('button','tb',ctl,'+ 1 000 fléchettes').onclick=()=>{fresh();add(1000);draw();};
+  SL.h('button','tb',ctl,'↺ autre tirage').onclick=()=>{seed++;reset();draw();};
+  reset();
+  SL.slider(document.getElementById('v6sl'),{label:'anneau',min:0,max:3,step:0.25,value:1,fmt:v=>nf(v)+' à '+nf(v+0.25)},v=>{a0=v;draw();});
+})();
+
+})();
+</script>
+</body>
+</html>

@@ -1,0 +1,63 @@
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>La marginale : intégrer l'autre variable <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 26, et 27 · Marginal and Conditional Densities</p>
+  <div class="idee">
+    <p>La <b>marginale</b> de X est la loi de X seule, quelle que soit Y. Dans le tableau des deux dés, P(X = 3) est la somme de la colonne x = 3 : six cases de 1/36, donc 1/6. On écrivait ces sommes dans la marge, d'où le nom. En continu, on intègre l'autre variable : f<sub>X</sub>(x) = ∫ f(x, y) dy.</p>
+    <p>Brunton dit que la gaussienne 2D est « une gaussienne en x et une gaussienne en y ». Le nuage de points paraît pourtant presque uniforme. D'abord, au cœur du nuage la densité baisse lentement : à distance 1 du centre, elle n'a perdu que 39 %, une pente que l'œil ne voit pas. Ensuite, « gaussienne en x » ne décrit pas l'aspect du nuage mais sa marginale, le compte des points de chaque bande verticale. La bande du centre traverse tout le nuage, celle du bord n'en touche qu'un bout clairsemé : ces comptes dessinent une cloche. Sur un carré uniforme, chaque bande compte autant de points : la marginale est plate.</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — la marginale compte les points bande par bande</div>
+    <div id="v2ctl" class="sl-ctl"></div><div id="v2ctl2" class="sl-ctl"></div><div id="v2sl"></div>
+    <div id="v2plot" class="wide"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">Chaque point est un couple (x, y). En haut, le nombre de points de chaque bande verticale de largeur 0,5 : c'est la marginale de X. À droite, celui de chaque bande horizontale : la marginale de Y. Les tirets donnent la loi théorique. Déplace la <b>bande</b> : dans le nuage gaussien, la bande [0 ; 0,5] contient 19,1 % des points, la bande [1,5 ; 2] seulement 4,4 %. <b>Uniforme sur un carré</b> : 12,5 % dans chaque bande, la marginale est plate. <b>Uniforme sur un disque</b> : la densité est la même partout, mais les bandes du centre sont plus longues, et la marginale fait un dôme (15,7 % contre 7,2 %). Compare au disque : les deux cœurs paraissent aussi remplis, mais le gaussien s'effiloche au bord, et sa marginale a des queues. <b>Ajoute des points</b> : les histogrammes se remplissent vers les tirets.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">discret : P(<i>X</i> = <i>x</i>) = Σ<sub><i>y</i></sub> P(<i>X</i> = <i>x</i>, <i>Y</i> = <i>y</i>) &nbsp;&nbsp;&nbsp; continu : <i>f<sub>X</sub></i>(<i>x</i>) = ∫<sub>−∞</sub><sup>+∞</sup> <i>f</i>(<i>x</i>, <i>y</i>) d<i>y</i></div>
+    <ul><li>On somme sur <b>toutes</b> les valeurs de y. Les événements {Y = y} forment une partition : c'est la formule des probabilités totales (<a href="lesson-00-03-conditionner-bayes-independance.html#n3">l03</a>). « Il faut bien que y prenne une valeur », dit Brunton.</li><li>C'est une somme, pas une moyenne : on ne divise par rien.</li><li>Même geste pour Y : f<sub>Y</sub>(y) = ∫ f(x, y) dx.</li><li>La marginale est une vraie loi : positive, de masse 1 (preuve plus bas).</li></ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — les marges du tableau</div>
+    <div id="f2ctl" class="sl-ctl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">La loi jointe en trente-sixièmes, x en colonne et l'autre variable en ligne. En haut, la somme de chaque colonne : la loi de X. À droite, la somme de chaque ligne. <b>Deux dés</b> : toutes les marges valent 6/36. <b>Premier dé et maximum</b> : M = max(X, Y) n'est jamais sous X, donc le triangle sous la diagonale est vide. La marge de X reste uniforme ; celle de M monte : P(M = m) = (2m − 1)/36. Les deux tableaux ont la même marge en X, et pourtant ils ne décrivent pas la même chose : la marge seule ne dit pas comment X est liée à l'autre variable.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux dés, le maximum, la gaussienne, le carré, le disque, un mélange</small></summary><div class="in">
+    <ol>
+      <li><b>Deux dés.</b> Chaque colonne somme à 6/36 = 1/6, chaque ligne aussi : les deux marginales sont uniformes.</li>
+      <li><b>Le premier dé X et le maximum M.</b> P(M = 1) = 1/36 (les deux dés à 1), P(M = 6) = 11/36 ; en général (2m − 1)/36, soit 1, 3, 5, 7, 9, 11 trente-sixièmes. Le maximum penche vers 6 : E[M] = 161/36 = 4,47 (<a href="lesson-00-08-esperance-variance.html#n1">l08</a>).</li>
+      <li><b>La gaussienne 2D standard</b> f(x, y) = (1/(2π)) e<sup>−(x² + y²)/2</sup> : sa marginale est la normale centrée réduite φ(x) (preuve).</li>
+      <li><b>Uniforme sur le carré [−2 ; 2]².</b> f = 1/16 ; à x fixé, y parcourt un segment de longueur 4 : f<sub>X</sub>(x) = 4 × 1/16 = 1/4. Plate.</li>
+      <li><b>Uniforme sur le disque de rayon 2.</b> f = 1/(4π) ; à x fixé, y parcourt une corde de longueur 2√(4 − x²) : f<sub>X</sub>(x) = √(4 − x²)/(2π). Un dôme : 1/π = 0,318 en 0, nul en ±2.</li>
+      <li><b>En ML, un mélange gaussien.</b> Une variable cachée Z donne le groupe de chaque point. La densité des données est la marginale p(x) = Σ<sub><i>k</i></sub> P(Z = k) f(x ∣ Z = k) : on somme sur la variable qu'on ne voit pas. C'est elle, la « vraisemblance marginale », qu'on maximise.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la marginale est une loi ; la marginale de la gaussienne 2D</small></summary><div class="in">
+    <div class="drv">
+      <div>∫ <i>f<sub>X</sub></i>(<i>x</i>) d<i>x</i> = ∫ ( ∫ <i>f</i>(<i>x</i>, <i>y</i>) d<i>y</i> ) d<i>x</i></div><span>définition de la marginale</span>
+      <div>= ∬ <i>f</i>(<i>x</i>, <i>y</i>) d<i>x</i> d<i>y</i> = 1</div><span>la jointe est une densité ; f<sub>X</sub> ≥ 0 puisque f ≥ 0</span>
+    </div>
+    <p>En discret, c'est la formule des probabilités totales : {X = x} est la réunion disjointe des {X = x} ∩ {Y = y}, donc P(X = x) = Σ<sub><i>y</i></sub> P(X = x, Y = y).</p>
+    <div class="drv">
+      <div><i>f<sub>X</sub></i>(<i>x</i>) = ∫ (1/(2π)) e<sup>−(<i>x</i>² + <i>y</i>²)/2</sup> d<i>y</i></div><span>définition, gaussienne 2D standard</span>
+      <div>= (1/√(2π)) e<sup>−<i>x</i>²/2</sup> · ∫ (1/√(2π)) e<sup>−<i>y</i>²/2</sup> d<i>y</i></div><span>e<sup>a + b</sup> = e<sup>a</sup> e<sup>b</sup>, et 1/(2π) = (1/√(2π))² ; le facteur en x sort de l'intégrale en y</span>
+      <div>= (1/√(2π)) e<sup>−<i>x</i>²/2</sup> = φ(<i>x</i>)</div><span>la densité normale intègre à 1</span>
+    </div>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>trois nuages, leurs marginales bande par bande</small></summary><div class="in">
+<pre class="py">{{CODE:c2}}</pre>
+<pre class="out">{{OUT:c2}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Les marginales ne déterminent pas la jointe.</b> Deux dés indépendants et le même dé lu deux fois (Y = X) ont les mêmes marginales, uniformes sur 1 à 6, et des jointes différentes (notion 1) ; la figure 4 donnera des gaussiennes de marginales N(0, 1) en x et en y, pour n'importe quelle corrélation.</li>
+      <li><b>« Uniforme » ne veut pas dire « marginale plate ».</b> Le disque uniforme a une marginale en dôme (exemple 5). La marginale mélange deux choses : la densité dans la bande et la longueur de la bande.</li>
+      <li><b>Même mot, autre chose.</b> Le coût marginal en économie, ou l'effet marginal de la <a href="../chains/chain-p05-02-logistique.html">régression logistique</a>, sont des dérivées. La loi marginale vient de la marge du tableau.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (27) décrit la marginale comme « la probabilité de x conditionnée sur quelque chose en y ». C'est l'inverse : la marginale est la loi de X quelle que soit Y, sans aucune condition ; conditionner, c'est fixer Y (notion 3). Il dit aussi qu'on « moyenne » y (average out) : on somme ou on intègre, sans diviser. Enfin, sa gaussienne 2D, écrite de mémoire avec la constante 1/√(2π), ne somme pas à 1 : sa masse totale vaut √(2π) ≈ 2,51. La bonne constante est 1/(2π) = (1/√(2π))², un facteur par coordonnée.</div>
+  </div></details>
+  <p class="garde">f<sub>X</sub>(x) = ∫ f(x, y) dy, en discret Σ<sub>y</sub> P(X = x, Y = y) : la loi de X quelle que soit Y, obtenue en sommant l'autre variable. Ce n'est pas une loi conditionnelle.</p>
+</section>
+

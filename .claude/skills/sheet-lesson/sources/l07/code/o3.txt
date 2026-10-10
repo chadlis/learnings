@@ -1,0 +1,4 @@
+points in the slice: 10304
+slice : mean 1.196 (theory 1.2), sd 0.604 (theory 0.6)
+all y : mean -0.000 (theory 0),   sd 1.000 (theory 1)
+P(M = m | X = 2), m = 1..6: [0.0, 0.333, 0.167, 0.167, 0.167, 0.166]

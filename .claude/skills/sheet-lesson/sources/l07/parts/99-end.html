@@ -1,0 +1,58 @@
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>La loi jointe, P(X = x, Y = y) ou f(x, y), décrit le couple ; une région se mesure par une somme de cases ou une intégrale double.</li>
+    <li>Marginale : sommer ou intégrer l'autre variable. C'est la loi de X quelle que soit Y, pas une conditionnelle.</li>
+    <li>Conditionnelle : f(y ∣ x) = f(x, y)/f<sub>X</sub>(x), la tranche à x fixé divisée par sa masse.</li>
+    <li>Indépendance : f(x, y) = f<sub>X</sub>(x) f<sub>Y</sub>(y) pour tous x, y ⟺ toutes les tranches ont la même loi.</li>
+    <li>Les marginales ne déterminent pas la jointe : N(0, 1) en x et en y va avec n'importe quelle corrélation.</li>
+    <li>La gaussienne 2D standard, (1/(2π)) e<sup>−(x² + y²)/2</sup>, est ronde et se factorise.</li>
+    <li>Bayes : f(x ∣ y) = f(y ∣ x) f<sub>X</sub>(x)/f<sub>Y</sub>(y), avec une marginale au dénominateur.</li>
+    <li>Changer de coordonnées multiplie la densité par le jacobien : r en polaires.</li>
+  </ol>
+</div>
+<div class="phrase">« La loi jointe décrit le couple. La marginale s'obtient en intégrant l'autre variable, la conditionnelle en coupant une tranche à x fixé puis en la divisant par la marginale. X et Y sont indépendantes quand la jointe est le produit des marginales, c'est-à-dire quand toutes les tranches ont la même forme ; les marginales seules ne disent rien de la dépendance. Bayes pour les densités inverse une conditionnelle, avec une marginale au dénominateur. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Comment obtient-on f<sub>X</sub> à partir de f(x, y) ?</div><div class="a hid">On intègre y : f<sub>X</sub>(x) = ∫ f(x, y) dy ; en discret, la somme de la colonne x.</div></li>
+    <li><div class="q">La marginale de X est-elle conditionnée par Y ?</div><div class="a hid">Non : c'est la loi de X quelle que soit Y. Conditionner, c'est fixer Y et renormaliser.</div></li>
+    <li><div class="q">Définis f(y ∣ x) et dis ce qu'elle représente.</div><div class="a hid">f(x, y)/f<sub>X</sub>(x) : la tranche à x fixé divisée par sa masse ; une densité en y, définie là où f<sub>X</sub>(x) &gt; 0.</div></li>
+    <li><div class="q">Quand X et Y sont-elles indépendantes ?</div><div class="a hid">Quand f(x, y) = f<sub>X</sub>(x) f<sub>Y</sub>(y) pour tous x, y ; de façon équivalente, quand f(y ∣ x) = f<sub>Y</sub>(y) pour tout x tel que f<sub>X</sub>(x) &gt; 0.</div></li>
+    <li><div class="q">La gaussienne 2D ronde est-elle séparable en x, y ? Et avec une corrélation ρ ?</div><div class="a hid">Oui : e<sup>−(x² + y²)/2</sup> = e<sup>−x²/2</sup> e<sup>−y²/2</sup>. Avec ρ ≠ 0, le terme croisé −2ρxy l'en empêche, alors que les marginales restent N(0, 1).</div></li>
+    <li><div class="q">La densité d'un score est 7,4 fois plus haute chez un malade que chez un sain. Pourquoi P(malade ∣ score) ne vaut-elle que 6,9 % ?</div><div class="a hid">Bayes en cotes : avec 1 % de prévalence, la cote a priori 1/99 multiplie le rapport 7,4, ce qui donne une cote de 0,075.</div></li>
+    <li><div class="q">Que devient la densité gaussienne ronde en coordonnées polaires ?</div><div class="a hid">f<sub>R,Θ</sub>(r, θ) = r f(r cos θ, r sin θ) = r e<sup>−r²/2</sup> · 1/(2π) : le jacobien r ; R suit une Rayleigh, Θ une uniforme, indépendants.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Leçons, ponts et chaînes</div>
+  <div class="bridges">
+    <a href="lesson-00-08-esperance-variance.html#n3"><b>Espérance et variance (l08)</b><small>La linéarité de E se prouve en marginalisant la jointe (notion 2), E[XY] = E[X] E[Y] en la factorisant (notion 4).</small></a>
+    <a href="lesson-00-09-covariance-correlation.html#n1"><b>Covariance et corrélation (l09)</b><small>Le lien que mesure le ρ de la figure 4, et les ellipses de la gaussienne 2D.</small></a>
+    <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html"><b>Du bruit à la loss</b><small>La vraisemblance de n observations indépendantes est un produit de p(y<sub>i</sub> ∣ x<sub>i</sub> ; θ) : la factorisation (notion 4) et la notation (notion 3).</small></a>
+    <a href="../chains/chain-p02-02-prior-penalite.html"><b>Du prior à la pénalité</b><small>Un prior à coordonnées indépendantes a une densité jointe produit, donc un −log en somme.</small></a>
+    <a href="../chains/chain-p02-03-conjugues-posterior.html"><b>Le posterior entier</b><small>Bayes pour les densités, et le dénominateur intraitable qui motive MCMC et VI (notion 5).</small></a>
+    <a href="../chains/chain-p04-04-pca.html"><b>PCA, diagonaliser la covariance</b><small>Les directions d'un nuage 2D, sans hypothèse gaussienne (notion 1).</small></a>
+    <a href="../chains/chain-p05-02-logistique.html"><b>Régression logistique</b><small>Un modèle discriminatif de p(y ∣ x), la sigmoïde de la notion 5 ; et l'« effet marginal », qui n'est pas une marginale.</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::loi-jointe</code> (notions 1, 3, 4) · <code>stats::marginale</code> (notions 2, 5). La notion 6 est culture, sans carte.</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l07 · v1 du 10/10/2026 · Brunton 26 et 27 · Prérequis : <a href="lesson-00-03-conditionner-bayes-independance.html">l03</a>, <a href="lesson-00-06-fonctions-standardisation.html">l06</a>. Suite : <a href="lesson-00-08-esperance-variance.html">l08 · Espérance et variance</a>.</footer>
+</div>

@@ -1,0 +1,48 @@
+<!-- ============================ n1 ============================ -->
+<section class="notion outil" id="n1">
+  <h3>La loi jointe : une loi sur le plan <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 26 · Joint Probability Distributions</p>
+  <div class="idee">
+    <p>Deux variables observées ensemble, X et Y, ont une loi sur le plan : la <b>loi jointe</b> P(X = x, Y = y), la probabilité que les deux valeurs sortent à la fois. Brunton pense aux trois composantes de la vitesse dans un fluide turbulent.</p>
+    <p>Pour deux dés, la loi jointe est un tableau de 36 cases de 1/36. Un événement est une région du tableau, et sa probabilité est la somme de ses cases : « X + Y = 7 » occupe une diagonale de 6 cases, soit 6/36.</p>
+    <p>Brunton passe au continu avec un joueur de basket filmé toute une saison : une <b>densité jointe</b> f(x, y) de sa position, haute là où il traîne souvent. f(x, y) dx dy est la probabilité de le trouver dans une minuscule case dx × dy ; la probabilité d'une zone, la raquette par exemple, est la somme de ces cases, l'intégrale double de f sur la zone.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — un événement est une région du tableau</div>
+    <div id="v1ctl" class="sl-ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">Les 36 cases des deux dés, chacune de probabilité 1/36. Choisis un événement : ses cases se colorent et sa probabilité est leur somme. <b>X + Y = 7</b> : la diagonale, 6/36. <b>X &gt; Y</b> : les 15 cases sous la diagonale, 15/36 = 0,417. <b>X ≤ 2 et Y ≥ 5</b> : un rectangle de 4 cases, 4/36. Puis <b>lance 360 paires</b> : chaque paire tombe dans sa case, et la part des paires dans la région approche la somme des cases.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">discret : P((<i>X</i>, <i>Y</i>) ∈ <i>A</i>) = Σ<sub>(<i>x</i>, <i>y</i>) ∈ <i>A</i></sub> P(<i>X</i> = <i>x</i>, <i>Y</i> = <i>y</i>) &nbsp;&nbsp;&nbsp; continu : P((<i>X</i>, <i>Y</i>) ∈ <i>A</i>) = ∬<sub><i>A</i></sub> <i>f</i>(<i>x</i>, <i>y</i>) d<i>x</i> d<i>y</i></div>
+    <ul><li>Discret : chaque case vaut P(X = x, Y = y) ≥ 0, et toutes les cases somment à 1. Continu : f(x, y) ≥ 0 et ∬ f = 1 sur tout le plan.</li><li>f(x, y) dx dy ≈ P(X ∈ [x, x + dx], Y ∈ [y, y + dy]). f est une probabilité <b>par unité d'aire</b>, pas une probabilité : elle peut dépasser 1.</li><li>X et Y n'ont pas à suivre la même loi, ni à être toutes deux discrètes ou toutes deux continues (la notion 5 couple une classe et un score).</li></ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — l'intégrale double est une somme de petites cases</div>
+    <div id="f1ctl" class="sl-ctl"></div><div id="f1ctl2" class="sl-ctl"></div>
+    <div id="f1plot" class="wide"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Un demi-terrain de 15 m × 14 m, et une densité de présence inventée pour l'exemple : beaucoup près du panier, un peu en haut de la raquette, un peu dans le corner droit. Plus la case est foncée, plus f y est haute. Chaque case pèse f × aire de la case ; celles de la région choisie sont en rouge. Avec des <b>cases de 1 m</b>, le terrain est un tableau de 210 cases, comme celui des dés, et la raquette pèse 0,610. Affine à <b>0,5 m</b> puis <b>0,25 m</b> : la somme tend vers l'intégrale, 0,608. Le corner droit pèse 0,143, et <b>tout le terrain</b> 1.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux pièces, deux dés, le carré, une densité qui vaut 4, le terrain</small></summary><div class="in">
+    <ol>
+      <li><b>Deux pièces.</b> Quatre cases, (P, P), (P, F), (F, P), (F, F), de ¼ chacune.</li>
+      <li><b>Deux dés.</b> P(X + Y = 7) = 6/36 = 1/6. P(X &gt; Y) = 15/36 = 0,417, les cases sous la diagonale. P(X = Y) = 6/36, la diagonale.</li>
+      <li><b>Uniforme sur le carré [0 ; 1]².</b> f = 1 sur le carré : la probabilité d'une région est son aire. P(X + Y ≤ 1) = ½, l'aire du triangle sous la diagonale.</li>
+      <li><b>Une densité qui vaut 4.</b> Uniforme sur [0 ; ½]² : l'aire vaut ¼, donc f = 4 pour que la masse fasse 1. La valeur 4 n'est pas une probabilité.</li>
+      <li><b>Le terrain</b> (figure 1). Avec la densité de la figure, P(raquette) = 0,608 et P(corner droit) = 0,143. Brunton ne donne pas de chiffres : ces valeurs viennent de la densité inventée.</li>
+      <li><b>En ML.</b> Un jeu de données étiqueté (x<sub><i>i</i></sub>, y<sub><i>i</i></sub>) est un échantillon de la loi jointe p(x, y) des variables explicatives (features) et de l'étiquette. Les caméras de Brunton font la même chose : leurs positions approchent la densité du joueur.</li>
+    </ol>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>f(x, y) n'est pas une probabilité.</b> En continu, P(X = x, Y = y) = 0 pour chaque point ; seule une région d'aire non nulle a une probabilité.</li>
+      <li><b>La valeur de f dépend de l'unité.</b> La densité du joueur culmine à 0,081 par m² ; par cm², elle vaudrait 10 000 fois moins. La probabilité de la raquette, elle, ne change pas.</li>
+      <li><b>Les deux lois séparées ne suffisent pas.</b> Deux dés indépendants et « le même dé lu deux fois » (Y = X) donnent chacun six faces de 1/6 en X comme en Y. Leurs jointes diffèrent : 36 cases de 1/36 d'un côté, 6 cases de 1/6 sur la diagonale de l'autre (notions 2 et 4).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (26) dit que la PCA suppose une loi jointe gaussienne. La PCA calcule les directions de plus grande variance de n'importe quel nuage, sans hypothèse de loi. La gaussienne ne sert qu'à aller plus loin : pour une gaussienne jointe, des composantes décorrélées sont indépendantes, ce qui est faux en général (<a href="lesson-00-09-covariance-correlation.html#n3">l09</a>).</div>
+  </div></details>
+  <p class="garde">La loi jointe d'un couple (X, Y) donne la probabilité de chaque case, P(X = x, Y = y), ou une densité f(x, y) ; une région A pèse la somme de ses cases, ou ∬<sub>A</sub> f dx dy.</p>
+</section>
+

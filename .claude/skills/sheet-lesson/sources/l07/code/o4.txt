@@ -1,0 +1,4 @@
+rho = 0.0: max |f(x, y) - fX(x) fY(y)| on the grid = 0.0000
+rho = 0.8: max |f(x, y) - fX(x) fY(y)| on the grid = 0.1071
+centre: share with r < 1 before 0.394, after shuffling 0.394
+ring  : share with r < 1 before 0.000, after shuffling 0.087

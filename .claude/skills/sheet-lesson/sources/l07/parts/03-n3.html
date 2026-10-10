@@ -1,0 +1,49 @@
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>La conditionnelle : la tranche renormalisée <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 27</p>
+  <div class="idee">
+    <p>Conditionner sur X = x, c'est ne garder que la <b>tranche</b> de la jointe à cet x, puis la diviser par sa masse : le zoom de <a href="lesson-00-03-conditionner-bayes-independance.html#n1">l03</a>, P(A ∣ B) = P(A ∩ B)/P(B), case par case. Premier dé X et maximum M, sachant X = 2 : il reste la colonne x = 2, M = 2 avec 2/36, puis 3, 4, 5 ou 6 avec 1/36 chacun. La colonne pèse 6/36, la marginale ; on divise : P(M = 2 ∣ X = 2) = 1/3, et 1/6 pour les autres valeurs.</p>
+    <p>En continu, on divise la tranche f(x, ·) par f<sub>X</sub>(x). Brunton (26) cite la probabilité d'une maladie cardiaque sachant qu'on est un homme de 40 ans, d'une taille et d'un poids donnés. Dans un nuage où Y = 0,8 X + 0,6 Z, avec X et Z normales centrées réduites indépendantes, la tranche x = 1,5 est une cloche centrée en 1,2, d'écart-type 0,6 ; la marginale de Y a un écart-type de 1. Savoir x resserre y.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — une bande du nuage, à x fixé</div>
+    <div id="v3ctl" class="sl-ctl"></div><div id="v3sl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">3 000 points du nuage Y = 0,8 X + 0,6 Z, X et Z normales centrées réduites indépendantes. Les points rouges sont ceux de la bande verticale de largeur 0,3 autour de <b>x fixé</b> ; à droite, l'histogramme de leurs y, mis à l'échelle d'une densité. Les tirets rouges sont la conditionnelle théorique, une normale de centre 0,8 x et d'écart-type 0,6 ; les tirets bleus, la marginale de Y, d'écart-type 1. Déplace <b>x fixé</b> : la bande monte avec x, sa largeur en y ne change pas, et elle reste plus étroite que la marginale. Au bord, la bande contient peu de points : la marginale de X y est faible.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">discret : P(<i>Y</i> = <i>y</i> ∣ <i>X</i> = <i>x</i>) = P(<i>X</i> = <i>x</i>, <i>Y</i> = <i>y</i>) / P(<i>X</i> = <i>x</i>) &nbsp;&nbsp;&nbsp; continu : <i>f</i>(<i>y</i> ∣ <i>x</i>) = <i>f</i>(<i>x</i>, <i>y</i>) / <i>f<sub>X</sub></i>(<i>x</i>)</div>
+    <ul><li>Défini seulement là où f<sub>X</sub>(x) &gt; 0 : on ne conditionne pas sur une valeur que X ne prend pas.</li><li>À x fixé, f(y ∣ x) est une densité en y : ∫ f(y ∣ x) dy = f<sub>X</sub>(x)/f<sub>X</sub>(x) = 1. Ce n'est pas une densité en x.</li><li>En continu, P(X = x) = 0 : la formule est la limite du conditionnement sur une bande [x, x + h] quand h tend vers 0. La vignette le fait avec une bande de largeur 0,3.</li><li><b>Notation.</b> La barre est juste ici : on conditionne sur la variable aléatoire X, prise en x. Le fil B écrit p(y ∣ x ; θ) : x derrière la barre, la valeur observée d'une variable sur laquelle on conditionne ; θ derrière le point-virgule, un paramètre fixe et inconnu, qui n'est pas une variable aléatoire et sur lequel on ne conditionne donc pas.</li></ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — couper la jointe, puis diviser par la marginale</div>
+    <div id="f3ctl"></div>
+    <div id="f3plot" class="wide"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">La jointe du nuage Y = 0,8 X + 0,6 Z (X et Z normales centrées réduites indépendantes), coupée à x₀ fixé. En violet, la tranche brute f(x₀, y) : son aire vaut f<sub>X</sub>(x₀), 0,130 pour x₀ = 1,5. En rouge, la même tranche divisée par f<sub>X</sub>(x₀) : son aire vaut 1, c'est la conditionnelle f(y ∣ x₀). En tirets bleus, la marginale de Y. Déplace <b>x₀</b> : vers le bord, la tranche brute s'écrase (aire 0,054 en x₀ = 2), mais la conditionnelle garde sa forme, un pic de 0,665 et un écart-type de 0,6, et glisse avec son centre 0,8 x₀.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux dés, le maximum, le nuage, un classifieur</small></summary><div class="in">
+    <ol>
+      <li><b>Deux dés.</b> Sachant X = 3, la colonne contient six cases de 1/36 et pèse 6/36. Divisée, chaque case vaut 1/6 : connaître le premier dé ne change rien au second.</li>
+      <li><b>Le maximum.</b> Sachant X = 2 : M = 2 avec 1/3, puis 1/6 pour chaque valeur de 3 à 6. Sachant X = 5 : la colonne contient 5/36 en M = 5 et 1/36 en M = 6 ; divisée par 6/36, M = 5 avec 5/6 et M = 6 avec 1/6.</li>
+      <li><b>Le nuage.</b> Sachant X = x, Y = 0,8 x + 0,6 Z est une normale de moyenne 0,8 x et d'écart-type 0,6. La tranche x = 0 est centrée en 0, la tranche x = 1,5 en 1,2 ; leur largeur est la même.</li>
+      <li><b>En ML.</b> Un modèle discriminatif, régression logistique ou classifieur softmax, apprend directement p(y ∣ x), la tranche en y à x fixé, sans jamais modéliser p(x). Un modèle génératif apprend la jointe, et retrouve p(y ∣ x) par Bayes (notion 5).</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>conditionner par une bande étroite, puis par comptage</small></summary><div class="in">
+<pre class="py">{{CODE:c3}}</pre>
+<pre class="out">{{OUT:c3}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>f(y ∣ x) n'est pas f(x ∣ y).</b> P(M = 2 ∣ X = 2) = 1/3, mais P(X = 2 ∣ M = 2) = 2/3. Passer de l'une à l'autre, c'est Bayes (notion 5).</li>
+      <li><b>Une densité en y, pas en x.</b> Dans le nuage, à y = 1 fixé, ∫ f(1 ∣ x) dx = 1/0,8 = 1,25. Vue comme fonction de x, f(y ∣ x) est une vraisemblance (notion 5).</li>
+      <li><b>Hors du support, rien.</b> « Sachant que le dé a donné 7 » n'a pas de sens : P(X = 7) = 0.</li>
+      <li><b>Une bande trop large mélange plusieurs tranches.</b> À x = 1,5, la bande ±0,15 de la vignette donne en moyenne 1,191 et non 1,2 : la densité de X décroît dans la bande, qui contient plus de petits x que de grands ; une bande ±0,5 donne 1,107. Avec les 117 points de la vignette, le hasard (± 0,06) masque cet écart.</li>
+    </ul>
+  </div></details>
+  <p class="garde">f(y ∣ x) = f(x, y)/f<sub>X</sub>(x) : la tranche de la jointe à x fixé, divisée par sa masse f<sub>X</sub>(x). C'est une densité en y, définie là où f<sub>X</sub>(x) &gt; 0.</p>
+</section>
+

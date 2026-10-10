@@ -1,0 +1,43 @@
+<!-- ============================ n5 ============================ -->
+<section class="notion outil" id="n5">
+  <h3>Bayes pour les densités <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 27</p>
+  <div class="idee">
+    <p>La jointe se lit dans les deux sens : f(x, y) = f(y ∣ x) f<sub>X</sub>(x) = f(x ∣ y) f<sub>Y</sub>(y). Égaliser les deux écritures et diviser donne <b>Bayes pour les densités</b> : f(x ∣ y) = f(y ∣ x) f<sub>X</sub>(x)/f<sub>Y</sub>(y). C'est la page que Brunton demande d'écrire en 27, en la reliant à <a href="lesson-00-03-conditionner-bayes-independance.html#n4">l03</a> : les mêmes formules, des densités à la place des probabilités, et une intégrale à la place de la somme au dénominateur.</p>
+    <p>Reprenons le dépistage de l03, avec un score continu au lieu d'un résultat positif ou négatif. Chez les sains, le score suit N(0, 1) ; chez les malades, N(2, 1) ; 1 % de la population est malade. La densité du score en 2 est 7,4 fois plus haute chez un malade que chez un sain. Pourtant P(malade ∣ score = 2) ne vaut que 6,9 % : la cote a priori, 1 contre 99, écrase le rapport.</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — ce que dit le score, et ce qu'il faut en croire</div>
+    <div id="v5ctl" class="sl-ctl"></div><div id="v5sl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">En haut, les deux vraisemblances du score : N(0, 1) chez les sains, en bleu, N(2, 1) chez les malades, en rouge. En bas, P(malade ∣ y) donnée par Bayes. Déplace le <b>score y</b> : à y = 2, la courbe rouge est 7,4 fois plus haute que la bleue, mais avec une <b>prévalence de 1 %</b> la probabilité a posteriori n'est que de 6,9 %, et il faut y = 3,3 pour passer ½. À <b>10 %</b>, le même score de 2 donne 45 % ; à <b>50 %</b>, 88 %, et le seuil ½ tombe en y = 1, à mi-chemin des deux centres. La courbe du bas est une sigmoïde de y, la forme de la régression logistique.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>f</i>(<i>x</i> ∣ <i>y</i>) = <i>f</i>(<i>y</i> ∣ <i>x</i>) <i>f<sub>X</sub></i>(<i>x</i>) / <i>f<sub>Y</sub></i>(<i>y</i>), &nbsp; avec &nbsp; <i>f<sub>Y</sub></i>(<i>y</i>) = ∫ <i>f</i>(<i>y</i> ∣ <i>x</i>) <i>f<sub>X</sub></i>(<i>x</i>) d<i>x</i></div>
+    <div class="eq">une classe et un score : P(<i>C</i> = <i>k</i> ∣ <i>Y</i> = <i>y</i>) = <i>f</i>(<i>y</i> ∣ <i>k</i>) P(<i>C</i> = <i>k</i>) / Σ<sub><i>j</i></sub> <i>f</i>(<i>y</i> ∣ <i>j</i>) P(<i>C</i> = <i>j</i>)</div>
+    <ul><li>f<sub>Y</sub>(y) &gt; 0 : on ne conditionne pas sur un score impossible.</li><li>Le dénominateur est la marginale de Y (notion 2), écrite avec la conditionnelle : les probabilités totales, version intégrale. Il ne dépend pas de x, il ne fait que renormaliser.</li><li>Vue comme fonction de x, f(y ∣ x) est une vraisemblance : elle ne somme pas à 1 en général (notion 3).</li><li>Le mélange est permis : une variable discrète, la classe C, avec P, et une continue, le score Y, avec f.</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>le maximum, le score, la sigmoïde, Naive Bayes</small></summary><div class="in">
+    <ol>
+      <li><b>Discret, le maximum.</b> P(X = 2 ∣ M = 2) = P(M = 2 ∣ X = 2) P(X = 2)/P(M = 2) = (1/3 × 1/6)/(3/36) = 2/3. Vérification directe : M = 2 correspond à (1, 2), (2, 1) et (2, 2), et X = 2 dans deux cas sur trois.</li>
+      <li><b>Le score, en cotes</b> (<a href="lesson-00-03-conditionner-bayes-independance.html#n5">l03</a>). Cote a posteriori = rapport de vraisemblance × cote a priori. À y = 2 : 7,39 × 1/99 = 0,075, soit 6,9 %. À y = 3 : rapport e<sup>4</sup> = 54,6, cote 0,55, soit 35,5 %. À y = 4 : rapport 403, soit 80,3 %.</li>
+      <li><b>Pourquoi une sigmoïde.</b> ln du rapport = (y² − (y − 2)²)/2 = 2y − 2, donc logit P(malade ∣ y), le ln de la cote a posteriori, vaut 2y − 2 + ln(p/(1 − p)), avec p la prévalence : affine en y. Deux gaussiennes de même écart-type donnent toujours une a posteriori logistique ; ce modèle génératif et une régression logistique ont la même forme de frontière.</li>
+      <li><b>En ML, Naive Bayes.</b> P(c ∣ x<sub>1</sub>, …, x<sub><i>d</i></sub>) ∝ P(c) Π<sub><i>j</i></sub> f(x<sub><i>j</i></sub> ∣ c) : Bayes, plus la factorisation de la notion 4 appliquée sachant la classe. Le dénominateur, le même pour toutes les classes, n'est pas calculé : on compare les numérateurs.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>la formule, puis une bande autour de y = 2</small></summary><div class="in">
+<pre class="py">{{CODE:c5}}</pre>
+<pre class="out">{{OUT:c5}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Oublier le taux de base.</b> f(y ∣ malade) élevée ne dit pas que P(malade ∣ y) l'est : 6,9 % à y = 2. C'est l'erreur de l03, en continu.</li>
+      <li><b>Prendre la vraisemblance pour une loi sur x.</b> f(y ∣ x) en fonction de x ne somme pas à 1 en général ; il faut multiplier par f<sub>X</sub> et renormaliser.</li>
+      <li><b>Le dénominateur coûte.</b> f<sub>Y</sub>(y) = ∫ f(y ∣ x) f<sub>X</sub>(x) dx n'a souvent pas de forme fermée en grande dimension. C'est pour l'éviter qu'existent MCMC et l'inférence variationnelle (<a href="../chains/chain-p02-03-conjugues-posterior.html">le posterior entier</a>).</li>
+      <li><b>Notation.</b> En fréquentiste, θ est fixe et la loi des données s'écrit p(y ; θ) : pas de Bayes sur θ. En bayésien, θ devient une variable aléatoire munie d'une loi a priori, et f(θ ∣ y) est une vraie conditionnelle, cette notion appliquée à θ.</li>
+    </ul>
+  </div></details>
+  <p class="garde">Bayes pour les densités, là où f<sub>Y</sub>(y) &gt; 0 : f(x ∣ y) = f(y ∣ x) f<sub>X</sub>(x)/f<sub>Y</sub>(y), le dénominateur étant la marginale ∫ f(y ∣ x) f<sub>X</sub>(x) dx.</p>
+</section>
+

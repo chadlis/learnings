@@ -1,0 +1,52 @@
+<!-- ============================ n6 ============================ -->
+<section class="notion culture" id="n6">
+  <h3>Coordonnées polaires et jacobien <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 26 et 27</p>
+  <div class="idee">
+    <p>Brunton parle de « bonnes coordonnées » : un nuage rond se décrit mieux par la distance au centre r et l'angle θ. Réécrire f en fonction de r et θ est permis. Mais pour obtenir la densité du couple (R, Θ), il faut un facteur r : une case dr × dθ a une aire r dr dθ, et les cases loin du centre sont plus grandes. Pour la gaussienne ronde, f<sub>R,Θ</sub>(r, θ) = r e<sup>−r²/2</sup> · 1/(2π) : R suit une loi de Rayleigh, Θ est uniforme, et les deux sont indépendants.</p>
+    <p>D'où un chiffre qui surprend : 39,3 % seulement des fléchettes tombent à moins d'un écart-type du centre, contre 68,3 % pour |X| ≤ 1 sur une seule coordonnée. La densité est maximale au centre, mais l'anneau le plus peuplé est vers r = 1 : là encore, la densité se lit par unité d'aire, le compte par anneau, et l'aire d'un anneau croît avec r.</p>
+  </div>
+  <div class="fig vis" id="v6">
+    <div class="lbl">Voir l'idée — dense au centre, peuplé sur les anneaux</div>
+    <div id="v6ctl" class="sl-ctl"></div><div id="v6sl"></div>
+    <div id="v6plot" class="wide"></div>
+    <div class="readouts" id="v6out"></div>
+    <p class="cap">1 000 fléchettes d'une gaussienne ronde. Dans le second panneau, la part des fléchettes dans chaque anneau de largeur 0,25, et en tirets la loi de Rayleigh. Choisis un <b>anneau</b> : il se colore sur la cible et dans l'histogramme. Le disque central [0 ; 0,25) reçoit 3,1 % des fléchettes, l'anneau [1 ; 1,25) 14,9 %, presque cinq fois plus, alors que la densité y est presque deux fois plus faible : 0,084 par unité d'aire contre 0,157. L'anneau est simplement 9 fois plus grand. <b>Ajoute des fléchettes</b> : l'histogramme se cale sur les tirets.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>f</i><sub><i>R</i>,Θ</sub>(<i>r</i>, θ) = <i>r</i> · <i>f</i><sub><i>X</i>,<i>Y</i></sub>(<i>r</i> cos θ, <i>r</i> sin θ) &nbsp;&nbsp;&nbsp; gaussienne : <i>f</i><sub><i>R</i>,Θ</sub>(<i>r</i>, θ) = <i>r</i> e<sup>−<i>r</i>²/2</sup> · 1/(2π), &nbsp; <i>r</i> &gt; 0, θ ∈ [0, 2π)</div>
+    <ul><li>Le facteur r est le jacobien : pour x = r cos θ, y = r sin θ, |det J| = r. C'est la version 2D du |dx/dy| de <a href="lesson-00-06-fonctions-standardisation.html#n1">l06</a>.</li><li>Cas général, pour un changement de variables bijectif et dérivable : f<sub>U,V</sub>(u, v) = f<sub>X,Y</sub>(x(u, v), y(u, v)) · |det ∂(x, y)/∂(u, v)|.</li><li>La jointe se factorise en une fonction de r fois une fonction de θ : R et Θ sont indépendants (notion 4). R a la densité r e<sup>−r²/2</sup> (Rayleigh), Θ est uniforme sur [0, 2π).</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>un, deux, trois écarts-types ; la distance moyenne</small></summary><div class="in">
+    <ol>
+      <li><b>Dans le cercle de rayon 1</b> : P(R ≤ 1) = 1 − e<sup>−1/2</sup> = 0,393. Sur une coordonnée, P(|X| ≤ 1) = 0,683.</li>
+      <li><b>Rayon 2</b> : 1 − e<sup>−2</sup> = 0,865. <b>Rayon 3</b> : 1 − e<sup>−4,5</sup> = 0,989.</li>
+      <li><b>La distance typique.</b> Le mode de R est 1, sa médiane √(2 ln 2) = 1,18, sa moyenne √(π/2) = 1,25. Aucune n'est 0, là où la densité du nuage est maximale.</li>
+      <li><b>Le disque et l'anneau</b> de la vignette : 3,1 % des fléchettes sur une aire de 0,196 pour [0 ; 0,25), 14,9 % sur une aire de 1,767 pour [1 ; 1,25).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la loi de R par la CDF, et la constante 1/(2π)</small></summary><div class="in">
+    <div class="drv">
+      <div>P(<i>R</i> ≤ <i>r</i>) = ∬<sub><i>x</i>² + <i>y</i>² ≤ <i>r</i>²</sub> (1/(2π)) e<sup>−(<i>x</i>² + <i>y</i>²)/2</sup> d<i>x</i> d<i>y</i></div><span>la probabilité d'une région (notion 1)</span>
+      <div>= ∫<sub>0</sub><sup>2π</sup> ∫<sub>0</sub><sup><i>r</i></sup> (1/(2π)) e<sup>−<i>s</i>²/2</sup> <i>s</i> d<i>s</i> dθ</div><span>polaires : d<i>x</i> d<i>y</i> devient <i>s</i> d<i>s</i> dθ, l'aire d'une case</span>
+      <div>= ∫<sub>0</sub><sup><i>r</i></sup> <i>s</i> e<sup>−<i>s</i>²/2</sup> d<i>s</i> = 1 − e<sup>−<i>r</i>²/2</sup></div><span>l'intégrale en θ vaut 2π ; −e<sup>−s²/2</sup> est une primitive</span>
+      <div><i>f<sub>R</sub></i>(<i>r</i>) = d/d<i>r</i> (1 − e<sup>−<i>r</i>²/2</sup>) = <i>r</i> e<sup>−<i>r</i>²/2</sup></div><span>de CDF à densité : dériver (l06)</span>
+    </div>
+    <p><b>L'aire d'une case.</b> Entre les rayons r et r + dr, sur un angle dθ : (r + dr)² dθ/2 − r² dθ/2 = r dr dθ + dr² dθ/2 ≈ r dr dθ.</p>
+    <p><b>La constante.</b> Soit I = ∫ e<sup>−x²/2</sup> dx. Alors I² = ∬ e<sup>−(x² + y²)/2</sup> dx dy = ∫<sub>0</sub><sup>2π</sup> ∫<sub>0</sub><sup>∞</sup> e<sup>−r²/2</sup> r dr dθ = 2π × 1, donc I = √(2π). D'où 1/√(2π) devant la normale en dimension 1, et 1/(2π) = (1/√(2π))² en dimension 2 : la constante de la notion 2.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>Box–Muller, et la coquille en grande dimension</small></summary><div class="in">
+<pre class="py">{{CODE:c6}}</pre>
+<pre class="out">{{OUT:c6}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Oublier r.</b> (1/(2π)) e<sup>−r²/2</sup> intégrée sur r &gt; 0 et θ ∈ [0, 2π) donne √(π/2) ≈ 1,253, pas 1 : ce n'est pas une densité de (R, Θ).</li>
+      <li><b>Densité maximale n'est pas distance la plus probable.</b> La densité du nuage culmine en (0, 0) ; la distance au centre la plus probable est 1.</li>
+      <li><b>En grande dimension, la masse est sur une coquille.</b> En dimension 100, la norme d'une gaussienne standard vaut environ 10, à ± 0,7 près, et presque aucun point n'est près du centre (code ci-dessus). Pour un espace latent gaussien, le centre est un endroit où l'on ne tombe jamais.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (27) écrit sa gaussienne puis ajoute qu'on pourrait l'écrire f(r, θ), « c'est juste r² ». Comme réécriture de la même fonction, c'est juste. Comme densité du couple (R, Θ), il manque le facteur r : f<sub>R,Θ</sub>(r, θ) = (r/(2π)) e<sup>−r²/2</sup>. Même chose pour « séparable en r, θ » en 26 : elle l'est, une fois le jacobien compté.</div>
+  </div></details>
+  <p class="garde">Changer de coordonnées multiplie la densité par le jacobien ; en polaires, f<sub>R,Θ</sub>(r, θ) = r f(r cos θ, r sin θ). La gaussienne ronde donne R de Rayleigh et Θ uniforme, indépendants.</p>
+</section>
+

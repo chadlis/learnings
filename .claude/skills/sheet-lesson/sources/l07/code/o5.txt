@@ -1,0 +1,4 @@
+score 2: likelihood ratio 7.39, P(sick | score) = 0.0695
+score 3: likelihood ratio 54.60, P(sick | score) = 0.3555
+people with a score near 2: 11647
+share of sick among them:   0.0705

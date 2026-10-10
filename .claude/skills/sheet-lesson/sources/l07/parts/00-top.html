@@ -1,0 +1,45 @@
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 7</div>
+  <h1>Lois <span>jointes</span>, marginales, conditionnelles</h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Deux variables observées ensemble ont une loi sur le plan, la <b>loi jointe</b>. On en tire trois gestes : intégrer l'autre variable pour la <b>marginale</b>, couper une tranche et la renormaliser pour la <b>conditionnelle</b>, factoriser pour reconnaître l'<b>indépendance</b>. La leçon suit Brunton 26 et 27, avec ses exemples : un joueur de basket filmé une saison, une gaussienne ronde, des fléchettes. Deux dés servent aux calculs à la main.</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="lesson-00-03-conditionner-bayes-independance.html#n1">l03 · Conditionner, Bayes, indépendance</a></li>
+    <li><a href="lesson-00-06-fonctions-standardisation.html#n1">l06 · Fonctions d'une variable aléatoire</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::loi-jointe</code><code>stats::marginale</code></div>
+  <h4>Suite</h4>
+  <ol>
+    <li><a href="lesson-00-08-esperance-variance.html">l08 · Espérance et variance</a></li>
+    <li><a href="lesson-00-09-covariance-correlation.html">l09 · Covariance et corrélation</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>Conditionner, c'est zoomer.</b> P(A ∣ B) = P(A ∩ B)/P(B) : on ne garde que B et on renormalise par sa probabilité (<a href="lesson-00-03-conditionner-bayes-independance.html#n1">l03, notion 1</a>). Les probabilités totales, P(A) = Σ P(A ∩ B<sub><i>k</i></sub>) pour une partition (<a href="lesson-00-03-conditionner-bayes-independance.html#n3">notion 3</a>), et Bayes (<a href="lesson-00-03-conditionner-bayes-independance.html#n4">notion 4</a>).</li>
+      <li><b>Indépendance d'événements.</b> P(A ∩ B) = P(A) P(B), autrement dit P(A ∣ B) = P(A) (<a href="lesson-00-03-conditionner-bayes-independance.html#n7">l03, notion 7</a>).</li>
+      <li><b>Densité.</b> f ≥ 0, ∫ f = 1, P(a ≤ X ≤ b) = ∫<sub><i>a</i></sub><sup><i>b</i></sup> f ; f(x) dx est la probabilité d'un petit intervalle, et f peut dépasser 1 (<a href="lesson-00-04-variables-binomiale-normale.html#n2">l04, notion 2</a>). La normale centrée réduite a la densité φ(x) = (1/√(2π)) e<sup>−x²/2</sup> (<a href="lesson-00-04-variables-binomiale-normale.html#n6">l04, notion 6</a>).</li>
+      <li><b>Changer de variable par la CDF.</b> On écrit P(Y ≤ y) en fonction de X, puis on dérive ; la densité se multiplie par |dx/dy| (<a href="lesson-00-06-fonctions-standardisation.html#n1">l06, notion 1</a>). Sert en notion 6.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">
+

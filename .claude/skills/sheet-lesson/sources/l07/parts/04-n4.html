@@ -1,0 +1,62 @@
+<!-- ============================ n4 ============================ -->
+<section class="notion outil" id="n4">
+  <h3>L'indépendance : la jointe se factorise <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 26</p>
+  <div class="idee">
+    <p>X et Y sont <b>indépendantes</b> quand savoir x ne change rien à la loi de y : toutes les tranches f(y ∣ x) sont la même loi. Sur la jointe, cela veut dire qu'elle est le produit de ses marginales, f(x, y) = f<sub>X</sub>(x) f<sub>Y</sub>(y). Deux dés : chaque case vaut 1/36 = 1/6 × 1/6. Premier dé et maximum : la case X = 1, M = 1 vaut 1/36, mais P(X = 1) P(M = 1) = 1/216 : X et M sont liées.</p>
+    <p>Brunton compare à la séparation des variables : sur un rectangle, la solution de l'équation de la chaleur s'écrit souvent fonction de x fois fonction de y. Puis il lance des fléchettes : un bon joueur dessine une gaussienne ronde autour du centre. Pour tester l'indépendance sur un nuage, on mélange les y entre les fléchettes : chaque x reçoit le y d'une autre fléchette, ce qui fabrique le produit des marginales. Une jointe déjà produit n'en est pas changée.</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — mélanger les y fabrique le produit des marginales</div>
+    <div id="v4ctl" class="sl-ctl"></div><div id="v4ctl2" class="sl-ctl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">400 fléchettes. <b>Viser le centre</b> : x et y sont deux normales centrées réduites indépendantes. <b>Mélange les y</b> : chaque point glisse à la verticale jusqu'au y d'une autre fléchette, tirée au hasard. Le nuage reste le même nuage rond, avec environ 39 % des fléchettes dans le cercle de rayon 1 (tirets rouges) avant comme après : la jointe était déjà le produit de ses marginales, elle est séparable en x, y. <b>Viser l'anneau</b> (un joueur qui vise une couronne à distance 2) : le nuage est rond lui aussi, mais le mélange le détruit : les points glissent vers les quatre coins, et le centre se remplit, de 0 % à environ 9 % dans le cercle de rayon 1. Rond, et pourtant non séparable.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>X</i>, <i>Y</i> indépendantes ⟺ <i>f</i>(<i>x</i>, <i>y</i>) = <i>f<sub>X</sub></i>(<i>x</i>) · <i>f<sub>Y</sub></i>(<i>y</i>) pour tous <i>x</i>, <i>y</i> ⟺ <i>f</i>(<i>y</i> ∣ <i>x</i>) = <i>f<sub>Y</sub></i>(<i>y</i>) partout où <i>f<sub>X</sub></i>(<i>x</i>) &gt; 0</div>
+    <div class="eq">gaussienne 2D standard : (1/(2π)) e<sup>−(<i>x</i>² + <i>y</i>²)/2</sup> = (1/√(2π)) e<sup>−<i>x</i>²/2</sup> · (1/√(2π)) e<sup>−<i>y</i>²/2</sup> = φ(<i>x</i>) φ(<i>y</i>)</div>
+    <ul><li>Discret : P(X = x, Y = y) = P(X = x) P(Y = y) pour toutes les cases. C'est l'indépendance d'événements de <a href="lesson-00-03-conditionner-bayes-independance.html#n7">l03</a>, appliquée à chaque paire {X = x}, {Y = y}.</li><li>« Pour tous x, y » : une case égale au produit ne prouve rien, il les faut toutes.</li><li>Avec une corrélation ρ, l'exposant devient −(x² − 2ρxy + y²)/(2(1 − ρ²)). Le terme croisé en xy ne se coupe pas en fonction de x fois fonction de y (figure 4). La covariance, qui mesure ce lien, est en <a href="lesson-00-09-covariance-correlation.html#n1">l09</a>.</li></ul>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — mêmes marginales, la jointe ne se factorise que sans corrélation</div>
+    <div id="f4ctl"></div>
+    <div id="f4plot" class="wide"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">La gaussienne standard à corrélation ρ, f(x, y) = e<sup>−(x² − 2ρxy + y²)/(2(1 − ρ²))</sup> / (2π√(1 − ρ²)). Ses marginales sont N(0, 1) pour tout ρ : le produit des marginales est donc toujours la même gaussienne ronde, en tirets. En traits pleins, les courbes de niveau de la jointe, aux mêmes hauteurs. À <b>ρ = 0</b>, les deux se confondent : la jointe est le produit. Monte <b>ρ</b> à 0,8 : la jointe s'allonge sur la diagonale. En (1, 1), elle vaut 0,152, 2,6 fois le produit 0,0585 ; en (1, −1), 0,0018, 33 fois moins.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux dés, un rectangle, le maximum, un triangle, les fléchettes, une permutation</small></summary><div class="in">
+    <ol>
+      <li><b>Deux dés.</b> Chaque case vaut 1/36 = 1/6 × 1/6 : indépendants.</li>
+      <li><b>Un rectangle se factorise.</b> P(X ≤ 2, Y ≥ 5) = 4/36 = 1/9 = P(X ≤ 2) P(Y ≥ 5) = 1/3 × 1/3.</li>
+      <li><b>Le maximum.</b> P(X = 6, M = 6) = 6/36 = 1/6, alors que P(X = 6) P(M = 6) = 1/6 × 11/36 = 11/216 = 0,051. Aucune case du tableau (X, M) n'est égale au produit de ses marges.</li>
+      <li><b>Un support en triangle.</b> Uniforme sur 0 &lt; y &lt; x &lt; 1, l'aire vaut ½ et f = 2. f<sub>X</sub>(x) = 2x, f<sub>Y</sub>(y) = 2(1 − y). Au point (0,2 ; 0,8), hors du triangle, f = 0, mais f<sub>X</sub>(0,2) f<sub>Y</sub>(0,8) = 0,4 × 0,4 = 0,16. Un support qui n'est pas un produit A × B (un rectangle, dans les cas simples) suffit à prouver la dépendance ; le disque uniforme est dans ce cas.</li>
+      <li><b>Les fléchettes</b> de la vignette : viser le centre donne une jointe séparable, viser l'anneau non.</li>
+      <li><b>En ML, l'importance par permutation.</b> Mélanger une colonne de variables explicatives, comme la vignette mélange les y, remplace la jointe par le produit de la marginale de cette colonne et de la loi du reste. Ce que le modèle perd alors mesure ce qu'il tirait du lien.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>produit et tranches, la gaussienne, le test du support</small></summary><div class="in">
+    <div class="drv">
+      <div><i>f</i>(<i>y</i> ∣ <i>x</i>) = <i>f</i>(<i>x</i>, <i>y</i>) / <i>f<sub>X</sub></i>(<i>x</i>)</div><span>définition de la conditionnelle (notion 3)</span>
+      <div>= <i>f<sub>X</sub></i>(<i>x</i>) <i>f<sub>Y</sub></i>(<i>y</i>) / <i>f<sub>X</sub></i>(<i>x</i>) = <i>f<sub>Y</sub></i>(<i>y</i>)</div><span>si la jointe est un produit : ⟹</span>
+      <div><i>f</i>(<i>x</i>, <i>y</i>) = <i>f</i>(<i>y</i> ∣ <i>x</i>) <i>f<sub>X</sub></i>(<i>x</i>) = <i>f<sub>Y</sub></i>(<i>y</i>) <i>f<sub>X</sub></i>(<i>x</i>)</div><span>si toutes les tranches valent f<sub>Y</sub> : ⟸</span>
+    </div>
+    <p><b>La gaussienne.</b> e<sup>−(x² + y²)/2</sup> = e<sup>−x²/2</sup> · e<sup>−y²/2</sup>, et 1/(2π) = (1/√(2π))². Chaque facteur est φ, et la notion 2 a montré que φ est la marginale : la jointe est le produit de ses marginales.</p>
+    <p><b>Le support.</b> Si f<sub>X</sub>(x) &gt; 0 et f<sub>Y</sub>(y) &gt; 0 mais f(x, y) = 0, le produit est strictement positif et ne peut pas valoir f : X et Y sont dépendantes.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>l'écart au produit, et le test du mélange</small></summary><div class="in">
+<pre class="py">{{CODE:c4}}</pre>
+<pre class="out">{{OUT:c4}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Mêmes marginales, jointes différentes</b> (figure 4). L'indépendance est une propriété de la jointe, invisible sur les marginales.</li>
+      <li><b>Rond ne veut pas dire indépendant.</b> L'anneau de la vignette et le disque uniforme sont ronds et non séparables. La gaussienne est la seule loi invariante par rotation dont les coordonnées sont indépendantes (théorème de Herschel–Maxwell).</li>
+      <li><b>Une covariance nulle ne suffit pas.</b> L'anneau est symétrique, sa covariance est nulle, et ses coordonnées sont pourtant liées (<a href="lesson-00-09-covariance-correlation.html#n3">l09</a>).</li>
+      <li><b>Indépendance conditionnelle n'est pas indépendance.</b> Naive Bayes suppose que les variables explicatives se factorisent sachant la classe, p(x<sub>1</sub>, …, x<sub><i>d</i></sub> ∣ c) = Π<sub><i>j</i></sub> p(x<sub><i>j</i></sub> ∣ c). Sans connaître la classe, elles restent liées par elle (notion 5).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (26) dit que la gaussienne 2D des fléchettes n'est pas séparable en x, y, seulement en r, θ. Elle l'est : e<sup>−(x² + y²)/2</sup> = e<sup>−x²/2</sup> · e<sup>−y²/2</sup>. Il l'avait construite plus tôt, ronde, à partir d'une gaussienne en x et d'une gaussienne en y ; ronde avec des marginales N(0, 1), elle a forcément ρ = 0, donc elle est séparable. Ce qui est rond sans être séparable, c'est un anneau ou un disque uniforme. Si la gravité ne fait que décaler ou étirer le nuage à la verticale, il reste séparable : aucun terme en xy n'apparaît. Enfin, « séparable en r, θ » demande un facteur r (notion 6).</div>
+  </div></details>
+  <p class="garde">X et Y indépendantes ⟺ f(x, y) = f<sub>X</sub>(x) f<sub>Y</sub>(y) pour tous x, y ⟺ toutes les tranches f(y ∣ x) sont la même loi f<sub>Y</sub>.</p>
+</section>
+
