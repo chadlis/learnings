@@ -1,0 +1,1334 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Événements rares et temps d'attente — leçon</title>
+<meta name="sheet" content="series=lesson;part=00;number=05;status=v1">
+<meta name="part" content="00 · Socle probabiliste">
+<meta name="subtitle" content="socle — Brunton 17 à 22 : Poisson par la limite, géométrique, exponentielle sans mémoire, processus de Poisson">
+<meta name="prereq" content="l04">
+<meta name="anki" content="stats::poisson,stats::exponentielle,stats::geometrique,stats::lois">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- série `coding` : squelette annoté et ruban de SL.trace (inerte hors coding) ---- */
+.skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.skel b{color:var(--pen);font-weight:600}
+.step .card.full,.step .card.casse{grid-column:1 / -1}
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .wide table{min-width:520px}
+.card .wide th:nth-child(2),.card .wide td:nth-child(2),
+.card .wide th:nth-child(3),.card .wide td:nth-child(3){text-align:left}
+.readouts .c1 b{color:var(--pen)}.readouts .c3 b{color:var(--red)}
+.sl-trace{--cw:58px;--cgap:8px;margin:4px 0 2px}
+.sl-cells{display:flex;gap:var(--cgap)}
+.sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
+.sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
+.sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.dim{background:rgba(34,48,43,.07);border-color:rgba(34,48,43,.18);border-style:dashed}
+.sl-cell.dim b,.sl-cell.dim i{color:var(--cardmuted);opacity:.5}
+.sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
+.sl-cell.win{border-color:var(--green);border-width:2.5px}
+.sl-ptrs{position:relative;height:20px;margin-top:5px}
+.sl-ptr{position:absolute;top:0;left:calc(var(--i) * (var(--cw) + var(--cgap)));width:var(--cw);text-align:center;font:600 12px var(--sans);color:var(--pen)}
+.sl-note{font-size:14px;color:var(--cardink);margin-top:10px}
+.sl-inv{font:12.5px/1.55 var(--mono);color:var(--cardmuted);margin-top:6px;border-left:2px solid #B7791F;padding-left:10px}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ===== série `lesson` : le cours autoporteur du socle (10/10/2026) ===== */
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px;color:var(--muted);margin:10px 0 0}
+.legend .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-right:6px}
+.lecon{counter-reset:notion}
+.notion{padding:22px 0 28px;border-top:1.5px dashed var(--line);max-width:900px}
+.notion h3{position:relative;padding-left:44px;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.3;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:2px}
+.notion h3::before{counter-increment:notion;content:counter(notion);position:absolute;left:0;top:-1px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle;text-shadow:none}
+.tag.outil{color:var(--mint)}.tag.culture{color:var(--violet)}
+.src{font-size:12.5px;color:var(--faint);margin:0 0 10px 44px}
+.idee{margin-left:44px;color:var(--chalk);font-size:16px;line-height:1.62;max-width:72ch}
+.idee p{margin:7px 0}
+.idee b{color:var(--yellow);font-weight:600}
+.formule{margin:12px 0 10px 44px;background:var(--card);color:var(--cardink);border-radius:3px;padding:12px 18px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--yellow)}
+.formule .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:4px}
+.formule .eq{font-size:17.5px}
+.formule ul{padding-left:18px;margin-top:6px}.formule li{font-size:14.5px;margin:3px 0;color:var(--cardmuted)}
+.notion .fig{margin-left:44px}
+details{margin:8px 0 0 44px;background:var(--card);color:var(--cardink);border-radius:3px;border-left:4px solid var(--ac,var(--yellow));box-shadow:0 10px 20px -16px rgba(0,0,0,.6)}
+details>summary{cursor:pointer;list-style:none;padding:9px 14px;font:600 13px var(--sans);letter-spacing:.03em;color:var(--cardink)}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸";display:inline-block;width:16px;color:var(--cardmuted)}
+details[open]>summary::before{content:"▾"}
+details>summary small{font-weight:400;color:var(--cardmuted);margin-left:6px;letter-spacing:0}
+details .in{padding:2px 18px 14px}
+details .in p,details .in li{font-size:15px;line-height:1.55;margin:5px 0}
+details .in ol,details .in ul{padding-left:20px}
+details.ex{--ac:var(--teal)}details.preuve{--ac:var(--violet)}details.code{--ac:var(--blue)}details.casse{--ac:var(--pink)}details.loin{--ac:var(--faint)}
+.drv{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:4px 16px;margin:8px 0;align-items:baseline}
+.drv>div{font-family:var(--math);font-size:16px;line-height:1.6}
+.drv>span{font-size:13.5px;color:var(--cardmuted);border-left:2px solid var(--cardline);padding-left:10px}
+@media(max-width:700px){.drv{grid-template-columns:minmax(0,1fr)}.drv>span{margin-bottom:6px}}
+pre.py,pre.out,pre.tri{font:13px/1.6 var(--mono);background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:pre}
+pre.out{background:transparent;border:1px dashed var(--cardline);color:var(--cardmuted)}
+pre.out::before{content:"sortie\A";font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.brunton{margin:10px 0 4px;padding:8px 12px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft);font-size:14.5px}
+.brunton b{display:block;font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:2px}
+.garde{margin:14px 0 0 44px;font-family:var(--serif);font-size:16.5px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--yellow);padding:4px 0 4px 14px;max-width:72ch}
+.garde::before{content:"Ce qu'on garde";display:block;font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);text-shadow:none;margin-bottom:2px}
+.notion.culture .garde{border-left-color:var(--violet)}
+.notion table{background:var(--cardsoft);border-radius:3px}
+.sl-fulcrum{fill:var(--red)}.sl-bar2{fill:var(--red);opacity:.55}.sl-bar3{fill:var(--pen);opacity:.6}
+@media(max-width:600px){.idee,.formule,details,.garde,.src,.notion .fig{margin-left:0}.notion h3{font-size:19px}}
+.sl-seg.sl-c1{stroke:var(--pen);stroke-width:2}.sl-seg.sl-c2{stroke:#6B46C1;stroke-width:2}.sl-seg.sl-c3{stroke:var(--red);stroke-width:2}.sl-seg.sl-c4{stroke:#1F5FA8;stroke-width:2}
+/* ===== v2 (10/10/2026) : vignettes « voir l'idée », sous chaque idée ===== */
+.fig.vis{--ac:var(--teal)}
+.v-row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:center}
+.v-row>div{flex:1 1 280px;min-width:0}.v-row>.v-mini{flex:0 1 220px}
+.v-row .sl-plot{min-width:0}
+.nogrid .sl-grid{display:none}
+.sl-ruler{fill:var(--cardmuted)}
+.sl-mass{fill:#6B46C1;opacity:.85}
+.sl-mass-t{font:600 11px var(--sans);fill:#fff}
+.sl-sq{fill:rgba(107,70,193,.16);stroke:#6B46C1;stroke-width:1.5}
+.sl-sq-t{font:600 12.5px var(--mono);fill:#6B46C1}
+.sl-cellp{fill:#6B46C1}.sl-cello{fill:none;stroke:var(--cardline)}
+.sl-prod{font:12px var(--mono);fill:var(--cardmuted);opacity:.5}.sl-prod.on{font-weight:700;fill:var(--cardink);opacity:1}
+.sl-seg.sl-dash{stroke-dasharray:4 3}.sl-seg.sl-link{stroke:rgba(34,48,43,.28);stroke-dasharray:3 3}
+.sl-seg.sl-c5{stroke:#B7791F;stroke-width:2}
+.sl-orbit{fill:none;stroke:rgba(34,48,43,.3);stroke-dasharray:3 4}
+.sl-stick{stroke:var(--cardmuted);stroke-width:4;stroke-linecap:round}
+.sl-dot.sl-tiny{stroke:none;opacity:.5}
+.sl-k1{fill:var(--pen)}.sl-k2{fill:#6B46C1}.sl-k3{fill:var(--red)}.sl-k4{fill:#1F5FA8}.sl-k5{fill:#B7791F}.sl-k6{fill:var(--green)}.sl-kc{opacity:.5}
+.sl-cell-t{font:600 11px var(--sans);fill:var(--cardink)}
+/* ---- propre à cette leçon ---- */
+.sl-fn.sl-dash{stroke-dasharray:6 4}
+.sl-win{fill:rgba(31,95,168,.11)}
+.sl-band{fill:rgba(183,121,31,.16)}
+.sl-x{font:600 13px var(--mono);fill:var(--pen)}
+.sl-lane{fill:#6B46C1;opacity:.7}.sl-lane.first{fill:var(--red);opacity:.8}
+.sl-lane-t{font:600 11px var(--sans);fill:#fff}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 5</div>
+  <h1>Événements rares et <span>temps d'attente</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Un événement rare qui a beaucoup d'occasions de se produire se <b>compte</b> avec la loi de Poisson ; l'attente jusqu'à sa prochaine occurrence se <b>chronomètre</b> avec la loi exponentielle. La leçon suit Brunton 17 à 22 et ses exemples : des néons d'usine, un dé lancé jusqu'au premier 5, des ampoules, le polonium 210, des mails, la file d'attente du DMV. L'exemple ML : les requêtes qui arrivent sur une API de LLM.</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="lesson-00-04-variables-binomiale-normale.html#n1">l04 · Variable, réalisation, paramètre</a></li>
+    <li><a href="lesson-00-04-variables-binomiale-normale.html#n2">l04 · Loi, densité, CDF</a></li>
+    <li><a href="lesson-00-04-variables-binomiale-normale.html#n4">l04 · Binomiale</a></li>
+    <li><a href="lesson-00-04-variables-binomiale-normale.html#n5">l04 · Normale, limite de la binomiale</a></li>
+    <li><a href="lesson-00-03-conditionner-bayes-independance.html#n1">l03 · P(A ∣ B), rappel</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::poisson</code><code>stats::exponentielle</code><code>stats::geometrique</code><code>stats::lois</code></div>
+  <h4>Chaînes</h4>
+  <ol>
+    <li><a href="../chains/chain-p07-02-bagging-rf.html">Bagging : 36,8 % hors-sac</a></li>
+    <li><a href="../chains/chain-p01-05-bootstrap.html">Bootstrap</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>Variable, réalisation, paramètre.</b> X est le nombre que le tirage va produire, k la valeur observée cette fois-ci, λ ou p un paramètre fixe de la loi. Un paramètre fixe s'écrit après un point-virgule, P(X = k ; λ) ; la barre est réservée au conditionnement (<a href="lesson-00-04-variables-binomiale-normale.html#n1">l04</a>).</li>
+      <li><b>Loi discrète et densité.</b> Un compte a une loi P(X = k). Un temps a une densité f : la probabilité d'un intervalle est l'aire sous f, et f(t) seule n'est pas une probabilité (<a href="lesson-00-04-variables-binomiale-normale.html#n2">l04</a>).</li>
+      <li><b>Binomiale.</b> Le nombre de succès en n essais indépendants de probabilité p : P(X = k) = C(n, k) p<sup>k</sup>(1 − p)<sup>n−k</sup>, E = np, Var = np(1 − p) (<a href="lesson-00-04-variables-binomiale-normale.html#n4">l04</a>). Pour n grand et p modéré, elle ressemble à une normale (<a href="lesson-00-04-variables-binomiale-normale.html#n5">l04</a>).</li>
+      <li><b>Conditionner, et l'indépendance.</b> P(A ∣ B) = P(A ∩ B)/P(B) ; des événements indépendants ont une probabilité conjointe égale au produit (<a href="lesson-00-03-conditionner-bayes-independance.html#n1">l03</a>, <a href="lesson-00-03-conditionner-bayes-independance.html#n7">l03</a>).</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">
+<!-- ============================ n1 ============================ -->
+<section class="notion outil" id="n1">
+  <h3>Poisson, la limite des événements rares <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 17 · The Poisson Distribution: the Rare-Event Limit of a Binomial Distribution</p>
+  <div class="idee">
+    <p>Brunton part d'un échec. Mille essais, chacun avec une chance sur mille : la binomiale a pour moyenne np = 1 et pour variance npq = 0,999. La normale de même moyenne et de même variance met 16 % de sa masse sous zéro, sur des nombres de succès négatifs, qui n'existent pas.</p>
+    <p>Le remède est de garder le nombre moyen de succès <b>λ = np</b> fixé, de faire grandir n et donc de rapetisser p = λ/n. Beaucoup d'occasions, chacune improbable, λ succès en moyenne. À la limite, la binomiale devient la <b>loi de Poisson</b>, qui ne dépend plus que de λ.</p>
+    <p>L'exemple de Brunton : une usine compte 10 000 néons, et chacun grille dans la journée avec une probabilité de 0,002. Le nombre de néons grillés aujourd'hui suit une loi de Poisson de paramètre λ = 10 000 × 0,002 = 20.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — la normale déborde sous zéro, la Poisson colle</div>
+    <div id="v1ctl" class="sl-ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">Les barres sont la binomiale exacte, les points rouges la Poisson de même moyenne, la courbe la normale de même moyenne et de même variance, avec en rouge sa masse sous zéro. <b>1 000 essais à 1/1 000</b> : la normale met 15,9 % de sa masse sur des comptes négatifs et se trompe de 0,13 au pire ; la Poisson se trompe de 0,0002. <b>Néons</b> : λ = 20, la masse négative tombe à 0,0004 % ; la Poisson colle encore, et la normale aussi, parce qu'à λ = 20 les trois lois se ressemblent.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>P</i>(<i>X</i> = <i>k</i> ; λ) = λ<sup><i>k</i></sup> e<sup>−λ</sup> / <i>k</i>!, &nbsp; <i>k</i> = 0, 1, 2, … &nbsp;&nbsp;&nbsp;&nbsp; E[<i>X</i>] = Var(<i>X</i>) = λ</div>
+    <ul>
+      <li>C'est la limite de Binomiale(n, p) quand n → ∞ et p → 0 avec np = λ fixé. Ce qui compte est que <b>p soit petit</b>, pas que λ le soit : λ = 20 convient.</li>
+      <li>Les occasions sont indépendantes et ont la même probabilité p : c'est la binomiale de <a href="lesson-00-04-variables-binomiale-normale.html#n4">l04</a>, et sans indépendance la limite tombe.</li>
+      <li>λ est un paramètre fixe, d'où le point-virgule ; k est le compte qu'on observe, une réalisation de X.</li>
+      <li>E = Var est un <b>test nécessaire</b> : un seul paramètre fixe à la fois le niveau et la dispersion, donc une variance nettement différente de la moyenne exclut la Poisson ; l'égalité, elle, ne la prouve pas.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — la binomiale rejoint la Poisson</div>
+    <div id="f1plot" class="wide"></div>
+    <div id="f1ctl"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Les <b>barres</b> sont la Binomiale(n, λ/n), la <b>ligne rouge à points</b> la Poisson(λ). Les deux ont la même moyenne λ par construction. Monte <b>n</b> à λ fixé : l'écart maximal entre les deux tombe, et la valeur affichée passe au vert sous 0,01 (à λ = 4 et n = 1 000, il vaut 0,0004). Monte <b>λ</b> : la loi s'élargit comme √λ, sa variance reste égale à sa moyenne. Pousse λ à 15 et ramène n à 20 : p = 0,75 n'est plus petit, et la binomiale, de variance np(1 − p) = 3,75, est bien plus étroite que la Poisson, de variance 15.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>λ = 1, les néons, les spams, un bootstrap</small></summary><div class="in">
+    <ol>
+      <li><b>λ = 1</b>, l'expérience de pensée de Brunton : P(0) = P(1) = e<sup>−1</sup> = 0,368 ; P(2) = 0,184 ; P(3) = 0,061. La Binomiale(1 000 ; 0,001) donne 0,368 ; 0,368 ; 0,184 ; 0,061.</li>
+      <li><b>Les néons</b>, λ = 20 : P(20) = 0,0888 (binomiale 0,0889) ; P(10) = 0,0058 ; P(5) = 5,5 × 10<sup>−5</sup>. Une journée à exactement cinq néons grillés arrive une fois tous les 18 200 jours en moyenne, soit 50 ans.</li>
+      <li><b>Le fil rouge</b> : des spams à 4 par heure, Poisson(4). P(0) = e<sup>−4</sup> = 0,018 ; P(4) = e<sup>−4</sup> 4<sup>4</sup>/4! = 0,195 ; P(X ≥ 7) = 0,111. La Binomiale(1 000 ; 0,004), mille mails à 0,4 % de spam, donne P(4) = 0,196.</li>
+      <li><b>ML, le bootstrap.</b> On tire n lignes avec remise parmi n. Une ligne donnée est tirée Binomiale(n, 1/n) fois, presque une Poisson(1) : elle est absente avec probabilité (1 − 1/n)<sup>n</sup> → e<sup>−1</sup> = 0,368 (0,3677 pour n = 1 000), tirée deux fois ou plus avec probabilité 0,264. Ce sont les 36,8 % de lignes hors-sac des forêts aléatoires (<a href="../chains/chain-p07-02-bagging-rf.html">p07-02</a>).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la limite au tableau, puis E = Var = λ par la série</small></summary><div class="in">
+    <p><b>La limite.</b> On pose p = λ/n dans la binomiale, k fixé, et on réécrit sans rien approcher, comme Brunton :</p>
+    <div class="drv">
+      <div><i>P</i>(<i>X</i> = <i>k</i>) = <i>n</i>! / (<i>k</i>! (<i>n</i> − <i>k</i>)!) · (λ/<i>n</i>)<sup><i>k</i></sup> (1 − λ/<i>n</i>)<sup><i>n</i>−<i>k</i></sup></div><span>binomiale, p = λ/n</span>
+      <div>= (λ<sup><i>k</i></sup>/<i>k</i>!) · [<i>n</i>(<i>n</i> − 1)⋯(<i>n</i> − <i>k</i> + 1) / <i>n</i><sup><i>k</i></sup>] · (1 − λ/<i>n</i>)<sup><i>n</i></sup> · (1 − λ/<i>n</i>)<sup>−<i>k</i></sup></div><span>n!/(n − k)! a k facteurs, un n sous chacun ; on coupe l'exposant n − k</span>
+      <div>[<i>n</i>(<i>n</i> − 1)⋯(<i>n</i> − <i>k</i> + 1) / <i>n</i><sup><i>k</i></sup>] = 1 · (1 − 1/<i>n</i>) ⋯ (1 − (<i>k</i> − 1)/<i>n</i>) → 1</div><span>k facteurs, chacun → 1, et k ne bouge pas</span>
+      <div>(1 − λ/<i>n</i>)<sup>−<i>k</i></sup> → 1<sup>−<i>k</i></sup> = 1</div><span>λ/n → 0, exposant fixe</span>
+      <div>(1 − λ/<i>n</i>)<sup><i>n</i></sup> = e<sup><i>n</i> ln(1 − λ/<i>n</i>)</sup> = e<sup>−λ − λ²/(2<i>n</i>) − …</sup> → e<sup>−λ</sup></div><span>ln(1 − x) = −x − x²/2 − … pour x petit</span>
+      <div><i>P</i>(<i>X</i> = <i>k</i>) → λ<sup><i>k</i></sup> e<sup>−λ</sup> / <i>k</i>!</div><span>produit des limites</span>
+    </div>
+    <p>Le passage à la limite, n → ∞ avec λ = np fixé, donc p → 0, sert aux trois dernières limites : il fait tendre vers 1 les deux facteurs parasites et fait apparaître e<sup>−λ</sup>. Le total vaut bien 1 : Σ<sub>k</sub> λ<sup>k</sup>/k! = e<sup>λ</sup> (série de l'exponentielle), donc Σ<sub>k</sub> λ<sup>k</sup>e<sup>−λ</sup>/k! = 1.</p>
+    <p><b>E = Var = λ</b>, par la série :</p>
+    <div class="drv">
+      <div>E[<i>X</i>] = Σ<sub><i>k</i>≥1</sub> <i>k</i> λ<sup><i>k</i></sup> e<sup>−λ</sup>/<i>k</i>! = λ Σ<sub><i>k</i>≥1</sub> λ<sup><i>k</i>−1</sup> e<sup>−λ</sup>/(<i>k</i> − 1)! = λ</div><span>k/k! = 1/(k − 1)! ; la somme restante est le total de la loi, 1</span>
+      <div>E[<i>X</i>(<i>X</i> − 1)] = Σ<sub><i>k</i>≥2</sub> <i>k</i>(<i>k</i> − 1) λ<sup><i>k</i></sup> e<sup>−λ</sup>/<i>k</i>! = λ² Σ<sub><i>k</i>≥2</sub> λ<sup><i>k</i>−2</sup> e<sup>−λ</sup>/(<i>k</i> − 2)! = λ²</div><span>même geste, deux crans ; LOTUS (<a href="lesson-00-08-esperance-variance.html#n5">l08</a>)</span>
+      <div>Var(<i>X</i>) = E[<i>X</i>(<i>X</i> − 1)] + E[<i>X</i>] − E[<i>X</i>]² = λ² + λ − λ² = λ</div><span>E[X²] = E[X(X − 1)] + E[X], puis E[X²] − μ² (<a href="lesson-00-08-esperance-variance.html#n6">l08</a>)</span>
+    </div>
+    <p>La même chose se lit sur la binomiale : E = np = λ, et Var = np(1 − p) = λ(1 − λ/n) → λ.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>100 000 journées de néons</small></summary><div class="in">
+<pre class="py">import numpy as np
+from scipy import stats
+
+rng = np.random.default_rng(0)
+n, p = 10_000, 0.002            # Brunton's factory: 10,000 lights, p = 0.002 per day
+lam = n * p                     # 20 lights per day on average
+
+days = rng.binomial(n, p, size=100_000)          # exact model: one binomial per day
+print(f"mean {days.mean():.3f}   var {days.var():.3f}   (Poisson: both = {lam:.0f})")
+
+for k in [10, 15, 20, 25, 30]:
+    b, q = stats.binom.pmf(k, n, p), stats.poisson.pmf(k, lam)
+    print(f"P(X={k})  binomial {b:.5f}  Poisson {q:.5f}  simulated {np.mean(days == k):.5f}")
+
+# what matters is a small p with np fixed: lambda = 4, n grows
+k = np.arange(60)
+for n in [10, 100, 1_000, 100_000]:
+    gap = np.abs(stats.binom.pmf(k, n, 4 / n) - stats.poisson.pmf(k, 4)).max()
+    print(f"n = {n:&gt;7,}   p = {4 / n:.5f}   max gap to Poisson(4) = {gap:.6f}")</pre>
+<pre class="out">mean 19.993   var 19.937   (Poisson: both = 20)
+P(X=10)  binomial 0.00579  Poisson 0.00582  simulated 0.00576
+P(X=15)  binomial 0.05162  Poisson 0.05165  simulated 0.05190
+P(X=20)  binomial 0.08892  Poisson 0.08884  simulated 0.08935
+P(X=25)  binomial 0.04459  Poisson 0.04459  simulated 0.04399
+P(X=30)  binomial 0.00831  Poisson 0.00834  simulated 0.00833
+n =      10   p = 0.40000   max gap to Poisson(4) = 0.055456
+n =     100   p = 0.04000   max gap to Poisson(4) = 0.004022
+n =   1,000   p = 0.00400   max gap to Poisson(4) = 0.000392
+n = 100,000   p = 0.00004   max gap to Poisson(4) = 0.000004</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Les occasions ne sont pas indépendantes.</b> Des spams envoyés par rafales : les comptes deviennent <b>surdispersés</b>, Var &gt; E. Une moyenne de 4 et une variance de 9 sur des comptes horaires, rapport 2,25, disent « pas Poisson » avant tout autre calcul. La loi qui absorbe cet excès s'appelle la binomiale négative ; on la nomme seulement.</li>
+      <li><b>p n'est pas petit.</b> Dix mails à 40 % de spam : Binomiale(10 ; 0,4), moyenne 4 mais variance 2,4. La Poisson(4) aurait une variance de 4, et donnerait P(X &gt; 10) = 0,003 à un compte qui ne peut pas dépasser 10.</li>
+      <li><b>La normale échoue à λ petit, pas la Poisson à λ grand.</b> À λ = 20, la normale N(20 ; 19,96) donne en 20 une densité de 0,0893, contre 0,0888 pour la Poisson : les deux marchent.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (17) annonce une dérivation où « np n'est pas trop grand », puis prend pour exemple des néons où np = 20. Ce qui justifie la Poisson n'est pas un λ petit, c'est p = 0,002 petit avec np fixé. Il n'énonce pas non plus E = Var = λ, qui est pourtant le premier test de la loi.</div>
+  </div></details>
+  <p class="garde">Occasions nombreuses, indépendantes et rares : Poisson(λ), limite de Binomiale(n, λ/n), P(X = k ; λ) = λ<sup>k</sup>e<sup>−λ</sup>/k!, E = Var = λ. Une variance nettement différente de la moyenne exclut la Poisson ; l'égalité ne la prouve pas.</p>
+</section>
+
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>La géométrique : le rang du premier succès <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 18 · The Geometric Distribution: the First Success of a Bernoulli Sequence</p>
+  <div class="idee">
+    <p>On lance un dé jusqu'à obtenir un 5 (« I need 5's »). X est le rang du premier 5. Brunton insiste : premier succès exactement au n-ième lancer, pas « au moins ».</p>
+    <p>La seule façon d'avoir le premier 5 au lancer n est d'avoir raté les n − 1 premiers, puis réussi. Les lancers sont indépendants, donc la probabilité est un produit : (5/6)<sup>n−1</sup> × 1/6. Au dixième lancer exactement : 0,032.</p>
+    <p>La question utile est plutôt « faut-il au moins 10 lancers ? ». Cela arrive si et seulement si les 9 premiers lancers ratent : (5/6)<sup>9</sup> = 0,194. Un joueur sur cinq attend au moins dix lancers, alors qu'il en faut 6 en moyenne.</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — vingt joueurs qui lancent jusqu'au premier 5</div>
+    <div id="v2ctl" class="sl-ctl"></div>
+    <div id="v2plot" class="wide"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">Une ligne par joueur, une case par lancer : vide pour un raté, pleine pour le premier 5. La bande ocre couvre les <b>9 premiers lancers</b> : un joueur a besoin d'au moins 10 lancers si et seulement si sa ligne traverse la bande sans case pleine (marque rouge à droite). Clique sur <b>vingt autres joueurs</b> : le cumul de la part « au moins 10 » s'approche de (5/6)<sup>9</sup> = 19,4 %, le rang moyen de 6.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>P</i>(<i>X</i> = <i>k</i> ; <i>p</i>) = <i>q</i><sup><i>k</i>−1</sup> <i>p</i>, &nbsp; <i>k</i> = 1, 2, 3, … &nbsp;&nbsp;&nbsp; <i>P</i>(<i>X</i> ≥ <i>k</i>) = <i>q</i><sup><i>k</i>−1</sup> &nbsp;&nbsp;&nbsp; E[<i>X</i>] = 1/<i>p</i></div>
+    <ul>
+      <li>q = 1 − p. Les essais sont des Bernoulli <b>indépendantes</b> : c'est ce qui fait du « k − 1 échecs puis un succès » un produit.</li>
+      <li>La <b>même probabilité p</b> à chaque essai : c'est ce qui donne la puissance q<sup>k−1</sup>.</li>
+      <li>X compte les essais, succès compris, donc commence à 1. La variance vaut q/p², donnée pour la culture.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — la loi géométrique et sa queue</div>
+    <div id="f2ctl" class="sl-ctl"></div>
+    <div id="f2sl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Chaque barre est P(X = k) ; les barres bleues, à partir du <b>seuil k</b>, forment la queue P(X ≥ k). Pour le dé (p = 1/6) et k = 10 : la barre du seuil vaut 0,032, la queue entière 0,194 = (5/6)<sup>9</sup>. Les barres décroissent d'un facteur q à chaque pas : c'est une suite géométrique, d'où le nom. Passe à la <b>pièce</b> : la queue fond, P(X ≥ 10) = 1/512.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>une pièce, le dé de Brunton, pass@k</small></summary><div class="in">
+    <ol>
+      <li><b>Une pièce</b>, p = ½. P(X = 3) = ½ × ½ × ½ = 1/8 (raté, raté, réussi). P(X ≥ 3) = ¼ : les deux premiers lancers ratent.</li>
+      <li><b>Le dé, premier 5</b>, p = 1/6. P(X = 1) = 0,167 ; P(X = 2) = 5/36 = 0,139 ; P(X = 10) = 0,032 ; P(X ≥ 10) = 0,194. Moyenne 1/p = 6 lancers. La médiane est 4 : P(X ≤ 3) = 0,421 et P(X ≤ 4) = 0,518. La moitié des joueurs ont leur 5 en 4 lancers au plus, et la queue tire la moyenne à 6.</li>
+      <li><b>ML, pass@k.</b> Un modèle de code résout un problème avec probabilité p = 0,2 par génération. Avec k générations indépendantes, « au moins un succès » est « le premier succès arrive au rang k au plus » : P(X ≤ k) = 1 − q<sup>k</sup>. pass@5 = 1 − 0,8<sup>5</sup> = 0,672 ; pass@10 = 0,893.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la loi, la queue de deux façons, la moyenne</small></summary><div class="in">
+    <p>On note F<sub>i</sub> « l'essai i rate » et S<sub>k</sub> « l'essai k réussit », comme Brunton.</p>
+    <div class="drv">
+      <div><i>P</i>(<i>X</i> = <i>k</i>) = <i>P</i>(F<sub>1</sub> ∩ ⋯ ∩ F<sub><i>k</i>−1</sub> ∩ S<sub><i>k</i></sub>)</div><span>premier succès au rang k : tout ce qui précède a raté</span>
+      <div>= <i>P</i>(F<sub>1</sub>) ⋯ <i>P</i>(F<sub><i>k</i>−1</sub>) <i>P</i>(S<sub><i>k</i></sub>) = <i>q</i><sup><i>k</i>−1</sup> <i>p</i></div><span>indépendance : l'intersection devient un produit (<a href="lesson-00-03-conditionner-bayes-independance.html#n7">l03</a>)</span>
+      <div><i>P</i>(<i>X</i> ≥ <i>k</i>) = Σ<sub><i>n</i>≥<i>k</i></sub> <i>q</i><sup><i>n</i>−1</sup> <i>p</i> = <i>q</i><sup><i>k</i>−1</sup> <i>p</i> (1 + <i>q</i> + <i>q</i>² + ⋯)</div><span>on met q<sup>k−1</sup>p en facteur</span>
+      <div>= <i>q</i><sup><i>k</i>−1</sup> <i>p</i> / (1 − <i>q</i>) = <i>q</i><sup><i>k</i>−1</sup></div><span>série géométrique, q &lt; 1 ; 1 − q = p se simplifie</span>
+    </div>
+    <p><b>Deuxième méthode, que Brunton donne aussi.</b> {X ≥ k} est exactement l'événement « les k − 1 premiers essais ratent », donc P(X ≥ k) = q<sup>k−1</sup> sans aucune somme. Avec k = 1 on retrouve P(X ≥ 1) = 1 : la loi est complète.</p>
+    <p><b>La moyenne</b>, par la somme des queues de <a href="lesson-00-08-esperance-variance.html#n11">l08</a> : E[X] = Σ<sub>k≥1</sub> P(X ≥ k) = Σ<sub>k≥1</sub> q<sup>k−1</sup> = 1/(1 − q) = 1/p. Ou, sans elle : on s'arrête au premier essai avec probabilité p, sinon un essai est perdu et tout recommence ; donc E = 1 + qE, et E = 1/p.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>200 000 joueurs de dé</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(0)
+p = 1 / 6                                   # rolling a die until the first 5
+x = rng.geometric(p, size=200_000)          # numpy counts trials: support 1, 2, 3, ...
+
+print(f"P(X = 10)   sim {np.mean(x == 10):.4f}   exact {(5/6)**9 * p:.4f}")
+print(f"P(X &gt;= 10)  sim {np.mean(x &gt;= 10):.4f}   exact {(5/6)**9:.4f}")
+print(f"mean {x.mean():.3f} (1/p = 6)   median {np.median(x):.0f}")
+
+late = x[x &gt; 20] - 20                       # players with no 5 in their first 20 rolls
+print(f"after 20 misses: P(10+ more rolls) {np.mean(late &gt;= 10):.4f}   (no memory: 0.1938)")
+
+for k in [1, 5, 10]:                        # pass@k with p = 0.2 per sample
+    print(f"pass@{k:&lt;2d} = 1 - 0.8**{k:&lt;2d} = {1 - 0.8**k:.3f}")</pre>
+<pre class="out">P(X = 10)   sim 0.0321   exact 0.0323
+P(X &gt;= 10)  sim 0.1936   exact 0.1938
+mean 5.993 (1/p = 6)   median 4
+after 20 misses: P(10+ more rolls) 0.1971   (no memory: 0.1938)
+pass@1  = 1 - 0.8**1  = 0.200
+pass@5  = 1 - 0.8**5  = 0.672
+pass@10 = 1 - 0.8**10 = 0.893</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>« Exactement » contre « au moins ».</b> P(X = 10) = 0,032 et P(X ≥ 10) = 0,194 : six fois plus. C'est la confusion contre laquelle Brunton met en garde.</li>
+      <li><b>Deux conventions.</b> Certains comptent les échecs avant le premier succès : support 0, 1, 2, …, moyenne q/p = 5 pour le dé. numpy (<code>rng.geometric</code>) et scipy (<code>stats.geom</code>) comptent les essais, support 1, 2, …</li>
+      <li><b>Le 5 n'est pas « dû ».</b> Après 20 lancers sans 5, la probabilité d'attendre encore au moins 10 lancers reste (5/6)<sup>9</sup> = 0,194 : la géométrique est sans mémoire, version discrète de la <a href="#n4">notion 4</a>. Croire le contraire est l'erreur du joueur.</li>
+      <li><b>pass@k quand p varie.</b> Si la moitié des problèmes se résout avec p = 0,4 et l'autre jamais, p vaut 0,2 en moyenne, mais pass@5 = ½(1 − 0,6<sup>5</sup>) = 0,461, et non 0,672. La formule 1 − q<sup>k</sup> demande le même p pour chaque essai.</li>
+    </ul>
+  </div></details>
+  <p class="garde">Géométrique(p) : le rang du premier succès dans des essais indépendants de même probabilité p. P(X = k) = q<sup>k−1</sup> p, P(X ≥ k) = q<sup>k−1</sup> (les k − 1 premiers ratent), E[X] = 1/p.</p>
+</section>
+
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>L'exponentielle : attendre un événement rare <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 19 · The Exponential Distribution: Time Between Poisson Events</p>
+  <div class="idee">
+    <p>La loi exponentielle modélise l'instant d'un événement rare : la panne d'une ampoule, la désintégration d'un atome, le moment où l'on est enfin reçu au DMV, le guichet américain des permis de conduire. T est un temps, une variable continue. Sa densité λe<sup>−λt</sup> part de la hauteur λ en t = 0 et décroît.</p>
+    <p>L'ampoule de Brunton dure 100 heures en moyenne, donc λ = 1/100 par heure. Elle tient au moins 50 heures avec probabilité e<sup>−50/100</sup> = e<sup>−1/2</sup> = 0,607 : six ampoules sur dix.</p>
+    <p>Le polonium 210 a une <b>demi-vie</b> de 138 jours : la moitié des atomes a disparu à 138 jours, les trois quarts à 276. La demi-vie est la médiane de T, pas sa moyenne : la vie moyenne d'un atome est de 199 jours.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — 400 ampoules, 400 atomes</div>
+    <div id="v3ctl" class="sl-ctl"></div>
+    <div id="v3sl"></div>
+    <div id="v3plot"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">Le premier panneau montre 400 ampoules ou 400 atomes : un disque plein tant qu'il vit, un cercle vide une fois éteint. Le second donne la courbe de survie e<sup>−λt</sup> et, en rouge, la part encore en vie. Déplace le <b>temps</b>. Ampoules de 100 h en moyenne : à 50 h, il en reste 60,7 % en théorie. Polonium 210 : 50 % à 138 jours, 16 % à 365 jours, 1 % à 917 jours. <b>Laisse passer le temps</b> : chaque demi-vie emporte la moitié de ce qui reste.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>f</i>(<i>t</i>) = λ e<sup>−λ<i>t</i></sup>, <i>t</i> ≥ 0 &nbsp;&nbsp; <i>F</i>(<i>t</i>) = 1 − e<sup>−λ<i>t</i></sup> &nbsp;&nbsp; survie <i>P</i>(<i>T</i> &gt; <i>t</i>) = e<sup>−λ<i>t</i></sup><br><i>P</i>(<i>a</i> &lt; <i>T</i> &lt; <i>b</i>) = e<sup>−λ<i>a</i></sup> − e<sup>−λ<i>b</i></sup> &nbsp;&nbsp; E[<i>T</i>] = 1/λ &nbsp;&nbsp; médiane = demi-vie = ln 2/λ ≈ 0,693/λ</div>
+    <ul>
+      <li>λ &gt; 0 est un <b>taux</b>, fixe : des événements par unité de temps. Son unité fixe celle de t, et λt n'a pas d'unité.</li>
+      <li>T ≥ 0 : l'horloge démarre maintenant, rien n'est arrivé avant. La densité vaut 0 pour t &lt; 0.</li>
+      <li>f(t) est une densité, pas une probabilité : une probabilité est une aire sous f (<a href="lesson-00-04-variables-binomiale-normale.html#n2">l04</a>).</li>
+      <li>L'écart-type vaut aussi 1/λ ; le calcul de E[T] et de Var(T) par intégration est en <a href="lesson-00-08-esperance-variance.html#n8">l08</a>.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — l'attente du prochain spam, et ses aires</div>
+    <div id="f3plot" class="wide"></div>
+    <div id="f3ctl"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">La densité de l'attente entre deux spams ; l'<b>aire violette</b> est P(a &lt; T &lt; b). Le trait rouge marque la moyenne 1/λ, le pointillé la médiane, toujours à gauche de la moyenne : c'est la signature d'une queue à droite. À 4 spams par heure, entre a = 15 et b = 30 min : e<sup>−1</sup> − e<sup>−2</sup> = 0,233. Pousse <b>b</b> au bout : l'aire devient la survie P(T &gt; a). Monte <b>λ</b> : la courbe part plus haut et l'attente raccourcit.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>les spams, l'ampoule, le polonium</small></summary><div class="in">
+    <ol>
+      <li><b>Les spams du fil rouge</b>, 4 par heure : attente moyenne 1/4 h = 15 min. P(T &gt; 15 min) = e<sup>−1</sup> = 0,368 ; P(T &gt; 30 min) = e<sup>−2</sup> = 0,135 ; P(15 &lt; T &lt; 30) = 0,233. Médiane ln 2/4 h = 10,4 min. 63 % des attentes sont plus courtes que la moyenne.</li>
+      <li><b>L'ampoule</b> de 100 h en moyenne : P(T ≥ 50) = e<sup>−0,5</sup> = 0,607 ; P(50 &lt; T &lt; 100) = e<sup>−0,5</sup> − e<sup>−1</sup> = 0,239 ; médiane 100 ln 2 = 69,3 h.</li>
+      <li><b>Le polonium 210</b>, demi-vie 138 jours : λ = ln 2/138 = 0,00502 par jour. Un atome passe l'année avec probabilité e<sup>−365λ</sup> = 2<sup>−365/138</sup> = 0,160. 99 % d'un échantillon a disparu au bout de ln 100/λ = 917 jours, 2,5 ans. Vie moyenne 1/λ = 199 jours.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>répartition, survie, intervalle, médiane, moyenne</small></summary><div class="in">
+    <div class="drv">
+      <div><i>F</i>(<i>t</i>) = ∫<sub>0</sub><sup><i>t</i></sup> λ e<sup>−λ<i>u</i></sup> d<i>u</i> = [−e<sup>−λ<i>u</i></sup>]<sub>0</sub><sup><i>t</i></sup> = 1 − e<sup>−λ<i>t</i></sup></div><span>la densité est nulle avant 0, on intègre depuis 0 ; primitive de l'exponentielle</span>
+      <div><i>F</i>(<i>t</i>) → 1 quand <i>t</i> → ∞</div><span>l'aire totale vaut 1 : c'est bien une densité</span>
+      <div><i>P</i>(<i>T</i> &gt; <i>t</i>) = 1 − <i>F</i>(<i>t</i>) = e<sup>−λ<i>t</i></sup></div><span>complément</span>
+      <div><i>P</i>(<i>a</i> &lt; <i>T</i> &lt; <i>b</i>) = <i>F</i>(<i>b</i>) − <i>F</i>(<i>a</i>) = e<sup>−λ<i>a</i></sup> − e<sup>−λ<i>b</i></sup></div><span>aire entre a et b</span>
+      <div>1 − e<sup>−λ<i>m</i></sup> = ½ ⟹ e<sup>−λ<i>m</i></sup> = ½ ⟹ <i>m</i> = ln 2/λ</div><span>médiane : F(m) = ½ ; c'est le calcul de Brunton pour la demi-vie, lu à l'envers λ = ln 2/t<sub>½</sub></span>
+    </div>
+    <p><b>La moyenne, par l'intuition.</b> À λ événements par heure, une longue durée H en contient à peu près λH, séparés en moyenne de H/(λH) = 1/λ heure. À 4 spams par heure, un spam toutes les 15 minutes.</p>
+    <p><b>La moyenne, en une ligne.</b> Pour une variable positive, E[T] = ∫<sub>0</sub><sup>∞</sup> P(T &gt; t) dt, la version continue de la somme des queues de <a href="lesson-00-08-esperance-variance.html#n11">l08</a>, admise ici. Donc E[T] = ∫<sub>0</sub><sup>∞</sup> e<sup>−λt</sup> dt = 1/λ. Le calcul direct par parties, et la variance 1/λ², sont en <a href="lesson-00-08-esperance-variance.html#n8">l08</a>.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>un million d'atomes de polonium</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(0)
+half_life = 138                                   # polonium-210, in days
+lam = np.log(2) / half_life                       # decay rate per day
+t = rng.exponential(scale=1 / lam, size=1_000_000)  # numpy wants the mean 1/lam
+
+print(f"lam = {lam:.5f} per day   mean life {t.mean():.1f} days (1/lam = {1/lam:.1f})")
+print(f"median {np.median(t):.1f} days   (half-life {half_life})")
+for d in [138, 365, 917]:
+    print(f"P(T &gt; {d} d)   sim {np.mean(t &gt; d):.4f}   exact {np.exp(-lam * d):.4f}")
+
+bulb = rng.exponential(scale=100, size=1_000_000)   # light bulbs, mean 100 h
+print(f"bulb P(T &gt;= 50 h)  sim {np.mean(bulb &gt;= 50):.4f}   exact {np.exp(-0.5):.4f}")
+print(f"bulb P(50 &lt; T &lt; 100)  sim {np.mean((bulb &gt; 50) &amp; (bulb &lt; 100)):.4f}"
+      f"   exact {np.exp(-0.5) - np.exp(-1):.4f}")</pre>
+<pre class="out">lam = 0.00502 per day   mean life 199.0 days (1/lam = 199.1)
+median 137.8 days   (half-life 138)
+P(T &gt; 138 d)   sim 0.4995   exact 0.5000
+P(T &gt; 365 d)   sim 0.1595   exact 0.1599
+P(T &gt; 917 d)   sim 0.0101   exact 0.0100
+bulb P(T &gt;= 50 h)  sim 0.6068   exact 0.6065
+bulb P(50 &lt; T &lt; 100)  sim 0.2393   exact 0.2387</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>La densité n'est pas une probabilité.</b> Pour des spams à 4 par heure, f(0) = λ = 4 (par heure) : plus que 1. La probabilité d'une attente d'exactement 10 minutes est nulle ; seule une aire, comme P(9 &lt; T &lt; 11 min), est une probabilité.</li>
+      <li><b>La demi-vie n'est pas la vie moyenne.</b> 138 jours contre 199 pour le polonium : le rapport est ln 2 = 0,693, la queue droite tirant la moyenne.</li>
+      <li><b>Les unités.</b> λ en « par heure » et t en minutes faussent l'exposant d'un facteur 60. Et numpy attend la moyenne 1/λ, pas λ : <code>rng.exponential(scale=1/lam)</code> (<a href="lesson-00-08-esperance-variance.html#n8">l08</a>).</li>
+      <li><b>Un taux constant est une hypothèse.</b> Les ampoules de cuisine de Brunton « lâchent le jour où on les pose » : elles ne suivent pas une exponentielle (<a href="#n5">notion 5</a>).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (19) estime e<sup>−1/2</sup> de tête, « √e ≈ 1,4, donc à peu près 70 % ». C'est 0,607 : √e = 1,649. Pour P(a &lt; T &lt; b), il dit aussi « e to the minus at minus e to the minus bt » : λ a disparu des exposants ; c'est e<sup>−λa</sup> − e<sup>−λb</sup>. En lisant e<sup>−a</sup> − e<sup>−b</sup>, l'ampoule donnerait P(50 &lt; T &lt; 100) = e<sup>−50</sup> − e<sup>−100</sup> ≈ 2 × 10<sup>−22</sup> au lieu de 0,239. Enfin, il appelle λe<sup>−λt</sup> « la probabilité de T au temps t » : c'est une densité.</div>
+  </div></details>
+  <p class="garde">Exponentielle(λ) : P(T &gt; t) = e<sup>−λt</sup>, E[T] = 1/λ, médiane = demi-vie = ln 2/λ ≈ 0,69/λ. Une probabilité est une aire sous λe<sup>−λt</sup>, jamais une hauteur.</p>
+</section>
+
+<!-- ============================ n4 ============================ -->
+<section class="notion outil" id="n4">
+  <h3>L'absence de mémoire <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 19, 20 · The Hazard Rate and Memoryless Property of the Exponential Distribution</p>
+  <div class="idee">
+    <p>L'image de Brunton : une ampoule dure 1 000 heures en moyenne, et elle a déjà brillé 1 000 heures. Combien lui reste-t-il ? En moyenne, encore 1 000 heures. Tant que la panne n'est pas arrivée, l'avenir est le même qu'au premier jour : l'horloge se remet à zéro à chaque instant.</p>
+    <p>L'intuition dit le contraire : après 1 000 heures sur 1 000 prévues, « on compte les secondes ». C'est vrai d'un objet qui s'use, pas d'une durée exponentielle.</p>
+    <p>Les chiffres du fil rouge : on attend le prochain spam depuis 15 minutes. La probabilité d'attendre encore au moins 30 minutes vaut e<sup>−3</sup>/e<sup>−1</sup> = e<sup>−2</sup> = 0,135, exactement P(T &gt; 30 min) pour une attente qui commence. Les 15 minutes déjà passées ne comptent pour rien.</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — ce qu'il reste à vivre aux ampoules encore allumées</div>
+    <div id="v4ctl" class="sl-ctl"></div>
+    <div id="v4sl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">2 000 ampoules de 1 000 h en moyenne. Les barres sont la vie qui reste aux ampoules encore allumées après s heures ; le pointillé est la loi d'une ampoule neuve, la courbe pleine la théorie pour les survivantes. <b>Exponentielle</b> : quel que soit s, les deux courbes coïncident ; à s = 1 000 h, 36,8 % survivent et il leur reste 1 000 h en moyenne. <b>Usure</b> (durée normale, 1 000 ± 200 h) : à s = 1 000 h, la moitié survit et il ne lui reste que 160 h. Fais glisser <b>s</b>.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>P</i>(<i>T</i> &gt; <i>s</i> + <i>t</i> ∣ <i>T</i> &gt; <i>s</i>) = <i>P</i>(<i>T</i> &gt; <i>t</i>) &nbsp; pour tous <i>s</i>, <i>t</i> ≥ 0 &nbsp;&nbsp;&nbsp; donc &nbsp; E[<i>T</i> − <i>s</i> ∣ <i>T</i> &gt; <i>s</i>] = 1/λ</div>
+    <ul>
+      <li>La barre est un vrai conditionnement, sur l'événement {T &gt; s} « déjà survécu jusqu'à s » (<a href="lesson-00-03-conditionner-bayes-independance.html#n1">l03</a>).</li>
+      <li>Parmi les lois continues sur [0, ∞[, l'exponentielle est la seule à vérifier cette égalité ; en discret, c'est la géométrique (<a href="#n2">notion 2</a>).</li>
+      <li>Sachant T &gt; s, ce qui reste, T − s, suit la même Exponentielle(λ) : la vie restante moyenne vaut 1/λ à tout âge.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — l'attente et son absence de mémoire</div>
+    <div id="f4plot" class="wide"></div>
+    <div class="sl-ctl" id="f4btn"></div>
+    <div id="f4ctl"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">La densité de l'attente du prochain spam ; l'<b>aire violette</b> est P(T &gt; t). Clique sur <b>« déjà attendu 15 min »</b> : la densité sachant T &gt; 15 se superpose, identique, simplement décalée de 15 minutes. L'aire rouge sous cette densité, au-delà de 15 + t, est P(T &gt; 15 + t ∣ T &gt; 15) : elle égale l'aire violette P(T &gt; t) pour tout t, et la valeur affichée le confirme. À t = 30 min : 0,135 des deux côtés.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>l'ampoule, les spams, le dé, et une loi qui s'use</small></summary><div class="in">
+    <ol>
+      <li><b>L'ampoule</b> de 1 000 h en moyenne : 36,8 % passent 1 000 h, et leur vie restante moyenne est de 1 000 h. 13,5 % passent 2 000 h : encore 1 000 h devant elles.</li>
+      <li><b>Les spams</b> : P(T &gt; 45 min ∣ T &gt; 15 min) = e<sup>−3</sup>/e<sup>−1</sup> = e<sup>−2</sup> = 0,135 = P(T &gt; 30 min).</li>
+      <li><b>Le dé</b> : après 20 lancers sans 5, attendre encore au moins 10 lancers a la probabilité (5/6)<sup>9</sup> = 0,194, comme au départ.</li>
+      <li><b>Le contre-exemple, l'usure.</b> Une durée normale de moyenne 1 000 h et d'écart-type 200 h. À 500 h, presque toutes vivent encore et il leur reste 504 h ; à 1 000 h, la moitié vit et il lui reste 160 h ; à 1 500 h, 0,6 % vit et il lui reste 65 h. La vie restante fond : cette loi a de la mémoire.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>trois lignes, puis pourquoi l'exponentielle est la seule</small></summary><div class="in">
+    <div class="drv">
+      <div><i>P</i>(<i>T</i> &gt; <i>s</i> + <i>t</i> ∣ <i>T</i> &gt; <i>s</i>) = <i>P</i>(<i>T</i> &gt; <i>s</i> + <i>t</i> ∩ <i>T</i> &gt; <i>s</i>) / <i>P</i>(<i>T</i> &gt; <i>s</i>)</div><span>définition du conditionnement (<a href="lesson-00-03-conditionner-bayes-independance.html#n1">l03</a>)</span>
+      <div>= <i>P</i>(<i>T</i> &gt; <i>s</i> + <i>t</i>) / <i>P</i>(<i>T</i> &gt; <i>s</i>)</div><span>durer plus que s + t implique durer plus que s</span>
+      <div>= e<sup>−λ(<i>s</i>+<i>t</i>)</sup> / e<sup>−λ<i>s</i></sup> = e<sup>−λ<i>t</i></sup> = <i>P</i>(<i>T</i> &gt; <i>t</i>)</div><span>survie de la <a href="#n3">notion 3</a> ; e<sup>a+b</sup> = e<sup>a</sup>e<sup>b</sup></span>
+    </div>
+    <p>Tout tient dans la dernière ligne : la survie e<sup>−λt</sup> transforme une somme de durées en produit de probabilités, donc le rapport ne garde que t.</p>
+    <p><b>La seule loi continue sans mémoire</b> (culture). L'égalité s'écrit S(s + t) = S(s) S(t) pour la survie S. Alors S(2) = S(1)², S(n) = S(1)<sup>n</sup>, S(1/m)<sup>m</sup> = S(1), donc S(r) = S(1)<sup>r</sup> pour tout rationnel r ; avec 0 &lt; S(1) &lt; 1 (sinon T = 0 ou T = ∞), et S étant décroissante, S(t) = S(1)<sup>t</sup> = e<sup>−λt</sup> pour tout t, avec λ = −ln S(1). C'est l'exponentielle.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>ampoules sans mémoire contre ampoules qui s'usent</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(1)
+expo = rng.exponential(scale=1000, size=400_000)   # memoryless bulbs, mean 1000 h
+wear = rng.normal(1000, 200, size=400_000)         # bulbs that wear out, mean 1000 h
+
+print("already on   exponential: alive, h left   |   wear: alive, h left")
+for s in [0, 500, 1000, 1500]:
+    e = expo[expo &gt; s] - s                          # remaining life of the survivors
+    w = wear[wear &gt; s] - s
+    print(f"  {s:5d} h      {np.mean(expo &gt; s):.3f}  {e.mean():5.0f}"
+          f"         |          {np.mean(wear &gt; s):.3f}  {w.mean():5.0f}")</pre>
+<pre class="out">already on   exponential: alive, h left   |   wear: alive, h left
+      0 h      1.000    997         |          1.000   1000
+    500 h      0.606    996         |          0.994    504
+   1000 h      0.367    994         |          0.501    159
+   1500 h      0.222    991         |          0.006     62</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Ce n'est pas vrai de toute durée.</b> Seule une durée exponentielle, à taux de risque constant, est sans mémoire. Une ampoule qui s'use a de la mémoire (exemple 4) ; une pièce fragile au début aussi (<a href="#n5">notion 5</a>).</li>
+      <li><b>La condition compte.</b> P(T &gt; s + t ∣ T &gt; s) n'est pas P(T &gt; s + t). Pour les spams, attendre plus de 45 minutes depuis le début vaut e<sup>−3</sup> = 0,050 ; sachant les 15 premières déjà passées, 0,135.</li>
+      <li><b>Le paradoxe de l'arrêt de bus.</b> Des bus passent selon un processus de Poisson, un toutes les 10 minutes en moyenne. Un passager qui arrive au hasard attend en moyenne 10 minutes, pas 5 : l'absence de mémoire remet son attente à zéro. L'intervalle entre deux bus dans lequel il tombe dure, lui, 20 minutes en moyenne : un long intervalle a plus de chances d'attraper un passager.</li>
+      <li><b>σ = moyenne n'explique pas l'absence de mémoire</b> : c'en est une conséquence, et une log-normale peut avoir σ = moyenne avec de la mémoire (<a href="lesson-00-08-esperance-variance.html#n8">l08</a>).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (20) ouvre en disant qu'il existe une probabilité de panne future « qui change avec le temps ». Pour l'exponentielle, c'est l'inverse : le risque de panne dans l'heure qui vient est le même à tout âge. C'est tout le contenu de l'absence de mémoire, et il le dit lui-même dans la phrase suivante.</div>
+  </div></details>
+  <p class="garde">Une durée exponentielle est sans mémoire : P(T &gt; s + t ∣ T &gt; s) = P(T &gt; t), donc après s sans événement il reste encore 1/λ en moyenne. C'est la seule loi continue qui le fait.</p>
+</section>
+
+<!-- ============================ n5 ============================ -->
+<section class="notion culture" id="n5">
+  <h3>Le taux de risque : jeunesse, hasard, usure <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 20</p>
+  <div class="idee">
+    <p>Brunton propose une lecture plus intuitive de l'absence de mémoire. Une ampoule a tenu jusqu'à l'instant t. Quelle est la probabilité qu'elle lâche dans le petit instant dt qui suit ? Pour l'exponentielle, c'est λ dt, quel que soit t. λ est le <b>taux de risque</b> (hazard rate) : un risque par unité de temps, constant.</p>
+    <p>Avec λ = 1/1 000 par heure, une ampoule allumée a une chance sur mille de griller dans l'heure qui vient, qu'elle soit neuve ou qu'elle ait 3 000 heures.</p>
+    <p>Les vraies durées de vie ont rarement un taux constant. Les ampoules de la cuisine de Brunton « lâchent le jour où on les pose » : un taux élevé au début, ce sont les <b>pannes de jeunesse</b>. Une machine qui vieillit a un taux qui monte, c'est l'<b>usure</b>. Additionnés (l'ampoule meurt de la première cause qui frappe), un risque de jeunesse, un risque constant (le hasard) et un risque d'usure dessinent la <b>courbe en baignoire</b>.</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — taux constant, et courbe en baignoire</div>
+    <div id="v5ctl" class="sl-ctl"></div>
+    <div id="v5sl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">Le taux de risque h(t), en pannes pour 1 000 heures, selon l'âge t de l'ampoule. <b>Taux constant</b> : un trait plat à 1, et une ampoule vivante a 9,5 % de chances de griller dans les 100 h qui suivent, à tout âge. <b>Baignoire</b> : la somme de trois risques en pointillé, jeunesse, hasard et usure. Une ampoule neuve a 31 % de chances de griller dans ses 100 premières heures ; vers 1 200 h, au fond de la baignoire, 9,5 % comme le taux constant ; à 3 000 h, 23 %. Fais glisser l'<b>âge</b>.</p>
+  </div>
+  <div class="formule"><div class="lbl">La définition</div>
+    <div class="eq"><i>h</i>(<i>t</i>) = <i>f</i>(<i>t</i>) / <i>S</i>(<i>t</i>), &nbsp; <i>S</i>(<i>t</i>) = <i>P</i>(<i>T</i> &gt; <i>t</i>) &nbsp;&nbsp;&nbsp; <i>P</i>(<i>t</i> &lt; <i>T</i> ≤ <i>t</i> + d<i>t</i> ∣ <i>T</i> &gt; <i>t</i>) ≈ <i>h</i>(<i>t</i>) d<i>t</i><br>exponentielle : <i>h</i>(<i>t</i>) = λ &nbsp;&nbsp;&nbsp; en général : <i>S</i>(<i>t</i>) = exp(−∫<sub>0</sub><sup><i>t</i></sup> <i>h</i>(<i>u</i>) d<i>u</i>)</div>
+    <ul>
+      <li>dt est petit : l'approximation est au premier ordre en dt.</li>
+      <li>h est un <b>taux</b>, en « par heure » ; h dt est une <b>probabilité</b>, sans unité. h peut dépasser 1, h dt non, tant que dt est petit.</li>
+      <li>La formule générale et la baignoire vont au-delà de Brunton, qui ne traite que le cas constant.</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>l'ampoule à taux constant, la Weibull, l'usure</small></summary><div class="in">
+    <ol>
+      <li><b>Taux constant</b>, λ = 1/1 000 par heure. Dans l'heure qui suit : 1 − e<sup>−0,001</sup> = 0,0009995 ≈ λ × 1 h = 0,001, à tout âge. Dans la minute qui suit : λ dt = 0,001/60 = 1,7 × 10<sup>−5</sup>. La probabilité dépend de dt ; le taux, lui, reste 0,001 par heure.</li>
+      <li><b>La loi de Weibull</b>, la loi standard des durées de vie : h(t) = (k/η)(t/η)<sup>k−1</sup>. Pour k &lt; 1 le taux décroît (jeunesse), pour k = 1 il est constant et l'on retrouve l'exponentielle, pour k &gt; 1 il croît (usure). La baignoire de la vignette additionne une Weibull de forme 0,5, un taux constant et une Weibull de forme 5.</li>
+      <li><b>L'usure de la notion 4</b>, durée normale 1 000 ± 200 h : à 1 000 h, h = f/S = 0,0040 par heure, quatre fois le taux d'une ampoule exponentielle de même moyenne, et il continue de monter.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>le taux, la route de Brunton, et son devoir</small></summary><div class="in">
+    <div class="drv">
+      <div><i>P</i>(<i>t</i> &lt; <i>T</i> ≤ <i>t</i> + d<i>t</i> ∣ <i>T</i> &gt; <i>t</i>) = [<i>S</i>(<i>t</i>) − <i>S</i>(<i>t</i> + d<i>t</i>)] / <i>S</i>(<i>t</i>)</div><span>conditionnement ; {t &lt; T ≤ t + dt} est inclus dans {T &gt; t}</span>
+      <div>≈ <i>f</i>(<i>t</i>) d<i>t</i> / <i>S</i>(<i>t</i>) = <i>h</i>(<i>t</i>) d<i>t</i></div><span>S(t) − S(t + dt) ≈ f(t) dt au premier ordre, car S′ = −f</span>
+      <div>exponentielle : λe<sup>−λ<i>t</i></sup> / e<sup>−λ<i>t</i></sup> = λ</div><span>le taux ne dépend pas de t</span>
+    </div>
+    <p><b>La route de Brunton</b> passe par l'absence de mémoire : P(T ≤ t + dt ∣ T &gt; t) = 1 − P(T &gt; dt) = 1 − e<sup>−λdt</sup> = λ dt − (λ dt)²/2 + ⋯ ≈ λ dt, par le développement de Taylor de l'exponentielle.</p>
+    <p><b>Son devoir, la réciproque.</b> Si h(t) = λ pour tout t, alors f = λS ; or f = −S′, donc S′ = −λS, une équation différentielle dont la solution avec S(0) = 1 est S(t) = e<sup>−λt</sup>. Un taux constant force l'exponentielle. En général, h = −S′/S = −(ln S)′, d'où S(t) = exp(−∫<sub>0</sub><sup>t</sup> h).</p>
+    <p><b>Pourquoi la baignoire est une somme.</b> Si l'ampoule meurt de la première de trois causes indépendantes, T = min(T<sub>1</sub>, T<sub>2</sub>, T<sub>3</sub>) et S = S<sub>1</sub>S<sub>2</sub>S<sub>3</sub> (indépendance) ; donc −ln S = Σ −ln S<sub>i</sub> et, en dérivant, h = h<sub>1</sub> + h<sub>2</sub> + h<sub>3</sub>.</p>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>h n'est pas une probabilité.</b> C'est un taux : il dépasse 1 sans problème, et pour la jeunesse (Weibull de forme &lt; 1) il est infini en t = 0. La probabilité de panne dans [t, t + dt] est h dt, et seulement pour dt petit.</li>
+      <li><b>« Taux constant » se vérifie.</b> On découpe les âges en tranches et on calcule, parmi les objets encore vivants au début de chaque tranche, la part qui meurt dans la tranche. Si cette part bouge avec l'âge, l'exponentielle est fausse, et avec elle l'absence de mémoire.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (20) appelle « λ dt » le taux de risque. Le taux de risque est λ ; λ dt est la probabilité de panne dans [t, t + dt] sachant qu'on a survécu jusqu'à t. Chiffré : avec λ = 1/1 000 par heure, λ dt vaut 0,001 pour dt = 1 h et 1,7 × 10<sup>−5</sup> pour dt = 1 min, alors que le taux n'a pas bougé. Il ne définit pas h(t) = f(t)/S(t) pour d'autres lois et ne trace pas de baignoire : ce sont des ajouts de la leçon.</div>
+  </div></details>
+  <p class="garde">Le taux de risque h(t) = f(t)/S(t) est un risque par unité de temps sachant la survie ; h dt est une probabilité. Taux constant ⇔ exponentielle ⇔ sans mémoire ; les vraies durées suivent plutôt une baignoire : jeunesse, hasard, usure.</p>
+</section>
+
+<!-- ============================ n6 ============================ -->
+<section class="notion outil" id="n6">
+  <h3>Le processus de Poisson : compter et attendre <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 21 · The Connection Between the Exponential Distribution and the Poisson Process</p>
+  <div class="idee">
+    <p>Brunton relie les deux lois par une frise. Des mails arrivent au hasard, 5 par minute en moyenne. On marque chaque arrivée d'une croix sur l'axe du temps ; les écarts W<sub>1</sub>, W<sub>2</sub>, W<sub>3</sub>… entre deux croix sont les attentes.</p>
+    <p>Deux questions sur la même frise. Combien de temps jusqu'au prochain mail ? Une attente exponentielle de taux λ = 5 par minute, 12 secondes en moyenne. Combien de mails dans une fenêtre de t minutes ? Un compte de Poisson de paramètre λt : en une minute, 5 en moyenne. Poisson compte, l'exponentielle chronomètre.</p>
+    <p>Le lien tient en une phrase : « aucun mail pendant t » et « la première attente dépasse t » sont le même événement. D'où P(N(t) = 0) = e<sup>−5t</sup> = P(T &gt; t). Un mail n'a rien de rare, mais dans chaque tranche infime de temps il l'est : c'est la binomiale à n grand de la <a href="#n1">notion 1</a>.</p>
+  </div>
+  <div class="fig vis" id="v6">
+    <div class="lbl">Voir l'idée — une heure de mails, comptée et chronométrée</div>
+    <div id="v6ctl" class="sl-ctl"></div>
+    <div id="v6sl"></div>
+    <div id="v6plot"></div>
+    <div class="readouts" id="v6out"></div>
+    <p class="cap">En haut, les 4 premières minutes d'une heure de mails à 5 par minute : une croix par mail, les attentes W<sub>1</sub>, W<sub>2</sub>, W<sub>3</sub>, et des fenêtres de durée t avec leur compte. En bas, toute l'heure : le premier panneau donne les attentes, contre la densité exponentielle (12 s en moyenne) ; le second, les comptes par fenêtre, contre les probabilités de Poisson(5t) en points rouges. Change la <b>fenêtre</b> : la moyenne et la variance des comptes suivent ensemble 5t, les attentes ne bougent pas.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">attentes <i>W</i><sub>1</sub>, <i>W</i><sub>2</sub>, … i.i.d. Exponentielle(λ) &nbsp;⟺&nbsp; dans toute fenêtre de durée <i>t</i>, le compte <i>N</i>(<i>t</i>) suit Poisson(λ<i>t</i>), et les comptes de fenêtres disjointes sont indépendants<br><i>P</i>(<i>N</i>(<i>t</i>) = <i>k</i>) = (λ<i>t</i>)<sup><i>k</i></sup> e<sup>−λ<i>t</i></sup> / <i>k</i>!<br><i>P</i>(<i>T</i><sub>1</sub> &gt; <i>t</i>) = <i>P</i>(<i>N</i>(<i>t</i>) = 0) = e<sup>−λ<i>t</i></sup> &nbsp;&nbsp;&nbsp; E[<i>N</i>(<i>t</i>)] = Var(<i>N</i>(<i>t</i>)) = λ<i>t</i></div>
+    <ul>
+      <li>N(t) compte les arrivées dans une fenêtre de durée t ; T<sub>1</sub> = W<sub>1</sub> est l'instant de la première arrivée.</li>
+      <li><b>Indépendantes</b> : les attentes ne se parlent pas, et les comptes de fenêtres disjointes sont indépendants.</li>
+      <li><b>De même loi</b> : un seul taux λ, constant dans le temps. Brunton le dit faux pour ses mails (beaucoup le lundi à 9 h, peu le dimanche soir) et vrai à peu près pendant la journée de travail.</li>
+      <li>λ a une unité (mails par minute), λt n'en a pas. Le λ de la notion 1 était un nombre moyen ; ici c'est un taux, et le paramètre de Poisson est λt.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig5">
+    <div class="lbl">Figure 5 — zéro mail, un mail, et le facteur 5t</div>
+    <div id="f5plot" class="wide"></div>
+    <div id="f5ctl"></div>
+    <div class="readouts" id="f5out"></div>
+    <p class="cap">À 5 mails par minute, la probabilité d'avoir 0, 1 ou 2 mails dans une fenêtre de t minutes. La courbe de « 0 mail » est aussi la survie de l'attente, e<sup>−5t</sup>. Le pointillé ocre est la formule de Brunton pour « 1 mail », 5e<sup>−5t</sup> : elle part de 5 et dépasse 1 tant que t &lt; 0,32 min, ce qu'aucune probabilité ne fait. Déplace <b>t</b> : le rapport P(1)/P(0) vaut 5t, 0,5 à t = 0,1 min et 5 seulement à t = 1 min.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>les mails, les spams, une API de LLM, la table du processus</small></summary><div class="in">
+    <ol>
+      <li><b>Les mails de Brunton</b>, 5 par minute. En une minute : P(0) = e<sup>−5</sup> = 0,0067 ; P(1) = 5e<sup>−5</sup> = 0,034, cinq fois plus. En six secondes (t = 0,1 min) : P(0) = e<sup>−0,5</sup> = 0,607 ; P(1) = 0,5 e<sup>−0,5</sup> = 0,303, deux fois moins. Vingt minutes sans mail : e<sup>−100</sup> = 3,7 × 10<sup>−44</sup>.</li>
+      <li><b>Les spams du fil rouge</b>, 4 par heure : en une heure, Poisson(4) (<a href="#n1">notion 1</a>) ; entre deux spams, une exponentielle de moyenne 15 min (<a href="#n3">notion 3</a>). En 30 min, Poisson(2) : P(0) = e<sup>−2</sup> = 0,135 = P(T &gt; 30 min).</li>
+      <li><b>ML, une API de LLM</b> qui reçoit λ = 20 requêtes par seconde. L'écart entre deux requêtes est exponentiel, 50 ms en moyenne, et 18 % des écarts font moins de 10 ms. Dans une fenêtre de 100 ms, le compte suit Poisson(2) : vide 13,5 % du temps, 5 requêtes ou plus 5,3 % du temps. Par seconde, Poisson(20) : un service qui traite 31 requêtes par seconde suffit 99,2 % des secondes ; dimensionné sur la moyenne, 20 par seconde, il serait débordé 44 % des secondes.</li>
+      <li><b>Une frise, quatre questions.</b>
+        <table>
+          <tr><th>question</th><th>loi</th><th>moyenne</th></tr>
+          <tr><td>combien d'événements pendant t ?</td><td>Poisson(λt)</td><td>λt</td></tr>
+          <tr><td>combien de temps jusqu'au prochain ?</td><td>Exponentielle(λ)</td><td>1/λ</td></tr>
+          <tr><td>combien de temps jusqu'au r-ième ?</td><td>Gamma(r, λ) (<a href="#n7">notion 7</a>)</td><td>r/λ</td></tr>
+          <tr><td>en temps discret, à quel essai le premier succès ?</td><td>Géométrique(p) (<a href="#n2">notion 2</a>)</td><td>1/p</td></tr>
+        </table>
+      </li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>l'attente à partir du compte, le compte à partir de la notion 1</small></summary><div class="in">
+    <div class="drv">
+      <div>{<i>T</i><sub>1</sub> &gt; <i>t</i>} = {<i>N</i>(<i>t</i>) = 0}</div><span>la première arrivée est après t si et seulement si la fenêtre [0, t] est vide</span>
+      <div><i>P</i>(<i>T</i><sub>1</sub> &gt; <i>t</i>) = (λ<i>t</i>)<sup>0</sup> e<sup>−λ<i>t</i></sup> / 0! = e<sup>−λ<i>t</i></sup></div><span>Poisson(λt) en 0</span>
+      <div><i>T</i><sub>1</sub> ~ Exponentielle(λ)</div><span>c'est la survie de la <a href="#n3">notion 3</a></span>
+    </div>
+    <p><b>Pourquoi le compte est Poisson(λt).</b> On découpe [0, t] en n tranches de durée t/n. Dans chacune, un mail arrive avec probabilité ≈ λt/n, deux mails avec une probabilité d'ordre (λt/n)², négligeable, et les tranches sont indépendantes. Le compte est donc une Binomiale(n, λt/n), dont la limite quand n → ∞ est Poisson(λt) par la <a href="#n1">notion 1</a>. C'est le « rare dans une tranche infime » de Brunton.</p>
+    <p><b>Pourquoi toutes les attentes ont la même loi</b>, en esquisse. Après la première arrivée, ce qui suit ne dépend pas de ce qui précède (comptes indépendants sur des fenêtres disjointes) : le processus repart à zéro, W<sub>2</sub> a la loi de W<sub>1</sub> et en est indépendante ; de même pour W<sub>3</sub>, W<sub>4</sub>, …</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>des attentes exponentielles fabriquent des comptes de Poisson</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(0)
+lam = 5.0                                          # emails per minute
+gaps = rng.exponential(scale=1 / lam, size=500_000)  # waiting times W1, W2, ...
+arrivals = np.cumsum(gaps)                         # arrival times T1, T2, ...
+H = np.floor(arrivals[-1])                         # whole minutes covered
+print(f"mean gap {60 * gaps.mean():.2f} s   (1/lam = 12 s)")
+
+for t in [0.1, 1.0]:
+    edges = np.arange(0, H + 1e-9, t)              # windows of t minutes
+    counts = np.histogram(arrivals, bins=edges)[0] # N(t) in each window
+    p0, p1 = np.exp(-lam * t), lam * t * np.exp(-lam * t)
+    print(f"t = {t} min: mean {counts.mean():.3f}  var {counts.var():.3f}  (lam t = {lam * t})")
+    print(f"   P(N = 0) {np.mean(counts == 0):.4f} vs {p0:.4f}"
+          f"   P(N = 1) {np.mean(counts == 1):.4f} vs {p1:.4f}   ratio 5t = {lam * t}")</pre>
+<pre class="out">mean gap 11.99 s   (1/lam = 12 s)
+t = 0.1 min: mean 0.500  var 0.500  (lam t = 0.5)
+   P(N = 0) 0.6065 vs 0.6065   P(N = 1) 0.3030 vs 0.3033   ratio 5t = 0.5
+t = 1.0 min: mean 5.003  var 5.030  (lam t = 5.0)
+   P(N = 0) 0.0068 vs 0.0067   P(N = 1) 0.0343 vs 0.0337   ratio 5t = 5.0</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Le taux varie.</b> Lundi 9 h contre dimanche soir, heures de pointe d'une API. Même si chaque heure est Poisson, le mélange d'heures calmes et chargées donne des comptes <b>surdispersés</b>, Var &gt; E. Le test : comparer la variance et la moyenne des comptes par fenêtre.</li>
+      <li><b>Les arrivées se suivent.</b> Des clients qui relancent leurs requêtes en rafale après une erreur, un cron qui envoie tout à l'heure pile : les attentes ne sont plus indépendantes, et dimensionner sur Poisson sous-estime les pics.</li>
+      <li><b>λ ou λt.</b> P(N(t) = k) a (λt)<sup>k</sup> au numérateur, pas λ<sup>k</sup>. Écrire λ<sup>k</sup>e<sup>−λt</sup>/k! mélange un taux et un nombre moyen.</li>
+      <li><b>Compter n'est pas faire la queue.</b> L'exemple de l'API compte des arrivées par seconde ; si chaque requête prend du temps, la latence relève de la théorie des files d'attente, hors de cette leçon.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (21) écrit P(1 mail en t) = 5e<sup>−5t</sup> et conclut qu'un mail est « cinq fois plus probable » que zéro. C'est 5t e<sup>−5t</sup> : le rapport vaut 5t, soit 5 pour t = 1 min et 0,5 pour t = 6 s. Sa formule dépasse 1 pour t &lt; 0,32 min, signe qu'elle n'est pas une probabilité. En cherchant la loi, il dit « λ<sup>k</sup> e<sup>−λt</sup>/k! » : c'est (λt)<sup>k</sup>. Et quand il dit qu'attendre 20 minutes sans mail est « un très grand nombre », il pense sans doute à l'exposant, 5 × 20 = 100 ; la probabilité est e<sup>−100</sup> = 3,7 × 10<sup>−44</sup>.</div>
+  </div></details>
+  <p class="garde">Processus de Poisson de taux λ : attentes i.i.d. Exponentielle(λ), compte Poisson(λt) dans une fenêtre de durée t, car « aucun événement pendant t » = « attente &gt; t », de probabilité e<sup>−λt</sup>.</p>
+</section>
+
+<!-- ============================ n7 ============================ -->
+<section class="notion culture" id="n7">
+  <h3>La loi Gamma : attendre le r-ième ; série contre parallèle <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 22 · The Gamma Distribution</p>
+  <div class="idee">
+    <p>Combien de temps faut-il attendre le 10<sup>e</sup> mail ? Brunton prévient : « ce n'est pas juste 10 fois l'exponentielle ». C'est la somme de 10 attentes indépendantes, T<sub>10</sub> = W<sub>1</sub> + ⋯ + W<sub>10</sub>. La loi de la somme de r attentes exponentielles de taux λ s'appelle la <b>loi Gamma</b>(r, λ), de moyenne r/λ.</p>
+    <p>À 5 mails par minute, le 10<sup>e</sup> arrive en 2 minutes en moyenne. Dix fois une seule attente a la même moyenne, mais un écart-type de 2 minutes, contre 0,63 pour la somme : dans une somme, les attentes longues et courtes se compensent.</p>
+    <p>Au DMV, chaque guichet prend 15 minutes en moyenne. S'il faut passer par trois guichets l'un après l'autre, A puis B puis C, on attend une Gamma(3, 1/15) : 45 minutes en moyenne. Si trois guichets sont ouverts en parallèle et qu'on prend le premier libre, on attend le minimum des trois : 5 minutes en moyenne.</p>
+  </div>
+  <div class="fig vis" id="v7">
+    <div class="lbl">Voir l'idée — trois guichets du DMV, en série ou en parallèle</div>
+    <div id="v7ctl" class="sl-ctl"></div>
+    <div id="v7plot"></div>
+    <div class="readouts" id="v7out"></div>
+    <p class="cap">En haut, un client : chaque barre est un guichet, d'une durée exponentielle de moyenne 15 min. <b>En série</b>, les barres s'enchaînent en escalier et l'attente est leur somme. <b>En parallèle</b>, les trois guichets sont occupés au même moment et l'attente s'arrête à la première barre qui finit (en rouge). En bas, l'histogramme des clients servis, contre la densité théorique : Gamma(3, 1/15), 45 min en moyenne, ou Exponentielle(3/15), 5 min. <b>Fais passer 200 clients.</b></p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>T<sub>r</sub></i> = <i>W</i><sub>1</sub> + ⋯ + <i>W<sub>r</sub></i> ~ Gamma(<i>r</i>, λ) : &nbsp; <i>f</i>(<i>t</i>) = λ<sup><i>r</i></sup> <i>t</i><sup><i>r</i>−1</sup> e<sup>−λ<i>t</i></sup> / (<i>r</i> − 1)!, <i>t</i> ≥ 0 &nbsp;&nbsp; E = <i>r</i>/λ, &nbsp; Var = <i>r</i>/λ²<br>survie : <i>P</i>(<i>T<sub>r</sub></i> &gt; <i>t</i>) = Σ<sub><i>k</i>=0</sub><sup><i>r</i>−1</sup> e<sup>−λ<i>t</i></sup> (λ<i>t</i>)<sup><i>k</i></sup> / <i>k</i>! &nbsp;&nbsp;&nbsp; parallèle : min(<i>W</i><sub>1</sub>, …, <i>W<sub>r</sub></i>) ~ Exponentielle(<i>r</i>λ)</div>
+    <ul>
+      <li>Les W<sub>i</sub> sont i.i.d. Exponentielle(λ). L'<b>indépendance</b> fait additionner les variances et multiplier les survies du minimum ; la <b>même loi</b> fait que chaque terme apporte 1/λ à la moyenne et 1/λ² à la variance.</li>
+      <li>r est un entier : on parle aussi de loi d'Erlang. Pour r réel positif, (r − 1)! est remplacé par la fonction Γ(r), d'où le nom. r = 1 redonne l'exponentielle.</li>
+      <li>scipy écrit <code>stats.gamma(a=r, scale=1/λ)</code> : encore la moyenne, pas le taux.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig6">
+    <div class="lbl">Figure 6 — r attentes contre r fois une attente</div>
+    <div id="f6plot" class="wide"></div>
+    <div id="f6ctl"></div>
+    <div class="readouts" id="f6out"></div>
+    <p class="cap">À 5 mails par minute, la densité de T<sub>r</sub>, l'attente du r-ième mail (bleu), contre celle de r × W, r fois une seule attente (rouge, pointillé). Même moyenne r/5 (trait vertical), mais la somme se resserre : écart-type √r/5 contre r/5. À <b>r = 10</b>, attendre plus de 3 minutes a la probabilité 0,070 pour la somme et 0,223 pour 10 × W. À r = 1, les deux courbes sont la même exponentielle.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>r = 1, le 10<sup>e</sup> mail, le DMV, un batch d'inférence, une guirlande</small></summary><div class="in">
+    <ol>
+      <li><b>r = 1</b> : Gamma(1, λ) a la densité λe<sup>−λt</sup>, c'est l'exponentielle.</li>
+      <li><b>Le 10<sup>e</sup> mail</b> à 5 par minute : moyenne 2 min, écart-type √10/5 = 0,63 min. P(T<sub>10</sub> &gt; 3 min) = 0,070, contre 0,223 si l'on prenait 10 × W.</li>
+      <li><b>Le DMV en série</b> : moyenne 3 × 15 = 45 min, variance 3 × 15² = 675, écart-type 26 min. Plus de 45 minutes ? C'est avoir au plus 2 passages en 45 minutes, N(45) ~ Poisson(3) : e<sup>−3</sup>(1 + 3 + 4,5) = 0,423. <b>En parallèle</b> : 5 min en moyenne, et P(min &gt; 15) = e<sup>−3</sup> = 0,050.</li>
+      <li><b>ML, un batch d'inférence.</b> Un serveur attend r = 8 requêtes avant de lancer un batch, à 20 requêtes par seconde : le remplissage suit Gamma(8, 20), 0,4 s en moyenne. Le batch est plein en moins de 0,5 s si au moins 8 requêtes arrivent en 0,5 s : P(Poisson(10) ≥ 8) = 0,780.</li>
+      <li><b>La guirlande de Brunton</b>, trois ampoules de 1 000 h en moyenne : la première panne est un minimum, Exponentielle de moyenne 1 000/3 = 333 h.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la survie par Poisson, la densité par une somme qui télescope, le minimum</small></summary><div class="in">
+    <div class="drv">
+      <div>{<i>T<sub>r</sub></i> &gt; <i>t</i>} = {<i>N</i>(<i>t</i>) ≤ <i>r</i> − 1}</div><span>le r-ième arrive après t si et seulement si moins de r arrivées ont eu lieu pendant t</span>
+      <div><i>P</i>(<i>T<sub>r</sub></i> &gt; <i>t</i>) = Σ<sub><i>k</i>=0</sub><sup><i>r</i>−1</sup> e<sup>−λ<i>t</i></sup>(λ<i>t</i>)<sup><i>k</i></sup>/<i>k</i>!</div><span>N(t) ~ Poisson(λt) (<a href="#n6">notion 6</a>) ; c'est une survie, pas une répartition</span>
+      <div><i>F</i>(<i>t</i>) = 1 − <i>P</i>(<i>T<sub>r</sub></i> &gt; <i>t</i>), &nbsp; <i>f</i>(<i>t</i>) = −d/d<i>t</i> <i>P</i>(<i>T<sub>r</sub></i> &gt; <i>t</i>)</div><span>complément, puis f = F′</span>
+      <div>d/d<i>t</i> [e<sup>−λ<i>t</i></sup>(λ<i>t</i>)<sup><i>k</i></sup>/<i>k</i>!] = −λe<sup>−λ<i>t</i></sup>(λ<i>t</i>)<sup><i>k</i></sup>/<i>k</i>! + λe<sup>−λ<i>t</i></sup>(λ<i>t</i>)<sup><i>k</i>−1</sup>/(<i>k</i> − 1)!</div><span>dérivée d'un produit ; le second terme n'existe pas pour k = 0</span>
+      <div>Σ<sub><i>k</i>=0</sub><sup><i>r</i>−1</sup> … = −λe<sup>−λ<i>t</i></sup>(λ<i>t</i>)<sup><i>r</i>−1</sup>/(<i>r</i> − 1)!</div><span>chaque second terme annule le premier terme du rang précédent : la somme télescope</span>
+      <div><i>f</i>(<i>t</i>) = λe<sup>−λ<i>t</i></sup>(λ<i>t</i>)<sup><i>r</i>−1</sup>/(<i>r</i> − 1)! = λ<sup><i>r</i></sup><i>t</i><sup><i>r</i>−1</sup>e<sup>−λ<i>t</i></sup>/(<i>r</i> − 1)!</div><span>la formule de Brunton, sans les « dot, dot, dot »</span>
+    </div>
+    <p><b>Moyenne et variance.</b> E[T<sub>r</sub>] = r/λ par linéarité (<a href="lesson-00-08-esperance-variance.html#n3">l08</a>), sans hypothèse. Var(T<sub>r</sub>) = r/λ², parce que les variances de termes indépendants s'additionnent (<a href="lesson-00-09-covariance-correlation.html#n2">l09</a>). Pour 10 × W, Var = 10² Var(W) = 100/λ² (<a href="lesson-00-08-esperance-variance.html#n9">l08</a>).</p>
+    <p><b>Le minimum.</b> P(min &gt; t) = P(W<sub>1</sub> &gt; t, …, W<sub>r</sub> &gt; t) = (e<sup>−λt</sup>)<sup>r</sup> = e<sup>−rλt</sup>, par indépendance : c'est la survie d'une Exponentielle(rλ). Trois guichets de taux 1/15 font un guichet de taux 3/15.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>400 000 clients du DMV</small></summary><div class="in">
+<pre class="py">import numpy as np
+from scipy import stats
+
+rng = np.random.default_rng(0)
+w = rng.exponential(scale=15, size=(400_000, 3))   # three desks, 15 min each on average
+
+series = w.sum(axis=1)       # desk A, then B, then C
+parallel = w.min(axis=1)     # three open lanes: wait for the first one to free up
+print(f"series    mean {series.mean():5.2f}  sd {series.std():5.2f}   Gamma(3, 1/15): 45, {np.sqrt(3) * 15:.2f}")
+print(f"parallel  mean {parallel.mean():5.2f}  sd {parallel.std():5.2f}   Exp(3/15): 5, 5")
+print(f"P(series &gt; 45)  sim {np.mean(series &gt; 45):.4f}   Poisson(3) &lt;= 2: {stats.poisson.cdf(2, 3):.4f}"
+      f"   gamma.sf: {stats.gamma.sf(45, a=3, scale=15):.4f}")
+
+gaps = rng.exponential(scale=1 / 5, size=(400_000, 10))   # 10 email gaps, 5 per minute
+t10, ten_w = gaps.sum(axis=1), 10 * gaps[:, 0]
+print(f"10th email: mean {t10.mean():.3f} sd {t10.std():.3f}   10 x one gap: mean {ten_w.mean():.3f} sd {ten_w.std():.3f}")
+print(f"P(&gt; 3 min): sum {np.mean(t10 &gt; 3):.3f}   10 x one gap {np.mean(ten_w &gt; 3):.3f}")</pre>
+<pre class="out">series    mean 45.01  sd 26.02   Gamma(3, 1/15): 45, 25.98
+parallel  mean  5.00  sd  5.00   Exp(3/15): 5, 5
+P(series &gt; 45)  sim 0.4236   Poisson(3) &lt;= 2: 0.4232   gamma.sf: 0.4232
+10th email: mean 1.998 sd 0.632   10 x one gap: mean 1.999 sd 2.001
+P(&gt; 3 min): sum 0.070   10 x one gap 0.222</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>« Série » change de sens.</b> Des guichets en série s'additionnent : Gamma. Une guirlande en série s'éteint à la première ampoule grillée : c'est un minimum, Exponentielle(3λ). Une guirlande en parallèle s'éteint à la dernière : un maximum, ni Gamma ni exponentielle, de moyenne 1 000(1 + ½ + ⅓) = 1 833 h. La première panne est un minimum quel que soit le montage ; c'est l'extinction de la guirlande qui en dépend. Avant toute formule : somme, minimum ou maximum ? (La fiabilité de systèmes en série et en parallèle est en <a href="lesson-00-03-conditionner-bayes-independance.html#n8">l03</a>.)</li>
+      <li><b>r × W n'est pas la somme de r attentes.</b> Même moyenne, mais une variance r fois trop grande (figure 6).</li>
+      <li><b>Le parallèle compte l'attente d'un guichet libre.</b> Une fois au guichet, son propre passage dure encore 15 minutes en moyenne : 5 + 15 = 20 minutes avant de ressortir.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (22) modélise d'abord trois guichets en parallèle par Gamma(3, 1/15), puis soupçonne « un bug ». En parallèle, l'attente est le minimum de trois exponentielles, Exponentielle(3/15), 5 min en moyenne. Gamma(3, 1/15), 45 min, vaut pour trois guichets en série, la version qu'il retient ; il laisse le parallèle en devoir. Il appelle aussi « fonction de répartition » la somme Σ e<sup>−λt</sup>(λt)<sup>k</sup>/k! : c'est la fonction de survie P(T<sub>r</sub> &gt; t) ; la répartition vaut 1 moins elle, et la densité moins sa dérivée.</div>
+  </div></details>
+  <p class="garde">Attendre le r-ième événement d'un flux de taux λ : Gamma(r, λ), somme de r exponentielles indépendantes, moyenne r/λ, variance r/λ². Attendre le premier de r flux en parallèle : le minimum, Exponentielle(rλ).</p>
+</section>
+
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Poisson(λ) : limite de Binomiale(n, λ/n), beaucoup d'occasions indépendantes et rares ; P(X = k ; λ) = λ<sup>k</sup>e<sup>−λ</sup>/k!, E = Var = λ.</li>
+    <li>Ce qui justifie Poisson est p petit à np fixé, pas λ petit.</li>
+    <li>Géométrique(p) : le rang du premier succès ; P(X ≥ k) = q<sup>k−1</sup>, E = 1/p.</li>
+    <li>Exponentielle(λ) : P(T &gt; t) = e<sup>−λt</sup>, E = 1/λ, médiane = demi-vie = ln 2/λ ; une probabilité est une aire.</li>
+    <li>Sans mémoire : P(T &gt; s + t ∣ T &gt; s) = P(T &gt; t) ; c'est un taux de risque constant λ, et λ dt est une probabilité.</li>
+    <li>Processus de Poisson : attentes i.i.d. Exponentielle(λ), comptes Poisson(λt) ; aucun événement pendant t = attente &gt; t.</li>
+    <li>Somme de r attentes : Gamma(r, λ), moyenne r/λ ; premier de r flux en parallèle : Exponentielle(rλ).</li>
+  </ol>
+</div>
+<div class="phrase">« Un comptage d'événements rares mais nombreux en occasions est Poisson, limite de la binomiale à p petit et np fixé, avec une variance égale à la moyenne. Dans un processus de Poisson de taux λ, l'attente du prochain événement est exponentielle, de moyenne 1/λ et sans mémoire, le nombre d'événements dans une fenêtre t est Poisson(λt), et l'attente du r-ième est une Gamma. Si les comptes ont une variance nettement plus grande que leur moyenne, les arrivées ne sont pas indépendantes ou leur taux varie, et le modèle tombe. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Mille essais à une chance sur mille : pourquoi pas la normale, et quelle loi ?</div><div class="a hid">La normale de même moyenne et variance mettrait 16 % de sa masse sous 0. Poisson(1), limite de Binomiale(n, λ/n), avec E = Var = 1.</div></li>
+    <li><div class="q">10 000 néons qui grillent chacun avec probabilité 0,002 : λ = 20 est-il petit, et qu'est-ce qui justifie Poisson ?</div><div class="a hid">λ = 20 n'est pas petit. Ce qui justifie Poisson est p petit à np fixé.</div></li>
+    <li><div class="q">Quelle est la probabilité qu'il faille au moins 10 lancers de dé pour obtenir un 5 ?</div><div class="a hid">C'est que les 9 premiers ratent : (5/6)<sup>9</sup> = 0,194. Exactement 10 : 0,032.</div></li>
+    <li><div class="q">Une ampoule dure 100 h en moyenne : probabilité de tenir 50 h, et médiane ?</div><div class="a hid">e<sup>−1/2</sup> = 0,607, pas 70 % ; médiane 100 ln 2 = 69,3 h.</div></li>
+    <li><div class="q">Une ampoule exponentielle de 1 000 h en moyenne a déjà tenu 1 000 h : combien lui reste-t-il ?</div><div class="a hid">1 000 h en moyenne : P(T &gt; s + t ∣ T &gt; s) = e<sup>−λt</sup>, l'horloge repart de zéro.</div></li>
+    <li><div class="q">Mails à 5 par minute : probabilité de 0 mail en t minutes, puis de 1 mail ?</div><div class="a hid">e<sup>−5t</sup>, qui est aussi P(attente &gt; t) ; puis 5t e<sup>−5t</sup>, un rapport de 5t, et non 5.</div></li>
+    <li><div class="q">Trois guichets de 15 min en moyenne : attente en série, puis en parallèle ?</div><div class="a hid">En série, une somme : Gamma(3, 1/15), 45 min. En parallèle, un minimum : Exponentielle(3/15), 5 min.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Chaînes et leçons</div>
+  <div class="bridges">
+    <a href="../chains/chain-p07-02-bagging-rf.html"><b>Bagging et forêts aléatoires</b><small>(1 − 1/n)<sup>n</sup> → e<sup>−1</sup> = 0,368, la part de lignes hors-sac : la limite de la notion 1, une Poisson(1) en 0.</small></a>
+    <a href="../chains/chain-p01-05-bootstrap.html"><b>Le bootstrap</b><small>Chaque ligne apparaît Binomiale(n, 1/n) ≈ Poisson(1) fois dans un rééchantillon (notion 1, exemple 4).</small></a>
+    <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html"><b>Du bruit à la loss (fil B)</b><small>Indépendance ⇒ produit ⇒ vraisemblance. Appliqué à des comptes Poisson, le geste donne la perte de Poisson, λ − y ln λ à une constante près.</small></a>
+    <a href="../chains/chain-p07-03-boosting.html"><b>Gradient boosting</b><small>La perte de Poisson y figure parmi les pertes possibles, pour régresser un comptage (requêtes par minute, pannes par jour).</small></a>
+    <a href="lesson-00-08-esperance-variance.html#n8"><b>l08 · L'exponentielle : E, Var, médiane</b><small>Les intégrales par parties de E[T] = 1/λ et Var(T) = 1/λ², que cette leçon admet.</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::poisson</code> (notions 1, 6) · <code>stats::geometrique</code> (notion 2) · <code>stats::exponentielle</code> (notions 3, 4, 6). Les notions 5 et 7 sont de la culture, sans carte.</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l05 · v1 du 10/10/2026 · Brunton 17 à 22 · Prérequis : <a href="lesson-00-04-variables-binomiale-normale.html">l04 · Variables aléatoires, de la binomiale à la normale</a>. Suite : <a href="lesson-00-06-fonctions-standardisation.html">l06 · Fonctions d'une variable aléatoire</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* ===== commun à toutes les leçons (kit, étalon l08 v2) ===== */
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc : une entrée par notion, étiquette comprise */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.notion').forEach((s,i)=>{const li=document.createElement('li');const t=s.querySelector('h3').firstChild.textContent.trim();const k=s.classList.contains('culture')?' · culture':'';li.innerHTML=`<a href="#${s.id}">${i+1}. ${t}${k}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.notion').forEach(s=>io.observe(s));
+/* une ancre #nN ouvre la notion visée ; rien n'est replié par défaut hors des blocs */
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outils de dessin ===== */
+function curve(P,f,a,b,cls,ymax){let d='';const n=240;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;let y=f(x);if(!isFinite(y))continue;y=Math.min(y,ymax);d+=(d?' L':'M')+P.sx(x).toFixed(1)+' '+P.sy(y).toFixed(1);}SL.el('path',{d:d,class:'sl-fn '+cls,fill:'none'},P.dyn);}
+function bar(P,x0,x1,y,cls){const a=P.sx(x0),b=P.sx(x1);SL.el('rect',{x:Math.min(a,b),y:P.sy(y),width:Math.max(1.5,Math.abs(b-a)),height:Math.max(0,P.sy(0)-P.sy(y)),class:cls||'sl-bar'},P.dyn);}
+/* SL.plot trace l'axe vertical en x = 0 ; quand 0 porte une barre, on le ramène au bord gauche */
+function leftAxis(P,x0){const ax=P.svg.querySelectorAll('line.sl-axis');if(ax[1]){ax[1].setAttribute('x1',P.sx(x0));ax[1].setAttribute('x2',P.sx(x0));}}
+function rd(host,items){host.innerHTML=items.map(it=>`<div class="${it[2]||''}">${it[0]}<b>${it[1]}</b></div>`).join('');}
+function buttons(host,names,cb){const bs=names.map((n,i)=>{const b=SL.h('button','tb',host,n);b.onclick=()=>{bs.forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');cb(i);};return b;});bs[0].onclick();return bs;}
+
+
+/* ===== v2 : vignettes « voir l'idée », une par notion, juste sous l'idée ===== */
+/* tween : animation 0 → 1 lissée ; runner : un jeton par figure, un nouveau clic tue l'animation en cours */
+function runner(){let t={dead:true};return ()=>{t.dead=true;t={dead:false};return t;};}
+function tween(ms,draw,tk,done){if(SL.reduced){draw(1);if(done)done();return;}const t0=performance.now();const st=t=>{if(tk&&tk.dead)return;let u=Math.min(1,(t-t0)/ms);u=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;draw(u);if(u<1)requestAnimationFrame(st);else if(done)done();};requestAnimationFrame(st);}
+function loop(tk,step){if(SL.reduced){let g=0;while(step()!==false&&g++<1e5);return;}const f=()=>{if(tk.dead)return;if(step()!==false)requestAnimationFrame(f);};requestAnimationFrame(f);}
+function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function pick(r,v,p){let u=r(),a=0;for(let i=0;i<v.length;i++){a+=p[i];if(u<a)return v[i];}return v[v.length-1];}
+function gauss(r){let u=0;while(u===0)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());}
+function fulcrum(P,x){const cx=P.sx(x),cy=P.sy(0);SL.el('path',{d:`M${cx.toFixed(1)} ${(cy+1).toFixed(1)} L${(cx-8).toFixed(1)} ${(cy+16).toFixed(1)} L${(cx+8).toFixed(1)} ${(cy+16).toFixed(1)} Z`,class:'sl-fulcrum'},P.dyn);}
+function median(a){const s=a.slice().sort((x,y)=>x-y),n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;}
+function rect(P,x0,x1,y0,y1,cls,parent){const a=P.sx(x0),b=P.sx(x1),c=P.sy(y0),d=P.sy(y1);return SL.el('rect',{x:Math.min(a,b).toFixed(1),y:Math.min(c,d).toFixed(1),width:Math.abs(b-a).toFixed(1),height:Math.abs(d-c).toFixed(1),class:cls},parent||P.dyn);}
+/* pile de pastilles : une par individu, regroupées par classe de largeur bw */
+function stack(P,vals,bw,r,clsOf,centred){const bins=new Map();vals.forEach((v,i)=>{const b=centred?Math.round(v/bw):Math.floor(v/bw);if(!bins.has(b))bins.set(b,[]);bins.get(b).push(i);});
+  const res=[];bins.forEach((ids,b)=>{const c=centred?b*bw:(b+0.5)*bw,cx=P.sx(c);res.push({c:c,ids:ids});ids.forEach((i,j)=>SL.el('circle',{cx:cx.toFixed(1),cy:(P.sy(0)-r-1-j*(2*r+1)).toFixed(1),r:r,class:'sl-dot '+clsOf(i)},P.dyn));});return res;}
+
+
+/* ===== outils numériques propres à l05 (en partie portés de p00-01) ===== */
+const LG=(function(){const g=7,c=[0.99999999999980993,676.5203681218851,-1259.1392167224028,771.32342877765313,-176.61502916214059,12.507343278686905,-0.13857109526572012,9.9843695780195716e-6,1.5056327351493116e-7];
+  function lg(x){if(x<0.5)return Math.log(Math.PI/Math.sin(Math.PI*x))-lg(1-x);x-=1;let a=c[0];const t=x+g+0.5;for(let i=1;i<g+2;i++)a+=c[i]/(x+i);return 0.5*Math.log(2*Math.PI)+(x+0.5)*Math.log(t)-t+Math.log(a);}
+  return lg;})();
+const lchoose=(n,k)=>LG(n+1)-LG(k+1)-LG(n-k+1);
+function binpmf(n,p,k){if(k<0||k>n)return 0;if(p<=0)return k===0?1:0;if(p>=1)return k===n?1:0;return Math.exp(lchoose(n,k)+k*Math.log(p)+(n-k)*Math.log(1-p));}
+function poispmf(lam,k){if(k<0)return 0;if(lam<=0)return k===0?1:0;return Math.exp(-lam+k*Math.log(lam)-LG(k+1));}
+function gammapdf(r,lam,t){if(t<0)return 0;if(t===0)return r===1?lam:0;return Math.exp(r*Math.log(lam)+(r-1)*Math.log(t)-lam*t-LG(r));}
+function erfc(x){const z=Math.abs(x),t=1/(1+0.5*z);const r=t*Math.exp(-z*z-1.26551223+t*(1.00002368+t*(0.37409196+t*(0.09678418+t*(-0.18628806+t*(0.27886807+t*(-1.13520398+t*(1.48851587+t*(-0.82215223+t*0.17087277)))))))));return x>=0?r:2-r;}
+const Phi=x=>0.5*erfc(-x/Math.SQRT2);
+const npdf=(x,m,s)=>Math.exp(-(x-m)*(x-m)/(2*s*s))/(s*Math.sqrt(2*Math.PI));
+function expo(r,lam){return -Math.log(1-r())/lam;}
+function xticks(a,b,m){const step=Math.max(1,Math.ceil((b-a)/m));const t=[];for(let k=a;k<=b;k+=step)t.push(k);return t;}
+function yticks(ym){const raw=ym/4,e=Math.pow(10,Math.floor(Math.log10(raw)));const step=[1,2,2.5,5,10].map(f=>f*e).find(s=>s>=raw)||e*10;const t=[];for(let y=step;y<ym*0.98;y+=step)t.push(+y.toPrecision(6));return t;}
+/* polyline et aire remplie dans la couche dynamique */
+function poly(P,pts,cls){let s='';pts.forEach(q=>{s+=P.sx(q[0]).toFixed(1)+','+P.sy(q[1]).toFixed(1)+' ';});return SL.el('polyline',{points:s.trim(),class:cls,fill:'none'},P.dyn);}
+function area(P,f,a,b,y0,cls){let s='';const n=140;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;s+=P.sx(x).toFixed(1)+','+P.sy(f(x)).toFixed(1)+' ';}
+  s+=P.sx(b).toFixed(1)+','+P.sy(y0).toFixed(1)+' '+P.sx(a).toFixed(1)+','+P.sy(y0).toFixed(1);
+  return SL.el('polygon',{points:s.trim(),class:cls},P.dyn);}
+/* courbe qui sort par le haut au lieu de s'écraser contre le bord */
+function curveS(P,f,a,b,cls,ymax){let d='',on=false;const n=300;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)||y>ymax){if(on){d+=' L'+P.sx(x).toFixed(1)+' '+P.sy(ymax).toFixed(1);}on=false;continue;}d+=(on?' L':(d?' M':'M'))+P.sx(x).toFixed(1)+' '+P.sy(y).toFixed(1);on=true;}SL.el('path',{d:d,class:'sl-fn '+cls,fill:'none'},P.dyn);}
+function sample(f,a,b,n){const t=[];for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;t.push([x,f(x)]);}return t;}
+/* histogramme en densité : valeurs → barres de largeur bw sur [x0, x1] */
+function histo(P,vals,x0,x1,bw,cls,ymax,scale){const k=Math.round((x1-x0)/bw),c=new Array(k).fill(0),sc=scale||1;vals.forEach(v=>{const i=Math.floor((v-x0)/bw);if(i>=0&&i<k)c[i]++;});
+  const n=Math.max(1,vals.length);c.forEach((m,i)=>{if(m)bar(P,x0+i*bw+bw*0.06,x0+(i+1)*bw-bw*0.06,Math.min(ymax,sc*m/(n*bw)),cls);});}
+/* nombre à décimales fixes, virgule (SL.fmt retire les zéros finaux) */
+const fx=(x,d)=>x.toFixed(d).replace('.',',');
+
+/* ===== Figure 1 : la binomiale rejoint la Poisson (portée de p00-01, figure 2) ===== */
+(function(){
+  const h=document.getElementById('f1plot'),o=document.getElementById('f1out'),st={lam:4,n:1000};
+  function draw(){
+    const lam=st.lam,n=st.n,p=lam/n,ok=p<=1;h.innerHTML='';
+    const kmax=Math.max(8,Math.ceil(lam+4*Math.sqrt(lam)+3));
+    const po=[],bi=[];let ymax=0,dmax=0;
+    for(let k=0;k<=kmax;k++){const a=poispmf(lam,k),b=ok?binpmf(n,p,k):0;po.push(a);bi.push(b);
+      if(a>ymax)ymax=a;if(b>ymax)ymax=b;if(Math.abs(a-b)>dmax)dmax=Math.abs(a-b);}
+    const Y=ymax*1.3;
+    const P=SL.plot(h,{x:[-0.6,kmax+0.6],y:[0,Y],w:600,h:290,xt:xticks(0,kmax,9),yt:yticks(Y),xl:'k — événements dans l’intervalle',yl:'probabilité'});
+    leftAxis(P,-0.6);
+    if(ok)bi.forEach((v,k)=>{if(v>1e-5)bar(P,k-0.34,k+0.34,v,'sl-bar');});
+    poly(P,po.map((v,k)=>[k,v]),'sl-fn sl-c3');
+    po.forEach((v,k)=>{if(v>1e-5)P.dot(k,v,'sl-c3',3.2);});
+    P.text(kmax+0.5,Y*0.93,'● Poisson(λ)','sl-c3','end');
+    if(ok)P.text(kmax+0.5,Y*0.84,'▮ Binomiale(n, λ/n)','','end');
+    rd(o,[['λ = E = Var',SL.fmt(lam,2)],['p = λ/n',ok?SL.fmt(p,4):SL.fmt(p,2)+' > 1',ok?'':'zero'],
+      ['écart max, binomiale contre Poisson',ok?fx(dmax,4):'binomiale impossible',!ok?'':(dmax<=0.01?'pos':'zero')]]);
+  }
+  const c=document.getElementById('f1ctl');
+  SL.slider(c,{label:'λ',min:0.5,max:15,step:0.5,value:4},v=>{st.lam=v;draw();});
+  SL.slider(c,{label:'n (occasions)',min:20,max:2000,step:10,value:1000,fmt:v=>SL.fmt(v,0)},v=>{st.n=v;draw();});
+})();
+
+/* ===== Figure 2 : la loi géométrique et sa queue ===== */
+(function(){
+  const host=document.getElementById('f2plot'),out=document.getElementById('f2out'),st={p:1/6,k:10};
+  function draw(){
+    host.innerHTML='';const p=st.p,q=1-p,k=st.k,Y=p*1.32;
+    const P=SL.plot(host,{x:[0.3,30.7],y:[0,Y],w:600,h:260,xt:[1,5,10,15,20,25,30],yt:yticks(Y),xl:'k — rang du premier succès',yl:'P(X = k)'});
+    for(let j=1;j<=30;j++)bar(P,j-0.36,j+0.36,Math.pow(q,j-1)*p,j>=k?'sl-bar3':'sl-bar');
+    P.seg(k-0.5,0,k-0.5,Y*0.86,'sl-dash');
+    P.text(30.5,Y*0.92,'▮ violet\u00a0: X < k','sl-c2','end');P.text(30.5,Y*0.82,'▮ bleu\u00a0: la queue X ≥ k','sl-c1','end');
+    rd(out,[['P(X = k) = qᵏ⁻¹ p',fx(Math.pow(q,k-1)*p,4)],['P(X ≥ k) = qᵏ⁻¹, la queue',fx(Math.pow(q,k-1),4),'c3'],['E[X] = 1/p',SL.fmt(1/p,2)]]);
+  }
+  buttons(document.getElementById('f2ctl'),['dé, p = 1/6','p = 1/3','pièce, p = 1/2'],i=>{st.p=[1/6,1/3,1/2][i];draw();});
+  SL.slider(document.getElementById('f2sl'),{label:'seuil k',min:1,max:20,step:1,value:10,fmt:v=>String(v)},v=>{st.k=v;draw();});
+})();
+
+/* ===== Figure 3 : l'exponentielle et ses aires (portée de p00-01, figure 3) ===== */
+(function(){
+  const h=document.getElementById('f3plot'),o=document.getElementById('f3out'),XM=90,st={lam:4,a:15,b:30};
+  function draw(){
+    const r=st.lam/60,a=Math.min(st.a,st.b),b=Math.max(st.a,st.b),inf=Math.max(st.a,st.b)>=XM;h.innerHTML='';
+    const Y=r*1.22,f=x=>r*Math.exp(-r*x);
+    const P=SL.plot(h,{x:[0,XM],y:[0,Y],w:600,h:280,xt:[0,15,30,45,60,75,90],yt:yticks(Y),xl:'t — minutes depuis le dernier spam',yl:'densité (par minute)'});
+    area(P,f,a,inf?XM:b,0,'sl-bar');
+    poly(P,sample(f,0,XM,180),'sl-fn sl-c1');
+    const E=60/st.lam,med=Math.LN2*60/st.lam;
+    P.seg(E,0,E,Y*0.86,'sl-mean');P.seg(med,0,med,Y*0.86,'chord');
+    P.text(XM*0.99,Y*0.92,'│ moyenne 1/λ','sl-c3','end');P.text(XM*0.99,Y*0.81,'┆ médiane ln 2/λ','sl-c3','end');
+    const pa=Math.exp(-r*a),pb=inf?0:Math.exp(-r*b);
+    rd(o,[['E[T] = 1/λ',SL.fmt(E,1)+' min'],['médiane = ln 2/λ',SL.fmt(med,1)+' min'],['P(T &gt; a) = e<sup>−λa</sup>',fx(pa,3)],
+      [inf?'P(T &gt; a), b = ∞':'P(a &lt; T &lt; b), aire violette',fx(pa-pb,3),'c3']]);
+  }
+  const c=document.getElementById('f3ctl');
+  SL.slider(c,{label:'λ (par heure)',min:2,max:12,step:0.5,value:4},v=>{st.lam=v;draw();});
+  SL.slider(c,{label:'a (minutes)',min:0,max:60,step:1,value:15,fmt:v=>SL.fmt(v,0)},v=>{st.a=v;draw();});
+  SL.slider(c,{label:'b (minutes)',min:1,max:90,step:1,value:30,fmt:v=>v>=90?'∞':SL.fmt(v,0)},v=>{st.b=v;draw();});
+})();
+
+/* ===== Figure 4 : l'absence de mémoire, bouton « déjà attendu » (portée de p00-01, figure 3) ===== */
+(function(){
+  const h=document.getElementById('f4plot'),o=document.getElementById('f4out'),XM=90,ATT=15,st={lam:4,t:30,cond:false};
+  function draw(){
+    const r=st.lam/60,t=st.t;h.innerHTML='';
+    const Y=r*1.22,f=x=>r*Math.exp(-r*x);
+    const P=SL.plot(h,{x:[0,XM],y:[0,Y],w:600,h:280,xt:[0,15,30,45,60,75,90],yt:yticks(Y),xl:'t — minutes',yl:'densité (par minute)'});
+    area(P,f,t,XM,0,'sl-bar');
+    poly(P,sample(f,0,XM,180),'sl-fn sl-c1');
+    P.dot(t,f(t),'sl-c1',4.5);
+    P.text(XM*0.99,Y*0.92,'— densité de T','sl-c1','end');
+    let extra=[];
+    if(st.cond){
+      const g=x=>r*Math.exp(-r*(x-ATT));
+      P.seg(ATT,0,ATT,Y*0.86,'sl-c2 sl-dash');
+      if(ATT+t<XM)area(P,g,ATT+t,XM,0,'sl-bar2');
+      poly(P,sample(g,ATT,XM,150),'sl-fn sl-c2');
+      if(ATT+t<=XM)P.dot(ATT+t,g(ATT+t),'sl-c2',4.5);
+      P.text(XM*0.99,Y*0.81,'— densité sachant T > 15 min','sl-c2','end');
+      extra=[['P(T &gt; 15 + t ∣ T &gt; 15)',fx(Math.exp(-r*t),3),'pos']];
+    }
+    rd(o,[['P(T &gt; t), aire violette',fx(Math.exp(-r*t),3)]].concat(extra,[['E[T] = 1/λ',SL.fmt(60/st.lam,1)+' min']]));
+  }
+  const bc=SL.h('button','tb',document.getElementById('f4btn'),'déjà attendu 15 min');bc.setAttribute('aria-pressed','false');
+  bc.onclick=()=>{st.cond=!st.cond;bc.setAttribute('aria-pressed',String(st.cond));draw();};
+  const c=document.getElementById('f4ctl');
+  SL.slider(c,{label:'λ (par heure)',min:2,max:12,step:0.5,value:4},v=>{st.lam=v;draw();});
+  SL.slider(c,{label:'t (minutes)',min:0,max:75,step:1,value:30,fmt:v=>SL.fmt(v,0)},v=>{st.t=v;draw();});
+})();
+
+/* ===== Figure 5 : zéro mail, un mail, et le facteur 5t ===== */
+(function(){
+  const host=document.getElementById('f5plot'),out=document.getElementById('f5out'),L=5,XM=1.2,YM=1.12;
+  const P=SL.plot(host,{x:[0,XM],y:[0,YM],w:600,h:280,xt:[0,0.2,0.4,0.6,0.8,1,1.2],yt:[0.25,0.5,0.75,1],xl:'t — durée de la fenêtre (minutes)',yl:'probabilité'});
+  const p=(k,t)=>Math.pow(L*t,k)*Math.exp(-L*t)/[1,1,2][k],bru=t=>5*Math.exp(-5*t);
+  function draw(t){
+    P.clear();
+    P.seg(0,1,XM,1,'sl-dash');
+    curveS(P,bru,0,XM,'sl-c5 sl-dash',YM);
+    curve(P,x=>p(2,x),0,XM,'sl-c2',YM);curve(P,x=>p(1,x),0,XM,'sl-c3',YM);curve(P,x=>p(0,x),0,XM,'sl-c1',YM);
+    P.seg(t,0,t,Math.min(1,Math.max(p(0,t),p(1,t),p(2,t),Math.min(bru(t),1))+0.06),'sl-dash');
+    [['sl-c1',0],['sl-c3',1],['sl-c2',2]].forEach(c=>P.dot(t,p(c[1],t),c[0],4.5));
+    if(bru(t)<=YM)P.dot(t,bru(t),'sl-c5',4.5);
+    const xr=XM*0.99;
+    P.text(xr,0.93,'— 0 mail\u00a0: e⁻⁵ᵗ, la survie de l’attente','sl-c1','end');
+    P.text(xr,0.85,'— 1 mail\u00a0: 5t e⁻⁵ᵗ','sl-c3','end');
+    P.text(xr,0.77,'— 2 mails\u00a0: (5t)² e⁻⁵ᵗ/2','sl-c2','end');
+    P.text(xr,0.69,'┄ Brunton\u00a0: 5 e⁻⁵ᵗ, dépasse 1','sl-c5','end');
+    const p0=p(0,t),p1=p(1,t),b=bru(t);
+    rd(out,[['P(N(t) = 0) = e<sup>−5t</sup>',fx(p0,4)],['P(N(t) = 1) = 5t e<sup>−5t</sup>',fx(p1,4),'c3'],['rapport P(1)/P(0) = 5t',SL.fmt(5*t,2)],
+      ['formule de Brunton, 5 e<sup>−5t</sup>',fx(b,3),b>1?'zero':'']]);
+  }
+  SL.slider(document.getElementById('f5ctl'),{label:'t (minutes)',min:0.01,max:1.2,step:0.01,value:0.1,fmt:v=>SL.fmt(v,2)},draw);
+})();
+
+/* ===== Figure 6 : r attentes contre r fois une attente ===== */
+(function(){
+  const host=document.getElementById('f6plot'),out=document.getElementById('f6out'),L=5,XM=6;
+  function draw(r){
+    host.innerHTML='';
+    const g=t=>gammapdf(r,L,t),w=t=>(L/r)*Math.exp(-L*t/r);
+    let ym=Math.max(g(0),w(0));for(let i=1;i<=300;i++){const t=XM*i/300;ym=Math.max(ym,g(t),w(t));}
+    const Y=ym*1.25;
+    const P=SL.plot(host,{x:[0,XM],y:[0,Y],w:600,h:270,xt:[0,1,2,3,4,5,6],yt:yticks(Y),xl:'attente du r-ième mail (minutes)',yl:'densité'});
+    curve(P,w,0,XM,'sl-c3 sl-dash',Y);curve(P,g,0,XM,'sl-c4',Y);
+    P.vline(r/L,'sl-mean');
+    P.text(XM*0.99,Y*0.92,'— somme de r attentes, Gamma(r, 5)','sl-c4','end');
+    P.text(XM*0.99,Y*0.83,'┄ r fois une seule attente','sl-c3','end');
+    P.text(XM*0.99,Y*0.74,'│ moyenne commune r/5','sl-c3','end');
+    let pg=0;for(let k=0;k<r;k++)pg+=poispmf(3*L,k);
+    rd(out,[['moyenne commune r/λ',SL.fmt(r/L,2)+' min'],['écart-type, somme\u00a0: √r/λ',fx(Math.sqrt(r)/L,2)+' min','c1'],['écart-type, r × W\u00a0: r/λ',fx(r/L,2)+' min','c3'],
+      ['P(somme &gt; 3 min)',fx(pg,3),'c1'],['P(r × W &gt; 3 min)',fx(Math.exp(-3*L/r),3),'c3']]);
+  }
+  SL.slider(document.getElementById('f6ctl'),{label:'r (mails attendus)',min:1,max:10,step:1,value:10,fmt:v=>String(v)},draw);
+})();
+
+/* ===== v1 : la normale déborde sous zéro, la Poisson colle ===== */
+(function(){
+  const host=document.getElementById('v1plot'),out=document.getElementById('v1out');
+  /* écarts max et masse négative recalculés par script (check/vis.py) */
+  const S=[{n:1000,p:0.001,x:[-3.6,6.6],xt:[-3,-2,-1,0,1,2,3,4,5,6],w:0.36,neg:'15,9\u00a0%',dp:'0,0002',dn:'0,13'},
+           {n:10000,p:0.002,x:[-6,41],xt:[0,5,10,15,20,25,30,35,40],w:0.34,neg:'0,0004\u00a0%',dp:'0,0001',dn:'0,005'}];
+  function draw(i){
+    const s=S[i],lam=s.n*s.p,sd=Math.sqrt(s.n*s.p*(1-s.p)),kmax=Math.floor(s.x[1]);host.innerHTML='';
+    let ym=npdf(lam,lam,sd);for(let k=0;k<=kmax;k++)ym=Math.max(ym,binpmf(s.n,s.p,k));
+    const Y=ym*1.55,f=x=>npdf(x,lam,sd);
+    const P=SL.plot(host,{x:s.x,y:[0,Y],w:600,h:270,xt:s.xt,yt:yticks(Y),xl:'k — nombre de succès',yl:'probabilité'});
+    leftAxis(P,s.x[0]);
+    area(P,f,s.x[0],0,0,'sl-bar2');
+    for(let k=0;k<=kmax;k++){const v=binpmf(s.n,s.p,k);if(v>1e-6)bar(P,k-s.w,k+s.w,v,'sl-bar');}
+    poly(P,sample(f,s.x[0],s.x[1],300),'sl-fn sl-c1');
+    for(let k=0;k<=kmax;k++){const v=poispmf(lam,k);if(v>1e-6)P.dot(k,v,'sl-c3',3.4);}
+    P.vline(0,'sl-dash');
+    const xr=s.x[1]-(s.x[1]-s.x[0])*0.01;
+    P.text(xr,Y*0.93,'▮ binomiale exacte','','end');
+    P.text(xr,Y*0.84,'● Poisson de même moyenne','sl-c3','end');
+    P.text(xr,Y*0.75,'— normale de même moyenne et variance','sl-c1','end');
+    P.text(xr,Y*0.66,'▮ rouge\u00a0: sa masse sous zéro','sl-c3','end');
+    rd(out,[['λ = np',String(lam)],['normale, masse sous 0',s.neg,'c3'],['écart max à la binomiale, Poisson',s.dp],['écart max à la binomiale, normale',s.dn]]);
+  }
+  buttons(document.getElementById('v1ctl'),['1 000 essais, p = 1/1 000','néons : 10 000, p = 0,002'],draw);
+})();
+
+/* ===== v2 : vingt joueurs qui lancent jusqu'au premier 5 ===== */
+(function(){
+  const host=document.getElementById('v2plot'),out=document.getElementById('v2out'),N=20,C=30;
+  host.classList.add('nogrid');
+  const P=SL.plot(host,{x:[0,C+3],y:[0,N+1.7],w:600,h:340,xt:[1,5,9,15,20,25,30],yt:[],xl:'lancer n°'});
+  const ax=P.svg.querySelectorAll('line.sl-axis');if(ax[1])ax[1].remove();
+  rect(P,0.5,9.5,0.45,N+0.55,'sl-band',P.layer);
+  P.label(5,N+1.05,'les 9 premiers lancers','','middle');
+  P.label(C+2.8,N+1.05,'X','','end');
+  let seed=37,tot=0,ge=0,sum=0;
+  function draw(){
+    P.clear();const r=rng(seed);let k10=0;
+    for(let i=0;i<N;i++){
+      let x=1;while(r()>=1/6)x++;
+      const y=N-i;
+      for(let j=1;j<=Math.min(x,C);j++)rect(P,j-0.42,j+0.42,y-0.36,y+0.36,j===x?'sl-cellp':'sl-cello');
+      if(x>C)P.text(C+0.55,y-0.3,'…','','start');
+      P.text(C+2.8,y-0.3,String(x),x>=10?'sl-c3':'','end');
+      if(x>=10)k10++;
+      tot++;sum+=x;if(x>=10)ge++;
+    }
+    rd(out,[['ces vingt joueurs, X ≥ 10',k10+' sur 20'],['joueurs en tout',String(tot)],['part X ≥ 10 (théorie 19,4\u00a0%)',SL.fmt(100*ge/tot,1)+'\u00a0%','c3'],['rang moyen (théorie 6)',fx(sum/tot,2)]]);
+  }
+  draw();
+  SL.h('button','tb',document.getElementById('v2ctl'),'▶ vingt autres joueurs').onclick=()=>{seed++;draw();};
+})();
+
+/* ===== v3 : 400 ampoules, 400 atomes ===== */
+(function(){
+  const host=document.getElementById('v3plot'),out=document.getElementById('v3out'),sdiv=document.getElementById('v3sl'),ctl=document.getElementById('v3ctl');
+  const M=[{lam:1/100,T:300,u:'h',xt:[0,50,100,150,200,250,300],t0:50,seed:182},
+           {lam:Math.LN2/138,T:920,u:'j',xt:[0,138,276,414,552,690,828],t0:138,seed:210}];
+  const row=SL.h('div','v-row',host),A=SL.h('div','nogrid',row),B=SL.h('div','',row);
+  const G=SL.plot(A,{x:[0,20],y:[0,20],w:300,h:300,xt:[],yt:[]});
+  G.svg.querySelectorAll('line.sl-axis').forEach(l=>l.remove());
+  let mode=0,life=[],S=null,sl=null;const fresh=runner();
+  function draw(t){
+    const m=M[mode];G.clear();S.clear();let alive=0;
+    life.forEach((d,i)=>{const on=d>t;if(on)alive++;G.dot(0.5+(i%20),19.5-Math.floor(i/20),on?'sl-c2':'hollow sl-c2',on?5.6:4.4);});
+    S.seg(t,0,t,0.9,'sl-c5');S.dot(t,alive/400,'sl-c3',5.5);
+    rd(out,[['temps écoulé',SL.fmt(t,0)+' '+m.u],['encore en vie',alive+' sur 400'],['part simulée',SL.fmt(100*alive/400,1)+'\u00a0%','c3'],['théorie e<sup>−λt</sup>',SL.fmt(100*Math.exp(-m.lam*t),1)+'\u00a0%']]);
+  }
+  function setMode(i){
+    mode=i;fresh();const m=M[i],r=rng(m.seed);life=[];for(let k=0;k<400;k++)life.push(expo(r,m.lam));
+    B.innerHTML='';S=SL.plot(B,{x:[0,m.T],y:[0,1.05],w:300,h:300,xt:m.xt,yt:[0.25,0.5,0.75,1],xl:'temps ('+m.u+')',yl:'part en vie'});
+    S.fn(t=>Math.exp(-m.lam*t),'sl-c1');
+    sdiv.innerHTML='';sl=SL.slider(sdiv,{label:'temps',min:0,max:m.T,step:1,value:m.t0,fmt:v=>SL.fmt(v,0)+' '+m.u},draw);
+    sl.input.addEventListener('input',()=>fresh());
+  }
+  buttons(ctl,['ampoules, 100 h en moyenne','polonium 210, demi-vie 138 j'],setMode);
+  SL.h('button','tb',ctl,'▶ laisser passer le temps').onclick=()=>{const tk=fresh(),T=M[mode].T,t0=performance.now();
+    loop(tk,()=>{const u=SL.reduced?1:Math.min(1,(performance.now()-t0)/5000);sl.set(Math.round(u*T));return u<1;});};
+})();
+
+/* ===== v4 : la vie qui reste aux ampoules encore allumées ===== */
+(function(){
+  const host=document.getElementById('v4plot'),out=document.getElementById('v4out'),N=2000,XM=3000,BW=200,YM=4.4;
+  const r=rng(22),E=[],W=[];for(let i=0;i<N;i++){E.push(expo(r,1/1000));W.push(1000+200*gauss(r));}
+  const P=SL.plot(host,{x:[0,XM],y:[0,YM],w:600,h:260,xt:[0,500,1000,1500,2000,2500,3000],yt:[1,2,3,4],xl:'vie restante (h)',yl:'densité, pour 1 000 h'});
+  const st={m:0,s:1000};
+  const Sw=s=>Phi((1000-s)/200);
+  function mrlW(s){const a=s,b=s+1600,n=800,hh=(b-a)/n;let t=Sw(a)+Sw(b);for(let i=1;i<n;i++)t+=Sw(a+i*hh)*(i%2?4:2);return t*hh/3/Sw(s);}
+  function draw(){
+    P.clear();const s=st.s,L=st.m?W:E,rest=L.filter(x=>x>s).map(x=>x-s);
+    histo(P,rest,0,XM,BW,'sl-bar',4,1000);
+    const neuf=st.m?(t=>1000*npdf(t,1000,200)):(t=>Math.exp(-t/1000));
+    const surv=st.m?(t=>1000*npdf(s+t,1000,200)/Sw(s)):(t=>Math.exp(-t/1000));
+    curveS(P,neuf,0,XM,'sl-c4 sl-dash',YM);curveS(P,surv,0,XM,'sl-c1',YM);
+    const xr=XM*0.99;
+    P.text(xr,YM*0.92,'┄ une ampoule neuve','sl-c4','end');P.text(xr,YM*0.83,'— les survivantes, théorie','sl-c1','end');P.text(xr,YM*0.74,'▮ les survivantes, simulées','','end');
+    const m=rest.length?rest.reduce((a,b)=>a+b,0)/rest.length:NaN;
+    rd(out,[['encore allumées à s',SL.fmt(100*rest.length/N,1)+'\u00a0%'],['théorie',SL.fmt(100*(st.m?Sw(s):Math.exp(-s/1000)),1)+'\u00a0%'],
+      ['vie restante moyenne, simulée',rest.length?SL.fmt(m,0)+' h':'—','c3'],['théorie',SL.fmt(st.m?mrlW(s):1000,0)+' h']]);
+  }
+  buttons(document.getElementById('v4ctl'),['exponentielle, moyenne 1 000 h','usure : normale 1 000 ± 200 h'],i=>{st.m=i;draw();});
+  SL.slider(document.getElementById('v4sl'),{label:'déjà allumées depuis s',min:0,max:1400,step:50,value:1000,fmt:v=>SL.fmt(v,0)+' h'},v=>{st.s=v;draw();});
+})();
+
+/* ===== v5 : taux constant, et courbe en baignoire ===== */
+(function(){
+  const host=document.getElementById('v5plot'),out=document.getElementById('v5out'),XM=4000,YM=4.4;
+  const P=SL.plot(host,{x:[0,XM],y:[0,YM],w:600,h:270,xt:[0,500,1000,1500,2000,2500,3000,3500,4000],yt:[1,2,3,4],xl:'âge de l’ampoule (h)',yl:'pannes pour 1 000 h'});
+  /* jeunesse = Weibull de forme 0,5 et d’échelle 1 000 h, hasard = 0,5 pour 1 000 h, usure = Weibull de forme 5 et d’échelle 3 000 h */
+  const h1=t=>0.5*Math.sqrt(1000/t),h0=0.5,h3=t=>(5000/3000)*Math.pow(t/3000,4);
+  const Hb=t=>Math.sqrt(t/1000)+h0*t/1000+Math.pow(t/3000,5),Hc=t=>t/1000;
+  const st={m:1,t:1200};
+  function draw(){
+    P.clear();const t=st.t,xr=XM*0.66;let h,H,ph;
+    if(st.m===0){
+      curveS(P,()=>1,0,XM,'sl-c1',YM);h=1;H=Hc;ph='hasard seul';
+      P.text(xr,3.95,'— taux constant, 1 pour 1 000 h','sl-c1','end');
+    }else{
+      curveS(P,h1,1,XM,'sl-c2 sl-dash',YM);curveS(P,()=>h0,0,XM,'sl-c4 sl-dash',YM);curveS(P,h3,0,XM,'sl-c5 sl-dash',YM);
+      curveS(P,u=>h1(u)+h0+h3(u),1,XM,'sl-c1',YM);
+      h=t>0?h1(t)+h0+h3(t):Infinity;H=Hb;
+      const a=t>0?h1(t):Infinity,c=h3(t);ph=a>Math.max(h0,c)?'jeunesse':c>Math.max(h0,a)?'usure':'hasard';
+      P.text(xr,3.95,'— taux total\u00a0: la baignoire','sl-c1','end');P.text(xr,3.6,'┄ jeunesse','sl-c2','end');
+      P.text(xr,3.25,'┄ hasard','sl-c4','end');P.text(xr,2.9,'┄ usure','sl-c5','end');
+    }
+    P.vline(t,'sl-c3 sl-dash');if(isFinite(h)&&h<=YM)P.dot(t,h,'sl-c3',5);
+    const p100=1-Math.exp(-(H(t+100)-H(t)));
+    rd(out,[['âge t',SL.fmt(t,0)+' h'],['taux h(t), pour 1 000 h',isFinite(h)?fx(h,2):'∞'],['panne dans les 100 h, sachant vivante',SL.fmt(100*p100,1)+'\u00a0%','c3'],['phase qui domine',ph]]);
+  }
+  buttons(document.getElementById('v5ctl'),['baignoire : jeunesse, hasard, usure','taux constant : l’exponentielle'],i=>{st.m=i?0:1;draw();});
+  SL.slider(document.getElementById('v5sl'),{label:'âge',min:0,max:4000,step:50,value:1200,fmt:v=>SL.fmt(v,0)+' h'},v=>{st.t=v;draw();});
+})();
+
+/* ===== v6 : une heure de mails, comptée et chronométrée ===== */
+(function(){
+  const host=document.getElementById('v6plot'),out=document.getElementById('v6out'),L=5,H=60,SHOW=4;
+  const top=SL.h('div','wide',host);
+  const F=SL.plot(top,{x:[0,SHOW],y:[0,1],w:600,h:130,xt:[0,0.5,1,1.5,2,2.5,3,3.5,4],yt:[],xl:'temps (minutes)'});
+  F.svg.parentNode.classList.add('nogrid');
+  const row=SL.h('div','v-row',host),A=SL.h('div','',row),B=SL.h('div','',row);
+  const PA=SL.plot(A,{x:[0,60],y:[0,0.11],w:300,h:240,xt:[0,12,24,36,48,60],yt:[0.05,0.1],xl:'attente entre deux mails (s)',yl:'densité'});
+  PA.fn(s=>(L/60)*Math.exp(-L*s/60),'sl-c1');
+  let seed=1413,arr=[],win=0.5;
+  function gen(){const r=rng(seed);arr=[];let s=0;for(;;){s+=expo(r,L);if(s>H)break;arr.push(s);}}
+  function draw(){
+    F.clear();PA.clear();B.innerHTML='';
+    const nw=Math.round(H/win),cnt=new Array(nw).fill(0);arr.forEach(a=>{const j=Math.floor(a/win);if(j<nw)cnt[j]++;});
+    for(let j=0;j*win<SHOW-1e-9;j++){if(j%2===0)rect(F,j*win,Math.min(SHOW,(j+1)*win),0.02,1,'sl-win');F.text((j+0.5)*win,0.8,String(cnt[j]),'sl-c4','middle');}
+    arr.filter(a=>a<=SHOW).forEach(a=>F.text(a,0.18,'×','sl-x','middle'));
+    for(let i=0;i<3;i++){const x0=i?arr[i-1]:0,x1=arr[i];if(x1>SHOW)break;F.seg(x1,0.1,x1,0.5,'sl-c2 sl-dash');if(!i)F.seg(0,0.1,0,0.5,'sl-c2 sl-dash');F.seg(x0,0.45,x1,0.45,'sl-c2');if(x1-x0>=0.12)F.text((x0+x1)/2,0.52,'W'+'₁₂₃'[i],'sl-c2','middle');}
+    const waits=arr.map((a,i)=>60*(a-(i?arr[i-1]:0))),mw=waits.reduce((a,b)=>a+b,0)/waits.length;
+    histo(PA,waits,0,60,3,'sl-bar',0.11);PA.seg(mw,0,mw,0.095,'sl-mean');
+    const lt=L*win,km=Math.max(8,Math.ceil(lt+4*Math.sqrt(lt)+2)),fr=new Array(km+1).fill(0);
+    cnt.forEach(c=>{if(c<=km)fr[c]++;});
+    let ym=0;for(let k=0;k<=km;k++)ym=Math.max(ym,fr[k]/nw,poispmf(lt,k));
+    const Y=ym*1.2;
+    const PB=SL.plot(B,{x:[-0.6,km+0.6],y:[0,Y],w:300,h:240,xt:xticks(0,km,6),yt:yticks(Y),xl:'mails par fenêtre',yl:'fréquence'});
+    leftAxis(PB,-0.6);
+    fr.forEach((c,k)=>{if(c)bar(PB,k-0.34,k+0.34,c/nw,'sl-bar');});
+    for(let k=0;k<=km;k++)PB.dot(k,poispmf(lt,k),'sl-c3',3.4);
+    const mc=cnt.reduce((a,b)=>a+b,0)/nw,vc=cnt.reduce((a,b)=>a+(b-mc)*(b-mc),0)/nw;
+    rd(out,[['mails dans l’heure',String(arr.length)],['attente moyenne (théorie 12 s)',SL.fmt(mw,1)+' s','c3'],
+      ['compte moyen par fenêtre (théorie '+SL.fmt(lt,2)+')',fx(mc,2)],['variance des comptes (théorie '+SL.fmt(lt,2)+')',fx(vc,2)]]);
+  }
+  gen();
+  SL.slider(document.getElementById('v6sl'),{label:'fenêtre t',min:0.25,max:2,step:0.25,value:0.5,fmt:v=>SL.fmt(v,2)+' min'},v=>{win=v;draw();});
+  SL.h('button','tb',document.getElementById('v6ctl'),'▶ une autre heure').onclick=()=>{seed++;gen();draw();};
+})();
+
+/* ===== v7 : trois guichets du DMV, en série ou en parallèle ===== */
+(function(){
+  const host=document.getElementById('v7plot'),out=document.getElementById('v7out'),ctl=document.getElementById('v7ctl'),XM=120;
+  const top=SL.h('div','wide',host),bot=SL.h('div','wide',host);
+  const U=SL.plot(top,{x:[0,XM],y:[0,3.4],w:600,h:150,xt:[0,15,30,45,60,75,90,105,120],yt:[],xl:'un client (minutes)'});
+  top.classList.add('nogrid');
+  ['A','B','C'].forEach((n,i)=>P_lbl(n,i));
+  function P_lbl(n,i){const e=SL.el('text',{x:(U.sx(0)-6).toFixed(1),y:(U.sy(2.7-i)+4).toFixed(1),'text-anchor':'end',class:'sl-lbl'},U.layer);e.textContent=n;}
+  const fresh=runner();let mode=0,vals=[],cur=null,seed=77;
+  const draw3=r=>[expo(r,1/15),expo(r,1/15),expo(r,1/15)];
+  const tot=w=>mode?Math.min(...w):w[0]+w[1]+w[2];
+  function drawClient(){
+    U.clear();if(!cur)return;let s=0;const m=Math.min(...cur);
+    cur.forEach((d,i)=>{const x0=mode?0:s,x1=Math.min(XM,x0+d),y=2.7-i;
+      rect(U,x0,x1,y-0.3,y+0.3,'sl-lane'+(mode&&d===m?' first':''));
+      const T=tot(cur);if(x1-x0>11){if(mode){if(!(T>x1-11&&T<x1-0.5))U.text(x1-1,y-0.12,SL.fmt(d,0)+' min','sl-lane-t','end');}else{const c=(x0+x1)/2;if(Math.abs(T-c)>6)U.text(c,y-0.12,SL.fmt(d,0)+' min','sl-lane-t','middle');}}s+=d;});
+    U.vline(Math.min(XM,tot(cur)),'sl-mean');
+  }
+  function drawHist(){
+    bot.innerHTML='';const bw=mode?1:5,Y=mode?0.25:0.03;
+    const P=SL.plot(bot,{x:[0,XM],y:[0,Y],w:600,h:210,xt:[0,15,30,45,60,75,90,105,120],yt:yticks(Y),xl:'attente de chaque client (minutes)',yl:'densité'});
+    histo(P,vals,0,XM,bw,'sl-bar',Y);
+    curve(P,mode?(t=>Math.exp(-t/5)/5):(t=>gammapdf(3,1/15,t)),0,XM,'sl-c1',Y);
+    const n=vals.length,m=n?vals.reduce((a,b)=>a+b,0)/n:0,sd=n>1?Math.sqrt(vals.reduce((a,b)=>a+(b-m)*(b-m),0)/n):0;
+    if(n)P.vline(m,'sl-mean');
+    P.text(XM*0.99,Y*0.92,mode?'— Exponentielle(3/15), moyenne 5 min':'— Gamma(3, 1/15), moyenne 45 min','sl-c1','end');
+    P.text(XM*0.99,Y*0.82,'│ moyenne des clients servis','sl-c3','end');
+    rd(out,[['ce client',cur?SL.fmt(tot(cur),1)+' min':'—'],['clients servis',String(n)],['attente moyenne (théorie '+(mode?'5':'45')+')',SL.fmt(m,1)+' min','c3'],['écart-type (théorie '+(mode?'5':'26')+')',SL.fmt(sd,1)+' min']]);
+  }
+  function fill(k){const r=rng(seed);vals=[];for(let i=0;i<k;i++){cur=draw3(r);vals.push(tot(cur));}}
+  buttons(ctl,['en série : A, puis B, puis C','en parallèle : le premier guichet libre'],i=>{mode=i;fresh();seed=77;fill(200);drawClient();drawHist();});
+  SL.h('button','tb',ctl,'▶ 200 autres clients').onclick=()=>{const tk=fresh(),r=rng(++seed);vals=[];let k=0;
+    loop(tk,()=>{const n=k<20?1:5;for(let j=0;j<n&&k<200;j++,k++){cur=draw3(r);vals.push(tot(cur));}drawClient();drawHist();return k<200;});};
+})();
+
+})();
+</script>
+</body>
+</html>

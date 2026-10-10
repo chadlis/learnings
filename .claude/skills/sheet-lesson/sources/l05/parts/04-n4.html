@@ -1,0 +1,66 @@
+<!-- ============================ n4 ============================ -->
+<section class="notion outil" id="n4">
+  <h3>L'absence de mémoire <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 19, 20 · The Hazard Rate and Memoryless Property of the Exponential Distribution</p>
+  <div class="idee">
+    <p>L'image de Brunton : une ampoule dure 1 000 heures en moyenne, et elle a déjà brillé 1 000 heures. Combien lui reste-t-il ? En moyenne, encore 1 000 heures. Tant que la panne n'est pas arrivée, l'avenir est le même qu'au premier jour : l'horloge se remet à zéro à chaque instant.</p>
+    <p>L'intuition dit le contraire : après 1 000 heures sur 1 000 prévues, « on compte les secondes ». C'est vrai d'un objet qui s'use, pas d'une durée exponentielle.</p>
+    <p>Les chiffres du fil rouge : on attend le prochain spam depuis 15 minutes. La probabilité d'attendre encore au moins 30 minutes vaut e<sup>−3</sup>/e<sup>−1</sup> = e<sup>−2</sup> = 0,135, exactement P(T &gt; 30 min) pour une attente qui commence. Les 15 minutes déjà passées ne comptent pour rien.</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — ce qu'il reste à vivre aux ampoules encore allumées</div>
+    <div id="v4ctl" class="sl-ctl"></div>
+    <div id="v4sl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">2 000 ampoules de 1 000 h en moyenne. Les barres sont la vie qui reste aux ampoules encore allumées après s heures ; le pointillé est la loi d'une ampoule neuve, la courbe pleine la théorie pour les survivantes. <b>Exponentielle</b> : quel que soit s, les deux courbes coïncident ; à s = 1 000 h, 36,8 % survivent et il leur reste 1 000 h en moyenne. <b>Usure</b> (durée normale, 1 000 ± 200 h) : à s = 1 000 h, la moitié survit et il ne lui reste que 160 h. Fais glisser <b>s</b>.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>P</i>(<i>T</i> &gt; <i>s</i> + <i>t</i> ∣ <i>T</i> &gt; <i>s</i>) = <i>P</i>(<i>T</i> &gt; <i>t</i>) &nbsp; pour tous <i>s</i>, <i>t</i> ≥ 0 &nbsp;&nbsp;&nbsp; donc &nbsp; E[<i>T</i> − <i>s</i> ∣ <i>T</i> &gt; <i>s</i>] = 1/λ</div>
+    <ul>
+      <li>La barre est un vrai conditionnement, sur l'événement {T &gt; s} « déjà survécu jusqu'à s » (<a href="lesson-00-03-conditionner-bayes-independance.html#n1">l03</a>).</li>
+      <li>Parmi les lois continues sur [0, ∞[, l'exponentielle est la seule à vérifier cette égalité ; en discret, c'est la géométrique (<a href="#n2">notion 2</a>).</li>
+      <li>Sachant T &gt; s, ce qui reste, T − s, suit la même Exponentielle(λ) : la vie restante moyenne vaut 1/λ à tout âge.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — l'attente et son absence de mémoire</div>
+    <div id="f4plot" class="wide"></div>
+    <div class="sl-ctl" id="f4btn"></div>
+    <div id="f4ctl"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">La densité de l'attente du prochain spam ; l'<b>aire violette</b> est P(T &gt; t). Clique sur <b>« déjà attendu 15 min »</b> : la densité sachant T &gt; 15 se superpose, identique, simplement décalée de 15 minutes. L'aire rouge sous cette densité, au-delà de 15 + t, est P(T &gt; 15 + t ∣ T &gt; 15) : elle égale l'aire violette P(T &gt; t) pour tout t, et la valeur affichée le confirme. À t = 30 min : 0,135 des deux côtés.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>l'ampoule, les spams, le dé, et une loi qui s'use</small></summary><div class="in">
+    <ol>
+      <li><b>L'ampoule</b> de 1 000 h en moyenne : 36,8 % passent 1 000 h, et leur vie restante moyenne est de 1 000 h. 13,5 % passent 2 000 h : encore 1 000 h devant elles.</li>
+      <li><b>Les spams</b> : P(T &gt; 45 min ∣ T &gt; 15 min) = e<sup>−3</sup>/e<sup>−1</sup> = e<sup>−2</sup> = 0,135 = P(T &gt; 30 min).</li>
+      <li><b>Le dé</b> : après 20 lancers sans 5, attendre encore au moins 10 lancers a la probabilité (5/6)<sup>9</sup> = 0,194, comme au départ.</li>
+      <li><b>Le contre-exemple, l'usure.</b> Une durée normale de moyenne 1 000 h et d'écart-type 200 h. À 500 h, presque toutes vivent encore et il leur reste 504 h ; à 1 000 h, la moitié vit et il lui reste 160 h ; à 1 500 h, 0,6 % vit et il lui reste 65 h. La vie restante fond : cette loi a de la mémoire.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>trois lignes, puis pourquoi l'exponentielle est la seule</small></summary><div class="in">
+    <div class="drv">
+      <div><i>P</i>(<i>T</i> &gt; <i>s</i> + <i>t</i> ∣ <i>T</i> &gt; <i>s</i>) = <i>P</i>(<i>T</i> &gt; <i>s</i> + <i>t</i> ∩ <i>T</i> &gt; <i>s</i>) / <i>P</i>(<i>T</i> &gt; <i>s</i>)</div><span>définition du conditionnement (<a href="lesson-00-03-conditionner-bayes-independance.html#n1">l03</a>)</span>
+      <div>= <i>P</i>(<i>T</i> &gt; <i>s</i> + <i>t</i>) / <i>P</i>(<i>T</i> &gt; <i>s</i>)</div><span>durer plus que s + t implique durer plus que s</span>
+      <div>= e<sup>−λ(<i>s</i>+<i>t</i>)</sup> / e<sup>−λ<i>s</i></sup> = e<sup>−λ<i>t</i></sup> = <i>P</i>(<i>T</i> &gt; <i>t</i>)</div><span>survie de la <a href="#n3">notion 3</a> ; e<sup>a+b</sup> = e<sup>a</sup>e<sup>b</sup></span>
+    </div>
+    <p>Tout tient dans la dernière ligne : la survie e<sup>−λt</sup> transforme une somme de durées en produit de probabilités, donc le rapport ne garde que t.</p>
+    <p><b>La seule loi continue sans mémoire</b> (culture). L'égalité s'écrit S(s + t) = S(s) S(t) pour la survie S. Alors S(2) = S(1)², S(n) = S(1)<sup>n</sup>, S(1/m)<sup>m</sup> = S(1), donc S(r) = S(1)<sup>r</sup> pour tout rationnel r ; avec 0 &lt; S(1) &lt; 1 (sinon T = 0 ou T = ∞), et S étant décroissante, S(t) = S(1)<sup>t</sup> = e<sup>−λt</sup> pour tout t, avec λ = −ln S(1). C'est l'exponentielle.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>ampoules sans mémoire contre ampoules qui s'usent</small></summary><div class="in">
+<pre class="py">{{CODE:c4}}</pre>
+<pre class="out">{{OUT:c4}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Ce n'est pas vrai de toute durée.</b> Seule une durée exponentielle, à taux de risque constant, est sans mémoire. Une ampoule qui s'use a de la mémoire (exemple 4) ; une pièce fragile au début aussi (<a href="#n5">notion 5</a>).</li>
+      <li><b>La condition compte.</b> P(T &gt; s + t ∣ T &gt; s) n'est pas P(T &gt; s + t). Pour les spams, attendre plus de 45 minutes depuis le début vaut e<sup>−3</sup> = 0,050 ; sachant les 15 premières déjà passées, 0,135.</li>
+      <li><b>Le paradoxe de l'arrêt de bus.</b> Des bus passent selon un processus de Poisson, un toutes les 10 minutes en moyenne. Un passager qui arrive au hasard attend en moyenne 10 minutes, pas 5 : l'absence de mémoire remet son attente à zéro. L'intervalle entre deux bus dans lequel il tombe dure, lui, 20 minutes en moyenne : un long intervalle a plus de chances d'attraper un passager.</li>
+      <li><b>σ = moyenne n'explique pas l'absence de mémoire</b> : c'en est une conséquence, et une log-normale peut avoir σ = moyenne avec de la mémoire (<a href="lesson-00-08-esperance-variance.html#n8">l08</a>).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (20) ouvre en disant qu'il existe une probabilité de panne future « qui change avec le temps ». Pour l'exponentielle, c'est l'inverse : le risque de panne dans l'heure qui vient est le même à tout âge. C'est tout le contenu de l'absence de mémoire, et il le dit lui-même dans la phrase suivante.</div>
+  </div></details>
+  <p class="garde">Une durée exponentielle est sans mémoire : P(T &gt; s + t ∣ T &gt; s) = P(T &gt; t), donc après s sans événement il reste encore 1/λ en moyenne. C'est la seule loi continue qui le fait.</p>
+</section>
+

@@ -1,0 +1,7 @@
+lam = 0.00502 per day   mean life 199.0 days (1/lam = 199.1)
+median 137.8 days   (half-life 138)
+P(T > 138 d)   sim 0.4995   exact 0.5000
+P(T > 365 d)   sim 0.1595   exact 0.1599
+P(T > 917 d)   sim 0.0101   exact 0.0100
+bulb P(T >= 50 h)  sim 0.6068   exact 0.6065
+bulb P(50 < T < 100)  sim 0.2393   exact 0.2387

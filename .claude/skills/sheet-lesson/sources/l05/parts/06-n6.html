@@ -1,0 +1,74 @@
+<!-- ============================ n6 ============================ -->
+<section class="notion outil" id="n6">
+  <h3>Le processus de Poisson : compter et attendre <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 21 · The Connection Between the Exponential Distribution and the Poisson Process</p>
+  <div class="idee">
+    <p>Brunton relie les deux lois par une frise. Des mails arrivent au hasard, 5 par minute en moyenne. On marque chaque arrivée d'une croix sur l'axe du temps ; les écarts W<sub>1</sub>, W<sub>2</sub>, W<sub>3</sub>… entre deux croix sont les attentes.</p>
+    <p>Deux questions sur la même frise. Combien de temps jusqu'au prochain mail ? Une attente exponentielle de taux λ = 5 par minute, 12 secondes en moyenne. Combien de mails dans une fenêtre de t minutes ? Un compte de Poisson de paramètre λt : en une minute, 5 en moyenne. Poisson compte, l'exponentielle chronomètre.</p>
+    <p>Le lien tient en une phrase : « aucun mail pendant t » et « la première attente dépasse t » sont le même événement. D'où P(N(t) = 0) = e<sup>−5t</sup> = P(T &gt; t). Un mail n'a rien de rare, mais dans chaque tranche infime de temps il l'est : c'est la binomiale à n grand de la <a href="#n1">notion 1</a>.</p>
+  </div>
+  <div class="fig vis" id="v6">
+    <div class="lbl">Voir l'idée — une heure de mails, comptée et chronométrée</div>
+    <div id="v6ctl" class="sl-ctl"></div>
+    <div id="v6sl"></div>
+    <div id="v6plot"></div>
+    <div class="readouts" id="v6out"></div>
+    <p class="cap">En haut, les 4 premières minutes d'une heure de mails à 5 par minute : une croix par mail, les attentes W<sub>1</sub>, W<sub>2</sub>, W<sub>3</sub>, et des fenêtres de durée t avec leur compte. En bas, toute l'heure : le premier panneau donne les attentes, contre la densité exponentielle (12 s en moyenne) ; le second, les comptes par fenêtre, contre les probabilités de Poisson(5t) en points rouges. Change la <b>fenêtre</b> : la moyenne et la variance des comptes suivent ensemble 5t, les attentes ne bougent pas.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">attentes <i>W</i><sub>1</sub>, <i>W</i><sub>2</sub>, … i.i.d. Exponentielle(λ) &nbsp;⟺&nbsp; dans toute fenêtre de durée <i>t</i>, le compte <i>N</i>(<i>t</i>) suit Poisson(λ<i>t</i>), et les comptes de fenêtres disjointes sont indépendants<br><i>P</i>(<i>N</i>(<i>t</i>) = <i>k</i>) = (λ<i>t</i>)<sup><i>k</i></sup> e<sup>−λ<i>t</i></sup> / <i>k</i>!<br><i>P</i>(<i>T</i><sub>1</sub> &gt; <i>t</i>) = <i>P</i>(<i>N</i>(<i>t</i>) = 0) = e<sup>−λ<i>t</i></sup> &nbsp;&nbsp;&nbsp; E[<i>N</i>(<i>t</i>)] = Var(<i>N</i>(<i>t</i>)) = λ<i>t</i></div>
+    <ul>
+      <li>N(t) compte les arrivées dans une fenêtre de durée t ; T<sub>1</sub> = W<sub>1</sub> est l'instant de la première arrivée.</li>
+      <li><b>Indépendantes</b> : les attentes ne se parlent pas, et les comptes de fenêtres disjointes sont indépendants.</li>
+      <li><b>De même loi</b> : un seul taux λ, constant dans le temps. Brunton le dit faux pour ses mails (beaucoup le lundi à 9 h, peu le dimanche soir) et vrai à peu près pendant la journée de travail.</li>
+      <li>λ a une unité (mails par minute), λt n'en a pas. Le λ de la notion 1 était un nombre moyen ; ici c'est un taux, et le paramètre de Poisson est λt.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig5">
+    <div class="lbl">Figure 5 — zéro mail, un mail, et le facteur 5t</div>
+    <div id="f5plot" class="wide"></div>
+    <div id="f5ctl"></div>
+    <div class="readouts" id="f5out"></div>
+    <p class="cap">À 5 mails par minute, la probabilité d'avoir 0, 1 ou 2 mails dans une fenêtre de t minutes. La courbe de « 0 mail » est aussi la survie de l'attente, e<sup>−5t</sup>. Le pointillé ocre est la formule de Brunton pour « 1 mail », 5e<sup>−5t</sup> : elle part de 5 et dépasse 1 tant que t &lt; 0,32 min, ce qu'aucune probabilité ne fait. Déplace <b>t</b> : le rapport P(1)/P(0) vaut 5t, 0,5 à t = 0,1 min et 5 seulement à t = 1 min.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>les mails, les spams, une API de LLM, la table du processus</small></summary><div class="in">
+    <ol>
+      <li><b>Les mails de Brunton</b>, 5 par minute. En une minute : P(0) = e<sup>−5</sup> = 0,0067 ; P(1) = 5e<sup>−5</sup> = 0,034, cinq fois plus. En six secondes (t = 0,1 min) : P(0) = e<sup>−0,5</sup> = 0,607 ; P(1) = 0,5 e<sup>−0,5</sup> = 0,303, deux fois moins. Vingt minutes sans mail : e<sup>−100</sup> = 3,7 × 10<sup>−44</sup>.</li>
+      <li><b>Les spams du fil rouge</b>, 4 par heure : en une heure, Poisson(4) (<a href="#n1">notion 1</a>) ; entre deux spams, une exponentielle de moyenne 15 min (<a href="#n3">notion 3</a>). En 30 min, Poisson(2) : P(0) = e<sup>−2</sup> = 0,135 = P(T &gt; 30 min).</li>
+      <li><b>ML, une API de LLM</b> qui reçoit λ = 20 requêtes par seconde. L'écart entre deux requêtes est exponentiel, 50 ms en moyenne, et 18 % des écarts font moins de 10 ms. Dans une fenêtre de 100 ms, le compte suit Poisson(2) : vide 13,5 % du temps, 5 requêtes ou plus 5,3 % du temps. Par seconde, Poisson(20) : un service qui traite 31 requêtes par seconde suffit 99,2 % des secondes ; dimensionné sur la moyenne, 20 par seconde, il serait débordé 44 % des secondes.</li>
+      <li><b>Une frise, quatre questions.</b>
+        <table>
+          <tr><th>question</th><th>loi</th><th>moyenne</th></tr>
+          <tr><td>combien d'événements pendant t ?</td><td>Poisson(λt)</td><td>λt</td></tr>
+          <tr><td>combien de temps jusqu'au prochain ?</td><td>Exponentielle(λ)</td><td>1/λ</td></tr>
+          <tr><td>combien de temps jusqu'au r-ième ?</td><td>Gamma(r, λ) (<a href="#n7">notion 7</a>)</td><td>r/λ</td></tr>
+          <tr><td>en temps discret, à quel essai le premier succès ?</td><td>Géométrique(p) (<a href="#n2">notion 2</a>)</td><td>1/p</td></tr>
+        </table>
+      </li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>l'attente à partir du compte, le compte à partir de la notion 1</small></summary><div class="in">
+    <div class="drv">
+      <div>{<i>T</i><sub>1</sub> &gt; <i>t</i>} = {<i>N</i>(<i>t</i>) = 0}</div><span>la première arrivée est après t si et seulement si la fenêtre [0, t] est vide</span>
+      <div><i>P</i>(<i>T</i><sub>1</sub> &gt; <i>t</i>) = (λ<i>t</i>)<sup>0</sup> e<sup>−λ<i>t</i></sup> / 0! = e<sup>−λ<i>t</i></sup></div><span>Poisson(λt) en 0</span>
+      <div><i>T</i><sub>1</sub> ~ Exponentielle(λ)</div><span>c'est la survie de la <a href="#n3">notion 3</a></span>
+    </div>
+    <p><b>Pourquoi le compte est Poisson(λt).</b> On découpe [0, t] en n tranches de durée t/n. Dans chacune, un mail arrive avec probabilité ≈ λt/n, deux mails avec une probabilité d'ordre (λt/n)², négligeable, et les tranches sont indépendantes. Le compte est donc une Binomiale(n, λt/n), dont la limite quand n → ∞ est Poisson(λt) par la <a href="#n1">notion 1</a>. C'est le « rare dans une tranche infime » de Brunton.</p>
+    <p><b>Pourquoi toutes les attentes ont la même loi</b>, en esquisse. Après la première arrivée, ce qui suit ne dépend pas de ce qui précède (comptes indépendants sur des fenêtres disjointes) : le processus repart à zéro, W<sub>2</sub> a la loi de W<sub>1</sub> et en est indépendante ; de même pour W<sub>3</sub>, W<sub>4</sub>, …</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>des attentes exponentielles fabriquent des comptes de Poisson</small></summary><div class="in">
+<pre class="py">{{CODE:c6}}</pre>
+<pre class="out">{{OUT:c6}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Le taux varie.</b> Lundi 9 h contre dimanche soir, heures de pointe d'une API. Même si chaque heure est Poisson, le mélange d'heures calmes et chargées donne des comptes <b>surdispersés</b>, Var &gt; E. Le test : comparer la variance et la moyenne des comptes par fenêtre.</li>
+      <li><b>Les arrivées se suivent.</b> Des clients qui relancent leurs requêtes en rafale après une erreur, un cron qui envoie tout à l'heure pile : les attentes ne sont plus indépendantes, et dimensionner sur Poisson sous-estime les pics.</li>
+      <li><b>λ ou λt.</b> P(N(t) = k) a (λt)<sup>k</sup> au numérateur, pas λ<sup>k</sup>. Écrire λ<sup>k</sup>e<sup>−λt</sup>/k! mélange un taux et un nombre moyen.</li>
+      <li><b>Compter n'est pas faire la queue.</b> L'exemple de l'API compte des arrivées par seconde ; si chaque requête prend du temps, la latence relève de la théorie des files d'attente, hors de cette leçon.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (21) écrit P(1 mail en t) = 5e<sup>−5t</sup> et conclut qu'un mail est « cinq fois plus probable » que zéro. C'est 5t e<sup>−5t</sup> : le rapport vaut 5t, soit 5 pour t = 1 min et 0,5 pour t = 6 s. Sa formule dépasse 1 pour t &lt; 0,32 min, signe qu'elle n'est pas une probabilité. En cherchant la loi, il dit « λ<sup>k</sup> e<sup>−λt</sup>/k! » : c'est (λt)<sup>k</sup>. Et quand il dit qu'attendre 20 minutes sans mail est « un très grand nombre », il pense sans doute à l'exposant, 5 × 20 = 100 ; la probabilité est e<sup>−100</sup> = 3,7 × 10<sup>−44</sup>.</div>
+  </div></details>
+  <p class="garde">Processus de Poisson de taux λ : attentes i.i.d. Exponentielle(λ), compte Poisson(λt) dans une fenêtre de durée t, car « aucun événement pendant t » = « attente &gt; t », de probabilité e<sup>−λt</sup>.</p>
+</section>
+

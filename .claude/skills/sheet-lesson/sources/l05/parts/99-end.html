@@ -1,0 +1,55 @@
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Poisson(λ) : limite de Binomiale(n, λ/n), beaucoup d'occasions indépendantes et rares ; P(X = k ; λ) = λ<sup>k</sup>e<sup>−λ</sup>/k!, E = Var = λ.</li>
+    <li>Ce qui justifie Poisson est p petit à np fixé, pas λ petit.</li>
+    <li>Géométrique(p) : le rang du premier succès ; P(X ≥ k) = q<sup>k−1</sup>, E = 1/p.</li>
+    <li>Exponentielle(λ) : P(T &gt; t) = e<sup>−λt</sup>, E = 1/λ, médiane = demi-vie = ln 2/λ ; une probabilité est une aire.</li>
+    <li>Sans mémoire : P(T &gt; s + t ∣ T &gt; s) = P(T &gt; t) ; c'est un taux de risque constant λ, et λ dt est une probabilité.</li>
+    <li>Processus de Poisson : attentes i.i.d. Exponentielle(λ), comptes Poisson(λt) ; aucun événement pendant t = attente &gt; t.</li>
+    <li>Somme de r attentes : Gamma(r, λ), moyenne r/λ ; premier de r flux en parallèle : Exponentielle(rλ).</li>
+  </ol>
+</div>
+<div class="phrase">« Un comptage d'événements rares mais nombreux en occasions est Poisson, limite de la binomiale à p petit et np fixé, avec une variance égale à la moyenne. Dans un processus de Poisson de taux λ, l'attente du prochain événement est exponentielle, de moyenne 1/λ et sans mémoire, le nombre d'événements dans une fenêtre t est Poisson(λt), et l'attente du r-ième est une Gamma. Si les comptes ont une variance nettement plus grande que leur moyenne, les arrivées ne sont pas indépendantes ou leur taux varie, et le modèle tombe. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Mille essais à une chance sur mille : pourquoi pas la normale, et quelle loi ?</div><div class="a hid">La normale de même moyenne et variance mettrait 16 % de sa masse sous 0. Poisson(1), limite de Binomiale(n, λ/n), avec E = Var = 1.</div></li>
+    <li><div class="q">10 000 néons qui grillent chacun avec probabilité 0,002 : λ = 20 est-il petit, et qu'est-ce qui justifie Poisson ?</div><div class="a hid">λ = 20 n'est pas petit. Ce qui justifie Poisson est p petit à np fixé.</div></li>
+    <li><div class="q">Quelle est la probabilité qu'il faille au moins 10 lancers de dé pour obtenir un 5 ?</div><div class="a hid">C'est que les 9 premiers ratent : (5/6)<sup>9</sup> = 0,194. Exactement 10 : 0,032.</div></li>
+    <li><div class="q">Une ampoule dure 100 h en moyenne : probabilité de tenir 50 h, et médiane ?</div><div class="a hid">e<sup>−1/2</sup> = 0,607, pas 70 % ; médiane 100 ln 2 = 69,3 h.</div></li>
+    <li><div class="q">Une ampoule exponentielle de 1 000 h en moyenne a déjà tenu 1 000 h : combien lui reste-t-il ?</div><div class="a hid">1 000 h en moyenne : P(T &gt; s + t ∣ T &gt; s) = e<sup>−λt</sup>, l'horloge repart de zéro.</div></li>
+    <li><div class="q">Mails à 5 par minute : probabilité de 0 mail en t minutes, puis de 1 mail ?</div><div class="a hid">e<sup>−5t</sup>, qui est aussi P(attente &gt; t) ; puis 5t e<sup>−5t</sup>, un rapport de 5t, et non 5.</div></li>
+    <li><div class="q">Trois guichets de 15 min en moyenne : attente en série, puis en parallèle ?</div><div class="a hid">En série, une somme : Gamma(3, 1/15), 45 min. En parallèle, un minimum : Exponentielle(3/15), 5 min.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Chaînes et leçons</div>
+  <div class="bridges">
+    <a href="../chains/chain-p07-02-bagging-rf.html"><b>Bagging et forêts aléatoires</b><small>(1 − 1/n)<sup>n</sup> → e<sup>−1</sup> = 0,368, la part de lignes hors-sac : la limite de la notion 1, une Poisson(1) en 0.</small></a>
+    <a href="../chains/chain-p01-05-bootstrap.html"><b>Le bootstrap</b><small>Chaque ligne apparaît Binomiale(n, 1/n) ≈ Poisson(1) fois dans un rééchantillon (notion 1, exemple 4).</small></a>
+    <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html"><b>Du bruit à la loss (fil B)</b><small>Indépendance ⇒ produit ⇒ vraisemblance. Appliqué à des comptes Poisson, le geste donne la perte de Poisson, λ − y ln λ à une constante près.</small></a>
+    <a href="../chains/chain-p07-03-boosting.html"><b>Gradient boosting</b><small>La perte de Poisson y figure parmi les pertes possibles, pour régresser un comptage (requêtes par minute, pannes par jour).</small></a>
+    <a href="lesson-00-08-esperance-variance.html#n8"><b>l08 · L'exponentielle : E, Var, médiane</b><small>Les intégrales par parties de E[T] = 1/λ et Var(T) = 1/λ², que cette leçon admet.</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::poisson</code> (notions 1, 6) · <code>stats::geometrique</code> (notion 2) · <code>stats::exponentielle</code> (notions 3, 4, 6). Les notions 5 et 7 sont de la culture, sans carte.</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l05 · v1 du 10/10/2026 · Brunton 17 à 22 · Prérequis : <a href="lesson-00-04-variables-binomiale-normale.html">l04 · Variables aléatoires, de la binomiale à la normale</a>. Suite : <a href="lesson-00-06-fonctions-standardisation.html">l06 · Fonctions d'une variable aléatoire</a>.</footer>
+</div>

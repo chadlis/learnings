@@ -1,0 +1,6 @@
+.sl-fn.sl-dash{stroke-dasharray:6 4}
+.sl-win{fill:rgba(31,95,168,.11)}
+.sl-band{fill:rgba(183,121,31,.16)}
+.sl-x{font:600 13px var(--mono);fill:var(--pen)}
+.sl-lane{fill:#6B46C1;opacity:.7}.sl-lane.first{fill:var(--red);opacity:.8}
+.sl-lane-t{font:600 11px var(--sans);fill:#fff}

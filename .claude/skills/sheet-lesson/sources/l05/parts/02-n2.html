@@ -1,0 +1,65 @@
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>La géométrique : le rang du premier succès <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 18 · The Geometric Distribution: the First Success of a Bernoulli Sequence</p>
+  <div class="idee">
+    <p>On lance un dé jusqu'à obtenir un 5 (« I need 5's »). X est le rang du premier 5. Brunton insiste : premier succès exactement au n-ième lancer, pas « au moins ».</p>
+    <p>La seule façon d'avoir le premier 5 au lancer n est d'avoir raté les n − 1 premiers, puis réussi. Les lancers sont indépendants, donc la probabilité est un produit : (5/6)<sup>n−1</sup> × 1/6. Au dixième lancer exactement : 0,032.</p>
+    <p>La question utile est plutôt « faut-il au moins 10 lancers ? ». Cela arrive si et seulement si les 9 premiers lancers ratent : (5/6)<sup>9</sup> = 0,194. Un joueur sur cinq attend au moins dix lancers, alors qu'il en faut 6 en moyenne.</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — vingt joueurs qui lancent jusqu'au premier 5</div>
+    <div id="v2ctl" class="sl-ctl"></div>
+    <div id="v2plot" class="wide"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">Une ligne par joueur, une case par lancer : vide pour un raté, pleine pour le premier 5. La bande ocre couvre les <b>9 premiers lancers</b> : un joueur a besoin d'au moins 10 lancers si et seulement si sa ligne traverse la bande sans case pleine (marque rouge à droite). Clique sur <b>vingt autres joueurs</b> : le cumul de la part « au moins 10 » s'approche de (5/6)<sup>9</sup> = 19,4 %, le rang moyen de 6.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>P</i>(<i>X</i> = <i>k</i> ; <i>p</i>) = <i>q</i><sup><i>k</i>−1</sup> <i>p</i>, &nbsp; <i>k</i> = 1, 2, 3, … &nbsp;&nbsp;&nbsp; <i>P</i>(<i>X</i> ≥ <i>k</i>) = <i>q</i><sup><i>k</i>−1</sup> &nbsp;&nbsp;&nbsp; E[<i>X</i>] = 1/<i>p</i></div>
+    <ul>
+      <li>q = 1 − p. Les essais sont des Bernoulli <b>indépendantes</b> : c'est ce qui fait du « k − 1 échecs puis un succès » un produit.</li>
+      <li>La <b>même probabilité p</b> à chaque essai : c'est ce qui donne la puissance q<sup>k−1</sup>.</li>
+      <li>X compte les essais, succès compris, donc commence à 1. La variance vaut q/p², donnée pour la culture.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — la loi géométrique et sa queue</div>
+    <div id="f2ctl" class="sl-ctl"></div>
+    <div id="f2sl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Chaque barre est P(X = k) ; les barres bleues, à partir du <b>seuil k</b>, forment la queue P(X ≥ k). Pour le dé (p = 1/6) et k = 10 : la barre du seuil vaut 0,032, la queue entière 0,194 = (5/6)<sup>9</sup>. Les barres décroissent d'un facteur q à chaque pas : c'est une suite géométrique, d'où le nom. Passe à la <b>pièce</b> : la queue fond, P(X ≥ 10) = 1/512.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>une pièce, le dé de Brunton, pass@k</small></summary><div class="in">
+    <ol>
+      <li><b>Une pièce</b>, p = ½. P(X = 3) = ½ × ½ × ½ = 1/8 (raté, raté, réussi). P(X ≥ 3) = ¼ : les deux premiers lancers ratent.</li>
+      <li><b>Le dé, premier 5</b>, p = 1/6. P(X = 1) = 0,167 ; P(X = 2) = 5/36 = 0,139 ; P(X = 10) = 0,032 ; P(X ≥ 10) = 0,194. Moyenne 1/p = 6 lancers. La médiane est 4 : P(X ≤ 3) = 0,421 et P(X ≤ 4) = 0,518. La moitié des joueurs ont leur 5 en 4 lancers au plus, et la queue tire la moyenne à 6.</li>
+      <li><b>ML, pass@k.</b> Un modèle de code résout un problème avec probabilité p = 0,2 par génération. Avec k générations indépendantes, « au moins un succès » est « le premier succès arrive au rang k au plus » : P(X ≤ k) = 1 − q<sup>k</sup>. pass@5 = 1 − 0,8<sup>5</sup> = 0,672 ; pass@10 = 0,893.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la loi, la queue de deux façons, la moyenne</small></summary><div class="in">
+    <p>On note F<sub>i</sub> « l'essai i rate » et S<sub>k</sub> « l'essai k réussit », comme Brunton.</p>
+    <div class="drv">
+      <div><i>P</i>(<i>X</i> = <i>k</i>) = <i>P</i>(F<sub>1</sub> ∩ ⋯ ∩ F<sub><i>k</i>−1</sub> ∩ S<sub><i>k</i></sub>)</div><span>premier succès au rang k : tout ce qui précède a raté</span>
+      <div>= <i>P</i>(F<sub>1</sub>) ⋯ <i>P</i>(F<sub><i>k</i>−1</sub>) <i>P</i>(S<sub><i>k</i></sub>) = <i>q</i><sup><i>k</i>−1</sup> <i>p</i></div><span>indépendance : l'intersection devient un produit (<a href="lesson-00-03-conditionner-bayes-independance.html#n7">l03</a>)</span>
+      <div><i>P</i>(<i>X</i> ≥ <i>k</i>) = Σ<sub><i>n</i>≥<i>k</i></sub> <i>q</i><sup><i>n</i>−1</sup> <i>p</i> = <i>q</i><sup><i>k</i>−1</sup> <i>p</i> (1 + <i>q</i> + <i>q</i>² + ⋯)</div><span>on met q<sup>k−1</sup>p en facteur</span>
+      <div>= <i>q</i><sup><i>k</i>−1</sup> <i>p</i> / (1 − <i>q</i>) = <i>q</i><sup><i>k</i>−1</sup></div><span>série géométrique, q &lt; 1 ; 1 − q = p se simplifie</span>
+    </div>
+    <p><b>Deuxième méthode, que Brunton donne aussi.</b> {X ≥ k} est exactement l'événement « les k − 1 premiers essais ratent », donc P(X ≥ k) = q<sup>k−1</sup> sans aucune somme. Avec k = 1 on retrouve P(X ≥ 1) = 1 : la loi est complète.</p>
+    <p><b>La moyenne</b>, par la somme des queues de <a href="lesson-00-08-esperance-variance.html#n11">l08</a> : E[X] = Σ<sub>k≥1</sub> P(X ≥ k) = Σ<sub>k≥1</sub> q<sup>k−1</sup> = 1/(1 − q) = 1/p. Ou, sans elle : on s'arrête au premier essai avec probabilité p, sinon un essai est perdu et tout recommence ; donc E = 1 + qE, et E = 1/p.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>200 000 joueurs de dé</small></summary><div class="in">
+<pre class="py">{{CODE:c2}}</pre>
+<pre class="out">{{OUT:c2}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>« Exactement » contre « au moins ».</b> P(X = 10) = 0,032 et P(X ≥ 10) = 0,194 : six fois plus. C'est la confusion contre laquelle Brunton met en garde.</li>
+      <li><b>Deux conventions.</b> Certains comptent les échecs avant le premier succès : support 0, 1, 2, …, moyenne q/p = 5 pour le dé. numpy (<code>rng.geometric</code>) et scipy (<code>stats.geom</code>) comptent les essais, support 1, 2, …</li>
+      <li><b>Le 5 n'est pas « dû ».</b> Après 20 lancers sans 5, la probabilité d'attendre encore au moins 10 lancers reste (5/6)<sup>9</sup> = 0,194 : la géométrique est sans mémoire, version discrète de la <a href="#n4">notion 4</a>. Croire le contraire est l'erreur du joueur.</li>
+      <li><b>pass@k quand p varie.</b> Si la moitié des problèmes se résout avec p = 0,4 et l'autre jamais, p vaut 0,2 en moyenne, mais pass@5 = ½(1 − 0,6<sup>5</sup>) = 0,461, et non 0,672. La formule 1 − q<sup>k</sup> demande le même p pour chaque essai.</li>
+    </ul>
+  </div></details>
+  <p class="garde">Géométrique(p) : le rang du premier succès dans des essais indépendants de même probabilité p. P(X = k) = q<sup>k−1</sup> p, P(X ≥ k) = q<sup>k−1</sup> (les k − 1 premiers ratent), E[X] = 1/p.</p>
+</section>
+

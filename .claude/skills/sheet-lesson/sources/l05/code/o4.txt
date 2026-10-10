@@ -1,0 +1,5 @@
+already on   exponential: alive, h left   |   wear: alive, h left
+      0 h      1.000    997         |          1.000   1000
+    500 h      0.606    996         |          0.994    504
+   1000 h      0.367    994         |          0.501    159
+   1500 h      0.222    991         |          0.006     62

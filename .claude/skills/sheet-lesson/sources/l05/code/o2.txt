@@ -1,0 +1,7 @@
+P(X = 10)   sim 0.0321   exact 0.0323
+P(X >= 10)  sim 0.1936   exact 0.1938
+mean 5.993 (1/p = 6)   median 4
+after 20 misses: P(10+ more rolls) 0.1971   (no memory: 0.1938)
+pass@1  = 1 - 0.8**1  = 0.200
+pass@5  = 1 - 0.8**5  = 0.672
+pass@10 = 1 - 0.8**10 = 0.893

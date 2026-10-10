@@ -1,0 +1,74 @@
+<!-- ============================ n1 ============================ -->
+<section class="notion outil" id="n1">
+  <h3>Poisson, la limite des événements rares <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 17 · The Poisson Distribution: the Rare-Event Limit of a Binomial Distribution</p>
+  <div class="idee">
+    <p>Brunton part d'un échec. Mille essais, chacun avec une chance sur mille : la binomiale a pour moyenne np = 1 et pour variance npq = 0,999. La normale de même moyenne et de même variance met 16 % de sa masse sous zéro, sur des nombres de succès négatifs, qui n'existent pas.</p>
+    <p>Le remède est de garder le nombre moyen de succès <b>λ = np</b> fixé, de faire grandir n et donc de rapetisser p = λ/n. Beaucoup d'occasions, chacune improbable, λ succès en moyenne. À la limite, la binomiale devient la <b>loi de Poisson</b>, qui ne dépend plus que de λ.</p>
+    <p>L'exemple de Brunton : une usine compte 10 000 néons, et chacun grille dans la journée avec une probabilité de 0,002. Le nombre de néons grillés aujourd'hui suit une loi de Poisson de paramètre λ = 10 000 × 0,002 = 20.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — la normale déborde sous zéro, la Poisson colle</div>
+    <div id="v1ctl" class="sl-ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">Les barres sont la binomiale exacte, les points rouges la Poisson de même moyenne, la courbe la normale de même moyenne et de même variance, avec en rouge sa masse sous zéro. <b>1 000 essais à 1/1 000</b> : la normale met 15,9 % de sa masse sur des comptes négatifs et se trompe de 0,13 au pire ; la Poisson se trompe de 0,0002. <b>Néons</b> : λ = 20, la masse négative tombe à 0,0004 % ; la Poisson colle encore, et la normale aussi, parce qu'à λ = 20 les trois lois se ressemblent.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>P</i>(<i>X</i> = <i>k</i> ; λ) = λ<sup><i>k</i></sup> e<sup>−λ</sup> / <i>k</i>!, &nbsp; <i>k</i> = 0, 1, 2, … &nbsp;&nbsp;&nbsp;&nbsp; E[<i>X</i>] = Var(<i>X</i>) = λ</div>
+    <ul>
+      <li>C'est la limite de Binomiale(n, p) quand n → ∞ et p → 0 avec np = λ fixé. Ce qui compte est que <b>p soit petit</b>, pas que λ le soit : λ = 20 convient.</li>
+      <li>Les occasions sont indépendantes et ont la même probabilité p : c'est la binomiale de <a href="lesson-00-04-variables-binomiale-normale.html#n4">l04</a>, et sans indépendance la limite tombe.</li>
+      <li>λ est un paramètre fixe, d'où le point-virgule ; k est le compte qu'on observe, une réalisation de X.</li>
+      <li>E = Var est un <b>test nécessaire</b> : un seul paramètre fixe à la fois le niveau et la dispersion, donc une variance nettement différente de la moyenne exclut la Poisson ; l'égalité, elle, ne la prouve pas.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — la binomiale rejoint la Poisson</div>
+    <div id="f1plot" class="wide"></div>
+    <div id="f1ctl"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Les <b>barres</b> sont la Binomiale(n, λ/n), la <b>ligne rouge à points</b> la Poisson(λ). Les deux ont la même moyenne λ par construction. Monte <b>n</b> à λ fixé : l'écart maximal entre les deux tombe, et la valeur affichée passe au vert sous 0,01 (à λ = 4 et n = 1 000, il vaut 0,0004). Monte <b>λ</b> : la loi s'élargit comme √λ, sa variance reste égale à sa moyenne. Pousse λ à 15 et ramène n à 20 : p = 0,75 n'est plus petit, et la binomiale, de variance np(1 − p) = 3,75, est bien plus étroite que la Poisson, de variance 15.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>λ = 1, les néons, les spams, un bootstrap</small></summary><div class="in">
+    <ol>
+      <li><b>λ = 1</b>, l'expérience de pensée de Brunton : P(0) = P(1) = e<sup>−1</sup> = 0,368 ; P(2) = 0,184 ; P(3) = 0,061. La Binomiale(1 000 ; 0,001) donne 0,368 ; 0,368 ; 0,184 ; 0,061.</li>
+      <li><b>Les néons</b>, λ = 20 : P(20) = 0,0888 (binomiale 0,0889) ; P(10) = 0,0058 ; P(5) = 5,5 × 10<sup>−5</sup>. Une journée à exactement cinq néons grillés arrive une fois tous les 18 200 jours en moyenne, soit 50 ans.</li>
+      <li><b>Le fil rouge</b> : des spams à 4 par heure, Poisson(4). P(0) = e<sup>−4</sup> = 0,018 ; P(4) = e<sup>−4</sup> 4<sup>4</sup>/4! = 0,195 ; P(X ≥ 7) = 0,111. La Binomiale(1 000 ; 0,004), mille mails à 0,4 % de spam, donne P(4) = 0,196.</li>
+      <li><b>ML, le bootstrap.</b> On tire n lignes avec remise parmi n. Une ligne donnée est tirée Binomiale(n, 1/n) fois, presque une Poisson(1) : elle est absente avec probabilité (1 − 1/n)<sup>n</sup> → e<sup>−1</sup> = 0,368 (0,3677 pour n = 1 000), tirée deux fois ou plus avec probabilité 0,264. Ce sont les 36,8 % de lignes hors-sac des forêts aléatoires (<a href="../chains/chain-p07-02-bagging-rf.html">p07-02</a>).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la limite au tableau, puis E = Var = λ par la série</small></summary><div class="in">
+    <p><b>La limite.</b> On pose p = λ/n dans la binomiale, k fixé, et on réécrit sans rien approcher, comme Brunton :</p>
+    <div class="drv">
+      <div><i>P</i>(<i>X</i> = <i>k</i>) = <i>n</i>! / (<i>k</i>! (<i>n</i> − <i>k</i>)!) · (λ/<i>n</i>)<sup><i>k</i></sup> (1 − λ/<i>n</i>)<sup><i>n</i>−<i>k</i></sup></div><span>binomiale, p = λ/n</span>
+      <div>= (λ<sup><i>k</i></sup>/<i>k</i>!) · [<i>n</i>(<i>n</i> − 1)⋯(<i>n</i> − <i>k</i> + 1) / <i>n</i><sup><i>k</i></sup>] · (1 − λ/<i>n</i>)<sup><i>n</i></sup> · (1 − λ/<i>n</i>)<sup>−<i>k</i></sup></div><span>n!/(n − k)! a k facteurs, un n sous chacun ; on coupe l'exposant n − k</span>
+      <div>[<i>n</i>(<i>n</i> − 1)⋯(<i>n</i> − <i>k</i> + 1) / <i>n</i><sup><i>k</i></sup>] = 1 · (1 − 1/<i>n</i>) ⋯ (1 − (<i>k</i> − 1)/<i>n</i>) → 1</div><span>k facteurs, chacun → 1, et k ne bouge pas</span>
+      <div>(1 − λ/<i>n</i>)<sup>−<i>k</i></sup> → 1<sup>−<i>k</i></sup> = 1</div><span>λ/n → 0, exposant fixe</span>
+      <div>(1 − λ/<i>n</i>)<sup><i>n</i></sup> = e<sup><i>n</i> ln(1 − λ/<i>n</i>)</sup> = e<sup>−λ − λ²/(2<i>n</i>) − …</sup> → e<sup>−λ</sup></div><span>ln(1 − x) = −x − x²/2 − … pour x petit</span>
+      <div><i>P</i>(<i>X</i> = <i>k</i>) → λ<sup><i>k</i></sup> e<sup>−λ</sup> / <i>k</i>!</div><span>produit des limites</span>
+    </div>
+    <p>Le passage à la limite, n → ∞ avec λ = np fixé, donc p → 0, sert aux trois dernières limites : il fait tendre vers 1 les deux facteurs parasites et fait apparaître e<sup>−λ</sup>. Le total vaut bien 1 : Σ<sub>k</sub> λ<sup>k</sup>/k! = e<sup>λ</sup> (série de l'exponentielle), donc Σ<sub>k</sub> λ<sup>k</sup>e<sup>−λ</sup>/k! = 1.</p>
+    <p><b>E = Var = λ</b>, par la série :</p>
+    <div class="drv">
+      <div>E[<i>X</i>] = Σ<sub><i>k</i>≥1</sub> <i>k</i> λ<sup><i>k</i></sup> e<sup>−λ</sup>/<i>k</i>! = λ Σ<sub><i>k</i>≥1</sub> λ<sup><i>k</i>−1</sup> e<sup>−λ</sup>/(<i>k</i> − 1)! = λ</div><span>k/k! = 1/(k − 1)! ; la somme restante est le total de la loi, 1</span>
+      <div>E[<i>X</i>(<i>X</i> − 1)] = Σ<sub><i>k</i>≥2</sub> <i>k</i>(<i>k</i> − 1) λ<sup><i>k</i></sup> e<sup>−λ</sup>/<i>k</i>! = λ² Σ<sub><i>k</i>≥2</sub> λ<sup><i>k</i>−2</sup> e<sup>−λ</sup>/(<i>k</i> − 2)! = λ²</div><span>même geste, deux crans ; LOTUS (<a href="lesson-00-08-esperance-variance.html#n5">l08</a>)</span>
+      <div>Var(<i>X</i>) = E[<i>X</i>(<i>X</i> − 1)] + E[<i>X</i>] − E[<i>X</i>]² = λ² + λ − λ² = λ</div><span>E[X²] = E[X(X − 1)] + E[X], puis E[X²] − μ² (<a href="lesson-00-08-esperance-variance.html#n6">l08</a>)</span>
+    </div>
+    <p>La même chose se lit sur la binomiale : E = np = λ, et Var = np(1 − p) = λ(1 − λ/n) → λ.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>100 000 journées de néons</small></summary><div class="in">
+<pre class="py">{{CODE:c1}}</pre>
+<pre class="out">{{OUT:c1}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Les occasions ne sont pas indépendantes.</b> Des spams envoyés par rafales : les comptes deviennent <b>surdispersés</b>, Var &gt; E. Une moyenne de 4 et une variance de 9 sur des comptes horaires, rapport 2,25, disent « pas Poisson » avant tout autre calcul. La loi qui absorbe cet excès s'appelle la binomiale négative ; on la nomme seulement.</li>
+      <li><b>p n'est pas petit.</b> Dix mails à 40 % de spam : Binomiale(10 ; 0,4), moyenne 4 mais variance 2,4. La Poisson(4) aurait une variance de 4, et donnerait P(X &gt; 10) = 0,003 à un compte qui ne peut pas dépasser 10.</li>
+      <li><b>La normale échoue à λ petit, pas la Poisson à λ grand.</b> À λ = 20, la normale N(20 ; 19,96) donne en 20 une densité de 0,0893, contre 0,0888 pour la Poisson : les deux marchent.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (17) annonce une dérivation où « np n'est pas trop grand », puis prend pour exemple des néons où np = 20. Ce qui justifie la Poisson n'est pas un λ petit, c'est p = 0,002 petit avec np fixé. Il n'énonce pas non plus E = Var = λ, qui est pourtant le premier test de la loi.</div>
+  </div></details>
+  <p class="garde">Occasions nombreuses, indépendantes et rares : Poisson(λ), limite de Binomiale(n, λ/n), P(X = k ; λ) = λ<sup>k</sup>e<sup>−λ</sup>/k!, E = Var = λ. Une variance nettement différente de la moyenne exclut la Poisson ; l'égalité ne la prouve pas.</p>
+</section>
+

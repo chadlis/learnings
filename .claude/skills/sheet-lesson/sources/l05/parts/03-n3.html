@@ -1,0 +1,67 @@
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>L'exponentielle : attendre un événement rare <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 19 · The Exponential Distribution: Time Between Poisson Events</p>
+  <div class="idee">
+    <p>La loi exponentielle modélise l'instant d'un événement rare : la panne d'une ampoule, la désintégration d'un atome, le moment où l'on est enfin reçu au DMV, le guichet américain des permis de conduire. T est un temps, une variable continue. Sa densité λe<sup>−λt</sup> part de la hauteur λ en t = 0 et décroît.</p>
+    <p>L'ampoule de Brunton dure 100 heures en moyenne, donc λ = 1/100 par heure. Elle tient au moins 50 heures avec probabilité e<sup>−50/100</sup> = e<sup>−1/2</sup> = 0,607 : six ampoules sur dix.</p>
+    <p>Le polonium 210 a une <b>demi-vie</b> de 138 jours : la moitié des atomes a disparu à 138 jours, les trois quarts à 276. La demi-vie est la médiane de T, pas sa moyenne : la vie moyenne d'un atome est de 199 jours.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — 400 ampoules, 400 atomes</div>
+    <div id="v3ctl" class="sl-ctl"></div>
+    <div id="v3sl"></div>
+    <div id="v3plot"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">Le premier panneau montre 400 ampoules ou 400 atomes : un disque plein tant qu'il vit, un cercle vide une fois éteint. Le second donne la courbe de survie e<sup>−λt</sup> et, en rouge, la part encore en vie. Déplace le <b>temps</b>. Ampoules de 100 h en moyenne : à 50 h, il en reste 60,7 % en théorie. Polonium 210 : 50 % à 138 jours, 16 % à 365 jours, 1 % à 917 jours. <b>Laisse passer le temps</b> : chaque demi-vie emporte la moitié de ce qui reste.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>f</i>(<i>t</i>) = λ e<sup>−λ<i>t</i></sup>, <i>t</i> ≥ 0 &nbsp;&nbsp; <i>F</i>(<i>t</i>) = 1 − e<sup>−λ<i>t</i></sup> &nbsp;&nbsp; survie <i>P</i>(<i>T</i> &gt; <i>t</i>) = e<sup>−λ<i>t</i></sup><br><i>P</i>(<i>a</i> &lt; <i>T</i> &lt; <i>b</i>) = e<sup>−λ<i>a</i></sup> − e<sup>−λ<i>b</i></sup> &nbsp;&nbsp; E[<i>T</i>] = 1/λ &nbsp;&nbsp; médiane = demi-vie = ln 2/λ ≈ 0,693/λ</div>
+    <ul>
+      <li>λ &gt; 0 est un <b>taux</b>, fixe : des événements par unité de temps. Son unité fixe celle de t, et λt n'a pas d'unité.</li>
+      <li>T ≥ 0 : l'horloge démarre maintenant, rien n'est arrivé avant. La densité vaut 0 pour t &lt; 0.</li>
+      <li>f(t) est une densité, pas une probabilité : une probabilité est une aire sous f (<a href="lesson-00-04-variables-binomiale-normale.html#n2">l04</a>).</li>
+      <li>L'écart-type vaut aussi 1/λ ; le calcul de E[T] et de Var(T) par intégration est en <a href="lesson-00-08-esperance-variance.html#n8">l08</a>.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — l'attente du prochain spam, et ses aires</div>
+    <div id="f3plot" class="wide"></div>
+    <div id="f3ctl"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">La densité de l'attente entre deux spams ; l'<b>aire violette</b> est P(a &lt; T &lt; b). Le trait rouge marque la moyenne 1/λ, le pointillé la médiane, toujours à gauche de la moyenne : c'est la signature d'une queue à droite. À 4 spams par heure, entre a = 15 et b = 30 min : e<sup>−1</sup> − e<sup>−2</sup> = 0,233. Pousse <b>b</b> au bout : l'aire devient la survie P(T &gt; a). Monte <b>λ</b> : la courbe part plus haut et l'attente raccourcit.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>les spams, l'ampoule, le polonium</small></summary><div class="in">
+    <ol>
+      <li><b>Les spams du fil rouge</b>, 4 par heure : attente moyenne 1/4 h = 15 min. P(T &gt; 15 min) = e<sup>−1</sup> = 0,368 ; P(T &gt; 30 min) = e<sup>−2</sup> = 0,135 ; P(15 &lt; T &lt; 30) = 0,233. Médiane ln 2/4 h = 10,4 min. 63 % des attentes sont plus courtes que la moyenne.</li>
+      <li><b>L'ampoule</b> de 100 h en moyenne : P(T ≥ 50) = e<sup>−0,5</sup> = 0,607 ; P(50 &lt; T &lt; 100) = e<sup>−0,5</sup> − e<sup>−1</sup> = 0,239 ; médiane 100 ln 2 = 69,3 h.</li>
+      <li><b>Le polonium 210</b>, demi-vie 138 jours : λ = ln 2/138 = 0,00502 par jour. Un atome passe l'année avec probabilité e<sup>−365λ</sup> = 2<sup>−365/138</sup> = 0,160. 99 % d'un échantillon a disparu au bout de ln 100/λ = 917 jours, 2,5 ans. Vie moyenne 1/λ = 199 jours.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>répartition, survie, intervalle, médiane, moyenne</small></summary><div class="in">
+    <div class="drv">
+      <div><i>F</i>(<i>t</i>) = ∫<sub>0</sub><sup><i>t</i></sup> λ e<sup>−λ<i>u</i></sup> d<i>u</i> = [−e<sup>−λ<i>u</i></sup>]<sub>0</sub><sup><i>t</i></sup> = 1 − e<sup>−λ<i>t</i></sup></div><span>la densité est nulle avant 0, on intègre depuis 0 ; primitive de l'exponentielle</span>
+      <div><i>F</i>(<i>t</i>) → 1 quand <i>t</i> → ∞</div><span>l'aire totale vaut 1 : c'est bien une densité</span>
+      <div><i>P</i>(<i>T</i> &gt; <i>t</i>) = 1 − <i>F</i>(<i>t</i>) = e<sup>−λ<i>t</i></sup></div><span>complément</span>
+      <div><i>P</i>(<i>a</i> &lt; <i>T</i> &lt; <i>b</i>) = <i>F</i>(<i>b</i>) − <i>F</i>(<i>a</i>) = e<sup>−λ<i>a</i></sup> − e<sup>−λ<i>b</i></sup></div><span>aire entre a et b</span>
+      <div>1 − e<sup>−λ<i>m</i></sup> = ½ ⟹ e<sup>−λ<i>m</i></sup> = ½ ⟹ <i>m</i> = ln 2/λ</div><span>médiane : F(m) = ½ ; c'est le calcul de Brunton pour la demi-vie, lu à l'envers λ = ln 2/t<sub>½</sub></span>
+    </div>
+    <p><b>La moyenne, par l'intuition.</b> À λ événements par heure, une longue durée H en contient à peu près λH, séparés en moyenne de H/(λH) = 1/λ heure. À 4 spams par heure, un spam toutes les 15 minutes.</p>
+    <p><b>La moyenne, en une ligne.</b> Pour une variable positive, E[T] = ∫<sub>0</sub><sup>∞</sup> P(T &gt; t) dt, la version continue de la somme des queues de <a href="lesson-00-08-esperance-variance.html#n11">l08</a>, admise ici. Donc E[T] = ∫<sub>0</sub><sup>∞</sup> e<sup>−λt</sup> dt = 1/λ. Le calcul direct par parties, et la variance 1/λ², sont en <a href="lesson-00-08-esperance-variance.html#n8">l08</a>.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>un million d'atomes de polonium</small></summary><div class="in">
+<pre class="py">{{CODE:c3}}</pre>
+<pre class="out">{{OUT:c3}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>La densité n'est pas une probabilité.</b> Pour des spams à 4 par heure, f(0) = λ = 4 (par heure) : plus que 1. La probabilité d'une attente d'exactement 10 minutes est nulle ; seule une aire, comme P(9 &lt; T &lt; 11 min), est une probabilité.</li>
+      <li><b>La demi-vie n'est pas la vie moyenne.</b> 138 jours contre 199 pour le polonium : le rapport est ln 2 = 0,693, la queue droite tirant la moyenne.</li>
+      <li><b>Les unités.</b> λ en « par heure » et t en minutes faussent l'exposant d'un facteur 60. Et numpy attend la moyenne 1/λ, pas λ : <code>rng.exponential(scale=1/lam)</code> (<a href="lesson-00-08-esperance-variance.html#n8">l08</a>).</li>
+      <li><b>Un taux constant est une hypothèse.</b> Les ampoules de cuisine de Brunton « lâchent le jour où on les pose » : elles ne suivent pas une exponentielle (<a href="#n5">notion 5</a>).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (19) estime e<sup>−1/2</sup> de tête, « √e ≈ 1,4, donc à peu près 70 % ». C'est 0,607 : √e = 1,649. Pour P(a &lt; T &lt; b), il dit aussi « e to the minus at minus e to the minus bt » : λ a disparu des exposants ; c'est e<sup>−λa</sup> − e<sup>−λb</sup>. En lisant e<sup>−a</sup> − e<sup>−b</sup>, l'ampoule donnerait P(50 &lt; T &lt; 100) = e<sup>−50</sup> − e<sup>−100</sup> ≈ 2 × 10<sup>−22</sup> au lieu de 0,239. Enfin, il appelle λe<sup>−λt</sup> « la probabilité de T au temps t » : c'est une densité.</div>
+  </div></details>
+  <p class="garde">Exponentielle(λ) : P(T &gt; t) = e<sup>−λt</sup>, E[T] = 1/λ, médiane = demi-vie = ln 2/λ ≈ 0,69/λ. Une probabilité est une aire sous λe<sup>−λt</sup>, jamais une hauteur.</p>
+</section>
+

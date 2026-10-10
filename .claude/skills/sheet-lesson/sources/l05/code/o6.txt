@@ -1,0 +1,5 @@
+mean gap 11.99 s   (1/lam = 12 s)
+t = 0.1 min: mean 0.500  var 0.500  (lam t = 0.5)
+   P(N = 0) 0.6065 vs 0.6065   P(N = 1) 0.3030 vs 0.3033   ratio 5t = 0.5
+t = 1.0 min: mean 5.003  var 5.030  (lam t = 5.0)
+   P(N = 0) 0.0068 vs 0.0067   P(N = 1) 0.0343 vs 0.0337   ratio 5t = 5.0

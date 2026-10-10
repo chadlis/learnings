@@ -1,0 +1,10 @@
+mean 19.993   var 19.937   (Poisson: both = 20)
+P(X=10)  binomial 0.00579  Poisson 0.00582  simulated 0.00576
+P(X=15)  binomial 0.05162  Poisson 0.05165  simulated 0.05190
+P(X=20)  binomial 0.08892  Poisson 0.08884  simulated 0.08935
+P(X=25)  binomial 0.04459  Poisson 0.04459  simulated 0.04399
+P(X=30)  binomial 0.00831  Poisson 0.00834  simulated 0.00833
+n =      10   p = 0.40000   max gap to Poisson(4) = 0.055456
+n =     100   p = 0.04000   max gap to Poisson(4) = 0.004022
+n =   1,000   p = 0.00400   max gap to Poisson(4) = 0.000392
+n = 100,000   p = 0.00004   max gap to Poisson(4) = 0.000004

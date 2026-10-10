@@ -1,0 +1,67 @@
+<!-- ============================ n7 ============================ -->
+<section class="notion culture" id="n7">
+  <h3>La loi Gamma : attendre le r-ième ; série contre parallèle <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 22 · The Gamma Distribution</p>
+  <div class="idee">
+    <p>Combien de temps faut-il attendre le 10<sup>e</sup> mail ? Brunton prévient : « ce n'est pas juste 10 fois l'exponentielle ». C'est la somme de 10 attentes indépendantes, T<sub>10</sub> = W<sub>1</sub> + ⋯ + W<sub>10</sub>. La loi de la somme de r attentes exponentielles de taux λ s'appelle la <b>loi Gamma</b>(r, λ), de moyenne r/λ.</p>
+    <p>À 5 mails par minute, le 10<sup>e</sup> arrive en 2 minutes en moyenne. Dix fois une seule attente a la même moyenne, mais un écart-type de 2 minutes, contre 0,63 pour la somme : dans une somme, les attentes longues et courtes se compensent.</p>
+    <p>Au DMV, chaque guichet prend 15 minutes en moyenne. S'il faut passer par trois guichets l'un après l'autre, A puis B puis C, on attend une Gamma(3, 1/15) : 45 minutes en moyenne. Si trois guichets sont ouverts en parallèle et qu'on prend le premier libre, on attend le minimum des trois : 5 minutes en moyenne.</p>
+  </div>
+  <div class="fig vis" id="v7">
+    <div class="lbl">Voir l'idée — trois guichets du DMV, en série ou en parallèle</div>
+    <div id="v7ctl" class="sl-ctl"></div>
+    <div id="v7plot"></div>
+    <div class="readouts" id="v7out"></div>
+    <p class="cap">En haut, un client : chaque barre est un guichet, d'une durée exponentielle de moyenne 15 min. <b>En série</b>, les barres s'enchaînent en escalier et l'attente est leur somme. <b>En parallèle</b>, les trois guichets sont occupés au même moment et l'attente s'arrête à la première barre qui finit (en rouge). En bas, l'histogramme des clients servis, contre la densité théorique : Gamma(3, 1/15), 45 min en moyenne, ou Exponentielle(3/15), 5 min. <b>Fais passer 200 clients.</b></p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>T<sub>r</sub></i> = <i>W</i><sub>1</sub> + ⋯ + <i>W<sub>r</sub></i> ~ Gamma(<i>r</i>, λ) : &nbsp; <i>f</i>(<i>t</i>) = λ<sup><i>r</i></sup> <i>t</i><sup><i>r</i>−1</sup> e<sup>−λ<i>t</i></sup> / (<i>r</i> − 1)!, <i>t</i> ≥ 0 &nbsp;&nbsp; E = <i>r</i>/λ, &nbsp; Var = <i>r</i>/λ²<br>survie : <i>P</i>(<i>T<sub>r</sub></i> &gt; <i>t</i>) = Σ<sub><i>k</i>=0</sub><sup><i>r</i>−1</sup> e<sup>−λ<i>t</i></sup> (λ<i>t</i>)<sup><i>k</i></sup> / <i>k</i>! &nbsp;&nbsp;&nbsp; parallèle : min(<i>W</i><sub>1</sub>, …, <i>W<sub>r</sub></i>) ~ Exponentielle(<i>r</i>λ)</div>
+    <ul>
+      <li>Les W<sub>i</sub> sont i.i.d. Exponentielle(λ). L'<b>indépendance</b> fait additionner les variances et multiplier les survies du minimum ; la <b>même loi</b> fait que chaque terme apporte 1/λ à la moyenne et 1/λ² à la variance.</li>
+      <li>r est un entier : on parle aussi de loi d'Erlang. Pour r réel positif, (r − 1)! est remplacé par la fonction Γ(r), d'où le nom. r = 1 redonne l'exponentielle.</li>
+      <li>scipy écrit <code>stats.gamma(a=r, scale=1/λ)</code> : encore la moyenne, pas le taux.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig6">
+    <div class="lbl">Figure 6 — r attentes contre r fois une attente</div>
+    <div id="f6plot" class="wide"></div>
+    <div id="f6ctl"></div>
+    <div class="readouts" id="f6out"></div>
+    <p class="cap">À 5 mails par minute, la densité de T<sub>r</sub>, l'attente du r-ième mail (bleu), contre celle de r × W, r fois une seule attente (rouge, pointillé). Même moyenne r/5 (trait vertical), mais la somme se resserre : écart-type √r/5 contre r/5. À <b>r = 10</b>, attendre plus de 3 minutes a la probabilité 0,070 pour la somme et 0,223 pour 10 × W. À r = 1, les deux courbes sont la même exponentielle.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>r = 1, le 10<sup>e</sup> mail, le DMV, un batch d'inférence, une guirlande</small></summary><div class="in">
+    <ol>
+      <li><b>r = 1</b> : Gamma(1, λ) a la densité λe<sup>−λt</sup>, c'est l'exponentielle.</li>
+      <li><b>Le 10<sup>e</sup> mail</b> à 5 par minute : moyenne 2 min, écart-type √10/5 = 0,63 min. P(T<sub>10</sub> &gt; 3 min) = 0,070, contre 0,223 si l'on prenait 10 × W.</li>
+      <li><b>Le DMV en série</b> : moyenne 3 × 15 = 45 min, variance 3 × 15² = 675, écart-type 26 min. Plus de 45 minutes ? C'est avoir au plus 2 passages en 45 minutes, N(45) ~ Poisson(3) : e<sup>−3</sup>(1 + 3 + 4,5) = 0,423. <b>En parallèle</b> : 5 min en moyenne, et P(min &gt; 15) = e<sup>−3</sup> = 0,050.</li>
+      <li><b>ML, un batch d'inférence.</b> Un serveur attend r = 8 requêtes avant de lancer un batch, à 20 requêtes par seconde : le remplissage suit Gamma(8, 20), 0,4 s en moyenne. Le batch est plein en moins de 0,5 s si au moins 8 requêtes arrivent en 0,5 s : P(Poisson(10) ≥ 8) = 0,780.</li>
+      <li><b>La guirlande de Brunton</b>, trois ampoules de 1 000 h en moyenne : la première panne est un minimum, Exponentielle de moyenne 1 000/3 = 333 h.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la survie par Poisson, la densité par une somme qui télescope, le minimum</small></summary><div class="in">
+    <div class="drv">
+      <div>{<i>T<sub>r</sub></i> &gt; <i>t</i>} = {<i>N</i>(<i>t</i>) ≤ <i>r</i> − 1}</div><span>le r-ième arrive après t si et seulement si moins de r arrivées ont eu lieu pendant t</span>
+      <div><i>P</i>(<i>T<sub>r</sub></i> &gt; <i>t</i>) = Σ<sub><i>k</i>=0</sub><sup><i>r</i>−1</sup> e<sup>−λ<i>t</i></sup>(λ<i>t</i>)<sup><i>k</i></sup>/<i>k</i>!</div><span>N(t) ~ Poisson(λt) (<a href="#n6">notion 6</a>) ; c'est une survie, pas une répartition</span>
+      <div><i>F</i>(<i>t</i>) = 1 − <i>P</i>(<i>T<sub>r</sub></i> &gt; <i>t</i>), &nbsp; <i>f</i>(<i>t</i>) = −d/d<i>t</i> <i>P</i>(<i>T<sub>r</sub></i> &gt; <i>t</i>)</div><span>complément, puis f = F′</span>
+      <div>d/d<i>t</i> [e<sup>−λ<i>t</i></sup>(λ<i>t</i>)<sup><i>k</i></sup>/<i>k</i>!] = −λe<sup>−λ<i>t</i></sup>(λ<i>t</i>)<sup><i>k</i></sup>/<i>k</i>! + λe<sup>−λ<i>t</i></sup>(λ<i>t</i>)<sup><i>k</i>−1</sup>/(<i>k</i> − 1)!</div><span>dérivée d'un produit ; le second terme n'existe pas pour k = 0</span>
+      <div>Σ<sub><i>k</i>=0</sub><sup><i>r</i>−1</sup> … = −λe<sup>−λ<i>t</i></sup>(λ<i>t</i>)<sup><i>r</i>−1</sup>/(<i>r</i> − 1)!</div><span>chaque second terme annule le premier terme du rang précédent : la somme télescope</span>
+      <div><i>f</i>(<i>t</i>) = λe<sup>−λ<i>t</i></sup>(λ<i>t</i>)<sup><i>r</i>−1</sup>/(<i>r</i> − 1)! = λ<sup><i>r</i></sup><i>t</i><sup><i>r</i>−1</sup>e<sup>−λ<i>t</i></sup>/(<i>r</i> − 1)!</div><span>la formule de Brunton, sans les « dot, dot, dot »</span>
+    </div>
+    <p><b>Moyenne et variance.</b> E[T<sub>r</sub>] = r/λ par linéarité (<a href="lesson-00-08-esperance-variance.html#n3">l08</a>), sans hypothèse. Var(T<sub>r</sub>) = r/λ², parce que les variances de termes indépendants s'additionnent (<a href="lesson-00-09-covariance-correlation.html#n2">l09</a>). Pour 10 × W, Var = 10² Var(W) = 100/λ² (<a href="lesson-00-08-esperance-variance.html#n9">l08</a>).</p>
+    <p><b>Le minimum.</b> P(min &gt; t) = P(W<sub>1</sub> &gt; t, …, W<sub>r</sub> &gt; t) = (e<sup>−λt</sup>)<sup>r</sup> = e<sup>−rλt</sup>, par indépendance : c'est la survie d'une Exponentielle(rλ). Trois guichets de taux 1/15 font un guichet de taux 3/15.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>400 000 clients du DMV</small></summary><div class="in">
+<pre class="py">{{CODE:c7}}</pre>
+<pre class="out">{{OUT:c7}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>« Série » change de sens.</b> Des guichets en série s'additionnent : Gamma. Une guirlande en série s'éteint à la première ampoule grillée : c'est un minimum, Exponentielle(3λ). Une guirlande en parallèle s'éteint à la dernière : un maximum, ni Gamma ni exponentielle, de moyenne 1 000(1 + ½ + ⅓) = 1 833 h. La première panne est un minimum quel que soit le montage ; c'est l'extinction de la guirlande qui en dépend. Avant toute formule : somme, minimum ou maximum ? (La fiabilité de systèmes en série et en parallèle est en <a href="lesson-00-03-conditionner-bayes-independance.html#n8">l03</a>.)</li>
+      <li><b>r × W n'est pas la somme de r attentes.</b> Même moyenne, mais une variance r fois trop grande (figure 6).</li>
+      <li><b>Le parallèle compte l'attente d'un guichet libre.</b> Une fois au guichet, son propre passage dure encore 15 minutes en moyenne : 5 + 15 = 20 minutes avant de ressortir.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (22) modélise d'abord trois guichets en parallèle par Gamma(3, 1/15), puis soupçonne « un bug ». En parallèle, l'attente est le minimum de trois exponentielles, Exponentielle(3/15), 5 min en moyenne. Gamma(3, 1/15), 45 min, vaut pour trois guichets en série, la version qu'il retient ; il laisse le parallèle en devoir. Il appelle aussi « fonction de répartition » la somme Σ e<sup>−λt</sup>(λt)<sup>k</sup>/k! : c'est la fonction de survie P(T<sub>r</sub> &gt; t) ; la répartition vaut 1 moins elle, et la densité moins sa dérivée.</div>
+  </div></details>
+  <p class="garde">Attendre le r-ième événement d'un flux de taux λ : Gamma(r, λ), somme de r exponentielles indépendantes, moyenne r/λ, variance r/λ². Attendre le premier de r flux en parallèle : le minimum, Exponentielle(rλ).</p>
+</section>
+

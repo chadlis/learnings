@@ -1,0 +1,52 @@
+<!-- ============================ n5 ============================ -->
+<section class="notion culture" id="n5">
+  <h3>Le taux de risque : jeunesse, hasard, usure <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 20</p>
+  <div class="idee">
+    <p>Brunton propose une lecture plus intuitive de l'absence de mémoire. Une ampoule a tenu jusqu'à l'instant t. Quelle est la probabilité qu'elle lâche dans le petit instant dt qui suit ? Pour l'exponentielle, c'est λ dt, quel que soit t. λ est le <b>taux de risque</b> (hazard rate) : un risque par unité de temps, constant.</p>
+    <p>Avec λ = 1/1 000 par heure, une ampoule allumée a une chance sur mille de griller dans l'heure qui vient, qu'elle soit neuve ou qu'elle ait 3 000 heures.</p>
+    <p>Les vraies durées de vie ont rarement un taux constant. Les ampoules de la cuisine de Brunton « lâchent le jour où on les pose » : un taux élevé au début, ce sont les <b>pannes de jeunesse</b>. Une machine qui vieillit a un taux qui monte, c'est l'<b>usure</b>. Additionnés (l'ampoule meurt de la première cause qui frappe), un risque de jeunesse, un risque constant (le hasard) et un risque d'usure dessinent la <b>courbe en baignoire</b>.</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — taux constant, et courbe en baignoire</div>
+    <div id="v5ctl" class="sl-ctl"></div>
+    <div id="v5sl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">Le taux de risque h(t), en pannes pour 1 000 heures, selon l'âge t de l'ampoule. <b>Taux constant</b> : un trait plat à 1, et une ampoule vivante a 9,5 % de chances de griller dans les 100 h qui suivent, à tout âge. <b>Baignoire</b> : la somme de trois risques en pointillé, jeunesse, hasard et usure. Une ampoule neuve a 31 % de chances de griller dans ses 100 premières heures ; vers 1 200 h, au fond de la baignoire, 9,5 % comme le taux constant ; à 3 000 h, 23 %. Fais glisser l'<b>âge</b>.</p>
+  </div>
+  <div class="formule"><div class="lbl">La définition</div>
+    <div class="eq"><i>h</i>(<i>t</i>) = <i>f</i>(<i>t</i>) / <i>S</i>(<i>t</i>), &nbsp; <i>S</i>(<i>t</i>) = <i>P</i>(<i>T</i> &gt; <i>t</i>) &nbsp;&nbsp;&nbsp; <i>P</i>(<i>t</i> &lt; <i>T</i> ≤ <i>t</i> + d<i>t</i> ∣ <i>T</i> &gt; <i>t</i>) ≈ <i>h</i>(<i>t</i>) d<i>t</i><br>exponentielle : <i>h</i>(<i>t</i>) = λ &nbsp;&nbsp;&nbsp; en général : <i>S</i>(<i>t</i>) = exp(−∫<sub>0</sub><sup><i>t</i></sup> <i>h</i>(<i>u</i>) d<i>u</i>)</div>
+    <ul>
+      <li>dt est petit : l'approximation est au premier ordre en dt.</li>
+      <li>h est un <b>taux</b>, en « par heure » ; h dt est une <b>probabilité</b>, sans unité. h peut dépasser 1, h dt non, tant que dt est petit.</li>
+      <li>La formule générale et la baignoire vont au-delà de Brunton, qui ne traite que le cas constant.</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>l'ampoule à taux constant, la Weibull, l'usure</small></summary><div class="in">
+    <ol>
+      <li><b>Taux constant</b>, λ = 1/1 000 par heure. Dans l'heure qui suit : 1 − e<sup>−0,001</sup> = 0,0009995 ≈ λ × 1 h = 0,001, à tout âge. Dans la minute qui suit : λ dt = 0,001/60 = 1,7 × 10<sup>−5</sup>. La probabilité dépend de dt ; le taux, lui, reste 0,001 par heure.</li>
+      <li><b>La loi de Weibull</b>, la loi standard des durées de vie : h(t) = (k/η)(t/η)<sup>k−1</sup>. Pour k &lt; 1 le taux décroît (jeunesse), pour k = 1 il est constant et l'on retrouve l'exponentielle, pour k &gt; 1 il croît (usure). La baignoire de la vignette additionne une Weibull de forme 0,5, un taux constant et une Weibull de forme 5.</li>
+      <li><b>L'usure de la notion 4</b>, durée normale 1 000 ± 200 h : à 1 000 h, h = f/S = 0,0040 par heure, quatre fois le taux d'une ampoule exponentielle de même moyenne, et il continue de monter.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>le taux, la route de Brunton, et son devoir</small></summary><div class="in">
+    <div class="drv">
+      <div><i>P</i>(<i>t</i> &lt; <i>T</i> ≤ <i>t</i> + d<i>t</i> ∣ <i>T</i> &gt; <i>t</i>) = [<i>S</i>(<i>t</i>) − <i>S</i>(<i>t</i> + d<i>t</i>)] / <i>S</i>(<i>t</i>)</div><span>conditionnement ; {t &lt; T ≤ t + dt} est inclus dans {T &gt; t}</span>
+      <div>≈ <i>f</i>(<i>t</i>) d<i>t</i> / <i>S</i>(<i>t</i>) = <i>h</i>(<i>t</i>) d<i>t</i></div><span>S(t) − S(t + dt) ≈ f(t) dt au premier ordre, car S′ = −f</span>
+      <div>exponentielle : λe<sup>−λ<i>t</i></sup> / e<sup>−λ<i>t</i></sup> = λ</div><span>le taux ne dépend pas de t</span>
+    </div>
+    <p><b>La route de Brunton</b> passe par l'absence de mémoire : P(T ≤ t + dt ∣ T &gt; t) = 1 − P(T &gt; dt) = 1 − e<sup>−λdt</sup> = λ dt − (λ dt)²/2 + ⋯ ≈ λ dt, par le développement de Taylor de l'exponentielle.</p>
+    <p><b>Son devoir, la réciproque.</b> Si h(t) = λ pour tout t, alors f = λS ; or f = −S′, donc S′ = −λS, une équation différentielle dont la solution avec S(0) = 1 est S(t) = e<sup>−λt</sup>. Un taux constant force l'exponentielle. En général, h = −S′/S = −(ln S)′, d'où S(t) = exp(−∫<sub>0</sub><sup>t</sup> h).</p>
+    <p><b>Pourquoi la baignoire est une somme.</b> Si l'ampoule meurt de la première de trois causes indépendantes, T = min(T<sub>1</sub>, T<sub>2</sub>, T<sub>3</sub>) et S = S<sub>1</sub>S<sub>2</sub>S<sub>3</sub> (indépendance) ; donc −ln S = Σ −ln S<sub>i</sub> et, en dérivant, h = h<sub>1</sub> + h<sub>2</sub> + h<sub>3</sub>.</p>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>h n'est pas une probabilité.</b> C'est un taux : il dépasse 1 sans problème, et pour la jeunesse (Weibull de forme &lt; 1) il est infini en t = 0. La probabilité de panne dans [t, t + dt] est h dt, et seulement pour dt petit.</li>
+      <li><b>« Taux constant » se vérifie.</b> On découpe les âges en tranches et on calcule, parmi les objets encore vivants au début de chaque tranche, la part qui meurt dans la tranche. Si cette part bouge avec l'âge, l'exponentielle est fausse, et avec elle l'absence de mémoire.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (20) appelle « λ dt » le taux de risque. Le taux de risque est λ ; λ dt est la probabilité de panne dans [t, t + dt] sachant qu'on a survécu jusqu'à t. Chiffré : avec λ = 1/1 000 par heure, λ dt vaut 0,001 pour dt = 1 h et 1,7 × 10<sup>−5</sup> pour dt = 1 min, alors que le taux n'a pas bougé. Il ne définit pas h(t) = f(t)/S(t) pour d'autres lois et ne trace pas de baignoire : ce sont des ajouts de la leçon.</div>
+  </div></details>
+  <p class="garde">Le taux de risque h(t) = f(t)/S(t) est un risque par unité de temps sachant la survie ; h dt est une probabilité. Taux constant ⇔ exponentielle ⇔ sans mémoire ; les vraies durées suivent plutôt une baignoire : jeunesse, hasard, usure.</p>
+</section>
+
