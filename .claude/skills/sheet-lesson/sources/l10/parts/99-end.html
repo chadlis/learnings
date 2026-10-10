@@ -1,0 +1,58 @@
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Markov, pour X ≥ 0 : P(X ≥ a) ≤ E[X]/a ; la loi {0, a} atteint la borne.</li>
+    <li>Chebyshev, pour toute loi de variance finie : P(|X − μ| ≥ kσ) ≤ 1/k², soit 25 % à 2σ, contre 4,6 % pour une normale.</li>
+    <li>X̄ est une variable aléatoire, x̄ sa réalisation, μ un nombre fixe.</li>
+    <li>E[X̄] = μ par linéarité seule ; Var(X̄) = σ²/n : l'indépendance annule les covariances, la même loi donne σ² à chaque terme.</li>
+    <li>LGN : P(|X̄ − μ| ≥ ε) ≤ σ²/(nε²) → 0 ; la somme, elle, s'écarte en σ√n.</li>
+    <li>SE = σ/√n : diviser la largeur par 2 coûte 4 fois plus de données ; accuracy : √(p(1 − p)/n).</li>
+    <li>Termes de corrélation commune ρ : Var(X̄) = ρσ² + (1 − ρ)σ²/n → ρσ², au plus 1/ρ termes indépendants.</li>
+    <li>Monte Carlo : une espérance se simule par une moyenne, d'erreur σ<sub>g</sub>/√N.</li>
+  </ol>
+</div>
+<div class="phrase">« La moyenne de n observations est une variable aléatoire, centrée sur μ par la seule linéarité, de variance σ²/n parce que l'indépendance annule les covariances et que la même loi donne σ² à chaque terme. Chebyshev transforme cette variance qui tend vers zéro en convergence : c'est la loi des grands nombres. L'erreur standard σ/√n coûte cher, diviser l'incertitude par deux demande quatre fois plus de données, et si les termes partagent une même corrélation ρ elle plafonne à σ√ρ. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Pourquoi Markov exige-t-il X ≥ 0 ?</div><div class="a hid">Sinon un contrepoids négatif équilibre n'importe quelle masse à droite : X ∈ {−30, 20} avec P(X = 20) = 0,8 a une moyenne de 10 et P(X ≥ 20) = 0,8 &gt; ½.</div></li>
+    <li><div class="q">Chebyshev à 2σ : quelle part de la masse au plus, et combien pour une normale ?</div><div class="a hid">Au plus 25 %, pour toute loi de variance finie ; une normale en met 4,6 %.</div></li>
+    <li><div class="q">μ, X̄, x̄ : lequel est aléatoire ?</div><div class="a hid">X̄, la procédure « jeter n dés et moyenner » ; x̄ est sa réalisation, μ un nombre fixe de la loi.</div></li>
+    <li><div class="q">Que valent E[X̄] et Var(X̄), et quelle hypothèse sert à chaque ligne ?</div><div class="a hid">E[X̄] = μ par linéarité, sans hypothèse. Var(X̄) = σ²/n : l'indépendance annule les covariances, la même loi donne σ² à chaque terme, et 1/n sort au carré.</div></li>
+    <li><div class="q">Pourquoi la moyenne converge-t-elle, et que fait la somme pendant ce temps ?</div><div class="a hid">Var(X̄) = σ²/n → 0, et Chebyshev donne P(|X̄ − μ| ≥ ε) ≤ σ²/(nε²) → 0. La somme s'écarte de nμ en σ√n : rien ne se compense.</div></li>
+    <li><div class="q">Ton accuracy a un SE d'un point sur 1 000 exemples. Combien d'exemples pour un demi-point ?</div><div class="a hid">4 000 : le SE est en 1/√n, diviser par 2 coûte ×4.</div></li>
+    <li><div class="q">n termes de corrélation commune ρ : que devient Var(X̄) quand n grandit ?</div><div class="a hid">ρσ² + (1 − ρ)σ²/n → ρσ² : un plancher ; au plus 1/ρ termes indépendants.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts et chaînes</div>
+  <div class="bridges">
+    <a href="lesson-00-11-tcl.html"><b>l11 · Théorème central limite</b><small>La suite directe : la LGN donne le centre et la largeur de X̄, le TCL sa forme, et le ±1,96 de la notion 5.</small></a>
+    <a href="../bridges/bridge-04-variance-moyenne-correlee.html"><b>Variance d'une moyenne corrélée</b><small>La notion 6 dérivée jusqu'au bout, et ses quatre habits : forêts, validation croisée, SE sur des lignes dépendantes, bootstrap.</small></a>
+    <a href="../chains/chain-p01-01-objet-aleatoire.html"><b>L'objet aléatoire (fil A)</b><small>X̄ devient un estimateur, σ/√n le SE d'une proportion : les notions 3 et 5 au travail.</small></a>
+    <a href="../walkthroughs/walkthrough-p01-04-accuracy-vers-se.html"><b>De l'accuracy au SE</b><small>Le déroulé de l'exemple ML de la notion 5, en quatre maillons.</small></a>
+    <a href="../chains/chain-p01-05-bootstrap.html"><b>Bootstrap</b><small>Une simulation Monte Carlo sur l'échantillon (notion 7), qui suppose des lignes indépendantes (notion 6).</small></a>
+    <a href="../chains/chain-p07-02-bagging-rf.html"><b>Bagging et forêt aléatoire</b><small>Des arbres corrélés : le plancher ρσ² de la notion 6, et pourquoi on tire des variables explicatives au hasard.</small></a>
+    <a href="../chains/chain-p06-02-cv-leakage.html"><b>Validation croisée et fuite</b><small>La moyenne de k erreurs de plis corrélées : plus de plis n'achète presque rien (notion 6).</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::chebyshev</code> (notion 2) · <code>stats::lgn</code> (notions 3 et 4) · <code>stats::se</code> (notions 5 et 6). Markov (notion 1) et Monte Carlo (notion 7) sont de la culture, sans carte.</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l10 · v1 du 10/10/2026 · Brunton 33 à 35 · Prérequis : <a href="lesson-00-08-esperance-variance.html">l08</a>, <a href="lesson-00-09-covariance-correlation.html">l09</a>. Suite : <a href="lesson-00-11-tcl.html">l11 · Théorème central limite</a>.</footer>
+</div>

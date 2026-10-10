@@ -1,0 +1,1123 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Inégalités et loi des grands nombres — leçon</title>
+<meta name="sheet" content="series=lesson;part=00;number=10;status=v1">
+<meta name="part" content="00 · Socle probabiliste">
+<meta name="subtitle" content="socle — Brunton 33 à 35 : Markov, Chebyshev, Var(X̄) = σ²/n, la moyenne converge">
+<meta name="prereq" content="l08,l09">
+<meta name="anki" content="stats::lgn,stats::se,stats::chebyshev">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- série `coding` : squelette annoté et ruban de SL.trace (inerte hors coding) ---- */
+.skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.skel b{color:var(--pen);font-weight:600}
+.step .card.full,.step .card.casse{grid-column:1 / -1}
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .wide table{min-width:520px}
+.card .wide th:nth-child(2),.card .wide td:nth-child(2),
+.card .wide th:nth-child(3),.card .wide td:nth-child(3){text-align:left}
+.readouts .c1 b{color:var(--pen)}.readouts .c3 b{color:var(--red)}
+.sl-trace{--cw:58px;--cgap:8px;margin:4px 0 2px}
+.sl-cells{display:flex;gap:var(--cgap)}
+.sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
+.sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
+.sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.dim{background:rgba(34,48,43,.07);border-color:rgba(34,48,43,.18);border-style:dashed}
+.sl-cell.dim b,.sl-cell.dim i{color:var(--cardmuted);opacity:.5}
+.sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
+.sl-cell.win{border-color:var(--green);border-width:2.5px}
+.sl-ptrs{position:relative;height:20px;margin-top:5px}
+.sl-ptr{position:absolute;top:0;left:calc(var(--i) * (var(--cw) + var(--cgap)));width:var(--cw);text-align:center;font:600 12px var(--sans);color:var(--pen)}
+.sl-note{font-size:14px;color:var(--cardink);margin-top:10px}
+.sl-inv{font:12.5px/1.55 var(--mono);color:var(--cardmuted);margin-top:6px;border-left:2px solid #B7791F;padding-left:10px}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ===== série `lesson` : le cours autoporteur du socle (10/10/2026) ===== */
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px;color:var(--muted);margin:10px 0 0}
+.legend .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-right:6px}
+.lecon{counter-reset:notion}
+.notion{padding:22px 0 28px;border-top:1.5px dashed var(--line);max-width:900px}
+.notion h3{position:relative;padding-left:44px;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.3;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:2px}
+.notion h3::before{counter-increment:notion;content:counter(notion);position:absolute;left:0;top:-1px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle;text-shadow:none}
+.tag.outil{color:var(--mint)}.tag.culture{color:var(--violet)}
+.src{font-size:12.5px;color:var(--faint);margin:0 0 10px 44px}
+.idee{margin-left:44px;color:var(--chalk);font-size:16px;line-height:1.62;max-width:72ch}
+.idee p{margin:7px 0}
+.idee b{color:var(--yellow);font-weight:600}
+.formule{margin:12px 0 10px 44px;background:var(--card);color:var(--cardink);border-radius:3px;padding:12px 18px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--yellow)}
+.formule .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:4px}
+.formule .eq{font-size:17.5px}
+.formule ul{padding-left:18px;margin-top:6px}.formule li{font-size:14.5px;margin:3px 0;color:var(--cardmuted)}
+.notion .fig{margin-left:44px}
+details{margin:8px 0 0 44px;background:var(--card);color:var(--cardink);border-radius:3px;border-left:4px solid var(--ac,var(--yellow));box-shadow:0 10px 20px -16px rgba(0,0,0,.6)}
+details>summary{cursor:pointer;list-style:none;padding:9px 14px;font:600 13px var(--sans);letter-spacing:.03em;color:var(--cardink)}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸";display:inline-block;width:16px;color:var(--cardmuted)}
+details[open]>summary::before{content:"▾"}
+details>summary small{font-weight:400;color:var(--cardmuted);margin-left:6px;letter-spacing:0}
+details .in{padding:2px 18px 14px}
+details .in p,details .in li{font-size:15px;line-height:1.55;margin:5px 0}
+details .in ol,details .in ul{padding-left:20px}
+details.ex{--ac:var(--teal)}details.preuve{--ac:var(--violet)}details.code{--ac:var(--blue)}details.casse{--ac:var(--pink)}details.loin{--ac:var(--faint)}
+.drv{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:4px 16px;margin:8px 0;align-items:baseline}
+.drv>div{font-family:var(--math);font-size:16px;line-height:1.6}
+.drv>span{font-size:13.5px;color:var(--cardmuted);border-left:2px solid var(--cardline);padding-left:10px}
+@media(max-width:700px){.drv{grid-template-columns:minmax(0,1fr)}.drv>span{margin-bottom:6px}}
+pre.py,pre.out,pre.tri{font:13px/1.6 var(--mono);background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:pre}
+pre.out{background:transparent;border:1px dashed var(--cardline);color:var(--cardmuted)}
+pre.out::before{content:"sortie\A";font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.brunton{margin:10px 0 4px;padding:8px 12px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft);font-size:14.5px}
+.brunton b{display:block;font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:2px}
+.garde{margin:14px 0 0 44px;font-family:var(--serif);font-size:16.5px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--yellow);padding:4px 0 4px 14px;max-width:72ch}
+.garde::before{content:"Ce qu'on garde";display:block;font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);text-shadow:none;margin-bottom:2px}
+.notion.culture .garde{border-left-color:var(--violet)}
+.notion table{background:var(--cardsoft);border-radius:3px}
+.sl-fulcrum{fill:var(--red)}.sl-bar2{fill:var(--red);opacity:.55}.sl-bar3{fill:var(--pen);opacity:.6}
+@media(max-width:600px){.idee,.formule,details,.garde,.src,.notion .fig{margin-left:0}.notion h3{font-size:19px}}
+.sl-seg.sl-c1{stroke:var(--pen);stroke-width:2}.sl-seg.sl-c2{stroke:#6B46C1;stroke-width:2}.sl-seg.sl-c3{stroke:var(--red);stroke-width:2}.sl-seg.sl-c4{stroke:#1F5FA8;stroke-width:2}
+/* ===== v2 (10/10/2026) : vignettes « voir l'idée », sous chaque idée ===== */
+.fig.vis{--ac:var(--teal)}
+.v-row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:center}
+.v-row>div{flex:1 1 280px;min-width:0}.v-row>.v-mini{flex:0 1 220px}
+.v-row .sl-plot{min-width:0}
+.nogrid .sl-grid{display:none}
+.sl-ruler{fill:var(--cardmuted)}
+.sl-mass{fill:#6B46C1;opacity:.85}
+.sl-mass-t{font:600 11px var(--sans);fill:#fff}
+.sl-sq{fill:rgba(107,70,193,.16);stroke:#6B46C1;stroke-width:1.5}
+.sl-sq-t{font:600 12.5px var(--mono);fill:#6B46C1}
+.sl-cellp{fill:#6B46C1}.sl-cello{fill:none;stroke:var(--cardline)}
+.sl-prod{font:12px var(--mono);fill:var(--cardmuted);opacity:.5}.sl-prod.on{font-weight:700;fill:var(--cardink);opacity:1}
+.sl-seg.sl-dash{stroke-dasharray:4 3}.sl-seg.sl-link{stroke:rgba(34,48,43,.28);stroke-dasharray:3 3}
+.sl-seg.sl-c5{stroke:#B7791F;stroke-width:2}
+.sl-orbit{fill:none;stroke:rgba(34,48,43,.3);stroke-dasharray:3 4}
+.sl-stick{stroke:var(--cardmuted);stroke-width:4;stroke-linecap:round}
+.sl-dot.sl-tiny{stroke:none;opacity:.5}
+.sl-k1{fill:var(--pen)}.sl-k2{fill:#6B46C1}.sl-k3{fill:var(--red)}.sl-k4{fill:#1F5FA8}.sl-k5{fill:#B7791F}.sl-k6{fill:var(--green)}.sl-kc{opacity:.5}
+.sl-cell-t{font:600 11px var(--sans);fill:var(--cardink)}
+/* ---- propre à cette leçon ---- */
+.sl-fn.band{stroke-dasharray:5 4;stroke-width:1.5}
+.sl-fn.thin{stroke-width:1.6}
+.sl-forbid{fill:var(--red);opacity:.07}
+.sl-tail{fill:var(--red);opacity:.06}
+.sl-ghost{fill:none;stroke:var(--red);stroke-width:1.8;stroke-dasharray:4 3}
+.sl-die{fill:var(--card);stroke:var(--cardink);stroke-width:1.2}
+.sl-halo{paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 10</div>
+  <h1>Inégalités et loi des <span>grands nombres</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Avec la seule moyenne d'une loi, on borne déjà ses queues ; avec sa variance, on les borne des deux côtés. Appliquées à la moyenne de n mesures, ces deux inégalités donnent la <b>loi des grands nombres</b> : X̄ se resserre sur μ, avec une largeur σ/√n qui coûte cher et que la corrélation fait plafonner. La leçon suit Brunton 33 à 35 et ses images : la bascule qui doit rester en équilibre, les mesures répétées de la vitesse de la lumière. Un dé sert aux calculs, le taux de bonnes réponses (accuracy) d'un modèle à l'exemple ML.</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="lesson-00-08-esperance-variance.html">l08 · Espérance et variance</a></li>
+    <li><a href="lesson-00-09-covariance-correlation.html">l09 · Covariance et corrélation</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::lgn</code><code>stats::se</code><code>stats::chebyshev</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-04-variance-moyenne-correlee.html">Variance d'une moyenne corrélée</a></li>
+  </ol>
+  <h4>Suite</h4>
+  <ol>
+    <li><a href="lesson-00-11-tcl.html">l11 · Théorème central limite</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>L'espérance est un centre de masse.</b> Les probabilités sont des masses posées sur une règle ; E[X] est le point où la règle tient en équilibre (<a href="lesson-00-08-esperance-variance.html#n1">l08, notion 1</a>). Elle est linéaire sans aucune hypothèse : E[aX + bY] = aE[X] + bE[Y] (<a href="lesson-00-08-esperance-variance.html#n3">notion 3</a>).</li>
+      <li><b>La variance est l'inertie autour du centre.</b> Var(X) = E[(X − μ)²] : une valeur deux fois plus loin compte quatre fois plus (<a href="lesson-00-08-esperance-variance.html#n6">l08, notion 6</a>). Un facteur sort au carré : Var(aX + b) = a² Var(X) (<a href="lesson-00-08-esperance-variance.html#n9">notion 9</a>).</li>
+      <li><b>La variance d'une somme a un terme croisé.</b> Var(X + Y) = Var X + Var Y + 2 Cov(X, Y) ; l'indépendance annule la covariance (<a href="lesson-00-09-covariance-correlation.html#n2">l09, notion 2</a>). Cov(X, Y) = ρ σ<sub>X</sub> σ<sub>Y</sub> (<a href="lesson-00-09-covariance-correlation.html#n4">notion 4</a>).</li>
+      <li><b>Variable, réalisation, paramètre.</b> X est la règle qui attache un nombre au tirage, x le nombre sorti ce jour-là, μ un nombre fixe de la loi (<a href="lesson-00-04-variables-binomiale-normale.html#n1">l04, notion 1</a>).</li>
+      <li><b>Le dé.</b> μ = 3,5, σ² = 35/12 = 2,917, σ = 1,708.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">
+
+<!-- ============================ n1 ============================ -->
+<section class="notion culture" id="n1">
+  <h3>Markov : la bascule, et la borne atteinte <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 33 · Markov's Inequality in Probability: First-Order Estimates</p>
+  <div class="idee">
+    <p>Brunton énonce l'inégalité, puis la fait sentir sur un exemple. Une variable X ne prend que des valeurs positives ou nulles, et sa moyenne vaut 10. Peut-elle valoir 20 ou plus, plus d'une fois sur deux ? Non : P(X ≥ 20) ≤ 10/20 = ½. C'est l'<b>inégalité de Markov</b>, et elle n'utilise que la moyenne.</p>
+    <p>L'image est la règle en équilibre de l08 : la moyenne est le point d'appui, en 10. Une masse posée en 20 fait pencher la règle à droite ; il faut un contrepoids à gauche de 10. Mais le contrepoids ne peut pas descendre sous 0, puisque X ≥ 0. Avec une masse ½ en 20, le contrepoids ½ doit être tout entier en 0 : c'est le cas limite, la loi {0, 20}, qui atteint la borne. Au-delà de ½, plus rien ne peut équilibrer : la règle bascule.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — le contrepoids ne peut pas passer sous 0</div>
+    <div id="v1ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">La règle tient sur le point d'appui rouge, la moyenne 10. Monte la <b>masse p posée en 20</b> : le contrepoids 1 − p glisse vers 0 pour garder l'équilibre, à la position (10 − 20p)/(1 − p) : 6,67 pour p = 0,25, 3,33 pour p = 0,4. À <b>p = 0,5</b> il touche 0 : c'est la loi {0, 20}, la borne de Markov est atteinte. Au-delà, il faudrait le poser sous 0 (cercle pointillé), ce que X ≥ 0 interdit : posé en 0, il ne suffit plus, la moyenne dépasse 10 et la règle bascule.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>X</i> ≥ 0 et <i>a</i> &gt; 0 &nbsp;⇒&nbsp; P(<i>X</i> ≥ <i>a</i>) ≤ E[<i>X</i>] / <i>a</i></div>
+    <ul><li><b>X ≥ 0</b> est l'hypothèse du contrepoids. Si X peut être négative, une masse loin à gauche équilibre n'importe quelle masse à droite, et l'inégalité tombe (où ça casse).</li><li><b>a &gt; 0</b> : on divise par a. La borne ne dit quelque chose que pour a &gt; E[X] ; pour a ≤ E[X] elle vaut au moins 1.</li><li>Seule la moyenne sert, aucune forme de loi n'est supposée. Brunton parle d'estimation « d'ordre 1 » : elle n'utilise que le premier moment.</li></ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — trois lois de moyenne 10 sous la même hyperbole</div>
+    <div id="f1ctl" class="sl-ctl"></div><div id="f1sl"></div>
+    <div id="f1plot" class="wide"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">En rouge, la borne de Markov E[X]/a = 10/a ; en bleu, la vraie P(X ≥ a) de la loi choisie. Les trois lois ont la moyenne 10 et ne prennent que des valeurs ≥ 0. Déplace <b>a</b> : le bleu reste toujours sous le rouge. L'<b>exponentielle</b> donne 0,135 en a = 20, presque quatre fois moins que la borne 0,5. La loi <b>à deux points</b> {0, 20} touche l'hyperbole en a = 20 : sans autre hypothèse, la borne ne peut pas être améliorée. Sous a = 10, la borne dépasse 1 et ne dit rien.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>Brunton, deux points, exponentielle, uniforme, une perte</small></summary><div class="in">
+    <ol>
+      <li><b>L'exemple de Brunton.</b> E[X] = 10 : P(X ≥ 20) ≤ 10/20 = 0,5 ; P(X ≥ 50) ≤ 10/50 = 0,2.</li>
+      <li><b>La loi à deux points.</b> ½ en 0, ½ en 20 : E[X] = 10 et P(X ≥ 20) = ½, l'égalité. Plus généralement, une masse E[X]/a en a et le reste en 0 atteint la borne pour tout a ≥ E[X].</li>
+      <li><b>L'exponentielle de moyenne 10.</b> P(X ≥ a) = e<sup>−a/10</sup>. En a = 20 : e<sup>−2</sup> = 0,135, contre une borne de 0,5. En a = 50 : e<sup>−5</sup> = 0,0067, contre 0,2. Quand la queue décroît vite, la borne est lâche.</li>
+      <li><b>L'uniforme sur [0, 20].</b> Moyenne 10, P(X ≥ 15) = 0,25, contre une borne de 0,667.</li>
+      <li><b>Une perte de modèle.</b> L'entropie croisée d'un exemple est ≥ 0. Si sa moyenne sur le jeu de test (test set) vaut 0,3, Markov appliqué à la loi empirique des exemples dit : au plus 30 % des exemples ont une perte ≥ 1, c'est-à-dire donnent une probabilité ≤ e<sup>−1</sup> ≈ 0,37 à la bonne classe.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la chaîne de Brunton, et la version en une ligne</small></summary><div class="in">
+    <div class="drv">
+      <div>E[<i>X</i>] = Σ<sub><i>x</i></sub> <i>x</i> P(<i>X</i> = <i>x</i>)</div><span>définition (l08, notion 1)</span>
+      <div>≥ Σ<sub><i>x</i> ≥ <i>a</i></sub> <i>x</i> P(<i>X</i> = <i>x</i>)</div><span>on jette les termes x &lt; a : ils sont ≥ 0 parce que X ≥ 0. C'est ici que l'hypothèse sert</span>
+      <div>≥ Σ<sub><i>x</i> ≥ <i>a</i></sub> <i>a</i> P(<i>X</i> = <i>x</i>)</div><span>sur ce domaine, x ≥ a</span>
+      <div>= <i>a</i> P(<i>X</i> ≥ <i>a</i>)</div><span>a sort de la somme ; ce qui reste est P(X ≥ a)</span>
+    </div>
+    <p>On divise par a &gt; 0. En continu, mêmes lignes avec des intégrales de 0 à ∞. <b>Version en une ligne</b> : pour toute issue, a · 1{X ≥ a} ≤ X (si X ≥ a, c'est a ≤ X ; sinon c'est 0 ≤ X, encore grâce à X ≥ 0), puis on prend l'espérance des deux côtés.</p>
+    <p><b>Quand y a-t-il égalité ?</b> Il faut que les deux « ≥ » soient des égalités : toute la masse sous a est en 0 (premier « ≥ »), toute la masse de droite est exactement en a (second « ≥ »). C'est la loi à deux points {0, a}.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>deux lois qui respectent la borne, une qui la viole</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(0)
+n, a = 1_000_000, 20
+laws = {
+    "exponential, mean 10": rng.exponential(10, n),
+    "two points {0, 20}": rng.choice([0, 20], size=n),
+    "{-30, 20}, P(20) = 0.8": rng.choice([-30, 20], p=[0.2, 0.8], size=n),  # X &lt; 0: Markov fails
+}
+for name, x in laws.items():
+    print(f"{name:23s} mean {x.mean():5.2f}   P(X &gt;= 20) {np.mean(x &gt;= a):.4f}"
+          f"   E[X]/a {x.mean() / a:.4f}")</pre>
+<pre class="out">exponential, mean 10    mean 10.00   P(X &gt;= 20) 0.1353   E[X]/a 0.4999
+two points {0, 20}      mean 10.01   P(X &gt;= 20) 0.5006   E[X]/a 0.5006
+{-30, 20}, P(20) = 0.8  mean 10.00   P(X &gt;= 20) 0.7999   E[X]/a 0.4998</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>X peut être négative.</b> X vaut −30 ou 20, avec P(X = 20) = 0,8 : E[X] = 0,8 × 20 − 0,2 × 30 = 10, mais P(X ≥ 20) = 0,8, au-dessus de la « borne » 0,5 (code). Le contrepoids posé en −30 équilibre une masse bien plus grosse.</li>
+      <li><b>Pour a ≤ E[X], la borne vaut au moins 1</b> : elle ne dit rien.</li>
+      <li><b>Elle est lâche pour les lois usuelles</b> : 0,135 contre 0,5 pour l'exponentielle. Son rôle n'est pas numérique : elle est la brique de Chebyshev (notion 2), qui est celle de la loi des grands nombres (notion 4).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (33) illustre Markov en dessinant « ma loi normale », et dit de X qu'elle est « non négative, donc ne prend que des valeurs positives ». Une normale prend toutes les valeurs réelles, négatives comprises : Markov ne s'y applique pas. Il faut X ≥ 0 (la valeur 0 est permise, c'est même là que se pose le contrepoids du cas limite) et a &gt; 0. La figure 1 dessine des lois sur [0, ∞).</div>
+  </div></details>
+  <p class="garde">Pour X ≥ 0 et a &gt; 0, P(X ≥ a) ≤ E[X]/a : la moyenne seule borne la queue droite, et la loi à deux points {0, a} atteint la borne.</p>
+</section>
+
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>Chebyshev : au plus 1/k² au-delà de kσ <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 34 · Chebyshev's Inequality in Probability: Second-Order Estimates</p>
+  <div class="idee">
+    <p>Markov ne regarde qu'un côté, et que la moyenne. Chebyshev regarde l'écart à μ des deux côtés et se sert de la variance : c'est l'estimation « d'ordre 2 » de Brunton. Il l'obtient en appliquant Markov à l'écart au carré (X − μ)², qui est ≥ 0 et dont la moyenne est σ².</p>
+    <p>L'image est celle de l'inertie (l08, notion 6). Une masse posée à kσ du centre apporte k²σ² à la variance, par unité de masse. Si plus d'une fraction 1/k² de la loi était à kσ du centre ou plus loin, ces masses suffiraient à dépasser σ². Donc à k = 2 : au plus un quart de la masse hors de μ ± 2σ, quelle que soit la loi. Une normale n'en met que 4,6 %. Une loi construite exprès, ⅛ en μ − 2σ, ⅛ en μ + 2σ et ¾ en μ, en met exactement 25 %.</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — la part de la masse loin du centre</div>
+    <div id="v2ctl" class="sl-ctl"></div><div id="v2sl"></div>
+    <div id="v2plot" class="wide"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">L'axe compte les écarts à μ en unités de σ ; en rouge, ce qui tombe hors de ±kσ. À <b>k = 2</b>, la <b>normale</b> n'y met que 4,6 % de sa masse, la borne autorise 25 %. Le <b>dé</b> : à k = 1, les faces 1 et 6, soit 33 % (la borne vaut 100 %) ; dès k = 1,5, plus rien, la face la plus éloignée étant à 2,5 = 1,46σ de 3,5. La loi à <b>trois points</b> suit le curseur et met toujours exactement 1/k² hors de ±kσ : aucune borne valable pour toutes les lois ne peut faire mieux.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(|<i>X</i> − μ| ≥ <i>a</i>) ≤ σ² / <i>a</i>² &nbsp;(<i>a</i> &gt; 0) &nbsp;&nbsp;&nbsp; avec <i>a</i> = <i>k</i>σ : &nbsp;P(|<i>X</i> − μ| ≥ <i>k</i>σ) ≤ 1 / <i>k</i>²</div>
+    <ul><li>μ = E[X] et σ² = Var(X), qui doit être <b>finie</b>. Aucune hypothèse de forme : symétrique ou non, discrète ou continue, « avec des bosses bizarres », dit Brunton.</li><li>Lue à l'envers : P(|X − μ| &lt; kσ) ≥ 1 − 1/k². Au moins 75 % de la masse dans ±2σ, au moins 88,9 % dans ±3σ.</li><li>Il faut k &gt; 1 pour une borne utile ; pour k ≤ 1 elle vaut au moins 1.</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>k = 2 et 3, le dé, la loi qui atteint la borne, une alerte</small></summary><div class="in">
+    <ol>
+      <li><b>k = 2</b> : au plus 25 % hors de ±2σ ; une normale en met 4,55 %. <b>k = 3</b> : au plus 11,1 % ; une normale en met 0,27 %.</li>
+      <li><b>Le dé.</b> μ = 3,5, σ² = 2,917. Avec a = 2,5 : P(|X − 3,5| ≥ 2,5) ≤ 2,917/6,25 = 0,467. La vraie valeur : les faces 1 et 6, soit 1/3.</li>
+      <li><b>La loi à trois points.</b> X = μ ± kσ avec probabilité 1/(2k²) chacun, X = μ sinon. Sa variance vaut 2 × 1/(2k²) × k²σ² = σ², et P(|X − μ| ≥ kσ) = 1/k² exactement. À k = 2 : ⅛, ¾, ⅛.</li>
+      <li><b>D'autres formes.</b> Uniforme, k = 1,5 : 13,4 % hors de la bande (borne 44 %). Exponentielle de moyenne 1, k = 2 : e<sup>−3</sup> = 5,0 % (borne 25 %).</li>
+      <li><b>Une alerte de surveillance en production.</b> Une métrique de production de moyenne et d'écart-type connus, alerte au-delà de ±3σ. Sans hypothèse sur sa loi, jusqu'à 11 % des points normaux peuvent déclencher l'alerte ; si elle est normale, 0,27 %. Le « 3σ » des tableaux de bord suppose une forme.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>Markov appliqué à l'écart au carré</small></summary><div class="in">
+    <div class="drv">
+      <div>P(|<i>X</i> − μ| ≥ <i>a</i>) = P((<i>X</i> − μ)² ≥ <i>a</i>²)</div><span>élever au carré ne change pas l'événement : les deux côtés sont ≥ 0, et t ↦ t² est croissante sur [0, ∞)</span>
+      <div>= P(<i>Y</i> ≥ <i>b</i>), &nbsp;<i>Y</i> = (<i>X</i> − μ)², <i>b</i> = <i>a</i>²</div><span>le changement de variable de Brunton</span>
+      <div>≤ E[<i>Y</i>] / <i>b</i></div><span>Markov (notion 1), permis parce que Y ≥ 0 : c'est un carré</span>
+      <div>= σ² / <i>a</i>²</div><span>E[(X − μ)²] est la définition de la variance (l08, notion 6)</span>
+    </div>
+    <p>Avec a = kσ : σ²/(k²σ²) = 1/k². <b>Égalité</b> : Markov est atteint quand Y ne prend que les valeurs 0 et b, c'est-à-dire X = μ ou |X − μ| = a. Ce sont les lois à trois points de l'exemple 3.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>la part hors de ±2σ pour cinq lois</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(0)
+n, k = 1_000_000, 2
+m = 1 / (2 * k**2)       # three-point law built to attain the bound
+laws = {  # name: (sample, true mean, true sd)
+    "normal": (rng.normal(0, 1, n), 0, 1),
+    "uniform": (rng.uniform(0, 1, n), 0.5, np.sqrt(1 / 12)),
+    "exponential": (rng.exponential(1, n), 1, 1),
+    "die": (rng.integers(1, 7, n), 3.5, np.sqrt(35 / 12)),
+    "three-point": (rng.choice([-k, 0, k], p=[m, 1 - 2 * m, m], size=n), 0, 1),
+}
+print(f"Chebyshev bound for k = {k}: {1 / k**2:.4f}")
+for name, (x, mu, sd) in laws.items():
+    print(f"{name:12s} P(|X - mu| &gt;= 2 sd) = {np.mean(np.abs(x - mu) &gt;= k * sd):.4f}")</pre>
+<pre class="out">Chebyshev bound for k = 2: 0.2500
+normal       P(|X - mu| &gt;= 2 sd) = 0.0456
+uniform      P(|X - mu| &gt;= 2 sd) = 0.0000
+exponential  P(|X - mu| &gt;= 2 sd) = 0.0500
+die          P(|X - mu| &gt;= 2 sd) = 0.0000
+three-point  P(|X - mu| &gt;= 2 sd) = 0.2502</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>La borne est large.</b> Elle vaut pour toutes les lois, donc elle est calée sur la pire : 25 % là où une normale donne 4,6 % et un dé 0 %.</li>
+      <li><b>Pour k ≤ 1, elle ne dit rien.</b></li>
+      <li><b>Variance infinie : rien.</b> Pareto d'indice ≤ 2, Cauchy (qui n'a même pas d'espérance).</li>
+      <li><b>σ doit être le vrai écart-type.</b> Avec un σ estimé sur quelques points, la borne n'est plus garantie.</li>
+      <li><b>Elle porte sur les deux queues ensemble.</b> « Au plus 12,5 % de chaque côté » est faux : une seule queue peut prendre jusqu'à 1/(1 + k²), soit 20 % à k = 2 (inégalité de Cantelli). La loi qui le fait : ⅕ en μ + 2σ, ⅘ en μ − σ/2.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (34) pose Y = (X − μ)² et applique Markov à Y sans dire pourquoi il en a le droit. Markov n'a qu'une hypothèse, Y ≥ 0 : elle est vraie parce que Y est un carré, mais c'est le seul point de la preuve à vérifier. Il ne donne pas non plus la forme en kσ, ni aucun chiffre : le 1/k² et la comparaison avec la normale sont ajoutés ici.</div>
+  </div></details>
+  <p class="garde">Pour toute loi de variance finie, P(|X − μ| ≥ kσ) ≤ 1/k² : au plus 25 % de la masse au-delà de 2σ, contre 4,6 % pour une normale. Universelle, donc large.</p>
+</section>
+
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>X̄ est une variable aléatoire : E[X̄] = μ, Var(X̄) = σ²/n <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 35 · The Law of Large Numbers</p>
+  <div class="idee">
+    <p>Brunton : « je n'ai pas de modèle de la loi, mais je collecte des données ». Je jette n dés et je fais la moyenne. Trois objets se croisent alors, et les confondre est l'erreur la plus coûteuse du sujet. μ = 3,5 est le <b>paramètre</b> : un nombre fixe de la loi du dé. X̄ = (X<sub>1</sub> + … + X<sub>n</sub>)/n est une <b>variable aléatoire</b> : la procédure « jeter n dés et moyenner », avant de la lancer. x̄ est sa <b>réalisation</b> : le nombre obtenu ce jour-là.</p>
+    <p>Rejoue trois fois la procédure à quatre dés : 2, 5, 1, 5 donne x̄ = 3,25 ; 6, 3, 4, 5 donne 4,5 ; 1, 4, 3, 3 donne 2,75. Trois réalisations différentes de la même X̄, pour un μ qui n'a pas bougé. X̄ a donc une loi, avec un centre et une largeur : c'est le « pic » que dessine Brunton, large pour n petit, de plus en plus étroit quand n grandit.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — le paramètre ne bouge pas, chaque expérience donne une réalisation</div>
+    <div id="v3ctl" class="sl-ctl"></div><div id="v3ctl2" class="sl-ctl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">Le trait rouge μ = 3,5 ne bouge jamais : c'est le paramètre. Chaque clic sur <b>refaire l'expérience</b> lance n dés (en haut) et pose leur moyenne x̄, une réalisation de X̄, en pastille ; la dernière est en bleu. Au départ, les trois réalisations 3,25, 4,5 et 2,75 à n = 4. La pile des x̄ (des barres quand elle devient trop haute) dessine la loi de X̄, centrée sur μ. Lance <b>100 fois</b> et compare l'écart-type des x̄ à la théorie σ/√n : 1,708 à n = 1, 0,854 à n = 4, 0,427 à n = 16.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>X̄</i> = (1/<i>n</i>) Σ<sub><i>i</i></sub> <i>X<sub>i</sub></i> &nbsp;&nbsp;&nbsp; E[<i>X̄</i>] = μ &nbsp;&nbsp;&nbsp; Var(<i>X̄</i>) = σ² / <i>n</i> &nbsp;&nbsp;&nbsp; écart-type σ / √<i>n</i></div>
+    <ul><li><b>E[X̄] = μ</b> ne demande qu'une chose : E[X<sub>i</sub>] = μ pour chaque i. Aucune indépendance : c'est la linéarité (<a href="lesson-00-08-esperance-variance.html#n3">l08, notion 3</a>).</li><li><b>Var(X̄) = σ²/n</b> demande les deux moitiés d'i.i.d. (indépendantes et de même loi), chacune pour sa raison. L'<b>indépendance</b> annule toutes les covariances Cov(X<sub>i</sub>, X<sub>j</sub>), i ≠ j. La <b>même loi</b> donne à chaque terme la même variance σ².</li><li>La preuve n'utilise en fait que cela : même moyenne, même variance, covariances nulles. Brunton (35) ne dit d'ailleurs pas « même loi ».</li><li>σ/√n, l'écart-type de X̄, s'appelle l'erreur standard (notion 5).</li></ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — Var(X̄) est la somme des cases, divisée par n²</div>
+    <div id="f2ctl" class="sl-ctl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Six termes de variance 1. La case de la ligne i et de la colonne j porte Cov(X<sub>i</sub>, X<sub>j</sub>) ; sur la diagonale, Cov(X<sub>i</sub>, X<sub>i</sub>) = Var(X<sub>i</sub>). Var(X̄) est la <b>somme des 36 cases divisée par 36</b>. <b>i.i.d.</b> : six 1 sur la diagonale, 0 ailleurs, 6/36 = 0,167 = σ²/n. Retire la <b>même loi</b> (variances 1, 1, 1, 1, 1, 4) : les covariances restent nulles, mais la diagonale fait 9, d'où 0,25. Retire l'<b>indépendance</b> (ρ = 0,5) : la diagonale fait 6, les 30 cases hors diagonale ajoutent 15, d'où 0,583. <b>Copies</b> : toutes les cases valent 1, Var(X̄) = 1, moyenner n'a servi à rien.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>n = 1, le dé, des copies, une pièce, une accuracy</small></summary><div class="in">
+    <ol>
+      <li><b>n = 1</b> : X̄ = X<sub>1</sub>, de moyenne μ et de variance σ². Rien de neuf, et c'est un bon test de la formule.</li>
+      <li><b>Le dé, n = 4</b> : E[X̄] = 3,5 ; Var(X̄) = 2,917/4 = 0,729 ; écart-type 0,854. Pour n = 16 : 0,182 et 0,427.</li>
+      <li><b>Un dé recopié quatre fois</b> : X<sub>1</sub> = X<sub>2</sub> = X<sub>3</sub> = X<sub>4</sub>. Le centre est intact, E[X̄] = 3,5. Mais X̄ = X<sub>1</sub>, donc Var(X̄) = 2,917 et non 0,729 : l'indépendance perdue se paie dans la largeur, jamais dans le centre.</li>
+      <li><b>Une pièce de biais p</b> (le cas de Brunton : « n lancers, n Bernoulli »). X<sub>i</sub> ∈ {0, 1}, X̄ est la proportion de piles. E[X̄] = p, Var(X̄) = p(1 − p)/n.</li>
+      <li><b>Une accuracy.</b> L'accuracy d'un modèle sur n exemples de test est la moyenne des indicatrices « bonne réponse ». C'est une réalisation de X̄ : un autre jeu de test tiré de la même population donnerait une autre accuracy, autour de la vraie p, avec la variance p(1 − p)/n.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>à savoir produire : chaque ligne nomme ce qui sert</small></summary><div class="in">
+    <p><b>Le centre.</b></p>
+    <div class="drv">
+      <div>E[<i>X̄</i>] = E[(1/<i>n</i>) Σ<sub><i>i</i></sub> <i>X<sub>i</sub></i>]</div><span>définition de X̄</span>
+      <div>= (1/<i>n</i>) Σ<sub><i>i</i></sub> E[<i>X<sub>i</sub></i>]</div><span>linéarité (l08, notion 3) : aucune hypothèse</span>
+      <div>= (1/<i>n</i>) · <i>n</i>μ = μ</div><span>chaque E[X<sub>i</sub>] vaut μ (même loi, ou seulement même moyenne)</span>
+    </div>
+    <p><b>La largeur.</b> Chaque ligne nomme la moitié d'i.i.d. qui sert.</p>
+    <div class="drv">
+      <div>Var(<i>X̄</i>) = (1/<i>n</i>²) Var(Σ<sub><i>i</i></sub> <i>X<sub>i</sub></i>)</div><span>Var(aY) = a² Var(Y) avec a = 1/n (l08, notion 9) : aucune hypothèse</span>
+      <div>= (1/<i>n</i>²) [Σ<sub><i>i</i></sub> Var(<i>X<sub>i</sub></i>) + Σ<sub><i>i</i> ≠ <i>j</i></sub> Cov(<i>X<sub>i</sub></i>, <i>X<sub>j</sub></i>)]</div><span>variance d'une somme (l09, notion 2) : aucune hypothèse ; n variances, n(n − 1) covariances</span>
+      <div>= (1/<i>n</i>²) Σ<sub><i>i</i></sub> Var(<i>X<sub>i</sub></i>)</div><span><b>indépendance</b> : chaque Cov(X<sub>i</sub>, X<sub>j</sub>) = 0</span>
+      <div>= (1/<i>n</i>²) · <i>n</i>σ²</div><span><b>même loi</b> : chaque Var(X<sub>i</sub>) = σ²</span>
+      <div>= σ² / <i>n</i></div><span>le n du haut vient des n variances, le n² du bas de la division</span>
+    </div>
+    <p>Au tableau : « l'indépendance tue les covariances, la même loi égalise les variances, le 1/n sort au carré ». Sans indépendance, la troisième ligne garde ses covariances (notion 6) ; sans même loi, la quatrième donne Σ σ<sub>i</sub>²/n².</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>100 000 fois quatre dés, indépendants puis recopiés</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(0)
+reps, n = 100_000, 4
+dice = rng.integers(1, 7, size=(reps, n))      # 100,000 repetitions of "throw 4 dice"
+xbar = dice.mean(axis=1)                       # one realisation of Xbar per repetition
+copies = np.repeat(dice[:, :1], n, axis=1)     # one die copied 4 times: fully dependent
+xbar_copy = copies.mean(axis=1)
+
+print("first three realisations:", xbar[:3])
+for name, x, var in (("independent", xbar, 35 / 12 / n), ("copies", xbar_copy, 35 / 12)):
+    print(f"{name:11s}  mean {x.mean():.3f} (theory 3.5)   var {x.var():.3f} (theory {var:.3f})")</pre>
+<pre class="out">first three realisations: [4.   1.25 4.25]
+independent  mean 3.500 (theory 3.5)   var 0.728 (theory 0.729)
+copies       mean 3.510 (theory 3.5)   var 2.915 (theory 2.917)</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Réalisation, variable, paramètre.</b> Écrire « μ = 3,2 » pour « x̄ = 3,2 sur ces quatre dés » mélange les trois. μ ne se mesure pas, il s'estime : x̄ en est une estimation, X̄ l'estimateur (<a href="lesson-00-04-variables-binomiale-normale.html#n1">l04, notion 1</a>, puis <a href="../chains/chain-p01-01-objet-aleatoire.html">p01-01</a>).</li>
+      <li><b>Ce qui se réduit est Var(X̄), pas Var(X).</b> La variance d'un dé reste 2,917 quel que soit le nombre de lancers ; celle de leur moyenne tombe en 1/n.</li>
+      <li><b>Dépendance.</b> Le centre reste μ, la largeur change : 2,917 au lieu de 0,729 pour des copies, et la notion 6 pour une corrélation partielle.</li>
+      <li><b>Des lois différentes.</b> Indépendantes mais de variances σ<sub>i</sub>² différentes : Var(X̄) = Σ σ<sub>i</sub>²/n², pas σ²/n (figure 2). Un seul terme très bruité peut dominer.</li>
+      <li><b>Variance infinie</b> (Pareto d'indice ≤ 2) : σ²/n n'a pas de sens. Sans espérance du tout (Cauchy, notion 4), c'est même le centre qui manque.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (35) écrit E[X̄] = μ « puisque tous ces X sont indépendants ». La linéarité de l'espérance n'a besoin d'aucune hypothèse (l08, notion 3) : E[X̄] = μ vaut aussi pour des dés recopiés. L'indépendance ne sert qu'à la ligne de la variance, où elle annule les covariances.</div>
+  </div></details>
+  <p class="garde">Pour X̄ = (1/n) Σ X<sub>i</sub> : E[X̄] = μ par linéarité, sans hypothèse ; Var(X̄) = σ²/n parce que l'indépendance annule les covariances, que la même loi donne σ² à chaque terme, et que 1/n sort au carré.</p>
+</section>
+
+<!-- ============================ n4 ============================ -->
+<section class="notion outil" id="n4">
+  <h3>Loi des grands nombres : la moyenne converge, la somme s'écarte <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 35 · l'image des mesures répétées vient des vidéos 01 et 36</p>
+  <div class="idee">
+    <p>Brunton prend l'exemple de la mesure : on mesure la vitesse de la lumière 30 fois, et l'on obtient 30 valeurs un peu différentes. La moyenne des mesures se rapproche de la vraie valeur à mesure qu'on en ajoute. La <b>loi des grands nombres</b> (LGN) le dit précisément : la probabilité que X̄ s'écarte de μ de plus de ε tend vers 0, pour tout ε.</p>
+    <p>Le mécanisme tient en une ligne : Var(X̄) = σ²/n tend vers 0 (notion 3), et Chebyshev (notion 2) transforme une variance qui tend vers 0 en une probabilité d'écart qui tend vers 0. Rien ne se compense pour autant. La somme S<sub>n</sub> s'écarte de nμ avec un écart-type σ√n qui grandit : sur 1 000 dés, 54,0, quand celui de la moyenne vaut 0,054. C'est la division par n qui écrase un écart qui, lui, continue de grandir.</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — des mesures répétées, et leur moyenne</div>
+    <div id="v4ctl" class="sl-ctl"></div><div id="v4ctl2" class="sl-ctl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">Chaque point est une mesure simulée de la vitesse de la lumière, en écart à la vraie valeur 299 792 km/s, avec un bruit d'écart-type 100 km/s choisi pour l'illustration. La courbe rouge est la moyenne des n premières mesures ; la bande bleue ±2σ/√n se referme sur 0 : ±36,5 km/s à n = 30, ±11,5 à n = 300. Clique <b>270 mesures de plus</b> : les points restent aussi dispersés, la moyenne se pose. Puis choisis des <b>erreurs de Cauchy</b>, un instrument qui déraille de temps en temps : la moyenne de n erreurs de Cauchy a la loi d'une seule erreur, elle saute à chaque grosse erreur et ne se pose jamais.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">pour tout ε &gt; 0 : &nbsp;P(|<i>X̄<sub>n</sub></i> − μ| ≥ ε) ≤ σ² / (<i>n</i>ε²) &nbsp;→ 0 &nbsp;&nbsp;&nbsp; et &nbsp;&nbsp; écart-type(<i>S<sub>n</sub></i> − <i>n</i>μ) = σ√<i>n</i> &nbsp;→ ∞</div>
+    <ul><li>C'est la loi <b>faible</b> des grands nombres : X̄<sub>n</sub> converge vers μ <b>en probabilité</b> (weak law, convergence in probability).</li><li>Hypothèses de cette preuve : même moyenne μ, variance σ² finie, covariances nulles (l'indépendance suffit). La LGN reste vraie pour des X<sub>i</sub> i.i.d. d'espérance seulement finie, avec une preuve plus longue, hors leçon. Pour Cauchy, qui n'a pas d'espérance, X̄<sub>n</sub> ne converge pas : elle a la loi d'une seule mesure (où ça casse).</li><li>La LGN dit que X̄ se pose sur μ. Elle ne dit ni à quelle vitesse (notion 5) ni avec quelle forme (<a href="lesson-00-11-tcl.html">l11</a>).</li></ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — un seul chemin, deux lectures opposées</div>
+    <div id="f3a" class="wide"></div>
+    <div id="f3b" class="wide"></div>
+    <div class="sl-ctl" id="f3ctl"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Les deux courbes rouges lisent <b>le même tirage de 1 000 dés</b>, l'une divisée par n, l'autre non, et les deux bandes décrivent le même événement : le chemin sort de l'une exactement quand il sort de l'autre. En haut, la bande ±2σ/√n se referme sur μ = 3,5, et la moyenne avec elle. En bas, la bande ±2σ√n s'ouvre : la somme moins 3,5n erre à quelques dizaines de 0 (36 en médiane à n = 1 000), recoupe parfois 0 mais ne s'y pose pas. Clique <b>nouveau chemin</b> plusieurs fois : en haut l'écart à 3,5 fond, en bas il ne fond pas. Rien ne se compense : c'est la division par n qui fabrique la convergence.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>la borne à n = 100, moyenne et somme, une pièce, une fréquence</small></summary><div class="in">
+    <ol>
+      <li><b>Chebyshev pour 100 dés, ε = 0,5.</b> P(|X̄ − 3,5| ≥ 0,5) ≤ 2,917/(100 × 0,25) = 0,117. La valeur exacte, calculée sur la loi de la somme de 100 dés, est 0,0036 : la borne est 32 fois trop large. Mais elle tend vers 0 quand n grandit, et c'est tout ce que la preuve demande.</li>
+      <li><b>Moyenne et somme, 1 000 dés.</b> Écart-type de X̄ : 1,708/√1 000 = 0,054. Écart-type de S − 3 500 : 1,708 × √1 000 = 54,0. Un facteur 1 000 entre les deux, sur le même tirage.</li>
+      <li><b>Une pièce.</b> Sur 100 lancers, la proportion de piles a un écart-type de 0,05 et le nombre de piles moins 50 un écart-type de 5. Sur 10 000 lancers : 0,005 et 50. Après dix faces de suite, le lancer suivant reste à ½ : la pièce ne « rattrape » rien.</li>
+      <li><b>Une fréquence est une moyenne.</b> Pour un événement A, l'indicatrice 1{A} est une Bernoulli de moyenne P(A) : la fréquence de A sur n tirages converge vers P(A). C'est ce qui rend précis le « à peu près » de la <a href="lesson-00-08-esperance-variance.html#n1">notion 1 de l08</a> : chaque face sort à peu près N · P(X = x) fois sur N lancers.</li>
+      <li><b>Une accuracy.</b> Mesurée sur un jeu de test de plus en plus grand, d'exemples tirés indépendamment, elle converge vers la vraie accuracy du modèle sur cette population.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>Chebyshev appliqué à X̄</small></summary><div class="in">
+    <div class="drv">
+      <div>E[<i>X̄<sub>n</sub></i>] = μ, &nbsp;Var(<i>X̄<sub>n</sub></i>) = σ²/<i>n</i></div><span>notion 3</span>
+      <div>P(|<i>X̄<sub>n</sub></i> − μ| ≥ ε) ≤ Var(<i>X̄<sub>n</sub></i>) / ε²</div><span>Chebyshev (notion 2) appliqué à la variable X̄<sub>n</sub>, avec a = ε</span>
+      <div>= σ² / (<i>n</i>ε²)</div><span>on remplace Var(X̄<sub>n</sub>)</span>
+      <div>→ 0 quand <i>n</i> → ∞</div><span>ε et σ² sont fixés, seul n bouge</span>
+    </div>
+    <p><b>La somme.</b> Var(S<sub>n</sub> − nμ) = Var(S<sub>n</sub>) = nσ², par les deux mêmes moitiés d'i.i.d. ; son écart-type σ√n tend vers l'infini. Et S<sub>n</sub> − nμ = n(X̄<sub>n</sub> − μ) : l'écart de la somme est celui de la moyenne, multiplié par n.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>2 000 chemins de 1 000 dés, puis une moyenne de Cauchy</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(1)
+paths, n = 2_000, 1_000
+s = rng.integers(1, 7, size=(paths, n)).cumsum(axis=1)   # S_m along each path
+for m in (10, 100, 1000):
+    mean_dev = s[:, m - 1] / m - 3.5                       # Xbar_m - mu
+    sum_dev = s[:, m - 1] - 3.5 * m                        # S_m - m mu
+    print(f"n = {m:4d}   sd(Xbar - mu) {mean_dev.std():.3f}   sd(S - n mu) {sum_dev.std():5.1f}")
+
+N = 1_000_000
+cauchy_mean = rng.standard_cauchy(N).cumsum() / np.arange(1, N + 1)
+print("Cauchy running mean at n = 1e3, 1e4, 1e5, 1e6:",
+      np.round(cauchy_mean[[999, 9_999, 99_999, N - 1]], 2))</pre>
+<pre class="out">n =   10   sd(Xbar - mu) 0.543   sd(S - n mu)   5.4
+n =  100   sd(Xbar - mu) 0.172   sd(S - n mu)  17.2
+n = 1000   sd(Xbar - mu) 0.054   sd(S - n mu)  53.8
+Cauchy running mean at n = 1e3, 1e4, 1e5, 1e6: [-1.56 -0.92  2.53  1.54]</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Pas d'espérance : Cauchy.</b> La moyenne de n variables de Cauchy indépendantes a exactement la loi d'une seule : moyenner n'apporte rien, la moyenne courante saute à chaque gros tirage (vignette, bouton Cauchy, et code). La symétrie fait croire à un centre en 0, mais l'espérance n'existe pas (<a href="lesson-00-08-esperance-variance.html#n1">l08, notion 1</a>).</li>
+      <li><b>« Les tirages se compensent » est faux</b> : c'est l'erreur du joueur. Les écarts accumulés grandissent en σ√n ; la moyenne converge parce qu'on divise par n.</li>
+      <li><b>Dépendance.</b> Si toutes les paires ont la même corrélation ρ &gt; 0, Var(X̄) ne tend plus vers 0 (notion 6) : la moyenne se pose sur μ + C, où C est l'erreur commune, et non sur μ. Si la corrélation s'éteint avec l'écart entre les termes (série temporelle stationnaire), X̄ converge encore, mais moins vite que σ/√n ne le dit.</li>
+      <li><b>Ni vitesse ni forme.</b> La LGN dit « ça converge », pas « à ±0,05 près avec 95 % de chances » : la vitesse est la notion 5, la forme le TCL (<a href="lesson-00-11-tcl.html">l11</a>).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (35), annonçant le TCL, dit que « cette somme » va converger vers une gaussienne « avec cette moyenne et l'écart-type ». S<sub>n</sub> ne converge vers aucune loi : son centre nμ et son écart-type σ√n grandissent avec n. Ce qui converge vers N(0, 1), c'est la version standardisée, (X̄<sub>n</sub> − μ)/(σ/√n) = (S<sub>n</sub> − nμ)/(σ√n) ; S<sub>n</sub> ≈ N(nμ, nσ²) n'est qu'une approximation à n fixé (<a href="lesson-00-11-tcl.html#n3">l11, notion 3</a>). En (34), il annonce « le théorème central limite » en décrivant la LGN, et en (33) il résume le TCL par « additionner des lois de probabilité » : on additionne des variables aléatoires i.i.d., pas des lois.</div>
+  </div></details>
+  <p class="garde">Pour des X<sub>i</sub> indépendantes de même moyenne μ et de variance σ² finie : P(|X̄<sub>n</sub> − μ| ≥ ε) ≤ σ²/(nε²) → 0, parce que Var(X̄) → 0 et non par compensation : la somme s'écarte de nμ en σ√n.</p>
+</section>
+
+<!-- ============================ n5 ============================ -->
+<section class="notion outil" id="n5">
+  <h3>Erreur standard σ/√n : diviser la largeur par 2 coûte 4 fois plus de données <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 35</p>
+  <div class="idee">
+    <p>L'écart-type de X̄, σ/√n, porte un nom à lui : l'<b>erreur standard</b> (standard error, SE). Le nom rappelle qu'il mesure la dispersion d'une quantité calculée, la moyenne, et non celle des mesures : σ décrit un dé, le SE décrit la moyenne de n dés.</p>
+    <p>La racine rend la précision chère. Pour diviser le SE par 2, il faut multiplier n par 4 ; pour le diviser par 10, par 100. L'exemple ML : une accuracy de 0,9 mesurée sur 1 000 exemples de test a un SE de √(0,9 × 0,1/1 000) = 0,0095, soit ±1,86 point à 95 % (le 1,96 vient de la forme normale, l11). Pour ±0,93 point, il faut annoter 4 000 exemples ; pour ±0,46 point, 16 000.</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — le côté double, l'aire quadruple, l'intervalle se divise par 2</div>
+    <div id="v5ctl" class="sl-ctl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">Chaque case représente 250 exemples de test annotés. Passe de <b>n = 250</b> à <b>1 000</b>, <b>4 000</b> puis <b>16 000</b> : le côté du carré double, son aire et le coût d'annotation quadruplent, et l'intervalle ±1,96 SE autour de l'accuracy 0,9 ne se divise que par 2 : ±3,72, ±1,86, ±0,93 puis ±0,46 point.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">SE(<i>X̄</i>) = σ / √<i>n</i> &nbsp;&nbsp;&nbsp; <i>n</i> requis pour un SE visé <i>s</i> : (σ/<i>s</i>)² &nbsp;&nbsp;&nbsp; proportion : SE = √(<i>p</i>(1 − <i>p</i>) / <i>n</i>)</div>
+    <ul><li>SE(k²n) = SE(n)/k : diviser l'incertitude par k coûte k² fois plus de données.</li><li>Hypothèses : celles de Var(X̄) = σ²/n (notion 3), donc indépendance et même loi. Des exemples de test dépendants rendent ce SE trop optimiste (notion 6).</li><li>σ et p sont inconnus en pratique : on les remplace par leur estimation (<a href="../chains/chain-p01-01-objet-aleatoire.html">p01-01</a>). Pour une proportion, p(1 − p) ≤ ¼ donne un SE d'au plus 0,5/√n.</li><li>Passer d'un SE à un intervalle « à 95 % », ±1,96 SE, demande la forme normale de X̄ : c'est le TCL (<a href="lesson-00-11-tcl.html">l11</a>).</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>le dé, combien de dés, un sondage, une accuracy</small></summary><div class="in">
+    <ol>
+      <li><b>Le dé.</b> SE = 1,708, 0,854, 0,342, 0,171 pour n = 1, 4, 25, 100. De 1 à 4 dés la largeur est divisée par 2 ; de 1 à 100, par 10.</li>
+      <li><b>Combien de dés pour un SE visé</b> : n = (1,708/s)². SE 0,5 : 12 dés ; 0,1 : 292 ; 0,05 : 1 167 ; 0,01 : 29 167. Passer de 0,1 à 0,05 coûte 875 dés de plus.</li>
+      <li><b>Un sondage.</b> p = ½, le pire cas, et n = 1 000 : SE = 0,0158, soit ±3,1 points à 95 %. C'est le « ±3 points » des sondages à 1 000 personnes.</li>
+      <li><b>Une accuracy p = 0,9.</b> n = 250 : SE 0,019 ; 1 000 : 0,0095 ; 4 000 : 0,0047 ; 16 000 : 0,0024. Une différence d'un point entre deux modèles, sur 1 000 exemples, est de l'ordre d'un seul SE : elle ne suffit pas à les départager (le SE d'une différence sur un jeu de test partagé est en <a href="lesson-00-09-covariance-correlation.html#n6">l09, notion 6</a>).</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>20 000 jeux de test, l'écart-type de l'accuracy</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(0)
+p, sets = 0.9, 20_000                   # true accuracy, number of simulated test sets
+for n in (1_000, 4_000):
+    acc = rng.binomial(n, p, size=sets) / n     # one realised accuracy per test set
+    se = np.sqrt(p * (1 - p) / n)
+    print(f"n = {n}: sd of the accuracies {acc.std():.5f}   formula {se:.5f}")
+
+sigma = np.sqrt(35 / 12)                # one die
+for se in (0.1, 0.05):
+    print(f"dice needed for SE {se}: {int(np.ceil((sigma / se) ** 2))}")</pre>
+<pre class="out">n = 1000: sd of the accuracies 0.00946   formula 0.00949
+n = 4000: sd of the accuracies 0.00472   formula 0.00474
+dice needed for SE 0.1: 292
+dice needed for SE 0.05: 1167</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>σ n'est pas le SE.</b> σ = 1,708 décrit un dé et ne bouge pas avec n ; le SE décrit la moyenne et tombe en 1/√n. Rapporter « ±σ » pour une moyenne surestime son incertitude ; rapporter « ±SE » pour une mesure isolée la sous-estime.</li>
+      <li><b>Exemples dépendants.</b> Plusieurs lignes d'un même utilisateur, plusieurs images d'une même vidéo : σ/√n est trop petit (notion 6).</li>
+      <li><b>σ estimé à petit n.</b> Remplacer σ par l'écart-type de l'échantillon ajoute de l'incertitude ; à petit n, l'intervalle s'élargit (loi de Student, <a href="../chains/chain-p01-03-inference-regression.html">p01-03</a>).</li>
+      <li><b>p proche de 0 ou de 1.</b> √(p(1 − p)/n) reste le bon écart-type, mais l'intervalle ±1,96 SE suppose une forme normale, qui demande assez de succès et d'échecs (l11).</li>
+      <li><b>Rendements décroissants.</b> Chaque décimale coûte 100 fois plus de données. Passé un certain stade, réduire le bruit (comparer deux modèles sur les mêmes exemples, l09) rapporte souvent plus qu'annoter davantage.</li>
+    </ul>
+  </div></details>
+  <p class="garde">SE = σ/√n, l'écart-type de X̄ et non des mesures : diviser l'incertitude par k demande k² fois plus de données.</p>
+</section>
+
+<!-- ============================ n6 ============================ -->
+<section class="notion outil" id="n6">
+  <h3>Moyenne de termes corrélés : ρσ² + (1 − ρ)σ²/n <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 35, prolongé : le cas que Brunton écarte en supposant l'indépendance</p>
+  <div class="idee">
+    <p>Brunton suppose les mesures indépendantes. Suppose maintenant que l'instrument est mal calibré : chaque mesure porte la même erreur C, tirée une fois pour toutes, plus son erreur propre E<sub>i</sub>. Donc X<sub>i</sub> = μ + C + E<sub>i</sub>. Moyenner efface les E<sub>i</sub> ; C, présente dans toutes les mesures, reste entière.</p>
+    <p>Avec σ² = 1 et ρ = 0,5, la moitié de la variance est commune et reste entière, l'autre moitié se divise par n : 0,5 + 0,5/10 = 0,55 pour 10 mesures, 0,505 pour 100, jamais moins de 0,5. En général, si C porte une fraction ρ de la variance σ², deux mesures ont la corrélation ρ, et Var(X̄) = ρσ² + (1 − ρ)σ²/n : le second terme s'éteint avec n, le premier jamais, c'est un <b>plancher</b>. Cent mesures valent à peine mieux que dix, et jamais mieux que deux mesures indépendantes.</p>
+  </div>
+  <div class="fig vis" id="v6">
+    <div class="lbl">Voir l'idée — la part commune ne se moyenne pas</div>
+    <div id="v6ctl"></div>
+    <div id="v6plot" class="wide"></div>
+    <div class="readouts" id="v6out"></div>
+    <p class="cap">En bleu pointillé, la variance de X̄ sans corrélation, σ²/n, qui descend sans fin ; en violet, la même avec la corrélation ρ ; en rouge pointillé, son plancher ρσ². Le second panneau, la barre, sépare les deux parts : en rouge l'erreur commune, en violet la part propre. Départ <b>ρ = 0,5, n = 10</b> : 0,5 + 0,05 = 0,55, dont 91 % pour la part commune. Monte <b>n</b> : la part propre fond, la part commune ne bouge pas. Baisse <b>ρ</b> : c'est le seul curseur qui fait descendre le plancher. n<sub>eff</sub> est le nombre de mesures indépendantes qui donneraient la même variance.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">Var(<i>X̄</i>) = (1/<i>n</i>²) [<i>n</i>σ² + <i>n</i>(<i>n</i> − 1)ρσ²] = ρσ² + (1 − ρ)σ²/<i>n</i> &nbsp;→ ρσ² &nbsp;&nbsp;&nbsp; <i>n</i><sub>eff</sub> = <i>n</i> / (1 + (<i>n</i> − 1)ρ) &nbsp;→ 1/ρ</div>
+    <ul><li>Hypothèses : chaque terme a la variance σ², chaque paire la corrélation ρ, donc la covariance ρσ² (<a href="lesson-00-09-covariance-correlation.html#n4">l09, notion 4</a>). Si les corrélations diffèrent, la formule reste exacte avec ρ̄, la corrélation moyenne sur les n(n − 1) paires.</li><li>ρ = 0 redonne σ²/n (notion 3) ; ρ = 1, des copies, donne σ².</li><li>Le centre ne bouge pas : E[X̄] = μ quel que soit ρ. La dépendance ne se voit que dans la largeur.</li><li>ρ ne peut pas être très négatif : Var(X̄) ≥ 0 impose ρ ≥ −1/(n − 1).</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>ρ = 0 et 1, le plancher à 0,5, le dé, des utilisateurs</small></summary><div class="in">
+    <ol>
+      <li><b>ρ = 0</b> : σ²/n, la notion 3. <b>ρ = 1</b> : σ², la moyenne de n copies.</li>
+      <li><b>σ² = 1, ρ = 0,5.</b> n = 10 : 0,55 ; n = 100 : 0,505 ; n = 1 000 : 0,5005. Passer de 10 à 100 termes gagne 0,045, de 100 à l'infini 0,005. n<sub>eff</sub> vaut 1,82, puis 1,98, et jamais plus de 2.</li>
+      <li><b>Le dé avec ρ = 0,05.</b> Le SE plafonne à √(0,05 × 2,917) = 0,382. À n = 10 000, il vaut 0,382, contre 0,017 sous indépendance : 22 fois moins. n<sub>eff</sub> ≈ 20 : dix mille lancers en valent vingt.</li>
+      <li><b>Des lignes par utilisateur.</b> 1 000 lignes venant de 50 utilisateurs à 20 lignes chacun, corrélation 0,2 entre deux lignes d'un même utilisateur, 0 entre utilisateurs. Compter les cases utilisateur par utilisateur donne n<sub>eff</sub> = 1 000/(1 + 19 × 0,2) = 208, et un vrai SE 2,19 fois plus grand que σ/√n (<a href="../bridges/bridge-04-variance-moyenne-correlee.html">pont b04</a>).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>compter les cases, puis par l'erreur commune</small></summary><div class="in">
+    <div class="drv">
+      <div>Var(<i>X̄</i>) = (1/<i>n</i>²) [Σ<sub><i>i</i></sub> Var(<i>X<sub>i</sub></i>) + Σ<sub><i>i</i> ≠ <i>j</i></sub> Cov(<i>X<sub>i</sub></i>, <i>X<sub>j</sub></i>)]</div><span>variance d'une somme (l09, notion 2), divisée par n² (l08, notion 9)</span>
+      <div>= (1/<i>n</i>²) [<i>n</i>σ² + <i>n</i>(<i>n</i> − 1)ρσ²]</div><span>n cases diagonales à σ², n(n − 1) hors diagonale à ρσ² (figure 2)</span>
+      <div>= σ²/<i>n</i> + ρσ² (<i>n</i> − 1)/<i>n</i></div><span>on divise chaque terme par n²</span>
+      <div>= ρσ² + (1 − ρ)σ²/<i>n</i></div><span>(n − 1)/n = 1 − 1/n, puis on regroupe les termes en σ²/n</span>
+    </div>
+    <p><b>Par l'erreur commune.</b> X<sub>i</sub> = μ + C + E<sub>i</sub>, avec C, E<sub>1</sub>, …, E<sub>n</sub> indépendants, Var(C) = ρσ², Var(E<sub>i</sub>) = (1 − ρ)σ². Alors Var(X<sub>i</sub>) = σ², Cov(X<sub>i</sub>, X<sub>j</sub>) = Var(C) = ρσ², et X̄ = μ + C + Ē. Donc Var(X̄) = ρσ² + (1 − ρ)σ²/n : la moyenne garde C entière et divise par n la variance des erreurs propres.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>l'erreur commune, et le plancher</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(4)
+reps, rho = 10_000, 0.5                 # sigma^2 = 1
+for n in (1, 10, 100, 1000):
+    C = rng.normal(0, np.sqrt(rho), size=(reps, 1))       # shared error: same for the n terms
+    E = rng.normal(0, np.sqrt(1 - rho), size=(reps, n))   # each term's own error
+    xbar = (C + E).mean(axis=1)
+    print(f"n = {n:4d}   Var(Xbar) {xbar.var():.4f}   formula {rho + (1 - rho) / n:.4f}")
+
+x = C + E                                                  # last batch: check one pair
+print(f"corr(X1, X2) = {np.corrcoef(x[:, 0], x[:, 1])[0, 1]:.3f}")</pre>
+<pre class="out">n =    1   Var(Xbar) 0.9931   formula 1.0000
+n =   10   Var(Xbar) 0.5443   formula 0.5500
+n =  100   Var(Xbar) 0.5014   formula 0.5050
+n = 1000   Var(Xbar) 0.5043   formula 0.5005
+corr(X1, X2) = 0.492</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Compter n sans regarder ρ.</b> Dès que ρσ² domine, ajouter des termes ne change plus rien : n<sub>eff</sub> plafonne à 1/ρ.</li>
+      <li><b>Les cas courants sont corrélés.</b> Lignes d'un même utilisateur, points successifs d'une série temporelle, erreurs des plis d'une validation croisée (<a href="../chains/chain-p06-02-cv-leakage.html">p06-02</a>), arbres d'une forêt entraînés sur des données qui se recouvrent (<a href="../chains/chain-p07-02-bagging-rf.html">p07-02</a>).</li>
+      <li><b>ρ se mesure rarement.</b> On le baisse par construction (tirer au hasard les variables explicatives (features) dans une forêt, grouper par utilisateur, rééchantillonner par blocs) plutôt qu'on ne l'estime.</li>
+      <li><b>Le bootstrap de lignes suppose ρ = 0.</b> Il reproduit le σ/√n trop petit (<a href="../chains/chain-p01-05-bootstrap.html">p01-05</a>) ; il faut rééchantillonner les unités indépendantes.</li>
+      <li><b>Un ρ négatif n'ouvre pas de plancher négatif.</b> ρ ≥ −1/(n − 1) : −0,111 à n = 10, −0,010 à n = 100.</li>
+    </ul>
+  </div></details>
+  <p class="garde">n termes de variance σ² et de corrélation commune ρ : Var(X̄) = ρσ² + (1 − ρ)σ²/n → ρσ². Moyenner n'efface que la part non partagée ; au plus 1/ρ termes indépendants.</p>
+</section>
+
+<!-- ============================ n7 ============================ -->
+<section class="notion culture" id="n7">
+  <h3>Monte Carlo : une espérance est une moyenne qu'on simule <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 35</p>
+  <div class="idee">
+    <p>Brunton conclut que la LGN est « la base de l'échantillonnage Monte Carlo ». L'idée se retourne : au lieu de calculer une espérance, on la simule. Pour E[g(X)], tire N valeurs de X, calcule g sur chacune et fais la moyenne. La LGN garantit que cette moyenne tend vers E[g(X)], et l'erreur standard σ<sub>g</sub>/√N dit à quelle vitesse.</p>
+    <p>L'exemple classique : lance des fléchettes au hasard dans le carré [0, 1]². La part qui tombe dans le quart de disque x² + y² ≤ 1 estime son aire, π/4 = 0,785, donc quatre fois cette part estime π. Avec N = 1 000 fléchettes, le SE sur π vaut 4 × √(0,785 × 0,215/1 000) = 0,052 ; pour un SE dix fois plus petit, il en faut cent fois plus.</p>
+  </div>
+  <div class="fig vis" id="v7">
+    <div class="lbl">Voir l'idée — des fléchettes dans un quart de disque</div>
+    <div id="v7ctl" class="sl-ctl"></div>
+    <div id="v7plot" class="wide"></div>
+    <div class="readouts" id="v7out"></div>
+    <p class="cap">Chaque point est une fléchette : bleue dans le quart de disque, rouge dehors. Dans le second panneau, l'estimation 4 × (part des bleues) contre le nombre N de fléchettes, et la bande π ± 2 SE qui se resserre en 1/√N. Départ : 1 000 fléchettes, SE 0,052. Ajoute-en <b>100</b>, puis va <b>jusqu'à 5 000</b> (SE 0,023) : l'estimation reste dans la bande, qui se resserre, sans jamais tomber exactement sur π. <b>Nouvelle graine</b> rejoue l'expérience.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">E[<i>g</i>(<i>X</i>)] ≈ (1/<i>N</i>) Σ<sub><i>i</i></sub> <i>g</i>(<i>x<sub>i</sub></i>), &nbsp;<i>x</i><sub>1</sub>, …, <i>x<sub>N</sub></i> tirés selon la loi de <i>X</i> &nbsp;&nbsp;&nbsp; SE = σ<sub><i>g</i></sub> / √<i>N</i>, &nbsp;σ<sub><i>g</i></sub>² = Var(<i>g</i>(<i>X</i>))</div>
+    <ul><li>Il faut savoir tirer selon la loi de X ; les tirages sont indépendants et de même loi, c'est la LGN de la notion 4 appliquée à g(X).</li><li>Var(g(X)) doit être finie pour que le SE existe.</li><li>Une probabilité est l'espérance d'une indicatrice, P(A) = E[1{A}] : elle s'estime de la même façon.</li><li>La vitesse 1/√N ne dépend pas de la dimension de X : c'est ce qui rend Monte Carlo utile là où une intégrale sur une grille serait impossible. La constante σ<sub>g</sub>, elle, peut en dépendre.</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>π, deux dés, E[e^Z], une perte moyenne</small></summary><div class="in">
+    <ol>
+      <li><b>π.</b> N = 1 000 : SE 0,052 ; N = 100 000 : SE 0,0052.</li>
+      <li><b>Deux dés.</b> P(somme ≥ 10) : l'indicatrice vaut 1 pour 6 issues sur 36, et sa fréquence sur N lancers simulés tend vers 1/6 = 0,167.</li>
+      <li><b>E[e<sup>Z</sup>] pour Z normale centrée réduite.</b> La moyenne de e<sup>z</sup> sur un million de tirages donne 1,648 ; la valeur exacte est e<sup>0,5</sup> = 1,649, alors que e<sup>E[Z]</sup> = 1 (code). Monte Carlo calcule E[g(X)], qui n'est pas g(E[X]) (<a href="lesson-00-08-esperance-variance.html#n5">l08, notion 5</a>).</li>
+      <li><b>Une perte moyenne.</b> La perte moyenne sur un jeu de test est une estimation Monte Carlo de la perte espérée, avec le SE σ<sub>ℓ</sub>/√n. Le gradient d'un mini-batch de B exemples tirés au hasard estime le gradient moyen avec un bruit en 1/√B : quadrupler le batch ne divise ce bruit que par 2.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>π à trois tailles, et E[e^Z]</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(17)
+for N in (100, 10_000, 1_000_000):
+    x, y = rng.random(N), rng.random(N)
+    inside = x**2 + y**2 &lt;= 1                  # g = indicator of the quarter disc
+    est = 4 * inside.mean()
+    se = 4 * inside.std() / np.sqrt(N)
+    print(f"N = {N:9d}   pi estimate {est:.4f}   error {abs(est - np.pi):.4f}   SE {se:.4f}")
+
+z = rng.normal(size=1_000_000)
+print(f"E[exp(Z)] ~ {np.exp(z).mean():.4f}   exact e^0.5 = {np.exp(0.5):.4f}   exp(E[Z]) = 1")</pre>
+<pre class="out">N =       100   pi estimate 3.1600   error 0.0184   SE 0.1629
+N =     10000   pi estimate 3.1480   error 0.0064   SE 0.0164
+N =   1000000   pi estimate 3.1427   error 0.0011   SE 0.0016
+E[exp(Z)] ~ 1.6480   exact e^0.5 = 1.6487   exp(E[Z]) = 1</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>1/√N est lent.</b> Une décimale de plus coûte 100 fois plus de tirages.</li>
+      <li><b>Événement rare.</b> Pour p = 10<sup>−4</sup> et N = 10<sup>4</sup>, on attend un seul succès : le SE relatif √((1 − p)/(Np)) vaut 100 %. On reformule le problème (échantillonnage préférentiel, importance sampling) plutôt que de tirer plus.</li>
+      <li><b>Tirages dépendants.</b> Les méthodes de Monte Carlo par chaînes de Markov (MCMC) produisent des tirages corrélés : le SE se calcule avec un n<sub>eff</sub> (notion 6), pas avec N.</li>
+      <li><b>Variance infinie.</b> Si E[g(X)] existe mais pas Var(g(X)), la moyenne converge encore, sans la vitesse σ<sub>g</sub>/√N et très irrégulièrement.</li>
+      <li><b>Le générateur.</b> Une graine fixée rend l'expérience reproductible ; deux simulations qui partagent une graine ne sont pas indépendantes.</li>
+    </ul>
+  </div></details>
+  <p class="garde">Monte Carlo : une espérance est une moyenne qu'on peut simuler. La LGN garantit la convergence, σ<sub>g</sub>/√N en donne la vitesse, quelle que soit la dimension.</p>
+</section>
+
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>Markov, pour X ≥ 0 : P(X ≥ a) ≤ E[X]/a ; la loi {0, a} atteint la borne.</li>
+    <li>Chebyshev, pour toute loi de variance finie : P(|X − μ| ≥ kσ) ≤ 1/k², soit 25 % à 2σ, contre 4,6 % pour une normale.</li>
+    <li>X̄ est une variable aléatoire, x̄ sa réalisation, μ un nombre fixe.</li>
+    <li>E[X̄] = μ par linéarité seule ; Var(X̄) = σ²/n : l'indépendance annule les covariances, la même loi donne σ² à chaque terme.</li>
+    <li>LGN : P(|X̄ − μ| ≥ ε) ≤ σ²/(nε²) → 0 ; la somme, elle, s'écarte en σ√n.</li>
+    <li>SE = σ/√n : diviser la largeur par 2 coûte 4 fois plus de données ; accuracy : √(p(1 − p)/n).</li>
+    <li>Termes de corrélation commune ρ : Var(X̄) = ρσ² + (1 − ρ)σ²/n → ρσ², au plus 1/ρ termes indépendants.</li>
+    <li>Monte Carlo : une espérance se simule par une moyenne, d'erreur σ<sub>g</sub>/√N.</li>
+  </ol>
+</div>
+<div class="phrase">« La moyenne de n observations est une variable aléatoire, centrée sur μ par la seule linéarité, de variance σ²/n parce que l'indépendance annule les covariances et que la même loi donne σ² à chaque terme. Chebyshev transforme cette variance qui tend vers zéro en convergence : c'est la loi des grands nombres. L'erreur standard σ/√n coûte cher, diviser l'incertitude par deux demande quatre fois plus de données, et si les termes partagent une même corrélation ρ elle plafonne à σ√ρ. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Pourquoi Markov exige-t-il X ≥ 0 ?</div><div class="a hid">Sinon un contrepoids négatif équilibre n'importe quelle masse à droite : X ∈ {−30, 20} avec P(X = 20) = 0,8 a une moyenne de 10 et P(X ≥ 20) = 0,8 &gt; ½.</div></li>
+    <li><div class="q">Chebyshev à 2σ : quelle part de la masse au plus, et combien pour une normale ?</div><div class="a hid">Au plus 25 %, pour toute loi de variance finie ; une normale en met 4,6 %.</div></li>
+    <li><div class="q">μ, X̄, x̄ : lequel est aléatoire ?</div><div class="a hid">X̄, la procédure « jeter n dés et moyenner » ; x̄ est sa réalisation, μ un nombre fixe de la loi.</div></li>
+    <li><div class="q">Que valent E[X̄] et Var(X̄), et quelle hypothèse sert à chaque ligne ?</div><div class="a hid">E[X̄] = μ par linéarité, sans hypothèse. Var(X̄) = σ²/n : l'indépendance annule les covariances, la même loi donne σ² à chaque terme, et 1/n sort au carré.</div></li>
+    <li><div class="q">Pourquoi la moyenne converge-t-elle, et que fait la somme pendant ce temps ?</div><div class="a hid">Var(X̄) = σ²/n → 0, et Chebyshev donne P(|X̄ − μ| ≥ ε) ≤ σ²/(nε²) → 0. La somme s'écarte de nμ en σ√n : rien ne se compense.</div></li>
+    <li><div class="q">Ton accuracy a un SE d'un point sur 1 000 exemples. Combien d'exemples pour un demi-point ?</div><div class="a hid">4 000 : le SE est en 1/√n, diviser par 2 coûte ×4.</div></li>
+    <li><div class="q">n termes de corrélation commune ρ : que devient Var(X̄) quand n grandit ?</div><div class="a hid">ρσ² + (1 − ρ)σ²/n → ρσ² : un plancher ; au plus 1/ρ termes indépendants.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts et chaînes</div>
+  <div class="bridges">
+    <a href="lesson-00-11-tcl.html"><b>l11 · Théorème central limite</b><small>La suite directe : la LGN donne le centre et la largeur de X̄, le TCL sa forme, et le ±1,96 de la notion 5.</small></a>
+    <a href="../bridges/bridge-04-variance-moyenne-correlee.html"><b>Variance d'une moyenne corrélée</b><small>La notion 6 dérivée jusqu'au bout, et ses quatre habits : forêts, validation croisée, SE sur des lignes dépendantes, bootstrap.</small></a>
+    <a href="../chains/chain-p01-01-objet-aleatoire.html"><b>L'objet aléatoire (fil A)</b><small>X̄ devient un estimateur, σ/√n le SE d'une proportion : les notions 3 et 5 au travail.</small></a>
+    <a href="../walkthroughs/walkthrough-p01-04-accuracy-vers-se.html"><b>De l'accuracy au SE</b><small>Le déroulé de l'exemple ML de la notion 5, en quatre maillons.</small></a>
+    <a href="../chains/chain-p01-05-bootstrap.html"><b>Bootstrap</b><small>Une simulation Monte Carlo sur l'échantillon (notion 7), qui suppose des lignes indépendantes (notion 6).</small></a>
+    <a href="../chains/chain-p07-02-bagging-rf.html"><b>Bagging et forêt aléatoire</b><small>Des arbres corrélés : le plancher ρσ² de la notion 6, et pourquoi on tire des variables explicatives au hasard.</small></a>
+    <a href="../chains/chain-p06-02-cv-leakage.html"><b>Validation croisée et fuite</b><small>La moyenne de k erreurs de plis corrélées : plus de plis n'achète presque rien (notion 6).</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::chebyshev</code> (notion 2) · <code>stats::lgn</code> (notions 3 et 4) · <code>stats::se</code> (notions 5 et 6). Markov (notion 1) et Monte Carlo (notion 7) sont de la culture, sans carte.</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l10 · v1 du 10/10/2026 · Brunton 33 à 35 · Prérequis : <a href="lesson-00-08-esperance-variance.html">l08</a>, <a href="lesson-00-09-covariance-correlation.html">l09</a>. Suite : <a href="lesson-00-11-tcl.html">l11 · Théorème central limite</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* ===== commun à toutes les leçons (kit, étalon l08 v2) ===== */
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc : une entrée par notion, étiquette comprise */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.notion').forEach((s,i)=>{const li=document.createElement('li');const t=s.querySelector('h3').firstChild.textContent.trim();const k=s.classList.contains('culture')?' · culture':'';li.innerHTML=`<a href="#${s.id}">${i+1}. ${t}${k}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.notion').forEach(s=>io.observe(s));
+/* une ancre #nN ouvre la notion visée ; rien n'est replié par défaut hors des blocs */
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outils de dessin ===== */
+function curve(P,f,a,b,cls,ymax){let d='';const n=240;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;let y=f(x);if(!isFinite(y))continue;y=Math.min(y,ymax);d+=(d?' L':'M')+P.sx(x).toFixed(1)+' '+P.sy(y).toFixed(1);}SL.el('path',{d:d,class:'sl-fn '+cls,fill:'none'},P.dyn);}
+function bar(P,x0,x1,y,cls){const a=P.sx(x0),b=P.sx(x1);SL.el('rect',{x:Math.min(a,b),y:P.sy(y),width:Math.max(1.5,Math.abs(b-a)),height:Math.max(0,P.sy(0)-P.sy(y)),class:cls||'sl-bar'},P.dyn);}
+/* SL.plot trace l'axe vertical en x = 0 ; quand 0 porte une barre, on le ramène au bord gauche */
+function leftAxis(P,x0){const ax=P.svg.querySelectorAll('line.sl-axis');if(ax[1]){ax[1].setAttribute('x1',P.sx(x0));ax[1].setAttribute('x2',P.sx(x0));}}
+function rd(host,items){host.innerHTML=items.map(it=>`<div class="${it[2]||''}">${it[0]}<b>${it[1]}</b></div>`).join('');}
+function buttons(host,names,cb){const bs=names.map((n,i)=>{const b=SL.h('button','tb',host,n);b.onclick=()=>{bs.forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');cb(i);};return b;});bs[0].onclick();return bs;}
+
+
+/* ===== v2 : vignettes « voir l'idée », une par notion, juste sous l'idée ===== */
+/* tween : animation 0 → 1 lissée ; runner : un jeton par figure, un nouveau clic tue l'animation en cours */
+function runner(){let t={dead:true};return ()=>{t.dead=true;t={dead:false};return t;};}
+function tween(ms,draw,tk,done){if(SL.reduced){draw(1);if(done)done();return;}const t0=performance.now();const st=t=>{if(tk&&tk.dead)return;let u=Math.min(1,(t-t0)/ms);u=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;draw(u);if(u<1)requestAnimationFrame(st);else if(done)done();};requestAnimationFrame(st);}
+function loop(tk,step){if(SL.reduced){let g=0;while(step()!==false&&g++<1e5);return;}const f=()=>{if(tk.dead)return;if(step()!==false)requestAnimationFrame(f);};requestAnimationFrame(f);}
+function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function pick(r,v,p){let u=r(),a=0;for(let i=0;i<v.length;i++){a+=p[i];if(u<a)return v[i];}return v[v.length-1];}
+function gauss(r){let u=0;while(u===0)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());}
+function fulcrum(P,x){const cx=P.sx(x),cy=P.sy(0);SL.el('path',{d:`M${cx.toFixed(1)} ${(cy+1).toFixed(1)} L${(cx-8).toFixed(1)} ${(cy+16).toFixed(1)} L${(cx+8).toFixed(1)} ${(cy+16).toFixed(1)} Z`,class:'sl-fulcrum'},P.dyn);}
+function median(a){const s=a.slice().sort((x,y)=>x-y),n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;}
+function rect(P,x0,x1,y0,y1,cls,parent){const a=P.sx(x0),b=P.sx(x1),c=P.sy(y0),d=P.sy(y1);return SL.el('rect',{x:Math.min(a,b).toFixed(1),y:Math.min(c,d).toFixed(1),width:Math.abs(b-a).toFixed(1),height:Math.abs(d-c).toFixed(1),class:cls},parent||P.dyn);}
+/* pile de pastilles : une par individu, regroupées par classe de largeur bw */
+function stack(P,vals,bw,r,clsOf,centred){const bins=new Map();vals.forEach((v,i)=>{const b=centred?Math.round(v/bw):Math.floor(v/bw);if(!bins.has(b))bins.set(b,[]);bins.get(b).push(i);});
+  const res=[];bins.forEach((ids,b)=>{const c=centred?b*bw:(b+0.5)*bw,cx=P.sx(c);res.push({c:c,ids:ids});ids.forEach((i,j)=>SL.el('circle',{cx:cx.toFixed(1),cy:(P.sy(0)-r-1-j*(2*r+1)).toFixed(1),r:r,class:'sl-dot '+clsOf(i)},P.dyn));});return res;}
+
+
+/* signe moins typographique et milliers séparés, pour les readouts */
+function fm(x,d){return SL.fmt(x,d).replace(/^-/,'−');}
+function fi(n){return Math.round(n).toLocaleString('fr-FR');}
+
+/* ===== Figure 1 : trois lois de moyenne 10 sous l'hyperbole de Markov ===== */
+(function(){
+  const out=document.getElementById('f1out');
+  const P=SL.plot(document.getElementById('f1plot'),{x:[0,50],y:[0,1.08],w:560,h:270,xt:[0,10,20,30,40,50],yt:[0,0.25,0.5,0.75,1],xl:'seuil a',yl:'P(X ≥ a)'});
+  const L=[{n:'exponentielle, moyenne 10',S:a=>Math.exp(-a/10)},
+           {n:'uniforme sur [0, 20]',S:a=>a<=0?1:a>=20?0:1-a/20},
+           {n:'deux points, 0 et 20',S:a=>a<=0?1:a<=20?0.5:0}];
+  const st={l:0,a:20};
+  function draw(){
+    P.clear();const L0=L[st.l],a=st.a;
+    curve(P,x=>10/x,10/1.08,50,'sl-c3',1.08);
+    if(st.l===2){P.seg(0,1,0,0.5,'sl-c4');P.seg(0,0.5,20,0.5,'sl-c4');P.seg(20,0.5,20,0,'sl-c4 sl-dash');P.seg(20,0,50,0,'sl-c4');P.dot(20,0.5,'sl-c4',4);P.dot(20,0,'hollow sl-c4',4);}
+    else curve(P,L0.S,0,50,'sl-c4',1.08);
+    P.vline(a,'sl-dash');
+    const p=L0.S(a),b=10/a;
+    if(b<=1.08)P.dot(a,b,'sl-c3',5);
+    P.dot(a,p,'sl-c4',5);
+    P.text(49.5,1.0,'│ borne de Markov E[X]/a = 10/a','sl-c3','end');
+    P.text(49.5,0.9,'│ P(X ≥ a), '+L0.n,'sl-c4','end');
+    rd(out,[['P(X ≥ a), cette loi',SL.fmt(p,3),'c1'],['borne 10/a',b>=1?SL.fmt(b,2)+' ≥ 1':SL.fmt(b,3),'c3'],['borne / vraie valeur',p>0?SL.fmt(b/p,1):'infini']]);
+  }
+  buttons(document.getElementById('f1ctl'),L.map(l=>l.n),k=>{st.l=k;draw();});
+  SL.slider(document.getElementById('f1sl'),{label:'seuil a',min:1,max:50,step:0.5,value:20,fmt:v=>SL.fmt(v,1)},v=>{st.a=v;draw();});
+})();
+
+/* ===== Figure 2 : la matrice de covariance, case par case ===== */
+(function(){
+  const out=document.getElementById('f2out'),n=6,host=document.getElementById('f2plot');host.classList.add('nogrid');
+  const P=SL.plot(host,{x:[-0.2,6.5],y:[0.5,7.1],w:560,h:330,xt:[],yt:[]});
+  const ax=P.svg.querySelectorAll('line.sl-axis');ax.forEach(e=>e.remove());
+  const sub='₀₁₂₃₄₅₆';
+  for(let j=1;j<=n;j++){const t=SL.el('text',{x:P.sx(j).toFixed(1),y:(P.sy(6.62)).toFixed(1),'text-anchor':'middle',class:'sl-tick'},P.layer);t.textContent='X'+sub[j];}
+  for(let i=1;i<=n;i++){const t=SL.el('text',{x:P.sx(0.3).toFixed(1),y:(P.sy(7-i)+4).toFixed(1),'text-anchor':'middle',class:'sl-tick'},P.layer);t.textContent='X'+sub[i];}
+  const C=[{v:[1,1,1,1,1,1],r:0,lost:'aucune'},{v:[1,1,1,1,1,4],r:0,lost:'la même loi'},{v:[1,1,1,1,1,1],r:0.5,lost:'l’indépendance'},{v:[1,1,1,1,1,1],r:1,lost:'l’indépendance'}];
+  function draw(k){
+    P.clear();const c=C[k];let d=0,o=0;
+    for(let i=1;i<=n;i++)for(let j=1;j<=n;j++){
+      const val=i===j?c.v[i-1]:c.r*Math.sqrt(c.v[i-1]*c.v[j-1]),y=7-i;
+      if(i===j)d+=val;else o+=val;
+      rect(P,j-0.47,j+0.47,y-0.45,y+0.45,'sl-cello');
+      if(val>1e-9)rect(P,j-0.47,j+0.47,y-0.45,y+0.45,'sl-cellp').setAttribute('fill-opacity',(0.12+0.13*Math.min(val,4)).toFixed(3));
+      P.text(j,y-0.14,SL.fmt(val,2),'sl-prod'+(val>1e-9?' on':''),'middle');
+    }
+    rd(out,[['diagonale, Σ Var(Xᵢ)',SL.fmt(d,2)],['hors diagonale, Σ Cov',SL.fmt(o,2)],['Var(X̄) = somme / 36',SL.fmt((d+o)/36,3),'c3'],['hypothèse retirée',c.lost]]);
+  }
+  buttons(document.getElementById('f2ctl'),['i.i.d.','variances inégales','corrélées, ρ = 0,5','copies, ρ = 1'],draw);
+})();
+
+/* ===== Figure 3 : un chemin, deux lectures (reprise de p00-04, figure 2) ===== */
+(function(){
+  const SIG=Math.sqrt(35/12),N0=4,NM=1000,out=document.getElementById('f3out');
+  const A=SL.plot(document.getElementById('f3a'),{x:[N0,NM],y:[1,6],w:600,h:210,xt:[200,400,600,800,1000],yt:[2,3,4,5],xl:'n (dés cumulés)',yl:'moyenne cumulée'});
+  A.fn(n=>3.5+2*SIG/Math.sqrt(n),'sl-c4 band',300);A.fn(n=>3.5-2*SIG/Math.sqrt(n),'sl-c4 band',300);A.fn(()=>3.5,'sl-c4',2);
+  A.label(990,5.55,'┄ ± 2σ/√n autour de μ = 3,5','sl-c4','end');
+  const B=SL.plot(document.getElementById('f3b'),{x:[N0,NM],y:[-130,130],w:600,h:210,xt:[200,400,600,800,1000],yt:[-100,-50,0,50,100],xl:'n (dés cumulés)',yl:'somme cumulée − 3,5n'});
+  B.fn(n=>2*SIG*Math.sqrt(n),'sl-c4 band',300);B.fn(n=>-2*SIG*Math.sqrt(n),'sl-c4 band',300);
+  B.label(990,118,'┄ ± 2σ√n','sl-c4','end');
+  const clamp=(v,a,b)=>v<a?a:v>b?b:v;
+  function poly(P,pts,cls){let d='';pts.forEach((p,i)=>{d+=(i?' L':'M')+P.sx(p[0]).toFixed(1)+' '+P.sy(p[1]).toFixed(1);});SL.el('path',{d:d,class:'sl-fn '+cls,fill:'none'},P.dyn);}
+  let seed=1;
+  function path(){
+    const r=rng(seed);A.clear();B.clear();let s=0;const pa=[],pb=[];
+    for(let i=1;i<=NM;i++){s+=1+Math.floor(6*r());if(i>=N0){pa.push([i,clamp(s/i,1,6)]);pb.push([i,clamp(s-3.5*i,-130,130)]);}}
+    poly(A,pa,'sl-c3 thin');poly(B,pb,'sl-c3 thin');
+    rd(out,[['moyenne après 1 000 dés',SL.fmt(s/NM,3),'c3'],['écart de la moyenne à 3,5',SL.fmt(Math.abs(s/NM-3.5),3)],['somme − 3 500',fm(s-3.5*NM,0),'c3']]);
+  }
+  path();
+  SL.h('button','tb',document.getElementById('f3ctl'),'nouveau chemin').onclick=()=>{seed++;path();};
+})();
+
+/* ===== v1 : la bascule de Markov, le contrepoids bloqué en 0 ===== */
+(function(){
+  const out=document.getElementById('v1out');
+  const P=SL.plot(document.getElementById('v1plot'),{x:[-9,26],y:[-0.3,1],w:560,h:250,xt:[-5,0,5,10,15,20,25],yt:[],xl:'position x'});
+  rect(P,-9,0,-0.3,1,'sl-forbid',P.layer);
+  SL.el('text',{x:P.sx(-8.6).toFixed(1),y:P.sy(0.9).toFixed(1),class:'sl-lbl sl-c3'},P.layer).textContent='x < 0 : interdit';
+  function draw(p){
+    P.clear();
+    const c0=p<1?(10-20*p)/(1-p):-1e9,ok=c0>=-1e-9,c=ok?c0:0,mean=20*p+(1-p)*c,th=ok?0:8*Math.tanh((mean-10)/2);
+    const cx=P.sx(10),cy=P.sy(0.36);
+    const g=SL.el('g',{transform:`rotate(${th.toFixed(2)} ${cx.toFixed(1)} ${cy.toFixed(1)})`},P.dyn);
+    SL.el('rect',{x:P.sx(-1).toFixed(1),y:(cy-5).toFixed(1),width:(P.sx(21)-P.sx(-1)).toFixed(1),height:5,class:'sl-ruler'},g);
+    [[20,p,'p = '+SL.fmt(p,2)],[c,1-p,'1 − p = '+SL.fmt(1-p,2)]].forEach(m=>{if(m[1]<0.004)return;const r=30*Math.sqrt(m[1]);
+      SL.el('circle',{cx:P.sx(m[0]).toFixed(1),cy:(cy-5-r).toFixed(1),r:r.toFixed(1),class:'sl-mass'},g);
+      const t=SL.el('text',{x:P.sx(m[0]).toFixed(1),y:(cy-11-2*r).toFixed(1),'text-anchor':'middle',class:'sl-lbl sl-halo'},g);t.textContent=m[2];});
+    if(!ok){const gx=Math.max(c0,-8.3),r=30*Math.sqrt(1-p);
+      SL.el('circle',{cx:P.sx(gx).toFixed(1),cy:(cy-5-r).toFixed(1),r:r.toFixed(1),class:'sl-ghost'},P.dyn);
+      const far=c0<-8.3,t=SL.el('text',{x:P.sx(far?-8.8:gx).toFixed(1),y:(P.sy(0.36)+22).toFixed(1),'text-anchor':far?'start':'middle',class:'sl-lbl sl-c3 sl-halo'},P.dyn);t.textContent=(far?'← ':'')+'il faudrait x = '+fm(c0,1);}
+    SL.el('path',{d:`M${cx.toFixed(1)} ${cy.toFixed(1)} L${(cx-10).toFixed(1)} ${(cy+22).toFixed(1)} L${(cx+10).toFixed(1)} ${(cy+22).toFixed(1)} Z`,class:'sl-fulcrum'},P.dyn);
+    const state=!ok?'bascule : impossible avec X ≥ 0':Math.abs(p-0.5)<1e-9?'cas limite : la loi {0, 20}':'équilibre en 10';
+    P.text(25.6,0.92,state,ok?'sl-c1':'sl-c3','end');
+    rd(out,[['masse p en 20',SL.fmt(p,2)],['contrepoids 1 − p en',ok?SL.fmt(c0,2):fm(c0,1)+' < 0','c3'],['moyenne de la loi',SL.fmt(mean,2)],['P(X ≥ 20) ≤ 10/20','0,5','c1']]);
+  }
+  SL.slider(document.getElementById('v1ctl'),{label:'masse p en 20',min:0,max:0.7,step:0.01,value:0.25,fmt:v=>SL.fmt(v,2)},draw);
+})();
+
+/* ===== v2 : la part hors de ±kσ, contre 1/k² ===== */
+(function(){
+  const out=document.getElementById('v2out'),S=Math.sqrt(35/12);
+  const P=SL.plot(document.getElementById('v2plot'),{x:[-4.2,4.2],y:[0,1],w:560,h:250,xt:[-4,-3,-2,-1,0,1,2,3,4],yt:[0,0.25,0.5,0.75,1],xl:'écart à μ, en unités de σ',yl:'masse ou densité'});
+  const phi=x=>Math.exp(-x*x/2)/Math.sqrt(2*Math.PI);
+  function erfc(x){const t=1/(1+0.3275911*x),y=t*(0.254829592+t*(-0.284496736+t*(1.421413741+t*(-1.453152027+t*1.061405429))));return y*Math.exp(-x*x);}
+  const st={l:0,k:2};
+  function area(a,b){let d='M'+P.sx(a).toFixed(1)+' '+P.sy(0).toFixed(1);for(let i=0;i<=60;i++){const x=a+(b-a)*i/60;d+=' L'+P.sx(x).toFixed(1)+' '+P.sy(phi(x)).toFixed(1);}d+=' L'+P.sx(b).toFixed(1)+' '+P.sy(0).toFixed(1)+' Z';SL.el('path',{d:d,class:'sl-k3 sl-kc'},P.dyn);}
+  function draw(){
+    P.clear();const k=st.k;let o=0;
+    rect(P,-4.2,-k,0,1,'sl-tail');rect(P,k,4.2,0,1,'sl-tail');
+    if(st.l===0){area(-4.2,-k);area(k,4.2);curve(P,phi,-4.2,4.2,'sl-c1',1);o=erfc(k/Math.SQRT2);}
+    else if(st.l===1){for(let x=1;x<=6;x++){const z=(x-3.5)/S,far=Math.abs(z)>=k-1e-9;if(far)o+=1/6;bar(P,z-0.09,z+0.09,1/6,far?'sl-bar2':'sl-bar');}}
+    else{const m=1/(2*k*k);[[-k,m],[0,1-2*m],[k,m]].forEach(q=>bar(P,q[0]-0.09,q[0]+0.09,q[1],q[0]===0?'sl-bar':'sl-bar2'));o=2*m;}
+    P.vline(-k,'sl-c3 sl-dash');P.vline(k,'sl-c3 sl-dash');
+    P.text(4.15,0.93,'┆ μ ± kσ','sl-c3','end');
+    rd(out,[['k',SL.fmt(k,1)],['hors de ±kσ, cette loi',o>0&&o<0.001?'< 0,1 %':SL.fmt(100*o,1)+' %','c1'],['borne de Chebyshev 1/k²',SL.fmt(100/(k*k),1)+' %','c3']]);
+  }
+  buttons(document.getElementById('v2ctl'),['normale','dé','trois points'],i=>{st.l=i;draw();});
+  SL.slider(document.getElementById('v2sl'),{label:'k',min:1,max:4,step:0.1,value:2,fmt:v=>SL.fmt(v,1)},v=>{st.k=v;draw();});
+})();
+
+/* ===== v3 : μ fixe, X̄ la procédure, x̄ la réalisation ===== */
+(function(){
+  const out=document.getElementById('v3out'),S=Math.sqrt(35/12);
+  const P=SL.plot(document.getElementById('v3plot'),{x:[0.5,6.5],y:[0,1],w:560,h:300,xt:[1,2,3,3.5,4,5,6],yt:[],xl:'x̄, moyenne des n dés'});
+  const init=[[2,5,1,5],[6,3,4,5],[1,4,3,3]],BW={1:1,4:0.25,16:0.125},CAP=300;
+  const st={n:4,xs:[],last:null};const fresh=runner();let seed=37;
+  function roll(r){const d=[];for(let i=0;i<st.n;i++)d.push(1+Math.floor(6*r()));return d;}
+  function add(d){st.last=d;st.xs.push(d.reduce((a,b)=>a+b,0)/d.length);if(st.xs.length>CAP)st.xs.shift();}
+  function draw(){
+    P.clear();
+    const d=st.last||[],s=22,gap=4,w=d.length*(s+gap)-gap,x0=P.sx(3.5)-w/2,y0=P.sy(0.97);
+    d.forEach((v,i)=>{SL.el('rect',{x:(x0+i*(s+gap)).toFixed(1),y:y0.toFixed(1),width:s,height:s,rx:3,class:'sl-die'},P.dyn);
+      const t=SL.el('text',{x:(x0+i*(s+gap)+s/2).toFixed(1),y:(y0+s/2+4).toFixed(1),'text-anchor':'middle',class:'sl-cell-t'},P.dyn);t.textContent=String(v);});
+    const bw=BW[st.n],cnt=new Map();st.xs.forEach(v=>{const b=Math.round(v/bw);cnt.set(b,(cnt.get(b)||0)+1);});
+    let M=1;cnt.forEach(c=>M=Math.max(M,c));
+    const avail=P.sy(0)-P.sy(0.64),last=st.xs.length-1;
+    if(M<=34){const r=Math.min(4.6,(avail/M-1)/2);stack(P,st.xs,bw,r,i=>i===last?'sl-c1':'sl-c2',true);}
+    else{cnt.forEach((c,b)=>bar(P,b*bw-bw*0.42,b*bw+bw*0.42,0.64*c/M,'sl-bar'));P.dot(st.xs[last],0,'sl-c1',5);}
+    P.seg(3.5,0,3.5,0.8,'sl-mean');
+    P.text(6.45,0.76,'│ μ = 3,5, le paramètre : fixe','sl-c3','end');
+    P.text(6.45,0.69,'● une réalisation x̄ par expérience','sl-c2','end');
+    const m=st.xs.reduce((a,b)=>a+b,0)/st.xs.length,sd=st.xs.length>1?Math.sqrt(st.xs.reduce((a,b)=>a+(b-m)**2,0)/(st.xs.length-1)):NaN;
+    rd(out,[['μ, paramètre fixe','3,5','c3'],['x̄, dernière réalisation',SL.fmt(st.xs[last],4),'c1'],['réalisations de X̄',fi(st.xs.length)],['écart-type des x̄',st.xs.length>=10?SL.fmt(sd,3):'trop peu'],['σ/√n, théorie',SL.fmt(S/Math.sqrt(st.n),3)]]);
+  }
+  function reset(n){fresh();st.n=n;st.xs=[];if(n===4)init.forEach(add);else{const r=rng(100+n);for(let j=0;j<3;j++)add(roll(r));}draw();}
+  buttons(document.getElementById('v3ctl'),['n = 4','n = 1','n = 16'],k=>reset([4,1,16][k]));
+  const c2=document.getElementById('v3ctl2');
+  SL.h('button','tb',c2,'▶ refaire l’expérience').onclick=()=>{fresh();add(roll(rng(seed++)));draw();};
+  SL.h('button','tb',c2,'▶ 100 fois').onclick=()=>{const tk=fresh(),r=rng(seed++);let k=0;loop(tk,()=>{add(roll(r));k++;draw();return k<100;});};
+})();
+
+/* ===== v4 : mesures de la vitesse de la lumière, et leur moyenne ===== */
+(function(){
+  const out=document.getElementById('v4out'),SG=100,NM=300,G=50;
+  const P=SL.plot(document.getElementById('v4plot'),{x:[0,NM],y:[-320,320],w:560,h:270,xt:[0,30,100,150,200,250,300],yt:[-300,-200,-100,0,100,200,300],xl:'n, nombre de mesures',yl:'mesure − c (km/s)'});
+  const st={law:0,d:[],m:30};let seed=7;const fresh=runner();
+  function gen(){const r=rng(seed+(st.law?1003:0)),a=[];for(let i=0;i<NM;i++)a.push(st.law===0?SG*gauss(r):G*Math.tan(Math.PI*(r()-0.5)));st.d=a;}
+  function draw(){
+    P.clear();const m=st.m,d=st.d;
+    if(st.law===0){curve(P,n=>2*SG/Math.sqrt(n),1,NM,'sl-c4 band',320);curve(P,n=>-2*SG/Math.sqrt(n),1,NM,'sl-c4 band',320);}
+    for(let i=0;i<m;i++)P.dot(i+1,Math.max(-315,Math.min(315,d[i])),'sl-c2 sl-tiny',2.4);
+    let s=0,pd='';for(let i=0;i<m;i++){s+=d[i];const y=Math.max(-320,Math.min(320,s/(i+1)));pd+=(i?' L':'M')+P.sx(i+1).toFixed(1)+' '+P.sy(y).toFixed(1);}
+    SL.el('path',{d:pd,class:'sl-fn sl-c3',fill:'none'},P.dyn);
+    P.text(296,290,'│ moyenne des n premières mesures','sl-c3','end');if(st.law===0)P.text(296,250,'┄ ± 2σ/√n','sl-c4','end');
+    rd(out,[['mesures',String(m)],['moyenne − c',fm(s/m,1)+' km/s','c3'],['± 2σ/√n',st.law===0?SL.fmt(2*SG/Math.sqrt(m),1)+' km/s':'σ infinie'],['dernière mesure − c',fm(d[m-1],0)+' km/s']]);
+  }
+  buttons(document.getElementById('v4ctl'),['erreurs normales','erreurs de Cauchy'],k=>{fresh();st.law=k;st.m=30;gen();draw();});
+  const c2=document.getElementById('v4ctl2');
+  SL.h('button','tb',c2,'▶ 270 mesures de plus').onclick=()=>{const tk=fresh();st.m=30;loop(tk,()=>{st.m=Math.min(NM,st.m+3);draw();return st.m<NM;});};
+  SL.h('button','tb',c2,'nouvelle série').onclick=()=>{fresh();seed++;st.m=30;gen();draw();};
+})();
+
+/* ===== v5 : 4 fois plus d'exemples pour un intervalle 2 fois plus étroit ===== */
+(function(){
+  const host=document.getElementById('v5plot'),out=document.getElementById('v5out');
+  const row=SL.h('div','v-row',host),L=SL.h('div','v-mini',row),R=SL.h('div','',row);
+  const S=SL.el('svg',{viewBox:'0 0 220 236',class:'sl-plot sl-mini'},L);
+  const cells=[];for(let i=0;i<8;i++)for(let j=0;j<8;j++)cells.push({i:i,j:j,e:SL.el('rect',{x:(13+j*24.5).toFixed(1),y:(8+i*24.5).toFixed(1),width:22,height:22,rx:2,class:'sl-cello'},S)});
+  const lab=SL.el('text',{x:110,y:230,'text-anchor':'middle',class:'sl-lbl'},S);
+  const P=SL.plot(R,{x:[0.85,0.95],y:[0.4,4.8],w:460,h:250,xt:[0.86,0.88,0.9,0.92,0.94],yt:[],xl:'accuracy'});
+  const N=[250,1000,4000,16000],NL=['250','1 000','4 000','16 000'];
+  function draw(s){
+    const side=1<<s;
+    cells.forEach(c=>{const on=c.i<side&&c.j<side;c.e.setAttribute('class',on?'sl-cellp':'sl-cello');if(on)c.e.setAttribute('fill-opacity','0.5');else c.e.removeAttribute('fill-opacity');});
+    lab.textContent=NL[s]+' exemples = '+(side*side)+(side>1?' cases':' case');
+    P.clear();P.vline(0.9,'sl-c4 sl-dash');
+    for(let t=0;t<=s;t++){const y=4.2-t,h=1.96*Math.sqrt(0.09/N[t]),cls=t===s?'sl-c3':'sl-c1';
+      P.seg(0.9-h,y,0.9+h,y,cls);P.seg(0.9-h,y-0.12,0.9-h,y+0.12,cls);P.seg(0.9+h,y-0.12,0.9+h,y+0.12,cls);P.dot(0.9,y,cls,4);
+      P.text(0.851,y+0.3,'n = '+NL[t]+'   ± '+SL.fmt(100*h,2)+(100*h>=2?' points':' point'),t===s?'sl-c3':'','start');}
+    const se=Math.sqrt(0.09/N[s]);
+    rd(out,[['exemples annotés n',NL[s]],['SE = √(0,9 × 0,1/n)',SL.fmt(se,4),'c3'],['± 1,96 SE, en points',SL.fmt(196*se,2)],['coût, en multiples de 250',String(side*side)]]);
+  }
+  const bs=buttons(document.getElementById('v5ctl'),NL.map(x=>'n = '+x),draw);bs[1].onclick();
+})();
+
+/* ===== v6 : le plancher ρσ² ===== */
+(function(){
+  const host=document.getElementById('v6plot'),out=document.getElementById('v6out'),ctl=document.getElementById('v6ctl');
+  const row=SL.h('div','v-row',host),L=SL.h('div','',row),R=SL.h('div','v-mini',row);
+  const P=SL.plot(L,{x:[0,3.1],y:[0,1.12],w:420,h:260,xt:[],yt:[0,0.25,0.5,0.75,1],xl:'n, échelle log',yl:'Var(X̄) / σ²'});
+  [[0,'1'],[1,'10'],[2,'100'],[3,'1 000']].forEach(q=>{const t=SL.el('text',{x:P.sx(q[0]).toFixed(1),y:(P.sy(0)+16).toFixed(1),'text-anchor':'middle',class:'sl-tick'},P.layer);t.textContent=q[1];});
+  const B=SL.el('svg',{viewBox:'0 0 200 260',class:'sl-plot sl-mini'},R),bg=SL.el('g',{},B);
+  const NS=[1,2,5,10,20,50,100,200,500,1000],st={r:0.5,i:3};
+  function draw(){
+    P.clear();const r=st.r,n=NS[st.i],v=r+(1-r)/n,x=Math.log10(n);
+    curve(P,t=>Math.pow(10,-t),0,3,'sl-c4 band',1.12);
+    curve(P,t=>r+(1-r)*Math.pow(10,-t),0,3,'sl-c2',1.12);
+    P.seg(0,r,3,r,'sl-c3 sl-dash');P.dot(x,v,'sl-c2',5.5);
+    const ly=r>0.7?[0.55,0.47,0.39]:[0.98,0.9,0.82];
+    P.text(2.98,ly[0],'┄ ρ = 0 : σ²/n','sl-c4','end');P.text(2.98,ly[1],'│ avec ρ','sl-c2','end');P.text(2.98,ly[2],'┄ plancher ρσ²','sl-c3','end');
+    while(bg.firstChild)bg.removeChild(bg.firstChild);
+    const Y=y=>230-200*y,own=(1-r)/n;
+    SL.el('line',{x1:20,x2:100,y1:230,y2:230,class:'sl-axis'},bg);
+    if(r>0)SL.el('rect',{x:34,y:Y(r).toFixed(1),width:44,height:(200*r).toFixed(1),class:'sl-k3 sl-kc'},bg);
+    SL.el('rect',{x:34,y:Y(v).toFixed(1),width:44,height:Math.max(0.6,200*own).toFixed(1),class:'sl-k2 sl-kc'},bg);
+    const t1=SL.el('text',{x:84,y:(Y(r/2)+4).toFixed(1),class:'sl-lbl sl-c3'},bg);t1.textContent=r>0.04?'commune '+SL.fmt(r,2):'';
+    const t2=SL.el('text',{x:84,y:Math.max(14,Math.min(Y(v)+4,Y(r)-10)).toFixed(1),class:'sl-lbl sl-c2'},bg);t2.textContent='propre '+SL.fmt(own,own<0.01?4:3);
+    const t3=SL.el('text',{x:56,y:250,'text-anchor':'middle',class:'sl-lbl'},bg);t3.textContent='n = '+String(n).replace('1000','1 000');
+    rd(out,[['Var(X̄) / σ²',SL.fmt(v,4),'c3'],['part commune ρσ²',SL.fmt(r,2)+' ('+SL.fmt(100*r/v,0)+' %)'],['part propre (1 − ρ)σ²/n',SL.fmt(own,4)],['n_eff',SL.fmt(1/v,2),'c1']]);
+  }
+  SL.slider(ctl,{label:'corrélation ρ',min:0,max:1,step:0.05,value:0.5,fmt:v=>SL.fmt(v,2)},v=>{st.r=v;draw();});
+  SL.slider(ctl,{label:'n',min:0,max:9,step:1,value:3,fmt:v=>String(NS[v]).replace('1000','1 000')},v=>{st.i=v;draw();});
+})();
+
+/* ===== v7 : des fléchettes pour estimer π ===== */
+(function(){
+  const host=document.getElementById('v7plot'),out=document.getElementById('v7out'),ctl=document.getElementById('v7ctl');
+  const row=SL.h('div','v-row',host),L=SL.h('div','',row),R=SL.h('div','',row);
+  const A=SL.plot(L,{x:[0,1],y:[0,1.033],w:300,h:300,xt:[0,0.5,1],yt:[0,0.5,1]});
+  let d='';for(let i=0;i<=90;i++){const a=Math.PI/2*i/90;d+=(i?' L':'M')+A.sx(Math.cos(a)).toFixed(1)+' '+A.sy(Math.sin(a)).toFixed(1);}
+  SL.el('path',{d:d,class:'sl-fn sl-c1',fill:'none'},A.layer);
+  const pts=SL.el('g',{},A.layer);
+  const NM=5000,q=Math.PI/4;
+  const B=SL.plot(R,{x:[0,NM],y:[2.6,3.7],w:300,h:300,xt:[0,2500,5000],yt:[2.8,3,3.2,3.4,3.6],xl:'N',yl:'estimation de π'});
+  B.fn(n=>n<40?NaN:Math.PI+8*Math.sqrt(q*(1-q)/n),'sl-c4 band',200);B.fn(n=>n<40?NaN:Math.PI-8*Math.sqrt(q*(1-q)/n),'sl-c4 band',200);B.fn(()=>Math.PI,'sl-c4',2);
+  B.label(4950,3.64,'┄ π ± 2 SE','sl-c4','end');
+  const st={n:0,k:0,est:[]};let seed=10,r=rng(seed);const fresh=runner();
+  function add(m){for(let i=0;i<m&&st.n<NM;i++){const x=r(),y=r(),ins=x*x+y*y<=1;st.n++;if(ins)st.k++;st.est.push(4*st.k/st.n);
+    SL.el('circle',{cx:A.sx(x).toFixed(1),cy:A.sy(y).toFixed(1),r:1.8,class:'sl-dot sl-tiny '+(ins?'sl-c4':'sl-c3')},pts);}}
+  function draw(){
+    B.clear();let pd='';const step=Math.max(1,Math.floor(st.n/600));
+    for(let i=9;i<st.n;i+=step){const y=Math.max(2.6,Math.min(3.7,st.est[i]));pd+=(pd?' L':'M')+B.sx(i+1).toFixed(1)+' '+B.sy(y).toFixed(1);}
+    if(pd)SL.el('path',{d:pd,class:'sl-fn sl-c3 thin',fill:'none'},B.dyn);
+    const e=4*st.k/st.n;
+    rd(out,[['fléchettes N',fi(st.n)],['dans le quart de disque',SL.fmt(100*st.k/st.n,1)+' %'],['estimation de π',SL.fmt(e,4),'c3'],['écart à π',SL.fmt(Math.abs(e-Math.PI),4)],['SE théorique',SL.fmt(4*Math.sqrt(q*(1-q)/st.n),4)]]);
+  }
+  function reset(){fresh();while(pts.firstChild)pts.removeChild(pts.firstChild);st.n=0;st.k=0;st.est=[];r=rng(seed);add(1000);draw();}
+  reset();
+  SL.h('button','tb',ctl,'+ 100 fléchettes').onclick=()=>{fresh();add(100);draw();};
+  SL.h('button','tb',ctl,'▶ jusqu’à 5 000').onclick=()=>{const tk=fresh();loop(tk,()=>{add(60);draw();return st.n<NM;});};
+  SL.h('button','tb',ctl,'nouvelle graine').onclick=()=>{seed++;reset();};
+})();
+
+})();
+</script>
+</body>
+</html>

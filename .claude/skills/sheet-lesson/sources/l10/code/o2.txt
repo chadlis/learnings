@@ -1,0 +1,6 @@
+Chebyshev bound for k = 2: 0.2500
+normal       P(|X - mu| >= 2 sd) = 0.0456
+uniform      P(|X - mu| >= 2 sd) = 0.0000
+exponential  P(|X - mu| >= 2 sd) = 0.0500
+die          P(|X - mu| >= 2 sd) = 0.0000
+three-point  P(|X - mu| >= 2 sd) = 0.2502

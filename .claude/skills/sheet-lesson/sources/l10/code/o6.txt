@@ -1,0 +1,5 @@
+n =    1   Var(Xbar) 0.9931   formula 1.0000
+n =   10   Var(Xbar) 0.5443   formula 0.5500
+n =  100   Var(Xbar) 0.5014   formula 0.5050
+n = 1000   Var(Xbar) 0.5043   formula 0.5005
+corr(X1, X2) = 0.492

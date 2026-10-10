@@ -1,0 +1,4 @@
+n =   10   sd(Xbar - mu) 0.543   sd(S - n mu)   5.4
+n =  100   sd(Xbar - mu) 0.172   sd(S - n mu)  17.2
+n = 1000   sd(Xbar - mu) 0.054   sd(S - n mu)  53.8
+Cauchy running mean at n = 1e3, 1e4, 1e5, 1e6: [-1.56 -0.92  2.53  1.54]

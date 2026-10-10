@@ -1,0 +1,49 @@
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 10</div>
+  <h1>Inégalités et loi des <span>grands nombres</span></h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Avec la seule moyenne d'une loi, on borne déjà ses queues ; avec sa variance, on les borne des deux côtés. Appliquées à la moyenne de n mesures, ces deux inégalités donnent la <b>loi des grands nombres</b> : X̄ se resserre sur μ, avec une largeur σ/√n qui coûte cher et que la corrélation fait plafonner. La leçon suit Brunton 33 à 35 et ses images : la bascule qui doit rester en équilibre, les mesures répétées de la vitesse de la lumière. Un dé sert aux calculs, le taux de bonnes réponses (accuracy) d'un modèle à l'exemple ML.</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="lesson-00-08-esperance-variance.html">l08 · Espérance et variance</a></li>
+    <li><a href="lesson-00-09-covariance-correlation.html">l09 · Covariance et corrélation</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::lgn</code><code>stats::se</code><code>stats::chebyshev</code></div>
+  <h4>Ponts</h4>
+  <ol>
+    <li><a href="../bridges/bridge-04-variance-moyenne-correlee.html">Variance d'une moyenne corrélée</a></li>
+  </ol>
+  <h4>Suite</h4>
+  <ol>
+    <li><a href="lesson-00-11-tcl.html">l11 · Théorème central limite</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>L'espérance est un centre de masse.</b> Les probabilités sont des masses posées sur une règle ; E[X] est le point où la règle tient en équilibre (<a href="lesson-00-08-esperance-variance.html#n1">l08, notion 1</a>). Elle est linéaire sans aucune hypothèse : E[aX + bY] = aE[X] + bE[Y] (<a href="lesson-00-08-esperance-variance.html#n3">notion 3</a>).</li>
+      <li><b>La variance est l'inertie autour du centre.</b> Var(X) = E[(X − μ)²] : une valeur deux fois plus loin compte quatre fois plus (<a href="lesson-00-08-esperance-variance.html#n6">l08, notion 6</a>). Un facteur sort au carré : Var(aX + b) = a² Var(X) (<a href="lesson-00-08-esperance-variance.html#n9">notion 9</a>).</li>
+      <li><b>La variance d'une somme a un terme croisé.</b> Var(X + Y) = Var X + Var Y + 2 Cov(X, Y) ; l'indépendance annule la covariance (<a href="lesson-00-09-covariance-correlation.html#n2">l09, notion 2</a>). Cov(X, Y) = ρ σ<sub>X</sub> σ<sub>Y</sub> (<a href="lesson-00-09-covariance-correlation.html#n4">notion 4</a>).</li>
+      <li><b>Variable, réalisation, paramètre.</b> X est la règle qui attache un nombre au tirage, x le nombre sorti ce jour-là, μ un nombre fixe de la loi (<a href="lesson-00-04-variables-binomiale-normale.html#n1">l04, notion 1</a>).</li>
+      <li><b>Le dé.</b> μ = 3,5, σ² = 35/12 = 2,917, σ = 1,708.</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">
+

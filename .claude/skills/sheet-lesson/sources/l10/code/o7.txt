@@ -1,0 +1,4 @@
+N =       100   pi estimate 3.1600   error 0.0184   SE 0.1629
+N =     10000   pi estimate 3.1480   error 0.0064   SE 0.0164
+N =   1000000   pi estimate 3.1427   error 0.0011   SE 0.0016
+E[exp(Z)] ~ 1.6480   exact e^0.5 = 1.6487   exp(E[Z]) = 1

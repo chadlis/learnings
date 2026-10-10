@@ -1,0 +1,60 @@
+<!-- ============================ n1 ============================ -->
+<section class="notion culture" id="n1">
+  <h3>Markov : la bascule, et la borne atteinte <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 33 · Markov's Inequality in Probability: First-Order Estimates</p>
+  <div class="idee">
+    <p>Brunton énonce l'inégalité, puis la fait sentir sur un exemple. Une variable X ne prend que des valeurs positives ou nulles, et sa moyenne vaut 10. Peut-elle valoir 20 ou plus, plus d'une fois sur deux ? Non : P(X ≥ 20) ≤ 10/20 = ½. C'est l'<b>inégalité de Markov</b>, et elle n'utilise que la moyenne.</p>
+    <p>L'image est la règle en équilibre de l08 : la moyenne est le point d'appui, en 10. Une masse posée en 20 fait pencher la règle à droite ; il faut un contrepoids à gauche de 10. Mais le contrepoids ne peut pas descendre sous 0, puisque X ≥ 0. Avec une masse ½ en 20, le contrepoids ½ doit être tout entier en 0 : c'est le cas limite, la loi {0, 20}, qui atteint la borne. Au-delà de ½, plus rien ne peut équilibrer : la règle bascule.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — le contrepoids ne peut pas passer sous 0</div>
+    <div id="v1ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">La règle tient sur le point d'appui rouge, la moyenne 10. Monte la <b>masse p posée en 20</b> : le contrepoids 1 − p glisse vers 0 pour garder l'équilibre, à la position (10 − 20p)/(1 − p) : 6,67 pour p = 0,25, 3,33 pour p = 0,4. À <b>p = 0,5</b> il touche 0 : c'est la loi {0, 20}, la borne de Markov est atteinte. Au-delà, il faudrait le poser sous 0 (cercle pointillé), ce que X ≥ 0 interdit : posé en 0, il ne suffit plus, la moyenne dépasse 10 et la règle bascule.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>X</i> ≥ 0 et <i>a</i> &gt; 0 &nbsp;⇒&nbsp; P(<i>X</i> ≥ <i>a</i>) ≤ E[<i>X</i>] / <i>a</i></div>
+    <ul><li><b>X ≥ 0</b> est l'hypothèse du contrepoids. Si X peut être négative, une masse loin à gauche équilibre n'importe quelle masse à droite, et l'inégalité tombe (où ça casse).</li><li><b>a &gt; 0</b> : on divise par a. La borne ne dit quelque chose que pour a &gt; E[X] ; pour a ≤ E[X] elle vaut au moins 1.</li><li>Seule la moyenne sert, aucune forme de loi n'est supposée. Brunton parle d'estimation « d'ordre 1 » : elle n'utilise que le premier moment.</li></ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — trois lois de moyenne 10 sous la même hyperbole</div>
+    <div id="f1ctl" class="sl-ctl"></div><div id="f1sl"></div>
+    <div id="f1plot" class="wide"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">En rouge, la borne de Markov E[X]/a = 10/a ; en bleu, la vraie P(X ≥ a) de la loi choisie. Les trois lois ont la moyenne 10 et ne prennent que des valeurs ≥ 0. Déplace <b>a</b> : le bleu reste toujours sous le rouge. L'<b>exponentielle</b> donne 0,135 en a = 20, presque quatre fois moins que la borne 0,5. La loi <b>à deux points</b> {0, 20} touche l'hyperbole en a = 20 : sans autre hypothèse, la borne ne peut pas être améliorée. Sous a = 10, la borne dépasse 1 et ne dit rien.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>Brunton, deux points, exponentielle, uniforme, une perte</small></summary><div class="in">
+    <ol>
+      <li><b>L'exemple de Brunton.</b> E[X] = 10 : P(X ≥ 20) ≤ 10/20 = 0,5 ; P(X ≥ 50) ≤ 10/50 = 0,2.</li>
+      <li><b>La loi à deux points.</b> ½ en 0, ½ en 20 : E[X] = 10 et P(X ≥ 20) = ½, l'égalité. Plus généralement, une masse E[X]/a en a et le reste en 0 atteint la borne pour tout a ≥ E[X].</li>
+      <li><b>L'exponentielle de moyenne 10.</b> P(X ≥ a) = e<sup>−a/10</sup>. En a = 20 : e<sup>−2</sup> = 0,135, contre une borne de 0,5. En a = 50 : e<sup>−5</sup> = 0,0067, contre 0,2. Quand la queue décroît vite, la borne est lâche.</li>
+      <li><b>L'uniforme sur [0, 20].</b> Moyenne 10, P(X ≥ 15) = 0,25, contre une borne de 0,667.</li>
+      <li><b>Une perte de modèle.</b> L'entropie croisée d'un exemple est ≥ 0. Si sa moyenne sur le jeu de test (test set) vaut 0,3, Markov appliqué à la loi empirique des exemples dit : au plus 30 % des exemples ont une perte ≥ 1, c'est-à-dire donnent une probabilité ≤ e<sup>−1</sup> ≈ 0,37 à la bonne classe.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>la chaîne de Brunton, et la version en une ligne</small></summary><div class="in">
+    <div class="drv">
+      <div>E[<i>X</i>] = Σ<sub><i>x</i></sub> <i>x</i> P(<i>X</i> = <i>x</i>)</div><span>définition (l08, notion 1)</span>
+      <div>≥ Σ<sub><i>x</i> ≥ <i>a</i></sub> <i>x</i> P(<i>X</i> = <i>x</i>)</div><span>on jette les termes x &lt; a : ils sont ≥ 0 parce que X ≥ 0. C'est ici que l'hypothèse sert</span>
+      <div>≥ Σ<sub><i>x</i> ≥ <i>a</i></sub> <i>a</i> P(<i>X</i> = <i>x</i>)</div><span>sur ce domaine, x ≥ a</span>
+      <div>= <i>a</i> P(<i>X</i> ≥ <i>a</i>)</div><span>a sort de la somme ; ce qui reste est P(X ≥ a)</span>
+    </div>
+    <p>On divise par a &gt; 0. En continu, mêmes lignes avec des intégrales de 0 à ∞. <b>Version en une ligne</b> : pour toute issue, a · 1{X ≥ a} ≤ X (si X ≥ a, c'est a ≤ X ; sinon c'est 0 ≤ X, encore grâce à X ≥ 0), puis on prend l'espérance des deux côtés.</p>
+    <p><b>Quand y a-t-il égalité ?</b> Il faut que les deux « ≥ » soient des égalités : toute la masse sous a est en 0 (premier « ≥ »), toute la masse de droite est exactement en a (second « ≥ »). C'est la loi à deux points {0, a}.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>deux lois qui respectent la borne, une qui la viole</small></summary><div class="in">
+<pre class="py">{{CODE:c1}}</pre>
+<pre class="out">{{OUT:c1}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>X peut être négative.</b> X vaut −30 ou 20, avec P(X = 20) = 0,8 : E[X] = 0,8 × 20 − 0,2 × 30 = 10, mais P(X ≥ 20) = 0,8, au-dessus de la « borne » 0,5 (code). Le contrepoids posé en −30 équilibre une masse bien plus grosse.</li>
+      <li><b>Pour a ≤ E[X], la borne vaut au moins 1</b> : elle ne dit rien.</li>
+      <li><b>Elle est lâche pour les lois usuelles</b> : 0,135 contre 0,5 pour l'exponentielle. Son rôle n'est pas numérique : elle est la brique de Chebyshev (notion 2), qui est celle de la loi des grands nombres (notion 4).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (33) illustre Markov en dessinant « ma loi normale », et dit de X qu'elle est « non négative, donc ne prend que des valeurs positives ». Une normale prend toutes les valeurs réelles, négatives comprises : Markov ne s'y applique pas. Il faut X ≥ 0 (la valeur 0 est permise, c'est même là que se pose le contrepoids du cas limite) et a &gt; 0. La figure 1 dessine des lois sur [0, ∞).</div>
+  </div></details>
+  <p class="garde">Pour X ≥ 0 et a &gt; 0, P(X ≥ a) ≤ E[X]/a : la moyenne seule borne la queue droite, et la loi à deux points {0, a} atteint la borne.</p>
+</section>
+

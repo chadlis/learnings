@@ -1,0 +1,43 @@
+<!-- ============================ n5 ============================ -->
+<section class="notion outil" id="n5">
+  <h3>Erreur standard σ/√n : diviser la largeur par 2 coûte 4 fois plus de données <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 35</p>
+  <div class="idee">
+    <p>L'écart-type de X̄, σ/√n, porte un nom à lui : l'<b>erreur standard</b> (standard error, SE). Le nom rappelle qu'il mesure la dispersion d'une quantité calculée, la moyenne, et non celle des mesures : σ décrit un dé, le SE décrit la moyenne de n dés.</p>
+    <p>La racine rend la précision chère. Pour diviser le SE par 2, il faut multiplier n par 4 ; pour le diviser par 10, par 100. L'exemple ML : une accuracy de 0,9 mesurée sur 1 000 exemples de test a un SE de √(0,9 × 0,1/1 000) = 0,0095, soit ±1,86 point à 95 % (le 1,96 vient de la forme normale, l11). Pour ±0,93 point, il faut annoter 4 000 exemples ; pour ±0,46 point, 16 000.</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — le côté double, l'aire quadruple, l'intervalle se divise par 2</div>
+    <div id="v5ctl" class="sl-ctl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">Chaque case représente 250 exemples de test annotés. Passe de <b>n = 250</b> à <b>1 000</b>, <b>4 000</b> puis <b>16 000</b> : le côté du carré double, son aire et le coût d'annotation quadruplent, et l'intervalle ±1,96 SE autour de l'accuracy 0,9 ne se divise que par 2 : ±3,72, ±1,86, ±0,93 puis ±0,46 point.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">SE(<i>X̄</i>) = σ / √<i>n</i> &nbsp;&nbsp;&nbsp; <i>n</i> requis pour un SE visé <i>s</i> : (σ/<i>s</i>)² &nbsp;&nbsp;&nbsp; proportion : SE = √(<i>p</i>(1 − <i>p</i>) / <i>n</i>)</div>
+    <ul><li>SE(k²n) = SE(n)/k : diviser l'incertitude par k coûte k² fois plus de données.</li><li>Hypothèses : celles de Var(X̄) = σ²/n (notion 3), donc indépendance et même loi. Des exemples de test dépendants rendent ce SE trop optimiste (notion 6).</li><li>σ et p sont inconnus en pratique : on les remplace par leur estimation (<a href="../chains/chain-p01-01-objet-aleatoire.html">p01-01</a>). Pour une proportion, p(1 − p) ≤ ¼ donne un SE d'au plus 0,5/√n.</li><li>Passer d'un SE à un intervalle « à 95 % », ±1,96 SE, demande la forme normale de X̄ : c'est le TCL (<a href="lesson-00-11-tcl.html">l11</a>).</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>le dé, combien de dés, un sondage, une accuracy</small></summary><div class="in">
+    <ol>
+      <li><b>Le dé.</b> SE = 1,708, 0,854, 0,342, 0,171 pour n = 1, 4, 25, 100. De 1 à 4 dés la largeur est divisée par 2 ; de 1 à 100, par 10.</li>
+      <li><b>Combien de dés pour un SE visé</b> : n = (1,708/s)². SE 0,5 : 12 dés ; 0,1 : 292 ; 0,05 : 1 167 ; 0,01 : 29 167. Passer de 0,1 à 0,05 coûte 875 dés de plus.</li>
+      <li><b>Un sondage.</b> p = ½, le pire cas, et n = 1 000 : SE = 0,0158, soit ±3,1 points à 95 %. C'est le « ±3 points » des sondages à 1 000 personnes.</li>
+      <li><b>Une accuracy p = 0,9.</b> n = 250 : SE 0,019 ; 1 000 : 0,0095 ; 4 000 : 0,0047 ; 16 000 : 0,0024. Une différence d'un point entre deux modèles, sur 1 000 exemples, est de l'ordre d'un seul SE : elle ne suffit pas à les départager (le SE d'une différence sur un jeu de test partagé est en <a href="lesson-00-09-covariance-correlation.html#n6">l09, notion 6</a>).</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>20 000 jeux de test, l'écart-type de l'accuracy</small></summary><div class="in">
+<pre class="py">{{CODE:c5}}</pre>
+<pre class="out">{{OUT:c5}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>σ n'est pas le SE.</b> σ = 1,708 décrit un dé et ne bouge pas avec n ; le SE décrit la moyenne et tombe en 1/√n. Rapporter « ±σ » pour une moyenne surestime son incertitude ; rapporter « ±SE » pour une mesure isolée la sous-estime.</li>
+      <li><b>Exemples dépendants.</b> Plusieurs lignes d'un même utilisateur, plusieurs images d'une même vidéo : σ/√n est trop petit (notion 6).</li>
+      <li><b>σ estimé à petit n.</b> Remplacer σ par l'écart-type de l'échantillon ajoute de l'incertitude ; à petit n, l'intervalle s'élargit (loi de Student, <a href="../chains/chain-p01-03-inference-regression.html">p01-03</a>).</li>
+      <li><b>p proche de 0 ou de 1.</b> √(p(1 − p)/n) reste le bon écart-type, mais l'intervalle ±1,96 SE suppose une forme normale, qui demande assez de succès et d'échecs (l11).</li>
+      <li><b>Rendements décroissants.</b> Chaque décimale coûte 100 fois plus de données. Passé un certain stade, réduire le bruit (comparer deux modèles sur les mêmes exemples, l09) rapporte souvent plus qu'annoter davantage.</li>
+    </ul>
+  </div></details>
+  <p class="garde">SE = σ/√n, l'écart-type de X̄ et non des mesures : diviser l'incertitude par k demande k² fois plus de données.</p>
+</section>
+

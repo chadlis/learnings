@@ -1,0 +1,69 @@
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>X̄ est une variable aléatoire : E[X̄] = μ, Var(X̄) = σ²/n <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 35 · The Law of Large Numbers</p>
+  <div class="idee">
+    <p>Brunton : « je n'ai pas de modèle de la loi, mais je collecte des données ». Je jette n dés et je fais la moyenne. Trois objets se croisent alors, et les confondre est l'erreur la plus coûteuse du sujet. μ = 3,5 est le <b>paramètre</b> : un nombre fixe de la loi du dé. X̄ = (X<sub>1</sub> + … + X<sub>n</sub>)/n est une <b>variable aléatoire</b> : la procédure « jeter n dés et moyenner », avant de la lancer. x̄ est sa <b>réalisation</b> : le nombre obtenu ce jour-là.</p>
+    <p>Rejoue trois fois la procédure à quatre dés : 2, 5, 1, 5 donne x̄ = 3,25 ; 6, 3, 4, 5 donne 4,5 ; 1, 4, 3, 3 donne 2,75. Trois réalisations différentes de la même X̄, pour un μ qui n'a pas bougé. X̄ a donc une loi, avec un centre et une largeur : c'est le « pic » que dessine Brunton, large pour n petit, de plus en plus étroit quand n grandit.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — le paramètre ne bouge pas, chaque expérience donne une réalisation</div>
+    <div id="v3ctl" class="sl-ctl"></div><div id="v3ctl2" class="sl-ctl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">Le trait rouge μ = 3,5 ne bouge jamais : c'est le paramètre. Chaque clic sur <b>refaire l'expérience</b> lance n dés (en haut) et pose leur moyenne x̄, une réalisation de X̄, en pastille ; la dernière est en bleu. Au départ, les trois réalisations 3,25, 4,5 et 2,75 à n = 4. La pile des x̄ (des barres quand elle devient trop haute) dessine la loi de X̄, centrée sur μ. Lance <b>100 fois</b> et compare l'écart-type des x̄ à la théorie σ/√n : 1,708 à n = 1, 0,854 à n = 4, 0,427 à n = 16.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq"><i>X̄</i> = (1/<i>n</i>) Σ<sub><i>i</i></sub> <i>X<sub>i</sub></i> &nbsp;&nbsp;&nbsp; E[<i>X̄</i>] = μ &nbsp;&nbsp;&nbsp; Var(<i>X̄</i>) = σ² / <i>n</i> &nbsp;&nbsp;&nbsp; écart-type σ / √<i>n</i></div>
+    <ul><li><b>E[X̄] = μ</b> ne demande qu'une chose : E[X<sub>i</sub>] = μ pour chaque i. Aucune indépendance : c'est la linéarité (<a href="lesson-00-08-esperance-variance.html#n3">l08, notion 3</a>).</li><li><b>Var(X̄) = σ²/n</b> demande les deux moitiés d'i.i.d. (indépendantes et de même loi), chacune pour sa raison. L'<b>indépendance</b> annule toutes les covariances Cov(X<sub>i</sub>, X<sub>j</sub>), i ≠ j. La <b>même loi</b> donne à chaque terme la même variance σ².</li><li>La preuve n'utilise en fait que cela : même moyenne, même variance, covariances nulles. Brunton (35) ne dit d'ailleurs pas « même loi ».</li><li>σ/√n, l'écart-type de X̄, s'appelle l'erreur standard (notion 5).</li></ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — Var(X̄) est la somme des cases, divisée par n²</div>
+    <div id="f2ctl" class="sl-ctl"></div>
+    <div id="f2plot" class="wide"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Six termes de variance 1. La case de la ligne i et de la colonne j porte Cov(X<sub>i</sub>, X<sub>j</sub>) ; sur la diagonale, Cov(X<sub>i</sub>, X<sub>i</sub>) = Var(X<sub>i</sub>). Var(X̄) est la <b>somme des 36 cases divisée par 36</b>. <b>i.i.d.</b> : six 1 sur la diagonale, 0 ailleurs, 6/36 = 0,167 = σ²/n. Retire la <b>même loi</b> (variances 1, 1, 1, 1, 1, 4) : les covariances restent nulles, mais la diagonale fait 9, d'où 0,25. Retire l'<b>indépendance</b> (ρ = 0,5) : la diagonale fait 6, les 30 cases hors diagonale ajoutent 15, d'où 0,583. <b>Copies</b> : toutes les cases valent 1, Var(X̄) = 1, moyenner n'a servi à rien.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>n = 1, le dé, des copies, une pièce, une accuracy</small></summary><div class="in">
+    <ol>
+      <li><b>n = 1</b> : X̄ = X<sub>1</sub>, de moyenne μ et de variance σ². Rien de neuf, et c'est un bon test de la formule.</li>
+      <li><b>Le dé, n = 4</b> : E[X̄] = 3,5 ; Var(X̄) = 2,917/4 = 0,729 ; écart-type 0,854. Pour n = 16 : 0,182 et 0,427.</li>
+      <li><b>Un dé recopié quatre fois</b> : X<sub>1</sub> = X<sub>2</sub> = X<sub>3</sub> = X<sub>4</sub>. Le centre est intact, E[X̄] = 3,5. Mais X̄ = X<sub>1</sub>, donc Var(X̄) = 2,917 et non 0,729 : l'indépendance perdue se paie dans la largeur, jamais dans le centre.</li>
+      <li><b>Une pièce de biais p</b> (le cas de Brunton : « n lancers, n Bernoulli »). X<sub>i</sub> ∈ {0, 1}, X̄ est la proportion de piles. E[X̄] = p, Var(X̄) = p(1 − p)/n.</li>
+      <li><b>Une accuracy.</b> L'accuracy d'un modèle sur n exemples de test est la moyenne des indicatrices « bonne réponse ». C'est une réalisation de X̄ : un autre jeu de test tiré de la même population donnerait une autre accuracy, autour de la vraie p, avec la variance p(1 − p)/n.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>à savoir produire : chaque ligne nomme ce qui sert</small></summary><div class="in">
+    <p><b>Le centre.</b></p>
+    <div class="drv">
+      <div>E[<i>X̄</i>] = E[(1/<i>n</i>) Σ<sub><i>i</i></sub> <i>X<sub>i</sub></i>]</div><span>définition de X̄</span>
+      <div>= (1/<i>n</i>) Σ<sub><i>i</i></sub> E[<i>X<sub>i</sub></i>]</div><span>linéarité (l08, notion 3) : aucune hypothèse</span>
+      <div>= (1/<i>n</i>) · <i>n</i>μ = μ</div><span>chaque E[X<sub>i</sub>] vaut μ (même loi, ou seulement même moyenne)</span>
+    </div>
+    <p><b>La largeur.</b> Chaque ligne nomme la moitié d'i.i.d. qui sert.</p>
+    <div class="drv">
+      <div>Var(<i>X̄</i>) = (1/<i>n</i>²) Var(Σ<sub><i>i</i></sub> <i>X<sub>i</sub></i>)</div><span>Var(aY) = a² Var(Y) avec a = 1/n (l08, notion 9) : aucune hypothèse</span>
+      <div>= (1/<i>n</i>²) [Σ<sub><i>i</i></sub> Var(<i>X<sub>i</sub></i>) + Σ<sub><i>i</i> ≠ <i>j</i></sub> Cov(<i>X<sub>i</sub></i>, <i>X<sub>j</sub></i>)]</div><span>variance d'une somme (l09, notion 2) : aucune hypothèse ; n variances, n(n − 1) covariances</span>
+      <div>= (1/<i>n</i>²) Σ<sub><i>i</i></sub> Var(<i>X<sub>i</sub></i>)</div><span><b>indépendance</b> : chaque Cov(X<sub>i</sub>, X<sub>j</sub>) = 0</span>
+      <div>= (1/<i>n</i>²) · <i>n</i>σ²</div><span><b>même loi</b> : chaque Var(X<sub>i</sub>) = σ²</span>
+      <div>= σ² / <i>n</i></div><span>le n du haut vient des n variances, le n² du bas de la division</span>
+    </div>
+    <p>Au tableau : « l'indépendance tue les covariances, la même loi égalise les variances, le 1/n sort au carré ». Sans indépendance, la troisième ligne garde ses covariances (notion 6) ; sans même loi, la quatrième donne Σ σ<sub>i</sub>²/n².</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>100 000 fois quatre dés, indépendants puis recopiés</small></summary><div class="in">
+<pre class="py">{{CODE:c3}}</pre>
+<pre class="out">{{OUT:c3}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Réalisation, variable, paramètre.</b> Écrire « μ = 3,2 » pour « x̄ = 3,2 sur ces quatre dés » mélange les trois. μ ne se mesure pas, il s'estime : x̄ en est une estimation, X̄ l'estimateur (<a href="lesson-00-04-variables-binomiale-normale.html#n1">l04, notion 1</a>, puis <a href="../chains/chain-p01-01-objet-aleatoire.html">p01-01</a>).</li>
+      <li><b>Ce qui se réduit est Var(X̄), pas Var(X).</b> La variance d'un dé reste 2,917 quel que soit le nombre de lancers ; celle de leur moyenne tombe en 1/n.</li>
+      <li><b>Dépendance.</b> Le centre reste μ, la largeur change : 2,917 au lieu de 0,729 pour des copies, et la notion 6 pour une corrélation partielle.</li>
+      <li><b>Des lois différentes.</b> Indépendantes mais de variances σ<sub>i</sub>² différentes : Var(X̄) = Σ σ<sub>i</sub>²/n², pas σ²/n (figure 2). Un seul terme très bruité peut dominer.</li>
+      <li><b>Variance infinie</b> (Pareto d'indice ≤ 2) : σ²/n n'a pas de sens. Sans espérance du tout (Cauchy, notion 4), c'est même le centre qui manque.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (35) écrit E[X̄] = μ « puisque tous ces X sont indépendants ». La linéarité de l'espérance n'a besoin d'aucune hypothèse (l08, notion 3) : E[X̄] = μ vaut aussi pour des dés recopiés. L'indépendance ne sert qu'à la ligne de la variance, où elle annule les covariances.</div>
+  </div></details>
+  <p class="garde">Pour X̄ = (1/n) Σ X<sub>i</sub> : E[X̄] = μ par linéarité, sans hypothèse ; Var(X̄) = σ²/n parce que l'indépendance annule les covariances, que la même loi donne σ² à chaque terme, et que 1/n sort au carré.</p>
+</section>
+

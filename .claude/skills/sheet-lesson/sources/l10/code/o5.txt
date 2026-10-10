@@ -1,0 +1,4 @@
+n = 1000: sd of the accuracies 0.00946   formula 0.00949
+n = 4000: sd of the accuracies 0.00472   formula 0.00474
+dice needed for SE 0.1: 292
+dice needed for SE 0.05: 1167

@@ -1,0 +1,61 @@
+<!-- ============================ n4 ============================ -->
+<section class="notion outil" id="n4">
+  <h3>Loi des grands nombres : la moyenne converge, la somme s'écarte <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 35 · l'image des mesures répétées vient des vidéos 01 et 36</p>
+  <div class="idee">
+    <p>Brunton prend l'exemple de la mesure : on mesure la vitesse de la lumière 30 fois, et l'on obtient 30 valeurs un peu différentes. La moyenne des mesures se rapproche de la vraie valeur à mesure qu'on en ajoute. La <b>loi des grands nombres</b> (LGN) le dit précisément : la probabilité que X̄ s'écarte de μ de plus de ε tend vers 0, pour tout ε.</p>
+    <p>Le mécanisme tient en une ligne : Var(X̄) = σ²/n tend vers 0 (notion 3), et Chebyshev (notion 2) transforme une variance qui tend vers 0 en une probabilité d'écart qui tend vers 0. Rien ne se compense pour autant. La somme S<sub>n</sub> s'écarte de nμ avec un écart-type σ√n qui grandit : sur 1 000 dés, 54,0, quand celui de la moyenne vaut 0,054. C'est la division par n qui écrase un écart qui, lui, continue de grandir.</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — des mesures répétées, et leur moyenne</div>
+    <div id="v4ctl" class="sl-ctl"></div><div id="v4ctl2" class="sl-ctl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">Chaque point est une mesure simulée de la vitesse de la lumière, en écart à la vraie valeur 299 792 km/s, avec un bruit d'écart-type 100 km/s choisi pour l'illustration. La courbe rouge est la moyenne des n premières mesures ; la bande bleue ±2σ/√n se referme sur 0 : ±36,5 km/s à n = 30, ±11,5 à n = 300. Clique <b>270 mesures de plus</b> : les points restent aussi dispersés, la moyenne se pose. Puis choisis des <b>erreurs de Cauchy</b>, un instrument qui déraille de temps en temps : la moyenne de n erreurs de Cauchy a la loi d'une seule erreur, elle saute à chaque grosse erreur et ne se pose jamais.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">pour tout ε &gt; 0 : &nbsp;P(|<i>X̄<sub>n</sub></i> − μ| ≥ ε) ≤ σ² / (<i>n</i>ε²) &nbsp;→ 0 &nbsp;&nbsp;&nbsp; et &nbsp;&nbsp; écart-type(<i>S<sub>n</sub></i> − <i>n</i>μ) = σ√<i>n</i> &nbsp;→ ∞</div>
+    <ul><li>C'est la loi <b>faible</b> des grands nombres : X̄<sub>n</sub> converge vers μ <b>en probabilité</b> (weak law, convergence in probability).</li><li>Hypothèses de cette preuve : même moyenne μ, variance σ² finie, covariances nulles (l'indépendance suffit). La LGN reste vraie pour des X<sub>i</sub> i.i.d. d'espérance seulement finie, avec une preuve plus longue, hors leçon. Pour Cauchy, qui n'a pas d'espérance, X̄<sub>n</sub> ne converge pas : elle a la loi d'une seule mesure (où ça casse).</li><li>La LGN dit que X̄ se pose sur μ. Elle ne dit ni à quelle vitesse (notion 5) ni avec quelle forme (<a href="lesson-00-11-tcl.html">l11</a>).</li></ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — un seul chemin, deux lectures opposées</div>
+    <div id="f3a" class="wide"></div>
+    <div id="f3b" class="wide"></div>
+    <div class="sl-ctl" id="f3ctl"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Les deux courbes rouges lisent <b>le même tirage de 1 000 dés</b>, l'une divisée par n, l'autre non, et les deux bandes décrivent le même événement : le chemin sort de l'une exactement quand il sort de l'autre. En haut, la bande ±2σ/√n se referme sur μ = 3,5, et la moyenne avec elle. En bas, la bande ±2σ√n s'ouvre : la somme moins 3,5n erre à quelques dizaines de 0 (36 en médiane à n = 1 000), recoupe parfois 0 mais ne s'y pose pas. Clique <b>nouveau chemin</b> plusieurs fois : en haut l'écart à 3,5 fond, en bas il ne fond pas. Rien ne se compense : c'est la division par n qui fabrique la convergence.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>la borne à n = 100, moyenne et somme, une pièce, une fréquence</small></summary><div class="in">
+    <ol>
+      <li><b>Chebyshev pour 100 dés, ε = 0,5.</b> P(|X̄ − 3,5| ≥ 0,5) ≤ 2,917/(100 × 0,25) = 0,117. La valeur exacte, calculée sur la loi de la somme de 100 dés, est 0,0036 : la borne est 32 fois trop large. Mais elle tend vers 0 quand n grandit, et c'est tout ce que la preuve demande.</li>
+      <li><b>Moyenne et somme, 1 000 dés.</b> Écart-type de X̄ : 1,708/√1 000 = 0,054. Écart-type de S − 3 500 : 1,708 × √1 000 = 54,0. Un facteur 1 000 entre les deux, sur le même tirage.</li>
+      <li><b>Une pièce.</b> Sur 100 lancers, la proportion de piles a un écart-type de 0,05 et le nombre de piles moins 50 un écart-type de 5. Sur 10 000 lancers : 0,005 et 50. Après dix faces de suite, le lancer suivant reste à ½ : la pièce ne « rattrape » rien.</li>
+      <li><b>Une fréquence est une moyenne.</b> Pour un événement A, l'indicatrice 1{A} est une Bernoulli de moyenne P(A) : la fréquence de A sur n tirages converge vers P(A). C'est ce qui rend précis le « à peu près » de la <a href="lesson-00-08-esperance-variance.html#n1">notion 1 de l08</a> : chaque face sort à peu près N · P(X = x) fois sur N lancers.</li>
+      <li><b>Une accuracy.</b> Mesurée sur un jeu de test de plus en plus grand, d'exemples tirés indépendamment, elle converge vers la vraie accuracy du modèle sur cette population.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>Chebyshev appliqué à X̄</small></summary><div class="in">
+    <div class="drv">
+      <div>E[<i>X̄<sub>n</sub></i>] = μ, &nbsp;Var(<i>X̄<sub>n</sub></i>) = σ²/<i>n</i></div><span>notion 3</span>
+      <div>P(|<i>X̄<sub>n</sub></i> − μ| ≥ ε) ≤ Var(<i>X̄<sub>n</sub></i>) / ε²</div><span>Chebyshev (notion 2) appliqué à la variable X̄<sub>n</sub>, avec a = ε</span>
+      <div>= σ² / (<i>n</i>ε²)</div><span>on remplace Var(X̄<sub>n</sub>)</span>
+      <div>→ 0 quand <i>n</i> → ∞</div><span>ε et σ² sont fixés, seul n bouge</span>
+    </div>
+    <p><b>La somme.</b> Var(S<sub>n</sub> − nμ) = Var(S<sub>n</sub>) = nσ², par les deux mêmes moitiés d'i.i.d. ; son écart-type σ√n tend vers l'infini. Et S<sub>n</sub> − nμ = n(X̄<sub>n</sub> − μ) : l'écart de la somme est celui de la moyenne, multiplié par n.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>2 000 chemins de 1 000 dés, puis une moyenne de Cauchy</small></summary><div class="in">
+<pre class="py">{{CODE:c4}}</pre>
+<pre class="out">{{OUT:c4}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Pas d'espérance : Cauchy.</b> La moyenne de n variables de Cauchy indépendantes a exactement la loi d'une seule : moyenner n'apporte rien, la moyenne courante saute à chaque gros tirage (vignette, bouton Cauchy, et code). La symétrie fait croire à un centre en 0, mais l'espérance n'existe pas (<a href="lesson-00-08-esperance-variance.html#n1">l08, notion 1</a>).</li>
+      <li><b>« Les tirages se compensent » est faux</b> : c'est l'erreur du joueur. Les écarts accumulés grandissent en σ√n ; la moyenne converge parce qu'on divise par n.</li>
+      <li><b>Dépendance.</b> Si toutes les paires ont la même corrélation ρ &gt; 0, Var(X̄) ne tend plus vers 0 (notion 6) : la moyenne se pose sur μ + C, où C est l'erreur commune, et non sur μ. Si la corrélation s'éteint avec l'écart entre les termes (série temporelle stationnaire), X̄ converge encore, mais moins vite que σ/√n ne le dit.</li>
+      <li><b>Ni vitesse ni forme.</b> La LGN dit « ça converge », pas « à ±0,05 près avec 95 % de chances » : la vitesse est la notion 5, la forme le TCL (<a href="lesson-00-11-tcl.html">l11</a>).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (35), annonçant le TCL, dit que « cette somme » va converger vers une gaussienne « avec cette moyenne et l'écart-type ». S<sub>n</sub> ne converge vers aucune loi : son centre nμ et son écart-type σ√n grandissent avec n. Ce qui converge vers N(0, 1), c'est la version standardisée, (X̄<sub>n</sub> − μ)/(σ/√n) = (S<sub>n</sub> − nμ)/(σ√n) ; S<sub>n</sub> ≈ N(nμ, nσ²) n'est qu'une approximation à n fixé (<a href="lesson-00-11-tcl.html#n3">l11, notion 3</a>). En (34), il annonce « le théorème central limite » en décrivant la LGN, et en (33) il résume le TCL par « additionner des lois de probabilité » : on additionne des variables aléatoires i.i.d., pas des lois.</div>
+  </div></details>
+  <p class="garde">Pour des X<sub>i</sub> indépendantes de même moyenne μ et de variance σ² finie : P(|X̄<sub>n</sub> − μ| ≥ ε) ≤ σ²/(nε²) → 0, parce que Var(X̄) → 0 et non par compensation : la somme s'écarte de nμ en σ√n.</p>
+</section>
+

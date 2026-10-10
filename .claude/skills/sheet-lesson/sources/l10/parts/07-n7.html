@@ -1,0 +1,43 @@
+<!-- ============================ n7 ============================ -->
+<section class="notion culture" id="n7">
+  <h3>Monte Carlo : une espérance est une moyenne qu'on simule <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 35</p>
+  <div class="idee">
+    <p>Brunton conclut que la LGN est « la base de l'échantillonnage Monte Carlo ». L'idée se retourne : au lieu de calculer une espérance, on la simule. Pour E[g(X)], tire N valeurs de X, calcule g sur chacune et fais la moyenne. La LGN garantit que cette moyenne tend vers E[g(X)], et l'erreur standard σ<sub>g</sub>/√N dit à quelle vitesse.</p>
+    <p>L'exemple classique : lance des fléchettes au hasard dans le carré [0, 1]². La part qui tombe dans le quart de disque x² + y² ≤ 1 estime son aire, π/4 = 0,785, donc quatre fois cette part estime π. Avec N = 1 000 fléchettes, le SE sur π vaut 4 × √(0,785 × 0,215/1 000) = 0,052 ; pour un SE dix fois plus petit, il en faut cent fois plus.</p>
+  </div>
+  <div class="fig vis" id="v7">
+    <div class="lbl">Voir l'idée — des fléchettes dans un quart de disque</div>
+    <div id="v7ctl" class="sl-ctl"></div>
+    <div id="v7plot" class="wide"></div>
+    <div class="readouts" id="v7out"></div>
+    <p class="cap">Chaque point est une fléchette : bleue dans le quart de disque, rouge dehors. Dans le second panneau, l'estimation 4 × (part des bleues) contre le nombre N de fléchettes, et la bande π ± 2 SE qui se resserre en 1/√N. Départ : 1 000 fléchettes, SE 0,052. Ajoute-en <b>100</b>, puis va <b>jusqu'à 5 000</b> (SE 0,023) : l'estimation reste dans la bande, qui se resserre, sans jamais tomber exactement sur π. <b>Nouvelle graine</b> rejoue l'expérience.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">E[<i>g</i>(<i>X</i>)] ≈ (1/<i>N</i>) Σ<sub><i>i</i></sub> <i>g</i>(<i>x<sub>i</sub></i>), &nbsp;<i>x</i><sub>1</sub>, …, <i>x<sub>N</sub></i> tirés selon la loi de <i>X</i> &nbsp;&nbsp;&nbsp; SE = σ<sub><i>g</i></sub> / √<i>N</i>, &nbsp;σ<sub><i>g</i></sub>² = Var(<i>g</i>(<i>X</i>))</div>
+    <ul><li>Il faut savoir tirer selon la loi de X ; les tirages sont indépendants et de même loi, c'est la LGN de la notion 4 appliquée à g(X).</li><li>Var(g(X)) doit être finie pour que le SE existe.</li><li>Une probabilité est l'espérance d'une indicatrice, P(A) = E[1{A}] : elle s'estime de la même façon.</li><li>La vitesse 1/√N ne dépend pas de la dimension de X : c'est ce qui rend Monte Carlo utile là où une intégrale sur une grille serait impossible. La constante σ<sub>g</sub>, elle, peut en dépendre.</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>π, deux dés, E[e^Z], une perte moyenne</small></summary><div class="in">
+    <ol>
+      <li><b>π.</b> N = 1 000 : SE 0,052 ; N = 100 000 : SE 0,0052.</li>
+      <li><b>Deux dés.</b> P(somme ≥ 10) : l'indicatrice vaut 1 pour 6 issues sur 36, et sa fréquence sur N lancers simulés tend vers 1/6 = 0,167.</li>
+      <li><b>E[e<sup>Z</sup>] pour Z normale centrée réduite.</b> La moyenne de e<sup>z</sup> sur un million de tirages donne 1,648 ; la valeur exacte est e<sup>0,5</sup> = 1,649, alors que e<sup>E[Z]</sup> = 1 (code). Monte Carlo calcule E[g(X)], qui n'est pas g(E[X]) (<a href="lesson-00-08-esperance-variance.html#n5">l08, notion 5</a>).</li>
+      <li><b>Une perte moyenne.</b> La perte moyenne sur un jeu de test est une estimation Monte Carlo de la perte espérée, avec le SE σ<sub>ℓ</sub>/√n. Le gradient d'un mini-batch de B exemples tirés au hasard estime le gradient moyen avec un bruit en 1/√B : quadrupler le batch ne divise ce bruit que par 2.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>π à trois tailles, et E[e^Z]</small></summary><div class="in">
+<pre class="py">{{CODE:c7}}</pre>
+<pre class="out">{{OUT:c7}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>1/√N est lent.</b> Une décimale de plus coûte 100 fois plus de tirages.</li>
+      <li><b>Événement rare.</b> Pour p = 10<sup>−4</sup> et N = 10<sup>4</sup>, on attend un seul succès : le SE relatif √((1 − p)/(Np)) vaut 100 %. On reformule le problème (échantillonnage préférentiel, importance sampling) plutôt que de tirer plus.</li>
+      <li><b>Tirages dépendants.</b> Les méthodes de Monte Carlo par chaînes de Markov (MCMC) produisent des tirages corrélés : le SE se calcule avec un n<sub>eff</sub> (notion 6), pas avec N.</li>
+      <li><b>Variance infinie.</b> Si E[g(X)] existe mais pas Var(g(X)), la moyenne converge encore, sans la vitesse σ<sub>g</sub>/√N et très irrégulièrement.</li>
+      <li><b>Le générateur.</b> Une graine fixée rend l'expérience reproductible ; deux simulations qui partagent une graine ne sont pas indépendantes.</li>
+    </ul>
+  </div></details>
+  <p class="garde">Monte Carlo : une espérance est une moyenne qu'on peut simuler. La LGN garantit la convergence, σ<sub>g</sub>/√N en donne la vitesse, quelle que soit la dimension.</p>
+</section>
+

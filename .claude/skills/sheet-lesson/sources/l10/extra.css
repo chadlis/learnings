@@ -1,0 +1,7 @@
+.sl-fn.band{stroke-dasharray:5 4;stroke-width:1.5}
+.sl-fn.thin{stroke-width:1.6}
+.sl-forbid{fill:var(--red);opacity:.07}
+.sl-tail{fill:var(--red);opacity:.06}
+.sl-ghost{fill:none;stroke:var(--red);stroke-width:1.8;stroke-dasharray:4 3}
+.sl-die{fill:var(--card);stroke:var(--cardink);stroke-width:1.2}
+.sl-halo{paint-order:stroke;stroke:var(--card);stroke-width:4px;stroke-linejoin:round}

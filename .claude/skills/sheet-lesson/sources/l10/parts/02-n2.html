@@ -1,0 +1,54 @@
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>Chebyshev : au plus 1/k² au-delà de kσ <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 34 · Chebyshev's Inequality in Probability: Second-Order Estimates</p>
+  <div class="idee">
+    <p>Markov ne regarde qu'un côté, et que la moyenne. Chebyshev regarde l'écart à μ des deux côtés et se sert de la variance : c'est l'estimation « d'ordre 2 » de Brunton. Il l'obtient en appliquant Markov à l'écart au carré (X − μ)², qui est ≥ 0 et dont la moyenne est σ².</p>
+    <p>L'image est celle de l'inertie (l08, notion 6). Une masse posée à kσ du centre apporte k²σ² à la variance, par unité de masse. Si plus d'une fraction 1/k² de la loi était à kσ du centre ou plus loin, ces masses suffiraient à dépasser σ². Donc à k = 2 : au plus un quart de la masse hors de μ ± 2σ, quelle que soit la loi. Une normale n'en met que 4,6 %. Une loi construite exprès, ⅛ en μ − 2σ, ⅛ en μ + 2σ et ¾ en μ, en met exactement 25 %.</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — la part de la masse loin du centre</div>
+    <div id="v2ctl" class="sl-ctl"></div><div id="v2sl"></div>
+    <div id="v2plot" class="wide"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">L'axe compte les écarts à μ en unités de σ ; en rouge, ce qui tombe hors de ±kσ. À <b>k = 2</b>, la <b>normale</b> n'y met que 4,6 % de sa masse, la borne autorise 25 %. Le <b>dé</b> : à k = 1, les faces 1 et 6, soit 33 % (la borne vaut 100 %) ; dès k = 1,5, plus rien, la face la plus éloignée étant à 2,5 = 1,46σ de 3,5. La loi à <b>trois points</b> suit le curseur et met toujours exactement 1/k² hors de ±kσ : aucune borne valable pour toutes les lois ne peut faire mieux.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(|<i>X</i> − μ| ≥ <i>a</i>) ≤ σ² / <i>a</i>² &nbsp;(<i>a</i> &gt; 0) &nbsp;&nbsp;&nbsp; avec <i>a</i> = <i>k</i>σ : &nbsp;P(|<i>X</i> − μ| ≥ <i>k</i>σ) ≤ 1 / <i>k</i>²</div>
+    <ul><li>μ = E[X] et σ² = Var(X), qui doit être <b>finie</b>. Aucune hypothèse de forme : symétrique ou non, discrète ou continue, « avec des bosses bizarres », dit Brunton.</li><li>Lue à l'envers : P(|X − μ| &lt; kσ) ≥ 1 − 1/k². Au moins 75 % de la masse dans ±2σ, au moins 88,9 % dans ±3σ.</li><li>Il faut k &gt; 1 pour une borne utile ; pour k ≤ 1 elle vaut au moins 1.</li></ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>k = 2 et 3, le dé, la loi qui atteint la borne, une alerte</small></summary><div class="in">
+    <ol>
+      <li><b>k = 2</b> : au plus 25 % hors de ±2σ ; une normale en met 4,55 %. <b>k = 3</b> : au plus 11,1 % ; une normale en met 0,27 %.</li>
+      <li><b>Le dé.</b> μ = 3,5, σ² = 2,917. Avec a = 2,5 : P(|X − 3,5| ≥ 2,5) ≤ 2,917/6,25 = 0,467. La vraie valeur : les faces 1 et 6, soit 1/3.</li>
+      <li><b>La loi à trois points.</b> X = μ ± kσ avec probabilité 1/(2k²) chacun, X = μ sinon. Sa variance vaut 2 × 1/(2k²) × k²σ² = σ², et P(|X − μ| ≥ kσ) = 1/k² exactement. À k = 2 : ⅛, ¾, ⅛.</li>
+      <li><b>D'autres formes.</b> Uniforme, k = 1,5 : 13,4 % hors de la bande (borne 44 %). Exponentielle de moyenne 1, k = 2 : e<sup>−3</sup> = 5,0 % (borne 25 %).</li>
+      <li><b>Une alerte de surveillance en production.</b> Une métrique de production de moyenne et d'écart-type connus, alerte au-delà de ±3σ. Sans hypothèse sur sa loi, jusqu'à 11 % des points normaux peuvent déclencher l'alerte ; si elle est normale, 0,27 %. Le « 3σ » des tableaux de bord suppose une forme.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>Markov appliqué à l'écart au carré</small></summary><div class="in">
+    <div class="drv">
+      <div>P(|<i>X</i> − μ| ≥ <i>a</i>) = P((<i>X</i> − μ)² ≥ <i>a</i>²)</div><span>élever au carré ne change pas l'événement : les deux côtés sont ≥ 0, et t ↦ t² est croissante sur [0, ∞)</span>
+      <div>= P(<i>Y</i> ≥ <i>b</i>), &nbsp;<i>Y</i> = (<i>X</i> − μ)², <i>b</i> = <i>a</i>²</div><span>le changement de variable de Brunton</span>
+      <div>≤ E[<i>Y</i>] / <i>b</i></div><span>Markov (notion 1), permis parce que Y ≥ 0 : c'est un carré</span>
+      <div>= σ² / <i>a</i>²</div><span>E[(X − μ)²] est la définition de la variance (l08, notion 6)</span>
+    </div>
+    <p>Avec a = kσ : σ²/(k²σ²) = 1/k². <b>Égalité</b> : Markov est atteint quand Y ne prend que les valeurs 0 et b, c'est-à-dire X = μ ou |X − μ| = a. Ce sont les lois à trois points de l'exemple 3.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>la part hors de ±2σ pour cinq lois</small></summary><div class="in">
+<pre class="py">{{CODE:c2}}</pre>
+<pre class="out">{{OUT:c2}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>La borne est large.</b> Elle vaut pour toutes les lois, donc elle est calée sur la pire : 25 % là où une normale donne 4,6 % et un dé 0 %.</li>
+      <li><b>Pour k ≤ 1, elle ne dit rien.</b></li>
+      <li><b>Variance infinie : rien.</b> Pareto d'indice ≤ 2, Cauchy (qui n'a même pas d'espérance).</li>
+      <li><b>σ doit être le vrai écart-type.</b> Avec un σ estimé sur quelques points, la borne n'est plus garantie.</li>
+      <li><b>Elle porte sur les deux queues ensemble.</b> « Au plus 12,5 % de chaque côté » est faux : une seule queue peut prendre jusqu'à 1/(1 + k²), soit 20 % à k = 2 (inégalité de Cantelli). La loi qui le fait : ⅕ en μ + 2σ, ⅘ en μ − σ/2.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (34) pose Y = (X − μ)² et applique Markov à Y sans dire pourquoi il en a le droit. Markov n'a qu'une hypothèse, Y ≥ 0 : elle est vraie parce que Y est un carré, mais c'est le seul point de la preuve à vérifier. Il ne donne pas non plus la forme en kσ, ni aucun chiffre : le 1/k² et la comparaison avec la normale sont ajoutés ici.</div>
+  </div></details>
+  <p class="garde">Pour toute loi de variance finie, P(|X − μ| ≥ kσ) ≤ 1/k² : au plus 25 % de la masse au-delà de 2σ, contre 4,6 % pour une normale. Universelle, donc large.</p>
+</section>
+

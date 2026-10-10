@@ -1,0 +1,3 @@
+first three realisations: [4.   1.25 4.25]
+independent  mean 3.500 (theory 3.5)   var 0.728 (theory 0.729)
+copies       mean 3.510 (theory 3.5)   var 2.915 (theory 2.917)
