@@ -14,6 +14,7 @@ comme sur le site publié.
 
 | série | dossier | quoi | combien |
 | --- | --- | --- | --- |
+| **leçon** | `sheets/lessons/` | le cours autoporteur du socle, aligné sur Brunton, blocs dépliables | 1 sur 12 |
 | **chaîne** | `sheets/chains/` | règle → application chiffrée, pas numérotés, figures interactives | 33 |
 | **déroulé** | `sheets/walkthroughs/` | un problème mené de bout en bout sur des chiffres | 7 |
 | **pont** | `sheets/bridges/` | un mécanisme qui traverse plusieurs parties | 6 |

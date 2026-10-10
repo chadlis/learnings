@@ -49,8 +49,8 @@ PARTS = [
 # Colonnes de la carte : parties 0–9 + ponts. Les déroulés n'y figurent pas
 # (ils sont listés sous leur chaîne dans l'index), les squelettes -00 non plus.
 MAP_PARTS = ('00', '01', '02', '03', '04', '05', '06', '07', '08', '09', 'B')
-DIR = {'chain': 'chains', 'walkthrough': 'walkthroughs', 'bridge': 'bridges', 'coding': 'coding'}
-LABEL = {'chain': 'chaîne', 'walkthrough': 'déroulé', 'bridge': 'pont', 'coding': 'coding'}
+DIR = {'chain': 'chains', 'walkthrough': 'walkthroughs', 'bridge': 'bridges', 'coding': 'coding', 'lesson': 'lessons'}
+LABEL = {'chain': 'chaîne', 'walkthrough': 'déroulé', 'bridge': 'pont', 'coding': 'coding', 'lesson': 'leçon'}
 
 def fm(path):
     t = open(path, encoding='utf-8').read()
@@ -66,6 +66,7 @@ def out_path(s):
     if s['series'] == 'chain': name = f"chain-{s['id']}-{s['slug']}.html"
     elif s['series'] == 'walkthrough': name = f"walkthrough-{s['id'][1:]}-{s['slug']}.html".replace('walkthrough-0', 'walkthrough-p0', 1)
     elif s['series'] == 'bridge': name = f"bridge-{s['number']}-{s['slug']}.html"
+    elif s['series'] == 'lesson': name = f"lesson-{s['part']}-{s['number']}-{s['slug']}.html"
     else: name = f"coding-{s['number']}-{s['slug']}.html"
     return f"sheets/{DIR[s['series']]}/{name}"
 
@@ -96,7 +97,7 @@ def version(href):
 
 def item(s):
     cls = 'it' + ('' if s['exists'] else ' todo')
-    k = {'chain': s['number'], 'walkthrough': 'D' + s['number'], 'bridge': 'P' + s['number'], 'coding': 'C' + s['number']}[s['series']]
+    k = {'chain': s['number'], 'walkthrough': 'D' + s['number'], 'bridge': 'P' + s['number'], 'coding': 'C' + s['number'], 'lesson': 'L' + str(int(s['number']))}[s['series']]
     sub = html.escape(s.get('subtitle', ''))
     n = version(s['href']) if s['exists'] else ('spec prêt' if s['status'] == 'ready' else 'à venir')
     inner = f'<span class="k">{k}</span><span class="t">{html.escape(s["title"])}<small>{LABEL[s["series"]]} · {sub}</small></span><span class="n">{n}</span>'
@@ -180,8 +181,8 @@ PWA = ('<link rel="manifest" href="manifest.webmanifest">'
 
 # ---------- graphe des prérequis
 def map_nodes(specs):
-    """Les nœuds de la carte : chaînes, ponts et coding des parties 0–9 + B, sans squelette -00."""
-    return [s for s in specs if s['part'] in MAP_PARTS and s['series'] in ('chain', 'bridge', 'coding') and not s['id'].endswith('-00')]
+    """Les nœuds de la carte : leçons, chaînes, ponts et coding des parties 0–9 + B, sans squelette -00 ni redirection."""
+    return [s for s in specs if s['part'] in MAP_PARTS and s['series'] in ('lesson', 'chain', 'bridge', 'coding') and not s['id'].endswith('-00') and s.get('status') != 'redirect']
 
 def closure(edges):
     """Fermeture transitive : nœud → ensemble des nœuds atteignables par ≥ 1 arête."""
@@ -244,15 +245,17 @@ def short_title(t, limit=48):
 def build_index(specs, today):
     out = [f'<!DOCTYPE html><html lang="fr"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Fiches — formation ML/LLM</title><style>{CSS}{CSS_INDEX}</style>{PWA}</head><body>',
            '<h1>Formation ML/LLM — <span>fiches</span></h1>',
-           '<p class="sub">Rangées par dépendance, pas par deck : chaque chaîne suppose les précédentes. Une chaîne = hypothèses → mécanisme → où ça casse → résumé ; un déroulé = la même chaîne sur des exemples chiffrés ; un pont = un mécanisme vu dans plusieurs domaines. Anki teste l\'atome ; ici on relit l\'enchaînement.</p>',
+           '<p class="sub">Rangées par dépendance, pas par deck : chaque chaîne suppose les précédentes. Une leçon = le cours autoporteur du socle, notion par notion, avec exemples, preuves et code dépliables ; une chaîne = hypothèses → mécanisme → où ça casse → résumé ; un déroulé = la même chaîne sur des exemples chiffrés ; un pont = un mécanisme vu dans plusieurs domaines. Anki teste l\'atome ; ici on relit l\'enchaînement.</p>',
            '<div class="nav"><a href="map.html">Carte des prérequis</a> · <a href="timeline.html">Timeline</a></div>']
     for part, title, ac, tenue in PARTS:
-        items = [s for s in specs if s['part'] == part and not s['id'].endswith('-00')]
+        # Un spec `redirect` est une chaîne remplacée par des leçons : son fichier
+        # reste servi (URL, favoris, cartes), mais il ne figure plus dans l'index.
+        items = [s for s in specs if s['part'] == part and not s['id'].endswith('-00') and s.get('status') != 'redirect']
         if not items and part not in ('10','11','12','13','14','20','21','22','30'): continue
         say = f'<p class="tenue hid">{html.escape(tenue)}</p>' if tenue else ''
         out.append(f'<div style="--ac:var(--{ac})"><h2>{html.escape(title)}</h2>{say}')
         if not items: out.append('<div class="it todo"><span class="k">·</span><span class="t">partie vide<small>la sheet du bloc arrive avec la revue du vendredi</small></span><span class="n">Phase à venir</span></div>')
-        order = {'chain': 0, 'walkthrough': 1, 'bridge': 0, 'coding': 0}
+        order = {'lesson': -1, 'chain': 0, 'walkthrough': 1, 'bridge': 0, 'coding': 0}
         for s in sorted(items, key=lambda s: (order[s['series']], s['number'])): out.append(item(s))
         out.append('</div>')
     arch = sorted(glob.glob(f'{ROOT}/sheets/archive/*.html'))
@@ -262,7 +265,7 @@ def build_index(specs, today):
             t = re.search(r'<title>(.*?)</title>', open(a, encoding='utf-8').read()); t = html.unescape(t.group(1)) if t else os.path.basename(a)
             out.append(f'<a class="it" href="sheets/archive/{os.path.basename(a)}" style="opacity:.7"><span class="k">A</span><span class="t">{html.escape(t)}</span><span class="n">archive</span></a>')
         out.append('</div>')
-    out.append(f'<footer>Un HTML par entrée, <code>assets/sheetlib.js</code> partagé, ouvrable hors ligne. Convention : <code>sheets/chains/chain-pPP-NN-&lt;slug&gt;.html</code> · <code>sheets/walkthroughs/walkthrough-pPP-NN-…</code> · <code>sheets/bridges/bridge-NN-…</code> · <code>sheets/coding/coding-NN-…</code> · <code>sheets/archive/</code>. Index et carte générés par <code>tools/build_index.py</code> le {today} — ne pas éditer à la main.</footer>'
+    out.append(f'<footer>Un HTML par entrée, <code>assets/sheetlib.js</code> partagé, ouvrable hors ligne. Convention : <code>sheets/lessons/lesson-PP-NN-&lt;slug&gt;.html</code> · <code>sheets/chains/chain-pPP-NN-&lt;slug&gt;.html</code> · <code>sheets/walkthroughs/walkthrough-pPP-NN-…</code> · <code>sheets/bridges/bridge-NN-…</code> · <code>sheets/coding/coding-NN-…</code> · <code>sheets/archive/</code>. Index et carte générés par <code>tools/build_index.py</code> le {today} — ne pas éditer à la main.</footer>'
                '<script>document.addEventListener("click",function(e){'
                'var t=e.target&&e.target.closest?e.target.closest(".tenue"):null;'
                'if(t)t.classList.toggle("hid");});</script>'
@@ -292,7 +295,7 @@ def build_map(specs, g, today):
     out.append('</ol></div>')
     # Partie par partie : une carte compacte par nœud, avec ses prérequis et successeurs directs dans R.
     for part, title, ac, _tenue in cols:
-        items = sorted((s for s in g['nodes'] if s['part'] == part), key=lambda s: s['number'])
+        items = sorted((s for s in g['nodes'] if s['part'] == part), key=lambda s: (s['series'] != 'lesson', s['number']))
         if not items: continue
         out.append(f'<div style="--ac:var(--{ac})"><h2>{html.escape(title)}</h2>')
         for s in items:
@@ -309,7 +312,7 @@ def build_map(specs, g, today):
     colw, rowh, x0, y0, bw, bh = 200, 58, 20, 56, 182, 42
     pos, col, acc, svg = {}, {}, {}, []
     for ci, (part, title, ac, _tenue) in enumerate(cols):
-        items = sorted((s for s in g['nodes'] if s['part'] == part), key=lambda s: s['number'])
+        items = sorted((s for s in g['nodes'] if s['part'] == part), key=lambda s: (s['series'] != 'lesson', s['number']))
         x = x0 + ci * colw
         svg.append(f'<text class="part" x="{x}" y="{y0 - 22}">{html.escape(title.split("·")[0].strip() if part != "B" else "PONTS")}</text>')
         for ri, s in enumerate(items):

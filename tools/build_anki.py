@@ -21,12 +21,13 @@ OUT = os.path.join(ROOT, 'anki', 'ancres.csv')
 META = re.compile(r'<meta name="anki" content="([^"]*)"')
 SHEET = re.compile(r'<meta name="sheet" content="([^"]*)"')
 TITLE = re.compile(r'<title>(.*?)</title>', re.S)
-STEP = re.compile(r'<div class="step" id="(s\d+)">(.*?)(?=<div class="step" id="|\Z)', re.S)
+# un pas de chaîne (div.step#sN) ou une notion de leçon (section.notion#nN)
+STEP = re.compile(r'<(?:div class="step"|section class="notion[^"]*") id="([sn]\d+)">(.*?)(?=<(?:div class="step"|section class="notion[^"]*") id="|\Z)', re.S)
 H3 = re.compile(r'<h3>(.*?)</h3>', re.S)
 TAGS = re.compile(r'<[^>]+>')
 # suffixes que le <title> porte par convention de série, et la version qui le suit
 # (« — chaîne · v2 ») : le libellé collé dans Anki ne doit pas changer à chaque révision.
-SUFFIX = re.compile(r'\s*—\s*(chaîne|déroulé|pont|coding|fiche thématique)(\s*·\s*v\d+)?\s*$')
+SUFFIX = re.compile(r'\s*—\s*(leçon|chaîne|déroulé|pont|coding|fiche thématique)(\s*·\s*v\d+)?\s*$')
 
 
 def fold(s):
@@ -44,6 +45,7 @@ def sheet_id(meta):
     if series == 'walkthrough': return f'w{part}-{number}'
     if series == 'bridge':      return f'b{number}'
     if series == 'coding':      return f'c{number}'
+    if series == 'lesson':      return f'l{number}'
     return f'{series}-{part}-{number}'
 
 

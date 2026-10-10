@@ -54,6 +54,16 @@ foi. `tools/test_walkthroughs.mjs` accepte les deux rails, donc les anciens ne
 sont pas à migrer : ne jamais renommer ni refondre un déroulé publié pour
 uniformiser. Le premier déroulé v5 est D5 (`walkthrough-p01-05`).
 
+## La série `lesson` (socle probabiliste, depuis le 10/10/2026)
+
+Les douze leçons `l01` à `l12` (`sheets/lessons/lesson-00-NN-<slug>.html`) sont le cours
+autoporteur du socle : une notion par section, avec idée, formule, figure et quatre blocs
+dépliables (exemples, preuve, code, où ça casse). Elles se produisent avec le skill
+`sheet-lesson` ; l'étalon est `lesson-00-08-esperance-variance.html`. Le validateur a une
+branche propre à la série. Les quatre chaînes p00 deviennent des pages de redirection
+(statut de spec `redirect`, hors index et carte) au fur et à mesure que leurs sections
+cibles existent : p00-03 après l03, p00-01 après l05, p00-02 après l09, p00-04 après l11.
+
 ## Intégrer un fichier de `inbox/`
 
 1. **Lire le fichier avant de le déplacer.** Le nom déposé ment souvent : se

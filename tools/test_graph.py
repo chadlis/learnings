@@ -15,7 +15,7 @@ sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_index as b
 
-REDONDANTES = 35
+REDONDANTES = 43  # 10/10/2026 : +8 avec les douze leçons l01–l12 du socle
 fails = []
 def check(cond, msg):
     if not cond: fails.append(msg)

@@ -23,7 +23,8 @@ if not m: fail('meta sheet manquante ou mal formée (series=…;part=…;number=
 else:
     series, part, number, status = m.groups()
     expect = {'chain': f'chain-p{part}-{number}-', 'walkthrough': f'walkthrough-p{part}-{number}-',
-              'bridge': f'bridge-{number}-', 'coding': f'coding-{number}-'}.get(series)
+              'bridge': f'bridge-{number}-', 'coding': f'coding-{number}-',
+              'lesson': f'lesson-{part}-{number}-'}.get(series)
     if expect and not name.startswith(expect): fail(f'nom de fichier attendu commençant par {expect}, reçu {name}')
 for meta in ('part', 'subtitle', 'prereq', 'anki'):
     if not re.search(rf'<meta name="{meta}" content="[^"]+">', t): fail(f'meta {meta} manquante')
@@ -41,49 +42,98 @@ if '../../assets/sheetlib.js' not in t: fail('sheetlib.js non chargé')
 nstyle = len(re.findall(r'<style\b', t))
 if nstyle != 1: fail(f'{nstyle} balises <style> (il en faut exactement 1 — un doublon avale le bloc :root)')
 
-# ---- structure de la chaîne
-need = {'#prereq': 'id="prereq"', '#hyp': 'id="hyp"', '.chain': 'class="chain"', '#resume': 'id="resume"',
-        '#verbal': 'id="verbal"', '#links': 'id="links"', '.phrase': 'class="phrase"'}
-for k, v in need.items():
-    if v not in t: fail(f'bloc manquant : {k}')
-# Le numéro affiché vient d'un compteur CSS : un id suffixé (s4b) ou un trou dans la
-# suite décale les ancres par rapport à ce que le lecteur voit, et tout lien entrant ment.
-all_steps = re.findall(r'<div class="step" id="([^"]+)">', t)
-expected = [f's{i}' for i in range(1, len(all_steps) + 1)]
-if all_steps != expected:
-    bad = [a for a, e in zip(all_steps, expected) if a != e] or all_steps[len(expected):]
-    fail(f'ids des pas non consécutifs : {", ".join(all_steps)} (attendu s1…s{len(all_steps)}) '
-         f'— renuméroter, jamais suffixer : {", ".join(bad[:3])}')
-steps = all_steps
-if len(steps) < 4: fail(f'{len(steps)} pas seulement (min 4)')
-if len(steps) > 14: warn(f'{len(steps)} pas : long, envisager de scinder')
-# Exigé pour toutes les séries, `coding` comprise (revue 6) : les pièges Python ne
-# remplacent pas le « Où ça casse ». Les pièges plantent ou changent la complexité ;
-# le contre-signal, lui, rend la réponse fausse sans erreur — c'est celui-là qui coûte.
-if 'class="card casse"' not in t: fail('pas de bloc « Où ça casse »')
-if 'class="tag tronc"' not in t: warn('aucun pas marqué tronc')
-say = re.findall(r'<p class="say">«(.*?)»</p>', t, re.S)
-if len(say) < len(steps) - 1: fail(f'{len(say)} formulations « au tableau » pour {len(steps)} pas')
-for s in say[1:]:
-    if ' donc ' not in s: fail(f'« au tableau » sans donc : {s.strip()[:60]}…')
-    if 'parce que' in s: warn(f'« parce que » dans un au tableau (préférer donc) : {s.strip()[:60]}…')
-figs = re.findall(r'<div class="fig" id="fig\d+">', t)
-if not figs: fail('aucune figure')
-if not re.search(r'SL\.(plot|repeat|descent|trace|plane)\(', t): fail('aucune figure construite avec sheetlib')
-for f in re.findall(r'<div class="fig" id="(fig\d+)">(.*?)</div>\s*</div>', t, re.S):
-    if 'class="cap"' not in f[1]: fail(f'{f[0]} sans légende .cap')
-verb = re.findall(r'<li><div class="q">', t)
-if not (4 <= len(verb) <= 7): fail(f'chaîne verbalisée : {len(verb)} maillons (attendu 4 à 7)')
-resume = re.search(r'<div class="card resume">.*?<ol>(.*?)</ol>', t, re.S)
-if resume and len(re.findall(r'<li>', resume.group(1))) > 8: fail('résumé > 8 lignes')
-if len(re.findall(r'<details', t)): fail('<details> Q/A interdit dans une chaîne (c\'est le format archivé)')
-if re.search(r'Encore|Difficile|Bien\s*`', t): fail('notation encore/difficile/bien interdite (Anki fait ça)')
+# ---- série `lesson` : le cours autoporteur du socle (décidé le 10/10/2026)
+# Une leçon n'est pas une chaîne : prose courte permise, et quatre blocs dépliables
+# par notion (exemples, preuve, code, où ça casse). Ce que le validateur garde des
+# chaînes : figures sheetlib légendées, résumé ≤ 8, chaîne verbalisée 4–7, phrase.
+def check_lesson():
+    need = {'#prereq': 'id="prereq"', '.lecon': 'class="lecon"', '#resume': 'id="resume"',
+            '#verbal': 'id="verbal"', '#links': 'id="links"', '.phrase': 'class="phrase"'}
+    for k, v in need.items():
+        if v not in t: fail(f'bloc manquant : {k}')
+    ids = re.findall(r'<section class="notion[^"]*" id="([^"]+)">', t)
+    expected = [f'n{i}' for i in range(1, len(ids) + 1)]
+    if ids != expected:
+        fail(f'ids des notions non consécutifs : {", ".join(ids)} (attendu n1…n{len(ids)}) — renuméroter, jamais suffixer')
+    if len(ids) < 3: fail(f'{len(ids)} notions seulement (min 3)')
+    if len(ids) > 14: warn(f'{len(ids)} notions : long, envisager de scinder la leçon')
+    bodies = re.split(r'<section class="notion[^"]*" id="n\d+">', t)[1:]
+    for nid, body in zip(ids, bodies):
+        body = body.split('</section>')[0] if '</section>' in body else body
+        has_o, has_c = 'class="tag outil"' in body, 'class="tag culture"' in body
+        if has_o == has_c: fail(f'{nid} : exactement une étiquette attendue (tag outil ou tag culture)')
+        for cls, what in (('class="idee"', "l'idée"), ('<details class="ex"', 'les exemples'),
+                          ('<details class="casse"', 'le « où ça casse »'), ('class="garde"', 'le « ce qu\'on garde »')):
+            if cls not in body: fail(f'{nid} : il manque {what} ({cls})')
+        if 'class="formule"' not in body: warn(f'{nid} : pas de bloc formule')
+        if 'class="src"' not in body: warn(f'{nid} : vidéo source non citée (p.src)')
+        for c in re.findall(r'<details class="([^"]*)"', body):
+            if c not in ('ex', 'preuve', 'code', 'casse', 'loin'):
+                fail(f'{nid} : <details class="{c}"> inconnu (ex, preuve, code, casse, loin)')
+        for code in re.findall(r'<details class="code">(.*?)</details>', body, re.S):
+            if '<pre class="py">' not in code: fail(f'{nid} : bloc code sans <pre class="py">')
+            if '<pre class="out">' not in code: warn(f'{nid} : bloc code sans sortie <pre class="out">')
+        idee = re.search(r'<div class="idee">(.*?)</div>', body, re.S)
+        if idee:
+            words = len(re.sub(r'<[^>]+>', ' ', idee.group(1)).split())
+            if words > 160: warn(f'{nid} : {words} mots dans l\'idée (viser < 140)')
+    figs = re.findall(r'<div class="fig" id="fig\d+">', t)
+    if not figs: fail('aucune figure')
+    if not re.search(r'SL\.(plot|repeat|descent|trace|plane)\(', t): fail('aucune figure construite avec sheetlib')
+    for f in re.findall(r'<div class="fig" id="(fig\d+)">(.*?)</div>\s*</div>', t, re.S):
+        if 'class="cap"' not in f[1]: fail(f'{f[0]} sans légende .cap')
+    verb = re.findall(r'<li><div class="q">', t)
+    if not (4 <= len(verb) <= 7): fail(f'chaîne verbalisée : {len(verb)} maillons (attendu 4 à 7)')
+    resume = re.search(r'<div class="card resume">.*?<ol>(.*?)</ol>', t, re.S)
+    if resume and len(re.findall(r'<li>', resume.group(1))) > 8: fail('résumé > 8 lignes')
+    if re.search(r'Encore|Difficile|Bien\s*`', t): fail('notation encore/difficile/bien interdite (Anki fait ça)')
 
-# ---- densité de prose : un pas ne doit pas dépasser ~120 mots dans .rule (hors say)
-for sid, body in re.findall(r'<div class="step" id="(s\d+)">(.*?)</div>\s*<div class="card apply">', t, re.S):
-    txt = re.sub(r'<p class="say">.*?</p>', '', body, flags=re.S)
-    words = len(re.sub(r'<[^>]+>', ' ', txt).split())
-    if words > 170: warn(f'{sid} : {words} mots dans la règle (viser < 120)')
+if m and m.group(1) == 'lesson':
+    check_lesson()
+else:
+    # ---- structure de la chaîne
+    need = {'#prereq': 'id="prereq"', '#hyp': 'id="hyp"', '.chain': 'class="chain"', '#resume': 'id="resume"',
+            '#verbal': 'id="verbal"', '#links': 'id="links"', '.phrase': 'class="phrase"'}
+    for k, v in need.items():
+        if v not in t: fail(f'bloc manquant : {k}')
+    # Le numéro affiché vient d'un compteur CSS : un id suffixé (s4b) ou un trou dans la
+    # suite décale les ancres par rapport à ce que le lecteur voit, et tout lien entrant ment.
+    all_steps = re.findall(r'<div class="step" id="([^"]+)">', t)
+    expected = [f's{i}' for i in range(1, len(all_steps) + 1)]
+    if all_steps != expected:
+        bad = [a for a, e in zip(all_steps, expected) if a != e] or all_steps[len(expected):]
+        fail(f'ids des pas non consécutifs : {", ".join(all_steps)} (attendu s1…s{len(all_steps)}) '
+             f'— renuméroter, jamais suffixer : {", ".join(bad[:3])}')
+    steps = all_steps
+    if len(steps) < 4: fail(f'{len(steps)} pas seulement (min 4)')
+    if len(steps) > 14: warn(f'{len(steps)} pas : long, envisager de scinder')
+    # Exigé pour toutes les séries, `coding` comprise (revue 6) : les pièges Python ne
+    # remplacent pas le « Où ça casse ». Les pièges plantent ou changent la complexité ;
+    # le contre-signal, lui, rend la réponse fausse sans erreur — c'est celui-là qui coûte.
+    if 'class="card casse"' not in t: fail('pas de bloc « Où ça casse »')
+    if 'class="tag tronc"' not in t: warn('aucun pas marqué tronc')
+    say = re.findall(r'<p class="say">«(.*?)»</p>', t, re.S)
+    if len(say) < len(steps) - 1: fail(f'{len(say)} formulations « au tableau » pour {len(steps)} pas')
+    for s in say[1:]:
+        if ' donc ' not in s: fail(f'« au tableau » sans donc : {s.strip()[:60]}…')
+        if 'parce que' in s: warn(f'« parce que » dans un au tableau (préférer donc) : {s.strip()[:60]}…')
+    figs = re.findall(r'<div class="fig" id="fig\d+">', t)
+    if not figs: fail('aucune figure')
+    if not re.search(r'SL\.(plot|repeat|descent|trace|plane)\(', t): fail('aucune figure construite avec sheetlib')
+    for f in re.findall(r'<div class="fig" id="(fig\d+)">(.*?)</div>\s*</div>', t, re.S):
+        if 'class="cap"' not in f[1]: fail(f'{f[0]} sans légende .cap')
+    verb = re.findall(r'<li><div class="q">', t)
+    if not (4 <= len(verb) <= 7): fail(f'chaîne verbalisée : {len(verb)} maillons (attendu 4 à 7)')
+    resume = re.search(r'<div class="card resume">.*?<ol>(.*?)</ol>', t, re.S)
+    if resume and len(re.findall(r'<li>', resume.group(1))) > 8: fail('résumé > 8 lignes')
+    if len(re.findall(r'<details', t)): fail('<details> Q/A interdit dans une chaîne (c\'est le format archivé)')
+    if re.search(r'Encore|Difficile|Bien\s*`', t): fail('notation encore/difficile/bien interdite (Anki fait ça)')
+
+    # ---- densité de prose : un pas ne doit pas dépasser ~120 mots dans .rule (hors say)
+    for sid, body in re.findall(r'<div class="step" id="(s\d+)">(.*?)</div>\s*<div class="card apply">', t, re.S):
+        txt = re.sub(r'<p class="say">.*?</p>', '', body, flags=re.S)
+        words = len(re.sub(r'<[^>]+>', ' ', txt).split())
+        if words > 170: warn(f'{sid} : {words} mots dans la règle (viser < 120)')
 
 # ---- liens internes
 for href in re.findall(r'href="((?:\.\./|\./)?[^"#:]+\.html)', t):
