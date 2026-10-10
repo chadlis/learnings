@@ -146,7 +146,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <h4>Prérequis</h4>
   <ol>
     <li><a href="chain-p03-02-gradient-descente.html#s4">p03-02 · Optimum local, non-convexité</a></li>
-    <li><a href="chain-p00-02-esperance-variance-densite.html#s3">p00-02 · La moyenne et les carrés</a></li>
+    <li><a href="../lessons/lesson-00-08-esperance-variance.html#n2">l08 · La moyenne et les carrés</a></li>
     <li><a href="chain-p04-04-pca.html#s6">p04-04 · Les unités, la distance</a></li>
   </ol>
   <h4>Cartes Anki liées</h4>
@@ -165,7 +165,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <div class="lbl">Ce que cette chaîne suppose acquis</div>
     <ul>
       <li><b>Descente, optimum local, non-convexité.</b> Un algorithme qui ne fait que descendre s'arrête dans le creux où il est tombé, et rien dans ce qu'il observe ne dit si c'est le bon (<a href="chain-p03-02-gradient-descente.html#s4">p03-02 pas 4</a>). Toute la seconde moitié de cette chaîne est ce constat, appliqué à des centroïdes.</li>
-      <li><b>La moyenne minimise la somme des carrés.</b> <span class="m">m</span> ↦ Σ(<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">m</span>)² est une parabole en <span class="m">m</span>, de dérivée −2Σ(<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">m</span>), nulle en la moyenne (<a href="chain-p00-02-esperance-variance-densite.html#s3">p00-02 pas 3</a>). C'est exactement le second demi-pas de Lloyd — on l'applique, on ne le redémontre pas.</li>
+      <li><b>La moyenne minimise la somme des carrés.</b> <span class="m">m</span> ↦ Σ(<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">m</span>)² est une parabole en <span class="m">m</span>, de dérivée −2Σ(<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">m</span>), nulle en la moyenne (<a href="../lessons/lesson-00-08-esperance-variance.html#n2">l08 notion 2</a>). C'est exactement le second demi-pas de Lloyd — on l'applique, on ne le redémontre pas.</li>
       <li><b>Les unités portent la distance.</b> Une feature en milliers écrase toutes les autres dans une norme euclidienne (<a href="chain-p04-04-pca.html#s6">p04-04 pas 6</a>). Même piège ici, même remède : standardiser avant, pas après.</li>
       <li><b>Le témoin atteignable.</b> Quand un critère peut toujours être amélioré par un modèle plus gros qui <i>reproduit</i> le plus petit, ce critère ne choisit pas la taille (<a href="../bridges/bridge-02-temoin-atteignable.html">b02</a>). C'est mot pour mot ce qui empêche <span class="m">J</span> de donner <span class="m">k</span>.</li>
     </ul>
@@ -211,7 +211,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <h3>Deux inconnues, deux minimisations exactes <span class="tag tronc">tronc</span></h3>
     <p>Prise séparément, chacune des deux inconnues se résout <b>en forme fermée</b>, sans itération ni approximation.</p>
     <div class="eq">à <span class="m">μ</span> fixés : &nbsp;<span class="m">c</span>(<span class="m">i</span>) = argmin<sub><span class="m">j</span></sub> ‖<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">μ</span><sub><span class="m">j</span></sub>‖² &nbsp;&nbsp;·&nbsp;&nbsp; à <span class="m">c</span> fixée : &nbsp;∂<span class="m">J</span>/∂<span class="m">μ</span><sub><span class="m">j</span></sub> = −2 Σ<sub><span class="m">i</span>∈<span class="m">C</span><sub><span class="m">j</span></sub></sub>(<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">μ</span><sub><span class="m">j</span></sub>) = 0 &nbsp;⇒&nbsp; <span class="m">μ</span><sub><span class="m">j</span></sub> = moyenne de <span class="m">C</span><sub><span class="m">j</span></sub></div>
-    <p>La première est une décision <b>point par point</b> : les termes de <span class="m">J</span> sont indépendants une fois <span class="m">μ</span> figé. La seconde est un système <b>linéaire</b> en <span class="m">μ</span>, un par cluster — la moyenne de <a href="chain-p00-02-esperance-variance-densite.html#s3">p00-02</a>, lue comme le demi-pas de <a href="../bridges/bridge-06-convexite-forme-fermee.html#s3">b06 pas 3</a>.</p>
+    <p>La première est une décision <b>point par point</b> : les termes de <span class="m">J</span> sont indépendants une fois <span class="m">μ</span> figé. La seconde est un système <b>linéaire</b> en <span class="m">μ</span>, un par cluster — la moyenne de <a href="../lessons/lesson-00-08-esperance-variance.html#n2">l08, notion 2</a>, lue comme le demi-pas de <a href="../bridges/bridge-06-convexite-forme-fermee.html#s3">b06 pas 3</a>.</p>
     <p class="say">« À centroïdes fixés le meilleur cluster d'un point est le plus proche, donc le premier demi-pas se résout point par point, donc à clusters fixés le gradient en <span class="m">μ</span> est linéaire et le meilleur centroïde est la moyenne, donc chaque demi-pas de Lloyd est un minimum exact et non une approximation. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — les deux demi-pas, en chiffres</div>

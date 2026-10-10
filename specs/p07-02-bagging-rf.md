@@ -6,7 +6,7 @@ number: "02"
 slug: bagging-rf
 title: Bagging et forêt aléatoire — la variance seule
 subtitle: arbres et ensembles — moyenner des arbres profonds réduit la variance, et tirer m features baisse ce que la moyenne ne peut pas baisser
-prereq: [p07-01, p01-05, p00-02, p06-01]
+prereq: [p07-01, p01-05, l09, p06-01]
 anki: [ml::bagging, ml::random-forest, ml::oob, ml::variance-correlee]
 bridges: [b04, b03, b02]
 next: p07-03

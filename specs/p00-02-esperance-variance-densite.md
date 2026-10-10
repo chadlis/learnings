@@ -10,8 +10,9 @@ prereq: [p00-01]
 anki: [stats::esperance, stats::variance, stats::densite, stats::covariance]
 bridges: [b04]
 next: p00-03
-status: built
+status: redirect
 ---
+Remplacée le 10/10/2026 par les leçons l04, l08 et l09 (renvoi secondaire : l10) ; la page est une redirection (table des ancres dans le fichier).
 
 ## Question de la chaîne
 Que valent E et Var d'une variable, comment se transforment-ils, quand s'additionnent-ils, et qu'est-ce qu'une densité par rapport à une probabilité ?

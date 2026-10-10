@@ -176,7 +176,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <ol>
     <li><a href="chain-p04-03-spectral-svd-conditionnement.html#s2">p04-03 · théorème spectral</a></li>
     <li><a href="chain-p04-03-spectral-svd-conditionnement.html#s4">p04-03 · SVD</a></li>
-    <li><a href="chain-p00-02-esperance-variance-densite.html#s5">p00-02 · variance, covariance</a></li>
+    <li><a href="../lessons/lesson-00-09-covariance-correlation.html#n2">l09 · variance, covariance</a></li>
   </ol>
   <h4>Cartes Anki liées</h4>
   <div class="tags"><code>ml::pca</code><code>algebre::spectral</code><code>ml::standardisation</code></div>
@@ -195,8 +195,8 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <li><b>Théorème spectral.</b> Si <span class="m">C</span> = <span class="m">C</span><sup>⊤</sup>, alors <span class="m">C</span> = <span class="m">Q</span>Λ<span class="m">Q</span><sup>⊤</sup> avec <span class="m">Q</span> orthogonale et Λ réelle (<a href="chain-p04-03-spectral-svd-conditionnement.html#s2">p04-03, pas 2</a>). Toute covariance est symétrique : ses axes propres sont donc orthogonaux, gratuitement.</li>
       <li><b>Forme quadratique dans la base propre.</b> <span class="m">x</span><sup>⊤</sup><span class="m">Cx</span> = Σ<span class="m">λ</span><sub>i</sub><span class="m">a</span><sub>i</sub>² où <span class="m">a</span><sub>i</sub> = ⟨<span class="m">q</span><sub>i</sub>, <span class="m">x</span>⟩ (<a href="chain-p04-03-spectral-svd-conditionnement.html#s3">p04-03, pas 3</a>). C'est le pas 3 de cette chaîne, tout entier.</li>
       <li><b>SVD.</b> Toute matrice <span class="m">X</span> s'écrit <span class="m">U</span>Σ<span class="m">V</span><sup>⊤</sup>, et <span class="m">X</span><sup>⊤</sup><span class="m">X</span> = <span class="m">V</span>Σ²<span class="m">V</span><sup>⊤</sup> (<a href="chain-p04-03-spectral-svd-conditionnement.html#s5">p04-03, pas 5</a>). Former <span class="m">X</span><sup>⊤</sup><span class="m">X</span> élève le conditionnement au carré (<a href="chain-p04-03-spectral-svd-conditionnement.html#s7">p04-03, pas 7</a>).</li>
-      <li><b>Variance, covariance.</b> Var(<span class="m">X</span>) = <span class="up">E</span>[(<span class="m">X</span> − <span class="m">μ</span>)²] — définie <b>autour de la moyenne</b> — et Var(<span class="m">aX</span> + <span class="m">bY</span>) = <span class="m">a</span>²Var(<span class="m">X</span>) + <span class="m">b</span>²Var(<span class="m">Y</span>) + 2<span class="m">ab</span> Cov(<span class="m">X</span>, <span class="m">Y</span>) (<a href="chain-p00-02-esperance-variance-densite.html#s5">p00-02, pas 5</a>). C'est déjà <span class="m">a</span><sup>⊤</sup><span class="m">Ca</span> en dimension 2.</li>
-      <li><b>Une variance porte les unités au carré.</b> Var(<span class="m">aX</span>) = <span class="m">a</span>²Var(<span class="m">X</span>) (<a href="chain-p00-02-esperance-variance-densite.html#s4">p00-02, pas 4</a>) : passer des mètres aux centimètres multiplie une variance par 10 000. Le pas 6 vit là-dessus.</li>
+      <li><b>Variance, covariance.</b> Var(<span class="m">X</span>) = <span class="up">E</span>[(<span class="m">X</span> − <span class="m">μ</span>)²] — définie <b>autour de la moyenne</b> — et Var(<span class="m">aX</span> + <span class="m">bY</span>) = <span class="m">a</span>²Var(<span class="m">X</span>) + <span class="m">b</span>²Var(<span class="m">Y</span>) + 2<span class="m">ab</span> Cov(<span class="m">X</span>, <span class="m">Y</span>) (<a href="../lessons/lesson-00-09-covariance-correlation.html#n2">l09, notion 2</a>). C'est déjà <span class="m">a</span><sup>⊤</sup><span class="m">Ca</span> en dimension 2.</li>
+      <li><b>Une variance porte les unités au carré.</b> Var(<span class="m">aX</span>) = <span class="m">a</span>²Var(<span class="m">X</span>) (<a href="../lessons/lesson-00-08-esperance-variance.html#n9">l08, notion 9</a>) : passer des mètres aux centimètres multiplie une variance par 10 000. Le pas 6 vit là-dessus.</li>
     </ul>
   </div>
 </section>
@@ -341,7 +341,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <div class="step" id="s6">
   <div class="rule">
     <h3>Piège 2 : les unités <span class="tag casse">casse</span></h3>
-    <p>Une variance porte les unités au carré (<a href="chain-p00-02-esperance-variance-densite.html#s4">p00-02, pas 4</a>) : multiplier une colonne par 100 multiplie sa variance par 10 000. Une feature en centaines domine donc une feature en unités <b>sans être plus informative</b>.</p>
+    <p>Une variance porte les unités au carré (<a href="../lessons/lesson-00-08-esperance-variance.html#n9">l08, notion 9</a>) : multiplier une colonne par 100 multiplie sa variance par 10 000. Une feature en centaines domine donc une feature en unités <b>sans être plus informative</b>.</p>
     <div class="eq">Var(<span class="m">c x</span>) = <span class="m">c</span>² Var(<span class="m">x</span>) &nbsp;⇒&nbsp; standardiser = diagonaliser la <b>corrélation</b>, pas la covariance</div>
     <p>Standardiser quand les unités diffèrent. Ne pas standardiser quand elles sont comparables et que les écarts de variance <i>sont</i> l'information — pixels, log-retours. C'est un choix à justifier, jamais un réglage par défaut.</p>
     <p class="say">« La variance porte les unités au carré, donc changer d'unité multiplie une variance par le carré du facteur, donc la composante dominante suit l'unité et non l'information — sauf à diagonaliser la corrélation. »</p>

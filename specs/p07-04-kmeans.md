@@ -6,7 +6,7 @@ number: "04"
 slug: kmeans
 title: k-means — une descente alternée sur l'inertie
 subtitle: arbres et ensembles — Lloyd alterne deux minimisations exactes et converge vers un optimum local ; l'initialisation décide
-prereq: [p03-02, p00-02, p04-04]
+prereq: [p03-02, l08, p04-04]
 anki: [ml::kmeans, ml::lloyd, ml::kmeans-plus-plus, ml::inertie]
 bridges: [b01, b06]
 next: p08-01

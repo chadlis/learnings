@@ -60,9 +60,19 @@ Les douze leçons `l01` à `l12` (`sheets/lessons/lesson-00-NN-<slug>.html`) son
 autoporteur du socle : une notion par section, avec idée, formule, figure et quatre blocs
 dépliables (exemples, preuve, code, où ça casse). Elles se produisent avec le skill
 `sheet-lesson` ; l'étalon est `lesson-00-08-esperance-variance.html`. Le validateur a une
-branche propre à la série. Les quatre chaînes p00 deviennent des pages de redirection
-(statut de spec `redirect`, hors index et carte) au fur et à mesure que leurs sections
-cibles existent : p00-03 après l03, p00-01 après l05, p00-02 après l09, p00-04 après l11.
+branche propre à la série. **Chaque page est assemblée** à partir de ses sources
+(`.claude/skills/sheet-lesson/sources/lNN/`) par `.claude/skills/sheet-lesson/kit/build.py` :
+une révision s'écrit dans les sources, puis on reconstruit — corriger la page seule serait
+effacé à la reconstruction suivante. La page produite reste un HTML autonome.
+
+**Migration faite le 10/10/2026.** Les quatre chaînes p00 (`chain-p00-0N-*.html`, URL
+gardées) sont des pages de redirection : statut de spec `redirect` (hors index et carte),
+meta `status=redirect`, une table ancienne ancre → nouvelle section dont chaque ligne porte
+l'ancien `id="sN"`, et un script qui envoie `#sN` vers sa notion (sans ancre, la page reste
+affichée). Elles ne portent plus de meta `anki` : les tags vivent dans les leçons. **Ne pas
+les ré-éditer** ni les reconvertir en chaînes ; le validateur a une branche `redirect`. Un
+nouveau lien vers le socle vise directement la leçon (`../lessons/lesson-00-NN-….html#nK`),
+un nouveau spec déclare `lNN` en `prereq`, jamais `p00-0N`.
 
 ## Intégrer un fichier de `inbox/`
 

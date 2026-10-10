@@ -10,8 +10,9 @@ prereq: []
 anki: [stats::lois, stats::binomiale, stats::poisson, stats::exponentielle, stats::normale]
 bridges: []
 next: p00-02
-status: built
+status: redirect
 ---
+Remplacée le 10/10/2026 par les leçons l04 et l05 (renvoi secondaire : l11) ; la page est une redirection (table des ancres dans le fichier).
 
 ## Question de la chaîne
 Devant une situation (un mail, une heure de trafic, une attente, une moyenne de mesures), quelle loi poser, pourquoi celle-là, et à quel signe reconnaître qu'elle est fausse ?

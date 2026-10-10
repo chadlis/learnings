@@ -6,7 +6,7 @@ number: "01"
 slug: arbres-impurete
 title: Arbres — impureté, split, profondeur
 subtitle: arbres et ensembles — un arbre coupe là où l'impureté baisse le plus, et sa profondeur est sa variance
-prereq: [p03-01, p00-03, p06-01]
+prereq: [p03-01, l03, p06-01]
 anki: [ml::arbres, ml::gini, ml::profondeur, ml::cart]
 bridges: [b05, b03]
 next: p07-02

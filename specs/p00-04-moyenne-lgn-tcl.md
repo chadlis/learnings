@@ -10,8 +10,9 @@ prereq: [p00-01, p00-02]
 anki: [stats::tcl, stats::lgn, stats::se, stats::normale]
 bridges: [b03, b04]
 next: p01-01
-status: built
+status: redirect
 ---
+Remplacée le 10/10/2026 par les leçons l10 et l11 (renvoi secondaire : l06) ; la page est une redirection (table des ancres dans le fichier).
 
 ## Question de la chaîne
 On moyenne n mesures. Que vaut le centre de la moyenne, sa largeur, sa forme, et à partir de quel n ?

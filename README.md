@@ -10,12 +10,12 @@ comme sur le site publié.
 
 ## État du site
 
-**56 sheets publiées**, réparties en quatre séries :
+**64 sheets publiées**, réparties en cinq séries (plus quatre pages de redirection) :
 
 | série | dossier | quoi | combien |
 | --- | --- | --- | --- |
-| **leçon** | `sheets/lessons/` | le cours autoporteur du socle, aligné sur Brunton, blocs dépliables | 1 sur 12 |
-| **chaîne** | `sheets/chains/` | règle → application chiffrée, pas numérotés, figures interactives | 33 |
+| **leçon** | `sheets/lessons/` | le cours autoporteur du socle, aligné sur Brunton, blocs dépliables | 12 |
+| **chaîne** | `sheets/chains/` | règle → application chiffrée, pas numérotés, figures interactives | 29, et les 4 chaînes p00 devenues des redirections vers les leçons (10/10/2026) |
 | **déroulé** | `sheets/walkthroughs/` | un problème mené de bout en bout sur des chiffres | 7 |
 | **pont** | `sheets/bridges/` | un mécanisme qui traverse plusieurs parties | 6 |
 | **coding** | `sheets/coding/` | un patron d'algorithme : invariant, variant, où ça casse | 10 |

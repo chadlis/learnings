@@ -157,7 +157,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <ol>
     <li><a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01 · Du bruit à la loss</a></li>
     <li><a href="chain-p04-02-valeurs-propres-iteration.html">p04-02 · Valeurs propres et itération</a></li>
-    <li><a href="chain-p00-03-conditionnement-bayes.html">p00-03 · Conditionnement et Bayes</a></li>
+    <li><a href="../lessons/lesson-00-03-conditionner-bayes-independance.html#n4">l03 · Conditionnement et Bayes</a></li>
     <li><a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4 · les mêmes exemples, calculés</a></li>
   </ol>
   <h4>Cartes Anki liées</h4>
@@ -176,7 +176,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <div class="lbl">Ce que cette chaîne suppose acquis</div>
     <ul>
       <li><b>Le geste en six pas</b> (<a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>) : densité → produit → log → négatif → jeter → nommer. Il produit la NLL. Ici on ne le redéroule pas : on le <b>rejoue sur un deuxième objet</b>, le prior, et on additionne.</li>
-      <li><b>Bayes</b> (<a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>) : <span class="m">p</span>(<span class="m">β</span> | <span class="m">D</span>) = <span class="m">p</span>(<span class="m">D</span> | <span class="m">β</span>) <span class="m">p</span>(<span class="m">β</span>) / <span class="m">p</span>(<span class="m">D</span>), donc <span class="m">p</span>(<span class="m">β</span> | <span class="m">D</span>) ∝ <span class="m">L</span>(<span class="m">β</span>) <span class="m">p</span>(<span class="m">β</span>) à données fixées : le dénominateur ne dépend pas de <span class="m">β</span> et ne déplace aucun argmax.</li>
+      <li><b>Bayes</b> (<a href="../lessons/lesson-00-07-lois-jointes.html#n5">l07, notion 5</a>) : <span class="m">p</span>(<span class="m">β</span> | <span class="m">D</span>) = <span class="m">p</span>(<span class="m">D</span> | <span class="m">β</span>) <span class="m">p</span>(<span class="m">β</span>) / <span class="m">p</span>(<span class="m">D</span>), donc <span class="m">p</span>(<span class="m">β</span> | <span class="m">D</span>) ∝ <span class="m">L</span>(<span class="m">β</span>) <span class="m">p</span>(<span class="m">β</span>) à données fixées : le dénominateur ne dépend pas de <span class="m">β</span> et ne déplace aucun argmax.</li>
       <li><b>Valeurs propres</b> (<a href="chain-p04-02-valeurs-propres-iteration.html">p04-02</a>) : si <span class="m">Av</span> = <span class="m">μv</span> alors (<span class="m">A</span> + <span class="m">λI</span>)<span class="m">v</span> = (<span class="m">μ</span> + <span class="m">λ</span>)<span class="m">v</span>. Mêmes vecteurs propres, spectre décalé. Une matrice symétrique est inversible si et seulement si aucune valeur propre n'est nulle.</li>
       <li><b>Les calculs sont faits ailleurs.</b> Le déroulé <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4</a> refait les marches 9 à 12 ligne à ligne sur ce même jeu colinéaire. Ici on garde les règles, les chiffres d'arrivée et les points d'arrêt.</li>
     </ul>
@@ -494,7 +494,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Chaîne p02-02 · v4 du 22/09/2026 · fil B, 2/3. Prérequis : <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, <a href="chain-p04-02-valeurs-propres-iteration.html">p04-02</a>, <a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>. Suite : <a href="chain-p02-03-conjugues-posterior.html">p02-03 Le posterior entier</a>.</footer>
+<footer>Chaîne p02-02 · v4 du 22/09/2026 · fil B, 2/3. Prérequis : <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, <a href="chain-p04-02-valeurs-propres-iteration.html">p04-02</a>, <a href="../lessons/lesson-00-03-conditionner-bayes-independance.html">l03</a>. Suite : <a href="chain-p02-03-conjugues-posterior.html">p02-03 Le posterior entier</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

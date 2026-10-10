@@ -6,7 +6,7 @@ number: "04"
 slug: calibration-desequilibre
 title: Scores, calibration, déséquilibre — que vaut un 0,8 ?
 subtitle: évaluer — discriminer n'est pas être calibré, et le déséquilibre se traite par le seuil avant tout
-prereq: [p06-03, p02-01, p00-03]
+prereq: [p06-03, p02-01, l03]
 anki: [ml::calibration, ml::brier, ml::desequilibre, ml::seuil]
 bridges: [b05]
 next: p07-01

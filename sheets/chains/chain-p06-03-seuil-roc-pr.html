@@ -146,7 +146,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <ol id="toc"></ol>
   <h4>Prérequis</h4>
   <ol>
-    <li><a href="chain-p00-03-conditionnement-bayes.html">p00-03 · Conditionnement, Bayes, VPP</a></li>
+    <li><a href="../lessons/lesson-00-03-conditionner-bayes-independance.html#n6">l03 · Conditionnement, Bayes, VPP</a></li>
     <li><a href="chain-p01-01-objet-aleatoire.html">p01-01 · L'objet aléatoire, le SE</a></li>
   </ol>
   <h4>Cartes Anki liées</h4>
@@ -162,8 +162,8 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="card" style="--ac:var(--blue)">
     <div class="lbl">Ce que cette chaîne suppose acquis</div>
     <ul>
-      <li><b>Propriétés du test.</b> Sensibilité = <span class="m">P</span>(test + | malade), spécificité = <span class="m">P</span>(test − | sain) : deux probabilités <i>conditionnées par la vérité</i>, mesurées une fois pour toutes sur le test lui-même (<a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>).</li>
-      <li><b>VPP et base rate.</b> <span class="m">P</span>(malade | test +) n'est pas la sensibilité : Bayes y fait entrer la prévalence, et quand elle est faible la VPP s'effondre même avec un très bon test (<a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>). Ici la précision <i>est</i> cette VPP.</li>
+      <li><b>Propriétés du test.</b> Sensibilité = <span class="m">P</span>(test + | malade), spécificité = <span class="m">P</span>(test − | sain) : deux probabilités <i>conditionnées par la vérité</i>, mesurées une fois pour toutes sur le test lui-même (<a href="../lessons/lesson-00-03-conditionner-bayes-independance.html#n6">l03, notion 6</a>).</li>
+      <li><b>VPP et base rate.</b> <span class="m">P</span>(malade | test +) n'est pas la sensibilité : Bayes y fait entrer la prévalence, et quand elle est faible la VPP s'effondre même avec un très bon test (<a href="../lessons/lesson-00-03-conditionner-bayes-independance.html#n6">l03, notion 6</a>). Ici la précision <i>est</i> cette VPP.</li>
       <li><b>Une proportion a un SE.</b> <span class="hat"><span class="m">p</span></span> = <span class="m">k</span>/<span class="m">n</span> sur <span class="m">n</span> tirages Bernoulli a pour erreur-type √(<span class="hat"><span class="m">p</span></span>(1−<span class="hat"><span class="m">p</span></span>)/<span class="m">n</span>) — reste à savoir quel <span class="m">n</span> (<a href="chain-p01-01-objet-aleatoire.html">p01-01</a>).</li>
     </ul>
   </div>
@@ -174,7 +174,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <div class="lbl">Hypothèses posées</div>
     <div class="hyp">
       <b>H1</b><span>Le modèle sort un <b>score</b> ; la décision est « score ≥ seuil ». Les métriques de <b>décision</b> (accuracy, rappel, FPR, précision, F1) dépendent du seuil ; les métriques de <b>classement</b> (AUC) n'en dépendent pas.</span>
-      <b>H2</b><span>La <b>prévalence</b> du jeu de test est celle de la production. Sans cela, ni la précision ni l'accuracy ne se transportent — les rates, si (<a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>).</span>
+      <b>H2</b><span>La <b>prévalence</b> du jeu de test est celle de la production. Sans cela, ni la précision ni l'accuracy ne se transportent — les rates, si (<a href="../lessons/lesson-00-03-conditionner-bayes-independance.html#n6">l03, notion 6</a>).</span>
     </div>
   </div>
 </section>
@@ -230,7 +230,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="rule">
     <h3>Les « rates » regardent une ligne de vérité</h3>
     <p>TPR (= rappel = sensibilité) divise par la ligne des vrais positifs ; FPR divise par la ligne des vrais négatifs. Chaque ligne est normalisée par son propre total, donc la taille relative des deux lignes n'entre nulle part : ces deux nombres <b>ne dépendent pas de la prévalence</b>.</p>
-    <p>Ce sont exactement les propriétés du test de <a href="chain-p00-03-conditionnement-bayes.html">p00-03</a> : TPR = sensibilité, FPR = 1 − spécificité.</p>
+    <p>Ce sont exactement les propriétés du test de <a href="../lessons/lesson-00-03-conditionner-bayes-independance.html#n6">l03, notion 6</a> : TPR = sensibilité, FPR = 1 − spécificité.</p>
     <p class="say">« Une rate divise par le total de sa ligne, donc elle est calculée à l'intérieur d'une classe, donc changer la taille des classes ne la change pas. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application</div>
@@ -244,7 +244,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="rule">
     <h3>La précision regarde une colonne — sans TN <span class="tag tronc">tronc</span></h3>
     <p>Précision = TP/(TP + FP) : le dénominateur est la colonne « déclaré positif ». Les TN n'y figurent pas — c'est la seule métrique courante qui ignore une case entière.</p>
-    <p>Or les FP sont prélevés sur la classe majoritaire. Un taux d'erreur de 1 % sur 99 700 négatifs fabrique déjà 960 faux positifs, contre 240 vrais au mieux. La précision <b>dépend donc de la prévalence</b> : c'est la VPP de <a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>, réécrite avec les cases.</p>
+    <p>Or les FP sont prélevés sur la classe majoritaire. Un taux d'erreur de 1 % sur 99 700 négatifs fabrique déjà 960 faux positifs, contre 240 vrais au mieux. La précision <b>dépend donc de la prévalence</b> : c'est la VPP de <a href="../lessons/lesson-00-03-conditionner-bayes-independance.html#n6">l03, notion 6</a>, réécrite avec les cases.</p>
     <div class="eq">précision = <sup><span class="m">π</span> · TPR</sup>⁄<sub><span class="m">π</span> · TPR + (1 − <span class="m">π</span>) · FPR</sub></div>
     <p class="say">« La précision divise par une colonne de décision où les négatifs entrent par leurs faux positifs, donc plus les négatifs sont nombreux plus la précision baisse, donc elle ne se transporte pas d'une population à l'autre. »</p>
   </div>
@@ -412,7 +412,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
   <div class="bridges">
     <a href="../bridges/bridge-05-escalier-vs-sensible.html"><b>Pont 05 — escalier vs sensible</b><small>accuracy, F1 et rappel à un seuil sont constants par morceaux : on évalue avec, on n'apprend pas avec — c'est la dernière limite de cette chaîne, vue côté critère</small></a>
-    <a href="chain-p00-03-conditionnement-bayes.html"><b>p00-03 — conditionnement et Bayes</b><small>la précision est la VPP : même formule, même effondrement quand le base rate est faible ; ici elle est lue sur des effectifs au lieu de probabilités</small></a>
+    <a href="../lessons/lesson-00-03-conditionner-bayes-independance.html#n6"><b>l03 notion 6 — sensibilité, spécificité, précision</b><small>la précision est la VPP : même formule, même effondrement quand le base rate est faible ; ici elle est lue sur des effectifs au lieu de probabilités</small></a>
     <a href="chain-p06-02-cv-leakage.html"><b>p06-02 — validation croisée et fuite</b><small>ces métriques s'estiment sur des données non vues ; choisir le seuil sur le jeu de test est une fuite, au même titre qu'une sélection de features hors des plis</small></a>
   </div>
 </div>
@@ -424,7 +424,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Chaîne p06-03 · v1 du 17/09/2026 · Prérequis : <a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>, <a href="chain-p01-01-objet-aleatoire.html">p01-01</a>. Suite : <a href="chain-p06-04-calibration-desequilibre.html">p06-04 Calibration et déséquilibre</a>.</footer>
+<footer>Chaîne p06-03 · v1 du 17/09/2026 · Prérequis : <a href="../lessons/lesson-00-03-conditionner-bayes-independance.html">l03</a>, <a href="chain-p01-01-objet-aleatoire.html">p01-01</a>. Suite : <a href="chain-p06-04-calibration-desequilibre.html">p06-04 Calibration et déséquilibre</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

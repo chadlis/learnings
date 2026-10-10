@@ -6,7 +6,7 @@ number: "01"
 slug: biais-variance
 title: Biais, variance, bruit — la décomposition
 subtitle: évaluer — le tirage est le dataset entier, et l'erreur se coupe en trois
-prereq: [p01-01, p00-02]
+prereq: [p01-01, l08]
 anki: [ml::biais-variance, ml::overfitting, ml::validation]
 bridges: [b03, b02]
 next: p06-02

@@ -148,7 +148,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <ol>
     <li><a href="chain-p02-01-bruit-vraisemblance-loss.html#s6">p02-01 · NLL, le geste des six pas</a></li>
     <li><a href="chain-p08-02-flottants-lse.html#s6">p08-02 · log-sum-exp et logits</a></li>
-    <li><a href="chain-p00-02-esperance-variance-densite.html#s2">p00-02 · espérance = moyenne pondérée</a></li>
+    <li><a href="../lessons/lesson-00-08-esperance-variance.html#n5">l08 · espérance = moyenne pondérée</a></li>
   </ol>
   <h4>Cartes Anki liées</h4>
   <div class="tags"><code>dl::cross-entropy</code><code>stats::entropie</code><code>stats::kl</code><code>dl::perplexite</code></div>
@@ -167,7 +167,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <ul>
       <li><b>La loss vient du bruit.</b> Bruit → densité → produit → log → négatif → jeter : six pas qui transforment une hypothèse de bruit en loss (<a href="chain-p02-01-bruit-vraisemblance-loss.html#s6">p02-01, pas 6</a>). Sous bruit catégoriel le résultat est −log <span class="m">q</span><sub><span class="m">y</span></sub>. On ne le redémontre pas ici : on le <i>retrouve</i> au pas 3, par un autre chemin.</li>
       <li><b>Softmax et logits.</b> <span class="m">q</span><sub><span class="m">i</span></sub> = <span class="m">e</span><sup><span class="m">z</span><sub><span class="m">i</span></sub></sup> / Σ<sub><span class="m">j</span></sub> <span class="m">e</span><sup><span class="m">z</span><sub><span class="m">j</span></sub></sup> ; le log-softmax se calcule par log-sum-exp, sans jamais former <span class="m">q</span> (<a href="chain-p08-02-flottants-lse.html#s6">p08-02, pas 6</a>). C'est la raison technique du pas 8.</li>
-      <li><b>Espérance = moyenne pondérée.</b> <span class="up">E</span><sub><span class="m">p</span></sub>[<span class="m">f</span>] = Σ <span class="m">p</span><sub><span class="m">i</span></sub> <span class="m">f</span>(<span class="m">i</span>) (<a href="chain-p00-02-esperance-variance-densite.html#s2">p00-02, pas 2</a>). Toute la chaîne n'est que cette somme, appliquée à <span class="m">f</span> = surprise.</li>
+      <li><b>Espérance = moyenne pondérée.</b> <span class="up">E</span><sub><span class="m">p</span></sub>[<span class="m">f</span>] = Σ <span class="m">p</span><sub><span class="m">i</span></sub> <span class="m">f</span>(<span class="m">i</span>) (<a href="../lessons/lesson-00-08-esperance-variance.html#n5">l08, notion 5</a>). Toute la chaîne n'est que cette somme, appliquée à <span class="m">f</span> = surprise.</li>
       <li><b>Logarithmes.</b> log(<span class="m">ab</span>) = log <span class="m">a</span> + log <span class="m">b</span>, et changer de base multiplie par une constante : 1 nat = 1/ln 2 = 1,443 bit.</li>
     </ul>
   </div>

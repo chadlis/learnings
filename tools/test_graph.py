@@ -15,7 +15,11 @@ sys.dont_write_bytecode = True
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 import build_index as b
 
-REDONDANTES = 43  # 10/10/2026 : +8 avec les douze leçons l01–l12 du socle
+REDONDANTES = 46  # 10/10/2026 : +8 avec les douze leçons l01–l12 du socle
+# 10/10/2026, migration p00 → leçons : +3. Les quatre chaînes p00 deviennent des
+# redirections et sortent du graphe (12 redondantes disparaissent avec elles) ;
+# les 13 specs qui les supposaient déclarent les leçons, dont 15 arêtes sont
+# redondantes (ex. l08 → p01-01, déjà atteinte par l08 → l09 → l10 → l11 → p01-01).
 fails = []
 def check(cond, msg):
     if not cond: fails.append(msg)

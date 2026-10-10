@@ -148,7 +148,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <ol>
     <li><a href="chain-p06-03-seuil-roc-pr.html">p06-03 · Seuil, ROC, PR</a></li>
     <li><a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01 · Du bruit à la loss</a></li>
-    <li><a href="chain-p00-03-conditionnement-bayes.html">p00-03 · Bayes, prévalence, VPP</a></li>
+    <li><a href="../lessons/lesson-00-03-conditionner-bayes-independance.html">l03 · Bayes, prévalence, VPP</a></li>
   </ol>
   <h4>Cartes Anki liées</h4>
   <div class="tags"><code>ml::calibration</code><code>ml::brier</code><code>ml::desequilibre</code><code>ml::seuil</code></div>
@@ -165,7 +165,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <ul>
       <li><b>Score, seuil, décision.</b> Le modèle sort un score ; quelqu'un pose un seuil ; les métriques de décision en dépendent, l'AUC non — elle vaut <span class="m">P</span>(score d'un positif &gt; score d'un négatif), une propriété du <i>classement</i> seul (<a href="chain-p06-03-seuil-roc-pr.html#s7">p06-03</a>).</li>
       <li><b>La log-loss note des probabilités.</b> Elle est la <span class="up">NLL</span> d'une Bernoulli : −log <span class="m">p</span> sur un positif, −log(1−<span class="m">p</span>) sur un négatif. Elle sanctionne la <i>valeur</i> annoncée, pas la décision prise (<a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>).</li>
-      <li><b>Prévalence et VPP.</b> <span class="m">P</span>(fraude | alerte) fait entrer le base rate par Bayes ; à 0,3 % de prévalence il s'effondre même pour un excellent détecteur (<a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>).</li>
+      <li><b>Prévalence et VPP.</b> <span class="m">P</span>(fraude | alerte) fait entrer le base rate par Bayes ; à 0,3 % de prévalence il s'effondre même pour un excellent détecteur (<a href="../lessons/lesson-00-03-conditionner-bayes-independance.html#n6">l03, notion 6</a>).</li>
       <li><b>Cote et logit.</b> cote = <span class="m">p</span>/(1−<span class="m">p</span>), logit <span class="m">p</span> = log(cote). Multiplier une cote par <span class="m">k</span> ajoute log <span class="m">k</span> au logit : c'est la <b>seule</b> opération algébrique de cette chaîne.</li>
     </ul>
   </div>
@@ -296,7 +296,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
     <p>Sur-échantillonner les positifs, sous-échantillonner les négatifs, <span class="up">SMOTE</span> : tous portent la prévalence d'entraînement à 50 %. Le modèle apprend alors <span class="m">p</span>(<span class="m">y</span> | <span class="m">x</span>) <b>pour cette prévalence</b>, pas pour la vraie.</p>
     <p>Le prior se lit en cote, et l'écart entre les deux priors est un facteur constant :</p>
     <div class="eq">cote<sub>prod</sub> = cote<sub>train</sub> × <sup><span class="m">π</span></sup>⁄<sub>1−<span class="m">π</span></sub> × (1−<span class="m">π</span><sub>train</sub>) / <span class="m">π</span><sub>train</sub></div>
-    <p>Le classement est intact, donc l'AUC ne bouge pas. Mais le seuil de coût est faux, et la <span class="up">VPP</span> lue sur les scores est fausse. Rééchantillonner, c'est <b>imposer un prior sans le dire</b> (<a href="chain-p02-03-conjugues-posterior.html">p02-03</a>, <a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>).</p>
+    <p>Le classement est intact, donc l'AUC ne bouge pas. Mais le seuil de coût est faux, et la <span class="up">VPP</span> lue sur les scores est fausse. Rééchantillonner, c'est <b>imposer un prior sans le dire</b> (<a href="chain-p02-03-conjugues-posterior.html">p02-03</a>, <a href="../lessons/lesson-00-03-conditionner-bayes-independance.html#n5">l03, notion 5</a>).</p>
     <p class="say">« Changer la prévalence d'entraînement change le prior que le modèle apprend, donc ses probabilités portent le mauvais prior, donc elles ne sont plus calibrées pour la production alors que le classement, lui, n'a pas bougé. »</p>
   </div>
   <div class="card apply"><div class="lbl">Application — le rapport des cotes vaut 332</div>
@@ -440,7 +440,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="bridges">
     <a href="../bridges/bridge-05-escalier-vs-sensible.html"><b>Pont 05 — escalier vs sensible</b><small>le Brier et la log-loss sont sensibles à la valeur du score, l'accuracy et l'AUC ne voient qu'un ordre ou qu'un comptage : la même opposition, lue côté évaluation</small></a>
     <a href="chain-p06-03-seuil-roc-pr.html#s7"><b>p06-03 — seuil, ROC, PR</b><small>même population, même fil rouge ; la ROC y est déjà présentée comme une propriété du classement — cette chaîne dit ce que le classement ne dit pas</small></a>
-    <a href="chain-p00-03-conditionnement-bayes.html"><b>p00-03 — Bayes, prévalence, VPP</b><small>le rapport des cotes de 332 est exactement le facteur de Bayes du prior : rééchantillonner, c'est remplacer un prior par un autre</small></a>
+    <a href="../lessons/lesson-00-03-conditionner-bayes-independance.html#n5"><b>l03 notion 5 — Bayes en cotes, prévalence</b><small>le rapport des cotes de 332 est exactement le facteur de Bayes du prior : rééchantillonner, c'est remplacer un prior par un autre</small></a>
     <a href="chain-p02-03-conjugues-posterior.html"><b>p02-03 — prior et posterior</b><small>un prior noyé par les données, un prior décisif : ici le prior est imposé par la construction du jeu d'entraînement, donc sans qu'on l'ait écrit</small></a>
   </div>
 </div>
@@ -452,7 +452,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Chaîne p06-04 · v1 du 17/09/2026 · Prérequis : <a href="chain-p06-03-seuil-roc-pr.html">p06-03</a>, <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, <a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>. Suite : <a href="chain-p07-01-arbres-impurete.html">p07-01</a>.</footer>
+<footer>Chaîne p06-04 · v1 du 17/09/2026 · Prérequis : <a href="chain-p06-03-seuil-roc-pr.html">p06-03</a>, <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, <a href="../lessons/lesson-00-03-conditionner-bayes-independance.html">l03</a>. Suite : <a href="chain-p07-01-arbres-impurete.html">p07-01</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

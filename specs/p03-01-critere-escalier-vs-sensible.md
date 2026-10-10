@@ -6,7 +6,7 @@ number: "01"
 slug: critere-escalier-vs-sensible
 title: Critère en escalier vs critère sensible
 subtitle: fil C — un seul argument, quatre habits : split, loss, pénalité, marge
-prereq: [p00-04, p02-01, p03-02]
+prereq: [l08, p02-01, p03-02]
 anki: [ml::arbres, ml::logistique, stats::regularisation, dl::cross-entropy, ml::svm]
 bridges: [b01, b06]
 next: p03-02

@@ -18,7 +18,7 @@ def warn(m): warns.append(m)
 
 # ---- nommage et méta
 # part : les chaînes et déroulés sont numérotés (00…09), les ponts vivent dans la partie « B ».
-m = re.search(r'<meta name="sheet" content="series=(\w+);part=([0-9A-Z]+);number=(\d+);status=(v\d+)">', t)
+m = re.search(r'<meta name="sheet" content="series=(\w+);part=([0-9A-Z]+);number=(\d+);status=(v\d+|redirect)">', t)
 if not m: fail('meta sheet manquante ou mal formée (series=…;part=…;number=…;status=v1)')
 else:
     series, part, number, status = m.groups()
@@ -26,6 +26,34 @@ else:
               'bridge': f'bridge-{number}-', 'coding': f'coding-{number}-',
               'lesson': f'lesson-{part}-{number}-'}.get(series)
     if expect and not name.startswith(expect): fail(f'nom de fichier attendu commençant par {expect}, reçu {name}')
+# ---- page de redirection (10/10/2026) : une chaîne remplacée par des leçons garde son
+#      URL (favoris, cache hors ligne, cartes Anki) et ne contient plus qu'une table
+#      ancienne ancre → nouvelle section. Rien des autres branches ne la concerne.
+red = re.search(r'<meta name="sheet" content="series=\w+;part=[0-9A-Z]+;number=\d+;status=redirect">', t)
+if red:
+    tab = re.search(r'<table class="redir">(.*?)</table>', t, re.S)
+    rows = re.findall(r'<tr id="([^"]+)">(.*?)</tr>', tab.group(1), re.S) if tab else []
+    if not rows: fail('redirection sans table d\'ancres (<table class="redir"> avec des <tr id="sN">)')
+    if [r for r, _ in rows] != [f's{i}' for i in range(1, len(rows) + 1)]:
+        fail(f'ancres de la table non consécutives : {", ".join(r for r, _ in rows)} (attendu s1…s{len(rows)})')
+    for rid, body in rows:
+        if not re.search(r'<td class="to"><a href="[^"#]+\.html#[^"]+">', body): fail(f'{rid} : pas de cible principale (td.to a)')
+        for href in re.findall(r'href="([^"]+)"', body):
+            p, _, frag = href.partition('#')
+            target = os.path.normpath(os.path.join(os.path.dirname(path), p))
+            if not os.path.exists(target): fail(f'{rid} : cible absente {href}'); continue
+            if frag and not re.search(rf'\bid="{re.escape(frag)}"', open(target, encoding='utf-8').read()):
+                fail(f'{rid} : ancre #{frag} absente de {p}')
+    ext = re.findall(r'(?:src|href)="(https?://[^"]+)"', t) + re.findall(r'@import', t)
+    if ext: fail(f'lien ou ressource externe : {ext[:3]}')
+    if 'location.replace(' not in t: fail('pas de script qui suit l\'ancre (location.replace)')
+    if '../../index.html' not in t: fail('pas de lien retour vers ../../index.html')
+    if '<meta name="anki"' in t: fail('meta anki dans une redirection : les tags vivent dans les leçons, sinon anki/ancres.csv pointe ici')
+    for w in warns: print('WARN', w)
+    for f in fails: print('FAIL', f)
+    print(f'{name} : {len(fails)} FAIL, {len(warns)} WARN (redirection, {len(rows)} ancres)')
+    sys.exit(1 if fails else 0)
+
 for meta in ('part', 'subtitle', 'prereq', 'anki'):
     if not re.search(rf'<meta name="{meta}" content="[^"]+">', t): fail(f'meta {meta} manquante')
 if '{{' in t: fail('placeholder {{…}} non remplacé')

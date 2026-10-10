@@ -6,7 +6,7 @@ number: "03"
 slug: conjugues-posterior
 title: Le posterior entier — conjugués, lissage, et pourquoi MCMC/VI existent
 subtitle: fil B — Beta-Binomiale, pseudo-comptes, prior noyé quand n grandit
-prereq: [p02-01, p02-02, p00-03]
+prereq: [p02-01, p02-02, l03, l07]
 anki: [stats::beta, stats::bayes, stats::map, stats::mle-map]
 bridges: [b03]
 next: p03-01

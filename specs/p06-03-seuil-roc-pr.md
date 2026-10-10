@@ -6,7 +6,7 @@ number: "03"
 slug: seuil-roc-pr
 title: Seuil, matrice de confusion, ROC, PR
 subtitle: évaluer — un score devient une décision par un seuil, et chaque métrique regarde une colonne
-prereq: [p00-03, p01-01]
+prereq: [l03, p01-01]
 anki: [ml::metriques, ml::roc-auc, ml::precision-rappel, ml::desequilibre]
 bridges: [b05]
 next: p06-04

@@ -145,8 +145,8 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <ol id="toc"></ol>
   <h4>Prérequis</h4>
   <ol>
-    <li><a href="../chains/chain-p00-02-esperance-variance-densite.html#s5">p00-02 · Variance et covariance</a></li>
-    <li><a href="../chains/chain-p00-04-moyenne-lgn-tcl.html#s3">p00-04 · Var(<span class="m">x̄</span>) = <span class="m">σ</span>²/<span class="m">n</span></a></li>
+    <li><a href="../lessons/lesson-00-09-covariance-correlation.html#n2">l09 · Variance et covariance</a></li>
+    <li><a href="../lessons/lesson-00-10-inegalites-lgn.html#n3">l10 · Var(<span class="m">x̄</span>) = <span class="m">σ</span>²/<span class="m">n</span></a></li>
     <li><a href="../chains/chain-p01-05-bootstrap.html#s4">p01-05 · Bootstrap, les 37 %</a></li>
     <li><a href="../chains/chain-p07-02-bagging-rf.html">p07-02 · Bagging et forêts</a></li>
     <li><a href="../chains/chain-p06-02-cv-leakage.html">p06-02 · CV et fuite</a></li>
@@ -165,8 +165,8 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <div class="card" style="--ac:var(--blue)">
     <div class="lbl">Ce que ce pont suppose acquis</div>
     <ul>
-      <li><b>La variance d'une somme.</b> Var(<span class="m">X</span> + <span class="m">Y</span>) = Var <span class="m">X</span> + Var <span class="m">Y</span> + 2 Cov(<span class="m">X</span>, <span class="m">Y</span>) : l'additivité n'est vraie qu'à covariance nulle (<a href="../chains/chain-p00-02-esperance-variance-densite.html#s5">p00-02 pas 5</a>), et Cov = <span class="m">ρσ</span><sub><span class="m">X</span></sub><span class="m">σ</span><sub><span class="m">Y</span></sub> (<a href="../chains/chain-p00-02-esperance-variance-densite.html#s6">pas 6</a>). Tout ce pont est cette parenthèse, comptée.</li>
-      <li><b>Var(<span class="m">x̄</span>) = <span class="m">σ</span>²/<span class="m">n</span> et le 1/√<span class="m">n</span></b> (<a href="../chains/chain-p00-04-moyenne-lgn-tcl.html#s3">p00-04 pas 3–4</a>). C'est le cas <span class="m">ρ</span> = 0 de la formule d'ici : le cas particulier, pas le cas général.</li>
+      <li><b>La variance d'une somme.</b> Var(<span class="m">X</span> + <span class="m">Y</span>) = Var <span class="m">X</span> + Var <span class="m">Y</span> + 2 Cov(<span class="m">X</span>, <span class="m">Y</span>) : l'additivité n'est vraie qu'à covariance nulle (<a href="../lessons/lesson-00-09-covariance-correlation.html#n2">l09 notion 2</a>), et Cov = <span class="m">ρσ</span><sub><span class="m">X</span></sub><span class="m">σ</span><sub><span class="m">Y</span></sub> (<a href="../lessons/lesson-00-09-covariance-correlation.html#n4">notion 4</a>). Tout ce pont est cette parenthèse, comptée.</li>
+      <li><b>Var(<span class="m">x̄</span>) = <span class="m">σ</span>²/<span class="m">n</span> et le 1/√<span class="m">n</span></b> (<a href="../lessons/lesson-00-10-inegalites-lgn.html#n3">l10 notions 3 et 5</a>). C'est le cas <span class="m">ρ</span> = 0 de la formule d'ici : le cas particulier, pas le cas général.</li>
       <li><b>Le geste du bootstrap</b> : rééchantillonner <span class="m">n</span> lignes avec remise, et les 37 % de lignes laissées dehors (<a href="../chains/chain-p01-05-bootstrap.html#s3">p01-05 pas 3–4</a>).</li>
       <li><b>Bagging, forêts, <span class="m">k</span>-fold</b> ne sont pas redéfinis : <a href="../chains/chain-p07-02-bagging-rf.html">p07-02</a> et <a href="../chains/chain-p06-02-cv-leakage.html">p06-02</a> les portent. Ce pont ne fournit qu'un chiffre, le même partout.</li>
     </ul>
@@ -229,7 +229,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <tr><td>Bootstrap</td><td><span class="m">B</span> tirages avec remise</td><td>la dépendance des lignes</td><td>par bloc</td></tr>
       <tr><td>Ensemble de modèles</td><td><span class="m">K</span> modèles</td><td>mêmes données, mêmes erreurs</td><td>des modèles variés</td></tr>
     </table>
-    <p><b>Où c'est écrit</b> : <a href="../chains/chain-p07-02-bagging-rf.html">p07-02</a> · <a href="../chains/chain-p06-02-cv-leakage.html">p06-02</a> · <a href="../chains/chain-p00-04-moyenne-lgn-tcl.html#s8">p00-04 casse</a> et <a href="../chains/chain-p01-01-objet-aleatoire.html#s10">p01-01 casse</a> · <a href="../chains/chain-p01-05-bootstrap.html#s7">p01-05 casse</a> · <a href="bridge-03-biais-variance-partout.html#s6">b03 pas 6</a>.</p>
+    <p><b>Où c'est écrit</b> : <a href="../chains/chain-p07-02-bagging-rf.html">p07-02</a> · <a href="../chains/chain-p06-02-cv-leakage.html">p06-02</a> · <a href="../lessons/lesson-00-10-inegalites-lgn.html#n6">l10 notion 6</a> et <a href="../chains/chain-p01-01-objet-aleatoire.html#s10">p01-01 casse</a> · <a href="../chains/chain-p01-05-bootstrap.html#s7">p01-05 casse</a> · <a href="bridge-03-biais-variance-partout.html#s6">b03 pas 6</a>.</p>
     <p>Les colonnes 2 et 3 sont tout le travail de lecture : nommer les <span class="m">B</span> termes, puis dire ce qu'ils <b>partagent</b>. Un bagging partage 63 % des lignes et les features dominantes ; deux plis d'une <span class="m">k</span>-fold partagent presque tout leur entraînement ; deux lignes d'un même utilisateur partagent l'utilisateur ; un bootstrap de lignes, lui, ne partage rien — et c'est précisément son erreur.</p>
     <p><b>Le chiffre qui tue le réflexe « plus ».</b> Pour descendre à 1 % au-dessus du plancher il faut <span class="m">B</span> = (1 − <span class="m">ρ</span>)/(0,01 <span class="m">ρ</span>) : <b>100</b> termes à <span class="m">ρ</span> = 0,5, <b>900</b> à <span class="m">ρ</span> = 0,1, <b>1 900</b> à <span class="m">ρ</span> = 0,05. Plus <span class="m">ρ</span> est bas, plus <span class="m">B</span> sert — le nombre ne paie que là où la corrélation est déjà basse.</p>
   </div>
@@ -362,8 +362,8 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 <div class="card" style="--ac:var(--violet)"><div class="lbl">Ponts</div>
   <div class="bridges">
     <a href="bridge-03-biais-variance-partout.html#s6"><b>b03 pas 6 — Biais et variance partout</b><small>l'autre moitié : là ce qui se décompose, ici le seul terme que moyenner attaque — et le biais qui, lui, ne bouge pas avec <span class="m">B</span></small></a>
-    <a href="../chains/chain-p00-02-esperance-variance-densite.html#s5"><b>p00-02 pas 5–6 — Additivité et corrélation</b><small>la parenthèse 2 Cov que ce pont ne fait que compter <span class="m">B</span>(<span class="m">B</span> − 1) fois</small></a>
-    <a href="../chains/chain-p00-04-moyenne-lgn-tcl.html#s3"><b>p00-04 pas 3–4 — Var(<span class="m">x̄</span>) et le 1/√<span class="m">n</span></b><small>le cas <span class="m">ρ</span> = 0, et pourquoi il est l'exception plutôt que la règle</small></a>
+    <a href="../lessons/lesson-00-09-covariance-correlation.html#n2"><b>l09 notions 2 et 4 — Additivité et corrélation</b><small>la parenthèse 2 Cov que ce pont ne fait que compter <span class="m">B</span>(<span class="m">B</span> − 1) fois</small></a>
+    <a href="../lessons/lesson-00-10-inegalites-lgn.html#n3"><b>l10 notions 3 et 5 — Var(<span class="m">x̄</span>) et le 1/√<span class="m">n</span></b><small>le cas <span class="m">ρ</span> = 0, et pourquoi il est l'exception plutôt que la règle</small></a>
     <a href="../chains/chain-p01-05-bootstrap.html#s4"><b>p01-05 pas 4 et casse — Bootstrap</b><small>les 37 % out-of-bag, et ce qui arrive quand les lignes rééchantillonnées ne sont pas indépendantes</small></a>
     <a href="../chains/chain-p07-02-bagging-rf.html"><b>p07-02 — Bagging et forêts aléatoires</b><small>d'où sortent <span class="m">m</span> et <span class="m">B</span> ; ce pont fournit le chiffre qui dit lequel régler</small></a>
   </div>

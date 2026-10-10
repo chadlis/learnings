@@ -6,7 +6,7 @@ number: "04"
 slug: variance-moyenne-correlee
 title: La variance d'une moyenne corrélée
 subtitle: pont — ρσ² + (1 − ρ)σ²/B : à ρ = 0,2, mille lignes n'en valent que 208 et le SE est 2,19 fois plus grand
-prereq: [p00-02, p00-04, p07-02, p06-02, p01-05]
+prereq: [l09, l10, p07-02, p06-02, p01-05]
 anki: [ml::bagging, stats::variance, ml::validation, stats::bootstrap]
 bridges: []
 next: b05

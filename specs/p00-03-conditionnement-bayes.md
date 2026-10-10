@@ -10,8 +10,9 @@ prereq: [p00-02]
 anki: [stats::bayes, stats::conditionnement, stats::base-rate, ml::metriques]
 bridges: []
 next: p00-04
-status: built
+status: redirect
 ---
+Remplacée le 10/10/2026 par la leçon l03 ; la page est une redirection (table des ancres dans le fichier).
 
 ## Question de la chaîne
 Un test détecte 90 % des cas et se trompe sur 5 % des sains. Il est positif : quelle est la probabilité d'être un cas ? Et pourquoi la réponse dépend d'un nombre que le test ne connaît pas ?

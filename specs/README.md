@@ -14,11 +14,11 @@ number: "01"
 slug: critere-escalier-vs-sensible
 title: Critère en escalier vs critère sensible
 subtitle: fil C — …
-prereq: [p00-04, p02-01, p03-02]
+prereq: [l08, p02-01, p03-02]
 anki: [ml::arbres, ml::logistique]
 bridges: [b01, b06]
 next: p03-02
-status: ready           # stub | ready | built | reviewed
+status: ready           # stub | ready | built | reviewed | redirect
 ---
 ```
 
@@ -43,7 +43,7 @@ Un spec `stub` n'a que le frontmatter et une ligne de périmètre : il sert au s
 
 ## Série `lesson` — le cours autoporteur du socle (décidé le 10/10/2026)
 
-Les douze leçons `l01` à `l12` remplacent les quatre chaînes p00 comme source du socle probabiliste. Elles suivent la playlist *Probability and Statistics* de Steve Brunton, vidéo par vidéo, avec un seul écart d'ordre : la covariance (vidéos 41, 42) est la leçon 9, juste après la variance. Chemin de sortie : `sheets/lessons/lesson-00-NN-<slug>.html`.
+Les douze leçons `l01` à `l12` ont remplacé, le 10/10/2026, les quatre chaînes p00 comme source du socle probabiliste. Elles suivent la playlist *Probability and Statistics* de Steve Brunton, vidéo par vidéo, avec un seul écart d'ordre : la covariance (vidéos 41, 42) est la leçon 9, juste après la variance. Chemin de sortie : `sheets/lessons/lesson-00-NN-<slug>.html`. Les specs p00 sont passés au statut `redirect` (hors index et carte) et leurs fichiers sont des pages de redirection, table des ancres comprise ; un `prereq` vise désormais `lNN`, jamais `p00-0N`.
 
 Pour cette série seulement, Salah a délégué l'écriture du spec et le passage en `ready` (10/10/2026) : la leçon reste relue par lui avant que la suivante ne parte, et la première produite (`l08`) fige le format.
 
@@ -60,4 +60,4 @@ Sections obligatoires d'un spec de leçon `ready` :
 9. **Erreurs de Brunton couvertes** — la ligne du tableau d'errata, et la notion qui la corrige.
 10. **Exclusions**.
 
-Gabarit d'une notion dans la leçon : `section.notion#nN` › `h3` (titre + `span.tag.outil|culture`) › `p.src` › `div.idee` › `div.formule` › figure éventuelle › `details.ex` › `details.preuve` › `details.code` (`pre.py` + `pre.out`, code exécuté avant publication) › `details.casse` (avec `div.brunton` s'il y a lieu) › `p.garde`. Le validateur (`tools/validate_sheet.py`, branche `lesson`) l'impose.
+Gabarit d'une notion dans la leçon : `section.notion#nN` › `h3` (titre + `span.tag.outil|culture`) › `p.src` › `div.idee` › `div.fig.vis` (vignette « Voir l'idée ») › `div.formule` › figure éventuelle › `details.ex` › `details.preuve` › `details.code` (`pre.py` + `pre.out`, code exécuté avant publication) › `details.casse` (avec `div.brunton` s'il y a lieu) › `p.garde`. Le validateur (`tools/validate_sheet.py`, branche `lesson`) l'impose.

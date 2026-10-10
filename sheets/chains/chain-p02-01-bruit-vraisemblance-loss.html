@@ -154,8 +154,8 @@ text.mk-asym{fill:var(--green)}
   <ol id="toc"></ol>
   <h4>Prérequis</h4>
   <ol>
-    <li><a href="chain-p00-02-esperance-variance-densite.html">p00-02 · Espérance, variance, densité</a></li>
-    <li><a href="chain-p00-03-conditionnement-bayes.html">p00-03 · Conditionnement et Bayes</a></li>
+    <li><a href="../lessons/lesson-00-04-variables-binomiale-normale.html#n2">l04 · Masse, densité, répartition</a></li>
+    <li><a href="../lessons/lesson-00-03-conditionner-bayes-independance.html#n7">l03 · Indépendance ⇒ produit</a></li>
     <li><a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4 · les mêmes exemples, calculés</a></li>
   </ol>
   <h4>Cartes Anki liées</h4>
@@ -172,8 +172,8 @@ text.mk-asym{fill:var(--green)}
   <div class="card" style="--ac:var(--blue)">
     <div class="lbl">Ce que cette chaîne suppose acquis</div>
     <ul>
-      <li><b>Masse contre densité</b> (<a href="chain-p00-02-esperance-variance-densite.html">p00-02</a>). Pour un <span class="m">y</span> continu, <span class="m">p</span>(<span class="m">y</span>) est une <b>densité</b> : on l'<b>évalue</b> en un point, on ne l'intègre pas. Elle peut dépasser 1 et ce n'est pas une probabilité. Pour un <span class="m">y</span> discret, c'est une masse, et là c'en est une.</li>
-      <li><b>Indépendance ⇒ produit</b> (<a href="chain-p00-03-conditionnement-bayes.html">p00-03</a>). Si les observations sont indépendantes sachant <span class="m">x</span> et <span class="m">θ</span>, la probabilité de les voir toutes est le produit de leurs probabilités individuelles. C'est la seule justification du produit du pas 3.</li>
+      <li><b>Masse contre densité</b> (<a href="../lessons/lesson-00-04-variables-binomiale-normale.html#n2">l04, notion 2</a>). Pour un <span class="m">y</span> continu, <span class="m">p</span>(<span class="m">y</span>) est une <b>densité</b> : on l'<b>évalue</b> en un point, on ne l'intègre pas. Elle peut dépasser 1 et ce n'est pas une probabilité. Pour un <span class="m">y</span> discret, c'est une masse, et là c'en est une.</li>
+      <li><b>Indépendance ⇒ produit</b> (<a href="../lessons/lesson-00-03-conditionner-bayes-independance.html#n7">l03, notion 7</a>). Si les observations sont indépendantes sachant <span class="m">x</span> et <span class="m">θ</span>, la probabilité de les voir toutes est le produit de leurs probabilités individuelles. C'est la seule justification du produit du pas 3.</li>
       <li><b>Le log ne déplace pas l'argmax.</b> <span class="m">log</span> est strictement croissante, donc <span class="up">argmax</span> <span class="m">L</span> = <span class="up">argmax</span> <span class="m">log L</span> ; et <span class="m">log</span>(<span class="m">ab</span>) = <span class="m">log a</span> + <span class="m">log b</span> transforme le produit en somme.</li>
       <li><b>Les calculs de cette chaîne sont faits ailleurs.</b> Le déroulé <a href="../walkthroughs/walkthrough-p02-01-une-chaine-trois-exemples.html">D4</a> refait les six pas ligne à ligne sur les trois mêmes exemples. Ici on garde les règles et les points d'arrêt.</li>
     </ul>

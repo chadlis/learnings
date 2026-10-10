@@ -148,7 +148,8 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
   <ol>
     <li><a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01 · Du bruit à la loss</a></li>
     <li><a href="chain-p04-01-matrice-action.html">p04-01 · Une matrice est une action</a></li>
-    <li><a href="chain-p00-02-esperance-variance-densite.html">p00-02 · Espérance, variance, covariance</a></li>
+    <li><a href="../lessons/lesson-00-08-esperance-variance.html">l08 · Espérance, variance</a></li>
+    <li><a href="../lessons/lesson-00-09-covariance-correlation.html#n1">l09 · Covariance</a></li>
   </ol>
   <h4>Cartes Anki liées</h4>
   <div class="tags"><code>ml::regression-lineaire</code><code>ml::ols</code><code>ml::r2</code><code>stats::residus</code></div>
@@ -167,7 +168,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
       <li><b>Le bruit décide de la loss</b> (<a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>). Poser une loi pour <span class="m">ε</span>, écrire la vraisemblance, passer au <span class="up">−</span>log : un bruit gaussien donne une somme de carrés, un bruit de Laplace une somme de valeurs absolues. Ici on utilise le résultat, on ne le redémontre pas.</li>
       <li><b>MSE estime la moyenne conditionnelle</b> (p02-01). Le minimiseur de <span class="m">E</span>[(<span class="m">Y</span> − <span class="m">c</span>)²] à <span class="m">x</span> fixé est <span class="m">E</span>[<span class="m">Y</span> | <span class="m">x</span>] ; c'est pour cela qu'une régression aux moindres carrés estime une <i>moyenne</i>, pas une médiane.</li>
       <li><b>Colonnes et projection</b> (<a href="chain-p04-01-matrice-action.html">p04-01</a>). <span class="m">X</span><span class="m">β</span> est une combinaison des colonnes de <span class="m">X</span> ; l'ensemble des <span class="m">X</span><span class="m">β</span> est le sous-espace qu'elles engendrent. Le mieux qu'on puisse faire pour approcher <span class="m">y</span> est d'y projeter.</li>
-      <li><b>Covariance et variance empiriques</b> (<a href="chain-p00-02-esperance-variance-densite.html">p00-02</a>). <span class="m">S</span><sub><span class="m">xy</span></sub> = Σ(<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">x̄</span>)(<span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">ȳ</span>) et <span class="m">S</span><sub><span class="m">xx</span></sub> = Σ(<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">x̄</span>)² ; leurs versions divisées par <span class="m">n</span> − 1 sont la covariance et la variance empiriques.</li>
+      <li><b>Covariance et variance empiriques</b> (<a href="../lessons/lesson-00-09-covariance-correlation.html#n1">l09, notion 1</a>). <span class="m">S</span><sub><span class="m">xy</span></sub> = Σ(<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">x̄</span>)(<span class="m">y</span><sub><span class="m">i</span></sub> − <span class="m">ȳ</span>) et <span class="m">S</span><sub><span class="m">xx</span></sub> = Σ(<span class="m">x</span><sub><span class="m">i</span></sub> − <span class="m">x̄</span>)² ; leurs versions divisées par <span class="m">n</span> − 1 sont la covariance et la variance empiriques.</li>
     </ul>
   </div>
 </section>
@@ -428,7 +429,7 @@ body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
 
 </main>
 </div>
-<footer>Chaîne p05-01 · v1 du 17/09/2026 · Prérequis : <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, <a href="chain-p04-01-matrice-action.html">p04-01</a>, <a href="chain-p00-02-esperance-variance-densite.html">p00-02</a>. Suite : <a href="chain-p05-02-logistique.html">p05-02 Régression logistique</a>.</footer>
+<footer>Chaîne p05-01 · v1 du 17/09/2026 · Prérequis : <a href="chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>, <a href="chain-p04-01-matrice-action.html">p04-01</a>, <a href="../lessons/lesson-00-08-esperance-variance.html">l08</a>, <a href="../lessons/lesson-00-09-covariance-correlation.html">l09</a>. Suite : <a href="chain-p05-02-logistique.html">p05-02 Régression logistique</a>.</footer>
 </div>
 <div class="ledge"></div>
 <script src="../../assets/sheetlib.js"></script>

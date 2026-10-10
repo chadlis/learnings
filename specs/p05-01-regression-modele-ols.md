@@ -6,7 +6,7 @@ number: "01"
 slug: regression-modele-ols
 title: Régression linéaire — le modèle, OLS, ce que R² ne dit pas
 subtitle: modèles linéaires — une hypothèse sur y sachant x, des carrés parce que gaussien, une forme fermée parce que linéaire
-prereq: [p02-01, p04-01, p00-02]
+prereq: [p02-01, p04-01, l08, l09]
 anki: [ml::regression-lineaire, ml::ols, ml::r2, stats::residus]
 bridges: [b06, b02]
 next: p05-02

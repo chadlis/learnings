@@ -6,7 +6,7 @@ number: "01"
 slug: bruit-vraisemblance-loss
 title: Du bruit à la loss — le geste en six pas
 subtitle: fil B — hypothèse de bruit → densité → produit → log → négatif → jeter
-prereq: [p00-02, p00-03]
+prereq: [l04, l03]
 anki: [stats::vraisemblance, stats::mle, ml::regression-lineaire, ml::logistique, dl::cross-entropy]
 bridges: [b05, b06]
 next: p02-02

@@ -6,7 +6,7 @@ number: "01"
 slug: objet-aleatoire
 title: L'objet aléatoire — échantillon, estimateur, distribution d'échantillonnage, SE
 subtitle: fil A — « qu'est-ce qui varierait si je refaisais l'expérience ? »
-prereq: [p00-02, p00-04]
+prereq: [l08, l09, l10, l11]
 anki: [stats::estimation, stats::inference, stats::binomiale, stats::tcl]
 bridges: [b03, b04]
 next: p01-02
