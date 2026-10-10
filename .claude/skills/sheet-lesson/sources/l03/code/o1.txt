@@ -1,0 +1,5 @@
+P(A | second die = 5)  = 0.1665   exact 1/6   (33490 rolls kept)
+P(A | sum = 6)         = 0.2054   exact 1/5   (27707 rolls kept)
+P(A | sum = 7)         = 0.1677   exact 1/6   (33594 rolls kept)
+P(A)                   = 0.1679   exact 1/6
+P(A and B) / P(B)      = 0.2054

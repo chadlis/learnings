@@ -1,0 +1,54 @@
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>La loi de multiplication <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 09 · The Law of Total Probability</p>
+  <div class="idee">
+    <p>Brunton tire la loi de multiplication de la définition en une ligne : « c'est si trivial que je multiplie simplement ». P(A ∣ B) = P(A ∩ B)/P(B), donc P(A ∩ B) = P(A ∣ B) P(B). Comme A ∩ B = B ∩ A, c'est aussi P(B ∣ A) P(A) : on peut conditionner dans les deux sens.</p>
+    <p>Une image utile : l'arbre. Tire deux cartes sans remise. Première branche : pique, avec probabilité 13/52. Seconde branche, sachant que la première carte était un pique : il reste 12 piques sur 51 cartes. Le chemin « pique puis pique » vaut le produit de ses branches, 13/52 × 12/51 = 1/17 ≈ 0,0588. Avec remise, la seconde branche redevient 13/52 et le chemin vaut 1/16 = 0,0625 : c'est le cas où conditionner ne change rien (notion 7).</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — un chemin vaut le produit de ses branches</div>
+    <div id="v2ctl" class="sl-ctl"></div>
+    <div id="v2plot" class="wide"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">Deux cartes tirées l'une après l'autre. Chaque branche porte une probabilité conditionnelle, sachant ce qui est arrivé avant ; chaque feuille, le produit des branches qui y mènent. Le chemin pique puis pique est en rouge. <b>Sans remise</b> : 1/17 = 0,0588 ; <b>avec remise</b> : 1/16 = 0,0625. Dans les deux cas les quatre feuilles somment à 1, et la seconde carte est un pique avec probabilité 1/4.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(<i>A</i> ∩ <i>B</i>) = P(<i>A</i> ∣ <i>B</i>) P(<i>B</i>) = P(<i>B</i> ∣ <i>A</i>) P(<i>A</i>)</div>
+    <div class="eq">P(<i>A</i><sub>1</sub> ∩ … ∩ <i>A</i><sub>n</sub>) = P(<i>A</i><sub>1</sub>) P(<i>A</i><sub>2</sub> ∣ <i>A</i><sub>1</sub>) … P(<i>A</i><sub>n</sub> ∣ <i>A</i><sub>1</sub> ∩ … ∩ <i>A</i><sub>n−1</sub>)</div>
+    <ul>
+      <li>Aucune hypothèse d'indépendance : c'est la définition du conditionnement, réécrite. Il faut seulement que les conditionnelles utilisées soient définies.</li>
+      <li>Les deux ordres sont justes. On choisit celui dont on connaît les termes : dans un dépistage, on connaît P(+ ∣ M) et P(M), donc P(M ∩ +) = P(+ ∣ M) P(M).</li>
+      <li>Pour n événements (règle de chaînage), chaque facteur est conditionné par <b>tous</b> ceux qui le précèdent.</li>
+      <li>Sous indépendance seulement, P(A ∣ B) = P(A) et le produit devient P(A) P(B) (notion 7).</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>cartes, l'étude de Brunton, un modèle de langage</small></summary><div class="in">
+    <ol>
+      <li><b>Deux piques.</b> Sans remise : 13/52 × 12/51 = 1/17 = 0,0588. Avec remise : 1/4 × 1/4 = 1/16 = 0,0625.</li>
+      <li><b>Trois piques sans remise.</b> 13/52 × 12/51 × 11/50 = 11/850 = 0,0129.</li>
+      <li><b>L'arbre complet</b>, sans remise : 1/17 (pique, pique), 13/68 (pique, autre), 13/68 (autre, pique), 19/34 (autre, autre) ; somme 1. La seconde carte est un pique sur deux chemins : 1/17 + 13/68 = 1/4. Sans rien savoir de la première, la seconde a la même loi qu'elle (c'est la notion 3).</li>
+      <li><b>L'étude de Brunton (08).</b> P(malade) = 500/1 000 = 0,5 et P(+ ∣ malade) = 0,9, donc P(malade ∩ +) = 0,45 : les 450 malades positifs sur 1 000.</li>
+      <li><b>Un dépistage</b> à 1 % de malades, qui détecte 90 % d'entre eux : P(M ∩ +) = 0,9 × 0,01 = 0,009, soit 900 personnes sur 100 000.</li>
+      <li><b>En ML, un modèle de langage autorégressif</b> écrit la probabilité d'une phrase par la règle de chaînage : P(w<sub>1</sub>, …, w<sub>n</sub>) = P(w<sub>1</sub>) P(w<sub>2</sub> ∣ w<sub>1</sub>) … P(w<sub>n</sub> ∣ w<sub>1</sub>, …, w<sub>n−1</sub>). Chaque facteur est une sortie du softmax ; la log-vraisemblance de la phrase est la somme de leurs logarithmes. Aucune indépendance n'est supposée.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>une ligne, puis la récurrence</small></summary><div class="in">
+    <div class="drv">
+      <div>P(<i>A</i> ∣ <i>B</i>) = P(<i>A</i> ∩ <i>B</i>) / P(<i>B</i>)</div><span>définition (notion 1), P(B) &gt; 0</span>
+      <div>P(<i>A</i> ∩ <i>B</i>) = P(<i>A</i> ∣ <i>B</i>) P(<i>B</i>)</div><span>multiplier par P(B)</span>
+      <div>= P(<i>B</i> ∣ <i>A</i>) P(<i>A</i>)</div><span>même définition, rôles échangés, car A ∩ B = B ∩ A</span>
+      <div>P(<i>A</i> ∩ <i>B</i> ∩ <i>C</i>) = P(<i>C</i> ∣ <i>A</i> ∩ <i>B</i>) P(<i>A</i> ∩ <i>B</i>)</div><span>la même loi, appliquée à C et à l'événement A ∩ B</span>
+      <div>= P(<i>C</i> ∣ <i>A</i> ∩ <i>B</i>) P(<i>B</i> ∣ <i>A</i>) P(<i>A</i>)</div><span>la loi encore, sur P(A ∩ B) ; par récurrence, n événements</span>
+    </div>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>P(A ∩ B) = P(A) P(B) n'est pas la loi de multiplication</b>, c'est son cas particulier sous indépendance. Deux piques sans remise : 1/17, pas (1/4)² = 1/16.</li>
+      <li><b>Confondre P(A ∩ B) et P(A ∣ B).</b> P(M ∩ +) = 0,009 compte les malades positifs dans toute la population ; P(+ ∣ M) = 0,90 les compte parmi les malades.</li>
+      <li><b>Couper la règle de chaînage.</b> Chaque facteur est conditionné par tout le passé. Ne garder que le terme précédent, P(w<sub>t</sub> ∣ w<sub>t−1</sub>), est une hypothèse supplémentaire (un modèle de Markov), pas la règle.</li>
+    </ul>
+  </div></details>
+  <p class="garde">Pour tous événements A et B, sans hypothèse d'indépendance, P(A ∩ B) = P(A ∣ B) P(B) = P(B ∣ A) P(A) : sur un arbre, un chemin vaut le produit de ses branches.</p>
+</section>
+

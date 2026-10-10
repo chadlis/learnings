@@ -1,0 +1,6 @@
+people tested     : 1000000
+sick              : 991
+positive tests    : 11100
+sick and positive : 984
+P(sick | +), sim. : 0.0886
+P(sick | +), Bayes: 0.0902

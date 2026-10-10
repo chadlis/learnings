@@ -1,0 +1,61 @@
+
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>P(A ∣ B) = P(A ∩ B)/P(B) : on se restreint à B et on renormalise ; P(A ∣ B) ≠ P(B ∣ A).</li>
+    <li>P(A ∩ B) = P(A ∣ B) P(B), toujours ; un chemin d'arbre vaut le produit de ses branches.</li>
+    <li>Probabilités totales : P(A) = Σ P(A ∣ B<sub>i</sub>) P(B<sub>i</sub>) sur une partition.</li>
+    <li>Bayes : a posteriori = vraisemblance × a priori / normalisation ; test à 99 %, maladie à 0,1 % : 9 %.</li>
+    <li>En cotes : a posteriori = a priori × LR ; deux tests indépendants sachant l'état multiplient leurs LR ; doubler une cote ne double pas p.</li>
+    <li>Rappel et FPR ne dépendent pas de la prévalence, la précision si.</li>
+    <li>Indépendance ⇔ P(A ∩ B) = P(A) P(B) ; disjoint n'est pas indépendant.</li>
+    <li>Série 1 − (1 − p)<sup>n</sup>, parallèle p<sup>n</sup>, sous indépendance mutuelle ; une cause commune fixe le plancher.</li>
+  </ol>
+</div>
+<div class="phrase">« Conditionner, c'est se restreindre à B et renormaliser : P(A ∣ B) et P(B ∣ A) ont le même numérateur et deux dénominateurs. Bayes passe de l'un à l'autre avec l'a priori : un test à 99 % sur une maladie à 0,1 % ne donne que 9 % de malades parmi les positifs. C'est pour ça qu'une précision dépend de la prévalence, alors que le rappel et le taux de faux positifs n'en dépendent pas. Et multiplier des probabilités demande l'indépendance, qui n'a rien à voir avec être disjoint. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Que veut dire P(A ∣ B), en un geste ?</div><div class="a hid">Se restreindre aux issues de B et renormaliser : P(A ∩ B)/P(B). Seul le dénominateur choisit le sens.</div></li>
+    <li><div class="q">Test à 99 %, maladie à 0,1 % : que vaut P(malade ∣ +), en effectifs ?</div><div class="a hid">Sur 100 000 : 100 malades dont 99 positifs, 99 900 sains dont 999 positifs. 99/1 098 = 9 %.</div></li>
+    <li><div class="q">Refais-le en cotes, puis avec un second test indépendant sachant l'état.</div><div class="a hid">1:999 × 99 = 99:999, soit 9 % ; × 99 encore : 9 801:999, soit 90,75 %.</div></li>
+    <li><div class="q">La cote double : la probabilité double-t-elle ?</div><div class="a hid">Seulement si p est petit : p devient 2p/(1 + p). 0,01 → 0,0198, mais 0,5 → 0,667.</div></li>
+    <li><div class="q">Quelle métrique dépend de la prévalence, et pourquoi ?</div><div class="a hid">La précision : son dénominateur TP + FP mélange malades et sains. Le rappel et le FPR restent chacun dans une ligne. Même test : 0,667 à 10 %, 0,154 à 1 %.</div></li>
+    <li><div class="q">Deux événements disjoints sont-ils indépendants ?</div><div class="a hid">Jamais quand leurs probabilités sont non nulles : P(A ∩ B) = 0 &lt; P(A) P(B). Savoir l'un exclut l'autre.</div></li>
+    <li><div class="q">Dix composants à 5 % de panne : série ou parallèle, et sous quelle hypothèse ?</div><div class="a hid">Série 0,401, parallèle 10<sup>−13</sup>, sous indépendance mutuelle des pannes. Une cause commune de probabilité q fixe un plancher : la parallèle ne descend jamais sous q.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Leçons et chaînes</div>
+  <div class="bridges">
+    <a href="lesson-00-07-lois-jointes.html#n3"><b>l07 · Lois jointes</b><small>la loi conditionnelle et Bayes pour des densités : le zoom de la notion 1, quand B est de probabilité nulle.</small></a>
+    <a href="../chains/chain-p06-03-seuil-roc-pr.html"><b>Seuil, ROC, PR</b><small>la ROC trace deux taux lus chacun dans une ligne, insensibles à la prévalence ; la PR contient la précision de la notion 6.</small></a>
+    <a href="../chains/chain-p06-04-calibration-desequilibre.html"><b>Calibration et déséquilibre</b><small>rééchantillonner à 50/50 change l'a priori : les probabilités du modèle portent la mauvaise prévalence.</small></a>
+    <a href="../chains/chain-p05-02-logistique.html"><b>Régression logistique</b><small>la log-cote est affine, e<sup>β</sup> multiplie une cote : la notion 5 et sa table cote → p.</small></a>
+    <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html"><b>Du bruit à la loss</b><small>la vraisemblance d'un échantillon est un produit, licite par l'indépendance mutuelle (notions 7 et 9).</small></a>
+    <a href="../chains/chain-p02-02-prior-penalite.html"><b>Du prior à la pénalité</b><small>a posteriori ∝ vraisemblance × a priori, lu en logarithme : l'a priori devient une pénalité.</small></a>
+    <a href="../chains/chain-p02-03-conjugues-posterior.html"><b>Le posterior entier</b><small>Bayes quand la cause est un paramètre muni d'une loi, et P(données) comme normalisation.</small></a>
+    <a href="../chains/chain-p07-01-arbres-impurete.html"><b>Arbres et impureté</b><small>la proportion d'une classe dans un nœud est une probabilité conditionnelle, le zoom de la notion 1.</small></a>
+    <a href="../chains/chain-p01-02-ic-test-procedure.html"><b>IC et test comme procédures</b><small>« p-value = P(H<sub>0</sub>) » est le sophisme du procureur de la notion 4.</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::conditionnement</code> (notions 1, 2, 3) · <code>stats::bayes</code> (notions 4, 5) · <code>stats::base-rate</code> (notions 4, 6) · <code>stats::independance</code> (notions 7, 8 ; notion 9 sans carte) · <code>ml::metriques</code> (notion 6).</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l03 · v1 du 10/10/2026 · Brunton 08 à 12 · Prérequis : <a href="lesson-00-02-espace-axiomes-complement.html">l02 · Ω, axiomes, complément</a>. Suite : <a href="lesson-00-04-variables-binomiale-normale.html">l04 · Variables aléatoires, de la binomiale à la normale</a>.</footer>
+</div>

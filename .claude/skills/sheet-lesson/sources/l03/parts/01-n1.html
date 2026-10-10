@@ -1,0 +1,63 @@
+<!-- ============================ n1 ============================ -->
+<section class="notion outil" id="n1">
+  <h3>P(A ∣ B) : zoomer sur B <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 08 · Conditional Probabilities</p>
+  <div class="idee">
+    <p>Brunton tire une carte. A : c'est un pique, P(A) = 1/4. On lui apprend B : la carte est noire. Il ne reste que deux couleurs possibles, trèfle et pique : la probabilité du pique monte à 1/2. Si on lui dit « rouge », elle tombe à 0. Une information partielle sur B change la probabilité de A.</p>
+    <p>L'image est celle d'un zoom. Savoir que B est arrivé, c'est jeter toutes les issues hors de B : B devient le nouvel univers, et la probabilité de A est la part de B qu'occupe A ∩ B. Avec deux dés, le premier vaut 3 sachant que le second vaut 5 : 1 case sur 6, soit 1/6, comme sans information. Sachant que la somme vaut 6 : 1 case sur 5, soit 1/5. Savoir la somme renseigne sur le premier dé.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — B devient le nouvel univers</div>
+    <div id="v1ctl" class="sl-ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">Chaque case est une issue équiprobable : 52 cartes, ou 36 couples de deux dés. Les cases de A sont en violet (le pique, ou « premier dé = 3 »). <b>Choisis une condition B</b> : ses cases descendent former la bande du bas, le nouvel univers, et le reste s'estompe. P(A ∣ B) se lit dans la bande : 13 cases sur 26 sachant « noire », 0 sur 26 sachant « rouge », 1 sur 6 sachant « second dé = 5 », 1 sur 5 sachant « somme = 6 ».</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(<i>A</i> ∣ <i>B</i>) = P(<i>A</i> ∩ <i>B</i>) / P(<i>B</i>) &nbsp;&nbsp;&nbsp; pour P(<i>B</i>) &gt; 0</div>
+    <ul>
+      <li>P(A ∩ B) : la masse des issues où A et B arrivent ensemble. Diviser par P(B) renormalise, pour que P(B ∣ B) = 1.</li>
+      <li>P(B) &gt; 0 : on divise. Conditionner par un événement de probabilité nulle n'a pas de sens ici.</li>
+      <li>À B fixé, P(· ∣ B) est une probabilité comme une autre : elle vérifie les axiomes de l02, donc P(Aᶜ ∣ B) = 1 − P(A ∣ B).</li>
+      <li>Issues équiprobables : P(A ∣ B) = #(A ∩ B) / #B, on compte à l'intérieur de B.</li>
+      <li>La barre est juste ici, parce que B est un <b>événement</b>. Un paramètre fixe θ n'est pas un événement : la probabilité d'une donnée sous θ s'écrit p(x ; θ), avec un point-virgule (<a href="lesson-00-04-variables-binomiale-normale.html#n1">l04, notion 1</a>).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — le même numérateur, deux dénominateurs</div>
+    <div id="f1ctl" class="sl-ctl"></div>
+    <div id="f1plot" class="wide"></div>
+    <div id="f1sl"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Ω est le carré, d'aire 1 : une aire est une probabilité. A est fixe (aire 0,30), B se règle. Au départ P(A ∩ B) = 0,10 ; divisé par P(B) = 0,24, il donne P(A ∣ B) = 0,42 ; divisé par P(A) = 0,30, il donne P(B ∣ A) = 0,33. <b>Déplace et élargis B</b> : le numérateur est toujours commun, seuls les dénominateurs diffèrent. Clique sur <b>zoomer sur B</b> : B s'étire jusqu'à remplir le carré, et la part qu'y occupe A ∩ B est P(A ∣ B).</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>cartes, deux dés, l'étude de Brunton</small></summary><div class="in">
+    <ol>
+      <li><b>Pique sachant noire.</b> P(pique ∩ noire) = 13/52, P(noire) = 26/52, donc P(pique ∣ noire) = 13/26 = 1/2. Sachant rouge : P(pique ∩ rouge) = 0, donc 0.</li>
+      <li><b>Deux dés, 36 couples équiprobables.</b> A = « premier dé = 3 ». Sachant « second dé = 5 » : A ∩ B = {(3, 5)}, une case sur six, 1/6 = P(A). Sachant « somme = 6 » : la somme vaut 6 en (1, 5), (2, 4), (3, 3), (4, 2), (5, 1), et A n'en contient qu'une, (3, 3) : 1/5. C'est l'exercice que Brunton laisse.</li>
+      <li><b>La paire d'ouverture de Brunton</b>, pique et trois. P(pique ∩ trois) = 1/52, le trois de pique ; P(trois) = 4/52 ; P(pique ∣ trois) = 1/4 = P(pique). Savoir que c'est un trois ne dit rien de la couleur : c'est l'indépendance (notion 7).</li>
+      <li><b>L'étude de Brunton.</b> 1 000 personnes : 500 malades, dont 450 positifs et 50 négatifs ; 500 témoins sains, dont 100 positifs et 400 négatifs.
+        <ul>
+          <li>P(+) = 550/1 000 = 0,55 dans cet échantillon ;</li>
+          <li>P(+ ∣ malade) = 450/500 = 0,90, on zoome sur les malades ;</li>
+          <li>P(− ∣ sain) = 400/500 = 0,80, on zoome sur les témoins ;</li>
+          <li>P(malade ∣ +) = 450/550 = 0,818, on zoome sur les positifs. Même numérateur 450, autre dénominateur.</li>
+        </ul></li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>conditionner, c'est filtrer puis compter</small></summary><div class="in">
+<pre class="py">{{CODE:c1}}</pre>
+<pre class="out">{{OUT:c1}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>P(A ∣ B) n'est pas P(B ∣ A).</b> « 90 % des malades sont positifs » et « 90 % des positifs sont malades » ne disent pas la même chose. Dans le dépistage de la notion 4 (sur 100 000 personnes, 1 % de malades), 900 personnes sont malades et positives : P(+ ∣ M) = 900/1 000 = 0,90, mais P(M ∣ +) = 900/5 850 = 0,154. Même numérateur, des dénominateurs dans un rapport de 5,85.</li>
+      <li><b>Se conditionner sur le mauvais événement.</b> Réflexe : nommer à voix haute la population du dénominateur, « parmi les positifs » ou « parmi les malades », avant de calculer.</li>
+      <li><b>Un échantillon construit fixe P(B).</b> L'étude de Brunton prend 500 malades et 500 témoins : la proportion de malades y vaut 50 % par construction. Son P(malade ∣ +) = 0,818 ne vaut donc pas pour la population, où la maladie est rare (notion 4). Seuls P(+ ∣ malade) et P(− ∣ sain) se transportent d'une population à l'autre.</li>
+      <li><b>P(B) = 0.</b> La formule ne s'applique pas ; conditionner par un événement de probabilité nulle demande les densités (<a href="lesson-00-07-lois-jointes.html#n3">l07, notion 3</a>).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (08) dit que P(+ ∣ malade) = 90 % fait un test « spécifique à 90 % ». C'est la <i>sensibilité</i> : la proportion de positifs chez les malades. La spécificité est la proportion de négatifs chez les sains, ici 400/500 = 80 %. Il emploie les bons mots en 11 (notion 6). Il ne dit pas non plus que la formule demande P(B) &gt; 0.</div>
+  </div></details>
+  <p class="garde">Pour P(B) &gt; 0, P(A ∣ B) = P(A ∩ B)/P(B) : on ne garde que les issues de B et on renormalise par P(B), pour que B pèse 1.</p>
+</section>
+

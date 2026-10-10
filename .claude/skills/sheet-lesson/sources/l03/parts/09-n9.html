@@ -1,0 +1,46 @@
+<!-- ============================ n9 ============================ -->
+<section class="notion culture" id="n9">
+  <h3>Indépendance deux à deux contre mutuelle <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 12 (non traité dans la vidéo)</p>
+  <div class="idee">
+    <p>Pour trois événements ou plus, vérifier chaque paire ne suffit pas. Lance deux pièces. A : la première tombe sur face. B : la seconde tombe sur face. C : les deux pièces tombent du même côté. Chacun a probabilité ½, et chaque paire est indépendante : A et C, par exemple, n'arrivent ensemble qu'en (face, face), ¼ = ½ × ½.</p>
+    <p>Mais A et B ensemble décident C : si les deux pièces sont sur face, elles sont du même côté. P(A ∩ B ∩ C) = ¼, pas ⅛. Savoir A seul ne dit rien de C, savoir B seul non plus ; savoir les deux dit tout. Les formules de la notion 8 multiplient n probabilités d'un coup : elles demandent l'indépendance mutuelle.</p>
+  </div>
+  <div class="fig vis" id="v9">
+    <div class="lbl">Voir l'idée — trois paires indépendantes, un triplet qui ne l'est pas</div>
+    <div id="v9ctl" class="sl-ctl"></div>
+    <div id="v9plot" class="wide"></div>
+    <div class="readouts" id="v9out"></div>
+    <p class="cap">Les quatre issues de deux pièces, chacune de probabilité ¼, avec les événements qui les contiennent. <b>Choisis une intersection</b> : ses issues s'allument. A ∩ B, A ∩ C et B ∩ C ne contiennent que (face, face) : ¼ = ½ × ½ chaque fois. A ∩ B ∩ C aussi : ¼, alors que le produit vaut ⅛. Et <b>C sachant A et B</b> vaut 1.</p>
+  </div>
+  <div class="formule"><div class="lbl">La définition</div>
+    <div class="eq"><i>A</i><sub>1</sub>, …, <i>A</i><sub>n</sub> mutuellement indépendants ⇔ P(∩<sub>i ∈ I</sub> <i>A</i><sub>i</sub>) = Π<sub>i ∈ I</sub> P(<i>A</i><sub>i</sub>) pour toute sous-famille I d'au moins deux indices</div>
+    <ul>
+      <li>Deux à deux : seulement les sous-familles de deux indices.</li>
+      <li>Pour n événements, 2<sup>n</sup> − n − 1 égalités : 4 pour trois événements (les trois paires et le triplet).</li>
+      <li>Le produit du triplet seul ne suffit pas non plus (exemple 3).</li>
+      <li>C'est la mutuelle que supposent p<sup>n</sup> (notion 8), la binomiale (<a href="lesson-00-04-variables-binomiale-normale.html#n4">l04, notion 4</a>) et la vraisemblance d'un échantillon i.i.d.</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux pièces, deux dés, trois pièces</small></summary><div class="in">
+    <ol>
+      <li><b>Deux pièces</b>, A, B, C comme dans l'idée : trois paires indépendantes, triplet à ¼ au lieu de ⅛.</li>
+      <li><b>Deux dés</b> : A = « premier dé pair », B = « second dé pair », C = « somme paire ». Chacun ½, chaque paire ¼ ; mais A ∩ B est contenu dans C, donc P(A ∩ B ∩ C) = ¼ ≠ ⅛.</li>
+      <li><b>Le triplet sans les paires.</b> Deux dés : A = « premier dé ∈ {1, 2, 3} », B = « premier dé ∈ {3, 4, 5} », C = « somme = 9 ». P(A ∩ B ∩ C) = P((3, 6)) = 1/36 = ½ × ½ × 1/9, et pourtant P(A ∩ B) = P(premier dé = 3) = 1/6 ≠ ¼.</li>
+      <li><b>Trois pièces différentes</b>, une face par événement : les quatre égalités sont vraies, l'indépendance est mutuelle.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>les quatre égalités, vérifiées une à une</small></summary><div class="in">
+<pre class="py">{{CODE:c9}}</pre>
+<pre class="out">{{OUT:c9}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Les produits de n facteurs</b> : p<sup>n</sup> d'un système parallèle, la binomiale, la vraisemblance comme produit. Avec seulement l'indépendance deux à deux, ils peuvent être faux.</li>
+      <li><b>Naive Bayes</b> suppose les mots mutuellement indépendants sachant la classe (notion 5). C'est faux en général (« Nouvelle » et « Calédonie »), et ses probabilités sont souvent trop proches de 0 ou de 1, même quand son classement reste bon.</li>
+      <li><b>Tester les paires dans les données</b>, deux variables à la fois, ne prouve pas l'indépendance mutuelle : l'exemple des deux pièces passe tous les tests de paires.</li>
+    </ul>
+  </div></details>
+  <p class="garde">Deux à deux ne suffit pas : l'indépendance de n événements demande le produit pour toute sous-famille, et c'est elle que supposent p<sup>n</sup> et la binomiale ; Naive Bayes la suppose sachant la classe.</p>
+</section>
+

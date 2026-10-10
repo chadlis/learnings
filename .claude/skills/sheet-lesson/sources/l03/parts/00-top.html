@@ -1,0 +1,43 @@
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 3</div>
+  <h1>Conditionner, <span>Bayes</span>, indépendance</h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Apprendre que B est arrivé change la probabilité de A : on <b>zoome sur B</b> et on renormalise. De là sortent trois outils, la loi de multiplication, les probabilités totales et Bayes, qui remonte d'un test à sa cause. Puis l'<b>indépendance</b>, le seul cas où l'on a le droit de multiplier. La leçon suit Brunton 08 à 12, avec ses exemples : cartes, dés, dépistage d'un cancer, test de drogue, disques durs et guirlande de Noël.</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="lesson-00-02-espace-axiomes-complement.html#n1">l02 · Ω, événements, opérations</a></li>
+    <li><a href="lesson-00-02-espace-axiomes-complement.html#n2">l02 · axiomes et complément</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::conditionnement</code><code>stats::bayes</code><code>stats::base-rate</code><code>stats::independance</code><code>ml::metriques</code></div>
+  <h4>Suite</h4>
+  <ol>
+    <li><a href="lesson-00-04-variables-binomiale-normale.html">l04 · Variables aléatoires</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>Événements et opérations.</b> Un événement est une partie de Ω. A ∩ B : A et B arrivent tous les deux ; A ∪ B : au moins l'un ; Aᶜ : A n'arrive pas. A et B sont <b>disjoints</b> quand A ∩ B = ∅ (<a href="lesson-00-02-espace-axiomes-complement.html#n1">l02, notion 1</a>).</li>
+      <li><b>Axiomes et complément.</b> P(Ω) = 1, et la probabilité d'une union d'événements disjoints est la somme de leurs probabilités. D'où P(Aᶜ) = 1 − P(A) (<a href="lesson-00-02-espace-axiomes-complement.html#n2">l02, notion 2</a>).</li>
+      <li><b>Compter.</b> Quand les issues sont équiprobables, P(A) = #A/#Ω : 13 piques sur 52 cartes, 36 couples pour deux dés (<a href="lesson-00-01-compter.html#n2">l01, notion 2</a>).</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">
+

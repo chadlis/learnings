@@ -1,0 +1,26 @@
+"""Numbers added while writing the page (figures, captions, 'où ça casse')."""
+from fractions import Fraction as F
+# fig1 initial: A = [0.1,0.6]x[0.2,0.8], B = [0.4,0.8]x[0.3,0.9]
+A = (F(1, 10), F(6, 10), F(2, 10), F(8, 10)); B = (F(4, 10), F(8, 10), F(3, 10), F(9, 10))
+area = lambda r: (r[1] - r[0]) * (r[3] - r[2])
+I = (max(A[0], B[0]), min(A[1], B[1]), max(A[2], B[2]), min(A[3], B[3]))
+print('fig1', float(area(A)), float(area(B)), float(area(I)), round(float(area(I) / area(B)), 4), round(float(area(I) / area(A)), 4))
+# cancer: P(T2+ | T1+) with conditional independence
+pr, se, fp = F(1, 1000), F(99, 100), F(1, 100)
+p1 = se * pr + fp * (1 - pr); p12 = se**2 * pr + fp**2 * (1 - pr)
+print('P(T2+|T1+)', round(float(p12 / p1), 4), 'P(T2+)', round(float(p1), 4))
+print('FP share of all tests', 999 / 100000)
+print('deck minus queen of hearts: P(QS)', round(1 / 51, 4), 'product', F(13, 51) * F(3, 51), round(float(F(13, 51) * F(3, 51)), 4))
+print('fraud false alerts', round(1 - 2 / 13, 3))
+print('die even via B=1:', F(0) * F(1, 6) + F(3, 5) * F(5, 6))
+print('cancer FP/TP paths', round(0.00999 / 0.00099, 2))
+print('spec .999 at 1%', round(0.9 * 0.01 / (0.9 * 0.01 + 0.001 * 0.99), 4))
+print('drug2 counts acc', (90 + 720) / 1000)
+print('n5 p3 cancer', round(float((F(1, 999) * 99**3) / (1 + F(1, 999) * 99**3)), 5))
+print('accuracy 1% exact', F(9495, 10000), '10%', F(9450, 10000))
+print('v6 50%: prec', round(4500 / 4750, 4), 'acc', (4500 + 4750) / 10000)
+print('LR+ spec 0.999', 0.9 / 0.001, 'bascule', round(0.001 / 0.901, 5))
+print('fig3 initial: prior 1:999 -> post odds', 99 / 999, '1:', round(999 / 99, 1), 'p', round((99 / 999) / (1 + 99 / 999), 4), 'x', round(((99 / 999) / (1 + 99 / 999)) / 0.001, 2))
+print('fig6 n=4 cc above floor', round((1e-3 + (1 - 1e-3) * 0.05**4) / 1e-3 - 1, 4), 'n=3', round((1e-3 + (1 - 1e-3) * 0.05**3) / 1e-3 - 1, 4))
+print('divide by 20 per component: 1/p =', 1 / 0.05)
+print('spam LRs', 0.4 / 0.02, 0.3 / 0.05, 'odds', F(1, 4) * 20 * 6)

@@ -1,0 +1,54 @@
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>Les probabilités totales sur une partition <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 09</p>
+  <div class="idee">
+    <p>Brunton découpe Ω en morceaux B<sub>1</sub>, …, B<sub>n</sub> qui ne se chevauchent pas et le recouvrent entièrement : une <b>partition</b>. Un événement A traverse plusieurs morceaux. Pour sa probabilité, on entre dans chaque morceau, on y mesure A, on pondère par le poids du morceau et on additionne.</p>
+    <p>Son exemple : la carte est rouge. Partition par couleur : sachant cœur, rouge avec probabilité 1 ; sachant carreau, 1 ; trèfle, 0 ; pique, 0 ; chaque couleur pèse ¼. P(rouge) = 1·¼ + 1·¼ + 0·¼ + 0·¼ = ½. « Pas une façon utile de le calculer », dit-il, mais la partition la plus courante, B et Bᶜ, sert partout. Un test est positif chez 90 % des malades et 5 % des sains, et 1 % des gens sont malades : P(+) = 0,9 × 0,01 + 0,05 × 0,99 = 0,0585. Les sains fournissent 5,5 fois plus de positifs que les malades.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — mesurer A morceau par morceau</div>
+    <div id="v3ctl" class="sl-ctl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">Ω est le carré d'aire 1, coupé en bandes verticales : la <b>largeur</b> d'une bande est P(B<sub>i</sub>), la <b>hauteur</b> colorée P(A ∣ B<sub>i</sub>). Chaque aire colorée vaut donc P(A ∣ B<sub>i</sub>) P(B<sub>i</sub>), et P(A) est leur somme. Cartes : deux bandes pleines sur quatre, ½. Dépistage à 1 % : la bande des malades est un fil presque plein (0,009), celle des sains une bande large et basse (0,0495), qui fait l'essentiel des positifs. À 10 % de malades : 0,09 et 0,045.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(<i>A</i>) = Σ<sub>i</sub> P(<i>A</i> ∣ <i>B</i><sub>i</sub>) P(<i>B</i><sub>i</sub>) &nbsp;&nbsp;&nbsp; et pour deux morceaux : P(<i>A</i>) = P(<i>A</i> ∣ <i>B</i>) P(<i>B</i>) + P(<i>A</i> ∣ <i>B</i>ᶜ) P(<i>B</i>ᶜ)</div>
+    <ul>
+      <li>Les B<sub>i</sub> sont disjoints (B<sub>i</sub> ∩ B<sub>j</sub> = ∅ pour i ≠ j) : aucun morceau de A n'est compté deux fois.</li>
+      <li>Leur union est Ω : aucun morceau de A n'est oublié.</li>
+      <li>P(B<sub>i</sub>) &gt; 0, pour que P(A ∣ B<sub>i</sub>) soit défini ; un morceau de probabilité nulle se retire de la somme.</li>
+      <li>La formule vaut aussi pour une partition en une infinité dénombrable de morceaux.</li>
+      <li>Lecture : P(A) est la <b>moyenne</b> des P(A ∣ B<sub>i</sub>), pondérée par les P(B<sub>i</sub>).</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>cartes, un dé, dépistage, drogue, un classifieur</small></summary><div class="in">
+    <ol>
+      <li><b>Carte rouge</b> par les quatre couleurs : ½.</li>
+      <li><b>Un dé</b>, avec la partition de Brunton, B = « j'ai fait 1 » et Bᶜ. A = « pair ». P(A ∣ B) = 0 ; sachant Bᶜ, il reste 2, 3, 4, 5, 6, dont trois pairs : 3/5. P(A) = 0 × 1/6 + 3/5 × 5/6 = ½.</li>
+      <li><b>Dépistage</b> (90 % de détection, 5 % de faux positifs). À 1 % de malades : 0,009 + 0,0495 = 0,0585. À 10 % : 0,09 + 0,045 = 0,135.</li>
+      <li><b>Le cancer de Brunton (10)</b>, test à 99 %, 0,1 % de malades : P(+) = 0,99 × 0,001 + 0,01 × 0,999 = 0,00099 + 0,00999 = 0,01098. Dix fois plus de positifs viennent des sains.</li>
+      <li><b>La drogue de Brunton (11)</b>, 10 % d'usagers. Test à 90 % dans les deux sens : 0,9 × 0,1 + 0,1 × 0,9 = 0,18. Spécificité ramenée à 0,8 : 0,9 × 0,1 + 0,2 × 0,9 = 0,27.</li>
+      <li><b>En ML, l'erreur globale d'un classifieur.</b> Il se trompe sur 2 % de la classe majoritaire (95 % des données) et 30 % de la minoritaire (5 %). Erreur globale : 0,02 × 0,95 + 0,30 × 0,05 = 0,019 + 0,015 = 0,034. La moyenne non pondérée des deux taux, 0,16, est l'erreur qu'on aurait sur une population à 50/50 (la « balanced error »), pas sur celle-ci.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>découper A, additionner, multiplier</small></summary><div class="in">
+    <div class="drv">
+      <div><i>A</i> = <i>A</i> ∩ Ω = (<i>A</i> ∩ <i>B</i><sub>1</sub>) ∪ … ∪ (<i>A</i> ∩ <i>B</i><sub>n</sub>)</div><span>les B<sub>i</sub> recouvrent Ω</span>
+      <div>les morceaux <i>A</i> ∩ <i>B</i><sub>i</sub> sont disjoints</div><span>parce que les B<sub>i</sub> le sont</span>
+      <div>P(<i>A</i>) = Σ<sub>i</sub> P(<i>A</i> ∩ <i>B</i><sub>i</sub>)</div><span>axiome d'additivité (<a href="lesson-00-02-espace-axiomes-complement.html#n2">l02, notion 2</a>)</span>
+      <div>= Σ<sub>i</sub> P(<i>A</i> ∣ <i>B</i><sub>i</sub>) P(<i>B</i><sub>i</sub>)</div><span>loi de multiplication (notion 2), P(B<sub>i</sub>) &gt; 0</span>
+    </div>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Des morceaux qui se chevauchent.</b> « Rouge » et « cœur » ne forment pas une partition : le cœur serait compté deux fois.</li>
+      <li><b>Un morceau oublié.</b> Sans le recouvrement, la somme est trop petite. Avec B et Bᶜ, rien ne peut manquer : c'est pour ça que cette partition est la plus utilisée.</li>
+      <li><b>Moyenner sans pondérer.</b> Faire la moyenne simple des P(A ∣ B<sub>i</sub>) revient à supposer des morceaux de même poids (exemple 6).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (09) dit que la formule « est une autre façon de dire que quelque chose doit arriver », que les probabilités somment à 1. C'est imprécis : la formule découpe A sur la partition, et l'hypothèse qui sert est le recouvrement, B<sub>1</sub> ∪ … ∪ B<sub>n</sub> = Ω. Il ne dit pas non plus que chaque P(B<sub>i</sub>) doit être non nulle.</div>
+  </div></details>
+  <p class="garde">Si B<sub>1</sub>, …, B<sub>n</sub> partitionnent Ω, P(A) = Σ P(A ∣ B<sub>i</sub>) P(B<sub>i</sub>) : la probabilité de A est la moyenne de ses probabilités conditionnelles, pondérée par le poids de chaque morceau.</p>
+</section>
+

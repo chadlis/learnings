@@ -1,0 +1,6 @@
+after one +            : P(sick) = 0.089
+two independent tests +: P(sick) = 0.901
+same test twice +      : P(sick) = 0.089
+odds 1:999 x 99 x 99   : P(sick) = 0.907
+P(second + | first +)  = 0.098
+P(second +)            = 0.011

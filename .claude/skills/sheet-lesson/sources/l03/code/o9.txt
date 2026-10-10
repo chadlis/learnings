@@ -1,0 +1,4 @@
+A and B       = 1/4  product = 1/4  equal
+A and C       = 1/4  product = 1/4  equal
+B and C       = 1/4  product = 1/4  equal
+A and B and C = 1/4  product = 1/8  NOT equal

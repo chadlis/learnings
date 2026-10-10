@@ -1,0 +1,3 @@
+second = 5  P(A and B) = 1/36   P(A)P(B) = 1/36    independent
+sum = 6     P(A and B) = 1/36   P(A)P(B) = 5/216   dependent
+sum = 7     P(A and B) = 1/36   P(A)P(B) = 1/36    independent

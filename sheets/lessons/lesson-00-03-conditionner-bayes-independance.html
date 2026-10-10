@@ -1,0 +1,1533 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Conditionner, Bayes, indépendance — leçon</title>
+<meta name="sheet" content="series=lesson;part=00;number=03;status=v1">
+<meta name="part" content="00 · Socle probabiliste">
+<meta name="subtitle" content="socle — Brunton 08 à 12 : zoomer sur B, probabilités totales, inverser un conditionnement, le produit">
+<meta name="prereq" content="l02">
+<meta name="anki" content="stats::conditionnement,stats::bayes,stats::base-rate,stats::independance,ml::metriques">
+<meta name="theme-color" content="#20312C">
+<link rel="icon" type="image/svg+xml" href="../../icone-fiches.svg">
+<style>
+/* ===== tokens — standard tableau noir v5, ne pas modifier ===== */
+:root{
+  --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
+  --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93; --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
+  --yellow:#F0D178; --pink:#EFA3B8; --mint:#B9E2C4; --teal:#9FE0D2; --violet:#C8B6F5; --blue:#A7CCEB; --coral:#F3A28F; --amber:#F0D178;
+  --card:#F5F1E6; --cardink:#22302B; --cardmuted:#4E5A55; --cardline:rgba(34,48,43,.14); --cardsoft:#ECE7D8;
+  --pen:#1E4E9E; --red:#B8322A; --green:#1F7A44;
+  --serif:Georgia,"Iowan Old Style","Times New Roman",serif; --sans:"Avenir Next",Avenir,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  --math:Georgia,"Times New Roman",serif; --mono:ui-monospace,Menlo,Consolas,monospace;
+  --c1:var(--teal); --c2:var(--violet); --c3:var(--coral); --c4:var(--blue); --c5:var(--yellow);
+}
+body.white{ --board:#F1F3F1; --board2:#E4E8E4; --chalk:#1E2A36; --chalk2:#3E4A57; --dust:rgba(30,42,54,.6);
+  --ink:#1E2A36; --muted:#3E4A57; --faint:#7C8896; --line:rgba(30,42,54,.12); --line2:rgba(30,42,54,.3);
+  --yellow:#B7791F; --pink:#B93A5A; --mint:#1F7A44; --teal:#0F8A7C; --violet:#6B46C1; --blue:#1F5FA8; --coral:#C0392B; --amber:#B7791F;
+  --card:#FFFFFF; --cardsoft:#F1EFE9; --cardline:rgba(34,48,43,.12)}
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:var(--board);color:var(--ink);font-family:var(--sans);font-size:16px;line-height:1.5;-webkit-font-smoothing:antialiased;
+  background-image:radial-gradient(ellipse at 20% 0%,rgba(255,255,255,.05),transparent 55%),radial-gradient(ellipse at 90% 100%,rgba(255,255,255,.04),transparent 50%)}
+body.white{background-image:none}
+a{color:inherit}
+.chalk{font-family:var(--serif);color:var(--chalk);text-shadow:0 0 1px var(--dust)}
+.app{max-width:1180px;margin:0 auto;padding:18px clamp(12px,3vw,32px) 60px}
+/* ---- top ---- */
+.top{display:flex;align-items:center;gap:10px;flex-wrap:wrap;border-bottom:2px solid var(--line2);padding-bottom:10px}
+.top .crumb{font-size:13px;color:var(--faint);flex:1 1 100%}
+.top .crumb a{text-decoration:none;color:var(--muted)}.top .crumb a:hover{color:var(--yellow)}
+.top h1{font-family:var(--serif);font-weight:400;font-size:clamp(26px,3.6vw,36px);line-height:1.15;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-right:auto}
+.top h1 span{text-decoration:underline;text-decoration-color:var(--yellow);text-decoration-thickness:3px;text-underline-offset:6px}
+.tb{font:500 13px var(--sans);color:var(--ink);background:transparent;border:1.5px solid var(--line2);border-radius:3px;padding:6px 12px;cursor:pointer}
+.tb:hover,.tb[aria-pressed="true"]{border-color:var(--yellow);color:var(--yellow)}
+.tb:disabled{opacity:.4;cursor:default}
+.sub{color:var(--muted);margin:12px 0 0;max-width:72ch;line-height:1.55;font-size:15px}
+/* ---- layout ---- */
+.wrap{display:grid;grid-template-columns:230px minmax(0,1fr);gap:28px;margin-top:22px}
+.side{position:sticky;top:12px;align-self:start;font-size:13.5px;max-height:calc(100vh - 24px);overflow:auto}
+@media(max-width:900px){.wrap{grid-template-columns:minmax(0,1fr)}.side{position:static;order:2;max-height:none}}
+.side h4{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);margin:16px 0 6px}
+.side ol{list-style:none}.side li{padding:3px 0 3px 10px;border-left:2px solid var(--line)}
+.side li a{text-decoration:none;color:var(--muted)}.side li a:hover{color:var(--yellow)}
+.side li.cur{border-left-color:var(--yellow)}.side li.cur a{color:var(--chalk)}
+.side .tags code{display:inline-block;font:12px var(--mono);border:1px solid var(--line);border-radius:3px;padding:1px 6px;margin:2px 3px 2px 0;color:var(--muted)}
+/* ---- cards (fiches cartonnées) ---- */
+.card{background:var(--card);color:var(--cardink);border-radius:3px;padding:16px 20px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6),0 1px 0 rgba(0,0,0,.2);border-left:4px solid var(--ac,var(--yellow))}
+.card .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:6px}
+.card p,.card li{font-size:15px;line-height:1.5}.card ul{padding-left:18px}.card li{margin:3px 0}
+.card a{color:var(--pen)}
+.card code,.side code{font-family:var(--mono);font-size:.92em}
+/* ---- blocs ---- */
+.blk{margin:22px 0}
+.blk h2{font-family:var(--serif);font-weight:400;font-size:22px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin:34px 0 10px}
+.blk h2::before{content:"";display:inline-block;width:22px;height:2px;background:var(--ac,var(--yellow));vertical-align:middle;margin-right:10px}
+.hyp{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;align-items:baseline}
+.hyp b{font:600 12px var(--sans);letter-spacing:.06em;text-transform:uppercase;color:var(--coral)}
+.card.hyp-card{--ac:var(--coral)}
+/* ---- chain ---- */
+.chain{counter-reset:step}
+.step{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1.15fr);gap:18px;align-items:start;padding:18px 0 22px;border-top:1.5px dashed var(--line)}
+@media(max-width:900px){.step{grid-template-columns:minmax(0,1fr)}}
+.step>*{min-width:0}
+.step.hidden{display:none}
+.step .rule{position:relative;padding-left:44px}
+.step .rule::before{counter-increment:step;content:counter(step);position:absolute;left:0;top:-2px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.step .rule h3{font-family:var(--serif);font-weight:400;font-size:19px;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:6px}
+.step .rule h3 .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle}
+.tag.sup{color:var(--coral)}.tag.casse{color:var(--pink)}.tag.tronc{color:var(--yellow)}
+.step .rule p{color:var(--muted);font-size:15px;margin:4px 0}
+.step .rule .say{font-family:var(--serif);color:var(--chalk);font-size:15.5px;border-left:2px solid var(--yellow);padding:4px 0 4px 12px;margin-top:10px}
+.step .apply{--ac:var(--c1)}
+.step .apply .lbl{color:var(--cardmuted)}
+/* ---- maths (HTML/CSS, zéro MathJax) ---- */
+.m{font-family:var(--math);font-style:italic}.up{font-family:var(--math);font-style:normal}
+.eq{font-family:var(--math);font-size:16.5px;margin:8px 0;padding:8px 12px;background:var(--cardsoft);border-radius:3px;line-height:1.7}
+.rule .eq{background:rgba(237,232,218,.07);color:var(--chalk);font-size:16px}
+body.white .rule .eq{background:rgba(30,42,54,.06)}
+sup,sub{font-size:.72em}.hat{position:relative}.hat::after{content:"^";position:absolute;left:0;right:0;top:-.55em;text-align:center;font-size:.9em}
+table{border-collapse:collapse;font-size:14px;margin:8px 0;width:100%}th,td{padding:5px 8px;border-bottom:1px solid var(--cardline);text-align:right}th:first-child,td:first-child{text-align:left}th{font-weight:600;color:var(--cardmuted)}
+tr.hl td{background:rgba(240,209,120,.35)}
+/* ---- figures ---- */
+.fig{margin:14px 0 6px;background:var(--card);color:var(--cardink);border-radius:3px;padding:14px 16px 12px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--ac,var(--violet))}
+.fig .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.fig .cap{font-size:14px;color:var(--cardmuted);margin-top:6px;line-height:1.45}
+.fig .cap b{color:var(--cardink)}
+.fig .wide{overflow-x:auto}
+.step .fig{grid-column:1 / -1}
+.sl-plot{display:block;width:100%;max-width:640px;min-width:440px;height:auto;margin:0 auto}.fig .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.sl-plot .sl-grid line{stroke:rgba(34,48,43,.08)}.sl-axis{stroke:rgba(34,48,43,.5);stroke-width:1.2}
+.sl-tick{font:11.5px var(--mono);fill:var(--cardmuted)}.sl-lbl{font:12.5px var(--sans);fill:var(--cardmuted)}
+.sl-fn{stroke-width:2.4}.sl-c1{stroke:var(--pen);fill:none}.sl-c2{stroke:#6B46C1;fill:none}.sl-c3{stroke:var(--red);fill:none}.sl-c4{stroke:#1F5FA8;fill:none}.sl-c5{stroke:#B7791F;fill:none}
+text.sl-c1{fill:var(--pen)}text.sl-c2{fill:#6B46C1}text.sl-c3{fill:var(--red)}text.sl-c4{fill:#1F5FA8}text.sl-c5{fill:#B7791F}
+.sl-dot{fill:var(--red);stroke:var(--card);stroke-width:1.5}.sl-dot.hollow{fill:var(--card)!important;stroke-width:2.2}.sl-dot.hollow.sl-c1{stroke:var(--pen)}.sl-dot.hollow.sl-c2{stroke:#6B46C1}.sl-dot.hollow.sl-c3{stroke:var(--red)}.sl-dot.hollow.sl-c4{stroke:#1F5FA8}.sl-dot.hollow.sl-c5{stroke:#B7791F}.sl-dot.sl-c1{fill:var(--pen)}.sl-dot.sl-c2{fill:#6B46C1}.sl-dot.sl-c3{fill:var(--red)}.sl-dot.sl-c4{fill:#1F5FA8}.sl-dot.sl-c5{fill:#B7791F}
+.sl-seg{stroke:rgba(34,48,43,.55);stroke-width:1.5}.sl-seg.chord{stroke:var(--red);stroke-dasharray:5 4;stroke-width:2}.sl-seg.gain{stroke:var(--green);stroke-width:3}.sl-seg.sl-path{stroke:var(--red);stroke-width:1.5}
+.sl-seg.slope{stroke-width:5;opacity:.45;stroke-linecap:round}.sl-seg.slope.sl-c1{stroke:var(--pen)}.sl-seg.slope.sl-c2{stroke:#6B46C1}.sl-seg.slope.sl-c3{stroke:var(--red)}.sl-seg.slope.sl-c5{stroke:#B7791F}
+.sl-ahead{fill:currentColor;fill:rgba(34,48,43,.7)}.sl-bar{fill:#6B46C1;opacity:.75}.sl-mean{stroke:var(--red);stroke-width:2}
+.sl-ctl{display:flex;gap:8px;flex-wrap:wrap;margin:6px 0 10px}
+.fig .tb{color:var(--cardink);border-color:var(--cardline)}.fig .tb:hover,.fig .tb[aria-pressed="true"]{border-color:var(--pen);color:var(--pen)}
+.sl-slider{display:grid;grid-template-columns:110px 1fr 64px;gap:10px;align-items:center;font-size:14px;margin:6px 0}
+.sl-slider input{width:100%}.sl-sval{font-family:var(--mono);font-size:13.5px;text-align:right}
+.sl-readout{font:13.5px var(--mono);color:var(--cardink);margin:6px 0 0}
+.readouts{display:grid;grid-template-columns:repeat(auto-fit,minmax(150px,1fr));gap:8px;margin:8px 0}
+.readouts div{background:var(--cardsoft);border-radius:3px;padding:8px 10px;font-size:13.5px}.readouts b{display:block;font-family:var(--mono);font-size:17px;margin-top:2px}
+.readouts .zero b{color:var(--red)}.readouts .pos b{color:var(--green)}
+/* ---- série `coding` : squelette annoté et ruban de SL.trace (inerte hors coding) ---- */
+.skel{font:13px/1.75 var(--mono);white-space:pre;background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch}
+.skel b{color:var(--pen);font-weight:600}
+.step .card.full,.step .card.casse{grid-column:1 / -1}
+.card .wide{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.card .wide table{min-width:520px}
+.card .wide th:nth-child(2),.card .wide td:nth-child(2),
+.card .wide th:nth-child(3),.card .wide td:nth-child(3){text-align:left}
+.readouts .c1 b{color:var(--pen)}.readouts .c3 b{color:var(--red)}
+.sl-trace{--cw:58px;--cgap:8px;margin:4px 0 2px}
+.sl-cells{display:flex;gap:var(--cgap)}
+.sl-cell{width:var(--cw);flex:0 0 var(--cw);text-align:center;padding:6px 0 4px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft)}
+.sl-cell b{display:block;font:600 17px var(--mono);color:var(--cardink)}
+.sl-cell i{display:block;font:11px var(--mono);font-style:normal;color:var(--cardmuted);margin-top:2px}
+.sl-cell.dim{background:rgba(34,48,43,.07);border-color:rgba(34,48,43,.18);border-style:dashed}
+.sl-cell.dim b,.sl-cell.dim i{color:var(--cardmuted);opacity:.5}
+.sl-cell.on{background:rgba(240,209,120,.45);border-color:#B7791F}
+.sl-cell.win{border-color:var(--green);border-width:2.5px}
+.sl-ptrs{position:relative;height:20px;margin-top:5px}
+.sl-ptr{position:absolute;top:0;left:calc(var(--i) * (var(--cw) + var(--cgap)));width:var(--cw);text-align:center;font:600 12px var(--sans);color:var(--pen)}
+.sl-note{font-size:14px;color:var(--cardink);margin-top:10px}
+.sl-inv{font:12.5px/1.55 var(--mono);color:var(--cardmuted);margin-top:6px;border-left:2px solid #B7791F;padding-left:10px}
+/* ---- casse / résumé / chaîne verbalisée ---- */
+.card.casse{--ac:var(--pink)}.card.resume{--ac:var(--yellow)}.card.say-card{--ac:var(--teal)}
+.resume ol{padding-left:22px}.resume li{margin:5px 0}
+.phrase{font-family:var(--serif);font-size:17px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--teal);padding:6px 0 6px 16px;margin:10px 0}
+.verb{list-style:none;counter-reset:v}
+.verb li{counter-increment:v;display:grid;grid-template-columns:28px 1fr;gap:10px;padding:8px 0;border-top:1px solid var(--cardline)}
+.verb li>div{grid-column:2}.verb li .q{grid-column:2}
+.verb li::before{content:counter(v);font:600 13px var(--sans);color:var(--cardmuted);grid-row:1 / span 2}
+.verb .q{font-weight:600}.verb .a{color:var(--cardmuted);margin-top:3px}
+.verb .a.hid{filter:blur(6px);cursor:pointer;user-select:none}
+@media(prefers-reduced-motion:reduce){.verb .a.hid{filter:none;opacity:.35}}
+.bridges a{display:block;text-decoration:none;color:var(--cardink);padding:6px 0;border-top:1px solid var(--cardline)}
+.bridges a b{color:var(--pen)}.bridges a small{display:block;color:var(--cardmuted)}
+footer{margin-top:40px;color:var(--faint);font-size:13px;border-top:1.5px solid var(--line);padding-top:12px;line-height:1.6}
+.ledge{position:fixed;left:0;right:0;bottom:0;height:8px;background:linear-gradient(#5b4632,#3b2b1c);opacity:.9;z-index:5}
+body.white .ledge{background:linear-gradient(#c8ccd0,#9aa1a8)}
+/* ===== série `lesson` : le cours autoporteur du socle (10/10/2026) ===== */
+.legend{display:flex;flex-wrap:wrap;gap:8px 18px;font-size:13.5px;color:var(--muted);margin:10px 0 0}
+.legend .tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-right:6px}
+.lecon{counter-reset:notion}
+.notion{padding:22px 0 28px;border-top:1.5px dashed var(--line);max-width:900px}
+.notion h3{position:relative;padding-left:44px;font-family:var(--serif);font-weight:400;font-size:21px;line-height:1.3;color:var(--chalk);text-shadow:0 0 1px var(--dust);margin-bottom:2px}
+.notion h3::before{counter-increment:notion;content:counter(notion);position:absolute;left:0;top:-1px;width:30px;height:30px;border-radius:50%;border:1.5px solid var(--yellow);color:var(--yellow);font:600 14px var(--sans);display:grid;place-items:center}
+.tag{font:600 10.5px var(--sans);letter-spacing:.07em;text-transform:uppercase;border:1px solid currentColor;border-radius:3px;padding:1px 6px;margin-left:8px;vertical-align:middle;text-shadow:none}
+.tag.outil{color:var(--mint)}.tag.culture{color:var(--violet)}
+.src{font-size:12.5px;color:var(--faint);margin:0 0 10px 44px}
+.idee{margin-left:44px;color:var(--chalk);font-size:16px;line-height:1.62;max-width:72ch}
+.idee p{margin:7px 0}
+.idee b{color:var(--yellow);font-weight:600}
+.formule{margin:12px 0 10px 44px;background:var(--card);color:var(--cardink);border-radius:3px;padding:12px 18px;box-shadow:0 14px 26px -16px rgba(0,0,0,.6);border-left:4px solid var(--yellow)}
+.formule .lbl{font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted);margin-bottom:4px}
+.formule .eq{font-size:17.5px}
+.formule ul{padding-left:18px;margin-top:6px}.formule li{font-size:14.5px;margin:3px 0;color:var(--cardmuted)}
+.notion .fig{margin-left:44px}
+details{margin:8px 0 0 44px;background:var(--card);color:var(--cardink);border-radius:3px;border-left:4px solid var(--ac,var(--yellow));box-shadow:0 10px 20px -16px rgba(0,0,0,.6)}
+details>summary{cursor:pointer;list-style:none;padding:9px 14px;font:600 13px var(--sans);letter-spacing:.03em;color:var(--cardink)}
+details>summary::-webkit-details-marker{display:none}
+details>summary::before{content:"▸";display:inline-block;width:16px;color:var(--cardmuted)}
+details[open]>summary::before{content:"▾"}
+details>summary small{font-weight:400;color:var(--cardmuted);margin-left:6px;letter-spacing:0}
+details .in{padding:2px 18px 14px}
+details .in p,details .in li{font-size:15px;line-height:1.55;margin:5px 0}
+details .in ol,details .in ul{padding-left:20px}
+details.ex{--ac:var(--teal)}details.preuve{--ac:var(--violet)}details.code{--ac:var(--blue)}details.casse{--ac:var(--pink)}details.loin{--ac:var(--faint)}
+.drv{display:grid;grid-template-columns:minmax(0,1.25fr) minmax(0,1fr);gap:4px 16px;margin:8px 0;align-items:baseline}
+.drv>div{font-family:var(--math);font-size:16px;line-height:1.6}
+.drv>span{font-size:13.5px;color:var(--cardmuted);border-left:2px solid var(--cardline);padding-left:10px}
+@media(max-width:700px){.drv{grid-template-columns:minmax(0,1fr)}.drv>span{margin-bottom:6px}}
+pre.py,pre.out,pre.tri{font:13px/1.6 var(--mono);background:var(--cardsoft);color:var(--cardink);border-radius:3px;padding:10px 12px;margin:8px 0;overflow-x:auto;-webkit-overflow-scrolling:touch;white-space:pre}
+pre.out{background:transparent;border:1px dashed var(--cardline);color:var(--cardmuted)}
+pre.out::before{content:"sortie\A";font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--cardmuted)}
+.brunton{margin:10px 0 4px;padding:8px 12px;border:1.5px solid var(--cardline);border-radius:3px;background:var(--cardsoft);font-size:14.5px}
+.brunton b{display:block;font:600 11px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--red);margin-bottom:2px}
+.garde{margin:14px 0 0 44px;font-family:var(--serif);font-size:16.5px;line-height:1.5;color:var(--chalk);text-shadow:0 0 1px var(--dust);border-left:3px solid var(--yellow);padding:4px 0 4px 14px;max-width:72ch}
+.garde::before{content:"Ce qu'on garde";display:block;font:600 10.5px var(--sans);letter-spacing:.08em;text-transform:uppercase;color:var(--faint);text-shadow:none;margin-bottom:2px}
+.notion.culture .garde{border-left-color:var(--violet)}
+.notion table{background:var(--cardsoft);border-radius:3px}
+.sl-fulcrum{fill:var(--red)}.sl-bar2{fill:var(--red);opacity:.55}.sl-bar3{fill:var(--pen);opacity:.6}
+@media(max-width:600px){.idee,.formule,details,.garde,.src,.notion .fig{margin-left:0}.notion h3{font-size:19px}}
+.sl-seg.sl-c1{stroke:var(--pen);stroke-width:2}.sl-seg.sl-c2{stroke:#6B46C1;stroke-width:2}.sl-seg.sl-c3{stroke:var(--red);stroke-width:2}.sl-seg.sl-c4{stroke:#1F5FA8;stroke-width:2}
+/* ===== v2 (10/10/2026) : vignettes « voir l'idée », sous chaque idée ===== */
+.fig.vis{--ac:var(--teal)}
+.v-row{display:flex;flex-wrap:wrap;gap:6px 14px;align-items:center;justify-content:center}
+.v-row>div{flex:1 1 280px;min-width:0}.v-row>.v-mini{flex:0 1 220px}
+.v-row .sl-plot{min-width:0}
+.nogrid .sl-grid{display:none}
+.sl-ruler{fill:var(--cardmuted)}
+.sl-mass{fill:#6B46C1;opacity:.85}
+.sl-mass-t{font:600 11px var(--sans);fill:#fff}
+.sl-sq{fill:rgba(107,70,193,.16);stroke:#6B46C1;stroke-width:1.5}
+.sl-sq-t{font:600 12.5px var(--mono);fill:#6B46C1}
+.sl-cellp{fill:#6B46C1}.sl-cello{fill:none;stroke:var(--cardline)}
+.sl-prod{font:12px var(--mono);fill:var(--cardmuted);opacity:.5}.sl-prod.on{font-weight:700;fill:var(--cardink);opacity:1}
+.sl-seg.sl-dash{stroke-dasharray:4 3}.sl-seg.sl-link{stroke:rgba(34,48,43,.28);stroke-dasharray:3 3}
+.sl-seg.sl-c5{stroke:#B7791F;stroke-width:2}
+.sl-orbit{fill:none;stroke:rgba(34,48,43,.3);stroke-dasharray:3 4}
+.sl-stick{stroke:var(--cardmuted);stroke-width:4;stroke-linecap:round}
+.sl-dot.sl-tiny{stroke:none;opacity:.5}
+.sl-k1{fill:var(--pen)}.sl-k2{fill:#6B46C1}.sl-k3{fill:var(--red)}.sl-k4{fill:#1F5FA8}.sl-k5{fill:#B7791F}.sl-k6{fill:var(--green)}.sl-kc{opacity:.5}
+.sl-cell-t{font:600 11px var(--sans);fill:var(--cardink)}
+/* ---- propre à cette leçon ---- */
+/* l03 : cases, tableaux et schémas des vignettes */
+.sl-cellv{fill:var(--cardsoft);stroke:rgba(34,48,43,.22);stroke-width:1;transition:opacity .3s}
+.sl-cellv.sl-k2{fill:#6B46C1;stroke:#6B46C1}
+.sl-cellv.sl-k1{fill:var(--pen);stroke:var(--pen)}
+.sl-fade{opacity:.16}
+.sl-hit{fill:none;stroke:var(--red);stroke-width:2.5}
+.sl-omega{fill:none;stroke:rgba(34,48,43,.55);stroke-width:1.5}
+.sl-setA{fill:rgba(107,70,193,.22);stroke:#6B46C1;stroke-width:1.5}
+.sl-setB{fill:rgba(31,95,168,.16);stroke:#1F5FA8;stroke-width:1.5}
+.sl-setAB{fill:rgba(107,70,193,.55);stroke:none}
+.sl-strip{fill:none;stroke:rgba(34,48,43,.45);stroke-width:1.2}
+.sl-areaA{fill:rgba(184,50,42,.55)}
+.sl-pp1{fill:var(--pen)}.sl-pp3{fill:var(--red)}
+.sl-num{fill:rgba(30,78,158,.2)}
+.sl-den{fill:none;stroke:var(--red);stroke-width:2.5}
+.sl-tcell{fill:var(--cardsoft);stroke:rgba(34,48,43,.18)}
+.sl-tval{font:600 15px var(--mono);fill:var(--cardink)}
+.sl-wire{stroke:var(--cardmuted);stroke-width:2;fill:none}
+.sl-box{fill:var(--cardsoft);stroke:var(--cardmuted);stroke-width:1.5}
+.sl-box.ko{fill:rgba(184,50,42,.16);stroke:var(--red)}
+.sl-ko{font:700 14px var(--sans);fill:var(--red)}
+.sl-ok{fill:var(--green)}
+.sl-node{fill:var(--cardmuted)}
+.sl-tree{stroke:rgba(34,48,43,.45);stroke-width:1.6}
+.sl-tree.on{stroke:var(--red);stroke-width:3}
+.sl-sym{font:15px var(--sans);fill:var(--cardink)}
+.sl-sym.r{fill:var(--red)}
+.sl-mono{font:12px var(--mono);fill:var(--cardink)}
+.sl-mono.on{fill:var(--red);font-weight:700}
+#f1plot .sl-plot{max-width:440px}
+.sl-halo{paint-order:stroke;stroke:var(--card);stroke-width:5px;stroke-linejoin:round}
+</style>
+</head>
+<body>
+<div class="app">
+<header class="top">
+  <div class="crumb"><a href="../../index.html">Fiches</a> › <a href="../../map.html">Carte</a> › 0 · Socle probabiliste › leçon 3</div>
+  <h1>Conditionner, <span>Bayes</span>, indépendance</h1>
+  <button class="tb" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
+</header>
+<p class="sub">Apprendre que B est arrivé change la probabilité de A : on <b>zoome sur B</b> et on renormalise. De là sortent trois outils, la loi de multiplication, les probabilités totales et Bayes, qui remonte d'un test à sa cause. Puis l'<b>indépendance</b>, le seul cas où l'on a le droit de multiplier. La leçon suit Brunton 08 à 12, avec ses exemples : cartes, dés, dépistage d'un cancer, test de drogue, disques durs et guirlande de Noël.</p>
+<div class="legend"><span><span class="tag outil">outil</span>à savoir produire au tableau, donnera une carte</span><span><span class="tag culture">culture</span>à comprendre, reste ici, pas de carte</span><span>▸ blocs à déplier : exemples, preuve, code, où ça casse</span></div>
+
+<div class="wrap">
+<aside class="side">
+  <h4>La leçon</h4>
+  <ol id="toc"></ol>
+  <h4>Prérequis</h4>
+  <ol>
+    <li><a href="lesson-00-02-espace-axiomes-complement.html#n1">l02 · Ω, événements, opérations</a></li>
+    <li><a href="lesson-00-02-espace-axiomes-complement.html#n2">l02 · axiomes et complément</a></li>
+  </ol>
+  <h4>Cartes Anki liées</h4>
+  <div class="tags"><code>stats::conditionnement</code><code>stats::bayes</code><code>stats::base-rate</code><code>stats::independance</code><code>ml::metriques</code></div>
+  <h4>Suite</h4>
+  <ol>
+    <li><a href="lesson-00-04-variables-binomiale-normale.html">l04 · Variables aléatoires</a></li>
+  </ol>
+</aside>
+
+<main>
+<section class="blk" id="prereq">
+  <div class="card" style="--ac:var(--blue)">
+    <div class="lbl">Ce que cette leçon suppose acquis</div>
+    <ul>
+      <li><b>Événements et opérations.</b> Un événement est une partie de Ω. A ∩ B : A et B arrivent tous les deux ; A ∪ B : au moins l'un ; Aᶜ : A n'arrive pas. A et B sont <b>disjoints</b> quand A ∩ B = ∅ (<a href="lesson-00-02-espace-axiomes-complement.html#n1">l02, notion 1</a>).</li>
+      <li><b>Axiomes et complément.</b> P(Ω) = 1, et la probabilité d'une union d'événements disjoints est la somme de leurs probabilités. D'où P(Aᶜ) = 1 − P(A) (<a href="lesson-00-02-espace-axiomes-complement.html#n2">l02, notion 2</a>).</li>
+      <li><b>Compter.</b> Quand les issues sont équiprobables, P(A) = #A/#Ω : 13 piques sur 52 cartes, 36 couples pour deux dés (<a href="lesson-00-01-compter.html#n2">l01, notion 2</a>).</li>
+    </ul>
+  </div>
+</section>
+
+<section class="blk" id="lecon-blk">
+<h2 style="--ac:var(--teal)">La leçon</h2>
+<div class="lecon" id="lecon">
+
+<!-- ============================ n1 ============================ -->
+<section class="notion outil" id="n1">
+  <h3>P(A ∣ B) : zoomer sur B <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 08 · Conditional Probabilities</p>
+  <div class="idee">
+    <p>Brunton tire une carte. A : c'est un pique, P(A) = 1/4. On lui apprend B : la carte est noire. Il ne reste que deux couleurs possibles, trèfle et pique : la probabilité du pique monte à 1/2. Si on lui dit « rouge », elle tombe à 0. Une information partielle sur B change la probabilité de A.</p>
+    <p>L'image est celle d'un zoom. Savoir que B est arrivé, c'est jeter toutes les issues hors de B : B devient le nouvel univers, et la probabilité de A est la part de B qu'occupe A ∩ B. Avec deux dés, le premier vaut 3 sachant que le second vaut 5 : 1 case sur 6, soit 1/6, comme sans information. Sachant que la somme vaut 6 : 1 case sur 5, soit 1/5. Savoir la somme renseigne sur le premier dé.</p>
+  </div>
+  <div class="fig vis" id="v1">
+    <div class="lbl">Voir l'idée — B devient le nouvel univers</div>
+    <div id="v1ctl" class="sl-ctl"></div>
+    <div id="v1plot" class="wide"></div>
+    <div class="readouts" id="v1out"></div>
+    <p class="cap">Chaque case est une issue équiprobable : 52 cartes, ou 36 couples de deux dés. Les cases de A sont en violet (le pique, ou « premier dé = 3 »). <b>Choisis une condition B</b> : ses cases descendent former la bande du bas, le nouvel univers, et le reste s'estompe. P(A ∣ B) se lit dans la bande : 13 cases sur 26 sachant « noire », 0 sur 26 sachant « rouge », 1 sur 6 sachant « second dé = 5 », 1 sur 5 sachant « somme = 6 ».</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(<i>A</i> ∣ <i>B</i>) = P(<i>A</i> ∩ <i>B</i>) / P(<i>B</i>) &nbsp;&nbsp;&nbsp; pour P(<i>B</i>) &gt; 0</div>
+    <ul>
+      <li>P(A ∩ B) : la masse des issues où A et B arrivent ensemble. Diviser par P(B) renormalise, pour que P(B ∣ B) = 1.</li>
+      <li>P(B) &gt; 0 : on divise. Conditionner par un événement de probabilité nulle n'a pas de sens ici.</li>
+      <li>À B fixé, P(· ∣ B) est une probabilité comme une autre : elle vérifie les axiomes de l02, donc P(Aᶜ ∣ B) = 1 − P(A ∣ B).</li>
+      <li>Issues équiprobables : P(A ∣ B) = #(A ∩ B) / #B, on compte à l'intérieur de B.</li>
+      <li>La barre est juste ici, parce que B est un <b>événement</b>. Un paramètre fixe θ n'est pas un événement : la probabilité d'une donnée sous θ s'écrit p(x ; θ), avec un point-virgule (<a href="lesson-00-04-variables-binomiale-normale.html#n1">l04, notion 1</a>).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig1">
+    <div class="lbl">Figure 1 — le même numérateur, deux dénominateurs</div>
+    <div id="f1ctl" class="sl-ctl"></div>
+    <div id="f1plot" class="wide"></div>
+    <div id="f1sl"></div>
+    <div class="readouts" id="f1out"></div>
+    <p class="cap">Ω est le carré, d'aire 1 : une aire est une probabilité. A est fixe (aire 0,30), B se règle. Au départ P(A ∩ B) = 0,10 ; divisé par P(B) = 0,24, il donne P(A ∣ B) = 0,42 ; divisé par P(A) = 0,30, il donne P(B ∣ A) = 0,33. <b>Déplace et élargis B</b> : le numérateur est toujours commun, seuls les dénominateurs diffèrent. Clique sur <b>zoomer sur B</b> : B s'étire jusqu'à remplir le carré, et la part qu'y occupe A ∩ B est P(A ∣ B).</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>cartes, deux dés, l'étude de Brunton</small></summary><div class="in">
+    <ol>
+      <li><b>Pique sachant noire.</b> P(pique ∩ noire) = 13/52, P(noire) = 26/52, donc P(pique ∣ noire) = 13/26 = 1/2. Sachant rouge : P(pique ∩ rouge) = 0, donc 0.</li>
+      <li><b>Deux dés, 36 couples équiprobables.</b> A = « premier dé = 3 ». Sachant « second dé = 5 » : A ∩ B = {(3, 5)}, une case sur six, 1/6 = P(A). Sachant « somme = 6 » : la somme vaut 6 en (1, 5), (2, 4), (3, 3), (4, 2), (5, 1), et A n'en contient qu'une, (3, 3) : 1/5. C'est l'exercice que Brunton laisse.</li>
+      <li><b>La paire d'ouverture de Brunton</b>, pique et trois. P(pique ∩ trois) = 1/52, le trois de pique ; P(trois) = 4/52 ; P(pique ∣ trois) = 1/4 = P(pique). Savoir que c'est un trois ne dit rien de la couleur : c'est l'indépendance (notion 7).</li>
+      <li><b>L'étude de Brunton.</b> 1 000 personnes : 500 malades, dont 450 positifs et 50 négatifs ; 500 témoins sains, dont 100 positifs et 400 négatifs.
+        <ul>
+          <li>P(+) = 550/1 000 = 0,55 dans cet échantillon ;</li>
+          <li>P(+ ∣ malade) = 450/500 = 0,90, on zoome sur les malades ;</li>
+          <li>P(− ∣ sain) = 400/500 = 0,80, on zoome sur les témoins ;</li>
+          <li>P(malade ∣ +) = 450/550 = 0,818, on zoome sur les positifs. Même numérateur 450, autre dénominateur.</li>
+        </ul></li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>conditionner, c'est filtrer puis compter</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(0)
+n = 200_000
+d1 = rng.integers(1, 7, n)            # first die
+d2 = rng.integers(1, 7, n)            # second die
+A = d1 == 3
+
+conditions = [("second die = 5", d2 == 5, "1/6"),
+              ("sum = 6", d1 + d2 == 6, "1/5"),
+              ("sum = 7", d1 + d2 == 7, "1/6")]
+for name, B, exact in conditions:
+    kept = A[B]                       # zoom on B: keep only the rolls where B happened
+    label = f"P(A | {name})"
+    print(f"{label:22s} = {kept.mean():.4f}   exact {exact}   ({kept.size} rolls kept)")
+print(f"{'P(A)':22s} = {A.mean():.4f}   exact 1/6")
+
+B = d1 + d2 == 6                      # the formula gives the same number as the filter
+print(f"{'P(A and B) / P(B)':22s} = {(A &amp; B).mean() / B.mean():.4f}")</pre>
+<pre class="out">P(A | second die = 5)  = 0.1665   exact 1/6   (33490 rolls kept)
+P(A | sum = 6)         = 0.2054   exact 1/5   (27707 rolls kept)
+P(A | sum = 7)         = 0.1677   exact 1/6   (33594 rolls kept)
+P(A)                   = 0.1679   exact 1/6
+P(A and B) / P(B)      = 0.2054</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>P(A ∣ B) n'est pas P(B ∣ A).</b> « 90 % des malades sont positifs » et « 90 % des positifs sont malades » ne disent pas la même chose. Dans le dépistage de la notion 4 (sur 100 000 personnes, 1 % de malades), 900 personnes sont malades et positives : P(+ ∣ M) = 900/1 000 = 0,90, mais P(M ∣ +) = 900/5 850 = 0,154. Même numérateur, des dénominateurs dans un rapport de 5,85.</li>
+      <li><b>Se conditionner sur le mauvais événement.</b> Réflexe : nommer à voix haute la population du dénominateur, « parmi les positifs » ou « parmi les malades », avant de calculer.</li>
+      <li><b>Un échantillon construit fixe P(B).</b> L'étude de Brunton prend 500 malades et 500 témoins : la proportion de malades y vaut 50 % par construction. Son P(malade ∣ +) = 0,818 ne vaut donc pas pour la population, où la maladie est rare (notion 4). Seuls P(+ ∣ malade) et P(− ∣ sain) se transportent d'une population à l'autre.</li>
+      <li><b>P(B) = 0.</b> La formule ne s'applique pas ; conditionner par un événement de probabilité nulle demande les densités (<a href="lesson-00-07-lois-jointes.html#n3">l07, notion 3</a>).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (08) dit que P(+ ∣ malade) = 90 % fait un test « spécifique à 90 % ». C'est la <i>sensibilité</i> : la proportion de positifs chez les malades. La spécificité est la proportion de négatifs chez les sains, ici 400/500 = 80 %. Il emploie les bons mots en 11 (notion 6). Il ne dit pas non plus que la formule demande P(B) &gt; 0.</div>
+  </div></details>
+  <p class="garde">Pour P(B) &gt; 0, P(A ∣ B) = P(A ∩ B)/P(B) : on ne garde que les issues de B et on renormalise par P(B), pour que B pèse 1.</p>
+</section>
+
+<!-- ============================ n2 ============================ -->
+<section class="notion outil" id="n2">
+  <h3>La loi de multiplication <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 09 · The Law of Total Probability</p>
+  <div class="idee">
+    <p>Brunton tire la loi de multiplication de la définition en une ligne : « c'est si trivial que je multiplie simplement ». P(A ∣ B) = P(A ∩ B)/P(B), donc P(A ∩ B) = P(A ∣ B) P(B). Comme A ∩ B = B ∩ A, c'est aussi P(B ∣ A) P(A) : on peut conditionner dans les deux sens.</p>
+    <p>Une image utile : l'arbre. Tire deux cartes sans remise. Première branche : pique, avec probabilité 13/52. Seconde branche, sachant que la première carte était un pique : il reste 12 piques sur 51 cartes. Le chemin « pique puis pique » vaut le produit de ses branches, 13/52 × 12/51 = 1/17 ≈ 0,0588. Avec remise, la seconde branche redevient 13/52 et le chemin vaut 1/16 = 0,0625 : c'est le cas où conditionner ne change rien (notion 7).</p>
+  </div>
+  <div class="fig vis" id="v2">
+    <div class="lbl">Voir l'idée — un chemin vaut le produit de ses branches</div>
+    <div id="v2ctl" class="sl-ctl"></div>
+    <div id="v2plot" class="wide"></div>
+    <div class="readouts" id="v2out"></div>
+    <p class="cap">Deux cartes tirées l'une après l'autre. Chaque branche porte une probabilité conditionnelle, sachant ce qui est arrivé avant ; chaque feuille, le produit des branches qui y mènent. Le chemin pique puis pique est en rouge. <b>Sans remise</b> : 1/17 = 0,0588 ; <b>avec remise</b> : 1/16 = 0,0625. Dans les deux cas les quatre feuilles somment à 1, et la seconde carte est un pique avec probabilité 1/4.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(<i>A</i> ∩ <i>B</i>) = P(<i>A</i> ∣ <i>B</i>) P(<i>B</i>) = P(<i>B</i> ∣ <i>A</i>) P(<i>A</i>)</div>
+    <div class="eq">P(<i>A</i><sub>1</sub> ∩ … ∩ <i>A</i><sub>n</sub>) = P(<i>A</i><sub>1</sub>) P(<i>A</i><sub>2</sub> ∣ <i>A</i><sub>1</sub>) … P(<i>A</i><sub>n</sub> ∣ <i>A</i><sub>1</sub> ∩ … ∩ <i>A</i><sub>n−1</sub>)</div>
+    <ul>
+      <li>Aucune hypothèse d'indépendance : c'est la définition du conditionnement, réécrite. Il faut seulement que les conditionnelles utilisées soient définies.</li>
+      <li>Les deux ordres sont justes. On choisit celui dont on connaît les termes : dans un dépistage, on connaît P(+ ∣ M) et P(M), donc P(M ∩ +) = P(+ ∣ M) P(M).</li>
+      <li>Pour n événements (règle de chaînage), chaque facteur est conditionné par <b>tous</b> ceux qui le précèdent.</li>
+      <li>Sous indépendance seulement, P(A ∣ B) = P(A) et le produit devient P(A) P(B) (notion 7).</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>cartes, l'étude de Brunton, un modèle de langage</small></summary><div class="in">
+    <ol>
+      <li><b>Deux piques.</b> Sans remise : 13/52 × 12/51 = 1/17 = 0,0588. Avec remise : 1/4 × 1/4 = 1/16 = 0,0625.</li>
+      <li><b>Trois piques sans remise.</b> 13/52 × 12/51 × 11/50 = 11/850 = 0,0129.</li>
+      <li><b>L'arbre complet</b>, sans remise : 1/17 (pique, pique), 13/68 (pique, autre), 13/68 (autre, pique), 19/34 (autre, autre) ; somme 1. La seconde carte est un pique sur deux chemins : 1/17 + 13/68 = 1/4. Sans rien savoir de la première, la seconde a la même loi qu'elle (c'est la notion 3).</li>
+      <li><b>L'étude de Brunton (08).</b> P(malade) = 500/1 000 = 0,5 et P(+ ∣ malade) = 0,9, donc P(malade ∩ +) = 0,45 : les 450 malades positifs sur 1 000.</li>
+      <li><b>Un dépistage</b> à 1 % de malades, qui détecte 90 % d'entre eux : P(M ∩ +) = 0,9 × 0,01 = 0,009, soit 900 personnes sur 100 000.</li>
+      <li><b>En ML, un modèle de langage autorégressif</b> écrit la probabilité d'une phrase par la règle de chaînage : P(w<sub>1</sub>, …, w<sub>n</sub>) = P(w<sub>1</sub>) P(w<sub>2</sub> ∣ w<sub>1</sub>) … P(w<sub>n</sub> ∣ w<sub>1</sub>, …, w<sub>n−1</sub>). Chaque facteur est une sortie du softmax ; la log-vraisemblance de la phrase est la somme de leurs logarithmes. Aucune indépendance n'est supposée.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>une ligne, puis la récurrence</small></summary><div class="in">
+    <div class="drv">
+      <div>P(<i>A</i> ∣ <i>B</i>) = P(<i>A</i> ∩ <i>B</i>) / P(<i>B</i>)</div><span>définition (notion 1), P(B) &gt; 0</span>
+      <div>P(<i>A</i> ∩ <i>B</i>) = P(<i>A</i> ∣ <i>B</i>) P(<i>B</i>)</div><span>multiplier par P(B)</span>
+      <div>= P(<i>B</i> ∣ <i>A</i>) P(<i>A</i>)</div><span>même définition, rôles échangés, car A ∩ B = B ∩ A</span>
+      <div>P(<i>A</i> ∩ <i>B</i> ∩ <i>C</i>) = P(<i>C</i> ∣ <i>A</i> ∩ <i>B</i>) P(<i>A</i> ∩ <i>B</i>)</div><span>la même loi, appliquée à C et à l'événement A ∩ B</span>
+      <div>= P(<i>C</i> ∣ <i>A</i> ∩ <i>B</i>) P(<i>B</i> ∣ <i>A</i>) P(<i>A</i>)</div><span>la loi encore, sur P(A ∩ B) ; par récurrence, n événements</span>
+    </div>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>P(A ∩ B) = P(A) P(B) n'est pas la loi de multiplication</b>, c'est son cas particulier sous indépendance. Deux piques sans remise : 1/17, pas (1/4)² = 1/16.</li>
+      <li><b>Confondre P(A ∩ B) et P(A ∣ B).</b> P(M ∩ +) = 0,009 compte les malades positifs dans toute la population ; P(+ ∣ M) = 0,90 les compte parmi les malades.</li>
+      <li><b>Couper la règle de chaînage.</b> Chaque facteur est conditionné par tout le passé. Ne garder que le terme précédent, P(w<sub>t</sub> ∣ w<sub>t−1</sub>), est une hypothèse supplémentaire (un modèle de Markov), pas la règle.</li>
+    </ul>
+  </div></details>
+  <p class="garde">Pour tous événements A et B, sans hypothèse d'indépendance, P(A ∩ B) = P(A ∣ B) P(B) = P(B ∣ A) P(A) : sur un arbre, un chemin vaut le produit de ses branches.</p>
+</section>
+
+<!-- ============================ n3 ============================ -->
+<section class="notion outil" id="n3">
+  <h3>Les probabilités totales sur une partition <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 09</p>
+  <div class="idee">
+    <p>Brunton découpe Ω en morceaux B<sub>1</sub>, …, B<sub>n</sub> qui ne se chevauchent pas et le recouvrent entièrement : une <b>partition</b>. Un événement A traverse plusieurs morceaux. Pour sa probabilité, on entre dans chaque morceau, on y mesure A, on pondère par le poids du morceau et on additionne.</p>
+    <p>Son exemple : la carte est rouge. Partition par couleur : sachant cœur, rouge avec probabilité 1 ; sachant carreau, 1 ; trèfle, 0 ; pique, 0 ; chaque couleur pèse ¼. P(rouge) = 1·¼ + 1·¼ + 0·¼ + 0·¼ = ½. « Pas une façon utile de le calculer », dit-il, mais la partition la plus courante, B et Bᶜ, sert partout. Un test est positif chez 90 % des malades et 5 % des sains, et 1 % des gens sont malades : P(+) = 0,9 × 0,01 + 0,05 × 0,99 = 0,0585. Les sains fournissent 5,5 fois plus de positifs que les malades.</p>
+  </div>
+  <div class="fig vis" id="v3">
+    <div class="lbl">Voir l'idée — mesurer A morceau par morceau</div>
+    <div id="v3ctl" class="sl-ctl"></div>
+    <div id="v3plot" class="wide"></div>
+    <div class="readouts" id="v3out"></div>
+    <p class="cap">Ω est le carré d'aire 1, coupé en bandes verticales : la <b>largeur</b> d'une bande est P(B<sub>i</sub>), la <b>hauteur</b> colorée P(A ∣ B<sub>i</sub>). Chaque aire colorée vaut donc P(A ∣ B<sub>i</sub>) P(B<sub>i</sub>), et P(A) est leur somme. Cartes : deux bandes pleines sur quatre, ½. Dépistage à 1 % : la bande des malades est un fil presque plein (0,009), celle des sains une bande large et basse (0,0495), qui fait l'essentiel des positifs. À 10 % de malades : 0,09 et 0,045.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">P(<i>A</i>) = Σ<sub>i</sub> P(<i>A</i> ∣ <i>B</i><sub>i</sub>) P(<i>B</i><sub>i</sub>) &nbsp;&nbsp;&nbsp; et pour deux morceaux : P(<i>A</i>) = P(<i>A</i> ∣ <i>B</i>) P(<i>B</i>) + P(<i>A</i> ∣ <i>B</i>ᶜ) P(<i>B</i>ᶜ)</div>
+    <ul>
+      <li>Les B<sub>i</sub> sont disjoints (B<sub>i</sub> ∩ B<sub>j</sub> = ∅ pour i ≠ j) : aucun morceau de A n'est compté deux fois.</li>
+      <li>Leur union est Ω : aucun morceau de A n'est oublié.</li>
+      <li>P(B<sub>i</sub>) &gt; 0, pour que P(A ∣ B<sub>i</sub>) soit défini ; un morceau de probabilité nulle se retire de la somme.</li>
+      <li>La formule vaut aussi pour une partition en une infinité dénombrable de morceaux.</li>
+      <li>Lecture : P(A) est la <b>moyenne</b> des P(A ∣ B<sub>i</sub>), pondérée par les P(B<sub>i</sub>).</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>cartes, un dé, dépistage, drogue, un classifieur</small></summary><div class="in">
+    <ol>
+      <li><b>Carte rouge</b> par les quatre couleurs : ½.</li>
+      <li><b>Un dé</b>, avec la partition de Brunton, B = « j'ai fait 1 » et Bᶜ. A = « pair ». P(A ∣ B) = 0 ; sachant Bᶜ, il reste 2, 3, 4, 5, 6, dont trois pairs : 3/5. P(A) = 0 × 1/6 + 3/5 × 5/6 = ½.</li>
+      <li><b>Dépistage</b> (90 % de détection, 5 % de faux positifs). À 1 % de malades : 0,009 + 0,0495 = 0,0585. À 10 % : 0,09 + 0,045 = 0,135.</li>
+      <li><b>Le cancer de Brunton (10)</b>, test à 99 %, 0,1 % de malades : P(+) = 0,99 × 0,001 + 0,01 × 0,999 = 0,00099 + 0,00999 = 0,01098. Dix fois plus de positifs viennent des sains.</li>
+      <li><b>La drogue de Brunton (11)</b>, 10 % d'usagers. Test à 90 % dans les deux sens : 0,9 × 0,1 + 0,1 × 0,9 = 0,18. Spécificité ramenée à 0,8 : 0,9 × 0,1 + 0,2 × 0,9 = 0,27.</li>
+      <li><b>En ML, l'erreur globale d'un classifieur.</b> Il se trompe sur 2 % de la classe majoritaire (95 % des données) et 30 % de la minoritaire (5 %). Erreur globale : 0,02 × 0,95 + 0,30 × 0,05 = 0,019 + 0,015 = 0,034. La moyenne non pondérée des deux taux, 0,16, est l'erreur qu'on aurait sur une population à 50/50 (la « balanced error »), pas sur celle-ci.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>découper A, additionner, multiplier</small></summary><div class="in">
+    <div class="drv">
+      <div><i>A</i> = <i>A</i> ∩ Ω = (<i>A</i> ∩ <i>B</i><sub>1</sub>) ∪ … ∪ (<i>A</i> ∩ <i>B</i><sub>n</sub>)</div><span>les B<sub>i</sub> recouvrent Ω</span>
+      <div>les morceaux <i>A</i> ∩ <i>B</i><sub>i</sub> sont disjoints</div><span>parce que les B<sub>i</sub> le sont</span>
+      <div>P(<i>A</i>) = Σ<sub>i</sub> P(<i>A</i> ∩ <i>B</i><sub>i</sub>)</div><span>axiome d'additivité (<a href="lesson-00-02-espace-axiomes-complement.html#n2">l02, notion 2</a>)</span>
+      <div>= Σ<sub>i</sub> P(<i>A</i> ∣ <i>B</i><sub>i</sub>) P(<i>B</i><sub>i</sub>)</div><span>loi de multiplication (notion 2), P(B<sub>i</sub>) &gt; 0</span>
+    </div>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Des morceaux qui se chevauchent.</b> « Rouge » et « cœur » ne forment pas une partition : le cœur serait compté deux fois.</li>
+      <li><b>Un morceau oublié.</b> Sans le recouvrement, la somme est trop petite. Avec B et Bᶜ, rien ne peut manquer : c'est pour ça que cette partition est la plus utilisée.</li>
+      <li><b>Moyenner sans pondérer.</b> Faire la moyenne simple des P(A ∣ B<sub>i</sub>) revient à supposer des morceaux de même poids (exemple 6).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (09) dit que la formule « est une autre façon de dire que quelque chose doit arriver », que les probabilités somment à 1. C'est imprécis : la formule découpe A sur la partition, et l'hypothèse qui sert est le recouvrement, B<sub>1</sub> ∪ … ∪ B<sub>n</sub> = Ω. Il ne dit pas non plus que chaque P(B<sub>i</sub>) doit être non nulle.</div>
+  </div></details>
+  <p class="garde">Si B<sub>1</sub>, …, B<sub>n</sub> partitionnent Ω, P(A) = Σ P(A ∣ B<sub>i</sub>) P(B<sub>i</sub>) : la probabilité de A est la moyenne de ses probabilités conditionnelles, pondérée par le poids de chaque morceau.</p>
+</section>
+
+<!-- ============================ n4 ============================ -->
+<section class="notion outil" id="n4">
+  <h3>Bayes : a priori, vraisemblance, a posteriori <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 10 · Bayes' Theorem with Example</p>
+  <div class="idee">
+    <p>Brunton part d'une asymétrie. On sait mesurer P(+ ∣ malade) : on teste des malades connus. Ce qu'on veut, c'est P(malade ∣ +), la cause, chère ou invasive à observer, sachant le symptôme, facile à observer. C'est un problème inverse. Bayes l'inverse en se servant de ce qu'on savait avant le test : l'<b>a priori</b> (prior).</p>
+    <p>Son exemple : un test « fiable à 99 % » pour un cancer qui touche 1 personne sur 1 000. Sur 100 000 personnes : 100 malades, dont 99 positifs ; 99 900 sains, dont 1 % de faux positifs, soit 999. Parmi les 1 098 positifs, 99 sont malades : P(malade ∣ +) = 9,0 %. « C'est fou », dit-il : 91 % des positifs sont sains. La maladie est rare, les sains sont si nombreux que leur petit taux d'erreur l'emporte.</p>
+  </div>
+  <div class="fig vis" id="v4">
+    <div class="lbl">Voir l'idée — les positifs, une personne par carré</div>
+    <div id="v4ctl" class="sl-ctl"></div>
+    <div id="v4plot" class="wide"></div>
+    <div class="readouts" id="v4out"></div>
+    <p class="cap">Seuls les positifs sont dessinés, un carré par personne : en bleu les malades détectés, en rouge les sains mal classés. <b>Cancer</b> (Brunton 10 ; ici sur 100 000 testés) : 99 carrés bleus contre 999 rouges, 9,0 %. <b>Drogue, test à 90 %</b> (Brunton 11 ; ici sur 1 000 employés, 10 % d'usagers) : 90 contre 90, 50 %. <b>Drogue, spécificité 0,8</b> : 90 contre 180, un tiers. Chaque clic rejoue l'arrivée des deux vagues de positifs.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule, en trois niveaux comme Brunton</div>
+    <div class="eq">P(<i>B</i> ∣ <i>A</i>) = P(<i>A</i> ∣ <i>B</i>) P(<i>B</i>) / P(<i>A</i>)</div>
+    <div class="eq">= P(<i>A</i> ∣ <i>B</i>) P(<i>B</i>) / [P(<i>A</i> ∣ <i>B</i>) P(<i>B</i>) + P(<i>A</i> ∣ <i>B</i>ᶜ) P(<i>B</i>ᶜ)]</div>
+    <div class="eq">P(<i>B</i><sub>j</sub> ∣ <i>A</i>) = P(<i>A</i> ∣ <i>B</i><sub>j</sub>) P(<i>B</i><sub>j</sub>) / Σ<sub>i</sub> P(<i>A</i> ∣ <i>B</i><sub>i</sub>) P(<i>B</i><sub>i</sub>)</div>
+    <ul>
+      <li>P(B), l'<b>a priori</b> (prior) : ce qu'on croit avant l'observation ; ici la prévalence.</li>
+      <li>P(A ∣ B), la <b>vraisemblance</b> (likelihood) : à quel point la cause B rend l'observation A probable.</li>
+      <li>P(A), la constante de <b>normalisation</b> (l'évidence) : la même pour toutes les causes, calculée par les probabilités totales (notion 3).</li>
+      <li>P(B ∣ A), l'<b>a posteriori</b> (posterior) : la croyance après l'observation. Comme le dénominateur est commun, a posteriori ∝ vraisemblance × a priori.</li>
+      <li>Hypothèses : P(A) &gt; 0 ; pour la troisième ligne, B<sub>1</sub>, …, B<sub>n</sub> partitionnent Ω.</li>
+      <li>Tout est ici un événement, la barre est juste. Quand la cause est un paramètre fixe θ, sa vraisemblance s'écrit L(θ) = p(x ; θ) ; écrire p(θ ∣ x) suppose qu'on a mis une loi sur θ (<a href="../chains/chain-p02-03-conjugues-posterior.html">p02-03</a>).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig2">
+    <div class="lbl">Figure 2 — les effectifs, et d'où viennent les positifs</div>
+    <div class="sl-ctl" id="f2pre"></div>
+    <div id="f2plot" class="wide"></div>
+    <div id="f2sl"></div>
+    <div class="readouts" id="f2out"></div>
+    <p class="cap">Barre du haut : la population, coupée en malades (bleu) et sains (violet), largeurs en <b>racine carrée</b> des effectifs, sinon les malades disparaissent. Barres du bas : les positifs et les négatifs, chacun coupé en vrais et faux, cette fois à l'échelle <b>linéaire</b> : la part bleue de la barre des positifs <i>est</i> P(malade ∣ +), la valeur prédictive positive (VPP). Au départ, le cancer de Brunton : 99 vrais positifs contre 999 faux, 9,0 %. Choisis consultation · 10 %, puis baisse la prévalence : la part bleue fond alors que sensibilité et spécificité n'ont pas bougé. Regarde le rapport des vrais aux faux positifs, pas les pourcentages du test.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>cancer, drogue, dépistage, l'étude de 08, un filtre anti-spam</small></summary><div class="in">
+    <ol>
+      <li><b>Le cancer de Brunton (10).</b> (0,99 × 0,001) / (0,99 × 0,001 + 0,01 × 0,999) = 0,00099 / 0,01098 = 0,0902. En effectifs : 99/(99 + 999).</li>
+      <li><b>La drogue de Brunton (11)</b>, test « fiable à 90 % » (sensibilité = spécificité = 0,9), 10 % d'usagers : 0,09 / (0,09 + 0,09) = 0,5. Sur 1 000 employés : 100 usagers dont 90 positifs, 900 non-usagers dont 90 positifs.</li>
+      <li><b>Même test, spécificité 0,8</b> : 0,09 / (0,09 + 0,18) = 1/3. « Vraiment très mauvais », dit Brunton.</li>
+      <li><b>Le dépistage de p00-03</b> : 1 % de malades, sensibilité 0,90, spécificité 0,95. Sur 100 000 personnes :
+        <table><tr><th></th><th>test +</th><th>test −</th><th>total</th></tr>
+        <tr><td>malade</td><td>900</td><td>100</td><td>1 000</td></tr>
+        <tr><td>sain</td><td>4 950</td><td>94 050</td><td>99 000</td></tr>
+        <tr><td>total</td><td>5 850</td><td>94 150</td><td>100 000</td></tr></table>
+        P(M ∣ +) = 900/5 850 = 2/13 = 0,154. Le test a multiplié la croyance par 15,4 (de 1 % à 15,4 %), et elle reste loin de 50 %. À 10 % de malades, même test : 9 000 contre 4 500, 2/3.</li>
+      <li><b>Le test de la vidéo 08</b> (sensibilité 0,9, spécificité 0,8) déployé sur une population à 1 % de malades : 0,009 / (0,009 + 0,198) = 0,0435. Loin des 0,818 de l'échantillon à 50/50 (notion 1).</li>
+      <li><b>En ML, un filtre anti-spam bayésien.</b> 20 % des mails sont des spams ; le mot « gratuit » apparaît dans 40 % des spams et 2 % des autres. P(spam ∣ gratuit) = 0,4 × 0,2 / (0,4 × 0,2 + 0,02 × 0,8) = 0,08 / 0,096 = 0,833. Chaque mot observé est un test ; en combiner plusieurs est la notion 5.</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>l'intersection écrite dans les deux sens</small></summary><div class="in">
+    <div class="drv">
+      <div>P(<i>A</i> ∩ <i>B</i>) = P(<i>A</i> ∣ <i>B</i>) P(<i>B</i>)</div><span>loi de multiplication (notion 2)</span>
+      <div>P(<i>A</i> ∩ <i>B</i>) = P(<i>B</i> ∣ <i>A</i>) P(<i>A</i>)</div><span>la même, dans l'autre sens</span>
+      <div>P(<i>B</i> ∣ <i>A</i>) P(<i>A</i>) = P(<i>A</i> ∣ <i>B</i>) P(<i>B</i>)</div><span>deux écritures de la même quantité</span>
+      <div>P(<i>B</i> ∣ <i>A</i>) = P(<i>A</i> ∣ <i>B</i>) P(<i>B</i>) / P(<i>A</i>)</div><span>diviser par P(A) &gt; 0 : le niveau « facile »</span>
+      <div>P(<i>A</i>) = P(<i>A</i> ∣ <i>B</i>) P(<i>B</i>) + P(<i>A</i> ∣ <i>B</i>ᶜ) P(<i>B</i>ᶜ)</div><span>probabilités totales sur B, Bᶜ (notion 3) : le niveau « moyen »</span>
+    </div>
+    <p>Sur une partition B<sub>1</sub>, …, B<sub>n</sub>, la même chose avec la somme au dénominateur donne le niveau « avancé ». « Un corollaire trivial de la définition », dit Brunton, et il a raison : rien d'autre que la notion 1 deux fois.</p>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>un million de dépistages, puis ne garder que les positifs</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(1)
+n = 1_000_000
+sick = rng.random(n) &lt; 0.001                     # prior: 1 person in 1,000
+u = rng.random(n)
+positive = np.where(sick, u &lt; 0.99, u &lt; 0.01)    # sensitivity 0.99, false positives 1 %
+
+print("people tested     :", n)
+print("sick              :", sick.sum())
+print("positive tests    :", positive.sum())
+print("sick and positive :", (sick &amp; positive).sum())
+print(f"P(sick | +), sim. : {sick[positive].mean():.4f}")   # zoom on the positives
+exact = 0.99 * 0.001 / (0.99 * 0.001 + 0.01 * 0.999)
+print(f"P(sick | +), Bayes: {exact:.4f}")</pre>
+<pre class="out">people tested     : 1000000
+sick              : 991
+positive tests    : 11100
+sick and positive : 984
+P(sick | +), sim. : 0.0886
+P(sick | +), Bayes: 0.0902</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Oublier l'a priori</b> (base rate neglect) : répondre 99 % parce que le test est à 99 %. C'est prendre P(+ ∣ malade) pour P(malade ∣ +) (notion 1).</li>
+      <li><b>Le sophisme du procureur.</b> « Une trace ADN pareille chez un innocent, c'est une chance sur un million », donc « une chance sur un million qu'il soit innocent » : c'est encore P(trace ∣ innocent) pris pour P(innocent ∣ trace). Même erreur que « la p-value est la probabilité que H<sub>0</sub> soit vraie » : une p-value se calcule sous H<sub>0</sub>, P(données au moins aussi extrêmes ; H<sub>0</sub>) (<a href="../chains/chain-p01-02-ic-test-procedure.html">p01-02</a>).</li>
+      <li><b>Un a priori tiré d'un échantillon construit.</b> L'étude cas-témoins de la vidéo 08 a 50 % de malades par construction ; son 0,818 ne vaut pas en population (exemple 5).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (10) appelle P(A ∣ B) « l'update », la mise à jour. Le terme usuel est la <i>vraisemblance</i> (likelihood) ; la mise à jour, c'est le passage de l'a priori à l'a posteriori. Il dit aussi « un test fiable à 99 % » : cela suppose sensibilité = spécificité = 0,99, une hypothèse à dire, car les deux taux diffèrent en général (notion 6). Il dit « 91 % du temps, c'est un faux positif » : c'est 91 % des positifs ; sur l'ensemble des tests, environ 1 % seulement (999 sur 100 000) sont des faux positifs. Enfin, il annonce une prévalence de « 0,001 % » avant de se corriger : c'est 0,001, soit 0,1 %.</div>
+  </div></details>
+  <p class="garde">Pour P(A) &gt; 0, P(B ∣ A) = P(A ∣ B) P(B) / P(A) : l'a posteriori est proportionnel à vraisemblance × a priori. Test à 99 % (sensibilité = spécificité = 0,99), maladie à 0,1 % : 9 % de malades parmi les positifs.</p>
+</section>
+
+<!-- ============================ n5 ============================ -->
+<section class="notion outil" id="n5">
+  <h3>En effectifs et en cotes ; deux tests successifs <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 10 et 11 · Drug Testing</p>
+  <div class="idee">
+    <p>Après un positif à 9 %, Brunton conseille un second test, plus précis. Que vaut un second positif si ce test a les mêmes taux et des erreurs indépendantes du premier ? Les effectifs le disent sans formule. Sur 10 000 000 personnes : 10 000 malades, 9 990 000 sains. Après un premier positif restent 9 900 malades et 99 900 sains, 9,0 % de malades. Après un second : 9 801 malades et 999 sains, 90,75 %.</p>
+    <p>La <b>cote</b> fait le même calcul en une multiplication. La cote d'un événement est P/(1 − P) : 1 contre 999 pour la maladie. Un positif est 99 fois plus probable chez un malade (0,99) que chez un sain (0,01) : ce 99 est le <b>rapport de vraisemblance</b> du test. Cote après le test = cote avant × 99, soit 99 contre 999. Un second test indépendant multiplie encore par 99 : « l'a posteriori d'une expérience devient l'a priori de la suivante », dit Brunton (10). Le test est un multiplicateur, la population fournit le point de départ.</p>
+  </div>
+  <div class="fig vis" id="v5">
+    <div class="lbl">Voir l'idée — dépister, puis un second test</div>
+    <div id="v5ctl" class="sl-ctl"></div>
+    <div id="v5plot" class="wide"></div>
+    <div class="readouts" id="v5out"></div>
+    <p class="cap">Chaque barre a la même longueur : c'est la population qui reste, coupée en malades (bleu) et sains (violet). Au-dessus de chaque barre les effectifs, en bout de barre la cote et P(malade). <b>Cancer</b> : 0,1 % de malades avant le test, 9,0 % après un positif, 90,75 % après deux ; la cote passe de 1:999 à 99:999 puis 9 801:999. <b>Drogue, test à 90 %</b> : 10 %, 50 %, 90 %. <b>Drogue, spécificité 0,8</b> : 10 %, 33 %, 69 %. <b>▶ rejouer</b> fait passer les tests un par un.</p>
+  </div>
+  <div class="formule"><div class="lbl">La formule</div>
+    <div class="eq">cote(<i>B</i>) = P(<i>B</i>) / P(<i>B</i>ᶜ) &nbsp;&nbsp; P(<i>B</i>) = cote / (1 + cote)</div>
+    <div class="eq">cote(<i>B</i> ∣ <i>A</i>) = cote(<i>B</i>) × LR &nbsp;&nbsp; LR = P(<i>A</i> ∣ <i>B</i>) / P(<i>A</i> ∣ <i>B</i>ᶜ)</div>
+    <div class="eq">test positif : LR<sup>+</sup> = sensibilité / (1 − spécificité) &nbsp;&nbsp; négatif : LR<sup>−</sup> = (1 − sensibilité) / spécificité</div>
+    <ul>
+      <li>« 1 contre 999 » : un malade pour 999 sains, donc P = 1/1 000.</li>
+      <li>On écrit Bayes pour B et pour Bᶜ, puis on divise : le dénominateur P(A), le même des deux côtés, disparaît. La forme en cotes n'en a pas besoin.</li>
+      <li>LR &gt; 1 fait monter la cote, LR &lt; 1 la fait baisser, LR = 1 ne change rien : le test est alors indépendant de la maladie (notion 7). Repères d'usage : LR &gt; 10 déplace fortement la cote, LR entre 2 et 5 un peu, LR = 1 pas du tout.</li>
+      <li>Deux tests : cote × LR<sub>1</sub> × LR<sub>2</sub>, si les deux résultats sont <b>indépendants sachant l'état</b>, chez les malades comme chez les sains. Ils ne sont pas indépendants tout court : un premier positif rend le second plus probable, parce qu'il rend la maladie plus probable.</li>
+      <li>Indépendants sachant l'état : P(T<sub>1</sub><sup>+</sup> ∩ T<sub>2</sub><sup>+</sup> ∣ B) = P(T<sub>1</sub><sup>+</sup> ∣ B) P(T<sub>2</sub><sup>+</sup> ∣ B), et de même sachant Bᶜ. C'est l'indépendance de la notion 7, appliquée à la probabilité P(· ∣ B).</li>
+      <li>La relation entre cote et probabilité n'est pas linéaire : doubler la cote ne double p que quand p est petit (figure 4).</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig3">
+    <div class="lbl">Figure 3 — l'échelle des cotes</div>
+    <div id="f3plot" class="wide"></div>
+    <div id="f3sl"></div>
+    <div class="readouts" id="f3out"></div>
+    <p class="cap">Une règle graduée en cotes, en échelle log. Le point du haut est la cote a priori (la population), la flèche verte la multiplication par le LR (le test), le point du bas la cote a posteriori. Au départ, le cancer de Brunton : 1:999 × 99 = 99:999 ≈ 1:10,1, soit 9,0 %. <b>Déplace le LR</b> : la flèche penche toujours de la même quantité pour un même LR, où qu'on parte ; c'est ce que veut dire « multiplicateur ». <b>Déplace la prévalence</b> : la flèche garde son inclinaison et glisse. À LR = 1 elle devient verticale, et le test n'apprend rien.</p>
+  </div>
+  <div class="fig" id="fig4">
+    <div class="lbl">Figure 4 — doubler la cote ne double pas la probabilité</div>
+    <div id="f4plot" class="wide"></div>
+    <div id="f4sl"></div>
+    <div class="readouts" id="f4out"></div>
+    <p class="cap">En abscisse la probabilité de départ p, en ordonnée la probabilité après avoir multiplié la cote par k. La courbe bleue est la vraie réponse, kp / (1 + (k − 1)p) ; le trait pointillé rouge, kp, est la fausse intuition « la probabilité est multipliée par k ». Les deux se confondent près de 0 et s'écartent ensuite. Avec <b>k = 2</b> : 0,01 devient 0,0198, mais 0,5 devient 0,667 et 0,9 devient 0,947. Règle k, puis promène p.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>cancer, drogue, dépistage, spam, la table cote → p</small></summary><div class="in">
+    <ol>
+      <li><b>Le cancer de Brunton.</b> LR<sup>+</sup> = 0,99/0,01 = 99. 1:999 × 99 = 99:999, p = 99/1 098 = 0,090. Second test : 9 801:999, p = 9 801/10 800 = 0,9075. Troisième : 0,999.</li>
+      <li><b>La drogue, test à 90 %.</b> LR<sup>+</sup> = 0,9/0,1 = 9. 1:9 → 1:1 (0,5) → 9:1 (0,9).</li>
+      <li><b>La drogue, spécificité 0,8.</b> LR<sup>+</sup> = 0,9/0,2 = 4,5. 1:9 → 4,5:9 = 1:2 (1/3) → 2,25:1 (0,692).</li>
+      <li><b>Le dépistage de p00-03</b> (1 %, 0,90, 0,95). LR<sup>+</sup> = 0,90/0,05 = 18 ; 1:99 × 18 = 18:99, p = 18/117 = 0,154. Un négatif : LR<sup>−</sup> = 0,10/0,95 = 0,105 ; 1:99 × 0,105 = 1:940,5, P(M ∣ −) = 0,00106. À faible prévalence, un négatif exclut presque la maladie (0,1 %) ; un positif ne l'établit pas (15 %), bien que son LR soit le plus fort (18, contre 1/0,105 = 9,5 pour le négatif).</li>
+      <li><b>En ML, le filtre anti-spam de la notion 4</b>, avec deux mots. Cote a priori 1:4 (20 % de spams). « gratuit » : LR = 0,40/0,02 = 20. « offre », présent dans 30 % des spams et 5 % des autres : LR = 6. Si les mots sont indépendants sachant la classe : 1:4 × 20 × 6 = 30:1, p = 30/31 = 0,968. C'est le classifieur Naive Bayes.</li>
+      <li><b>La table cote → p, quand la cote double.</b> La nouvelle probabilité est 2p/(1 + p), donc le facteur sur p est 2/(1 + p) : presque 2 en bas, 1,33 au milieu, presque 1 en haut.
+        <table><tr><th>p</th><th>cote</th><th>cote × 2</th><th>nouvelle p</th><th>p multipliée par</th></tr>
+        <tr><td>0,01</td><td>0,0101</td><td>0,0202</td><td>0,0198</td><td>1,98</td></tr>
+        <tr><td>0,05</td><td>0,0526</td><td>0,105</td><td>0,0952</td><td>1,90</td></tr>
+        <tr><td>0,10</td><td>0,111</td><td>0,222</td><td>0,182</td><td>1,82</td></tr>
+        <tr><td>0,20</td><td>0,25</td><td>0,5</td><td>0,333</td><td>1,67</td></tr>
+        <tr><td>0,50</td><td>1</td><td>2</td><td>0,667</td><td>1,33</td></tr>
+        <tr><td>0,90</td><td>9</td><td>18</td><td>0,947</td><td>1,05</td></tr></table></li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>un second test indépendant, contre le même test répété</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(2)
+n = 4_000_000
+# about 4,000 sick people: the simulated values carry about +-0.01 of noise
+sick = rng.random(n) &lt; 0.001
+
+def test(u):                     # sensitivity 0.99, false-positive rate 0.01
+    return np.where(sick, u &lt; 0.99, u &lt; 0.01)
+
+u1 = rng.random(n)
+t1 = test(u1)
+t2_new = test(rng.random(n))     # fresh draw: independent given the status
+t2_same = test(u1)               # same draw: repeats the first test's error
+
+print(f"after one +            : P(sick) = {sick[t1].mean():.3f}")
+print(f"two independent tests +: P(sick) = {sick[t1 &amp; t2_new].mean():.3f}")
+print(f"same test twice +      : P(sick) = {sick[t1 &amp; t2_same].mean():.3f}")
+odds = (0.001 / 0.999) * 99 * 99 # prior odds times LR, twice
+print(f"odds 1:999 x 99 x 99   : P(sick) = {odds / (1 + odds):.3f}")
+print(f"P(second + | first +)  = {t2_new[t1].mean():.3f}")
+print(f"P(second +)            = {t2_new.mean():.3f}")</pre>
+<pre class="out">after one +            : P(sick) = 0.089
+two independent tests +: P(sick) = 0.901
+same test twice +      : P(sick) = 0.089
+odds 1:999 x 99 x 99   : P(sick) = 0.907
+P(second + | first +)  = 0.098
+P(second +)            = 0.011</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Refaire le même test</b> n'est pas un second test indépendant : même réactif, même seuil, même patient atypique. Les erreurs sont corrélées et les LR ne se multiplient pas. À l'extrême, un test qui répète exactement son erreur n'apprend rien : 9 % reste 9 % (code ci-dessus).</li>
+      <li><b>Les deux résultats ne sont pas indépendants tout court.</b> Dans l'exemple du cancer, P(second + ∣ premier +) = 0,098 alors que P(second +) = 0,011. L'hypothèse qui sert est l'indépendance <i>sachant l'état</i>.</li>
+      <li><b>« La cote double, donc la probabilité double » est faux.</b> p devient 2p/(1 + p) : × 1,98 à 1 %, × 1,33 à 50 % (0,5 → 0,667), × 1,05 à 90 %. C'est le piège de la régression logistique, où e<sup>β</sup> multiplie une cote, jamais une probabilité (<a href="../chains/chain-p05-02-logistique.html">p05-02</a>).</li>
+      <li><b>Cote et probabilité.</b> « 1 contre 9 » vaut 1/10 = 10 %, pas 1/9.</li>
+      <li><b>Ce qui voyage et ce qui ne voyage pas.</b> Le LR ne dépend que de la sensibilité et de la spécificité : il se transporte d'une population à l'autre. La cote a priori, non.</li>
+    </ul>
+  </div></details>
+  <p class="garde">Cote a posteriori = cote a priori × LR, avec LR<sup>+</sup> = sensibilité/(1 − spécificité) pour un test positif ; deux tests indépendants sachant l'état multiplient leurs LR.</p>
+</section>
+
+<!-- ============================ n6 ============================ -->
+<section class="notion outil" id="n6">
+  <h3>Sensibilité, spécificité, précision : la précision dépend de la prévalence <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 11</p>
+  <div class="idee">
+    <p>Brunton donne enfin leurs noms aux deux taux du test. La <b>sensibilité</b> est P(+ ∣ usager) : à quel point le test réagit à ce qu'il cherche, 0,9 dans son exemple. La <b>spécificité</b> est P(− ∣ non-usager) : à quel point il se tait quand il n'y a rien, 0,8. Il faut les deux : un test qui répond toujours « positif » a 100 % de sensibilité et n'apprend rien.</p>
+    <p>Il ajoute la remarque ML : sur des données où l'événement est rare, « je peux avoir 99,9 % de taux de bonnes réponses (accuracy) en ne prédisant jamais qu'il arrive ». Le nombre qui intéresse celui qui reçoit un positif, la <b>précision</b> P(cas ∣ +), dépend en plus de la prévalence. Pour le test du dépistage (sensibilité 0,9 et spécificité 0,95), elle vaut 0,667 quand 10 % des gens sont malades, et 0,154 quand 1 % le sont.</p>
+  </div>
+  <div class="fig vis" id="v6">
+    <div class="lbl">Voir l'idée — quelles cases chaque métrique regarde</div>
+    <div id="v6ctl"></div>
+    <div id="v6plot" class="wide"></div>
+    <div class="readouts" id="v6out"></div>
+    <p class="cap">Le tableau croise l'état (lignes) et le test (colonnes), sur 10 000 personnes. <b>Choisis une métrique</b> : les cases de son numérateur se remplissent, celles de son dénominateur s'entourent. Le rappel et la spécificité restent dans une ligne ; la précision prend la colonne des positifs, qui traverse les deux lignes. <b>Passe de 10 % à 1 % de malades</b> : rappel 0,90 et spécificité 0,95 ne bougent pas, la précision tombe de 0,667 à 0,154. Les tests absurdes : <b>toujours +</b> a un rappel de 1 et une précision égale à la prévalence ; <b>toujours −</b> a 99 % d'accuracy à 1 % de malades.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les définitions</div>
+    <div class="eq">sensibilité = rappel = TPR = P(+ ∣ M) = TP / (TP + FN) &nbsp;&nbsp; spécificité = TNR = P(− ∣ Mᶜ) = TN / (TN + FP)</div>
+    <div class="eq">FPR = 1 − spécificité &nbsp;&nbsp; précision = VPP = P(M ∣ +) = TP / (TP + FP) = <i>s</i>π / (<i>s</i>π + (1 − <i>t</i>)(1 − π))</div>
+    <div class="eq">accuracy = (TP + TN) / N = π<i>s</i> + (1 − π)<i>t</i></div>
+    <ul>
+      <li>TP, FN, FP, TN : vrais positifs, faux négatifs, faux positifs, vrais négatifs. TPR, TNR, FPR : taux de vrais positifs, de vrais négatifs, de faux positifs (true positive rate…). VPP et VPN : valeurs prédictives positive, P(M ∣ +), et négative, P(Mᶜ ∣ −). s la sensibilité, t la spécificité, π = P(M) la prévalence.</li>
+      <li>s et t sont supposées propres au <b>test</b>, stables d'une population à l'autre. C'est une idéalisation : elle isole ce qui voyage.</li>
+      <li>π est propre à la <b>population</b> testée : dépistage de masse, consultation, urgences. Rien dans le test ne la contient.</li>
+      <li>La précision est l'a posteriori de Bayes (notion 4). Son dénominateur TP + FP mélange les deux lignes du tableau, d'où le π dans la formule.</li>
+      <li>L'accuracy est une moyenne de s et t pondérée par π (notion 3) : quand π est petit, elle ne regarde presque que la spécificité.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig5">
+    <div class="lbl">Figure 5 — la précision en fonction de la prévalence</div>
+    <div id="f5plot" class="wide"></div>
+    <div id="f5sl"></div>
+    <div class="readouts" id="f5out"></div>
+    <p class="cap">Sensibilité fixée à 0,90 ; seule la spécificité bouge. La courbe <b>violette</b> est le test de référence (spécificité 0,95), la <b>bleue</b> suit le curseur. Axe des prévalences en <b>log</b>, de 0,1 % à 50 %, avec deux repères à 1 % et 10 %. À prévalence faible la courbe est écrasée contre zéro, et c'est la <b>spécificité</b> seule qui décide, parce qu'elle s'applique au gros effectif des sains. Monte-la jusqu'à 0,999 : la courbe décolle, et la précision à 1 % passe de 15 % à 90 %.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>même test, deux populations ; les tests absurdes ; un modèle de fraude</small></summary><div class="in">
+    <ol>
+      <li><b>Même test</b> (sensibilité 0,90, spécificité 0,95), deux prévalences, sur 100 000 personnes :
+        <table><tr><th>métrique</th><th>formule</th><th>1 %</th><th>10 %</th></tr>
+        <tr><td>rappel (sensibilité)</td><td>TP/(TP + FN)</td><td>0,900</td><td>0,900</td></tr>
+        <tr><td>FPR (1 − spécificité)</td><td>FP/(FP + TN)</td><td>0,050</td><td>0,050</td></tr>
+        <tr><td>précision (VPP)</td><td>TP/(TP + FP)</td><td>0,154</td><td>0,667</td></tr>
+        <tr><td>F1</td><td>2 · préc · rapp / (préc + rapp)</td><td>0,263</td><td>0,766</td></tr>
+        <tr><td>VPN</td><td>TN/(TN + FN)</td><td>0,999</td><td>0,988</td></tr>
+        <tr><td>accuracy</td><td>(TP + TN)/N</td><td>0,9495</td><td>0,945</td></tr></table>
+        Les deux premières lignes ne bougent pas ; les quatre autres bougent.</li>
+      <li><b>La drogue de Brunton</b>, sensibilité 0,9, spécificité 0,8, 10 % d'usagers : précision 1/3, accuracy 0,1 × 0,9 + 0,9 × 0,8 = 0,81.</li>
+      <li><b>Le test toujours positif</b> : rappel 1, spécificité 0, précision égale à la prévalence (10 % chez Brunton).</li>
+      <li><b>Le test toujours négatif</b> : accuracy 1 − π, soit 0,99 à 1 % de malades et 0,999 à 0,1 %, les « 99,9 % » de Brunton ; rappel 0.</li>
+      <li><b>La bascule.</b> La précision vaut ½ quand vrais et faux positifs s'égalent : π = (1 − t)/(s + 1 − t) = 0,05/0,95 = 1/19 = 5,26 % pour le test de référence.</li>
+      <li><b>En ML, un modèle de fraude</b> de rappel 0,90 et FPR 0,05, évalué sur un jeu équilibré 50/50 : précision 0,947. En production, avec 1 % de fraudes : 0,154. Le modèle n'a pas changé ; 85 % des alertes sont fausses.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>le même classifieur sur trois populations</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(3)
+n = 1_000_000
+tpr, fpr = 0.90, 0.05                         # the classifier: same error rates everywhere
+
+for prev in (0.50, 0.10, 0.01):
+    y = rng.random(n) &lt; prev                  # true labels, at this prevalence
+    u = rng.random(n)
+    pred = np.where(y, u &lt; tpr, u &lt; fpr)      # predicted positive
+    tp, fp = (pred &amp; y).sum(), (pred &amp; ~y).sum()
+    fn, tn = (~pred &amp; y).sum(), (~pred &amp; ~y).sum()
+    print(f"prevalence {prev:.2f}: recall {tp / (tp + fn):.3f}  FPR {fp / (fp + tn):.3f}  "
+          f"precision {tp / (tp + fp):.3f}  accuracy {(tp + tn) / n:.3f}")</pre>
+<pre class="out">prevalence 0.50: recall 0.900  FPR 0.049  precision 0.948  accuracy 0.925
+prevalence 0.10: recall 0.900  FPR 0.050  precision 0.665  accuracy 0.945
+prevalence 0.01: recall 0.898  FPR 0.050  precision 0.152  accuracy 0.949</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>La prévalence importée.</b> Un test étalonné aux urgences (30 % de malades, précision 0,885) et déployé en dépistage (1 %) voit sa précision tomber à 0,154, sans que sensibilité ni spécificité aient bougé. Même piège pour un modèle évalué sur un jeu de validation plus riche en positifs que la production.</li>
+      <li><b>La sensibilité ne compense pas la prévalence.</b> Même à sensibilité 1, le dépistage à 1 % (spécificité 0,95, sur 100 000) donne 1 000 vrais positifs contre 4 950 faux : précision 0,168 au mieux. C'est la spécificité qui décide (figure 5).</li>
+      <li><b>L'accuracy en déséquilibre.</b> À 1 % de malades, le test de référence fait 0,9495 et le test toujours négatif 0,99 : l'accuracy préfère le test inutile.</li>
+      <li><b>ROC contre PR.</b> La courbe ROC trace le rappel contre le FPR, deux taux lus chacun dans une ligne : elle ne dépend pas de la prévalence. La courbe PR contient la précision : elle en dépend. En fort déséquilibre, c'est la PR qui montre le problème (<a href="../chains/chain-p06-03-seuil-roc-pr.html">p06-03</a>).</li>
+      <li><b>Rééchantillonner à 50/50</b> pour entraîner change la prévalence que le modèle voit : ses probabilités sont alors celles d'un monde à 50 % de positifs (<a href="../chains/chain-p06-04-calibration-desequilibre.html">p06-04</a>).</li>
+      <li><b>s et t ne sont pas parfaitement stables.</b> Un test détecte souvent mieux les cas avancés : sa sensibilité varie un peu avec la population. L'hypothèse reste la bonne approximation de départ.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (08) appelle « spécifique » un test qui détecte 90 % des malades, puis (11) nomme correctement ce taux sensibilité. Il décrit la spécificité comme « à peu près combien de faux positifs on aura dans la population des non-usagers » : c'est le taux de <i>vrais négatifs</i> P(− ∣ non-usager), et les faux positifs sont 1 − spécificité. Il appelle aussi « rare » une prévalence de 10 % : ce qui compte n'est pas le mot, c'est le rapport des faux positifs (1 − t)(1 − π) aux vrais positifs sπ.</div>
+  </div></details>
+  <p class="garde">Pour un même test, la précision P(M ∣ +) dépend de la prévalence, parce que son dénominateur mélange malades et sains : 0,667 à 10 %, 0,154 à 1 %. Le rappel et le FPR, lus dans une seule ligne, n'en dépendent pas.</p>
+</section>
+
+<!-- ============================ n7 ============================ -->
+<section class="notion outil" id="n7">
+  <h3>L'indépendance ; disjoint n'est pas indépendant <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 12 · Independence in Probability</p>
+  <div class="idee">
+    <p>Deux événements sont <b>indépendants</b> quand savoir que l'un est arrivé ne change rien à la probabilité de l'autre : P(A ∣ B) = P(A). Brunton dessine le paquet de 52 cartes en grille, 4 couleurs sur 13 valeurs. Les piques sont une ligne, les dames une colonne ; elles se croisent en une seule case, la dame de pique.</p>
+    <p>Restreint aux piques, on a toujours 1 chance sur 13 d'avoir une dame ; restreint aux dames, 1 sur 4 d'avoir un pique. Rien n'a bougé, et la dame de pique a pour probabilité le produit, 1/4 × 1/13 = 1/52. À l'inverse, pique et cœur ne se croisent pas du tout : ils sont <b>disjoints</b>. Savoir « cœur » rend le pique impossible, sa probabilité passe de 1/4 à 0. Disjoints, ils sont aussi dépendants qu'on peut l'être.</p>
+  </div>
+  <div class="fig vis" id="v7">
+    <div class="lbl">Voir l'idée — la grille 4 × 13 de Brunton</div>
+    <div id="v7ctl" class="sl-ctl"></div>
+    <div id="v7plot" class="wide"></div>
+    <div class="readouts" id="v7out"></div>
+    <p class="cap">A = « pique », la ligne du bas, est fixé ; <b>choisis B</b>. Les cases hors de B s'estompent, A ∩ B reste en couleur. <b>Dame</b> : une case sur 4 dans B, P(A ∣ B) = 1/4 = P(A), indépendants. <b>Trois</b> (la paire d'ouverture de Brunton) et <b>figure</b> : pareil. <b>Noire</b> : 13 cases sur 26, P(A ∣ B) = 1/2, dépendants. <b>Cœur</b> : aucune case commune, P(A ∩ B) = 0 au lieu de P(A)P(B) = 1/16, et P(A ∣ B) = 0 ; disjoints, donc dépendants.</p>
+  </div>
+  <div class="formule"><div class="lbl">La définition</div>
+    <div class="eq"><i>A</i> et <i>B</i> indépendants ⇔ P(<i>A</i> ∩ <i>B</i>) = P(<i>A</i>) P(<i>B</i>) ⇔ P(<i>A</i> ∣ <i>B</i>) = P(<i>A</i>) &nbsp; (si P(<i>B</i>) &gt; 0)</div>
+    <ul>
+      <li>La forme produit est la définition : symétrique en A et B, elle a un sens même si P(B) = 0 (un événement de probabilité nulle est indépendant de tout).</li>
+      <li>La forme conditionnelle est l'intuition : savoir B n'apprend rien sur A, et de même P(B ∣ A) = P(B) si P(A) &gt; 0.</li>
+      <li>Si A et B sont indépendants, Aᶜ et B, A et Bᶜ, Aᶜ et Bᶜ le sont aussi (preuve dépliable).</li>
+      <li>Disjoints avec P(A) &gt; 0 et P(B) &gt; 0 : P(A ∩ B) = 0 &lt; P(A) P(B), donc dépendants.</li>
+      <li>L'indépendance est une propriété de la loi P, pas des ensembles : les mêmes événements peuvent être indépendants sous une loi et pas sous une autre.</li>
+      <li>Pour des variables aléatoires, la même idée devient la factorisation de la loi jointe (<a href="lesson-00-07-lois-jointes.html#n4">l07, notion 4</a>).</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>cartes, deux dés, des pièces</small></summary><div class="in">
+    <ol>
+      <li><b>Dame de pique</b> : 1/52 = 1/4 × 1/13, indépendants.</li>
+      <li><b>Pique et trois</b>, la paire par laquelle Brunton ouvre la vidéo 08 : 1/52 = 1/4 × 1/13. Savoir que c'est un trois ne dit rien de la couleur.</li>
+      <li><b>Pique et figure</b> (valet, dame, roi) : 3/52 = 1/4 × 12/52, indépendants.</li>
+      <li><b>Pique et noire</b> : P(pique ∩ noire) = P(pique) = 1/4, mais 1/4 × 1/2 = 1/8. Dépendants : P(pique ∣ noire) = 1/2.</li>
+      <li><b>Pique et cœur</b> : 0 au lieu de 1/4 × 1/4 = 1/16. Disjoints, donc dépendants.</li>
+      <li><b>Deux dés</b>, A = « premier dé = 3 ». Avec « second dé = 5 » : 1/36 = 1/6 × 1/6, indépendants. Avec « somme = 6 » : 1/36 au lieu de 1/6 × 5/36 = 5/216, dépendants (P(A ∣ somme = 6) = 1/5, notion 1). Avec « somme = 7 » : 1/36 = 1/6 × 6/36, <b>indépendants</b>. Quel que soit le premier dé, exactement un second donne 7 : la somme 7 ne renseigne pas sur le premier dé.</li>
+      <li><b>Des pièces</b> : les lancers successifs d'une pièce sont modélisés indépendants, P(face, face) = ¼. C'est l'hypothèse qui donnera la binomiale (<a href="lesson-00-04-variables-binomiale-normale.html#n4">l04, notion 4</a>).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>les deux définitions, le complément, disjoint ⇒ dépendant</small></summary><div class="in">
+    <div class="drv">
+      <div>P(<i>A</i> ∣ <i>B</i>) = P(<i>A</i>)</div><span>l'intuition, avec P(B) &gt; 0</span>
+      <div>⇔ P(<i>A</i> ∩ <i>B</i>) / P(<i>B</i>) = P(<i>A</i>)</div><span>définition du conditionnement (notion 1)</span>
+      <div>⇔ P(<i>A</i> ∩ <i>B</i>) = P(<i>A</i>) P(<i>B</i>)</div><span>multiplier par P(B) : c'est la ligne de Brunton</span>
+      <div>P(<i>A</i>ᶜ ∩ <i>B</i>) = P(<i>B</i>) − P(<i>A</i> ∩ <i>B</i>)</div><span>B est l'union disjointe de A ∩ B et Aᶜ ∩ B</span>
+      <div>= P(<i>B</i>) − P(<i>A</i>) P(<i>B</i>) = P(<i>A</i>ᶜ) P(<i>B</i>)</div><span>indépendance, puis complément (l02, notion 2)</span>
+      <div>de même pour A et Bᶜ, puis pour Aᶜ et Bᶜ</div><span>par symétrie, puis en appliquant le résultat deux fois</span>
+      <div><i>A</i> ∩ <i>B</i> = ∅ ⇒ P(<i>A</i> ∩ <i>B</i>) = 0 &lt; P(<i>A</i>) P(<i>B</i>)</div><span>disjoints, de probabilités non nulles : jamais indépendants</span>
+    </div>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>les 36 issues, comptées exactement</small></summary><div class="in">
+<pre class="py">from fractions import Fraction
+from itertools import product
+
+omega = list(product(range(1, 7), repeat=2))       # the 36 equally likely pairs
+
+def P(event):
+    return Fraction(sum(1 for w in omega if event(w)), len(omega))
+
+A = lambda w: w[0] == 3                            # first die shows 3
+for name, B in [("second = 5", lambda w: w[1] == 5),
+                ("sum = 6", lambda w: w[0] + w[1] == 6),
+                ("sum = 7", lambda w: w[0] + w[1] == 7)]:
+    p_ab = P(lambda w: A(w) and B(w))
+    prod = P(A) * P(B)
+    verdict = "independent" if p_ab == prod else "dependent"
+    print(f"{name:10s}  P(A and B) = {str(p_ab):5s}  P(A)P(B) = {str(prod):6s}  {verdict}")</pre>
+<pre class="out">second = 5  P(A and B) = 1/36   P(A)P(B) = 1/36    independent
+sum = 6     P(A and B) = 1/36   P(A)P(B) = 5/216   dependent
+sum = 7     P(A and B) = 1/36   P(A)P(B) = 1/36    independent</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Disjoint n'est pas indépendant.</b> C'est même l'inverse : deux événements disjoints de probabilités non nulles s'excluent, donc chacun renseigne totalement sur l'autre.</li>
+      <li><b>L'indépendance dépend de P.</b> Retire la dame de cœur du paquet : il reste 51 cartes, P(dame) = 3/51, P(pique) = 13/51, P(dame de pique) = 1/51 = 0,0196, alors que le produit vaut 39/2 601 = 0,0150. Pique et dame ne sont plus indépendants.</li>
+      <li><b>Une covariance nulle n'est pas l'indépendance</b>, pour des variables aléatoires (<a href="lesson-00-09-covariance-correlation.html#n3">l09, notion 3</a>).</li>
+      <li><b>L'indépendance est une hypothèse à justifier.</b> « En un sens, une conséquence de la physique », dit Brunton : des disques sur la même prise ne tombent pas en panne indépendamment (notion 8).</li>
+      <li><b>Pas d'indépendance, pas de produit.</b> La vraisemblance d'un échantillon ne s'écrit comme un produit que si les observations sont indépendantes (<a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (12) ne dit pas que disjoint et indépendant sont deux choses différentes, et même incompatibles dès que les probabilités sont non nulles. Il développe IID en « identical independently distributed » : c'est <i>independent and identically distributed</i>, indépendantes et de même loi, deux hypothèses distinctes.</div>
+  </div></details>
+  <p class="garde">A et B sont indépendants si P(A ∩ B) = P(A) P(B), ce qui revient à P(A ∣ B) = P(A) quand P(B) &gt; 0 : savoir B ne change rien sur A.</p>
+</section>
+
+<!-- ============================ n8 ============================ -->
+<section class="notion outil" id="n8">
+  <h3>Systèmes en série et en parallèle ; la cause commune <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 12</p>
+  <div class="idee">
+    <p>Brunton applique l'indépendance à la fiabilité. En <b>série</b>, comme une guirlande de Noël, une seule panne coupe tout. Compter « exactement une panne, exactement deux… » mène au double compte, comme dans le problème des anniversaires ; il passe par le complément : le système marche seulement si les n composants marchent, (1 − p)<sup>n</sup> par indépendance. Avec 10 composants à 5 % de panne : 0,95<sup>10</sup> = 0,599, le système tombe 4 fois sur 10.</p>
+    <p>En <b>parallèle</b>, on contourne une panne ; le système ne tombe que si tout tombe : 0,05<sup>10</sup> ≈ 10<sup>−13</sup>. Trois disques durs à 1 % : un risque sur un million. Mais si le parasurtenseur lâche ou si la foudre tombe, les trois disques meurent ensemble. L'indépendance est une hypothèse physique, et une <b>cause commune</b> la casse.</p>
+  </div>
+  <div class="fig vis" id="v8">
+    <div class="lbl">Voir l'idée — la guirlande et les disques de secours</div>
+    <div id="v8ctl" class="sl-ctl"></div>
+    <div id="v8sl"></div>
+    <div id="v8plot" class="wide"></div>
+    <div class="readouts" id="v8out"></div>
+    <p class="cap">n composants, chacun en panne avec probabilité p = 0,05, indépendamment. Une panne est une croix rouge ; le courant passe de gauche à droite tant qu'un chemin existe. <b>Série</b>, n = 10 : P(panne) = 0,401. <b>Parallèle</b>, n = 10 : 9,8 × 10<sup>−14</sup>. <b>▶ 1 000 systèmes</b> en tire mille : en série environ 400 tombent, en parallèle aucun. Active la <b>cause commune</b> (une surtension, 1 fois sur 1 000, qui tue tout) : le bouton tire alors 20 000 systèmes, et la parallèle en voit tomber une vingtaine, environ une fois sur mille, quel que soit n.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les formules</div>
+    <div class="eq">série : P(panne) = 1 − (1 − <i>p</i>)<sup>n</sup> &nbsp;&nbsp;&nbsp; parallèle : P(panne) = <i>p</i><sup>n</sup></div>
+    <div class="eq">composants différents : 1 − Π(1 − <i>p</i><sub>i</sub>) et Π <i>p</i><sub>i</sub> &nbsp;&nbsp;&nbsp; cause commune de probabilité <i>q</i> : P(panne parallèle) = <i>q</i> + (1 − <i>q</i>) <i>p</i><sup>n</sup> ≥ <i>q</i></div>
+    <ul>
+      <li>Hypothèse : les n pannes sont <b>mutuellement</b> indépendantes, ce qui demande plus que l'indépendance de chaque paire (notion 9). C'est elle qui permet de multiplier n probabilités.</li>
+      <li>Série : le complément (<a href="lesson-00-02-espace-axiomes-complement.html#n2">l02, notion 2</a>) évite de compter une panne, deux pannes, et ainsi de suite, comme pour les anniversaires (<a href="lesson-00-02-espace-axiomes-complement.html#n4">l02, notion 4</a>).</li>
+      <li>Cause commune : un choc de probabilité q, indépendant des pannes propres, qui met tous les composants hors service d'un coup. La redondance ne protège pas contre lui.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig6">
+    <div class="lbl">Figure 6 — ajouter des composants, avec ou sans cause commune</div>
+    <div id="f6plot" class="wide"></div>
+    <div id="f6sl"></div>
+    <div class="readouts" id="f6out"></div>
+    <p class="cap">P(panne) en fonction du nombre n de composants, en échelle log, pour p = 0,05. En <b>série</b> (rouge), la panne monte vers 1 : 0,401 à n = 10. En <b>parallèle</b> (bleu), elle est divisée par 20 à chaque composant ajouté, jusqu'à 9,8 × 10<sup>−14</sup>. Avec une <b>cause commune</b> de probabilité q = 10<sup>−3</sup> (violet), la parallèle s'écrase sur le plancher q : à n = 4 elle n'est plus qu'à 0,6 % au-dessus. Règle q et p : le plancher suit q, pas n.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>la guirlande, deux composants, les disques, un agent LLM</small></summary><div class="in">
+    <ol>
+      <li><b>Brunton</b>, n = 10, p = 0,05. Série : 0,95<sup>10</sup> = 0,5987 de marche, 0,4013 de panne. Parallèle : 0,05<sup>10</sup> = 9,8 × 10<sup>−14</sup>, « à peu près 10<sup>−13</sup> ».</li>
+      <li><b>Deux composants</b> à 5 % : série 1 − 0,95² = 0,0975 ; parallèle 0,05² = 0,0025.</li>
+      <li><b>Les disques de Brunton</b> : trois à 1 % en parallèle, 0,01³ = 10<sup>−6</sup>. Avec une surtension commune de probabilité 10<sup>−3</sup> : 10<sup>−3</sup> + (1 − 10<sup>−3</sup>) × 10<sup>−6</sup> = 1,001 × 10<sup>−3</sup>, mille fois plus.</li>
+      <li><b>Cent composants à 1 %</b> en série : 1 − 0,99<sup>100</sup> = 0,634. Des pièces fiables, une chaîne qui ne l'est pas.</li>
+      <li><b>En ML, un agent LLM</b> qui enchaîne 10 étapes (appel d'outil, extraction, génération…), chacune réussie à 95 % et indépendamment des autres : il réussit de bout en bout avec probabilité 0,95<sup>10</sup> = 0,599 ; avec 20 étapes, 0,358. C'est un système en série.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>quatre millions de paires de disques, avec et sans surtension</small></summary><div class="in">
+<pre class="py">import numpy as np
+
+rng = np.random.default_rng(4)
+m, n, p, q = 4_000_000, 2, 0.01, 0.001     # systems, disks, failure prob., surge prob.
+# about 400 parallel failures expected: the simulated rates carry about 5 % of noise
+fail = rng.random((m, n)) &lt; p              # each disk fails on its own, independently
+surge = rng.random(m) &lt; q                  # a common shock that kills every disk at once
+
+series = fail.any(axis=1)                  # one failure is enough
+parallel = fail.all(axis=1)                # every disk must fail
+parallel_cc = parallel | surge
+
+print(f"series            : {series.mean():.6f}  exact {1 - (1 - p)**n:.6f}")
+print(f"parallel          : {parallel.mean():.6f}  exact {p**n:.6f}")
+print(f"parallel + surge  : {parallel_cc.mean():.6f}  exact {q + (1 - q) * p**n:.6f}")</pre>
+<pre class="out">series            : 0.019916  exact 0.019900
+parallel          : 0.000093  exact 0.000100
+parallel + surge  : 0.001114  exact 0.001100</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>La cause commune.</b> Même prise, même lot de fabrication, même foudre : les pannes ne sont plus indépendantes, et la parallèle ne descend jamais sous la probabilité du choc commun.</li>
+      <li><b>Des composants différents.</b> pⁿ suppose le même p partout ; sinon on multiplie les p<sub>i</sub> un par un.</li>
+      <li><b>Le basculement fait partie du système.</b> Si l'organe qui passe sur le secours peut lui-même tomber en panne, il est en série avec le bloc parallèle.</li>
+      <li><b>Un ensemble de modèles n'est redondant que si leurs erreurs le sont peu.</b> Un vote majoritaire réduit l'erreur quand les modèles se trompent indépendamment ; entraînés sur les mêmes données, ils se trompent souvent ensemble, une cause commune.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (12) écrit (1 − p)<sup>n</sup> et p<sup>n</sup> en invoquant l'indépendance, qu'il n'a définie que pour deux événements. Pour n composants, il faut l'<i>indépendance mutuelle</i> des n pannes : le produit pour toute sous-famille, pas seulement pour chaque paire (notion 9).</div>
+  </div></details>
+  <p class="garde">Pour n composants de panne p, aux pannes mutuellement indépendantes : en série P(panne) = 1 − (1 − p)<sup>n</sup>, en parallèle p<sup>n</sup>. Une cause commune de probabilité q fixe à la parallèle un plancher q.</p>
+</section>
+
+<!-- ============================ n9 ============================ -->
+<section class="notion culture" id="n9">
+  <h3>Indépendance deux à deux contre mutuelle <span class="tag culture">culture</span></h3>
+  <p class="src">Brunton 12 (non traité dans la vidéo)</p>
+  <div class="idee">
+    <p>Pour trois événements ou plus, vérifier chaque paire ne suffit pas. Lance deux pièces. A : la première tombe sur face. B : la seconde tombe sur face. C : les deux pièces tombent du même côté. Chacun a probabilité ½, et chaque paire est indépendante : A et C, par exemple, n'arrivent ensemble qu'en (face, face), ¼ = ½ × ½.</p>
+    <p>Mais A et B ensemble décident C : si les deux pièces sont sur face, elles sont du même côté. P(A ∩ B ∩ C) = ¼, pas ⅛. Savoir A seul ne dit rien de C, savoir B seul non plus ; savoir les deux dit tout. Les formules de la notion 8 multiplient n probabilités d'un coup : elles demandent l'indépendance mutuelle.</p>
+  </div>
+  <div class="fig vis" id="v9">
+    <div class="lbl">Voir l'idée — trois paires indépendantes, un triplet qui ne l'est pas</div>
+    <div id="v9ctl" class="sl-ctl"></div>
+    <div id="v9plot" class="wide"></div>
+    <div class="readouts" id="v9out"></div>
+    <p class="cap">Les quatre issues de deux pièces, chacune de probabilité ¼, avec les événements qui les contiennent. <b>Choisis une intersection</b> : ses issues s'allument. A ∩ B, A ∩ C et B ∩ C ne contiennent que (face, face) : ¼ = ½ × ½ chaque fois. A ∩ B ∩ C aussi : ¼, alors que le produit vaut ⅛. Et <b>C sachant A et B</b> vaut 1.</p>
+  </div>
+  <div class="formule"><div class="lbl">La définition</div>
+    <div class="eq"><i>A</i><sub>1</sub>, …, <i>A</i><sub>n</sub> mutuellement indépendants ⇔ P(∩<sub>i ∈ I</sub> <i>A</i><sub>i</sub>) = Π<sub>i ∈ I</sub> P(<i>A</i><sub>i</sub>) pour toute sous-famille I d'au moins deux indices</div>
+    <ul>
+      <li>Deux à deux : seulement les sous-familles de deux indices.</li>
+      <li>Pour n événements, 2<sup>n</sup> − n − 1 égalités : 4 pour trois événements (les trois paires et le triplet).</li>
+      <li>Le produit du triplet seul ne suffit pas non plus (exemple 3).</li>
+      <li>C'est la mutuelle que supposent p<sup>n</sup> (notion 8), la binomiale (<a href="lesson-00-04-variables-binomiale-normale.html#n4">l04, notion 4</a>) et la vraisemblance d'un échantillon i.i.d.</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>deux pièces, deux dés, trois pièces</small></summary><div class="in">
+    <ol>
+      <li><b>Deux pièces</b>, A, B, C comme dans l'idée : trois paires indépendantes, triplet à ¼ au lieu de ⅛.</li>
+      <li><b>Deux dés</b> : A = « premier dé pair », B = « second dé pair », C = « somme paire ». Chacun ½, chaque paire ¼ ; mais A ∩ B est contenu dans C, donc P(A ∩ B ∩ C) = ¼ ≠ ⅛.</li>
+      <li><b>Le triplet sans les paires.</b> Deux dés : A = « premier dé ∈ {1, 2, 3} », B = « premier dé ∈ {3, 4, 5} », C = « somme = 9 ». P(A ∩ B ∩ C) = P((3, 6)) = 1/36 = ½ × ½ × 1/9, et pourtant P(A ∩ B) = P(premier dé = 3) = 1/6 ≠ ¼.</li>
+      <li><b>Trois pièces différentes</b>, une face par événement : les quatre égalités sont vraies, l'indépendance est mutuelle.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>les quatre égalités, vérifiées une à une</small></summary><div class="in">
+<pre class="py">from fractions import Fraction
+from itertools import product, combinations
+
+coins = list(product("HT", repeat=2))              # HH, HT, TH, TT, each 1/4
+events = {"A": lambda w: w[0] == "H",              # first coin heads
+          "B": lambda w: w[1] == "H",              # second coin heads
+          "C": lambda w: w[0] == w[1]}             # both coins agree
+
+def P(event):
+    return Fraction(sum(1 for w in coins if event(w)), len(coins))
+
+for k in (2, 3):
+    for names in combinations("ABC", k):
+        joint = P(lambda w: all(events[e](w) for e in names))
+        prod = Fraction(1)
+        for e in names:
+            prod *= P(events[e])
+        label = " and ".join(names)
+        verdict = "equal" if joint == prod else "NOT equal"
+        print(f"{label:13s} = {str(joint):4s} product = {str(prod):4s} {verdict}")</pre>
+<pre class="out">A and B       = 1/4  product = 1/4  equal
+A and C       = 1/4  product = 1/4  equal
+B and C       = 1/4  product = 1/4  equal
+A and B and C = 1/4  product = 1/8  NOT equal</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Les produits de n facteurs</b> : p<sup>n</sup> d'un système parallèle, la binomiale, la vraisemblance comme produit. Avec seulement l'indépendance deux à deux, ils peuvent être faux.</li>
+      <li><b>Naive Bayes</b> suppose les mots mutuellement indépendants sachant la classe (notion 5). C'est faux en général (« Nouvelle » et « Calédonie »), et ses probabilités sont souvent trop proches de 0 ou de 1, même quand son classement reste bon.</li>
+      <li><b>Tester les paires dans les données</b>, deux variables à la fois, ne prouve pas l'indépendance mutuelle : l'exemple des deux pièces passe tous les tests de paires.</li>
+    </ul>
+  </div></details>
+  <p class="garde">Deux à deux ne suffit pas : l'indépendance de n événements demande le produit pour toute sous-famille, et c'est elle que supposent p<sup>n</sup> et la binomiale ; Naive Bayes la suppose sachant la classe.</p>
+</section>
+
+
+</div><!-- /lecon -->
+</section>
+
+<section class="blk" id="resume">
+<h2 style="--ac:var(--yellow)">Résumé</h2>
+<div class="card resume"><div class="lbl">À retenir</div>
+  <ol>
+    <li>P(A ∣ B) = P(A ∩ B)/P(B) : on se restreint à B et on renormalise ; P(A ∣ B) ≠ P(B ∣ A).</li>
+    <li>P(A ∩ B) = P(A ∣ B) P(B), toujours ; un chemin d'arbre vaut le produit de ses branches.</li>
+    <li>Probabilités totales : P(A) = Σ P(A ∣ B<sub>i</sub>) P(B<sub>i</sub>) sur une partition.</li>
+    <li>Bayes : a posteriori = vraisemblance × a priori / normalisation ; test à 99 %, maladie à 0,1 % : 9 %.</li>
+    <li>En cotes : a posteriori = a priori × LR ; deux tests indépendants sachant l'état multiplient leurs LR ; doubler une cote ne double pas p.</li>
+    <li>Rappel et FPR ne dépendent pas de la prévalence, la précision si.</li>
+    <li>Indépendance ⇔ P(A ∩ B) = P(A) P(B) ; disjoint n'est pas indépendant.</li>
+    <li>Série 1 − (1 − p)<sup>n</sup>, parallèle p<sup>n</sup>, sous indépendance mutuelle ; une cause commune fixe le plancher.</li>
+  </ol>
+</div>
+<div class="phrase">« Conditionner, c'est se restreindre à B et renormaliser : P(A ∣ B) et P(B ∣ A) ont le même numérateur et deux dénominateurs. Bayes passe de l'un à l'autre avec l'a priori : un test à 99 % sur une maladie à 0,1 % ne donne que 9 % de malades parmi les positifs. C'est pour ça qu'une précision dépend de la prévalence, alors que le rappel et le taux de faux positifs n'en dépendent pas. Et multiplier des probabilités demande l'indépendance, qui n'a rien à voir avec être disjoint. »</div>
+</section>
+
+<section class="blk" id="verbal">
+<h2 style="--ac:var(--teal)">Chaîne verbalisée — une prise, à voix haute</h2>
+<div class="card say-card"><div class="lbl">7 maillons · clique pour révéler après avoir dit</div>
+  <ol class="verb">
+    <li><div class="q">Que veut dire P(A ∣ B), en un geste ?</div><div class="a hid">Se restreindre aux issues de B et renormaliser : P(A ∩ B)/P(B). Seul le dénominateur choisit le sens.</div></li>
+    <li><div class="q">Test à 99 %, maladie à 0,1 % : que vaut P(malade ∣ +), en effectifs ?</div><div class="a hid">Sur 100 000 : 100 malades dont 99 positifs, 99 900 sains dont 999 positifs. 99/1 098 = 9 %.</div></li>
+    <li><div class="q">Refais-le en cotes, puis avec un second test indépendant sachant l'état.</div><div class="a hid">1:999 × 99 = 99:999, soit 9 % ; × 99 encore : 9 801:999, soit 90,75 %.</div></li>
+    <li><div class="q">La cote double : la probabilité double-t-elle ?</div><div class="a hid">Seulement si p est petit : p devient 2p/(1 + p). 0,01 → 0,0198, mais 0,5 → 0,667.</div></li>
+    <li><div class="q">Quelle métrique dépend de la prévalence, et pourquoi ?</div><div class="a hid">La précision : son dénominateur TP + FP mélange malades et sains. Le rappel et le FPR restent chacun dans une ligne. Même test : 0,667 à 10 %, 0,154 à 1 %.</div></li>
+    <li><div class="q">Deux événements disjoints sont-ils indépendants ?</div><div class="a hid">Jamais quand leurs probabilités sont non nulles : P(A ∩ B) = 0 &lt; P(A) P(B). Savoir l'un exclut l'autre.</div></li>
+    <li><div class="q">Dix composants à 5 % de panne : série ou parallèle, et sous quelle hypothèse ?</div><div class="a hid">Série 0,401, parallèle 10<sup>−13</sup>, sous indépendance mutuelle des pannes. Une cause commune de probabilité q fixe un plancher : la parallèle ne descend jamais sous q.</div></li>
+  </ol>
+</div>
+</section>
+
+<section class="blk" id="links">
+<h2 style="--ac:var(--violet)">Où ça sert ensuite</h2>
+<div class="card" style="--ac:var(--violet)"><div class="lbl">Leçons et chaînes</div>
+  <div class="bridges">
+    <a href="lesson-00-07-lois-jointes.html#n3"><b>l07 · Lois jointes</b><small>la loi conditionnelle et Bayes pour des densités : le zoom de la notion 1, quand B est de probabilité nulle.</small></a>
+    <a href="../chains/chain-p06-03-seuil-roc-pr.html"><b>Seuil, ROC, PR</b><small>la ROC trace deux taux lus chacun dans une ligne, insensibles à la prévalence ; la PR contient la précision de la notion 6.</small></a>
+    <a href="../chains/chain-p06-04-calibration-desequilibre.html"><b>Calibration et déséquilibre</b><small>rééchantillonner à 50/50 change l'a priori : les probabilités du modèle portent la mauvaise prévalence.</small></a>
+    <a href="../chains/chain-p05-02-logistique.html"><b>Régression logistique</b><small>la log-cote est affine, e<sup>β</sup> multiplie une cote : la notion 5 et sa table cote → p.</small></a>
+    <a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html"><b>Du bruit à la loss</b><small>la vraisemblance d'un échantillon est un produit, licite par l'indépendance mutuelle (notions 7 et 9).</small></a>
+    <a href="../chains/chain-p02-02-prior-penalite.html"><b>Du prior à la pénalité</b><small>a posteriori ∝ vraisemblance × a priori, lu en logarithme : l'a priori devient une pénalité.</small></a>
+    <a href="../chains/chain-p02-03-conjugues-posterior.html"><b>Le posterior entier</b><small>Bayes quand la cause est un paramètre muni d'une loi, et P(données) comme normalisation.</small></a>
+    <a href="../chains/chain-p07-01-arbres-impurete.html"><b>Arbres et impureté</b><small>la proportion d'une classe dans un nœud est une probabilité conditionnelle, le zoom de la notion 1.</small></a>
+    <a href="../chains/chain-p01-02-ic-test-procedure.html"><b>IC et test comme procédures</b><small>« p-value = P(H<sub>0</sub>) » est le sophisme du procureur de la notion 4.</small></a>
+  </div>
+</div>
+<div class="card" style="--ac:var(--teal)"><div class="lbl">Cartes Anki liées</div>
+  <p><code>stats::conditionnement</code> (notions 1, 2, 3) · <code>stats::bayes</code> (notions 4, 5) · <code>stats::base-rate</code> (notions 4, 6) · <code>stats::independance</code> (notions 7, 8 ; notion 9 sans carte) · <code>ml::metriques</code> (notion 6).</p>
+  <p>Une carte se fait depuis le « ce qu'on garde » d'une notion OUTIL, après ta lecture, dans tes mots.</p>
+</div>
+</section>
+
+</main>
+</div>
+<footer>leçon l03 · v1 du 10/10/2026 · Brunton 08 à 12 · Prérequis : <a href="lesson-00-02-espace-axiomes-complement.html">l02 · Ω, axiomes, complément</a>. Suite : <a href="lesson-00-04-variables-binomiale-normale.html">l04 · Variables aléatoires, de la binomiale à la normale</a>.</footer>
+</div>
+<div class="ledge"></div>
+<script src="../../assets/sheetlib.js"></script>
+<script>
+(function(){
+/* ===== commun à toutes les leçons (kit, étalon l08 v2) ===== */
+/* thème */
+const btn=document.getElementById('themeBtn'),body=document.body;
+function apply(w){body.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+apply(!!(window.matchMedia&&window.matchMedia('(prefers-color-scheme: light)').matches));
+btn.onclick=()=>apply(!body.classList.contains('white'));
+/* toc : une entrée par notion, étiquette comprise */
+const toc=document.getElementById('toc');
+document.querySelectorAll('.notion').forEach((s,i)=>{const li=document.createElement('li');const t=s.querySelector('h3').firstChild.textContent.trim();const k=s.classList.contains('culture')?' · culture':'';li.innerHTML=`<a href="#${s.id}">${i+1}. ${t}${k}</a>`;toc.appendChild(li);});
+const io=new IntersectionObserver(es=>{es.forEach(e=>{if(e.isIntersecting){toc.querySelectorAll('li').forEach(l=>l.classList.remove('cur'));const a=toc.querySelector(`a[href="#${e.target.id}"]`);if(a)a.parentNode.classList.add('cur');}});},{rootMargin:'-20% 0px -70% 0px'});
+document.querySelectorAll('.notion').forEach(s=>io.observe(s));
+/* une ancre #nN ouvre la notion visée ; rien n'est replié par défaut hors des blocs */
+/* chaîne verbalisée */
+document.querySelectorAll('.verb .a').forEach(a=>a.addEventListener('click',()=>a.classList.remove('hid')));
+
+/* ===== outils de dessin ===== */
+function curve(P,f,a,b,cls,ymax){let d='';const n=240;for(let i=0;i<=n;i++){const x=a+(b-a)*i/n;let y=f(x);if(!isFinite(y))continue;y=Math.min(y,ymax);d+=(d?' L':'M')+P.sx(x).toFixed(1)+' '+P.sy(y).toFixed(1);}SL.el('path',{d:d,class:'sl-fn '+cls,fill:'none'},P.dyn);}
+function bar(P,x0,x1,y,cls){const a=P.sx(x0),b=P.sx(x1);SL.el('rect',{x:Math.min(a,b),y:P.sy(y),width:Math.max(1.5,Math.abs(b-a)),height:Math.max(0,P.sy(0)-P.sy(y)),class:cls||'sl-bar'},P.dyn);}
+/* SL.plot trace l'axe vertical en x = 0 ; quand 0 porte une barre, on le ramène au bord gauche */
+function leftAxis(P,x0){const ax=P.svg.querySelectorAll('line.sl-axis');if(ax[1]){ax[1].setAttribute('x1',P.sx(x0));ax[1].setAttribute('x2',P.sx(x0));}}
+function rd(host,items){host.innerHTML=items.map(it=>`<div class="${it[2]||''}">${it[0]}<b>${it[1]}</b></div>`).join('');}
+function buttons(host,names,cb){const bs=names.map((n,i)=>{const b=SL.h('button','tb',host,n);b.onclick=()=>{bs.forEach(x=>x.setAttribute('aria-pressed','false'));b.setAttribute('aria-pressed','true');cb(i);};return b;});bs[0].onclick();return bs;}
+
+
+/* ===== v2 : vignettes « voir l'idée », une par notion, juste sous l'idée ===== */
+/* tween : animation 0 → 1 lissée ; runner : un jeton par figure, un nouveau clic tue l'animation en cours */
+function runner(){let t={dead:true};return ()=>{t.dead=true;t={dead:false};return t;};}
+function tween(ms,draw,tk,done){if(SL.reduced){draw(1);if(done)done();return;}const t0=performance.now();const st=t=>{if(tk&&tk.dead)return;let u=Math.min(1,(t-t0)/ms);u=u<.5?2*u*u:1-Math.pow(-2*u+2,2)/2;draw(u);if(u<1)requestAnimationFrame(st);else if(done)done();};requestAnimationFrame(st);}
+function loop(tk,step){if(SL.reduced){let g=0;while(step()!==false&&g++<1e5);return;}const f=()=>{if(tk.dead)return;if(step()!==false)requestAnimationFrame(f);};requestAnimationFrame(f);}
+function rng(s){return function(){s|=0;s=s+0x6D2B79F5|0;let t=Math.imul(s^s>>>15,1|s);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296;};}
+function pick(r,v,p){let u=r(),a=0;for(let i=0;i<v.length;i++){a+=p[i];if(u<a)return v[i];}return v[v.length-1];}
+function gauss(r){let u=0;while(u===0)u=r();return Math.sqrt(-2*Math.log(u))*Math.cos(2*Math.PI*r());}
+function fulcrum(P,x){const cx=P.sx(x),cy=P.sy(0);SL.el('path',{d:`M${cx.toFixed(1)} ${(cy+1).toFixed(1)} L${(cx-8).toFixed(1)} ${(cy+16).toFixed(1)} L${(cx+8).toFixed(1)} ${(cy+16).toFixed(1)} Z`,class:'sl-fulcrum'},P.dyn);}
+function median(a){const s=a.slice().sort((x,y)=>x-y),n=s.length;return n%2?s[(n-1)/2]:(s[n/2-1]+s[n/2])/2;}
+function rect(P,x0,x1,y0,y1,cls,parent){const a=P.sx(x0),b=P.sx(x1),c=P.sy(y0),d=P.sy(y1);return SL.el('rect',{x:Math.min(a,b).toFixed(1),y:Math.min(c,d).toFixed(1),width:Math.abs(b-a).toFixed(1),height:Math.abs(d-c).toFixed(1),class:cls},parent||P.dyn);}
+/* pile de pastilles : une par individu, regroupées par classe de largeur bw */
+function stack(P,vals,bw,r,clsOf,centred){const bins=new Map();vals.forEach((v,i)=>{const b=centred?Math.round(v/bw):Math.floor(v/bw);if(!bins.has(b))bins.set(b,[]);bins.get(b).push(i);});
+  const res=[];bins.forEach((ids,b)=>{const c=centred?b*bw:(b+0.5)*bw,cx=P.sx(c);res.push({c:c,ids:ids});ids.forEach((i,j)=>SL.el('circle',{cx:cx.toFixed(1),cy:(P.sy(0)-r-1-j*(2*r+1)).toFixed(1),r:r,class:'sl-dot '+clsOf(i)},P.dyn));});return res;}
+
+
+/* ===== outils propres à l03 ===== */
+const ent=v=>String(Math.round(v)).replace(/\B(?=(\d{3})+(?!\d))/g,' ');
+const fx=(x,d)=>Number(x).toFixed(d).replace('.',',');
+const pct=(v,d)=>fx(v*100,d===undefined?1:d)+' %';
+const vpp=(pr,se,sp)=>se*pr/(se*pr+(1-sp)*(1-pr));
+const SUP='⁰¹²³⁴⁵⁶⁷⁸⁹';
+const supn=k=>(k<0?'⁻':'')+String(Math.abs(k)).split('').map(c=>SUP[+c]).join('');
+/* 9,8 × 10⁻¹⁴ ; au-dessus de 0,01 on écrit le nombre */
+function sci(x,d){if(x===0)return '0';if(x>=0.01)return SL.fmt(x,d===undefined?3:d);const e=Math.floor(Math.log10(x)),m=x/Math.pow(10,e);
+  return (Math.abs(m-1)<0.005?'':fx(m,1)+' × ')+'10'+supn(e);}
+const cote=o=>o<1?'1:'+SL.fmt(1/o,1/o>=100?0:1):SL.fmt(o,o>=100?0:2)+':1';
+/* un SVG nu, en pixels, pour les schémas qui n'ont pas d'axes */
+function canvas(host,W,H){return SL.el('svg',{viewBox:`0 0 ${W} ${H}`,class:'sl-plot'},host);}
+function txt(parent,x,y,s,cls,anchor){const t=SL.el('text',{x:x.toFixed?x.toFixed(1):x,y:y.toFixed?y.toFixed(1):y,class:cls||'sl-lbl','text-anchor':anchor||'start'},parent);t.textContent=s;return t;}
+function box(parent,x,y,w,h,cls){return SL.el('rect',{x:x.toFixed(1),y:y.toFixed(1),width:Math.max(0,w).toFixed(1),height:Math.max(0,h).toFixed(1),class:cls},parent);}
+function noAxes(P){P.svg.querySelectorAll('line.sl-axis').forEach(l=>l.remove());}
+/* graduations posées à la main quand l'abscisse est un log */
+function logticks(P,pairs,ytop,y0){const g=SL.el('g',{class:'sl-grid'},P.layer);const yb=y0===undefined?0:y0;
+  pairs.forEach(function(pl){const X=P.sx(Math.log10(pl[0]));
+    SL.el('line',{x1:X,x2:X,y1:P.sy(ytop),y2:P.sy(yb)},g);
+    const tx=SL.el('text',{x:X,y:P.sy(yb)+16,'text-anchor':'middle',class:'sl-tick'},P.layer);tx.textContent=pl[1];});}
+
+/* ===== Figure 1 : le même numérateur, deux dénominateurs ===== */
+(function(){
+  const host=document.getElementById('f1plot'),out=document.getElementById('f1out');host.classList.add('nogrid');
+  const P=SL.plot(host,{x:[0,1],y:[0,1],w:500,h:492,xt:[],yt:[]});noAxes(P);
+  const X0=P.sx(0),Y0=P.sy(1),WW=P.sx(1)-P.sx(0),HH=P.sy(0)-P.sy(1);
+  const cp=SL.el('clipPath',{id:'f1clip'},P.svg);SL.el('rect',{x:X0,y:Y0,width:WW,height:HH},cp);
+  const g=SL.el('g',{'clip-path':'url(#f1clip)'},P.svg),inner=SL.el('g',{},g),lab=SL.el('g',{},P.svg);
+  const A=[0.1,0.6,0.2,0.8],st={c:0.6,w:0.4,z:0};const fresh=runner();
+  function rectXY(r,cls){const a=P.sx(r[0]),b=P.sx(r[1]),c=P.sy(r[3]),d=P.sy(r[2]);
+    return SL.el('rect',{x:a.toFixed(1),y:c.toFixed(1),width:Math.max(0,b-a).toFixed(1),height:Math.max(0,d-c).toFixed(1),class:cls,'vector-effect':'non-scaling-stroke'},inner);}
+  function Bbox(){return [Math.max(0,st.c-st.w/2),Math.min(1,st.c+st.w/2),0.3,0.9];}
+  function draw(){
+    while(inner.firstChild)inner.removeChild(inner.firstChild);while(lab.firstChild)lab.removeChild(lab.firstChild);
+    const B=Bbox(),I=[Math.max(A[0],B[0]),Math.min(A[1],B[1]),Math.max(A[2],B[2]),Math.min(A[3],B[3])];
+    const aA=(A[1]-A[0])*(A[3]-A[2]),aB=(B[1]-B[0])*(B[3]-B[2]),aI=Math.max(0,I[1]-I[0])*Math.max(0,I[3]-I[2]);
+    rectXY([0,1,0,1],'sl-omega');rectXY(A,'sl-setA');rectXY(B,'sl-setB');if(aI>0)rectXY(I,'sl-setAB');
+    /* zoom : l'image de B devient le carré entier */
+    const u=st.z,bx=P.sx(B[0]),by=P.sy(B[3]),bw=P.sx(B[1])-bx,bh=P.sy(B[2])-by;
+    const s1=1+u*(WW/bw-1),s2=1+u*(HH/bh-1),tx=bx+u*(X0-bx)-s1*bx,ty=by+u*(Y0-by)-s2*by;
+    inner.setAttribute('transform',`translate(${tx.toFixed(2)} ${ty.toFixed(2)}) scale(${s1.toFixed(4)} ${s2.toFixed(4)})`);
+    if(u<0.5){txt(lab,P.sx(0.02),P.sy(0.97),'Ω, aire 1','sl-lbl');txt(lab,P.sx(A[0])+6,P.sy(A[2])-8,'A','sl-c2');txt(lab,P.sx(B[1])-6,P.sy(B[3])+16,'B','sl-c4','end');}
+    else txt(lab,X0+8,Y0+18,'B est devenu l’univers\u202f; A ∩ B en occupe '+pct(aI/aB,0),'sl-lbl');
+    rd(out,[['P(A)',fx(aA,2)],['P(B)',fx(aB,2)],['P(A ∩ B), le numérateur commun',fx(aI,2)],
+      ['P(A ∣ B) = P(A ∩ B) / P(B)',fx(aI/aB,2),'c3'],['P(B ∣ A) = P(A ∩ B) / P(A)',fx(aI/aA,2),'c1']]);
+  }
+  const ctl=document.getElementById('f1ctl'),zb=SL.h('button','tb',ctl,'zoomer sur B');
+  zb.onclick=()=>{const tk=fresh(),a=st.z,b=a<0.5?1:0;zb.textContent=b?'revenir à Ω':'zoomer sur B';zb.setAttribute('aria-pressed',String(!!b));
+    tween(900,v=>{st.z=a+(b-a)*v;draw();},tk);};
+  const sl=document.getElementById('f1sl');
+  SL.slider(sl,{label:'position de B',min:0.2,max:0.8,step:0.01,value:0.6,fmt:v=>SL.fmt(v,2)},v=>{st.c=v;draw();});
+  SL.slider(sl,{label:'largeur de B',min:0.1,max:0.6,step:0.01,value:0.4,fmt:v=>SL.fmt(v,2)},v=>{st.w=v;draw();});
+})();
+
+/* ===== Figure 2 : les effectifs (portée de p00-03, figure 1) ===== */
+(function(){
+  const N=100000;
+  const P=SL.plot(document.getElementById('f2plot'),{x:[0,1],y:[0,1],w:620,h:340});noAxes(P);
+  const out=document.getElementById('f2out'),st={prev:.001,se:.99,sp:.99};
+  const ROWS=[{y0:.78,y1:.90},{y0:.44,y1:.56},{y0:.10,y1:.22}],FL=3;
+  function hbar(row,parts,scale){
+    const y0=ROWS[row].y0,y1=ROWS[row].y1,key=parts.map(p=>scale==='sqrt'?Math.sqrt(Math.max(p.n,0)):Math.max(p.n,0));
+    const tot=key.reduce((a,b)=>a+b,0)||1,Xa=P.sx(0),Wpx=P.sx(1)-Xa,brut=key.map(k=>k/tot*Wpx);
+    const manque=brut.reduce((a,w)=>a+Math.max(0,FL-w),0),large=brut.reduce((a,w)=>a+Math.max(0,w-FL),0)||1;
+    const w=brut.map(v=>v<FL?FL:v-(v-FL)*manque/large);let x=Xa;
+    parts.forEach(function(p,i){SL.el('rect',{x:x,y:P.sy(y1),width:w[i],height:P.sy(y0)-P.sy(y1),class:'sl-dot '+p.cls},P.dyn);x+=w[i];});
+    let lx=Xa;const ly=P.sy(y0)+14;
+    parts.forEach(function(p){const s=p.lab+' · '+ent(p.n);
+      SL.el('rect',{x:lx,y:ly-9,width:9,height:9,class:'sl-dot '+p.cls},P.dyn);
+      txt(P.dyn,lx+14,ly,s,'sl-tick');lx+=14+s.length*7+22;});
+  }
+  function title(row,s){txt(P.dyn,P.sx(0),P.sy(ROWS[row].y1)-9,s,'sl-lbl');}
+  function draw(){
+    P.clear();
+    const cas=N*st.prev,sains=N-cas,TP=cas*st.se,FN=cas-TP,FP=sains*(1-st.sp),TN=sains-FP,pos=TP+FP,neg=FN+TN,v=TP/pos,vn=TN/neg;
+    title(0,'La population testée · '+ent(N)+' personnes');
+    hbar(0,[{n:cas,cls:'sl-c1',lab:'malades'},{n:sains,cls:'sl-c2',lab:'sains'}],'sqrt');
+    title(1,'Les positifs · '+ent(pos)+'  —  P(malade ∣ +) = '+pct(v));
+    hbar(1,[{n:TP,cls:'sl-c1',lab:'vrais positifs'},{n:FP,cls:'sl-c3',lab:'faux positifs'}],'lin');
+    title(2,'Les négatifs · '+ent(neg)+'  —  P(sain ∣ −) = '+pct(vn,3));
+    hbar(2,[{n:FN,cls:'sl-c5',lab:'faux négatifs'},{n:TN,cls:'sl-c2',lab:'vrais négatifs'}],'lin');
+    rd(out,[['vrais positifs',ent(TP),'c1'],['faux positifs',ent(FP),'c3'],['positifs au total',ent(pos)],
+      ['P(malade ∣ +), la VPP',pct(v),'c3'],['faux négatifs',ent(FN)],['P(sain ∣ −), la VPN',pct(vn,3)]]);
+  }
+  const host=document.getElementById('f2sl');
+  const sPrev=SL.slider(host,{label:'prévalence',min:-3,max:Math.log10(.5),step:.01,value:-3,fmt:v=>pct(Math.pow(10,v),v<-2.4?2:1)},v=>{st.prev=Math.pow(10,v);draw();});
+  const sSe=SL.slider(host,{label:'sensibilité',min:.60,max:.99,step:.01,value:.99},v=>{st.se=v;draw();});
+  const sSp=SL.slider(host,{label:'spécificité',min:.75,max:.999,step:.001,value:.99},v=>{st.sp=v;draw();});
+  const pre=[['cancer · Brunton 10',-3,.99,.99],['drogue · Brunton 11',-1,.90,.90],['drogue, spécificité 0,8',-1,.90,.80],['dépistage · 1 %',-2,.90,.95],['consultation · 10 %',-1,.90,.95]];
+  buttons(document.getElementById('f2pre'),pre.map(q=>q[0]),k=>{const q=pre[k];sSe.set(q[2]);sSp.set(q[3]);sPrev.set(q[1]);});
+})();
+
+/* ===== Figure 3 : l'échelle des cotes (portée de p00-03, figure 3) ===== */
+(function(){
+  const P=SL.plot(document.getElementById('f3plot'),{x:[-3.25,2.25],y:[0,1],w:620,h:270,xt:[],yt:[],xl:'cote (log)'});
+  {const ax=P.svg.querySelectorAll('line.sl-axis');if(ax[1])ax[1].remove();}  /* l'axe vertical en x = 0 (cote 1:1) n'a pas de sens ici */
+  logticks(P,[[.001,'1:1000'],[.01,'1:100'],[.1,'1:10'],[1,'1:1'],[10,'10:1'],[100,'100:1']],1);
+  const YA=.74,YB=.26;
+  [[YA,.14,'avant le test, la population','sl-c1'],[YB,-.19,'après le test, le patient','sl-c3']].forEach(function(r){
+    SL.el('line',{x1:P.sx(-3.25),x2:P.sx(2.25),y1:P.sy(r[0]),y2:P.sy(r[0]),class:'sl-axis'},P.layer);
+    P.label(2.2,r[0]+r[1],r[2],r[3],'end');});
+  const out=document.getElementById('f3out'),st={prev:.001,lr:99};
+  const clamp=(x,a,b)=>Math.max(a,Math.min(b,x));
+  function draw(){
+    P.clear();
+    const a=st.prev/(1-st.prev),b=a*st.lr,xa=clamp(Math.log10(a),-3.2,2.2),xb=clamp(Math.log10(b),-3.2,2.2);
+    P.arrow(xa,YA,xb,YB,'gain');P.dot(xa,YA,'sl-c1',6);P.dot(xb,YB,'sl-c3',6);
+    P.text((xa+xb)/2+.18,.56,'× LR = '+SL.fmt(st.lr,1),'sl-halo','start');
+    P.text(clamp(xa,-2.85,1.85),YA+.07,cote(a),'sl-c1','middle');
+    P.text(clamp(xb,-2.85,1.85),YB-.09,cote(b),'sl-c3','middle');
+    rd(out,[['cote a priori',cote(a)],['LR appliqué','× '+SL.fmt(st.lr,1)],['cote a posteriori',cote(b)],
+      ['P(malade ∣ +) après le test',pct(b/(1+b)),'c3'],['P(malade) avant, la prévalence',pct(st.prev,2)],['croyance multipliée par','× '+SL.fmt((b/(1+b))/st.prev,2)]]);
+  }
+  const host=document.getElementById('f3sl');
+  SL.slider(host,{label:'prévalence',min:-3,max:Math.log10(.5),step:.01,value:-3,fmt:v=>pct(Math.pow(10,v),v<-2.4?2:1)},v=>{st.prev=Math.pow(10,v);draw();});
+  SL.slider(host,{label:'LR⁺',min:1,max:100,step:.5,value:99,fmt:v=>SL.fmt(v,1)},v=>{st.lr=v;draw();});
+})();
+
+/* ===== Figure 4 : doubler la cote ne double pas la probabilité ===== */
+(function(){
+  const P=SL.plot(document.getElementById('f4plot'),{x:[0,1],y:[0,1.04],w:560,h:330,xt:[0,.2,.4,.6,.8,1],yt:[0,.2,.4,.6,.8,1],xl:'p de départ',yl:'p après × k sur la cote'});
+  const out=document.getElementById('f4out'),st={k:2,p:.5};
+  P.seg(0,0,1,1,'sl-link');
+  P.label(.98,.13,'── vraie p : kp / (1 + (k − 1)p)','sl-c1','end');P.label(.98,.05,'┄┄ k × p, la fausse intuition','sl-c3','end');
+  let cur=null;
+  function draw(){
+    if(cur)cur.remove();const k=st.k,p=st.p,f=x=>k*x/(1+(k-1)*x);
+    cur=P.fn(f,'sl-c1',200);P.clear();
+    P.seg(0,0,Math.min(1,1/k),Math.min(1,k),'sl-c3 sl-dash');
+    const q=f(p),naive=k*p;
+    if(naive<=1.04){P.seg(p,q,p,Math.min(naive,1.04),'sl-c3');P.dot(p,Math.min(naive,1.04),'hollow sl-c3',5);}
+    P.dot(p,q,'sl-c1',6);
+    const c=p/(1-p);
+    rd(out,[['p de départ',SL.fmt(p,2)],['cote → cote × k',SL.fmt(c,c<1?3:2)+' → '+SL.fmt(k*c,k*c<1?3:2)],['nouvelle p',SL.fmt(q,3),'c1'],
+      ['k × p, faux',naive>1?fx(naive,2)+' > 1':SL.fmt(naive,3),'c3'],['p multipliée par',SL.fmt(k/(1+(k-1)*p),2)]]);
+  }
+  const host=document.getElementById('f4sl');
+  SL.slider(host,{label:'facteur k',min:1,max:10,step:.5,value:2,fmt:v=>'× '+SL.fmt(v,1)},v=>{st.k=v;draw();});
+  SL.slider(host,{label:'p de départ',min:.01,max:.95,step:.01,value:.5,fmt:v=>SL.fmt(v,2)},v=>{st.p=v;draw();});
+})();
+
+/* ===== Figure 5 : la précision en fonction de la prévalence (portée de p00-03, figure 2) ===== */
+(function(){
+  const XMIN=-3,XMAX=Math.log10(.5),SE=.90;
+  const P=SL.plot(document.getElementById('f5plot'),{x:[XMIN,XMAX],y:[0,1.05],w:620,h:300,xt:[],yt:[.25,.5,.75,1],xl:'prévalence (log)',yl:'précision = VPP'});
+  logticks(P,[[.001,'0,1 %'],[.003,'0,3 %'],[.01,'1 %'],[.03,'3 %'],[.1,'10 %'],[.3,'30 %']],1.05);
+  P.fn(u=>vpp(Math.pow(10,u),SE,.95),'sl-c2');
+  const out=document.getElementById('f5out');let cur=null;
+  function draw(sp){
+    if(cur)cur.remove();cur=P.fn(u=>vpp(Math.pow(10,u),SE,sp),'sl-c1');P.clear();
+    [[.01,'1 %'],[.1,'10 %']].forEach(function(mk){const u=Math.log10(mk[0]),y=vpp(mk[0],SE,sp);
+      P.vline(u,'chord');P.dot(u,y,'sl-c1',5);P.text(u+0.04,1.0,mk[1],'sl-c3','start');});
+    rd(out,[['précision à 1 %',pct(vpp(.01,SE,sp)),'c3'],['précision à 10 %',pct(vpp(.1,SE,sp)),'c3'],['rappel, inchangé',SL.fmt(SE,2)],
+      ['FPR = 1 − spécificité',pct(1-sp,2)],['LR⁺ = sens / (1 − spéc)',SL.fmt(SE/(1-sp),1)],['prévalence où précision = 50 %',pct((1-sp)/(SE+1-sp),2)]]);
+  }
+  SL.slider(document.getElementById('f5sl'),{label:'spécificité',min:.80,max:.999,step:.001,value:.95},draw);
+})();
+
+/* ===== Figure 6 : ajouter des composants, avec ou sans cause commune ===== */
+(function(){
+  const P=SL.plot(document.getElementById('f6plot'),{x:[0.5,10.5],y:[-14.5,2.2],w:560,h:330,xt:[1,2,3,4,5,6,7,8,9,10],yt:[],xl:'n, nombre de composants'});
+  noAxes(P);SL.el('line',{x1:P.sx(0.5),x2:P.sx(10.5),y1:P.sy(-14.5),y2:P.sy(-14.5),class:'sl-axis'},P.layer);
+  const g=SL.el('g',{class:'sl-grid'},P.layer);
+  [0,-2,-4,-6,-8,-10,-12,-14].forEach(e=>{SL.el('line',{x1:P.sx(0.5),x2:P.sx(10.5),y1:P.sy(e),y2:P.sy(e)},g);
+    txt(P.layer,P.sx(0.5)-6,P.sy(e)+4,e===0?'1':'10'+supn(e),'sl-tick','end');});
+  txt(P.layer,P.sx(0.62),P.sy(1.4),'── série','sl-lbl sl-c3');txt(P.layer,P.sx(2.4),P.sy(1.4),'── parallèle','sl-lbl sl-c4');txt(P.layer,P.sx(4.4),P.sy(1.4),'── parallèle avec cause commune q','sl-lbl sl-c2');
+  const out=document.getElementById('f6out'),st={p:.05,q:-3};
+  /* une courbe qui sort par le bas est coupée au bord de l'axe, jamais bornée : un palier ferait croire à un plancher */
+  function line(vals,cls){const Y=vals.map(v=>Math.log10(v)),B=-14.5;let d='';
+    for(let i=0;i<Y.length;i++){if(Y[i]>=B){d+=(d?' L':'M')+P.sx(i+1).toFixed(1)+' '+P.sy(Y[i]).toFixed(1);}
+      else{if(i>0&&Y[i-1]>=B){const t=(Y[i-1]-B)/(Y[i-1]-Y[i]);d+=' L'+P.sx(i+t).toFixed(1)+' '+P.sy(B).toFixed(1);}break;}}
+    SL.el('path',{d:d,class:'sl-fn '+cls,fill:'none'},P.dyn);Y.forEach((y,i)=>{if(y>=B)P.dot(i+1,y,cls,3.5);});}
+  function draw(){
+    P.clear();const p=st.p,q=Math.pow(10,st.q),n=[1,2,3,4,5,6,7,8,9,10];
+    const se=n.map(k=>1-Math.pow(1-p,k)),pa=n.map(k=>Math.pow(p,k)),cc=n.map(k=>q+(1-q)*Math.pow(p,k));
+    P.seg(0.5,st.q,10.5,st.q,'sl-c2 sl-dash');
+    line(se,'sl-c3');line(cc,'sl-c2');line(pa,'sl-c4');
+    rd(out,[['série, n = 10',sci(se[9]),'c3'],['parallèle, n = 10',sci(pa[9])],['parallèle + cause commune',sci(cc[9])],['le plancher q',sci(q)]]);
+  }
+  const host=document.getElementById('f6sl');
+  SL.slider(host,{label:'panne p',min:.01,max:.2,step:.01,value:.05,fmt:v=>SL.fmt(v,2)},v=>{st.p=v;draw();});
+  SL.slider(host,{label:'cause q',min:-7,max:-2,step:1,value:-3,fmt:v=>'10'+supn(v)},v=>{st.q=v;draw();});
+})();
+
+/* ===== v1 : B devient le nouvel univers ===== */
+(function(){
+  const host=document.getElementById('v1plot'),out=document.getElementById('v1out'),W=560,H=300,SY=258;
+  const S=canvas(host,W,H),gG=SL.el('g',{},S),gM=SL.el('g',{},S),gT=SL.el('g',{},S);
+  const SUITS=['♣','♦','♥','♠'],VALS=['1','2','3','4','5','6','7','8','9','10','V','D','R'];
+  const cards=[];for(let s=0;s<4;s++)for(let v=0;v<13;v++)cards.push({s:s,v:v,A:s===3,x:92+v*29,y:34+s*29,c:26});
+  const dice=[];for(let b=1;b<=6;b++)for(let a=1;a<=6;a++)dice.push({a:a,b:b,A:a===3,x:200+(a-1)*33,y:30+(b-1)*33,c:30});
+  const M=[{u:'cards',n:'Ω · cartes',B:o=>true,txt:'A = pique'},{u:'cards',n:'sachant noire',B:o=>o.s===0||o.s===3},{u:'cards',n:'sachant rouge',B:o=>o.s===1||o.s===2},
+           {u:'dice',n:'Ω · dés',B:o=>true},{u:'dice',n:'sachant 2ᵉ dé = 5',B:o=>o.b===5},{u:'dice',n:'sachant somme = 6',B:o=>o.a+o.b===6}];
+  let shown=null;const fresh=runner();
+  function grid(u){
+    while(gG.firstChild)gG.removeChild(gG.firstChild);while(gT.firstChild)gT.removeChild(gT.firstChild);
+    const L=u==='cards'?cards:dice;
+    L.forEach(o=>{o.el=box(gG,o.x,o.y,o.c,o.c,'sl-cellv'+(o.A?' sl-k2':''));});
+    if(u==='cards'){SUITS.forEach((s,i)=>txt(gT,80,34+i*29+19,s,'sl-sym'+(i===1||i===2?' r':''),'end'));
+      VALS.forEach((v,i)=>txt(gT,92+i*29+13,26,v,'sl-tick','middle'));}
+    else{for(let a=1;a<=6;a++)txt(gT,200+(a-1)*33+15,22,String(a),'sl-tick','middle');
+      for(let b=1;b<=6;b++)txt(gT,188,30+(b-1)*33+20,String(b),'sl-tick','end');
+      txt(gT,200+6*33+8,22,'← premier dé','sl-lbl');txt(gT,188,22,'second dé ↓','sl-lbl','end');}
+    shown=u;
+  }
+  function show(k,animate){
+    const m=M[k],L=m.u==='cards'?cards:dice;if(shown!==m.u)grid(m.u);
+    while(gM.firstChild)gM.removeChild(gM.firstChild);
+    const all=k===0||k===3,inB=L.filter(m.B),nA=L.filter(o=>o.A).length,nAB=inB.filter(o=>o.A).length;
+    L.forEach(o=>o.el.classList.toggle('sl-fade',!all&&!m.B(o)));
+    const tk=fresh();
+    if(all){txt(gM,W/2,SY+16,'aucune information : on compte A dans Ω entier','sl-lbl','middle');
+      rd(out,[['issues de A',String(nA)],['issues de Ω',String(L.length)],['P(A)',nA+'/'+L.length+' = '+SL.fmt(nA/L.length,3),'c3']]);return;}
+    const n=inB.length,cs=Math.min(26,Math.floor((W-40)/n)-2),x0=(W-n*(cs+2))/2;
+    txt(gM,W/2,SY-10,'le nouvel univers B : '+n+' issues, chacune de probabilité 1/'+n,'sl-lbl','middle');
+    const mv=inB.map((o,i)=>({o:o,e:box(gM,o.x,o.y,o.c,o.c,'sl-cellv'+(o.A?' sl-k2':'')),tx:x0+i*(cs+2),ty:SY}));
+    function frame(u){mv.forEach(q=>{const s=q.o.c+(cs-q.o.c)*u;q.e.setAttribute('x',(q.o.x+(q.tx-q.o.x)*u).toFixed(1));q.e.setAttribute('y',(q.o.y+(q.ty-q.o.y)*u).toFixed(1));
+      q.e.setAttribute('width',s.toFixed(1));q.e.setAttribute('height',s.toFixed(1));});}
+    if(animate)tween(900,frame,tk);else frame(1);
+    rd(out,[['issues de A ∩ B',String(nAB)],['issues de B',String(n)],['P(A ∣ B)',nAB+'/'+n+' = '+SL.fmt(nAB/n,3),'c3'],['P(A) sans information','1/'+(m.u==='cards'?'4':'6')]]);
+  }
+  let first=true;
+  buttons(document.getElementById('v1ctl'),M.map(m=>m.n),k=>{show(k,!first);first=false;});
+})();
+
+/* ===== v2 : l'arbre des deux cartes ===== */
+(function(){
+  const host=document.getElementById('v2plot'),out=document.getElementById('v2out'),W=560,H=280;
+  const S=canvas(host,W,H),g=SL.el('g',{},S);
+  const R={x:24,y:140},L1=[{x:160,y:70,t:'♠'},{x:160,y:210,t:'autre'}],L2=[{x:290,y:35,t:'♠ ♠'},{x:290,y:105,t:'♠ autre'},{x:290,y:175,t:'autre ♠'},{x:290,y:245,t:'autre autre'}];
+  const TX=394;
+  const CASES=[{n:'sans remise',b1:[[13,52],[39,52]],b2:[[12,51],[39,51],[13,51],[38,51]],leaf:['1/17','13/68','13/68','19/34'],
+      ss:'1/17 = 0,0588',sec:'1/17 + 13/68 = 1/4'},
+    {n:'avec remise',b1:[[13,52],[39,52]],b2:[[13,52],[39,52],[13,52],[39,52]],leaf:['1/16','3/16','3/16','9/16'],ss:'1/16 = 0,0625',sec:'1/16 + 3/16 = 1/4'}];
+  const wOf=o=>o.t.length*7.5+14;
+  /* étiquette d'une branche : à gauche du milieu, au-dessus si la branche monte, en dessous si elle descend */
+  function branch(a,b,on,lab){const xa=a===R?a.x+5:a.x+wOf(a),xb=b.x;SL.el('line',{x1:xa,y1:a.y,x2:xb,y2:b.y,class:'sl-tree'+(on?' on':'')},g);
+    const mx=(xa+xb)/2,my=(a.y+b.y)/2,up=b.y<a.y;txt(g,mx-4,up?my-7:my+15,lab,'sl-mono'+(on?' on':''),'end');}
+  function node(o,on){const w=wOf(o);box(g,o.x,o.y-11,w,22,'sl-tcell');txt(g,o.x+w/2,o.y+5,o.t,'sl-sym'+(on?' r':''),'middle');}
+  function draw(k){
+    while(g.firstChild)g.removeChild(g.firstChild);const C=CASES[k];
+    L1.forEach((o,i)=>branch(R,o,i===0,C.b1[i][0]+'/'+C.b1[i][1]));
+    L2.forEach((o,j)=>branch(L1[j>>1],o,j===0,C.b2[j][0]+'/'+C.b2[j][1]));
+    SL.el('circle',{cx:R.x,cy:R.y,r:5,class:'sl-node'},g);
+    L1.forEach((o,i)=>node(o,i===0));
+    L2.forEach((o,j)=>{node(o,j===0);const b1=C.b1[j>>1],b2=C.b2[j],v=(b1[0]*b2[0])/(b1[1]*b2[1]);
+      txt(g,TX,o.y+5,b1[0]+'/'+b1[1]+' × '+b2[0]+'/'+b2[1]+' = '+SL.fmt(v,4),'sl-mono'+(j===0?' on':''));});
+    txt(g,TX,14,'1ʳᵉ carte × 2ᵉ carte','sl-lbl');
+    rd(out,[['P(♠ puis ♠)',C.ss,'c3'],['somme des feuilles, '+C.leaf.join(' + '),'1'],['P(seconde carte ♠)',C.sec]]);
+  }
+  buttons(document.getElementById('v2ctl'),CASES.map(c=>c.n),draw);
+})();
+
+/* ===== v3 : Ω en bandes, A mesuré morceau par morceau ===== */
+(function(){
+  const host=document.getElementById('v3plot'),out=document.getElementById('v3out'),W=560,H=290,X0=40,Y0=24,WW=480,HH=210;
+  const S=canvas(host,W,H),g=SL.el('g',{},S);
+  const CASES=[{n:'cartes rouges',w:[.25,.25,.25,.25],h:[1,1,0,0],lab:['♥ · ¼','♦ · ¼','♣ · ¼','♠ · ¼'],A:'A = rouge',
+      rd:[['cœur, 1 × ¼','0,25'],['carreau, 1 × ¼','0,25'],['trèfle et pique, 0 × ¼','0 et 0'],['P(rouge), la somme','0,5','c3']]},
+    {n:'dépistage · 1 %',w:[.01,.99,0,0],h:[.9,.05,0,0],lab:['M · 0,01','sains · 0,99','',''],A:'A = test positif',
+      rd:[['malades, 0,9 × 0,01','0,009'],['sains, 0,05 × 0,99','0,0495'],['voie des sains / voie des malades','× 5,5'],['P(+), la somme','0,0585','c3']]},
+    {n:'dépistage · 10 %',w:[.1,.9,0,0],h:[.9,.05,0,0],lab:['M · 0,1','sains · 0,9','',''],A:'A = test positif',
+      rd:[['malades, 0,9 × 0,1','0,09'],['sains, 0,05 × 0,9','0,045'],['voie des sains / voie des malades','× 0,5'],['P(+), la somme','0,135','c3']]}];
+  let cur={w:CASES[0].w.slice(),h:CASES[0].h.slice()},k0=0;const fresh=runner();
+  function draw(st,C){
+    while(g.firstChild)g.removeChild(g.firstChild);
+    let x=X0;
+    st.w.forEach((w,i)=>{const pw=w*WW;if(pw<0.05){return;}
+      box(g,x,Y0+HH*(1-st.h[i]),Math.max(pw,1.5),HH*st.h[i],'sl-areaA');box(g,x,Y0,pw,HH,'sl-strip');
+      if(C.lab[i]){const wide=pw>60;txt(g,wide?x+pw/2:x,Y0+HH+16,C.lab[i],'sl-lbl',wide?'middle':'start');}
+      x+=pw;});
+    box(g,X0,Y0,WW,HH,'sl-omega');
+    txt(g,X0,Y0-8,'Ω : largeur = P(Bᵢ), hauteur rouge = P(A ∣ Bᵢ), '+C.A,'sl-lbl');
+    rd(out,C.rd);
+  }
+  buttons(document.getElementById('v3ctl'),CASES.map(c=>c.n),k=>{const tk=fresh(),a={w:cur.w.slice(),h:cur.h.slice()},C=CASES[k],b={w:C.w,h:C.h};
+    if(k===k0){cur={w:b.w.slice(),h:b.h.slice()};draw(cur,C);return;}k0=k;
+    tween(800,u=>{cur={w:a.w.map((v,i)=>v+(b.w[i]-v)*u),h:a.h.map((v,i)=>v+(b.h[i]-v)*u)};draw(cur,C);},tk);});
+})();
+
+/* ===== v4 : les positifs, une personne par carré ===== */
+(function(){
+  const host=document.getElementById('v4plot'),out=document.getElementById('v4out'),W=560,H=200;
+  const S=canvas(host,W,H),hd=SL.el('g',{},S),g=SL.el('g',{},S);
+  const CASES=[{n:'cancer · Brunton 10',N:100000,sick:100,tp:99,fp:999,cols:61,c:8},
+    {n:'drogue, test à 90 %',N:1000,sick:100,tp:90,fp:90,cols:30,c:16},
+    {n:'drogue, spécificité 0,8',N:1000,sick:100,tp:90,fp:180,cols:30,c:16}];
+  const fresh=runner();let first=true;
+  function cell(C,i){const r=Math.floor(i/C.cols),q=i%C.cols,step=C.c+1+(C.c>10?1:0);
+    return box(g,6+q*step,28+r*step,C.c,C.c,i<C.tp?'sl-pp1':'sl-pp3');}
+  function show(k){
+    const tk=fresh(),C=CASES[k];while(g.firstChild)g.removeChild(g.firstChild);while(hd.firstChild)hd.removeChild(hd.firstChild);
+    txt(hd,6,16,ent(C.N)+' testés · '+ent(C.sick)+' malades, '+ent(C.N-C.sick)+' sains → '+ent(C.tp+C.fp)+' positifs','sl-lbl');
+    rd(out,[['malades détectés, en bleu',ent(C.tp),'c1'],['sains mal classés, en rouge',ent(C.fp),'c3'],['P(malade ∣ +)',ent(C.tp)+'/'+ent(C.tp+C.fp)+' = '+pct(C.tp/(C.tp+C.fp))]]);
+    const tot=C.tp+C.fp;
+    if(first){first=false;for(let i=0;i<tot;i++)cell(C,i);return;}
+    let i=0;const per=Math.max(2,Math.ceil(tot/90));
+    loop(tk,()=>{for(let j=0;j<per&&i<tot;j++,i++)cell(C,i);return i<tot;});
+  }
+  buttons(document.getElementById('v4ctl'),CASES.map(c=>c.n),show);
+})();
+
+/* ===== v5 : dépister, puis refaire un test ===== */
+(function(){
+  const host=document.getElementById('v5plot'),out=document.getElementById('v5out'),W=560,H=230,BX=10,BW=360;
+  const S=canvas(host,W,H),g=SL.el('g',{},S);
+  const CASES=[{n:'cancer',lr:'99',st:[[10000,9990000,'1:999'],[9900,99900,'99:999'],[9801,999,'9 801:999']]},
+    {n:'drogue, test à 90 %',lr:'9',st:[[100,900,'1:9'],[90,90,'1:1'],[81,9,'9:1']]},
+    {n:'drogue, spécificité 0,8',lr:'4,5',st:[[100,900,'1:9'],[90,180,'1:2'],[81,36,'9:4']]}];
+  const ROW=['avant le test','après 1 positif','après 2 positifs'];
+  const fresh=runner();let kc=0;
+  function draw(C,vis,u){
+    while(g.firstChild)g.removeChild(g.firstChild);
+    txt(g,BX+BW+18,14,'cote','sl-lbl');txt(g,BX+BW+110,14,'P(malade)','sl-lbl');
+    C.st.forEach((s,i)=>{if(i>vis)return;const y=40+i*68,p=s[0]/(s[0]+s[1]);
+      let sh=p;if(i===vis&&i>0){const q=C.st[i-1][0]/(C.st[i-1][0]+C.st[i-1][1]);sh=q+(p-q)*u;}
+      txt(g,BX,y-8,ROW[i]+' : '+ent(s[0])+' malades, '+ent(s[1])+' sains','sl-lbl');
+      const wb=Math.max(2,sh*BW);box(g,BX,y,wb,24,'sl-cellv sl-k1');box(g,BX+wb,y,BW-wb,24,'sl-cellv sl-k2 sl-kc');
+      if(i<vis||u>=1){txt(g,BX+BW+18,y+17,s[2],'sl-mono');txt(g,BX+BW+110,y+17,pct(p,2),'sl-mono'+(i===2?' on':''));}
+      if(i>0&&(i<vis||u>=1))txt(g,BX+BW+18,y-8,'× '+C.lr,'sl-lbl sl-c3');});
+  }
+  function show(k){kc=k;const C=CASES[k];fresh();draw(C,2,1);
+    rd(out,[['LR⁺ du test',C.lr],['après 1 positif',pct(C.st[1][0]/(C.st[1][0]+C.st[1][1]),2)],['après 2 positifs',pct(C.st[2][0]/(C.st[2][0]+C.st[2][1]),2),'c3']]);}
+  const ctl=document.getElementById('v5ctl');
+  buttons(ctl,CASES.map(c=>c.n),show);
+  SL.h('button','tb',ctl,'▶ rejouer').onclick=()=>{const tk=fresh(),C=CASES[kc];draw(C,0,1);
+    const step=v=>{if(v>2||tk.dead)return;setTimeout(()=>{if(tk.dead)return;tween(900,u=>draw(C,v,u),tk,()=>step(v+1));},SL.reduced?0:350);};step(1);};
+})();
+
+/* ===== v6 : quelles cases chaque métrique regarde ===== */
+(function(){
+  const host=document.getElementById('v6plot'),out=document.getElementById('v6out'),W=560,H=236;
+  const S=canvas(host,W,H),g=SL.el('g',{},S),N=10000;
+  const CX=[150,280,410],RY=[34,92,150],CW=120,CH=50;
+  const MET=[{n:'rappel',num:['TP'],den:['TP','FN'],f:'TP / (TP + FN)'},{n:'spécificité',num:['TN'],den:['TN','FP'],f:'TN / (TN + FP)'},
+    {n:'précision',num:['TP'],den:['TP','FP'],f:'TP / (TP + FP)'},{n:'accuracy',num:['TP','TN'],den:['TP','FN','FP','TN'],f:'(TP + TN) / N'}];
+  const PREV=[.1,.01,.5],TEST=[[.9,.95],[1,0],[0,1]];const st={p:0,t:0,m:2};
+  const POS={TP:[0,0],FN:[1,0],FP:[0,1],TN:[1,1]};
+  function val(c,m){const v=MET[m].num.reduce((a,k)=>a+c[k],0),d=MET[m].den.reduce((a,k)=>a+c[k],0);return d?v/d:NaN;}
+  function draw(){
+    while(g.firstChild)g.removeChild(g.firstChild);
+    const pr=PREV[st.p],s=TEST[st.t][0],t=TEST[st.t][1],sick=N*pr,heal=N-sick;
+    const c={TP:Math.round(sick*s),FN:Math.round(sick*(1-s)),FP:Math.round(heal*(1-t)),TN:Math.round(heal*t)};
+    ['test +','test −','total'].forEach((h,i)=>txt(g,CX[i]+CW/2,22,h,'sl-lbl','middle'));
+    ['malade','sain','total'].forEach((h,j)=>txt(g,CX[0]-12,RY[j]+CH/2+5,h,'sl-lbl','end'));
+    const M=MET[st.m];
+    Object.keys(POS).forEach(k=>{const q=POS[k],x=CX[q[0]],y=RY[q[1]];
+      box(g,x,y,CW,CH,'sl-tcell');if(M.num.includes(k))box(g,x,y,CW,CH,'sl-num');
+      txt(g,x+8,y+15,k,'sl-tick');txt(g,x+CW/2,y+CH/2+10,ent(c[k]),'sl-tval','middle');});
+    Object.keys(POS).forEach(k=>{if(M.den.includes(k)){const q=POS[k];box(g,CX[q[0]]+1.5,RY[q[1]]+1.5,CW-3,CH-3,'sl-den');}});
+    [[c.TP+c.FN,2,0],[c.FP+c.TN,2,1],[c.TP+c.FP,0,2],[c.FN+c.TN,1,2],[N,2,2]].forEach(z=>{txt(g,CX[z[1]]+CW/2,RY[z[2]]+CH/2+6,ent(z[0]),'sl-mono','middle');});
+    const nv=M.num.reduce((a,k)=>a+c[k],0),dv=M.den.reduce((a,k)=>a+c[k],0);
+    txt(g,CX[0],RY[2]+CH+18,M.n+' = '+M.f+' = '+ent(nv)+' / '+ent(dv),'sl-lbl');
+    const f=m=>{const v=val(c,m);return isNaN(v)?'0/0':fx(v,m===3?4:3);};
+    rd(out,MET.map((q,i)=>[q.n+(i===st.m?', surlignée':''),f(i),i===st.m?'c3':'']));
+  }
+  const ctl=document.getElementById('v6ctl'),r1=SL.h('div','sl-ctl',ctl),r2=SL.h('div','sl-ctl',ctl),r3=SL.h('div','sl-ctl',ctl);
+  buttons(r1,['10 % de malades','1 %','50 %'],k=>{st.p=k;draw();});
+  buttons(r2,['test 0,90 / 0,95','toujours +','toujours −'],k=>{st.t=k;draw();});
+  const bm=buttons(r3,MET.map(m=>m.n),k=>{st.m=k;draw();});bm[2].onclick();
+})();
+
+/* ===== v7 : la grille 4 × 13 de Brunton ===== */
+(function(){
+  const host=document.getElementById('v7plot'),out=document.getElementById('v7out'),W=560,H=180;
+  const S=canvas(host,W,H),gG=SL.el('g',{},S),gH=SL.el('g',{},S);
+  const SUITS=['♣','♦','♥','♠'],VALS=['1','2','3','4','5','6','7','8','9','10','V','D','R'],X0=70,Y0=30,CW=32,CH=30,GP=3;
+  const cells=[];for(let s=0;s<4;s++)for(let v=0;v<13;v++){const e=box(gG,X0+v*(CW+GP),Y0+s*(CH+GP),CW,CH,'sl-cellv'+(s===3?' sl-k2':''));cells.push({s:s,v:v,e:e});}
+  SUITS.forEach((s,i)=>txt(gG,X0-10,Y0+i*(CH+GP)+21,s,'sl-sym'+(i===1||i===2?' r':''),'end'));
+  VALS.forEach((v,i)=>txt(gG,X0+i*(CW+GP)+CW/2,Y0-8,v,'sl-tick','middle'));
+  const B=[{n:'dame',f:c=>c.v===11,ab:'1/52',pp:'1/4 × 1/13 = 1/52',c:'1/4',ok:true},{n:'trois',f:c=>c.v===2,ab:'1/52',pp:'1/4 × 1/13 = 1/52',c:'1/4',ok:true},
+    {n:'figure (V, D, R)',f:c=>c.v>=10,ab:'3/52',pp:'1/4 × 3/13 = 3/52',c:'1/4',ok:true},{n:'noire',f:c=>c.s===0||c.s===3,ab:'1/4',pp:'1/4 × 1/2 = 1/8',c:'1/2',ok:false},
+    {n:'cœur',f:c=>c.s===2,ab:'0',pp:'1/4 × 1/4 = 1/16',c:'0',ok:false}];
+  buttons(document.getElementById('v7ctl'),B.map(b=>b.n),k=>{const b=B[k];while(gH.firstChild)gH.removeChild(gH.firstChild);
+    cells.forEach(c=>{c.e.classList.toggle('sl-fade',!b.f(c));if(b.f(c)&&c.s===3)box(gH,X0+c.v*(CW+GP)+1,Y0+c.s*(CH+GP)+1,CW-2,CH-2,'sl-hit');});
+    txt(gH,X0,Y0+4*(CH+GP)+16,'A = pique, la ligne du bas ; B = '+b.n+' ; A ∩ B entouré de rouge','sl-lbl');
+    rd(out,[['P(A ∩ B)',b.ab],['P(A) P(B) = '+b.pp.split(' = ')[0],b.pp.split(' = ')[1]],['P(A ∣ B), contre P(A) = 1/4',b.c,'c3'],[k===4?'verdict (A et B disjoints)':'verdict',b.ok?'indépendants':'dépendants']]);});
+})();
+
+/* ===== v8 : la guirlande et les disques de secours ===== */
+(function(){
+  const host=document.getElementById('v8plot'),out=document.getElementById('v8out'),W=560,H=250,p=0.05,q=0.001;
+  const S=canvas(host,W,H),g=SL.el('g',{},S);
+  const st={mode:0,n:10,cc:false,fail:null,shock:false,runs:0,ko:0};let seed=7;const fresh=runner();
+  function wire(x1,y1,x2,y2,ok){SL.el('line',{x1:x1,y1:y1,x2:x2,y2:y2,class:'sl-wire'},g);}
+  function comp(x,y,w,h,ko){box(g,x-w/2,y-h/2,w,h,'sl-box'+(ko?' ko':''));if(ko)txt(g,x,y+5,'✕','sl-ko','middle');}
+  function exact(){const n=st.n,base=st.mode?Math.pow(p,n):1-Math.pow(1-p,n);return st.cc?q+(1-q)*base:base;}
+  function draw(){
+    while(g.firstChild)g.removeChild(g.firstChild);
+    const n=st.n,f=st.fail||new Array(n).fill(false),down=st.shock||(st.mode?f.every(x=>x):f.some(x=>x));
+    SL.el('circle',{cx:20,cy:125,r:5,class:'sl-node'},g);SL.el('circle',{cx:540,cy:125,r:5,class:'sl-node'},g);
+    if(st.mode===0){const span=440/n,w=Math.min(34,span-10);
+      for(let i=0;i<n;i++){const cx=60+span*(i+0.5);wire(i?60+span*i-(span-w)/2:20,125,cx-w/2,125);comp(cx,125,w,30,f[i]);}
+      wire(60+span*n-(span-w)/2,125,540,125);}
+    else{const span=210/n,h=Math.min(26,span-4);wire(20,125,150,125);wire(410,125,540,125);
+      SL.el('line',{x1:150,y1:20+span/2,x2:150,y2:20+span*(n-0.5),class:'sl-wire'},g);SL.el('line',{x1:410,y1:20+span/2,x2:410,y2:20+span*(n-0.5),class:'sl-wire'},g);
+      for(let i=0;i<n;i++){const cy=20+span*(i+0.5);wire(150,cy,262,cy);wire(298,cy,410,cy);comp(280,cy,36,h,f[i]);}}
+    if(st.shock)txt(g,280,244,'surtension : tout tombe d’un coup','sl-ko','middle');
+    txt(g,20,13,st.runs?'dernier système tiré\u00a0: '+(down?'coupé':'le courant passe'):'',down?'sl-ko':'sl-lbl');
+    rd(out,[['P(panne), exacte',sci(exact()),'c3'],['systèmes tirés',st.runs?ent(st.runs):'aucun'],['dont en panne',st.runs?String(st.ko):'·'],['fréquence observée',st.runs?SL.fmt(st.ko/st.runs,3):'·']]);
+  }
+  function reset(){fresh();st.fail=null;st.shock=false;st.runs=0;st.ko=0;draw();}
+  const ctl=document.getElementById('v8ctl');
+  buttons(ctl,['série','parallèle'],k=>{st.mode=k;reset();});
+  const cb=SL.h('button','tb',ctl,'cause commune : non');cb.onclick=()=>{st.cc=!st.cc;cb.textContent='cause commune : '+(st.cc?'oui, 1 ‰':'non');cb.setAttribute('aria-pressed',String(st.cc));run.textContent=st.cc?'▶ 20 000 systèmes':'▶ 1 000 systèmes';reset();};
+  const run=SL.h('button','tb',ctl,'▶ 1 000 systèmes');
+  /* avec la cause commune, 1 000 tirages ne montrent rien (0 panne une fois sur trois) : on en tire 20 000 */
+  run.onclick=()=>{const tk=fresh(),r=rng(seed++),N=st.cc?20000:1000,per=N/50;st.runs=0;st.ko=0;
+    loop(tk,()=>{for(let j=0;j<per&&st.runs<N;j++){st.shock=st.cc&&r()<q;st.fail=[];for(let i=0;i<st.n;i++)st.fail.push(r()<p);
+      const down=st.shock||(st.mode?st.fail.every(x=>x):st.fail.some(x=>x));st.runs++;if(down)st.ko++;}draw();return st.runs<N;});};
+  SL.slider(document.getElementById('v8sl'),{label:'composants n',min:1,max:10,step:1,value:10,fmt:v=>String(v)},v=>{st.n=v;reset();});
+})();
+
+/* ===== v9 : trois paires indépendantes, un triplet qui ne l'est pas ===== */
+(function(){
+  const host=document.getElementById('v9plot'),out=document.getElementById('v9out'),W=560,H=200;
+  const S=canvas(host,W,H),g=SL.el('g',{},S),X0=170,Y0=40,CW=150,CH=64;
+  const OUT=[{a:'face',b:'face',m:'ABC'},{a:'pile',b:'face',m:'B'},{a:'face',b:'pile',m:'A'},{a:'pile',b:'pile',m:'C'}];
+  const pos=[[0,0],[1,0],[0,1],[1,1]];
+  const SEL=[{n:'A ∩ B',e:'AB',pr:'1/2 × 1/2 = 1/4',v:'1/4',ok:true},{n:'A ∩ C',e:'AC',pr:'1/2 × 1/2 = 1/4',v:'1/4',ok:true},{n:'B ∩ C',e:'BC',pr:'1/2 × 1/2 = 1/4',v:'1/4',ok:true},
+    {n:'A ∩ B ∩ C',e:'ABC',pr:'1/2 × 1/2 × 1/2 = 1/8',v:'1/4',ok:false},{n:'C sachant A ∩ B',e:'ABC',cond:true}];
+  txt(S,X0+CW,22,'première pièce : face │ pile','sl-lbl','middle');
+  ['face','pile'].forEach((s,j)=>txt(S,X0-12,Y0+j*(CH+8)+CH/2+5,'2ᵉ pièce '+s,'sl-lbl','end'));
+  buttons(document.getElementById('v9ctl'),SEL.map(s=>s.n),k=>{const s=SEL[k];while(g.firstChild)g.removeChild(g.firstChild);
+    OUT.forEach((o,i)=>{const x=X0+pos[i][0]*(CW+8),y=Y0+pos[i][1]*(CH+8),hit=s.e.split('').every(c=>o.m.includes(c));
+      box(g,x,y,CW,CH,'sl-cellv');if(hit){box(g,x,y,CW,CH,'sl-num');box(g,x+1.5,y+1.5,CW-3,CH-3,'sl-hit');}
+      txt(g,x+CW/2,y+24,'('+o.a+', '+o.b+') · ¼','sl-lbl','middle');
+      txt(g,x+CW/2,y+48,o.m.split('').join(' '),'sl-sym','middle');});
+    if(s.cond)rd(out,[['P(C ∣ A ∩ B)','1','c3'],['P(C) seul','1/2'],['verdict','A et B décident C']]);
+    else rd(out,[['P('+s.n+')',s.v,'c3'],['produit des probabilités',s.pr],['verdict',s.ok?'égal':'différent']]);});
+})();
+
+})();
+</script>
+</body>
+</html>

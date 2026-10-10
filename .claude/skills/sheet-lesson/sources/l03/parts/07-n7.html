@@ -1,0 +1,65 @@
+<!-- ============================ n7 ============================ -->
+<section class="notion outil" id="n7">
+  <h3>L'indépendance ; disjoint n'est pas indépendant <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 12 · Independence in Probability</p>
+  <div class="idee">
+    <p>Deux événements sont <b>indépendants</b> quand savoir que l'un est arrivé ne change rien à la probabilité de l'autre : P(A ∣ B) = P(A). Brunton dessine le paquet de 52 cartes en grille, 4 couleurs sur 13 valeurs. Les piques sont une ligne, les dames une colonne ; elles se croisent en une seule case, la dame de pique.</p>
+    <p>Restreint aux piques, on a toujours 1 chance sur 13 d'avoir une dame ; restreint aux dames, 1 sur 4 d'avoir un pique. Rien n'a bougé, et la dame de pique a pour probabilité le produit, 1/4 × 1/13 = 1/52. À l'inverse, pique et cœur ne se croisent pas du tout : ils sont <b>disjoints</b>. Savoir « cœur » rend le pique impossible, sa probabilité passe de 1/4 à 0. Disjoints, ils sont aussi dépendants qu'on peut l'être.</p>
+  </div>
+  <div class="fig vis" id="v7">
+    <div class="lbl">Voir l'idée — la grille 4 × 13 de Brunton</div>
+    <div id="v7ctl" class="sl-ctl"></div>
+    <div id="v7plot" class="wide"></div>
+    <div class="readouts" id="v7out"></div>
+    <p class="cap">A = « pique », la ligne du bas, est fixé ; <b>choisis B</b>. Les cases hors de B s'estompent, A ∩ B reste en couleur. <b>Dame</b> : une case sur 4 dans B, P(A ∣ B) = 1/4 = P(A), indépendants. <b>Trois</b> (la paire d'ouverture de Brunton) et <b>figure</b> : pareil. <b>Noire</b> : 13 cases sur 26, P(A ∣ B) = 1/2, dépendants. <b>Cœur</b> : aucune case commune, P(A ∩ B) = 0 au lieu de P(A)P(B) = 1/16, et P(A ∣ B) = 0 ; disjoints, donc dépendants.</p>
+  </div>
+  <div class="formule"><div class="lbl">La définition</div>
+    <div class="eq"><i>A</i> et <i>B</i> indépendants ⇔ P(<i>A</i> ∩ <i>B</i>) = P(<i>A</i>) P(<i>B</i>) ⇔ P(<i>A</i> ∣ <i>B</i>) = P(<i>A</i>) &nbsp; (si P(<i>B</i>) &gt; 0)</div>
+    <ul>
+      <li>La forme produit est la définition : symétrique en A et B, elle a un sens même si P(B) = 0 (un événement de probabilité nulle est indépendant de tout).</li>
+      <li>La forme conditionnelle est l'intuition : savoir B n'apprend rien sur A, et de même P(B ∣ A) = P(B) si P(A) &gt; 0.</li>
+      <li>Si A et B sont indépendants, Aᶜ et B, A et Bᶜ, Aᶜ et Bᶜ le sont aussi (preuve dépliable).</li>
+      <li>Disjoints avec P(A) &gt; 0 et P(B) &gt; 0 : P(A ∩ B) = 0 &lt; P(A) P(B), donc dépendants.</li>
+      <li>L'indépendance est une propriété de la loi P, pas des ensembles : les mêmes événements peuvent être indépendants sous une loi et pas sous une autre.</li>
+      <li>Pour des variables aléatoires, la même idée devient la factorisation de la loi jointe (<a href="lesson-00-07-lois-jointes.html#n4">l07, notion 4</a>).</li>
+    </ul>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>cartes, deux dés, des pièces</small></summary><div class="in">
+    <ol>
+      <li><b>Dame de pique</b> : 1/52 = 1/4 × 1/13, indépendants.</li>
+      <li><b>Pique et trois</b>, la paire par laquelle Brunton ouvre la vidéo 08 : 1/52 = 1/4 × 1/13. Savoir que c'est un trois ne dit rien de la couleur.</li>
+      <li><b>Pique et figure</b> (valet, dame, roi) : 3/52 = 1/4 × 12/52, indépendants.</li>
+      <li><b>Pique et noire</b> : P(pique ∩ noire) = P(pique) = 1/4, mais 1/4 × 1/2 = 1/8. Dépendants : P(pique ∣ noire) = 1/2.</li>
+      <li><b>Pique et cœur</b> : 0 au lieu de 1/4 × 1/4 = 1/16. Disjoints, donc dépendants.</li>
+      <li><b>Deux dés</b>, A = « premier dé = 3 ». Avec « second dé = 5 » : 1/36 = 1/6 × 1/6, indépendants. Avec « somme = 6 » : 1/36 au lieu de 1/6 × 5/36 = 5/216, dépendants (P(A ∣ somme = 6) = 1/5, notion 1). Avec « somme = 7 » : 1/36 = 1/6 × 6/36, <b>indépendants</b>. Quel que soit le premier dé, exactement un second donne 7 : la somme 7 ne renseigne pas sur le premier dé.</li>
+      <li><b>Des pièces</b> : les lancers successifs d'une pièce sont modélisés indépendants, P(face, face) = ¼. C'est l'hypothèse qui donnera la binomiale (<a href="lesson-00-04-variables-binomiale-normale.html#n4">l04, notion 4</a>).</li>
+    </ol>
+  </div></details>
+  <details class="preuve"><summary>Preuve <small>les deux définitions, le complément, disjoint ⇒ dépendant</small></summary><div class="in">
+    <div class="drv">
+      <div>P(<i>A</i> ∣ <i>B</i>) = P(<i>A</i>)</div><span>l'intuition, avec P(B) &gt; 0</span>
+      <div>⇔ P(<i>A</i> ∩ <i>B</i>) / P(<i>B</i>) = P(<i>A</i>)</div><span>définition du conditionnement (notion 1)</span>
+      <div>⇔ P(<i>A</i> ∩ <i>B</i>) = P(<i>A</i>) P(<i>B</i>)</div><span>multiplier par P(B) : c'est la ligne de Brunton</span>
+      <div>P(<i>A</i>ᶜ ∩ <i>B</i>) = P(<i>B</i>) − P(<i>A</i> ∩ <i>B</i>)</div><span>B est l'union disjointe de A ∩ B et Aᶜ ∩ B</span>
+      <div>= P(<i>B</i>) − P(<i>A</i>) P(<i>B</i>) = P(<i>A</i>ᶜ) P(<i>B</i>)</div><span>indépendance, puis complément (l02, notion 2)</span>
+      <div>de même pour A et Bᶜ, puis pour Aᶜ et Bᶜ</div><span>par symétrie, puis en appliquant le résultat deux fois</span>
+      <div><i>A</i> ∩ <i>B</i> = ∅ ⇒ P(<i>A</i> ∩ <i>B</i>) = 0 &lt; P(<i>A</i>) P(<i>B</i>)</div><span>disjoints, de probabilités non nulles : jamais indépendants</span>
+    </div>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>les 36 issues, comptées exactement</small></summary><div class="in">
+<pre class="py">{{CODE:c7}}</pre>
+<pre class="out">{{OUT:c7}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>Disjoint n'est pas indépendant.</b> C'est même l'inverse : deux événements disjoints de probabilités non nulles s'excluent, donc chacun renseigne totalement sur l'autre.</li>
+      <li><b>L'indépendance dépend de P.</b> Retire la dame de cœur du paquet : il reste 51 cartes, P(dame) = 3/51, P(pique) = 13/51, P(dame de pique) = 1/51 = 0,0196, alors que le produit vaut 39/2 601 = 0,0150. Pique et dame ne sont plus indépendants.</li>
+      <li><b>Une covariance nulle n'est pas l'indépendance</b>, pour des variables aléatoires (<a href="lesson-00-09-covariance-correlation.html#n3">l09, notion 3</a>).</li>
+      <li><b>L'indépendance est une hypothèse à justifier.</b> « En un sens, une conséquence de la physique », dit Brunton : des disques sur la même prise ne tombent pas en panne indépendamment (notion 8).</li>
+      <li><b>Pas d'indépendance, pas de produit.</b> La vraisemblance d'un échantillon ne s'écrit comme un produit que si les observations sont indépendantes (<a href="../chains/chain-p02-01-bruit-vraisemblance-loss.html">p02-01</a>).</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (12) ne dit pas que disjoint et indépendant sont deux choses différentes, et même incompatibles dès que les probabilités sont non nulles. Il développe IID en « identical independently distributed » : c'est <i>independent and identically distributed</i>, indépendantes et de même loi, deux hypothèses distinctes.</div>
+  </div></details>
+  <p class="garde">A et B sont indépendants si P(A ∩ B) = P(A) P(B), ce qui revient à P(A ∣ B) = P(A) quand P(B) &gt; 0 : savoir B ne change rien sur A.</p>
+</section>
+

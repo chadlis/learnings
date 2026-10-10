@@ -1,0 +1,57 @@
+<!-- ============================ n8 ============================ -->
+<section class="notion outil" id="n8">
+  <h3>Systèmes en série et en parallèle ; la cause commune <span class="tag outil">outil</span></h3>
+  <p class="src">Brunton 12</p>
+  <div class="idee">
+    <p>Brunton applique l'indépendance à la fiabilité. En <b>série</b>, comme une guirlande de Noël, une seule panne coupe tout. Compter « exactement une panne, exactement deux… » mène au double compte, comme dans le problème des anniversaires ; il passe par le complément : le système marche seulement si les n composants marchent, (1 − p)<sup>n</sup> par indépendance. Avec 10 composants à 5 % de panne : 0,95<sup>10</sup> = 0,599, le système tombe 4 fois sur 10.</p>
+    <p>En <b>parallèle</b>, on contourne une panne ; le système ne tombe que si tout tombe : 0,05<sup>10</sup> ≈ 10<sup>−13</sup>. Trois disques durs à 1 % : un risque sur un million. Mais si le parasurtenseur lâche ou si la foudre tombe, les trois disques meurent ensemble. L'indépendance est une hypothèse physique, et une <b>cause commune</b> la casse.</p>
+  </div>
+  <div class="fig vis" id="v8">
+    <div class="lbl">Voir l'idée — la guirlande et les disques de secours</div>
+    <div id="v8ctl" class="sl-ctl"></div>
+    <div id="v8sl"></div>
+    <div id="v8plot" class="wide"></div>
+    <div class="readouts" id="v8out"></div>
+    <p class="cap">n composants, chacun en panne avec probabilité p = 0,05, indépendamment. Une panne est une croix rouge ; le courant passe de gauche à droite tant qu'un chemin existe. <b>Série</b>, n = 10 : P(panne) = 0,401. <b>Parallèle</b>, n = 10 : 9,8 × 10<sup>−14</sup>. <b>▶ 1 000 systèmes</b> en tire mille : en série environ 400 tombent, en parallèle aucun. Active la <b>cause commune</b> (une surtension, 1 fois sur 1 000, qui tue tout) : le bouton tire alors 20 000 systèmes, et la parallèle en voit tomber une vingtaine, environ une fois sur mille, quel que soit n.</p>
+  </div>
+  <div class="formule"><div class="lbl">Les formules</div>
+    <div class="eq">série : P(panne) = 1 − (1 − <i>p</i>)<sup>n</sup> &nbsp;&nbsp;&nbsp; parallèle : P(panne) = <i>p</i><sup>n</sup></div>
+    <div class="eq">composants différents : 1 − Π(1 − <i>p</i><sub>i</sub>) et Π <i>p</i><sub>i</sub> &nbsp;&nbsp;&nbsp; cause commune de probabilité <i>q</i> : P(panne parallèle) = <i>q</i> + (1 − <i>q</i>) <i>p</i><sup>n</sup> ≥ <i>q</i></div>
+    <ul>
+      <li>Hypothèse : les n pannes sont <b>mutuellement</b> indépendantes, ce qui demande plus que l'indépendance de chaque paire (notion 9). C'est elle qui permet de multiplier n probabilités.</li>
+      <li>Série : le complément (<a href="lesson-00-02-espace-axiomes-complement.html#n2">l02, notion 2</a>) évite de compter une panne, deux pannes, et ainsi de suite, comme pour les anniversaires (<a href="lesson-00-02-espace-axiomes-complement.html#n4">l02, notion 4</a>).</li>
+      <li>Cause commune : un choc de probabilité q, indépendant des pannes propres, qui met tous les composants hors service d'un coup. La redondance ne protège pas contre lui.</li>
+    </ul>
+  </div>
+  <div class="fig" id="fig6">
+    <div class="lbl">Figure 6 — ajouter des composants, avec ou sans cause commune</div>
+    <div id="f6plot" class="wide"></div>
+    <div id="f6sl"></div>
+    <div class="readouts" id="f6out"></div>
+    <p class="cap">P(panne) en fonction du nombre n de composants, en échelle log, pour p = 0,05. En <b>série</b> (rouge), la panne monte vers 1 : 0,401 à n = 10. En <b>parallèle</b> (bleu), elle est divisée par 20 à chaque composant ajouté, jusqu'à 9,8 × 10<sup>−14</sup>. Avec une <b>cause commune</b> de probabilité q = 10<sup>−3</sup> (violet), la parallèle s'écrase sur le plancher q : à n = 4 elle n'est plus qu'à 0,6 % au-dessus. Règle q et p : le plancher suit q, pas n.</p>
+  </div>
+  <details class="ex"><summary>Exemples simples <small>la guirlande, deux composants, les disques, un agent LLM</small></summary><div class="in">
+    <ol>
+      <li><b>Brunton</b>, n = 10, p = 0,05. Série : 0,95<sup>10</sup> = 0,5987 de marche, 0,4013 de panne. Parallèle : 0,05<sup>10</sup> = 9,8 × 10<sup>−14</sup>, « à peu près 10<sup>−13</sup> ».</li>
+      <li><b>Deux composants</b> à 5 % : série 1 − 0,95² = 0,0975 ; parallèle 0,05² = 0,0025.</li>
+      <li><b>Les disques de Brunton</b> : trois à 1 % en parallèle, 0,01³ = 10<sup>−6</sup>. Avec une surtension commune de probabilité 10<sup>−3</sup> : 10<sup>−3</sup> + (1 − 10<sup>−3</sup>) × 10<sup>−6</sup> = 1,001 × 10<sup>−3</sup>, mille fois plus.</li>
+      <li><b>Cent composants à 1 %</b> en série : 1 − 0,99<sup>100</sup> = 0,634. Des pièces fiables, une chaîne qui ne l'est pas.</li>
+      <li><b>En ML, un agent LLM</b> qui enchaîne 10 étapes (appel d'outil, extraction, génération…), chacune réussie à 95 % et indépendamment des autres : il réussit de bout en bout avec probabilité 0,95<sup>10</sup> = 0,599 ; avec 20 étapes, 0,358. C'est un système en série.</li>
+    </ol>
+  </div></details>
+  <details class="code"><summary>Simuler en Python <small>quatre millions de paires de disques, avec et sans surtension</small></summary><div class="in">
+<pre class="py">{{CODE:c8}}</pre>
+<pre class="out">{{OUT:c8}}</pre>
+  </div></details>
+  <details class="casse"><summary>Où ça casse</summary><div class="in">
+    <ul>
+      <li><b>La cause commune.</b> Même prise, même lot de fabrication, même foudre : les pannes ne sont plus indépendantes, et la parallèle ne descend jamais sous la probabilité du choc commun.</li>
+      <li><b>Des composants différents.</b> pⁿ suppose le même p partout ; sinon on multiplie les p<sub>i</sub> un par un.</li>
+      <li><b>Le basculement fait partie du système.</b> Si l'organe qui passe sur le secours peut lui-même tomber en panne, il est en série avec le bloc parallèle.</li>
+      <li><b>Un ensemble de modèles n'est redondant que si leurs erreurs le sont peu.</b> Un vote majoritaire réduit l'erreur quand les modèles se trompent indépendamment ; entraînés sur les mêmes données, ils se trompent souvent ensemble, une cause commune.</li>
+    </ul>
+    <div class="brunton"><b>Brunton, rectifié</b>Brunton (12) écrit (1 − p)<sup>n</sup> et p<sup>n</sup> en invoquant l'indépendance, qu'il n'a définie que pour deux événements. Pour n composants, il faut l'<i>indépendance mutuelle</i> des n pannes : le produit pour toute sous-famille, pas seulement pour chaque paire (notion 9).</div>
+  </div></details>
+  <p class="garde">Pour n composants de panne p, aux pannes mutuellement indépendantes : en série P(panne) = 1 − (1 − p)<sup>n</sup>, en parallèle p<sup>n</sup>. Une cause commune de probabilité q fixe à la parallèle un plancher q.</p>
+</section>
+

@@ -1,0 +1,31 @@
+/* l03 : cases, tableaux et schémas des vignettes */
+.sl-cellv{fill:var(--cardsoft);stroke:rgba(34,48,43,.22);stroke-width:1;transition:opacity .3s}
+.sl-cellv.sl-k2{fill:#6B46C1;stroke:#6B46C1}
+.sl-cellv.sl-k1{fill:var(--pen);stroke:var(--pen)}
+.sl-fade{opacity:.16}
+.sl-hit{fill:none;stroke:var(--red);stroke-width:2.5}
+.sl-omega{fill:none;stroke:rgba(34,48,43,.55);stroke-width:1.5}
+.sl-setA{fill:rgba(107,70,193,.22);stroke:#6B46C1;stroke-width:1.5}
+.sl-setB{fill:rgba(31,95,168,.16);stroke:#1F5FA8;stroke-width:1.5}
+.sl-setAB{fill:rgba(107,70,193,.55);stroke:none}
+.sl-strip{fill:none;stroke:rgba(34,48,43,.45);stroke-width:1.2}
+.sl-areaA{fill:rgba(184,50,42,.55)}
+.sl-pp1{fill:var(--pen)}.sl-pp3{fill:var(--red)}
+.sl-num{fill:rgba(30,78,158,.2)}
+.sl-den{fill:none;stroke:var(--red);stroke-width:2.5}
+.sl-tcell{fill:var(--cardsoft);stroke:rgba(34,48,43,.18)}
+.sl-tval{font:600 15px var(--mono);fill:var(--cardink)}
+.sl-wire{stroke:var(--cardmuted);stroke-width:2;fill:none}
+.sl-box{fill:var(--cardsoft);stroke:var(--cardmuted);stroke-width:1.5}
+.sl-box.ko{fill:rgba(184,50,42,.16);stroke:var(--red)}
+.sl-ko{font:700 14px var(--sans);fill:var(--red)}
+.sl-ok{fill:var(--green)}
+.sl-node{fill:var(--cardmuted)}
+.sl-tree{stroke:rgba(34,48,43,.45);stroke-width:1.6}
+.sl-tree.on{stroke:var(--red);stroke-width:3}
+.sl-sym{font:15px var(--sans);fill:var(--cardink)}
+.sl-sym.r{fill:var(--red)}
+.sl-mono{font:12px var(--mono);fill:var(--cardink)}
+.sl-mono.on{fill:var(--red);font-weight:700}
+#f1plot .sl-plot{max-width:440px}
+.sl-halo{paint-order:stroke;stroke:var(--card);stroke-width:5px;stroke-linejoin:round}

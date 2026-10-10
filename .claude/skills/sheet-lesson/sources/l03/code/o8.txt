@@ -1,0 +1,3 @@
+series            : 0.019916  exact 0.019900
+parallel          : 0.000093  exact 0.000100
+parallel + surge  : 0.001114  exact 0.001100

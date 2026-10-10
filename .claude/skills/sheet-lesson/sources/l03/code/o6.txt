@@ -1,0 +1,3 @@
+prevalence 0.50: recall 0.900  FPR 0.049  precision 0.948  accuracy 0.925
+prevalence 0.10: recall 0.900  FPR 0.050  precision 0.665  accuracy 0.945
+prevalence 0.01: recall 0.898  FPR 0.050  precision 0.152  accuracy 0.949
