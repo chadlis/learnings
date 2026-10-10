@@ -30,7 +30,7 @@ for row in csv.DictReader(open(CSV, encoding='utf-8'), delimiter=';'):
 
 # 2. notes par tag → liens par note, dédoublonnés par sheet, au plus MAX_LINKS
 MAX_LINKS = 3
-RANK = {'p': 0, 'w': 1, 'b': 2, 'c': 3}          # chaînes, déroulés, ponts, coding
+RANK = {'l': 0, 'p': 1, 'w': 2, 'b': 3, 'c': 4}  # leçons d'abord (la source du socle depuis le 10/10/2026), puis chaînes, déroulés, ponts, coding
 per_note = defaultdict(dict)   # note_id -> {sheet_id: (titre, url)}
 for tag, lst in links.items():
     for nid in ac('findNotes', query=f'tag:{tag}'):
