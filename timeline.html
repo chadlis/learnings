@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Timeline formation ML/LLM · 51 semaines · v4 tableau (11/09)</title>
+<title>Timeline formation ML/LLM · 65 semaines · v6 cible évals (11/10)</title>
 <style>
     :root{
     --board:#20312C; --board2:#1A2925; --chalk:#EDE8DA; --chalk2:#C9C4B6; --dust:rgba(237,232,218,.55);
     --base:var(--board); --panel:var(--board2); --panel2:#162220; --card:var(--board2); --card2:#162220;
     --ink:#EDE8DA; --muted:#C9C4B6; --faint:#8F9A93;
     --line:rgba(237,232,218,.14); --line2:rgba(237,232,218,.3);
-    --p1:#9FE0D2; --p2:#A7CCEB; --p3:#C8B6F5; --p4:#F0D178; --p6:#F3A28F;
-    --algo:#A7CCEB; --ml:#9FE0D2; --couches:#C8B6F5; --bloc:#EDE8DA;
+    --p1:#9FE0D2; --p2:#A7CCEB; --p3:#C8B6F5; --p4:#F0D178; --p5:#B9E2C4; --p6:#F3A28F;
+    --algo:#A7CCEB; --ml:#9FE0D2; --stats:#C8B6F5; --mem:#E9B8D2; --bloc:#EDE8DA;
     --arte:#B9E2C4; --deci:#F0D178; --cp:#F3A28F;
     --teal:#9FE0D2; --blue:#A7CCEB; --violet:#C8B6F5; --green:#B9E2C4; --amber:#F0D178; --coral:#F3A28F;
     --mono:ui-monospace,Menlo,Consolas,monospace;
@@ -75,7 +75,7 @@
   .pha.mid{opacity:.92}
   .pha.body{background:color-mix(in srgb,var(--pc) 30%, transparent)}
 
-  /* bande des blocs B1→B8 : découpage pédagogique interne à la Phase 2 */
+  /* bande des blocs B1, 2A→2D : découpage pédagogique interne à la Phase 2 */
   .blk{font-family:var(--mono);font-size:9px;letter-spacing:.1em;font-weight:700;color:var(--pc);
     justify-content:flex-start;padding-left:6px;white-space:nowrap;overflow:hidden;border-right:0;
     background:color-mix(in srgb,var(--pc) 13%, transparent)}
@@ -116,6 +116,7 @@
   .p-top .hrs{font-family:var(--mono);font-size:10.5px;color:var(--faint);letter-spacing:.06em}
   .bdg{font-family:var(--mono);font-size:9px;letter-spacing:.1em;padding:2px 7px;border-radius:20px;border:1px solid currentColor}
   .bdg.arte{color:var(--arte)}.bdg.deci{color:var(--deci)}.bdg.cp{color:var(--cp)}
+  .bdg.mem{color:var(--mem)}.bdg.stats{color:var(--stats)}
   .nav{display:flex;gap:5px}
   .nav button{font-family:var(--mono);font-size:12px;color:var(--muted);background:transparent;
     border:1px solid var(--line2);border-radius:7px;width:28px;height:26px;cursor:pointer}
@@ -210,17 +211,18 @@
 <body>
 <div class="wrap">
 
-  <div class="eyebrow">Formation ML/LLM · 51 semaines · 08/09/2026 → 27/08/2027</div>
+  <div class="eyebrow">Formation ML/LLM · 65 semaines · 08/09/2026 → 03/12/2027 · plan du 11/10</div>
   <h1>La <span>timeline</span> jusqu'aux candidatures</h1>
-  <p class="sub">Cibles par ordre : <b>research engineer AI safety</b> → research engineer IA/ML → FDE / applied AI.
-  Chaque colonne est une semaine. La barre claire mesure les <b>heures de bloc principal</b>, les points marquent les
-  <b>drills</b>, les losanges les <b>jalons</b>. Clique une semaine — ou navigue aux flèches ← →.</p>
+  <p class="sub">Cible unique jusqu'à septembre 2027 : <b>research engineer AI safety, orientation évaluations</b> + <b>mémoire de philosophie</b>.
+  Trois chantiers au plus : bloc principal + stats + mémoire. Chaque colonne est une semaine. La barre claire mesure les <b>heures de bloc principal</b>,
+  les points marquent les séances des <b>pistes parallèles</b>, les losanges les <b>jalons</b>. Clique une semaine — ou navigue aux flèches ← →.</p>
 
   <div class="bar">
     <button class="chip on" data-k="bloc" style="--cc:var(--bloc)"><i></i>bloc</button>
     <button class="chip on" data-k="algo" style="--cc:var(--algo)"><i></i>algo</button>
     <button class="chip on" data-k="ml" style="--cc:var(--ml)"><i></i>ml coding</button>
-    <button class="chip on" data-k="couches" style="--cc:var(--couches)"><i></i>couches</button>
+    <button class="chip on" data-k="stats" style="--cc:var(--stats)"><i></i>stats</button>
+    <button class="chip on" data-k="mem" style="--cc:var(--mem)"><i></i>mémoire</button>
     <button class="chip on" data-k="arte" style="--cc:var(--arte)"><i></i>artefact</button>
     <button class="chip on" data-k="deci" style="--cc:var(--deci)"><i></i>décision</button>
     <span class="sp"></span>
@@ -233,7 +235,8 @@
     <div class="labels" id="labels"></div>
     <div class="scroll" id="scroll"><div class="grid" id="grid"></div></div>
   </div>
-  <p class="warn">⚠ Cascade B3→B8 provisoire (décalage par défaut, marge B8 consommée). Deux collisions à trancher à la revue du 25/09 : B4 attention ★ tombe sur la demi-semaine du 16/11 (h = 4), B7 réplication sur celle du 14/12 (h = 3).</p>
+  <p class="warn">⚠ Trois tensions à trancher à la revue du 16/10 : BlueDot (part-time, 07/12 → 17/01) continue pendant les congés du 16–22/12 — semaine allégée ou rattrapée ? · le créneau mémoire du vendredi 10h–12h en janvier chevauche la revue 09h–11h · la séance mémoire de 1h30 le week-end bute sur la règle « un jour à zéro, l'autre léger ». À surveiller : le 30/06 cumule publication et chapitre 4. ML4Good (≈ 03/05 → 14/05) attend les dates 2027.</p>
+  <div class="excl" style="margin-top:10px"><b>Coupé le 11/10, à ne pas réintroduire —</b> LeetCode (les cartes Anki restent) · makemore 3 et 4 · BPE · ARENA 1.2 interp et 2.4 RLHF (après juin, ou en septembre) · system design · Fluent Python comme piste (lecture juste-à-temps, voir le créneau libre). Les anciennes Phases 3 et 4 (system design, FDE, RE ML) sont supprimées ; la Phase 2 Karpathy est étendue jusqu'au 19/02.</div>
 
   <div class="panel" id="panel"></div>
 
@@ -246,34 +249,34 @@
   <span class="bkhint">un seul à la fois — clique pour basculer</span>
 </div>
 <div class="fp bk" id="bk-fp">
-<p class="lede" style="padding-left:0">23 tickets, <b>pagination vérifiée sur le PDF</b> (2<sup>e</sup> éd.). Un ticket se coche quand la section est lue <b>et</b> qu'un idiome en a été écrit dans la semaine — lue seule, elle ne compte pas. À ~30 min hebdomadaires tu en traiteras une quinzaine d'ici janvier : c'est une <b>réserve ordonnée</b>, pas une liste à finir.</p>
-<div class="fpgrp" style="--fc:var(--teal)"><h3>B1 · micrograd + makemore 1 — 06/10 → 12/10</h3>
+<p class="lede" style="padding-left:0">23 tickets, <b>pagination vérifiée sur le PDF</b> (2<sup>e</sup> éd.). Un ticket se coche quand la section est lue <b>et</b> qu'un idiome en a été écrit dans la semaine — lue seule, elle ne compte pas. Depuis le 11/10, Fluent Python n'est <b>plus une piste</b> : lecture juste-à-temps, quand le code du bloc réclame la section. Les groupes donnent le <b>déclencheur attendu</b>, pas un calendrier — c'est une <b>réserve ordonnée</b>, pas une liste à finir.</p>
+<div class="fpgrp" style="--fc:var(--teal)"><h3>2A · micrograd + makemore 1 — 12/10 → 06/11</h3>
 <div class="tk"><span class="id">FP-01</span><span class="ch">ch. 1 · Python Data Model, intégral<span class="pp">p. 3–18</span></span><span class="why"><code>Value.__repr__</code> et <code>__add__</code>. Le seul chapitre que Ramalho recommande à tout lecteur, quoi qu'il arrive.</span></div>
 <div class="tk"><span class="id">FP-02</span><span class="ch">ch. 16 · Operator Overloading 101 → Unary Operators<span class="pp">p. 562–568</span></span><span class="why"><code>__add__</code>, <code>__mul__</code>, <code>__pow__</code>, <code>__neg__</code>, <code>__sub__</code>, <code>__truediv__</code>.</span></div>
 <div class="tk"><span class="id">FP-03</span><span class="ch">ch. 16 · Overloading + → Wrapping-Up Arithmetic Operators<span class="pp">p. 568–577</span></span><span class="why">Opérateurs réfléchis. <code>2 * v</code> échoue sans <code>__rmul__</code> — tu vas rencontrer le bug avant de lire la section. <em>Pagination corrigée le 10/09 : la matière commence p. 568, pas 576.</em></span></div>
 <div class="tk"><span class="id">FP-04</span><span class="ch">ch. 9 · Variable Scope Rules → Closures → nonlocal<span class="pp">p. 308–316</span></span><span class="why"><code>_backward</code> <b>est</b> une closure. Le cœur conceptuel de micrograd, pas un à-côté.</span></div>
 </div>
-<div class="fpgrp" style="--fc:var(--violet)"><h3>B2 · makemore 2 et 3 — 13/10 → 23/10</h3>
+<div class="fpgrp" style="--fc:var(--violet)"><h3>2B · makemore 2 allégé — 18/11 → 04/12</h3>
 <div class="tk"><span class="id">FP-05</span><span class="ch">ch. 17 · Iterables vs Iterators → generator function → genexps<span class="pp">p. 599–613</span></span><span class="why">Construction du dataset, minibatchs.</span></div>
 <div class="tk"><span class="id">FP-06</span><span class="ch">ch. 2 · Why Slices and Ranges Exclude the Last Item + Slice Objects<span class="pp">p. 47–49</span></span><span class="why"><code>view(-1,6)</code>, indices de contexte, et la convention de tranche que tu poses avant chaque TAP.</span></div>
 <div class="tk"><span class="id">FP-2b</span><span class="ch">ch. 2 · Arrays → Memory Views → NumPy<span class="pp">p. 59–67</span></span><span class="why">Ramalho construit un <code>memoryview</code> sur un <code>array</code>, modifie un octet, voit la valeur changer des deux côtés. Le pont buffer / vue / copie en Python pur — il éclaire <code>keepdim</code>, la contiguïté et le bug « <code>view</code> échoue là où <code>reshape</code> passe ». <em>Ajouté après lecture du PDF complet.</em></span></div>
 </div>
-<div class="fpgrp" style="--fc:var(--blue)"><h3>B3 · makemore 3 — 26/10 → 06/11 (provisoire)</h3>
+<div class="fpgrp" style="--fc:var(--blue)"><h3>2C · GPT II, config et vues — 07/12 → 15/01</h3>
 <div class="tk"><span class="id">FP-07</span><span class="ch">ch. 5 · Overview of Data Class Builders → @dataclass field options<span class="pp">p. 164–186</span></span><span class="why">Objets de configuration d'expérience.</span></div>
 <div class="tk"><span class="id">FP-08</span><span class="ch">ch. 6 · Variables Are Not Boxes → Identity & Aliases → Copies Are Shallow<span class="pp">p. 202–216</span></span><span class="why"><em>Recentré le 10/09 :</em> le déclencheur est le modèle d'<b>aliasing</b> (202–207), pas seulement les copies superficielles — c'est lui qui explique vue-vs-copie en torch, tes trois cartes déjà en deck. Puis le dict de config partagé entre runs (214–216).</span></div>
 </div>
-<div class="fpgrp" style="--fc:var(--green)"><h3>B4 · makemore 4, backprop manuel — 16/11 → 27/11 (provisoire)</h3>
+<div class="fpgrp" style="--fc:var(--green)"><h3>2D · GPT complet, tests — 19/01 → 12/02</h3>
 <div class="tk"><span class="id">FP-09</span><span class="ch">ch. 7 · Higher-Order Functions → operator → functools.partial<span class="pp">p. 234–249</span></span><span class="why">Comparaison de gradients, fonctions de vérification.</span></div>
 <div class="tk"><span class="id">FP-10</span><span class="ch">ch. 8 · Gradual Typing in Practice → Generic Collections → ABCs<span class="pp">p. 255–280</span></span><span class="why">Annoter les repos from-scratch, mypy sur tinygraph.</span></div>
 </div>
-<div class="fpgrp" style="--fc:var(--coral)"><h3>B5–B8 · GPT, BPE, from-scratch — 30/11 → 08/01 (provisoire)</h3>
+<div class="fpgrp" style="--fc:var(--coral)"><h3>2D → Phase 3 · nn.Module, protocoles — 19/01 → 02/04</h3>
 <div class="tk"><span class="id">FP-11</span><span class="ch">ch. 11 · Object Representations → __format__ / __hash__ → __slots__<span class="pp">p. 364–388</span></span><span class="why">Classes de modules propres.</span></div>
 <div class="tk"><span class="id">FP-12</span><span class="ch">ch. 12 · Protocols and Duck Typing → __getitem__ slice-aware → __getattr__<span class="pp">p. 402–411</span></span><span class="why">Comment <code>nn.Module</code> expose ses paramètres. <em>Le dynamique est en 408–411.</em></span></div>
 <div class="tk"><span class="id">FP-13</span><span class="ch">ch. 13 · Two Kinds of Protocols → Goose Typing → Static Protocols<span class="pp">p. 434–476</span></span><span class="why">Ce qu'est vraiment <code>nn.Module</code> ; socle pour lire du code de labo.</span></div>
-<div class="tk"><span class="id">FP-14</span><span class="ch">ch. 4 · Byte Essentials → Basic Encoders/Decoders<span class="pp">p. 120–128</span></span><span class="why">Le BPE opère sur des <b>octets UTF-8</b>. Seul ticket hors ordre du livre : chapitre de la Partie I, déclencheur en novembre.</span></div>
+<div class="tk"><span class="id">FP-14</span><span class="ch">ch. 4 · Byte Essentials → Basic Encoders/Decoders<span class="pp">p. 120–128</span></span><span class="why">Le BPE opère sur des <b>octets UTF-8</b>. Seul ticket hors ordre du livre. <em>BPE coupé le 11/10 : plus de déclencheur, ticket dormant.</em></span></div>
 <div class="tk"><span class="id">FP-15</span><span class="ch">ch. 18 · Context Managers and with Blocks → @contextmanager<span class="pp">p. 658–668</span></span><span class="why"><code>torch.no_grad()</code> <b>est</b> un context manager.</span></div>
 </div>
-<div class="fpgrp" style="--fc:var(--amber)"><h3>Phase 3 · LLM engineering — dès le 12/01</h3>
+<div class="fpgrp" style="--fc:var(--amber)"><h3>Phases 3–4 · Inspect et runs de l'artefact — 22/02 → 11/06</h3>
 <div class="tk"><span class="id">FP-16</span><span class="ch">ch. 9 · Implementing a Simple Decorator → functools.cache / lru_cache<span class="pp">p. 317–323</span></span><span class="why">Caching d'inférence.</span></div>
 <div class="tk"><span class="id">FP-17</span><span class="ch">ch. 9 · Single Dispatch → Parameterized Decorators<span class="pp">p. 324–335</span></span><span class="why">Registries de handlers.</span></div>
 <div class="tk"><span class="id">FP-18</span><span class="ch">ch. 19 · Processes, Threads and the GIL → The Real Impact of the GIL<span class="pp">p. 699–713</span></span><span class="why">Serving, batching.</span></div>
@@ -290,23 +293,24 @@
 <div class="excl" style="border-style:solid;border-color:var(--line)"><b>Volume —</b> ~65 h pour ⓪ à ⑤, à ~2 h par semaine dans le créneau : environ <b>30 semaines</b>. C'est le rythme, pas un retard.</div>
 </div>
 </section>
-<p class="hint"><b>Cadence (11/09)</b> : mar <b>build</b> 3 h → mer <b>comprendre</b> 2 h → jeu <b>prouver</b> 2 h · ven <b>tampon</b> 8h → <b>revue</b> 9h → <b>cartes</b> 10h · drills 08h—09h lun→jeu (algo lun/jeu, ML mar/mer) · weekend : un jour à zéro, l'autre léger · la grille est un défaut, pas un contrat.</p>
-<p class="hint">← → semaine · ↑ ↓ jalon · trame hachurée = semaine blanche · colonne créneau : <b style="color:var(--muted)">08h—09h</b> grisé = créneau drill par défaut (lun→jeu, règle du 08/09) · <b style="color:var(--muted)">—</b> = pas d'horaire propre (jalon)</p>
+<p class="hint"><b>Cadence (11/10)</b> : lun matin = <b>cours aux Ponts</b> jusqu'au 25/01, puis <b>mémoire</b> 9h–12h · mar <b>build</b> 3 h → mer <b>comprendre</b> 2 h → jeu <b>prouver</b> 2 h · mer 08h <b>stats</b> · mémoire mar + jeu 16h, 1h30 le week-end, + ven 10h–12h en janvier · ven <b>tampon</b> 8h → <b>revue</b> 9h · trois chantiers au plus · weekend : un jour à zéro, l'autre léger · la grille est un défaut, pas un contrat.</p>
+<p class="hint">← → semaine · ↑ ↓ jalon · trame hachurée = semaine blanche · ≈ et bordure pointillée = provisoire · point = séance, point cerclé = check ou livrable · pistes <b style="color:var(--muted)">algo</b> et <b style="color:var(--muted)">ml coding</b> : historique, coupées le 11/10 · colonne créneau : <b style="color:var(--muted)">08h—09h</b> grisé = créneau du matin par défaut · <b style="color:var(--muted)">—</b> = pas d'horaire propre (jalon)</p>
 
 </div>
 <script>
 /* ---------------------------------------------------------------- données */
 const PH = {
   p1:{n:"Phase 1 · clôture", c:"--p1"},
-  p2:{n:"Phase 2 · DL & transformers from scratch", c:"--p2"},
-  p3:{n:"Phase 3 · LLM engineering orienté evals", c:"--p3"},
-  p4:{n:"Phase 4 · system design", c:"--p4"},
-  p6:{n:"Phase 6 · mocks & candidatures", c:"--p6"}
+  p2:{n:"Phase 2 · Karpathy étendue", c:"--p2"},
+  p3:{n:"Phase 3 · évals Inspect", c:"--p3"},
+  p4:{n:"Phase 4 · artefact", c:"--p4"},
+  p5:{n:"Phase 5 · publication", c:"--p5"},
+  p6:{n:"Suite · mocks, mémoire, candidatures", c:"--p6"}
 };
-const KC={bloc:"--bloc",algo:"--algo",ml:"--ml",couches:"--couches",arte:"--arte",deci:"--deci"};
-const KL={bloc:"bloc",algo:"algo",ml:"ml code",couches:"couches",arte:"artefact",deci:"décision"};
+const KC={bloc:"--bloc",algo:"--algo",ml:"--ml",stats:"--stats",mem:"--mem",arte:"--arte",deci:"--deci"};
+const KL={bloc:"bloc",algo:"algo",ml:"ml code",stats:"stats",mem:"mémoire",arte:"artefact",deci:"décision"};
 
-// h = heures de bloc ; d = {algo, ml, couches} nb de drills ; m = jalons ; off = semaine blanche
+// h = heures de bloc ; dr = {algo, ml} drills (historique) · {stats, mem} séances, 2 = check ou livrable ; m = jalons ; off = semaine blanche ; prov = provisoire
 const W = [
 {d:"07/09", p:"p1", t:"S9 · socle inférentiel + pont PyTorch", h:7, dr:{algo:2,ml:1}, m:[["cp","Calibration à blanc 10/09 — 71 % pondéré"],["deci","Consigner le nouveau cadre dans TickTick"]], r:[
  ["mar 08","algo","<b>LC 11 — Container With Most Water</b>, chrono 30 min. Premier invariant d'<em>échange</em> après trois fenêtres : justifier qu'on jette une borne sans perdre l'optimum."],
@@ -341,7 +345,7 @@ const W = [
  ["lun 28","ml","🔥 <b>Pont numpy → torch + reprise des ratés du test numpy du 10/09</b> (déplacé du 21/09) — reshape et ordre C, transpose 3D et strides, vue vs copie. Rien de neuf. <em>Dernier contact numpy/torch avant B1 le 06/10 ; dépend de l'Ouverture P2 du 25/09.</em>"],
  ["lun 28","bloc","Pas de bloc : le lundi est pris dès 09h par la préparation du cours aux Ponts. Départ le 29, Anki en déplacement uniquement."]]},
 
-{d:"05/10", p:"p2", t:"B1 · micrograd + makemore 1", h:7, dr:{algo:2,ml:2}, r:[
+{d:"05/10", p:"p2", t:"B1 · micrograd + makemore 1", h:7, dr:{algo:2,ml:2}, m:[["deci","Nouveau plan — dim 11/10"]], r:[
  ["lun 05","ml","🔥 <b>Reprise post-voyage</b> — les items du 28/09 qui n'ont pas passé ; sinon le pont numpy → torch en une prise. <em>Le lundi porte une reprise ML, jamais d'algo neuf (rotation du 15/09).</em>"],
  ["mar 06","algo","<b>LC 20 / 155 — stack</b>, J1 : étude et déroulement. Nouvelle famille, échauffement rapide."],
  ["mar 06","bloc","3 h — <b>tp_micrograd</b> : Value, dunder, fermetures _backward, tri topologique, MLP, boucle. Asserts de Karpathy, loss &lt; 0,01.","09h—12h"],
@@ -349,158 +353,278 @@ const W = [
  ["mer 07","bloc","2 h — chain rule au tableau, trois chemins dont une variable utilisée deux fois (le bug <em>=</em> vs <em>+=</em>). ⛑ grads manuels = grads du code.","09h—11h"],
  ["jeu 08","algo","<b>LC 20 J2</b> — réécriture sans support, chrono."],
  ["jeu 08","bloc","2 h — <b>tp_makemore1</b> : bigram par comptage, échantillonnage, NLL 2,454 puis réseau ≈ 2,48.","09h—11h"],
- ["ven 09","bloc","08h <b>tampon</b> · 09h <b>revue</b> (première revue longue de P2) · 10h <b>cartes B1</b> : accumulation des gradients, tri topologique, tanh, NLL 2,454 vs 2,48.","08h—11h"]]},
+ ["ven 09","bloc","08h <b>tampon</b> · 09h <b>revue</b> (première revue longue de P2) · 10h <b>cartes B1</b> : accumulation des gradients, tri topologique, tanh, NLL 2,454 vs 2,48.","08h—11h"],
+ ["dim 11","deci","★ <b>Nouveau plan</b> : cible unique research engineer AI safety (évals) + mémoire jusqu'en septembre 2027. tp_micrograd s'est arrêté à l'étape 3 le 06/10 (micrograd jamais vraiment fait) : la Phase 2 Karpathy est étendue en 2A → 2D, LeetCode et system design sortent du plan."]]},
 
-{d:"12/10", p:"p2", t:"B2 · makemore 2 (Bengio 2003)", h:8, dr:{algo:2,ml:2}, r:[
- ["lun 12","algo","<b>LC 33 — Search in Rotated Sorted Array</b>, J1 : étude et déroulement. L'invariant de recherche binaire est le plus exigeant du lot."],
- ["lun 12","bloc","1 h — <b>micrograd → torch</b> : le même réseau jouet réécrit en PyTorch en ~20 lignes, gradients comparés terme à terme avec ton engine.py (loss.backward() ≡ ce que tu as écrit à la main). Clôt B1 <em>et</em> rallume les tenseurs au retour de la semaine blanche, la veille de makemore 2. <em>Le pont que Karpathy ne fait pas explicitement.</em>","09h—10h"],
- ["mar 13","ml","⚡ <b>broadcasting + keepdim</b> : normaliser 27×27 par lignes, puis provoquer le bug sans keepdim et le nommer. <em>Nourrit tp_makemore2, qui tourne à 09h le même jour.</em>"],
- ["mar 13","bloc","3 h — makemore 1 <b>de mémoire</b> + le premier « DONC » de P2 à voix haute (comptage lissé ≡ réseau régularisé, même vraisemblance). Puis tp_makemore2.","09h—12h"],
- ["mer 14","ml","⚡ <b>cross_entropy reconstruite</b> à la main puis cassée avec des logits à +100."],
- ["mer 14","bloc","2 h — minibatchs, balayage de LR en 10^lr, split train/dev/test. Cible dev loss ≈ 2,17.","09h—11h"],
- ["jeu 15","algo","<b>LC 33 J2</b> — réécriture sans support, chrono. <em>Le drill ⚡ indexation fancy est supprimé : C[X] et view(-1,6) auront été vus quatre fois (09/09, 15/09, 16/09, 28/09) et le bloc de 09h les emploie en vrai.</em>"],
- ["jeu 15","bloc","2 h — makemore 2 de mémoire + séance LR / overfitting / embeddings 2-d.","09h—11h"]]},
+{d:"12/10", p:"p2", t:"2A · Fondations Karpathy — fin de micrograd", h:7, dr:{stats:1,mem:2}, m:[["mem","Mail au directeur — mar 13/10"],["deci","SPAR : register interest"]], r:[
+ ["lun 12","bloc","Lundi matin = <b>cours aux Ponts</b>, jusqu'au 25/01 : rien d'autre ce matin-là. <em>Dès février, le lundi 9h–12h passe au mémoire.</em>","—","Cours aux Ponts"],
+ ["mar 13","bloc","3 h — <b>fin de tp_micrograd</b>, reprise à l'étape 3 (tri topologique) : MLP, boucle d'entraînement, asserts de Karpathy, loss &lt; 0,01. <em>Budget réaliste 4–6 h au total : le 06/10 a montré que ce n'est pas une simple mise en œuvre.</em>","09h—12h"],
+ ["mar 13","mem","◆ <b>Mail au directeur</b> : premières pistes de sujet, demande d'un rendez-vous de cadrage. <em>La candidature BlueDot attend sa réponse.</em>","16h—17h"],
+ ["mer 14","stats","<b>M0</b> — ouverture de la piste stats : le socle probabiliste, dans l'ordre de construction Brunton.","08h—09h"],
+ ["mer 14","bloc","2 h — fin de micrograd si le mardi n'a pas suffi, sinon relecture d'engine.py à voix haute, fermeture par fermeture.","09h—11h"],
+ ["jeu 15","bloc","2 h — <b>chain rule au tableau</b> : trois chemins dont une variable utilisée deux fois (le bug <em>=</em> vs <em>+=</em>). ⛑ grads manuels = grads du code.","09h—11h"],
+ ["jeu 15","mem","<b>Cadrage</b> (octobre) : délimiter la question, premières lectures de positionnement.","16h—17h"],
+ ["ven 16","deci","★ <b>SPAR : register interest</b> — un formulaire, pas un engagement. Décision en janvier."],
+ ["ven 16","bloc","08h <b>tampon</b> · 09h <b>revue</b> — première revue sous le plan du 11/10 : 2A, piste stats et créneaux mémoire consignés dans TickTick ; les trois tensions ⚠ tranchées.","08h—11h"]]},
 
-{d:"19/10", p:"p2", t:"B2 · makemore 3 — le bloc le plus dense", h:7, dr:{algo:2,ml:2}, m:[["cp","Point de rupture n°1 du plan"]], r:[
- ["lun 19","algo","<b>LC 206 — Reverse Linked List</b>, J1 : étude et déroulement."],
- ["mar 20","ml","⚡ <b>statistiques par dimension</b> — mean/std sur le bon axe, keepdim, ce que ça change au batchnorm."],
- ["mar 20","bloc","3 h — <b>vidéo intégrale makemore 3</b> (elle enseigne la posture de diagnostic) + loss initiale trop haute, tanh saturée, init Kaiming.","09h—12h"],
- ["mer 21","ml","<b>init Kaiming à la main</b> : d'où sort le gain, le calculer pour tanh et relu, vérifier la variance des activations."],
- ["mer 21","bloc","2 h — batchnorm, pièges train/eval, histogrammes d'activations, ratio update/data.","09h—11h"],
- ["jeu 22","algo","<b>LC 206 J2</b> — réécriture sans support, chrono."],
- ["jeu 22","bloc","2 h — makemore 3 sans support ; au tableau : pourquoi l'init contrôle les gradients.","09h—11h"]]},
+{d:"19/10", p:"p2", t:"2A · micrograd → torch, softmax stable", h:7, dr:{stats:1,mem:1}, m:[["deci","Géographie : décision provisoire — dim 25/10"]], r:[
+ ["mar 20","bloc","3 h — ⛑ <b>micrograd réécrit à froid</b> (critère 2A : sans support, à J+2 au moins), puis <b>micrograd → torch</b> : le même réseau jouet en ~20 lignes, gradients comparés terme à terme avec engine.py.","09h—12h"],
+ ["mar 20","mem","<b>Cadrage</b> (suite). Créneaux : mar + jeu 16h, 1h30 le week-end.","16h—17h"],
+ ["mer 21","stats","<b>M1 · unité 1</b> — tutorat sur la vidéo vue en amont.","08h—09h"],
+ ["mer 21","bloc","2 h — <b>softmax stable</b> de mémoire : soustraction du max, log-sum-exp, cas des logits à +100.","09h—11h"],
+ ["jeu 22","bloc","2 h — ce que <code>loss.backward()</code> fait que tu as écrit à la main ; cartes 2A (accumulation des gradients, tri topologique, tanh).","09h—11h"],
+ ["dim 25","deci","★ <b>Géographie : décision provisoire</b> — confirmée ou révisée au jalon du 31/01."]]},
 
-{d:"26/10", p:"p2", t:"B3 · makemore 4 — backprop ninja", h:7, prov:1, dr:{algo:2,ml:2}, r:[
- ["lun 26","algo","★ <b>LC 200 — Number of Islands</b>, J1 : étude et déroulement. <em>Les graphes sont la lacune N1 de juillet, jamais fermée. Avancés au 19/10 par le décalage du 10/09.</em>"],
- ["mar 27","ml","⚡ <b>tril, masked_fill, softmax stable</b> — ils nourrissent directement l'attention du 03/11."],
- ["mar 27","bloc","3 h — vidéo intégrale + backprop manuelle à travers cross-entropy et tanh.","09h—12h"],
- ["mer 28","ml","<b>Adam de mémoire</b> en numpy : momentum, second moment, correction de biais, AdamW. Cible &lt; 15 min."],
- ["mer 28","bloc","2 h — batchnorm manuel, backward complet. ⛑ <b>tous les <em>cmp</em> exacts sans regarder</b>.","09h—11h"],
- ["jeu 29","algo","<b>LC 200 J2</b> — réécriture sans support, chrono. Le point de mesure le plus important du trimestre."],
- ["jeu 29","bloc","2 h socratique — optimizers SGD → momentum → Adam → AdamW, learning rate schedules.","09h—11h"]]},
+{d:"26/10", p:"p2", t:"2A · tp_makemore1", h:7, dr:{stats:1,mem:1}, r:[
+ ["mar 27","bloc","3 h — <b>tp_makemore1</b> : bigram par comptage, échantillonnage, <b>NLL 2,454</b>.","09h—12h"],
+ ["mar 27","mem","<b>Cadrage</b> : fin octobre, la question tient en une phrase.","16h—17h"],
+ ["mer 28","stats","<b>M1 · unité 2</b>.","08h—09h"],
+ ["mer 28","bloc","2 h — la même chose en réseau : one-hot, softmax, descente de gradient, <b>NLL ≈ 2,48</b>.","09h—11h"],
+ ["jeu 29","bloc","2 h — makemore 1 de mémoire, à voix haute : comptage lissé ≡ réseau régularisé, même vraisemblance, d'où 2,454 vs 2,48.","09h—11h"]]},
 
-{d:"02/11", p:"p2", t:"B3 · régularisation + méthodologie expérimentale", h:7, prov:1, dr:{algo:2,ml:2}, m:[["cp","Mini-checkpoint : backprop + debug PyTorch"]], r:[
- ["lun 02","algo","<b>Reprise à froid — LC 20 ou LC 33</b>, chrono, sans étude préalable. <em>Seul format qui mesure le critère de sortie (« medium inconnu &lt; 30 min ») : un J2 mesure toujours un problème étudié 3 jours avant.</em>"],
- ["mar 03","ml","<b>layernorm from scratch</b> + son backward ; différence opérationnelle avec batchnorm."],
- ["mar 03","bloc","3 h — dropout, weight decay, vanishing/exploding. Puis ★ <b>méthodologie expérimentale</b> : seeds, logging structuré, script d'ablation batchnorm on/off × 3 seeds, README de run.","09h—12h"],
- ["mer 04","ml","🔥 <b>debug PyTorch en direct</b> — Claude casse une boucle d'entraînement, tu trouves. Format qu'aucune vidéo ne prépare."],
- ["mer 04","bloc","2 h ⛑ mini-checkpoint : backprop au tableau + le debug ci-contre.","09h—11h"],
- ["jeu 05","algo","<b>Reprise libre</b> — créneau libéré par le passage au cycle J1/J2 : reprise d'un raté du mois, ou second passage sur les graphes si LC 200 J2 a coincé."],
- ["jeu 05","bloc","2 h — Illustrated Transformer + maths de l'attention. <b>Corpus FR prêt et GPU testé</b> — pas en décembre.","09h—11h"]]},
+{d:"02/11", p:"p2", t:"2A · réécriture à froid et clôture", h:7, dr:{stats:1,mem:2}, m:[["mem","Problématique envoyée — ven 06/11"],["cp","Critère 2A : réécriture à froid J+2"]], r:[
+ ["mar 03","bloc","3 h — ⛑ <b>makemore 1 réécrit à froid</b> (J+2), puis reprise de ce qui a coincé dans le mois.","09h—12h"],
+ ["mar 03","mem","Problématique : dernière passe avant envoi.","16h—17h"],
+ ["mer 04","stats","<b>M1 · unité 3</b>.","08h—09h"],
+ ["mer 04","bloc","2 h — fiche 2A (backprop scalaire, chain rule, softmax stable, NLL) et passe qualité des cartes.","09h—11h"],
+ ["jeu 05","bloc","2 h — marge 2A : ce qui n'a pas passé le critère J+2, sinon lecture des prérequis de makemore 2.","09h—11h"],
+ ["ven 06","mem","◆ <b>Problématique envoyée</b> au directeur. <em>Sujet de travail : « Que vaut l'échec d'une élicitation comme preuve d'incapacité quand la probabilité de détection est calibrée sur des étalons construits ? »</em>","—"]]},
 
-{d:"09/11", p:"p2", t:"Maroc 10 → 17/11 — semaine blanche", h:0, dr:{algo:1}, off:1, r:[
- ["lun 09","algo","<b>LC 133 — Clone Graph</b>, J1 : étude et déroulement. Drill seul, rien d'autre cette semaine."]]},
+{d:"09/11", p:"p2", t:"Congés 10 → 17/11 — semaine blanche", h:0, dr:{}, off:1, r:[
+ ["lun 09","bloc","Cours aux Ponts le matin, puis congés du 10 au 17/11. Anki seulement."]]},
 
-{d:"16/11", p:"p2", t:"B4 · Let's build GPT — attention ★ cœur du plan", h:4, prov:1, dr:{algo:2,ml:2}, r:[
- ["lun 16","algo","<b>LC 207 — Course Schedule</b> (tri topologique), J1 : étude et déroulement."],
- ["mar 17","ml","<b>Attention une tête</b> en numpy : masque causal, moyenne pondérée, scaling 1/√d. Écrire avant de regarder."],
- ["mar 17","bloc","3 h — vidéo 1/2 : bigram torch, l'astuce mathématique de la self-attention, une tête.","09h—12h"],
- ["mer 18","ml","<b>Multi-head</b> : découpage des têtes, concat, projection de sortie. Prédire toutes les shapes avant."],
- ["mer 18","bloc","2 h — vidéo 2/2 : multi-head, feedforward, résiduel, layernorm, assemblage.","09h—11h"],
- ["jeu 19","algo","<b>LC 207 J2</b> — réécriture sans support, chrono."],
- ["jeu 19","bloc","2 h — run d'entraînement sur le corpus FR (GPU) + revue reviewer du code.","09h—11h"]]},
+{d:"16/11", p:"p2", t:"2B · Attention I — makemore 2 allégé", h:4, dr:{stats:1,mem:1}, m:[["deci","Candidature BlueDot — 18–22/11"]], r:[
+ ["lun 16","bloc","Congés jusqu'au mardi 17 inclus."],
+ ["mer 18","stats","<b>M1 · unité 4</b> — le jour du retour.","08h—09h"],
+ ["mer 18","bloc","2 h — <b>makemore 2 allégé</b> (Bengio 2003) : embeddings, fenêtre de contexte, MLP, minibatchs. <em>Allégé : seulement ce que GPT réclame.</em>","09h—11h"],
+ ["jeu 19","bloc","2 h — makemore 2 : split train/dev, balayage de LR, dev loss ≈ 2,17.","09h—11h"],
+ ["jeu 19","mem","<b>Littérature</b> (novembre → janvier) : lectures et fiches de lecture.","16h—17h"],
+ ["ven 20","deci","★ <b>Candidature BlueDot</b> Technical AI Safety, part-time 07/12 → 17/01 : à envoyer entre le 18 et le 22/11, clôture le 29/11. <em>Après la réponse du directeur sur la problématique.</em>"],
+ ["ven 20","deci","Novembre : <b>2–3 entretiens informels</b> avec des équipes d'évals, à caser dans le mois."]]},
 
-{d:"23/11", p:"p2", t:"B4 · attention de mémoire, chronométrée", h:7, prov:1, dr:{algo:2,ml:1}, m:[["cp","Critère de sortie : bloc attention &lt; 30 min"],["deci","Go / no-go du repo from-scratch"]], r:[
- ["mar 24","algo","<b>LC 133 J2</b> — réécriture sans support, chrono. Retour de voyage, reprise douce."],
- ["mer 25","ml","<b>Attention causale multi-head chronométrée</b>, sans doc. Cible &lt; 25 min, shapes justifiées. <em>Critère de sortie du plan.</em>"],
- ["mer 25","bloc","2 h ⛑ <b>bloc attention de mémoire &lt; 30 min</b>, puis le modèle entier.","09h—11h"],
- ["jeu 26","algo","<b>LC 215 — Kth Largest</b> (heap), J1 : étude et déroulement."],
- ["jeu 26","bloc","2 h — run + README nanoGPT ; Raschka ch. 3-4 en appui.","09h—11h"],
- ["ven 27","deci","★ <b>Go / no-go from-scratch</b> : si les composants de novembre n'ont pas un test <em>allclose</em> qui tourne, l'artefact est abandonné plutôt que traîné jusqu'en janvier."]]},
+{d:"23/11", p:"p2", t:"2B · Attention I — makemore 2 → GPT I", h:7, dr:{stats:2,mem:1}, m:[["stats","Check M1 — mer 25/11"]], r:[
+ ["mar 24","bloc","3 h — fin de makemore 2 de mémoire, puis <b>GPT I</b> : bigram torch, l'astuce mathématique de la self-attention.","09h—12h"],
+ ["mer 25","stats","◆ <b>Check M1</b> — remédiation préprogrammée le 02/12 si ça ne passe pas.","08h—09h"],
+ ["mer 25","bloc","2 h — <b>attention une tête</b> : masque causal (tril, masked_fill), scaling 1/√d, softmax stable.","09h—11h"],
+ ["jeu 26","bloc","2 h — la tête unique intégrée au modèle, premier run.","09h—11h"],
+ ["jeu 26","mem","<b>Littérature</b>.","16h—17h"]]},
 
-{d:"30/11", p:"p2", t:"B5 · tokenizer BPE", h:7, prov:1, dr:{algo:2,ml:2}, r:[
- ["lun 30","algo","<b>LC 215 J2</b> — réécriture sans support, chrono."],
- ["mar 01","ml","⚡ <b>gather / scatter</b> — le geste sous-jacent à cross_entropy et au sampling."],
- ["mar 01","bloc","3 h — vidéo BPE en entier (la seule sans équivalent écrit) + tp_bpe : merges, encode/decode.","09h—12h"],
- ["mer 02","ml","<b>BPE encode de mémoire</b>, cible &lt; 20 min."],
- ["mer 02","bloc","2 h — regex de découpage GPT-2/GPT-4, tokens spéciaux.","09h—11h"],
- ["jeu 03","algo","<b>LC 56 — Merge Intervals</b>, J1 : étude et déroulement."],
- ["jeu 03","bloc","2 h ⛑ BPE de mémoire + pourquoi les LLM ratent l'arithmétique, arbitrage de taille de vocabulaire.","09h—11h"]]},
+{d:"30/11", p:"p2", t:"2B · Attention I — GPT tête unique", h:7, dr:{stats:1,mem:1}, r:[
+ ["mar 01","bloc","3 h — <b>GPT I, tête unique</b> : modèle complet à une tête, entraînement, échantillonnage.","09h—12h"],
+ ["mer 02","stats","<b>Remédiation M1</b> préprogrammée — si le check est passé, le créneau ouvre M2.","08h—09h"],
+ ["mer 02","bloc","2 h — tête unique réécrite à froid, shapes justifiées avant chaque ligne.","09h—11h"],
+ ["jeu 03","bloc","2 h — marge 2B ; accès et rythme BlueDot préparés (~5 h/sem).","09h—11h"],
+ ["jeu 03","mem","<b>Littérature</b>.","16h—17h"]]},
 
-{d:"07/12", p:"p2", t:"B6 · ARENA ch. 1 — transformer + mech interp", h:7, prov:1, dr:{algo:2,ml:2}, r:[
- ["lun 07","algo","<b>LC 56 J2</b> — réécriture sans support, chrono."],
- ["mar 08","ml","<b>Hooks TransformerLens</b> — poser un hook, lire une activation, la patcher. Couplé à ARENA 1.2."],
- ["mar 08","bloc","3 h — ARENA 1.1 en passage rapide (vérification, pas apprentissage) puis 1.2 : hooks.","09h—12h"],
- ["mer 09","ml","<b>KV cache</b> implémenté : ce que ça change aux shapes du masque, et le gain en FLOPs."],
- ["mer 09","bloc","2 h — ARENA 1.2, exercices induction heads.","09h—11h"],
- ["jeu 10","algo","<b>LC 300 — LIS</b> (DP 1D), J1 : étude et déroulement. Dernier pattern du périmètre fermé."],
- ["jeu 10","bloc","2 h — ARENA 1.2, fin. <em>ARENA 1.3+ (SAE) exclu : optionnel en P3.</em>","09h—11h"]]},
+{d:"07/12", p:"p2", t:"2C · Attention II + BlueDot", h:7, dr:{stats:1,mem:1}, m:[["deci","BlueDot démarre — 07/12 → 17/01"]], r:[
+ ["lun 07","bloc","<b>BlueDot Technical AI Safety</b>, part-time : ~5 h/sem, une discussion live par semaine, jusqu'au 17/01. <em>Compté dans le bloc principal avec GPT II : c'est ce qui tient la règle des trois chantiers.</em>"],
+ ["mar 08","bloc","3 h — <b>GPT II, multi-head</b> en mode réduit : découpage des têtes, concat, projection de sortie. Prédire toutes les shapes avant.","09h—12h"],
+ ["mer 09","stats","<b>Piste stats · M2</b> (décembre).","08h—09h"],
+ ["jeu 10","mem","<b>Littérature</b>.","16h—17h"],
+ ["ven 11","deci","Décembre : <b>2–3 entretiens informels</b>, à caser avant les congés du 16."]]},
 
-{d:"14/12", p:"p2", t:"B7 · réplication induction heads ★ premier artefact safety", h:3, prov:1, dr:{algo:2,ml:2}, m:[["deci","Format et canal de publication"]], r:[
- ["lun 14","algo","<b>LC 300 J2</b> — réécriture sans support, chrono."],
- ["mar 15","ml","<b>top-k / nucleus sampling</b> from scratch + température. Question d'entretien fréquente."],
- ["mar 15","bloc","3 h — modèle attention-only 2 couches avec <b>ton</b> code ; entraînement × 3 seeds. Les seeds sont une question d'inférence, pas un luxe.","09h—12h"],
- ["mer 16","ml","<b>Score de prefix-matching</b> implémenté proprement — couplé au bloc, réutilisable tel quel dans le rapport."],
- ["mer 16","bloc","2 h — score d'in-context learning, courbe de phase change en cours d'entraînement.","09h—11h"],
- ["jeu 17","algo","<b>Clôture du périmètre algo</b> — reprise du raté le plus coûteux des 8 familles. À partir d'ici : maintenance seulement."],
- ["jeu 17","bloc","2 h — 1 couche vs 2 couches, dispersion sur les seeds. Claude en <em>reviewer de rapport</em>.","09h—11h"],
- ["ven 18","deci","★ <b>Format et canal arrêtés</b> : blog canonique + LessWrong, structure « ce que dit le paper / ce que j'obtiens / où ça diverge »."]]},
+{d:"14/12", p:"p2", t:"2C · BlueDot + GPT II — congés dès le 16", h:3, dr:{mem:1}, r:[
+ ["mar 15","bloc","3 h — GPT II : feedforward, résiduel, layernorm.","09h—12h"],
+ ["mar 15","mem","<b>Littérature</b>.","16h—17h"],
+ ["mer 16","bloc","Congés du 16 au 22/12. <em>BlueDot continue pendant les congés : semaine allégée ou rattrapée — tension ⚠.</em>"]]},
 
-{d:"21/12", p:"p2", t:"Vacances", h:0, dr:{}, off:1, r:[
- ["—","bloc","Rien. Le tampon des 23-24/12 reste optionnel et non programmé."]]},
+{d:"21/12", p:"p2", t:"Congés jusqu'au 22/12 · fêtes", h:0, dr:{}, off:1, r:[
+ ["—","bloc","Congés 16 → 22/12, puis les fêtes. Rien de programmé."]]},
 
-{d:"28/12", p:"p2", t:"B7 · rédaction du rapport — vacances dès le 16", h:7, prov:1, dr:{algo:1}, m:[["arte","Rapport de réplication induction heads"]], r:[
- ["lun 28","algo","Reprise libre d'un raté du trimestre. Léger."],
- ["mar 29","bloc","3 h — <b>rapport de réplication rédigé</b>. Format imposé, pas un tutoriel.","09h—12h"],
- ["mar 29","arte","★ <b>Artefact n°1 terminé.</b> Publication après le checkpoint, pas avant."],
- ["mer 30","bloc","Vacances 16 → 22/12. 23-24/12 tampon optionnel, non programmé."]]},
+{d:"28/12", p:"p2", t:"2C · BlueDot + GPT II, reprise", h:5, dr:{stats:1,mem:1}, r:[
+ ["mar 29","bloc","3 h — GPT II multi-head : assemblage, run.","09h—12h"],
+ ["mer 30","stats","<b>Piste stats · M2</b>.","08h—09h"],
+ ["mer 30","bloc","2 h — BlueDot : lectures et exercice de la semaine.","09h—11h"],
+ ["jeu 31","mem","<b>Littérature</b>.","16h—17h"]]},
 
-{d:"04/01", p:"p2", t:"B8 · checkpoint Phase 2 et bascule", h:7, dr:{}, m:[["cp","Checkpoint P2 — seuil 80 %"],["deci","Arbitrage QLoRA + programme figé P3"],["arte","nanoGPT · from-scratch · rapport publiés"]], r:[
- ["mar 05","bloc","3 h — rapport et README finalisés ; bloc attention chronométré en calibration. <em>On ne bachote pas un checkpoint.</em>","09h—12h"],
- ["mer 06","bloc","2 h ⛑ <b>CHECKPOINT P2</b> : ① attention au tableau avec les maths ② bloc réécrit &lt; 30 min ③ <b>debug PyTorch en direct</b> ④ 20 questions à 80 %.","09h—11h"],
- ["mer 06","deci","★ <b>&lt; 80 % ⟹ prolongation ciblée d'une semaine</b>, P3 démarre le 19/01."],
- ["jeu 07","bloc","2 h — débrief + <b>programme figé P3</b> écrit dans TickTick avant toute explication : items, niveaux, durées, exclusions nommées.","09h—11h"],
- ["jeu 07","deci","★ <b>Arbitrage QLoRA</b> : 3 semaines justifiées par Datadog + Mistral, Datadog est sorti. Alternative : réplication DPO + eval Inspect, plus proche de la cible n°1."],
- ["jeu 07","deci","★ Reprogrammer les conteneurs P3, encore datés du 01/02/2027 dans TickTick."],
- ["ven 08","arte","★ <b>Publication</b> : rapport (blog + LessWrong), repo nanoGPT, repo from-scratch."]]}
+{d:"04/01", p:"p2", t:"2C · BlueDot + GPT II", h:7, dr:{stats:1,mem:1}, r:[
+ ["mar 05","bloc","3 h — GPT II multi-head : réécriture à froid partielle.","09h—12h"],
+ ["mer 06","stats","<b>Piste stats · M2</b> — préparation du check du 20/01.","08h—09h"],
+ ["jeu 07","bloc","2 h — BlueDot : lectures et exercice de la semaine.","09h—11h"],
+ ["jeu 07","mem","<b>Littérature</b>.","16h—17h"],
+ ["ven 08","mem","Créneau de janvier : <b>vendredi 10h–12h</b> en plus de mar + jeu 16h. <em>Chevauche la revue de 09h–11h — tension ⚠.</em>","10h—12h"]]},
+
+{d:"11/01", p:"p2", t:"2C · fin de BlueDot", h:7, dr:{stats:1,mem:1}, r:[
+ ["mar 12","bloc","3 h — GPT II : ce qui reste du mode réduit ; dernière semaine BlueDot.","09h—12h"],
+ ["mer 13","stats","<b>Piste stats · M2</b>.","08h—09h"],
+ ["jeu 14","mem","<b>Littérature</b> → premier jet du plan.","16h—17h"],
+ ["ven 15","bloc","Fin de 2C. BlueDot se clôt le dimanche 17/01."],
+ ["ven 15","mem","Plan détaillé (créneau du vendredi de janvier).","10h—12h"]]},
+
+{d:"18/01", p:"p2", t:"2D · GPT complet", h:7, dr:{stats:2,mem:1}, m:[["stats","Check M2 — mer 20/01"]], r:[
+ ["mar 19","bloc","3 h — <b>GPT complet</b> : blocs empilés, multi-head, FFN, résiduel, layernorm.","09h—12h"],
+ ["mer 20","stats","◆ <b>Check M2</b>.","08h—09h"],
+ ["mer 20","bloc","2 h — GPT complet : run sur le corpus, lecture des courbes.","09h—11h"],
+ ["jeu 21","mem","Plan détaillé et bibliographie.","16h—17h"],
+ ["ven 22","mem","Plan détaillé (créneau du vendredi de janvier).","10h—12h"]]},
+
+{d:"25/01", p:"p2", t:"2D · GPT complet — jalons de fin janvier", h:7, dr:{stats:1,mem:2}, m:[["deci","Jalon de révision — dim 31/01"],["mem","Plan détaillé + biblio — ven 29/01"],["deci","≈ SPAR · ML4Good : décisions"]], r:[
+ ["lun 25","mem","Dernier lundi de cours aux Ponts. <b>Dès février : lundi 9h–12h au mémoire</b>, en plus de mar + jeu 16h."],
+ ["mar 26","bloc","3 h — GPT complet : entraînement, échantillonnage, ce que chaque composant change à la loss.","09h—12h"],
+ ["mer 27","stats","<b>Piste stats · M3</b> démarre : multiplicité, biais du max (→ mars).","08h—09h"],
+ ["ven 29","mem","◆ <b>Plan détaillé + bibliographie</b> au directeur.","—"],
+ ["dim 31","deci","★ <b>Jalon de révision</b> : au moins 2 signaux marché ⟹ on continue ; sinon <b>plan B « applied evals » Paris</b>. Confirme la décision géographique du 25/10."],
+ ["dim 31","deci","≈ <b>SPAR</b> : décision. ≈ <b>ML4Good</b> : décision et candidature en participant (fin janvier)."]]},
+
+{d:"01/02", p:"p2", t:"2D · GPT complet de mémoire", h:7, dr:{stats:1,mem:1}, r:[
+ ["lun 01","mem","<b>Chapitre 1</b> — premier lundi au nouveau créneau.","09h—12h"],
+ ["mar 02","bloc","3 h — GPT complet de mémoire, morceau par morceau ; multi-head chronométrée.","09h—12h"],
+ ["mer 03","stats","<b>Piste stats · M3</b>.","08h—09h"],
+ ["jeu 04","bloc","2 h — questions orales de la gate : attention au tableau, shapes, masque, scaling.","09h—11h"]]},
+
+{d:"08/02", p:"p2", t:"2D · gate attention", h:7, dr:{stats:1,mem:1}, m:[["cp","Gate attention — ven 12/02"]], r:[
+ ["lun 08","mem","<b>Chapitre 1</b>.","09h—12h"],
+ ["mar 09","bloc","3 h — répétition : multi-head codée sans doc, chronométrée.","09h—12h"],
+ ["mer 10","stats","<b>Piste stats · M3</b>.","08h—09h"],
+ ["ven 12","bloc","⛑ <b>Gate attention</b> : 6/8 à l'oral <b>et</b> multi-head codée en ≤ 30 min, sans doc."],
+ ["ven 12","deci","★ <b>Gate franchie ⟹ spike artefact dès le 15/02.</b> Non franchie ⟹ remédiation préprogrammée du 15 au 19/02."]]},
+
+{d:"15/02", p:"p2", t:"2D · remédiation ou début du spike", h:7, dr:{stats:1,mem:1}, r:[
+ ["lun 15","mem","<b>Chapitre 1</b>.","09h—12h"],
+ ["mar 16","bloc","3 h — <b>gate ratée</b> : remédiation ciblée sur les questions manquées. <b>Gate franchie</b> : début du spike « faux tricheur » (voir Phase 3).","09h—12h"],
+ ["mer 17","stats","<b>Piste stats · M3</b>.","08h—09h"]]},
+
+{d:"22/02", p:"p3", t:"Évals Inspect · ARENA 3.1–3.2", h:7, dr:{stats:1,mem:2}, m:[["mem","Chapitre 1 — ven 26/02"]], r:[
+ ["mar 23","bloc","3 h — <b>ARENA ch. 3</b> : 3.1 (évals, modèles de menace, design) puis 3.2 (génération de datasets). Les deux d'ici fin février.","09h—12h"],
+ ["mer 24","stats","<b>Piste stats · M3</b> : multiplicité.","08h—09h"],
+ ["mer 24","bloc","2 h — 3.2 : génération du dataset, contrôle qualité.","09h—11h"],
+ ["jeu 25","bloc","2 h — 3.2, fin.","09h—11h"],
+ ["ven 26","mem","◆ <b>Chapitre 1</b> rendu au directeur.","—"]]},
+
+{d:"01/03", p:"p3", t:"Évals Inspect · ARENA 3.3", h:7, dr:{stats:1,mem:1}, r:[
+ ["lun 01","mem","<b>Chapitre 2</b>.","09h—12h"],
+ ["mar 02","bloc","3 h — <b>ARENA 3.3 · Inspect</b> : tasks, solvers, scorers, logs.","09h—12h"],
+ ["mer 03","stats","<b>Piste stats · M3</b> : biais du max.","08h—09h"],
+ ["jeu 04","bloc","2 h — 3.3 : une première éval Inspect de bout en bout.","09h—11h"]]},
+
+{d:"08/03", p:"p3", t:"Évals Inspect · ARENA 3.3", h:7, dr:{stats:1,mem:1}, r:[
+ ["lun 08","mem","<b>Chapitre 2</b>.","09h—12h"],
+ ["mar 09","bloc","3 h — ARENA 3.3 : solvers et scorers sur mesure, élicitation.","09h—12h"],
+ ["mer 10","stats","<b>Piste stats · M3</b>.","08h—09h"],
+ ["jeu 11","bloc","2 h — 3.3 : lecture des logs, variance entre runs.","09h—11h"]]},
+
+{d:"15/03", p:"p3", t:"Évals Inspect · fin de 3.3", h:7, dr:{stats:1,mem:1}, r:[
+ ["lun 15","mem","<b>Chapitre 2</b>.","09h—12h"],
+ ["mar 16","bloc","3 h — ARENA 3.3, fin.","09h—12h"],
+ ["mer 17","stats","<b>Piste stats · M3</b>, fin (mars).","08h—09h"],
+ ["jeu 18","bloc","2 h — inspect_evals : lire deux évals existantes, leur structure, leurs conventions.","09h—11h"]]},
+
+{d:"22/03", p:"p3", t:"Évals Inspect · spike « faux tricheur »", h:7, dr:{stats:1,mem:2}, m:[["mem","Chapitre 2 — ven 26/03"]], r:[
+ ["lun 22","mem","<b>Chapitre 2</b> : dernière passe.","09h—12h"],
+ ["mar 23","bloc","3 h — <b>spike « faux tricheur »</b>, 10–12 h au total : un petit modèle password-locked, et l'éval Inspect qui retrouve — ou non — la capacité cachée. <em>Commencé le 15/02 si la gate est passée.</em>","09h—12h"],
+ ["mer 24","stats","Socle M3 sur le spike : combien de runs pour conclure.","08h—09h"],
+ ["jeu 25","bloc","2 h — spike : verrou, élicitation, premier chiffre.","09h—11h"],
+ ["ven 26","mem","◆ <b>Chapitre 2</b> rendu.","—"]]},
+
+{d:"29/03", p:"p3", t:"Évals Inspect · 3.4 agents allégée + fin du spike", h:7, dr:{stats:1,mem:1}, r:[
+ ["lun 29","mem","<b>Chapitre 3</b>.","09h—12h"],
+ ["mar 30","bloc","3 h — <b>ARENA 3.4 agents</b>, version allégée.","09h—12h"],
+ ["mer 31","stats","<b>Stats appliquées à l'artefact</b> : puissance, nombre de seeds, multiplicité du plan d'analyse.","08h—09h"],
+ ["jeu 01","bloc","2 h — fin du spike : ce qu'il dit, ce qu'il ne dit pas. Fin de la Phase 3 le 02/04.","09h—11h"]]},
+
+{d:"05/04", p:"p4", t:"Artefact · plan d'analyse pré-enregistré", h:7, dr:{stats:1,mem:1}, r:[
+ ["lun 05","mem","<b>Chapitre 3</b>.","09h—12h"],
+ ["mar 06","arte","L'artefact : un petit modèle (~1,5B) <b>password-locked sur GSM8K</b>, deux constructions du verrou, et une question — le classement des méthodes d'élicitation est-il stable d'une construction à l'autre ?"],
+ ["mar 06","bloc","3 h — <b>plan d'analyse pré-enregistré</b> : hypothèses, métriques, méthodes d'élicitation comparées, critère de stabilité du classement, correction de multiplicité. Écrit avant tout run.","09h—12h"],
+ ["mer 07","stats","Stats appliquées : le plan d'analyse relu sous l'angle de la puissance.","08h—09h"]]},
+
+{d:"12/04", p:"p4", t:"Artefact · gel du périmètre + v0", h:7, dr:{stats:1,mem:1}, m:[["deci","Gel du périmètre — ven 16/04"],["arte","v0 publique + billet court (mi-avril)"]], r:[
+ ["lun 12","mem","<b>Chapitre 3</b>.","09h—12h"],
+ ["mar 13","bloc","3 h — premiers runs, construction n°1 du verrou.","09h—12h"],
+ ["mer 14","stats","Stats appliquées à l'artefact.","08h—09h"],
+ ["ven 16","deci","★ <b>Gel du périmètre</b> : plus aucune question ajoutée après cette date."],
+ ["ven 16","arte","★ <b>v0 publique + billet court</b> : le spike et le plan pré-enregistré. <em>Base de la calibration des candidatures fin avril.</em>"]]},
+
+{d:"19/04", p:"p4", t:"Artefact · runs", h:7, dr:{stats:1,mem:1}, r:[
+ ["lun 19","mem","<b>Chapitre 3</b>.","09h—12h"],
+ ["mar 20","bloc","3 h — runs, construction n°1 : méthodes d'élicitation une à une.","09h—12h"],
+ ["mer 21","stats","Stats appliquées à l'artefact.","08h—09h"],
+ ["ven 23","bloc","⛑ <b>Work test chronométré</b> (mensuel) : une tâche fermée, temps limité, format des labos."]]},
+
+{d:"26/04", p:"p4", t:"Artefact · runs — calibration candidatures", h:7, dr:{stats:1,mem:2}, m:[["mem","Chapitre 3 — ven 30/04"],["deci","Calibration des candidatures sur la v0"]], r:[
+ ["mar 27","bloc","3 h — runs, construction n°1, fin.","09h—12h"],
+ ["mer 28","stats","Stats appliquées à l'artefact.","08h—09h"],
+ ["ven 30","mem","◆ <b>Chapitre 3</b> rendu.","—"],
+ ["ven 30","deci","★ <b>Calibration des candidatures</b> d'octobre-novembre sur les retours à la v0."]]},
+
+{d:"03/05", p:"p4", t:"Artefact · ML4Good (participant, 8 j)", h:3, prov:1, dr:{}, r:[
+ ["—","bloc","≈ <b>ML4Good, en participant</b> : 8 jours, ~6 jours de congé posés. <em>Dates 2027 non publiées : placé par défaut sur 03/05 → 14/05, à recaler dès l'annonce.</em>"],
+ ["—","bloc","Runs en pause pendant le bootcamp ; hors bootcamp, analyse de ce qui a déjà tourné."]]},
+
+{d:"10/05", p:"p4", t:"Artefact · ML4Good, puis reprise des runs", h:3, prov:1, dr:{stats:1,mem:1}, r:[
+ ["—","bloc","≈ Fin de ML4Good (dates provisoires), reprise des runs sur la construction n°2 du verrou."],
+ ["—","mem","<b>Chapitre 5</b>."]]},
+
+{d:"17/05", p:"p4", t:"Artefact · runs, construction n°2 du verrou", h:7, dr:{stats:1,mem:1}, r:[
+ ["lun 17","mem","<b>Chapitre 5</b>.","09h—12h"],
+ ["mar 18","bloc","3 h — runs, construction n°2 du verrou.","09h—12h"],
+ ["mer 19","stats","Stats appliquées : stabilité du classement entre les deux constructions.","08h—09h"],
+ ["ven 21","bloc","⛑ <b>Work test chronométré</b> (mensuel)."]]},
+
+{d:"24/05", p:"p4", t:"Artefact · analyse", h:7, dr:{stats:1,mem:2}, m:[["mem","Chapitre 5 — ven 28/05"]], r:[
+ ["mar 25","bloc","3 h — analyse selon le plan pré-enregistré, et rien d'autre.","09h—12h"],
+ ["mer 26","stats","Stats appliquées : tests, intervalles, correction de multiplicité.","08h—09h"],
+ ["ven 28","mem","◆ <b>Chapitre 5</b> rendu.","—"]]},
+
+{d:"31/05", p:"p4", t:"Artefact · analyse et figures", h:7, dr:{stats:1,mem:1}, r:[
+ ["lun 31","mem","<b>Chapitre 4</b> (étude de cas) : il attend les résultats gelés.","09h—12h"],
+ ["mar 01","bloc","3 h — figures, analyses de robustesse prévues au plan.","09h—12h"],
+ ["mer 02","stats","Stats appliquées à l'artefact.","08h—09h"]]},
+
+{d:"07/06", p:"p4", t:"Artefact · résultats gelés", h:7, dr:{stats:1,mem:1}, m:[["arte","Résultats gelés — ven 11/06"]], r:[
+ ["lun 07","mem","<b>Chapitre 4</b>.","09h—12h"],
+ ["mar 08","bloc","3 h — derniers contrôles, reproductibilité, seeds.","09h—12h"],
+ ["mer 09","stats","Stats appliquées : dernière relecture des chiffres.","08h—09h"],
+ ["ven 11","arte","★ <b>Résultats gelés</b> : plus aucun run après cette date."]]},
+
+{d:"14/06", p:"p5", t:"Publication · billet LessWrong / AF", h:7, dr:{mem:1}, r:[
+ ["lun 14","mem","<b>Chapitre 4</b>.","09h—12h"],
+ ["mar 15","bloc","3 h — <b>billet LessWrong / Alignment Forum</b> : ce qu'on a mesuré, ce que ça dit des arguments d'incapacité.","09h—12h"],
+ ["ven 18","bloc","⛑ <b>Work test chronométré</b> (mensuel)."]]},
+
+{d:"21/06", p:"p5", t:"Publication · repo + Inspect Evals Register", h:7, dr:{mem:1}, r:[
+ ["lun 21","mem","<b>Chapitre 4</b>.","09h—12h"],
+ ["mar 22","bloc","3 h — <b>repo</b> propre et reproductible ; soumission à l'<b>Inspect Evals Register</b>.","09h—12h"]]},
+
+{d:"28/06", p:"p5", t:"Publication · mise en ligne", h:5, dr:{mem:2}, m:[["arte","Billet + repo + Register — 30/06"],["mem","Chapitre 4 (étude de cas) — mer 30/06"]], r:[
+ ["mar 29","bloc","3 h — relecture finale, mise en ligne.","09h—12h"],
+ ["mer 30","arte","★ <b>Publication</b> : billet LessWrong / AF, repo, Inspect Evals Register."],
+ ["mer 30","mem","◆ <b>Chapitre 4</b> — l'étude de cas, écrite sur l'artefact.","—"]]},
+
+{d:"05/07", p:"p6", t:"Suite · mocks", h:6, dr:{mem:1}, r:[
+ ["—","bloc","<b>Mocks</b> : work tests chronométrés · pair programming PyTorch · design d'une éval · ML/DL depth · behavioral technique."],
+ ["—","bloc","<b>Narratif</b> : pourquoi la safety, pourquoi les évals, l'artefact défendu ligne par ligne."],
+ ["—","mem","Introduction et conclusion."]]},
+
+{d:"12/07", p:"p6", t:"Suite · mocks — brouillon complet", h:6, dr:{mem:2}, m:[["mem","Brouillon complet — jeu 15/07"]], r:[
+ ["—","bloc","<b>Mocks</b>, même rotation."],
+ ["jeu 15","mem","◆ <b>Introduction et conclusion</b> : le brouillon complet existe.","—"]]},
+
+{d:"19/07", p:"p6", t:"Suite · mocks", h:6, dr:{mem:1}, r:[
+ ["—","bloc","<b>Mocks</b>, même rotation ; révision Anki du backlog de l'année."],
+ ["—","mem","Retours du directeur sur le brouillon."]]},
+
+{d:"26/07", p:"p6", t:"Suite · mocks", h:6, dr:{mem:1}, r:[
+ ["—","bloc","<b>Mocks</b>, dernière semaine."],
+ ["—","mem","Révisions."]]}
 ];
 
-/* ---- 2027 : blocs de plusieurs semaines, même contenu répété sur la plage ---- */
+/* ---- août → novembre 2027 : blocs de plusieurs semaines, même contenu répété sur la plage ---- */
 const BLOCKS = [
- {from:"11/01", n:5, p:"p3", t:"P3-A · evals, observabilité, Inspect", h:7, dr:{algo:1,ml:1,couches:2},
-  m:{"11/01":[["arte","Harness d'eval Chanel formalisé"]]}, r:[
-  ["bloc","bloc","Benchmarks vs evals produit · LLM-as-judge et ses biais · construction d'un harness · monitoring. <b>Re-sollicite le socle inférentiel</b> : significativité, biais du juge. Framework Inspect / UK AISI."],
-  ["bloc","arte","Le <b>harness d'eval de Chanel</b> se formalise ici en réponse d'entretien — l'artefact au plus fort ROI sur toutes les cibles."],
-  ["drill","couches","<b>LRU cache</b> puis sa version thread-safe · <b>rate limiter</b> (token bucket) · <b>KV store avec TTL</b>. 60 min, spécification qui s'épaissit à chaque niveau."],
-  ["drill","ml","Reprise chronométrée des composants from-scratch + <b>debug PyTorch</b> une semaine sur deux."],
-  ["drill","algo","1 par semaine, uniquement des reprises de ratés. Le périmètre est fermé : on maintient, on n'étend plus."]]},
+ {from:"02/08", n:5, p:"p6", t:"Suite · révisions du mémoire", h:0, dr:{mem:1}, r:[
+  ["—","mem","<b>Révisions</b> du mémoire sur les retours du directeur."],
+  ["—","bloc","Pas de bloc principal programmé."]]},
 
- {from:"15/02", n:4, p:"p3", t:"P3-B · fine-tuning, SFT → DPO", h:7, dr:{algo:1,ml:1,couches:2}, r:[
-  ["bloc","bloc","LoRA / QLoRA et leurs maths · quand fine-tuner vs RAG vs prompting · SFT, DPO, RLHF · lecture guidée des papers (LoRA, QLoRA, DPO, InstructGPT)."],
-  ["bloc","deci","Contenu exact dépendant de l'arbitrage du 07/01. <em>Hypothèse par défaut : réplication DPO à la place du projet QLoRA de 3 semaines.</em>"],
-  ["drill","couches","<b>Scheduler de tâches</b> · <b>parseur/CLI à spec croissante</b> · lecture de code inconnu (le HM call inclut une revue d'échantillons dans plusieurs langages)."],
-  ["drill","ml","Composants LoRA implémentés à la main : décomposition bas-rang, injection dans une couche linéaire."]]},
+ {from:"06/09", n:4, p:"p6", t:"Suite · rendu du mémoire", h:0, dr:{mem:1},
+  m:{"27/09":[["mem","Rendu du mémoire (septembre)"]]}, r:[
+  ["—","mem","Dernière relecture et <b>rendu en septembre</b> — date exacte à confirmer avec le directeur."],
+  ["—","bloc","Pas de bloc principal programmé."]]},
 
- {from:"15/03", n:5, p:"p3", t:"P3-C · inference, optimisation, publications", h:7, dr:{algo:1,ml:1,couches:2},
-  m:{"15/03":[["deci","Réactivation de la veille marché"]], "05/04":[["arte","training-loop-bugs + 2ᵉ artefact safety"]]}, r:[
-  ["bloc","bloc","KV cache · continuous batching · quantization GPTQ/AWQ, int8/int4 · spéculative decoding · vLLM en pratique, coûts et latence."],
-  ["drill","couches","Les 20 bugs de <b>training-loop-bugs</b> se fabriquent ici, en drill — l'artefact est un sous-produit, pas un projet en plus."],
-  ["—","arte","★ Publication de <b>training-loop-bugs</b> (GitHub + HN) et du second artefact safety (<b>réplication DPO ou eval Inspect</b>, blog + LessWrong)."],
-  ["—","deci","★ <b>Réactivation de la veille marché et employeurs</b> — la Phase 6 passe sous les 6 mois, condition posée le 24/08/2026."]]},
-
- {from:"19/04", n:4, p:"p4", t:"P4 · fondamentaux distribués + TypeScript ciblé", h:6, dr:{algo:1,couches:1}, r:[
-  ["bloc","bloc","Load balancing, caching, sharding, réplication, consistency, queues, idempotence, rate limiting. Alex Xu en lecture ciblée. <b>Lister d'abord ce que le cours aux Ponts a déjà payé.</b>"],
-  ["bloc","bloc","<b>TypeScript ciblé (~8 h, just-in-time)</b> : Handbook sélectif + Total TypeScript free tier. Payé par le projet réel, pas par un bloc programmé."],
-  ["drill","couches","Format entretien complet : un problème en 4 niveaux, 90 min, une fois par semaine."]]},
-
- {from:"17/05", n:3, p:"p4", t:"P4 · ML system design, monitoring, A/B testing", h:6, dr:{couches:1}, r:[
-  ["bloc","bloc","Serving patterns, feature stores, training/serving skew, monitoring, retraining, A/B testing. <b>Troisième passage du socle inférentiel.</b>"],
-  ["bloc","bloc","Substrat des mocks : le harness d'eval, Centravy / Relaycat, le projet pro."]]},
-
- {from:"07/06", n:1, p:"p4", t:"P4 · LLM system design + ⛑ checkpoint", h:6, dr:{couches:1},
-  m:{"07/06":[["cp","Mock LLM system design, 45 min"]]}, r:[
-  ["bloc","bloc","RAG à 10 M documents · plateforme de serving LLM · pipeline d'agents. Méthode imposée : cadrage → estimation → composants → trade-offs → bottlenecks."],
-  ["bloc","bloc","⛑ Mock de 45 min tenu avec une structure claire, sans notes."]]},
-
- {from:"14/06", n:5, p:"p6", t:"Phase 6 · mocks intensifs", h:8, dr:{algo:1,ml:2,couches:2}, r:[
-  ["mocks","bloc","Alternance quotidienne : <b>pair programming ML</b> (le format réel : PyTorch efficace, pas d'arbre binaire à inverser) · debug de training loop · problème en 4 niveaux + concurrence · ML/DL depth · system design · behavioral technique."],
-  ["mocks","bloc","Révision Anki : backlog complet des 12 mois."],
-  ["mocks","bloc","<b>Narratif</b> : pourquoi la safety, pourquoi ce labo, une décision d'architecture difficile — et les 6 artefacts défendus ligne par ligne."]]},
-
- {from:"19/07", n:6, p:"p6", t:"★ Critères de sortie puis départ des candidatures", h:5, dr:{},
-  m:{"19/07":[["deci","GO / NO-GO candidatures"]]}, r:[
-  ["—","deci","★ Cocher les critères : medium inconnu &lt; 30 min 3/3 · attention multi-head sans doc &lt; 25 min · backprop et attention au tableau · 4 bugs sur 5 en 30 min · LRU thread-safe &lt; 40 min avec test · BPE &lt; 20 min, Adam &lt; 15 min · un rapport de réplication qui dit où ça diverge · harness d'eval défendu 15 min."],
-  ["—","bloc","Départ des candidatures. Les process durent 4 à 8 semaines : les premiers entretiens sont l'entraînement le plus utile."]]}
+ {from:"04/10", n:9, p:"p6", t:"Suite · candidatures", h:4, prov:1, dr:{stats:1},
+  m:{"04/10":[["deci","≈ Départ des candidatures"]]}, r:[
+  ["—","deci","≈ <b>Candidatures</b> octobre-novembre, calibrées fin avril sur la v0. Les process durent 4 à 8 semaines : les premiers entretiens sont l'entraînement le plus utile."],
+  ["—","bloc","Work tests et entretiens au fil de l'eau."],
+  ["—","stats","<b>Piste stats · M4</b> (après septembre)."]]}
 ];
 
 /* ---------------------------------------------------- expansion en semaines */
@@ -513,19 +637,19 @@ const fr2 = x => String(x).padStart(2,'0');
 const key = dt => `${fr2(dt.getDate())}/${fr2(dt.getMonth()+1)}`;
 const MOIS=["janv","févr","mars","avril","mai","juin","juil","août","sept","oct","nov","déc"];
 
-const DATES = mondays("2026-09-07", 51);
+const DATES = mondays("2026-09-07", 65);
 const byKey = {}; W.forEach(w=>byKey[w.d]=w);
 BLOCKS.forEach(b=>{
   const i0 = DATES.findIndex(d=>key(d)===b.from);
   for(let i=0;i<b.n;i++){
     const k = key(DATES[i0+i]);
-    byKey[k] = {d:k, p:b.p, t:b.t + (b.n>1?` · ${i+1}/${b.n}`:""), h:b.h, dr:b.dr,
+    byKey[k] = {d:k, p:b.p, t:b.t + (b.n>1?` · ${i+1}/${b.n}`:""), h:b.h, dr:b.dr, prov:b.prov,
                 m:(b.m&&b.m[k])||null, r:b.r.map(x=>x.slice())};
   }
 });
 const WK = DATES.map(dt=>{
   const k=key(dt);
-  return byKey[k] || {d:k, p:"p3", t:"—", h:0, dr:{}, r:[]};
+  return byKey[k] || {d:k, p:"p6", t:"—", h:0, dr:{}, r:[]};
 });
 
 /* ---------------------------------------------------------------- rendu */
@@ -541,7 +665,8 @@ const ROWS=[
   {cls:"h-bloc", lb:"bloc · heures"},
   {cls:"h-lane", lb:"algo"},
   {cls:"h-lane", lb:"ml coding"},
-  {cls:"h-lane", lb:"couches"},
+  {cls:"h-lane", lb:"stats"},
+  {cls:"h-lane", lb:"mémoire"},
   {cls:"h-num",  lb:""}
 ];
 labels.innerHTML = ROWS.map(r=>`<div class="lb ${r.cls} ${r.lb?'strong':''}">${r.lb}</div>`).join('');
@@ -557,9 +682,9 @@ WK.forEach((w,i)=>{
   const start = i===0 || WK[i-1].p!==w.p;
   html+=`<div class="cell h-pha pha ${start?'':'body'}" style="--pc:${cv(PH[w.p].c)}" data-i="${i}">${start?PH[w.p].n.split(' · ')[0]:''}</div>`;
 });
-// 2b blocs B1→B8 (report du dernier bloc déclaré : une semaine blanche appartient à son bloc)
+// 2b blocs B1, 2A→2D (report du dernier bloc déclaré : une semaine blanche appartient à son bloc)
 let curBlk=null;   // NB: ne pas nommer « cur » — collision avec le curseur du panneau plus bas
-const BLK = WK.map(w=>{ const m=/^B(\d)\b/.exec(w.t); if(m) curBlk='B'+m[1];
+const BLK = WK.map(w=>{ const m=/^(B\d|2[A-D])\b/.exec(w.t); if(m) curBlk=m[1];
   else if(w.p!=='p2') curBlk=null; return curBlk; });
 WK.forEach((w,i)=>{
   const b=BLK[i], start = b && (i===0 || BLK[i-1]!==b);
@@ -579,14 +704,14 @@ WK.forEach((w,i)=>{
   const hh = Math.round((w.h/8)*32);
   html+=`<div class="cell h-bloc ${w.off?'offc':''}" data-i="${i}" data-k="bloc">${w.h?`<div class="bar-b" style="height:${hh}px"></div>`:''}</div>`;
 });
-// 5-7 lanes
-["algo","ml","couches"].forEach(k=>{
+// 5-8 lanes
+["algo","ml","stats","mem"].forEach(k=>{
   WK.forEach((w,i)=>{
     const n=(w.dr&&w.dr[k])||0;
     html+=`<div class="cell h-lane" data-i="${i}" data-k="${k}">${n?`<span class="dot ${n>1?'two':''}" style="--dc:${cv('--'+k)}"></span>`:''}</div>`;
   });
 });
-// 8 numéro
+// 9 numéro
 WK.forEach((w,i)=>{
   html+=`<div class="cell h-num num" data-i="${i}">${w.d.slice(0,2)}</div>`;
 });
@@ -622,7 +747,7 @@ const LCNAME={11:"Container With Most Water",20:"Valid Parentheses (stack)",155:
 function titleOf(r){
   const cap = t => t.length>44 ? t.slice(0,42).trim()+'…' : t;
   // seulement quand la ligne PORTE sur le problème : piste algo, et mention en tête de texte
-  const raw = r[2].replace(/<[^>]+>/g,'').replace(/^[★⚠️⛑⚡🔥\s]+/,'');
+  const raw = r[2].replace(/<[^>]+>/g,'').replace(/^[★⚠️⛑⚡🔥◆≈\s]+/,'');
   const lc = raw.match(/^(TAP\s+)?LC\s*(\d+)(\s*\/\s*(\d+))?/);
   if(r[1]==='algo' && lc && LCNAME[+lc[2]]){
     const num = lc[4] ? `LC ${lc[2]}/${lc[4]}` : `LC ${lc[2]}`;
@@ -635,9 +760,9 @@ function titleOf(r){
   const b = (first>=0 && first<28) ? bolds.find(x=>x.length>=5) : null;
   if(b) return cap(b);
   const plain = r[2].replace(/<[^>]+>/g,'')
-    .replace(/^[★⚠️⛑⚡🔥\s]+/,'')
+    .replace(/^[★⚠️⛑⚡🔥◆≈\s]+/,'')
     .replace(/^\d+\s*h(\s+\S+)?\s*[—-]\s*/,'')   // « 3 h — », « 2 h socratique — »
-    .replace(/^\d+\s*h\s*⛑\s*/,'').replace(/^[★⚠️⛑⚡🔥\s]+/,'').trim();
+    .replace(/^\d+\s*h\s*⛑\s*/,'').replace(/^[★⚠️⛑⚡🔥◆≈\s]+/,'').trim();
   return cap(plain.split(/\.\s|[:·]/)[0].trim());
 }
 
@@ -652,7 +777,7 @@ function draw(){
   const rows=(w.r||[]).map(r=>{
     const vis = !hidden.has(r[1]);
     const nd = vis && r[0]!==prevDay; if(vis) prevDay = r[0];
-    const drill=['algo','ml','couches'].includes(r[1]);
+    const drill=['algo','ml','stats'].includes(r[1]);
     const hr = r[3] || (drill?'08h—09h':'');
     const cls = r[3]?'':(drill?'dflt':'none');
     const ti = titleOf(r);
@@ -701,11 +826,11 @@ document.querySelectorAll('.chip').forEach(c=>{
     c.classList.toggle('on');
     const k=c.dataset.k, on=c.classList.contains('on');
     on?hidden.delete(k):hidden.add(k);
-    if(KC[k]&&['bloc','algo','ml','couches'].includes(k))
+    if(KC[k]&&['bloc','algo','ml','stats','mem'].includes(k))
       grid.querySelectorAll(`.cell[data-k="${k}"] > *`).forEach(el=>el.style.visibility=on?'visible':'hidden');
-    if(k==='arte'||k==='deci')
+    if(['arte','deci','stats','mem'].includes(k))
       grid.querySelectorAll('.mil > i').forEach(el=>el.style.visibility =
-        (hidden.has('arte')&&hidden.has('deci'))?'hidden':'visible');
+        ['arte','deci','stats','mem'].every(x=>hidden.has(x))?'hidden':'visible');
     draw();
   };
 });
