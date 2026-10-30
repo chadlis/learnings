@@ -204,6 +204,26 @@
   }
   @media (prefers-reduced-motion:reduce){*{transition:none!important;scroll-behavior:auto!important}}
   :focus-visible{outline:2px solid var(--p1);outline-offset:2px}
+
+  /* ---------- tableau blanc (thème clair, au bouton ; le sombre reste le défaut) ---------- */
+  html.white{
+    --board:#F4F1E8; --board2:#ECE7DA; --chalk:#1F2A27; --chalk2:#4A5550; --dust:rgba(31,42,39,.5);
+    --panel2:#E4DECF; --card2:#E4DECF;
+    --ink:#1F2A27; --muted:#4A5550; --faint:#6E7772;
+    --line:rgba(31,42,39,.14); --line2:rgba(31,42,39,.3);
+    --p1:#1F8A78; --p2:#2F6FA8; --p3:#6A4FC4; --p4:#A67C00; --p5:#2E8A4F; --p6:#C2502F;
+    --algo:#2F6FA8; --ml:#1F8A78; --stats:#6A4FC4; --mem:#B0477F; --bloc:#3C4A45;
+    --arte:#2E8A4F; --deci:#A67C00; --cp:#C2502F;
+    --teal:#1F8A78; --blue:#2F6FA8; --violet:#6A4FC4; --green:#2E8A4F; --amber:#A67C00; --coral:#C2502F;
+  }
+  html.white body{background-image:none}
+  html.white .labels{background:rgba(31,42,39,.05)}
+  html.white .cell{border-bottom-color:rgba(31,42,39,.07);border-right-color:rgba(31,42,39,.06)}
+  html.white .cell.sel{background:rgba(31,42,39,.08)}
+  html.white .cell:hover{background:rgba(31,42,39,.05)}
+  html.white .bar-b{background:linear-gradient(180deg,rgba(47,70,100,.75),rgba(47,70,100,.3))}
+  html.white .off .cell{background:repeating-linear-gradient(45deg,transparent 0 4px,rgba(31,42,39,.08) 4px 8px)}
+  html.white .row.sameday .day{color:rgba(60,75,100,.5)}
 </style>
 
 <!--pwa--><link rel="manifest" href="manifest.webmanifest"><link rel="icon" type="image/svg+xml" href="icon.svg"><link rel="apple-touch-icon" href="apple-touch-icon.png"><meta name="theme-color" content="#20312C"><meta name="mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-capable" content="yes"><meta name="apple-mobile-web-app-status-bar-style" content="black-translucent"><meta name="apple-mobile-web-app-title" content="Fiches"><script>if('serviceWorker' in navigator&&location.protocol.startsWith('http')){window.addEventListener('load',function(){navigator.serviceWorker.register('sw.js',{scope:'./'}).catch(function(){});});}</script><!--/pwa-->
@@ -226,6 +246,7 @@
     <button class="chip on" data-k="arte" style="--cc:var(--arte)"><i></i>artefact</button>
     <button class="chip on" data-k="deci" style="--cc:var(--deci)"><i></i>décision</button>
     <span class="sp"></span>
+    <button class="btn" id="themeBtn" aria-pressed="false">☀ Tableau blanc</button>
     <button class="btn" id="zoom">Zoom +</button>
     <button class="btn" id="goToday">↦ aujourd'hui</button>
     <button class="btn" id="goNext">◆ prochain jalon</button>
@@ -678,7 +699,7 @@ const WK = DATES.map(dt=>{
 /* ---------------------------------------------------------------- rendu */
 const grid=document.getElementById('grid'), labels=document.getElementById('labels');
 grid.style.setProperty('--n', WK.length);
-const cv = v => getComputedStyle(document.documentElement).getPropertyValue(v).trim();
+const cv = v => `var(${v})`;   // référence au token, résolue en direct : le changement de thème ne demande pas de re-rendu
 
 const ROWS=[
   {cls:"h-mon",  lb:""},
@@ -893,6 +914,15 @@ go(TODAY_WK);   // la page s'ouvre sur la semaine en cours (bornée à la grille
   });
   btns.forEach(b=>b.onclick=()=>show(b.dataset.bk));
   show('fp');
+})();
+</script>
+<script>
+(function(){
+  const root=document.documentElement, btn=document.getElementById('themeBtn');
+  function apply(w){root.classList.toggle('white',w);btn.textContent=w?'☾ Tableau noir':'☀ Tableau blanc';btn.setAttribute('aria-pressed',String(w));}
+  let saved=null; try{saved=localStorage.getItem('timeline-theme');}catch(e){}
+  apply(saved==='white');
+  btn.addEventListener('click',()=>{const w=!root.classList.contains('white');apply(w);try{localStorage.setItem('timeline-theme',w?'white':'board');}catch(e){}});
 })();
 </script>
 </body>
