@@ -256,7 +256,7 @@
     <div class="labels" id="labels"></div>
     <div class="scroll" id="scroll"><div class="grid" id="grid"></div></div>
   </div>
-  <p class="warn">⚠ Recalage du 30/10 : les semaines du 12/10 et du 19/10, prises par le travail, sont déclarées blanches ; tout le plan glisse de deux semaines, sauf les dates externes (congés, BlueDot, ML4Good, problématique, rendu). Tensions ouvertes : hackathon Lexsi (build 01 → 14/11) — go/no-go le 01/11 · BlueDot (07/12 → 17/01) chevauche la fin de 2B et les congés du 16–22/12 · la séance mémoire de 1h30 le week-end bute sur la règle « un jour à zéro, l'autre léger » · piste stats : M1 à recaler le 06/11, après le kit stats-évals. À surveiller : le 14/07 cumule publication et chapitre 4. ML4Good (≈ 10 → 21/05) attend les dates 2027.</p>
+  <p class="warn">⚠ Recalage du 30/10 : les semaines du 12/10 et du 19/10, prises par le travail, sont déclarées blanches ; tout le plan glisse de deux semaines, sauf les dates externes (congés, BlueDot, ML4Good, problématique, rendu). Tensions ouvertes : hackathon Lexsi (build 01 → 14/11) — go/no-go le 01/11 · BlueDot (07/12 → 17/01) chevauche la fin de 2B et les congés du 16–22/12 · la séance mémoire de 1h30 le week-end bute sur la règle « un jour à zéro, l'autre léger » · kit stats-évals décalé au 03/11 → 24/11 (pas démarré), M1 recalé à la revue du 27/11. À surveiller : le 14/07 cumule publication et chapitre 4. ML4Good (≈ 10 → 21/05) attend les dates 2027.</p>
   <div class="excl" style="margin-top:10px"><b>Coupé le 11/10, à ne pas réintroduire —</b> LeetCode (les cartes Anki restent) · makemore 3 et 4 · BPE · ARENA 1.2 interp et 2.4 RLHF (après juin, ou en septembre) · system design · Fluent Python comme piste (lecture juste-à-temps, voir le créneau libre). Les anciennes Phases 3 et 4 (system design, FDE, RE ML) sont supprimées ; la Phase 2 Karpathy est étendue jusqu'au 26/02 (gate), remédiation 01 → 05/03.</div>
 
   <div class="panel" id="panel"></div>
@@ -384,59 +384,60 @@ const W = [
  ["lun 19","bloc","Semaine prise par le travail, <b>déclarée blanche</b> le 22/10 : le plan glisse une seconde fois d'une semaine. Deux semaines perdues sur trois : dimensionnement à la revue du 30/10."],
  ["dim 25","deci","★ <b>Géographie : décision provisoire</b> — confirmée ou révisée au jalon du 14/02."]]},
 
-{d:"26/10", p:"p2", t:"2A · reprise : micrograd from scratch", h:7, dr:{stats:1,mem:1}, m:[["deci","Revue v3 en essai — jusqu'au 20/11"],["deci","Hackathon Lexsi : go/no-go — dim 01/11"]], r:[
+{d:"26/10", p:"p2", t:"2A · reprise : micrograd from scratch", h:7, dr:{mem:1}, m:[["deci","Revue v3 en essai — jusqu'au 20/11"],["deci","Hackathon Lexsi : go/no-go — dim 01/11"]], r:[
  ["lun 26","bloc","Cours aux Ponts le matin.","—","Cours aux Ponts"],
  ["mar 27","bloc","3 h — reprise de 2A : <b>micrograd refait from scratch</b>, seul, dans un notebook marimo, plutôt que tp_micrograd repris à l'étape 3.","08h—11h"],
- ["mer 28","stats","<b>Kit stats-évals</b> (priorité travail jusqu'au 09/11, à la place de M1) · S1 : §1–3 mesurer, variabilité, SE — absorbe M0.","07h—08h"],
- ["mer 28","stats","Kit S2 · TP 00 décisions avant formules + A/A.","après-midi"],
- ["jeu 29","stats","Kit S3 · §4–5 TCL, IC, Wald vs Wilson.","après-midi"],
+ ["mer 28","stats","<b>Kit stats-évals</b> prévu ici (priorité travail, à la place de M1) : <em>pas démarré, décalé au 03/11 → 24/11.</em>"],
  ["jeu 29","mem","<b>Cadrage</b> du mémoire.","16h—17h"],
  ["ven 30","bloc","<b>Tampon</b> puis <b>revue v3</b> : deux teach-backs, débrief sur chiffres, production. Premier des trois vendredis d'essai."],
- ["ven 30","stats","Kit S4 · TP 01 TCL, SE, Wilson, couverture.","après-midi"],
  ["ven 30","deci","★ <b>SPAR : register interest</b> — un formulaire, pas un engagement. Kickoff du hackathon Lexsi le sam 31/10, go/no-go le dim 01/11."]]},
 
 {d:"02/11", p:"p2", t:"2A · micrograd à froid → torch, softmax stable", h:7, dr:{stats:1,mem:2}, m:[["mem","Mail au directeur — lun 02/11"],["cp","⛑ micrograd réécrit à froid — mar 03/11"]], r:[
  ["lun 02","bloc","Cours aux Ponts (TDLOG), rien pour la formation.","—","Cours aux Ponts"],
  ["lun 02","mem","◆ <b>Mail au directeur</b> : pistes de sujet, demande de rendez-vous de cadrage. <em>Y clarifier l'échéance du 31/01 pour le document intermédiaire.</em>","—"],
  ["mar 03","bloc","3 h — ⛑ <b>micrograd réécrit à froid</b> (critère 2A : sans support, à J+2 au moins), puis <b>micrograd → torch</b> : le même réseau en ~20 lignes, gradients comparés.","08h—11h"],
- ["mar 03","stats","Kit S5 · §6–7 paires et covariance, p-value, McNemar.","après-midi"],
- ["mer 04","stats","Kit S6 · TP 02 comparaison appariée.","07h—08h"],
+ ["mar 03","stats","<b>Kit stats-évals</b> (priorité travail, à la place de M1) · S1 : §1–3 mesurer, variabilité, SE — absorbe M0.","après-midi"],
  ["mer 04","bloc","2 h — <b>softmax stable</b> de mémoire : soustraction du max, log-sum-exp, logits à +100.","08h—10h"],
- ["mer 04","stats","Kit S7 · §8 + TP 03 valider le juge LLM.","après-midi"],
+ ["mer 04","stats","Kit S2 · TP 00 décisions avant formules + A/A.","après-midi"],
  ["jeu 05","bloc","2 h — ce que <code>loss.backward()</code> fait que tu as écrit à la main ; cartes 2A.","09h—11h"],
- ["jeu 05","stats","Kit S8 · §9–11 clusters, A/A, puissance.","après-midi"],
+ ["jeu 05","stats","Kit S3 · §4–5 TCL, IC, Wald vs Wilson.","après-midi"],
  ["jeu 05","mem","Problématique : dernière passe avant envoi.","16h—17h"],
- ["ven 06","stats","Rappel à froid : paires → McNemar → juge. Revue v3 : <b>recalage de M1</b> (le kit couvre déjà SE, TCL, IC, Wilson).","07h—07h15"],
- ["ven 06","stats","Kit S9 · TP 04 dépendance, bootstrap par grappes, puissance.","après-midi"]]},
+ ["ven 06","stats","Rappel à froid : score → SE → IC.","07h—07h15"],
+ ["ven 06","stats","Kit S4 · TP 01 TCL, SE, Wilson, couverture.","après-midi"]]},
 
-{d:"09/11", p:"p2", t:"Congés 10 → 17/11 — semaine blanche", h:0, dr:{stats:2,mem:2}, off:1, m:[["mem","Problématique envoyée — lun 09/11"],["stats","Kit S10 · TP 05 rapport de décision — lun 09/11"]], r:[
+{d:"09/11", p:"p2", t:"Congés 10 → 17/11 — semaine blanche", h:0, dr:{stats:1,mem:2}, off:1, m:[["mem","Problématique envoyée — lun 09/11"]], r:[
+ ["—","deci","≈ Hackathon Lexsi : build du 01 au 14/11, rendu le 14, Demo Day le 22/11 — <em>seulement si go le 01/11 ; tombe sur la semaine dense et les congés.</em>"],
  ["lun 09","bloc","Cours aux Ponts le matin, puis congés du 10 au 17/11. Anki seulement.","—","Cours aux Ponts"],
- ["lun 09","stats","◆ Kit S10 · §12 + <b>TP 05 atelier final</b> : le rapport de décision « B remplace A ? », réutilisable au travail.","après-midi"],
- ["lun 09","mem","◆ <b>Problématique envoyée</b> au directeur, avant les congés.","—"],
- ["—","deci","≈ Hackathon Lexsi : build du 01 au 14/11, rendu le 14, Demo Day le 22/11 — <em>seulement si go le 01/11 ; tombe sur la semaine dense et les congés.</em>"]]},
+ ["lun 09","stats","Kit S5 · §6–7 paires et covariance, p-value, McNemar.","après-midi"],
+ ["lun 09","mem","◆ <b>Problématique envoyée</b> au directeur, avant les congés.","—"]]},
 
 {d:"16/11", p:"p2", t:"2A · makemore 1 — demi-semaine", h:4, dr:{stats:1,mem:1}, m:[["deci","Bilan de l'essai revue v3 — ven 20/11"],["deci","Hackathon mech interp — 20 → 22/11"]], r:[
  ["lun 16","bloc","Congés jusqu'au mardi 17 inclus."],
- ["mer 18","stats","Piste stats : reprise de M1, recalé à la revue du 06/11.","07h—08h"],
+ ["mer 18","stats","Kit S6 · TP 02 comparaison appariée.","07h—08h"],
  ["mer 18","bloc","2 h — <b>tp_makemore1</b> : bigram par comptage, échantillonnage, <b>NLL 2,454</b>. <em>2 h au lieu de 3 : le reste au tampon du vendredi.</em>","08h—10h"],
+ ["mer 18","stats","Kit S7 · §8 + TP 03 valider le juge LLM.","après-midi"],
+ ["jeu 19","stats","Kit S8 · §9–11 clusters, A/A, puissance.","après-midi"],
  ["jeu 19","bloc","2 h — la même chose en réseau : one-hot, softmax, descente de gradient, <b>NLL ≈ 2,48</b>.","08h—10h"],
  ["jeu 19","mem","<b>Littérature</b> (novembre → janvier) : lectures et fiches de lecture.","16h—17h"],
+ ["ven 20","stats","Rappel à froid : paires → McNemar → juge.","07h—07h15"],
  ["ven 20","deci","★ <b>Bilan de l'essai revue v3</b> + rétro système, 60 min à la place de la revue : garder, amender ou revenir à la v2 ; énergie par jour de semaine.","08h—09h"],
  ["ven 20","deci","Hackathon <b>Mechanistic Interpretability #5</b> (Autointerp Evals), en ligne, du 20 au 22/11."]]},
 
-{d:"23/11", p:"p2", t:"2A · makemore 1 de mémoire, réécriture à froid", h:7, dr:{stats:1,mem:1}, m:[["cp","⛑ makemore 1 réécrit à froid — jeu 26/11"],["deci","Candidature BlueDot — avant dim 29/11"]], r:[
+{d:"23/11", p:"p2", t:"2A · makemore 1 de mémoire, réécriture à froid", h:7, dr:{stats:2,mem:1}, m:[["stats","Kit S10 · TP 05 rapport de décision — mar 24/11"],["cp","⛑ makemore 1 réécrit à froid — jeu 26/11"],["deci","Candidature BlueDot — avant dim 29/11"]], r:[
  ["lun 23","bloc","Cours aux Ponts le matin.","—","Cours aux Ponts"],
+ ["lun 23","stats","Kit S9 · TP 04 dépendance, bootstrap par grappes, puissance.","après-midi"],
  ["mar 24","bloc","3 h — makemore 1 de mémoire, à voix haute : comptage lissé ≡ réseau régularisé, d'où 2,454 vs 2,48 ; reprise de ce qui a coincé.","08h—11h"],
- ["mer 25","stats","Piste stats · M1 (recalé).","07h—08h"],
+ ["mar 24","stats","◆ Kit S10 · §12 + <b>TP 05 atelier final</b> : le rapport de décision « B remplace A ? », réutilisable au travail. Fin du kit.","après-midi"],
  ["mer 25","bloc","2 h — <b>fiche 2A</b> (backprop scalaire, chain rule, softmax stable, NLL) et passe qualité des cartes.","08h—10h"],
  ["jeu 26","bloc","2 h — ⛑ <b>makemore 1 réécrit à froid</b> : critère de sortie de 2A, J+2.","08h—10h"],
  ["jeu 26","mem","<b>Littérature</b>.","16h—17h"],
+ ["ven 27","stats","Revue : <b>recalage de M1</b> Brunton (le kit couvre déjà SE, TCL, IC, Wilson) et de M3."],
  ["dim 29","deci","★ <b>Candidature BlueDot</b> Technical AI Safety, part-time 07/12 → 17/01 : clôture le 29/11. <em>Après la réponse du directeur sur la problématique.</em>"]]},
 
 {d:"30/11", p:"p2", t:"2B · Attention I — makemore 2 allégé", h:7, dr:{stats:1,mem:1}, r:[
  ["lun 30","bloc","Cours aux Ponts le matin.","—","Cours aux Ponts"],
  ["mar 01","bloc","3 h — <b>marge 2A</b> : ce qui n'a pas passé le critère J+2.","08h—11h"],
- ["mer 02","stats","Piste stats · M1 (recalé).","07h—08h"],
+ ["mer 02","stats","Piste stats · M1, selon le recalage du 27/11.","07h—08h"],
  ["mer 02","bloc","2 h — <b>makemore 2 allégé</b> (Bengio 2003) : embeddings, fenêtre de contexte, MLP, minibatchs. <em>Seulement ce que GPT réclame.</em>","08h—10h"],
  ["jeu 03","bloc","2 h — makemore 2 : split train/dev, balayage de LR, dev loss ≈ 2,17.","08h—10h"],
  ["jeu 03","mem","<b>Littérature</b>.","16h—17h"],
@@ -445,7 +446,7 @@ const W = [
 {d:"07/12", p:"p2", t:"2B · Attention I — GPT I + BlueDot", h:7, dr:{stats:2,mem:1}, m:[["deci","BlueDot démarre — 07/12 → 17/01"],["stats","≈ Check M1 — mer 09/12"]], r:[
  ["lun 07","bloc","<b>BlueDot Technical AI Safety</b>, part-time : ~5 h/sem, une discussion live par semaine, jusqu'au 17/01. <em>Chevauche la fin de 2B sans jeudi de marge : si la règle des trois chantiers casse, c'est la tête intégrée du jeu 10 qui glisse, pas BlueDot.</em>"],
  ["mar 08","bloc","3 h — fin de makemore 2 de mémoire, puis <b>GPT I</b> : bigram torch, l'astuce mathématique de la self-attention.","08h—11h"],
- ["mer 09","stats","◆ <b>Check M1</b> — date à confirmer au recalage du 06/11.","07h—08h"],
+ ["mer 09","stats","◆ <b>Check M1</b> — date à confirmer au recalage du 27/11.","07h—08h"],
  ["mer 09","bloc","2 h — <b>attention une tête</b> : masque causal (tril, masked_fill), scaling 1/√d, softmax stable.","08h—10h"],
  ["jeu 10","bloc","2 h — la tête unique intégrée au modèle, premier run.","08h—10h"],
  ["jeu 10","mem","<b>Littérature</b>.","16h—17h"]]},
