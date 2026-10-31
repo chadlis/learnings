@@ -5,7 +5,7 @@
 //   hors ligne, et se recharge instantanément).
 // La version du cache est réécrite par tools/build_index.py : elle ne change
 // que lorsque le contenu du site change, ce qui purge l'ancien cache.
-const CACHE = 'sheets-v118-adfa12b0d0f2ea82';
+const CACHE = 'sheets-v119-84e9b52b05df4d38';
 
 // Coquille minimale mise en cache dès l'installation.
 const SHELL = ['./', 'index.html', 'map.html', 'manifest.webmanifest',
