@@ -315,7 +315,7 @@
 <div class="excl" style="border-style:solid;border-color:var(--line)"><b>Volume —</b> ~65 h pour ⓪ à ⑤, à ~2 h par semaine dans le créneau : environ <b>30 semaines</b>. C'est le rythme, pas un retard.</div>
 </div>
 </section>
-<p class="hint"><b>Gabarit (31/10)</b> : Anki 6h30 chaque jour · mar <b>internals</b> 7h–11h30 (rappel 25 min, puis Karpathy par sections) · mer <b>stats</b> 7h–11h30, Boot.dev 15h–16h40, off dès 17h · jeu <b>projet</b> 7h–11h, indisponible dès 11h · ven <b>mémoire</b> 7h–11h30, consolidation Boot.dev 15h–15h30, Fluent Python 45 min puis Boot.dev jusqu'à 17h15, <b>revue</b> 17h15 · sam internals 7h–8h30 (fichier vide), projet 8h45–11h30, puis off · dim Fluent Python 45 min puis Boot.dev 7h–8h40, boulot 9h–10h15, puis off · lun : Anki seulement · sport mar, mer, ven, sam 11h30–14h30 (trajet et douche compris) · rien après 20h. Une séance manquée n'est pas une dette.</p>
+<p class="hint"><b>Gabarit (31/10, amendé le 02/11)</b> : Anki 6h30 chaque jour · mar <b>internals</b> 7h–11h30 (rappel 25 min, puis Karpathy par sections) · mer <b>stats</b> 7h–11h30, Boot.dev 15h–16h40, off dès 17h · jeu <b>projet</b> 7h–11h30 · ven <b>mémoire</b> 7h–11h30, consolidation Boot.dev 15h–15h30, Fluent Python 45 min puis Boot.dev jusqu'à 17h15 · sam internals 7h–8h30 (fichier vide), projet 8h45–11h30, puis off · dim Fluent Python 45 min puis Boot.dev 7h–8h40, boulot 8h45–10h15, <b>revue</b> 10h15–10h45, puis off · lun : Anki seulement · sport mar, mer, ven, sam 11h30–14h30 (trajet et douche compris) · <b>fenêtres Hypotrail</b> conditionnelles — lun 11h30 et 19h, mar 19h, mer 16h, jeu 11h30 et 19h, ven 17h15–18h — en temps effectif, ~1 h 30 par semaine au plus · rien après 20h. Une séance manquée n'est pas une dette.</p>
 <p class="hint">← → semaine · ↑ ↓ jalon · trame hachurée = semaine blanche · ≈ et bordure pointillée = provisoire · point = séance, point cerclé = check ou livrable · pistes <b style="color:var(--muted)">algo</b> et <b style="color:var(--muted)">ml coding</b> : historique, coupées le 11/10 · rangée « étape » = étape internals I1–I6 · colonne créneau : <b style="color:var(--muted)">08h—09h</b> grisé = créneau du matin par défaut · <b style="color:var(--muted)">—</b> = pas d'horaire propre (jalon)</p>
 
 </div>
@@ -396,18 +396,19 @@ const W = [
 
 {d:"02/11", p:"p3", t:"Tranche 1 · makemore 1, cadrage de l'audit, appropriation du mémoire", blk:"I1", h:19.5, dr:{int:1,proj:1,stats:1,mem:1,boot:1}, r:[
  ["lun 02","cal","Cours aux Ponts : Anki seulement pour la formation. Réunions 16h–18h."],
+ ["lun 02","deci","★ <b>Amendements du 02/11</b> : projet du jeudi porté à 7h–11h30 (projet 6 h 30, ≈ 20 h approfondies) ; revue déplacée au dimanche 10h15, avec la revue personnelle ; fenêtres Hypotrail conditionnelles, pour tout ce qui concerne le projet ; bloc TDLOG du mercredi supprimé."],
  ["mar 03","int","4 h — rappel 25 min (une variable utilisée deux fois : pourquoi <code>+=</code>, puis vérification numérique), puis <b>makemore 1 par sections</b> : regarder → mettre en pause et implémenter → une manipulation avec prédiction. Comptage, normalisation, échantillonnage, NLL 2,454. Passerelle micrograd ↔ torch seulement si elle éclaire ce qui vient d'être vu.","07h—11h30","Rappel + makemore 1 par sections"],
  ["mar 03","cal","Médical 14h30–16h (un mardi sur deux). ⚠ Déjeuner à situer entre sport et médical : s'il prend sur un bloc, le bloc se réduit sans rattrapage."],
  ["mar 03","boot","1 h — retrouver le parcours Boot.dev réellement sélectionné et le chapitre atteint.","16h—17h","Retrouver le parcours Boot.dev"],
  ["mer 04","stats","4 h — <b>kit stats-évals</b> S1 (mesurer, variabilité, erreur standard dérivée hypothèse par hypothèse) puis S2 (décisions avant formules, test A/A) ; après la médecine du travail (10h15), S3 (TCL, IC, Wald vs Wilson).","07h—10h15 · 10h30—11h30","Kit stats S1 → S3"],
  ["mer 04","boot","1 h — progression au point noté mardi.","15h—16h","Boot.dev · progression"],
- ["jeu 05","proj","3 h 30 — <b>P1 · cadrage</b> : la question d'une page (une famille de contraintes IFEval, candidate), défauts déjà connus vérifiés 1–2 h maximum (IFEval++, app. B.3), la règle attendue et les cas du scorer écrits avant le verdict (≈ 1 h), puis une trace données → réponse → verdict.","07h—11h","P1 · cadrage de l'audit"],
+ ["jeu 05","proj","4 h — <b>P1 · cadrage</b> : la question d'une page (une famille de contraintes IFEval, candidate), défauts déjà connus vérifiés 1–2 h maximum (IFEval++, app. B.3), la règle attendue et les cas du scorer écrits avant le verdict (≈ 1 h), puis une trace données → réponse → verdict. ⚠ Rendez-vous 10h–12h ce jour-là, non tranché.","07h—11h30","P1 · cadrage de l'audit"],
  ["ven 06","mem","3 h — <b>M1 · appropriation</b> : proposition annotée compris/flou, scénario fil conducteur, Barnett &amp; Thiergart (résumé, §2.1, §3.1), van der Weij et al. (§2, principe du §4.1), reformulation personnelle. Plan de la note pour l'encadrant. Extraits préparés hors ligne pour le Maroc.","07h—11h30","M1 · appropriation"],
  ["ven 06","boot","Consolidation sur un ancien cours (30 min), puis <b>Fluent Python</b> ch. 1 « A Pythonic Card Deck » (45 min : lire, manipuler), puis Boot.dev.","15h—17h15","Consolidation, Fluent Python, Boot.dev"],
- ["ven 06","deci","Revue 30 min — préparer les trois matinées du Maroc : notebooks, dépôt et extraits accessibles hors ligne.","17h15—17h45","Revue · préparer le Maroc"],
  ["sam 07","int","1 h 30 — <b>reconstruction sur fichier vide</b> : comptage et probabilités du bigramme, puis manipulations (keepdim, lissage). Indice ciblé après 15–20 min sans prochain pas.","07h—08h30","Reconstruction : bigramme"],
  ["sam 07","proj","2 h 30 — tâche Inspect minimale, tests du scorer, petit run ou replay ; replay hors ligne vérifié avant le voyage.","08h45—11h30","Tâche Inspect minimale, replay"],
- ["dim 08","boot","<b>Fluent Python</b> : rappel sans le livre et variante sur FrenchDeck (45 min), puis Boot.dev.","07h—08h40"]]},
+ ["dim 08","boot","<b>Fluent Python</b> : rappel sans le livre et variante sur FrenchDeck (45 min), puis Boot.dev.","07h—08h40"],
+ ["dim 08","deci","Revue 30 min — préparer les trois matinées du Maroc : notebooks, dépôt et extraits accessibles hors ligne.","10h15—10h45","Revue · préparer le Maroc"]]},
 
 {d:"09/11", p:"p3", t:"Tranche 1 · Maroc : trois matinées 06h–13h", blk:"I1", h:12, dr:{int:1,proj:1,stats:1,mem:2,boot:1}, m:[["mem","M1 · note courte, décision de présentation — ven 13/11"]], r:[
  ["lun 09","cal","Cours aux Ponts : Anki seulement."],
@@ -423,76 +424,76 @@ const W = [
  ["ven 13","deci","Revue 15 min : préparer la reprise du jeudi 19.","12h45—13h","Revue courte"],
  ["sam 14","cal","14 → 16/11 : entièrement off, Anki compris."]]},
 
-{d:"16/11", p:"p3", t:"Tranche 1 · reprise jeudi 19", blk:"I1", h:11.5, dr:{int:1,proj:1,mem:1,boot:1}, m:[["deci","Bilan de l'essai revue v3 + rétro — ven 20/11"]], r:[
+{d:"16/11", p:"p3", t:"Tranche 1 · reprise jeudi 19", blk:"I1", h:12, dr:{int:1,proj:1,mem:1,boot:1}, m:[["deci","Bilan de l'essai revue v3 + rétro — dim 22/11"]], r:[
  ["lun 16","cal","Off (Maroc)."],
  ["mar 17","cal","Vol retour : journée vide, Anki compris. ⚠ Médical du 17 à vérifier — le signaler, ne pas le déplacer."],
  ["mer 18","cal","Formation au travail : aucune formation personnelle, non comptée."],
- ["jeu 19","proj","3 h 30 — <b>reprise</b> au point réel : suite du pilote (P2), une vérification définie et exécutée, puis interpréter une trace. Rien à rattraper.","07h—11h","Reprise du pilote (P2)"],
+ ["jeu 19","proj","4 h — <b>reprise</b> au point réel : suite du pilote (P2), une vérification définie et exécutée, puis interpréter une trace. Rien à rattraper.","07h—11h30","Reprise du pilote (P2)"],
  ["ven 20","mem","3 h — finir M1 si besoin (30 min), puis <b>M2</b> : un passage argumenté avec son objection.","07h—11h30","Fin de M1, puis M2"],
  ["ven 20","boot","Consolidation (30 min), <b>Fluent Python</b> ch. 1 « How Special Methods Are Used » (45 min), puis Boot.dev.","15h—17h15","Consolidation, Fluent Python, Boot.dev"],
- ["ven 20","deci","◆ <b>Bilan de l'essai revue v3</b> + rétro système, à la place de la revue.","17h15—17h45"],
  ["sam 21","int","1 h 30 — consolider le dernier contenu réellement étudié ; pas de nouvelle leçon.","07h—08h30","Consolidation"],
  ["sam 21","proj","2 h 30 — audit du pilote, résultats annotés.","08h45—11h30","Audit du pilote"],
- ["dim 22","boot","<b>Fluent Python</b> : rappel sans le livre et variante (Vector), puis Boot.dev.","07h—08h40"]]},
+ ["dim 22","boot","<b>Fluent Python</b> : rappel sans le livre et variante (Vector), puis Boot.dev.","07h—08h40"],
+ ["dim 22","deci","◆ <b>Bilan de l'essai revue v3</b> + rétro système, à la place de la revue.","10h15—10h45"]]},
 
-{d:"23/11", p:"p3", t:"Tranche 1 · vers le MLP, mini-rapport d'audit", blk:"I2", h:19, dr:{int:1,proj:1,stats:1,mem:1,boot:1}, m:[["deci","Revue du 27/11 — premier point sur la répartition"],["deci","BlueDot : clôture des candidatures 29/11"]], r:[
+{d:"23/11", p:"p3", t:"Tranche 1 · vers le MLP, mini-rapport d'audit", blk:"I2", h:19.5, dr:{int:1,proj:1,stats:1,mem:1,boot:1}, m:[["deci","Revue du 29/11 — premier point sur la répartition"],["deci","BlueDot : clôture des candidatures 29/11"]], r:[
  ["lun 23","cal","Cours aux Ponts : Anki seulement."],
  ["mar 24","int","4 h — Karpathy par sections ; entrer dans le <b>MLP</b> (makemore 2) si le bigramme est acquis.","07h—11h30","Karpathy · vers le MLP"],
  ["mer 25","stats","3 h 30 — rappel à froid paires → McNemar → juge, TP 01 (S4), puis fin du kit (S5, S6, et ce qui reste), exercices et interprétation. Fin à 11h (rendez-vous médical 11h20).","07h—11h","Rappel à froid + fin du kit"],
  ["mer 25","boot","1 h 30.","15h—16h40"],
- ["jeu 26","proj","3 h 30 — compléter le pilote, puis mini-rapport d'audit.","07h—11h","Pilote + mini-rapport"],
+ ["jeu 26","proj","4 h — compléter le pilote, puis mini-rapport d'audit.","07h—11h30","Pilote + mini-rapport"],
  ["ven 27","mem","3 h — intégrer un retour éventuel, M2 puis amorcer <b>M3</b> sur un argument central.","07h—11h30","M2 puis M3"],
- ["ven 27","deci","★ <b>Revue</b> : premier point sur la répartition 19 h 30 + 5 h, sans conclure des semaines de voyage ; recaler la suite des stats (Brunton après le kit).","17h15—17h45"],
  ["sam 28","int","1 h 30 — reconstruire un composant étudié mardi.","07h—08h30","Reconstruction d'un composant"],
  ["sam 28","proj","2 h 30 — préciser la suite du projet.","08h45—11h30","Suite du projet"],
  ["dim 29","boot","<b>Fluent Python</b> : rappel et variante, puis Boot.dev.","07h—08h40"],
+ ["dim 29","deci","★ <b>Revue</b> : premier point sur la répartition 20 h + 5 h, sans conclure des semaines de voyage ; recaler la suite des stats (Brunton après le kit).","10h15—10h45"],
  ["dim 29","deci","BlueDot Technical AI Safety : <b>clôture des candidatures</b>. Intention forte, rien de confirmé ; viser les 25–26/11."]]},
 
-{d:"30/11", p:"p3", t:"Tranche 1 · nn.Module · réexamen de l'audit à 26 h", blk:"I2", h:19.5, prov:1, dr:{int:1,proj:2,stats:1,mem:1,boot:1}, m:[["proj","≈ Audit livré ou décision à 26 h — vers le sam 05/12"]], r:[
+{d:"30/11", p:"p3", t:"Tranche 1 · nn.Module · réexamen de l'audit à 26 h", blk:"I2", h:20, prov:1, dr:{int:1,proj:2,stats:1,mem:1,boot:1}, m:[["proj","≈ Audit livré ou décision à 26 h — vers le sam 05/12"]], r:[
  ["lun 30","cal","Sans cours : ce n'est pas une obligation supplémentaire."],
  ["mar 01","int","≈ Fin d'<b>I2</b> : passer au <code>nn.Module</code> ; annoncer ce qui doit rester identique, comparer logits et perte sur mêmes entrées et mêmes poids. Les séances datées du 01/12 (forward vs reverse, chain rule) sont le contenu de l'occurrence, pas un ajout.","07h—11h30"],
  ["mar 01","cal","Médical 14h30–16h."],
  ["sam 05","proj","≈ ★ <b>Réexamen à 26 h de projet</b> : qui utiliserait le résultat, quelle décision ou quel comportement du logiciel changerait ? Sans réponse précise, finir replay et rapport, puis clore le pilote.","08h45—11h30"]]},
 
-{d:"07/12", p:"p3", t:"Tranche 1 · I3 diagnostic d'entraînement", blk:"I3", h:19.5, prov:1, dr:{int:1,proj:1,stats:1,mem:1,boot:1}, m:[["deci","≈ BlueDot démarrerait le 07/12 — seulement si confirmé"]], r:[
+{d:"07/12", p:"p3", t:"Tranche 1 · I3 diagnostic d'entraînement", blk:"I3", h:20, prov:1, dr:{int:1,proj:1,stats:1,mem:1,boot:1}, m:[["deci","≈ BlueDot démarrerait le 07/12 — seulement si confirmé"]], r:[
  ["lun 07","cal","Cours aux Ponts."],
  ["mar 08","int","≈ <b>I3</b> : activations, gradients, initialisation ; injecter un défaut puis le localiser par observation, sans changer cinq paramètres à la fois.","07h—11h30"],
- ["jeu 10","proj","≈ <b>P3</b> si l'audit a laissé une question utile : hypothèse, mesure, population, séparation développement/confirmation, coût. Sinon nouveau besoin choisi en revue.","07h—11h"],
+ ["jeu 10","proj","≈ <b>P3</b> si l'audit a laissé une question utile : hypothèse, mesure, population, séparation développement/confirmation, coût. Sinon nouveau besoin choisi en revue.","07h—11h30"],
  ["ven 11","mem","≈ <b>M3</b> : reconstruire les arguments utiles ; Bellot seulement si nécessaire.","07h—11h30"],
  ["—","deci","Si BlueDot est confirmé, ses ~5 h remplacent des blocs ordinaires. Répartition proposée, non adoptée : internals 3 h, stats 2 h, projet 5 h, mémoire 3 h, BlueDot 5 h. Vérifier d'abord l'horaire réel de la cohorte."]]},
 
-{d:"14/12", p:"p3", t:"Tranche 1 · fin d'I3", blk:"I3", h:19.5, prov:1, dr:{int:1,proj:1,stats:1,mem:1,boot:1}, r:[
+{d:"14/12", p:"p3", t:"Tranche 1 · fin d'I3", blk:"I3", h:20, prov:1, dr:{int:1,proj:1,stats:1,mem:1,boot:1}, r:[
  ["lun 14","cal","Cours aux Ponts."],
  ["mar 15","int","≈ Fin d'<b>I3</b> : un diagnostic ou une dérivation tensorielle utile ; Backprop Ninja intégral et BatchNorm exhaustif ne sont pas requis.","07h—11h30"],
  ["mar 15","cal","Médical 14h30–16h."],
  ["ven 18","mem","≈ Fin de M3.","07h—11h30"]]},
 
-{d:"21/12", p:"p3", t:"Tranche 1 · I4 attention", blk:"I4", h:19.5, prov:1, dr:{int:1,proj:1,stats:1,mem:1,boot:1}, r:[
+{d:"21/12", p:"p3", t:"Tranche 1 · I4 attention", blk:"I4", h:20, prov:1, dr:{int:1,proj:1,stats:1,mem:1,boot:1}, r:[
  ["lun 21","cal","Sans cours. ⚠ Les congés 16–22/12 de l'ancien plan ne sont pas reconduits : un déplacement confirmé se traite à la revue."],
  ["mar 22","int","≈ <b>I4 · séquence 1</b> : scores Q/K, softmax, masque causal, multiplication par V — dimensions écrites sur papier avant le code.","07h—11h30"],
- ["ven 25","cal","⚠ Noël tombe un vendredi (mémoire, Boot.dev, revue) : à trancher à la revue du 18/12."]]},
+ ["ven 25","cal","⚠ Noël tombe un vendredi (mémoire, Boot.dev, fenêtre Hypotrail) : à trancher à la revue du 20/12."]]},
 
-{d:"28/12", p:"p3", t:"Tranche 1 · I4 multi-tête et bloc", blk:"I4", h:19.5, prov:1, dr:{int:1,proj:1,stats:1,mem:1,boot:1}, r:[
+{d:"28/12", p:"p3", t:"Tranche 1 · I4 multi-tête et bloc", blk:"I4", h:20, prov:1, dr:{int:1,proj:1,stats:1,mem:1,boot:1}, r:[
  ["mar 29","int","≈ <b>I4 · séquence 2</b> : plusieurs têtes, projection, résidus, normalisation, feed-forward, position.","07h—11h30"],
  ["mar 29","cal","Médical 14h30–16h."],
  ["ven 01","cal","⚠ Jour de l'an un vendredi : même arbitrage que le 25/12."]]},
 
-{d:"04/01", p:"p3", t:"Tranche 1 · I4 petit décodeur entraîné", blk:"I4", h:19.5, prov:1, dr:{int:1,proj:1,stats:1,mem:1,boot:1}, r:[
+{d:"04/01", p:"p3", t:"Tranche 1 · I4 petit décodeur entraîné", blk:"I4", h:20, prov:1, dr:{int:1,proj:1,stats:1,mem:1,boot:1}, r:[
  ["lun 04","cal","Cours aux Ponts."],
  ["mar 05","int","≈ <b>I4 · séquence 3</b> : entraîner un très petit décodeur ; un token futur ne change pas les logits antérieurs, et un token passé peut influencer une position ultérieure.","07h—11h30"],
  ["ven 08","mem","≈ <b>M4</b> : une inférence d'un cas publié (rapport Anthropic d'août 2026 confronté à la revue METR).","07h—11h30"]]},
 
-{d:"11/01", p:"p3", t:"Tranche 1 · I5 utiliser un modèle existant", blk:"I5", h:19.5, prov:1, dr:{int:1,proj:1,stats:1,mem:1,boot:1}, r:[
+{d:"11/01", p:"p3", t:"Tranche 1 · I5 utiliser un modèle existant", blk:"I5", h:20, prov:1, dr:{int:1,proj:1,stats:1,mem:1,boot:1}, r:[
  ["lun 11","cal","Cours aux Ponts."],
  ["mar 12","int","≈ <b>I5</b> : tokenisation, tokens spéciaux, masques, troncature, chat template, génération ; comparer le prompt affiché et l'entrée réelle. Au moins 5 h 30 protégées même si GPT déborde.","07h—11h30"],
  ["mar 12","cal","Médical 14h30–16h."]]},
 
-{d:"18/01", p:"p3", t:"Tranche 1 · fin d'I5", blk:"I5", h:19.5, prov:1, dr:{int:1,proj:1,stats:1,mem:1,boot:1}, r:[
+{d:"18/01", p:"p3", t:"Tranche 1 · fin d'I5", blk:"I5", h:20, prov:1, dr:{int:1,proj:1,stats:1,mem:1,boot:1}, r:[
  ["lun 18","cal","Dernier lundi de cours aux Ponts."],
  ["mar 19","int","≈ Fin d'<b>I5</b> : un petit pont vers le projet — comment un budget de sortie ou une transformation de prompt peut changer un verdict.","07h—11h30"],
  ["ven 22","mem","≈ <b>M5</b> : comparer deux familles de méthodes et réécrire.","07h—11h30"]]},
 
-{d:"25/01", p:"p3", t:"Tranche 1 · I6 réserve · bilan de tranche", blk:"I6", h:19.5, prov:1, dr:{int:2,proj:1,stats:1,mem:1,boot:1}, m:[["deci","≈ Bilan de la tranche 1 — revue du 29/01"]], r:[
+{d:"25/01", p:"p3", t:"Tranche 1 · I6 réserve · bilan de tranche", blk:"I6", h:20, prov:1, dr:{int:2,proj:1,stats:1,mem:1,boot:1}, m:[["deci","≈ Bilan de la tranche 1 — revue du 29/01"]], r:[
  ["mar 26","int","≈ <b>I6 · réserve</b> : reprendre les difficultés réellement rencontrées, aucun nouveau contenu obligatoire.","07h—11h30"],
  ["mar 26","cal","Médical 14h30–16h."],
  ["ven 29","deci","≈ ★ <b>Bilan de la tranche</b> (66 h d'internals, jusqu'à 78 h de projet, 36 h de mémoire) : si tu entraînes un petit modèle, expliques les résultats et corriges une erreur inédite sans tutoriel, la répartition bascule vers davantage d'évals.","17h15—17h45"]]}
@@ -500,18 +501,18 @@ const W = [
 
 /* ---- février → novembre 2027 : repères souples, rien n'est daté au-delà de deux semaines ---- */
 const BLOCKS = [
- {from:"01/02", n:13, p:"p4", t:"Extension ciblée · mémoire", h:19.5, prov:1, dr:{int:1,proj:1,stats:1,mem:1,boot:1},
+ {from:"01/02", n:13, p:"p4", t:"Extension ciblée · mémoire", h:20, prov:1, dr:{int:1,proj:1,stats:1,mem:1,boot:1},
   m:{"12/04":[["deci","≈ ML4Good France (avril–mai) — non confirmé"]]}, r:[
   ["—","proj","≈ <b>Une seule extension</b>, choisie selon la question et les retours : évaluation agentique contrôlée, validation d'un juge LLM, robustesse et prompt injection, ou intervention d'entraînement limitée (SFT si la question le justifie). Jamais les quatre."],
   ["—","int","≈ Répartition revue au bilan de tranche ; compléments ciblés selon le projet (hooks, entraînement instrumenté, checkpoints)."],
   ["—","mem","≈ M6 synthèse, M7 marge, puis la suite au rythme de l'encadrement (Adrien Barton, en cours de confirmation). Échéance et format à retrouver."],
-  ["—","deci","Ces blocs sont des repères : la revue du vendredi ne détaille que les deux semaines suivantes."]]},
+  ["—","deci","Ces blocs sont des repères : la revue du dimanche ne détaille que les deux semaines suivantes."]]},
 
- {from:"03/05", n:9, p:"p5", t:"Audit de validité autour du sandbagging", h:19.5, prov:1, dr:{int:1,proj:1,stats:1,mem:1,boot:1}, r:[
+ {from:"03/05", n:9, p:"p5", t:"Audit de validité autour du sandbagging", h:20, prov:1, dr:{int:1,proj:1,stats:1,mem:1,boot:1}, r:[
   ["—","proj","≈ <b>E5</b> : quand un protocole confond-il incapacité et sous-performance induite ? Distinguer incapacité, refus, sabotage simulé, erreur de mesure et sensibilité au protocole. Un résultat négatif rigoureux est un bon résultat."],
   ["—","mem","≈ Consolidation et rédaction du mémoire."]]},
 
- {from:"05/07", n:13, p:"p6", t:"Été · résultats, entretiens, candidatures", h:19.5, prov:1, dr:{proj:1,mem:1,boot:1},
+ {from:"05/07", n:13, p:"p6", t:"Été · résultats, entretiens, candidatures", h:20, prov:1, dr:{proj:1,mem:1,boot:1},
   m:{"02/08":[["deci","≈ Fenêtre de candidature (août–septembre)"]], "27/09":[["mem","≈ Rendu du mémoire (septembre, date à confirmer)"]]}, r:[
   ["—","proj","≈ Présenter les résultats ; mocks ciblés (work test, design d'une éval, ML/DL depth, behavioral) et system design ciblé."],
   ["—","deci","≈ Candidatures research engineer AI safety, orientation évaluations, en France ou à distance. Horizon d'orientation, pas une échéance de maîtrise."],
